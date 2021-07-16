@@ -90,10 +90,6 @@ class UserEmailOriginRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider getOriginsData
-     *
-     * @param callable $qbCallback
-     * @param callable $getTokenCallback
-     * @param $expectedCount
      */
     public function testGetOrigins(callable $qbCallback, callable $getTokenCallback, $expectedCount): void
     {

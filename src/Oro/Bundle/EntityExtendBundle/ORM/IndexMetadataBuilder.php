@@ -22,10 +22,6 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /**
-     * @param ConfigProvider                  $extendConfigProvider
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(
         ConfigProvider $extendConfigProvider,
         ExtendDbIdentifierNameGenerator $nameGenerator

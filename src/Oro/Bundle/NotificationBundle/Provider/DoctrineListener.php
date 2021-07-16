@@ -24,19 +24,12 @@ class DoctrineListener implements OptionalListenerInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @param EntityPool               $entityPool
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EntityPool $entityPool, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityPool = $entityPool;
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
         if ($this->enabled) {
@@ -44,9 +37,6 @@ class DoctrineListener implements OptionalListenerInterface
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function postUpdate(LifecycleEventArgs $args)
     {
         if ($this->enabled) {
@@ -54,9 +44,6 @@ class DoctrineListener implements OptionalListenerInterface
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function postPersist(LifecycleEventArgs $args)
     {
         if ($this->enabled) {
@@ -64,9 +51,6 @@ class DoctrineListener implements OptionalListenerInterface
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function postRemove(LifecycleEventArgs $args)
     {
         if ($this->enabled) {

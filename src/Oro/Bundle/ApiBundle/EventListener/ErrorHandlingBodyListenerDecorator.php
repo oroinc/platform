@@ -42,11 +42,6 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
         }
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string|null
-     */
     private function getInvalidJsonExceptionMessage(string $content): ?string
     {
         $errorMessage = null;

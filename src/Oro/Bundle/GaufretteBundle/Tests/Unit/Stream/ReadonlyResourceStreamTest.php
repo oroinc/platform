@@ -73,7 +73,6 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream->seek(2);
         $this->assertEquals(2, $this->stream->tell());
 
-
         $this->stream->seek(100);
         $this->assertEquals(100, $this->stream->tell());
     }

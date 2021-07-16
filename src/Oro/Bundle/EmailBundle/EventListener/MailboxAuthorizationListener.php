@@ -35,8 +35,6 @@ class MailboxAuthorizationListener
 
     /**
      * Filters requests to MailboxController.
-     *
-     * @param ControllerEvent $event
      */
     public function onKernelController(ControllerEvent $event): void
     {

@@ -93,9 +93,6 @@ class WorkflowConfigurationImportsProcessor implements ConfigImportProcessorInte
         );
     }
 
-    /**
-     * @param ImportProcessorFactoryInterface $importProcessorGenerator
-     */
     public function addImportProcessorFactory(ImportProcessorFactoryInterface $importProcessorGenerator)
     {
         $this->importProcessorFactories[] = $importProcessorGenerator;

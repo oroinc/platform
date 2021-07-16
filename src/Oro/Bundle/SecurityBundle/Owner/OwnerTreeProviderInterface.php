@@ -12,15 +12,11 @@ interface OwnerTreeProviderInterface extends WarmableConfigCacheInterface, Clear
 {
     /**
      * Checks if this provider is suitable in the current security context.
-     *
-     * @return bool
      */
     public function supports(): bool;
 
     /**
      * Gets the owner tree.
-     *
-     * @return OwnerTreeInterface
      */
     public function getTree(): OwnerTreeInterface;
 }

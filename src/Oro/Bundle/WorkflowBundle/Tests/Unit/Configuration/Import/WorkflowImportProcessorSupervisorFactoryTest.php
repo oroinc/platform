@@ -29,9 +29,6 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
 
     /**
      * @dataProvider applicabilityCases
-     *
-     * @param array $import
-     * @param bool $expected
      */
     public function testIsApplicable(array $import, bool $expected): void
     {

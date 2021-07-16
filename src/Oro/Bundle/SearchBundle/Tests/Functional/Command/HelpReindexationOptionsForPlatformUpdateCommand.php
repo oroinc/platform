@@ -11,9 +11,6 @@ class HelpReindexationOptionsForPlatformUpdateCommand extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @param string $output
-     */
     private function assertOutputContainsReindexationOptions(string $output)
     {
         self::assertContains('--skip-search-reindexation', $output);

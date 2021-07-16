@@ -17,9 +17,6 @@ class OrganizationManager
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -90,9 +87,6 @@ class OrganizationManager
         return $this->getEntityManager()->getRepository(Organization::class);
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
     protected function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass(Organization::class);

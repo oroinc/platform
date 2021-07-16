@@ -22,25 +22,16 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     /** @var CacheProvider */
     protected $cache;
 
-    /**
-     * @param DatabaseChecker $databaseChecker
-     * @param CacheProvider   $cache
-     */
     public function __construct(DatabaseChecker $databaseChecker, CacheProvider $cache)
     {
         $this->databaseChecker = $databaseChecker;
         $this->cache = $cache;
     }
 
-    /**
-     * @param OwnerTreeBuilderInterface $tree
-     */
     abstract protected function fillTree(OwnerTreeBuilderInterface $tree): void;
 
     /**
      * Returns empty instance of the owner tree builder
-     *
-     * @return OwnerTreeBuilderInterface
      */
     protected function createTreeBuilder(): OwnerTreeBuilderInterface
     {
@@ -166,8 +157,6 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
 
     /**
      * Loads tree data.
-     *
-     * @return OwnerTreeInterface
      */
     protected function loadTree(): OwnerTreeInterface
     {

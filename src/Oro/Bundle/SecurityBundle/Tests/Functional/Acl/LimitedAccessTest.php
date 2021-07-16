@@ -115,7 +115,6 @@ class LimitedAccessTest extends WebTestCase
         );
     }
 
-
     public function testActionByAclAnnotation()
     {
         $aclAnnotation = new Acl(['id' => 'test_action', 'type' => 'action']);
@@ -212,7 +211,6 @@ class LimitedAccessTest extends WebTestCase
         );
     }
 
-
     public function testEntityRecordByDomainObjectWrapper()
     {
         $objectWrapper = new DomainObjectWrapper(
@@ -223,7 +221,6 @@ class LimitedAccessTest extends WebTestCase
             $this->getAuthorizationChecker()->isGranted('DELETE', $objectWrapper)
         );
     }
-
 
     public function testEntityRecordByDomainObjectWrapperWhenAccessGranted()
     {

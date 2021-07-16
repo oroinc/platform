@@ -11,8 +11,6 @@ interface TranslatorAwareInterface
 {
     /**
      * Sets a translator instance on the object.
-     *
-     * @param TranslatorInterface $translator
      */
     public function setTranslator(TranslatorInterface $translator): void;
 }

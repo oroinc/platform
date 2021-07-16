@@ -22,10 +22,6 @@ class EmailSettingsType extends AbstractType
     /** @var OAuth2ManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param UserImapConfigSubscriber $subscriber
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         UserImapConfigSubscriber $subscriber,
         OAuth2ManagerRegistry    $oauthManagerRegistry

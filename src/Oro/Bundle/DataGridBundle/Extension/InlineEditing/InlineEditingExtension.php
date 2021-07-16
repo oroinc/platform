@@ -29,11 +29,6 @@ class InlineEditingExtension extends AbstractExtension
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
 
-    /**
-     * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
-     * @param EntityClassNameHelper          $entityClassNameHelper
-     * @param AuthorizationCheckerInterface  $authorizationChecker
-     */
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
         EntityClassNameHelper $entityClassNameHelper,
@@ -56,8 +51,6 @@ class InlineEditingExtension extends AbstractExtension
 
     /**
      * Validate configs nad fill default values
-     *
-     * @param DatagridConfiguration $config
      */
     public function processConfigs(DatagridConfiguration $config)
     {

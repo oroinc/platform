@@ -56,11 +56,6 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
             ->getSingleScalarResult();
     }
 
-    /**
-     * @param string $languageCode
-     * @param string $formattingCode
-     * @return Localization|null
-     */
     public function findOneByLanguageCodeAndFormattingCode(string $languageCode, string $formattingCode): ?Localization
     {
         $qb = $this->createQueryBuilder('localization');
@@ -77,9 +72,6 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
             ->getOneOrNullResult();
     }
 
-    /**
-     * @return array
-     */
     public function findAllIndexedById(): array
     {
         return $this

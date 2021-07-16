@@ -16,7 +16,7 @@ class ExcludeDefinitionsProcessSchedulePolicy implements ProcessSchedulePolicy
      * @var array
      */
     protected $excludeDefinitions = array();
-    
+
     /**
      * Not allow scheduling definition if it's excluded by some process.
      *
@@ -33,8 +33,6 @@ class ExcludeDefinitionsProcessSchedulePolicy implements ProcessSchedulePolicy
 
     /**
      * Collect information about excluded definitions.
-     *
-     * @param ProcessHandleEvent $event
      */
     public function onProcessHandleBefore(ProcessHandleEvent $event)
     {
@@ -50,8 +48,6 @@ class ExcludeDefinitionsProcessSchedulePolicy implements ProcessSchedulePolicy
 
     /**
      * Cleanup information about excluded definitions.
-     *
-     * @param ProcessHandleEvent $event
      */
     public function onProcessHandleAfterFlush(ProcessHandleEvent $event)
     {

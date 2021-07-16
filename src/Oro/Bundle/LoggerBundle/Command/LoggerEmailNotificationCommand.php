@@ -27,7 +27,7 @@ class LoggerEmailNotificationCommand extends Command
     {
         $this->validator = $validator;
         $this->configManager = $configManager;
-        
+
         parent::__construct();
     }
 

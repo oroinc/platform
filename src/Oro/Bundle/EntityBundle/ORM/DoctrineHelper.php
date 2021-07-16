@@ -28,9 +28,6 @@ class DoctrineHelper implements ResetInterface
     /** @var array */
     private $entityClasses = [];
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

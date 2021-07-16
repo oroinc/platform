@@ -19,15 +19,11 @@ class FileReflector implements LoggerAwareInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->logger = new NullLogger();
     }
-
 
     /**
      * Populates file with properties from source file of the given digital asset.
@@ -38,11 +34,6 @@ class FileReflector implements LoggerAwareInterface
      * - mimeType
      * - fileSize
      * - owner
-     *
-     * @param File $file
-     * @param DigitalAsset $digitalAsset
-     *
-     * @return bool
      */
     public function reflectFromDigitalAsset(File $file, DigitalAsset $digitalAsset): bool
     {
@@ -70,9 +61,6 @@ class FileReflector implements LoggerAwareInterface
      * - mimeType
      * - fileSize
      * - owner
-     *
-     * @param File $file
-     * @param File $sourceFile
      */
     public function reflectFromFile(File $file, File $sourceFile): void
     {

@@ -54,9 +54,6 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider pathDataProvider
-     *
-     * @param string|null $path
-     * @param string $expectedPath
      */
     public function testGetImageUrlWithoutFile(?string $path, string $expectedPath): void
     {
@@ -75,9 +72,6 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider pathDataProvider
-     *
-     * @param string|null $path
-     * @param string $expectedPath
      */
     public function testGetPlaceholder(?string $path, string $expectedPath): void
     {
@@ -90,9 +84,6 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedPath, $this->placeholderDataProvider->getPlaceholder('filter'));
     }
 
-    /**
-     * @return array
-     */
     public function pathDataProvider(): array
     {
         return [

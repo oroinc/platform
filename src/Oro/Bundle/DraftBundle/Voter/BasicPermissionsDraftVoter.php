@@ -51,11 +51,6 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
      */
     private $authorizationChecker;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param DraftPermissionHelper $draftPermissionHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         DraftPermissionHelper $draftPermissionHelper,
@@ -102,12 +97,6 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         return $result;
     }
 
-    /**
-     * @param DraftableInterface $object
-     * @param string $attribute
-     *
-     * @return int
-     */
     private function checkBasicPermission(DraftableInterface $object, string $attribute): int
     {
         if ($this->draftPermissionHelper->isUserOwned($object)) {
@@ -118,12 +107,6 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         return $this->isGranted($object, $draftGlobalPermission);
     }
 
-    /**
-     * @param DraftableInterface $object
-     * @param string $attribute
-     *
-     * @return int
-     */
     private function checkDeletePermission(DraftableInterface $object, string $attribute): int
     {
         $permission = $this->draftPermissionHelper->generatePermissions($object, $attribute);
@@ -131,12 +114,6 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         return $this->isGranted($object, $permission);
     }
 
-    /**
-     * @param DraftableInterface $object
-     * @param string $attribute
-     *
-     * @return int
-     */
     private function checkSourcePermission(DraftableInterface $object, string $attribute): int
     {
         $source = $object->getDraftSource();
@@ -145,12 +122,6 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         return $this->isGranted($source, $attribute) | $this->isGranted($object, $permissions);
     }
 
-    /**
-     * @param DraftableInterface $object
-     * @param string $attribute
-     *
-     * @return int
-     */
     private function isGranted(DraftableInterface $object, string $attribute): int
     {
         return $this->authorizationChecker->isGranted($attribute, $object)

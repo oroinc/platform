@@ -12,9 +12,6 @@ class FieldTypeHelper
     /** @var EntityExtendConfigurationProvider */
     private $configurationProvider;
 
-    /**
-     * @param EntityExtendConfigurationProvider $configurationProvider
-     */
     public function __construct(EntityExtendConfigurationProvider $configurationProvider)
     {
         $this->configurationProvider = $configurationProvider;

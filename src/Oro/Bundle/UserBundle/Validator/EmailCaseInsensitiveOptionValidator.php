@@ -32,11 +32,6 @@ class EmailCaseInsensitiveOptionValidator extends ConstraintValidator
     /** @var DatagridRouteHelper */
     private $datagridRouteHelper;
 
-    /**
-     * @param ManagerRegistry     $doctrine
-     * @param TranslatorInterface $translator
-     * @param DatagridRouteHelper $datagridRouteHelper
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
@@ -102,10 +97,6 @@ class EmailCaseInsensitiveOptionValidator extends ConstraintValidator
             ->addViolation();
     }
 
-    /**
-     * @param array $emails
-     * @return string
-     */
     private function buildLink(array $emails): string
     {
         return $this->datagridRouteHelper->generate(

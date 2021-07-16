@@ -59,7 +59,6 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
                 'allow_custom_color'    => false,
                 'custom_color_control'  => null,
 
-
             ],
             $resolvedOptions
         );
@@ -113,7 +112,6 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
                 'empty_value'           => null,
                 'allow_custom_color'    => false,
                 'custom_color_control'  => null,
-
 
             ],
             $resolvedOptions

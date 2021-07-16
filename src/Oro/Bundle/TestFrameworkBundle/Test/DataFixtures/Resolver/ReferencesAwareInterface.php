@@ -11,8 +11,6 @@ interface ReferencesAwareInterface
 {
     /**
      * Sets the object collection to handle referential calls.
-     *
-     * @param Collection $references
      */
     public function setReferences(Collection $references);
 }

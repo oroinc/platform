@@ -36,11 +36,6 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
      */
     private $entityIdentityReaders;
 
-    /**
-     * @param Manager $datagridManager
-     * @param EntityReader $entityReader
-     * @param iterable $entityIdentityReaders
-     */
     public function __construct(
         Manager $datagridManager,
         EntityReader $entityReader,
@@ -112,12 +107,6 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
         return $entityIdentityReader->getIds($datagrid, $entityName, $options);
     }
 
-    /**
-     * @param DatagridInterface $datagrid
-     * @param string $entityName
-     * @param array $options
-     * @return FilteredEntityIdentityReaderInterface|null
-     */
     private function getApplicableIdentityReader(
         DatagridInterface $datagrid,
         string $entityName,

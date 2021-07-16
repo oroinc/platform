@@ -42,9 +42,6 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         'autoincrement'
     ];
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

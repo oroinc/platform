@@ -43,12 +43,6 @@ abstract class AbstractAccessLevelAclExtension extends AbstractAclExtension
     /** @var AccessLevelOwnershipDecisionMakerInterface */
     protected $decisionMaker;
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,

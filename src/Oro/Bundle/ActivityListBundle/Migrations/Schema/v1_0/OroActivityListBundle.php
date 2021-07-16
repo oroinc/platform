@@ -22,8 +22,6 @@ class OroActivityListBundle implements Migration
 
     /**
      * Create oro_activity_list table
-     *
-     * @param Schema $schema
      */
     protected function createOroActivityListTable(Schema $schema)
     {
@@ -47,8 +45,6 @@ class OroActivityListBundle implements Migration
 
     /**
      * Add oro_activity_list foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroActivityListForeignKeys(Schema $schema)
     {

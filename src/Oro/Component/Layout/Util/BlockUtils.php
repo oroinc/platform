@@ -81,11 +81,6 @@ class BlockUtils
         }
     }
 
-    /**
-     * @param BlockView $view
-     * @param Options   $options
-     * @param array     $optionNames
-     */
     public static function setViewVarsFromOptions(BlockView $view, Options $options, array $optionNames)
     {
         foreach ($optionNames as $optionName) {

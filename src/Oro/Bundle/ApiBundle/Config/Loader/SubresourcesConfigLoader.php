@@ -54,10 +54,6 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
         return $subresource;
     }
 
-    /**
-     * @param SubresourceConfig $subresource
-     * @param array|null        $actions
-     */
     protected function loadActions(SubresourceConfig $subresource, array $actions = null)
     {
         if (!empty($actions)) {

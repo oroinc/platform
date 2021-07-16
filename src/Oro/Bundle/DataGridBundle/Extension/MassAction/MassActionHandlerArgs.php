@@ -20,12 +20,6 @@ class MassActionHandlerArgs
     /** @var DatagridInterface|null */
     protected $datagrid;
 
-    /**
-     * @param MassActionInterface     $massAction
-     * @param DatagridInterface       $datagrid
-     * @param IterableResultInterface $results
-     * @param array                   $data
-     */
     public function __construct(
         MassActionInterface $massAction,
         DatagridInterface $datagrid,

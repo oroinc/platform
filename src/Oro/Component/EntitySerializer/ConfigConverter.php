@@ -24,10 +24,6 @@ class ConfigConverter
         return $result;
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function buildEntityConfig(EntityConfig $result, array $config)
     {
         $this->setExclusionPolicy($result, $config);
@@ -52,10 +48,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array       $config
-     */
     protected function buildFieldConfig(FieldConfig $result, array $config)
     {
         $this->setPropertyPath($result, $config);
@@ -73,10 +65,6 @@ class ConfigConverter
         $this->setCollapseField($result, $config);
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setExclusionPolicy(EntityConfig $result, array $config)
     {
         if (!empty($config[ConfigUtil::EXCLUSION_POLICY])
@@ -86,10 +74,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setPartialLoad(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::DISABLE_PARTIAL_LOAD, $config)
@@ -99,10 +83,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setHints(EntityConfig $result, array $config)
     {
         if (!empty($config[ConfigUtil::HINTS])) {
@@ -116,10 +96,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setInnerJoinAssociations(EntityConfig $result, array $config)
     {
         if (!empty($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS])) {
@@ -127,10 +103,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setOrderBy(EntityConfig $result, array $config)
     {
         if (!empty($config[ConfigUtil::ORDER_BY])) {
@@ -138,10 +110,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setMaxResults(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::MAX_RESULTS, $config)
@@ -151,10 +119,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setHasMore(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::HAS_MORE, $config)
@@ -164,10 +128,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setPostSerializeHandler(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::POST_SERIALIZE, $config)
@@ -177,10 +137,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setPostSerializeCollectionHandler(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::POST_SERIALIZE_COLLECTION, $config)
@@ -190,10 +146,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setExcludedFields(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::EXCLUDED_FIELDS, $config)
@@ -203,10 +155,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param EntityConfig $result
-     * @param array        $config
-     */
     protected function setRenamedFields(EntityConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::RENAMED_FIELDS, $config)
@@ -216,10 +164,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array       $config
-     */
     protected function setPropertyPath(FieldConfig $result, array $config)
     {
         if (!empty($config[ConfigUtil::PROPERTY_PATH])) {
@@ -227,10 +171,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array       $config
-     */
     protected function setExcluded(FieldConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::EXCLUDE, $config)
@@ -240,10 +180,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array       $config
-     */
     protected function setCollapsed(FieldConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::COLLAPSE, $config)
@@ -253,10 +189,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array        $config
-     */
     protected function setCollapseField(FieldConfig $result, array $config)
     {
         if (\array_key_exists(ConfigUtil::COLLAPSE_FIELD, $config)) {
@@ -267,10 +199,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array       $config
-     */
     protected function setDataTransformers(FieldConfig $result, array $config)
     {
         if (!empty($config[ConfigUtil::DATA_TRANSFORMER])) {
@@ -286,10 +214,6 @@ class ConfigConverter
         }
     }
 
-    /**
-     * @param FieldConfig $result
-     * @param array       $config
-     */
     protected function setAssociationQuery(FieldConfig $result, array $config)
     {
         if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {

@@ -18,11 +18,6 @@ class FieldSearchProvider implements SearchProviderInterface
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigBag $configBag
-     * @param TranslatorInterface $translator
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigBag $configBag, TranslatorInterface $translator, ConfigManager $configManager)
     {
         $this->configBag = $configBag;

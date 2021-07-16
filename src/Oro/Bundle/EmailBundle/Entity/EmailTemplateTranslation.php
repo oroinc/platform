@@ -68,17 +68,11 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
      */
     private $contentFallback = true;
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return EmailTemplate|null
-     */
     public function getTemplate(): ?EmailTemplate
     {
         return $this->template;
@@ -94,9 +88,6 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this;
     }
 
-    /**
-     * @return Localization|null
-     */
     public function getLocalization(): ?Localization
     {
         return $this->localization;
@@ -130,9 +121,6 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isSubjectFallback(): bool
     {
         return $this->subjectFallback;
@@ -166,9 +154,6 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isContentFallback(): bool
     {
         return $this->contentFallback;

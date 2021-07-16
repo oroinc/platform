@@ -51,10 +51,6 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         return $definition;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param array|null             $config
-     */
     protected function loadDefinition(EntityDefinitionConfig $definition, array $config = null)
     {
         if (empty($config)) {
@@ -72,10 +68,6 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param array|null             $fields
-     */
     protected function loadFields(EntityDefinitionConfig $definition, array $fields = null)
     {
         if (!empty($fields)) {

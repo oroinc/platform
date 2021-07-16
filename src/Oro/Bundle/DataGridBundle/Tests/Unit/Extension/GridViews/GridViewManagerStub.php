@@ -36,7 +36,7 @@ class GridViewManagerStub extends GridViewManager
             ],
             'user' => [$view1, $view2]
         ];
-        
+
         return $gridViews;
     }
 }

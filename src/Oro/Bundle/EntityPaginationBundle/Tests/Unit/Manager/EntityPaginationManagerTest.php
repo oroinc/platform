@@ -89,9 +89,6 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $scope
-     * @param $expected
-     *
      * @dataProvider getPermissionProvider
      */
     public function testGetPermission($scope, $expected)

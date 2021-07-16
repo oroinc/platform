@@ -35,10 +35,6 @@ class TooltipFormExtension extends AbstractTypeExtension
     /** @var Translator */
     protected $translator;
 
-    /**
-     * @param ConfigProvider $entityConfigProvider
-     * @param Translator $translator
-     */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         Translator $translator
@@ -73,10 +69,6 @@ class TooltipFormExtension extends AbstractTypeExtension
         $this->updateTooltip($form, $view);
     }
 
-    /**
-     * @param FormInterface $field
-     * @param FormView $view
-     */
     protected function updateTooltip(FormInterface $field, FormView $view)
     {
         $parentOptions = $field->getParent()->getConfig()->getOptions();

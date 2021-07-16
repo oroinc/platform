@@ -29,12 +29,6 @@ abstract class AbstractScopeManager
     /** @var array */
     protected $changedSettings = [];
 
-    /**
-     * @param ManagerRegistry          $doctrine
-     * @param CacheProvider            $cache
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ConfigBag                $configBag
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         CacheProvider $cache,
@@ -448,10 +442,6 @@ abstract class AbstractScopeManager
         return $this->normalizeSettings(SettingsConverter::convertToSettings($config));
     }
 
-    /**
-     * @param array $settings
-     * @return array
-     */
     protected function normalizeSettings(array $settings): array
     {
         $configFields = $this->configBag->getConfig()['fields'];

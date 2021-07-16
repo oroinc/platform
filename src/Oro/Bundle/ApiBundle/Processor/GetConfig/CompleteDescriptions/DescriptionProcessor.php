@@ -15,10 +15,6 @@ class DescriptionProcessor
     /** @var FeatureDependedTextProcessor */
     private $featureDependedTextProcessor;
 
-    /**
-     * @param RequestDependedTextProcessor $requestDependedTextProcessor
-     * @param FeatureDependedTextProcessor $featureDependedTextProcessor
-     */
     public function __construct(
         RequestDependedTextProcessor $requestDependedTextProcessor,
         FeatureDependedTextProcessor $featureDependedTextProcessor
@@ -27,12 +23,6 @@ class DescriptionProcessor
         $this->featureDependedTextProcessor = $featureDependedTextProcessor;
     }
 
-    /**
-     * @param string      $description
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
     public function process(string $description, RequestType $requestType): string
     {
         return $this->requestDependedTextProcessor->process(

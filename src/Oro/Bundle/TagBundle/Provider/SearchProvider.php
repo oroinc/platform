@@ -31,14 +31,6 @@ class SearchProvider extends ResultStatisticsProvider
      */
     protected $securityProvider;
 
-    /**
-     * @param EntityManager       $em
-     * @param ObjectMapper        $mapper
-     * @param SecurityProvider    $securityProvider
-     * @param Indexer             $indexer
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EntityManager $em,
         ObjectMapper $mapper,

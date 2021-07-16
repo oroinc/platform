@@ -24,9 +24,6 @@ class ProcessDataSerializeListener
     /** @var ServiceLink */
     private $serializerLink;
 
-    /**
-     * @param ServiceLink $serializerLink
-     */
     public function __construct(ServiceLink $serializerLink)
     {
         $this->serializerLink = $serializerLink;
@@ -34,8 +31,6 @@ class ProcessDataSerializeListener
 
     /**
      * Deserialize data of ProcessJob
-     *
-     * @param ProcessJob $processJob
      */
     protected function deserialize(ProcessJob $processJob)
     {
@@ -54,8 +49,6 @@ class ProcessDataSerializeListener
 
     /**
      * Before flush, serializes all ProcessJob's data
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
@@ -75,9 +68,6 @@ class ProcessDataSerializeListener
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
         if ($this->scheduledEntities) {
@@ -90,9 +80,6 @@ class ProcessDataSerializeListener
 
     /**
      * After ProcessJob loaded deserialize $serializedData
-     *
-     * @param ProcessJob         $entity
-     * @param LifecycleEventArgs $args
      */
     public function postLoad(ProcessJob $entity, LifecycleEventArgs $args)
     {
@@ -101,8 +88,6 @@ class ProcessDataSerializeListener
 
     /**
      * Serialize data of ProcessJob
-     *
-     * @param ProcessJob $processJob
      */
     protected function serialize(ProcessJob $processJob)
     {

@@ -34,10 +34,6 @@ class EntityFieldSelectType extends AbstractType
 
     /**
      * Constructor
-     *
-     * @param EntityProvider      $entityProvider
-     * @param EntityFieldProvider $entityFieldProvider
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         EntityProvider $entityProvider,

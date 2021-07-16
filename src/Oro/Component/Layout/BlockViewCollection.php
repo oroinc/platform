@@ -9,9 +9,6 @@ class BlockViewCollection implements \ArrayAccess
      */
     protected $elements;
 
-    /**
-     * @param array $elements
-     */
     public function __construct(array $elements = [])
     {
         $this->elements = $elements;

@@ -133,8 +133,6 @@ class StepExecutor
     /**
      * Executes a step
      *
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
-     *
      * @throws \Exception If any critical error occurs
      */
     public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
@@ -213,8 +211,6 @@ class StepExecutor
 
     /**
      * Makes sure that all step elements are properly closed
-     *
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
      */
     protected function ensureResourcesReleased(StepExecutionWarningHandlerInterface $warningHandler = null)
     {
@@ -225,9 +221,6 @@ class StepExecutor
 
     /**
      * Makes sure that the given step element is properly closed
-     *
-     * @param                                           $element
-     * @param StepExecutionWarningHandlerInterface|null $warningHandler
      */
     protected function ensureElementClosed(
         $element,

@@ -16,9 +16,6 @@ class ConfigLoaderFactory
     /** @var ConfigLoaderInterface[] */
     private $loaders;
 
-    /**
-     * @param ConfigExtensionRegistry $extensionRegistry
-     */
     public function __construct(ConfigExtensionRegistry $extensionRegistry)
     {
         $this->extensionRegistry = $extensionRegistry;

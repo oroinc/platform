@@ -62,7 +62,6 @@ class CumulativeWriterTest extends WebTestCase
         $family2 = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
         $family2->setUpdatedAt(new \DateTime('2030-05-05 00:00:00'));
 
-
         $executor->setReader(new DummyReader(new \ArrayIterator([$family1, $family2])));
         $executor->execute($warningHandler);
 

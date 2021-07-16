@@ -37,8 +37,6 @@ class OroSegmentBundleInstaller implements Installation
 
     /**
      * Create oro_segment_type table
-     *
-     * @param Schema $schema
      */
     protected function createOroSegmentTypeTable(Schema $schema)
     {
@@ -51,8 +49,6 @@ class OroSegmentBundleInstaller implements Installation
 
     /**
      * Create oro_segment_snapshot table
-     *
-     * @param Schema $schema
      */
     protected function createOroSegmentSnapshotTable(Schema $schema)
     {
@@ -71,8 +67,6 @@ class OroSegmentBundleInstaller implements Installation
 
     /**
      * Create oro_segment table
-     *
-     * @param Schema $schema
      */
     protected function createOroSegmentTable(Schema $schema)
     {
@@ -99,8 +93,6 @@ class OroSegmentBundleInstaller implements Installation
 
     /**
      * Add oro_segment_snapshot foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSegmentSnapshotForeignKeys(Schema $schema)
     {
@@ -115,8 +107,6 @@ class OroSegmentBundleInstaller implements Installation
 
     /**
      * Add oro_segment foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSegmentForeignKeys(Schema $schema)
     {

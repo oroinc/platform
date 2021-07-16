@@ -32,14 +32,6 @@ class TagsExtension extends AbstractTagsExtension
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TagManager                    $tagManager
-     * @param EntityClassResolver           $entityClassResolver
-     * @param TaggableHelper                $helper
-     * @param EntityRoutingHelper           $entityRoutingHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface         $tokenStorage
-     */
     public function __construct(
         TagManager $tagManager,
         EntityClassResolver $entityClassResolver,

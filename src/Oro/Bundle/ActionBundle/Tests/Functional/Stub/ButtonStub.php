@@ -16,10 +16,6 @@ class ButtonStub implements ButtonInterface
     /** @var array */
     protected $datagridOptions;
 
-    /**
-     * @param array $buttonOptions
-     * @param array $datagridOptions
-     */
     public function __construct(array $buttonOptions = [], array $datagridOptions = [])
     {
         $this->buttonOptions = array_replace_recursive(

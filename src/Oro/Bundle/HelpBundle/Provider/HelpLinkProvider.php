@@ -48,14 +48,6 @@ class HelpLinkProvider
     /** @var CacheProvider */
     private $cache;
 
-    /**
-     * @param array $defaultConfig
-     * @param ConfigurationProvider $configProvider
-     * @param RequestStack $requestStack
-     * @param ControllerClassProvider $controllerClassProvider
-     * @param VersionHelper $helper
-     * @param CacheProvider $cache
-     */
     public function __construct(
         array $defaultConfig,
         ConfigurationProvider $configProvider,
@@ -195,8 +187,6 @@ class HelpLinkProvider
 
     /**
      * Apply configuration from annotations
-     *
-     * @param array $resultConfig
      */
     private function mergeAnnotationConfig(array &$resultConfig)
     {
@@ -222,8 +212,6 @@ class HelpLinkProvider
 
     /**
      * Apply configuration from "routes" section of configuration
-     *
-     * @param array $resultConfig
      */
     private function mergeRoutesConfig(array &$resultConfig)
     {
@@ -239,9 +227,6 @@ class HelpLinkProvider
 
     /**
      * Apply configuration from request controller name
-     *
-     * @param array $resultConfig
-     * @param array $controllerData
      */
     private function mergeRequestControllerConfig(array &$resultConfig, array $controllerData)
     {
@@ -250,9 +235,6 @@ class HelpLinkProvider
 
     /**
      * Apply configuration from "vendors" and "resources" section of configuration
-     *
-     * @param array $resultConfig
-     * @param array $controllerData
      */
     private function mergeVendorsAndResourcesConfig(array &$resultConfig, array $controllerData)
     {

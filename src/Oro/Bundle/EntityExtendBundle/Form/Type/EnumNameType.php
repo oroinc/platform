@@ -26,10 +26,6 @@ class EnumNameType extends AbstractType
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /**
-     * @param EnumTypeHelper                  $typeHelper
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(
         EnumTypeHelper $typeHelper,
         ExtendDbIdentifierNameGenerator $nameGenerator

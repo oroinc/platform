@@ -22,11 +22,6 @@ class ImportStrategyListener
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ImportStrategyHelper $strategyHelper
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         ImportStrategyHelper $strategyHelper,
@@ -37,9 +32,6 @@ class ImportStrategyListener
         $this->configManager = $configManager;
     }
 
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessAfter(StrategyEvent $event)
     {
         $context = $event->getContext();

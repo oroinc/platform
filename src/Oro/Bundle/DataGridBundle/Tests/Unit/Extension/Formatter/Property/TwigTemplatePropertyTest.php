@@ -27,9 +27,6 @@ class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $params
-     * @param array $expected
-     *
      * @dataProvider valueDataProvider
      */
     public function testGetRawValue(array $params, array $expected): void
@@ -65,9 +62,6 @@ class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
         $this->property->getRawValue($record);
     }
 
-    /**
-     * @return array
-     */
     public function valueDataProvider(): array
     {
         return [

@@ -14,9 +14,6 @@ trait TranslatorAwareTrait
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface|null $translator
-     */
     public function setTranslator(?TranslatorInterface $translator): void
     {
         $this->translator = $translator;

@@ -31,14 +31,6 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /** @var array */
     protected $supportedTypes = [];
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param ConfigManager                              $configManager
-     * @param EntitySecurityMetadataProvider             $entityMetadataProvider
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,

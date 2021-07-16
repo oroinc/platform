@@ -20,7 +20,7 @@ class FormTypeValidatorExtensionStub extends BaseValidatorExtension
             ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
             : 'form';
     }
-    
+
     /**
      * {@inheritdoc}
      */

@@ -27,17 +27,11 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * @return WorkflowManager
-     */
     protected function getWorkflowManager(): WorkflowManager
     {
         return $this->container->get(WorkflowManagerRegistry::class)->getManager();
@@ -106,9 +100,6 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->getWorkflowVariableFormatter()->formatWorkflowVariableValue($variable);
     }
 
-    /**
-     * @return WorkflowVariableFormatter
-     */
     protected function getWorkflowVariableFormatter(): WorkflowVariableFormatter
     {
         return $this->container->get(WorkflowVariableFormatter::class);

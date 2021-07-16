@@ -17,9 +17,6 @@ class EnsureInitialized implements ProcessorInterface
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
-    /**
-     * @param ConfigLoaderFactory $configLoaderFactory
-     */
     public function __construct(ConfigLoaderFactory $configLoaderFactory)
     {
         $this->configLoaderFactory = $configLoaderFactory;

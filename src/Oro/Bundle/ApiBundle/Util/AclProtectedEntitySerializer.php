@@ -48,9 +48,6 @@ class AclProtectedEntitySerializer extends EntitySerializer
         }
     }
 
-    /**
-     * @param array $context
-     */
     private function setContext(array $context): void
     {
         // push the context to the stack
@@ -77,9 +74,6 @@ class AclProtectedEntitySerializer extends EntitySerializer
         }
     }
 
-    /**
-     * @param array $context
-     */
     private function applyContext(array $context): void
     {
         if (isset($context[Context::REQUEST_TYPE])) {

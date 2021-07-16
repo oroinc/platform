@@ -89,9 +89,6 @@ class DefaultGridViewLoadListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     private function getGridViews(): array
     {
         return [
@@ -154,9 +151,6 @@ class DefaultGridViewLoadListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getExpectedGridViews(), $this->event->getGridViews());
     }
 
-    /**
-     * @return array
-     */
     private function getExpectedGridViews(): array
     {
         return [

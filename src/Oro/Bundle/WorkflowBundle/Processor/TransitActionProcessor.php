@@ -21,10 +21,6 @@ class TransitActionProcessor extends ActionProcessor
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ProcessorBagInterface $processorBag
-     * @param LoggerInterface|null $logger
-     */
     public function __construct(ProcessorBagInterface $processorBag, LoggerInterface $logger = null)
     {
         parent::__construct($processorBag, self::ACTION);

@@ -29,9 +29,6 @@ class EmbedFormLayoutManager
      */
     protected $inline = false;
 
-    /**
-     * @param LayoutManager $layoutManager
-     */
     public function __construct(LayoutManager $layoutManager)
     {
         $this->layoutManager = $layoutManager;
@@ -83,9 +80,6 @@ class EmbedFormLayoutManager
         $this->inline = (bool)$inline;
     }
 
-    /**
-     * @param SessionIdProviderInterface $sessionIdProvider
-     */
     public function setSessionIdProvider(SessionIdProviderInterface $sessionIdProvider)
     {
         $this->sessionIdProvider = $sessionIdProvider;

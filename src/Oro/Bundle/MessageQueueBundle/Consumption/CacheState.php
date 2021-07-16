@@ -10,9 +10,6 @@ class CacheState
     /** @var StateDriverInterface */
     private $driver;
 
-    /**
-     * @param StateDriverInterface $driver
-     */
     public function __construct(StateDriverInterface $driver)
     {
         $this->driver = $driver;

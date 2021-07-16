@@ -15,9 +15,6 @@ class DateHelper
     /** @var string */
     private $offset;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(LocaleSettings $localeSettings)
     {
         $this->localeSettings = $localeSettings;

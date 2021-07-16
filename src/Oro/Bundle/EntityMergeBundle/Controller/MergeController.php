@@ -120,7 +120,6 @@ class MergeController extends AbstractController
                     }
                 }
 
-
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get(TranslatorInterface::class)->trans('oro.entity_merge.controller.merged_successful')

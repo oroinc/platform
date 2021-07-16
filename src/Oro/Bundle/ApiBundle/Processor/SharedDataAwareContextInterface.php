@@ -38,8 +38,6 @@ interface SharedDataAwareContextInterface extends ComponentContextInterface
      * Gets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @return ParameterBagInterface
      */
     public function getSharedData(): ParameterBagInterface;
 
@@ -47,8 +45,6 @@ interface SharedDataAwareContextInterface extends ComponentContextInterface
      * Sets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @param ParameterBagInterface $sharedData
      */
     public function setSharedData(ParameterBagInterface $sharedData): void;
 }

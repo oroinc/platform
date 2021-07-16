@@ -31,10 +31,6 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
 
     /**
      * @dataProvider getSelectedFieldsDataProvider
-     *
-     * @param array $state
-     * @param array $configuration
-     * @param array $expectedSelectedFields
      */
     public function testGetSelectedFields(array $state, array $configuration, array $expectedSelectedFields): void
     {
@@ -45,9 +41,6 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
         self::assertEquals($expectedSelectedFields, $selectedFields);
     }
 
-    /**
-     * @return array
-     */
     public function getSelectedFieldsDataProvider(): array
     {
         return [
@@ -79,9 +72,6 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
         ];
     }
 
-    /**
-     * @param array $state
-     */
     protected function mockGetState(array $state): void
     {
         $this->datagridStateProvider
@@ -91,10 +81,5 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
             ->willReturn($state);
     }
 
-    /**
-     * @param array $configuration
-     *
-     * @return void
-     */
     abstract protected function mockGetConfiguration(array $configuration): void;
 }

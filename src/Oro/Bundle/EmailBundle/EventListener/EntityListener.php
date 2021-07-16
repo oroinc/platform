@@ -50,10 +50,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
     /** @var EmailAddress[] */
     protected $newEmailAddresses = [];
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param ContainerInterface       $container
-     */
     public function __construct(
         MessageProducerInterface $producer,
         ContainerInterface $container
@@ -76,9 +72,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         ];
     }
 
-    /**
-     * @param OnFlushEventArgs $event
-     */
     public function onFlush(OnFlushEventArgs $event)
     {
         if (!$this->enabled) {
@@ -114,9 +107,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         $this->newEmailAddresses = array_merge($this->newEmailAddresses, $created);
     }
 
-    /**
-     * @param PostFlushEventArgs $event
-     */
     public function postFlush(PostFlushEventArgs $event)
     {
         if (!$this->enabled) {
@@ -157,9 +147,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $event
-     */
     protected function addAssociationWithEmailActivity(PostFlushEventArgs $event)
     {
         $emailActivityUpdates = $this->getEmailActivityUpdates();
@@ -169,7 +156,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         if (!$entities) {
             return;
         }
-        
+
         $entitiesIdsByClass = [];
         foreach ($entities as $entity) {
             $class = ClassUtils::getClass($entity);
@@ -184,9 +171,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function postRemove(LifecycleEventArgs $args)
     {
         if (!$this->enabled) {
@@ -225,9 +209,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         };
     }
 
-    /**
-     * @param EntityManager $em
-     */
     protected function saveNewEmailAddresses(EntityManager $em)
     {
         $flush = false;
@@ -249,9 +230,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         }
     }
 
-    /**
-     * @return EmailOwnerManager
-     */
     protected function getEmailOwnerManager(): EmailOwnerManager
     {
         return $this->container->get('oro_email.email.owner.manager');
@@ -273,17 +251,11 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         return $this->container->get('oro_email.email.activity.manager');
     }
 
-    /**
-     * @return EmailActivityUpdates
-     */
     protected function getEmailActivityUpdates(): EmailActivityUpdates
     {
         return $this->container->get('oro_email.model.email_activity_updates');
     }
 
-    /**
-     * @return EmailAddressManager
-     */
     protected function getEmailAddressManager(): EmailAddressManager
     {
         return $this->container->get('oro_email.email.address.manager');

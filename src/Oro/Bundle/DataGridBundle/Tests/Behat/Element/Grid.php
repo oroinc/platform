@@ -189,9 +189,6 @@ class Grid extends Table implements GridInterface
         $this->getRowByContent($content)->checkMassActionCheckbox();
     }
 
-    /**
-     * @param $content
-     */
     public function canCheckRecord($content)
     {
         $this->getRowByContent($content)->hasMassActionCheckbox();

@@ -15,9 +15,6 @@ class WorkflowAwareCacheWarmer implements CacheWarmerInterface
      */
     private $workflowAwareCache;
 
-    /**
-     * @param WorkflowAwareCache $workflowAwareCache
-     */
     public function __construct(WorkflowAwareCache $workflowAwareCache)
     {
         $this->workflowAwareCache = $workflowAwareCache;

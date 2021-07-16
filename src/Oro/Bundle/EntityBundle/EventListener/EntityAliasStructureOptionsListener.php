@@ -13,17 +13,11 @@ class EntityAliasStructureOptionsListener
     /** @var EntityAliasResolver */
     private $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();

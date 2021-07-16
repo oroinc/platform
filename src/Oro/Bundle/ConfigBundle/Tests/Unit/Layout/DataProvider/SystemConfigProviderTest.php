@@ -26,8 +26,6 @@ class SystemConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValueDataProvider
-     *
-     * @param array $arguments
      */
     public function testGetValue(array $arguments)
     {

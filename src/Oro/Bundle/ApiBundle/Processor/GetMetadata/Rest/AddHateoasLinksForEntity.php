@@ -23,10 +23,6 @@ class AddHateoasLinksForEntity implements ProcessorInterface
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * @param RestRoutesRegistry    $routesRegistry
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(RestRoutesRegistry $routesRegistry, UrlGeneratorInterface $urlGenerator)
     {
         $this->routesRegistry = $routesRegistry;

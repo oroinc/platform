@@ -11,26 +11,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 trait ResponseExtension
 {
-    /**
-     * @param Response $response
-     * @param int $expectedStatus
-     */
     public function assertResponseStatus(Response $response, int $expectedStatus): void
     {
         $this->assertInstanceOfResponse($response);
         self::assertEquals($expectedStatus, $response->getStatusCode(), $this->getAssertMessage($response));
     }
-    /**
-     * @param int $expectedStatus
-     */
+
     public function assertLastResponseStatus(int $expectedStatus): void
     {
         $this->assertResponseStatus($this->getClientInstance()->getResponse(), $expectedStatus);
     }
 
-    /**
-     * @param Response $response
-     */
     public function assertResponseContentTypeHtml(Response $response): void
     {
         $this->assertInstanceOfResponse($response);
@@ -48,9 +39,6 @@ trait ResponseExtension
         $this->assertResponseContentTypeHtml($this->getClientInstance()->getResponse());
     }
 
-    /**
-     * @param Response $response
-     */
     public function assertResponseContentTypeJson(Response $response): void
     {
         $this->assertInstanceOfResponse($response);
@@ -99,11 +87,6 @@ trait ResponseExtension
         self::assertInstanceOf(Response::class, $actual);
     }
 
-    /**
-     * @param Response $response
-     *
-     * @return string
-     */
     private function getAssertMessage(Response $response): string
     {
         $responseStatusCode = $response->getStatusCode();

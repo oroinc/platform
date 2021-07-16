@@ -51,8 +51,6 @@ class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
 
     /**
      * Initializes new Context object.
-     *
-     * @param Context $context
      */
     protected function initializeContextObject(Context $context)
     {

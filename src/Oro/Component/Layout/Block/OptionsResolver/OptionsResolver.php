@@ -180,18 +180,11 @@ class OptionsResolver implements Options
         return $this->optionsResolver->offsetExists($option);
     }
 
-    /**
-     * @param $option
-     * @param $value
-     */
     public function offsetSet($option, $value)
     {
         $this->optionsResolver->offsetSet($option, $value);
     }
 
-    /**
-     * @param $option
-     */
     public function offsetUnset($option)
     {
         $this->optionsResolver->offsetUnset($option);

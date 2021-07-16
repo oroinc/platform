@@ -14,17 +14,11 @@ class OriginRegistryFactory
      */
     private $originProvider;
 
-    /**
-     * @param OriginProviderInterface $originProvider
-     */
     public function __construct(OriginProviderInterface $originProvider)
     {
         $this->originProvider = $originProvider;
     }
 
-    /**
-     * @return OriginRegistry
-     */
     public function __invoke(): OriginRegistry
     {
         $originRegistry = new OriginRegistry();

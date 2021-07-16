@@ -54,8 +54,6 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider loadDataProvider
      */
     public function testLoad(array $expected)

@@ -47,7 +47,7 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($emailBody === $entity->getEmailBody());
     }
-    
+
     public function testGetSize()
     {
         $file = $this->createMock('Oro\Bundle\AttachmentBundle\Entity\File');

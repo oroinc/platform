@@ -30,10 +30,6 @@ class Loader
     /** @var bool */
     private $orderFixturesByDependencies = false;
 
-    /**
-     * @param FixtureFactoryInterface            $factory
-     * @param FixtureIdentifierResolverInterface $identifierResolver
-     */
     public function __construct(
         FixtureFactoryInterface $factory,
         FixtureIdentifierResolverInterface $identifierResolver

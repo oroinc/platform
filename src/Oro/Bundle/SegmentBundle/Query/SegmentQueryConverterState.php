@@ -22,17 +22,11 @@ class SegmentQueryConverterState
     /** @var int */
     private $numberOfRegisteredQueries = 0;
 
-    /**
-     * @param Cache $cache
-     */
     public function __construct(Cache $cache)
     {
         $this->cache = $cache;
     }
 
-    /**
-     * @param int $segmentId
-     */
     public function registerQuery(int $segmentId): void
     {
         if (isset($this->queries[$segmentId])) {
@@ -43,9 +37,6 @@ class SegmentQueryConverterState
         $this->numberOfRegisteredQueries++;
     }
 
-    /**
-     * @param int $segmentId
-     */
     public function unregisterQuery(int $segmentId): void
     {
         if (!$this->isQueryRegistered($segmentId)) {
@@ -62,11 +53,6 @@ class SegmentQueryConverterState
         }
     }
 
-    /**
-     * @param int $segmentId
-     *
-     * @return bool
-     */
     public function isRootQuery(int $segmentId): bool
     {
         return
@@ -75,12 +61,6 @@ class SegmentQueryConverterState
             && 1 === $this->queries[$segmentId];
     }
 
-    /**
-     * @param int                   $segmentId
-     * @param AbstractQueryDesigner $segment
-     *
-     * @return string
-     */
     public function buildQueryAlias(int $segmentId, AbstractQueryDesigner $segment): string
     {
         if (!$this->isQueryRegistered($segmentId)) {
@@ -96,11 +76,6 @@ class SegmentQueryConverterState
             . $this->numberOfRegisteredQueries;
     }
 
-    /**
-     * @param int $segmentId
-     *
-     * @return QueryBuilder|null
-     */
     public function getQueryFromCache(int $segmentId): ?QueryBuilder
     {
         $queryBuilder = $this->cache->fetch($this->getQueryCacheKey($segmentId));
@@ -110,38 +85,21 @@ class SegmentQueryConverterState
             : null;
     }
 
-    /**
-     * @param int          $segmentId
-     * @param QueryBuilder $queryBuilder
-     */
     public function saveQueryToCache(int $segmentId, QueryBuilder $queryBuilder): void
     {
         $this->cache->save($this->getQueryCacheKey($segmentId), clone $queryBuilder);
     }
 
-    /**
-     * @param int $segmentId
-     *
-     * @return string
-     */
     private function getQueryCacheKey(int $segmentId): string
     {
         return 'segment_query_' . $segmentId;
     }
 
-    /**
-     * @param int $segmentId
-     *
-     * @return bool
-     */
     private function isQueryRegistered(int $segmentId): bool
     {
         return isset($this->queries[$segmentId]) && $this->queries[$segmentId] > 0;
     }
 
-    /**
-     * @return bool
-     */
     private function isAllQueriesUnregistered(): bool
     {
         if ($this->queries) {

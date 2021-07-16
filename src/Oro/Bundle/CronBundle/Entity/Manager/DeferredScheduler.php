@@ -192,10 +192,6 @@ class DeferredScheduler implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param array $schedules
-     * @param array $arguments
-     */
     private function removeSchedules(array $schedules, array $arguments)
     {
         $schedules = $this->schedulesByArgumentsFilter->filter($schedules, $arguments);

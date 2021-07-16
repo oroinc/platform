@@ -15,10 +15,6 @@ class AttributeFamilyActionsConfiguration
     /** @var EntityManager */
     private $entityManager;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityManager                 $entityManager
-     */
     public function __construct(AuthorizationCheckerInterface $authorizationChecker, EntityManager $entityManager)
     {
         $this->authorizationChecker = $authorizationChecker;

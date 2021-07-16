@@ -21,10 +21,6 @@ class WidgetProviderFilterManager
         $this->filters = $filters;
     }
 
-    /**
-     * @param QueryBuilder    $queryBuilder
-     * @param WidgetOptionBag $widgetOptions
-     */
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         foreach ($this->filters as $filter) {

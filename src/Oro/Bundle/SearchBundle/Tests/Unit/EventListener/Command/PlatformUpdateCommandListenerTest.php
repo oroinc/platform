@@ -61,10 +61,6 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onAfterDatabasePreparationProvider
-     *
-     * @param bool $isSkip
-     * @param bool $isScheduled
-     * @param string $expectedMessage
      */
     public function testOnAfterDatabasePreparation(bool $isSkip, bool $isScheduled, string $expectedMessage)
     {
@@ -103,9 +99,6 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onAfterDatabasePreparation($this->event);
     }
 
-    /**
-     * @return array
-     */
     public function onAfterDatabasePreparationProvider(): array
     {
         return [

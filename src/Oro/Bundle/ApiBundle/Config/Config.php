@@ -70,8 +70,6 @@ class Config implements \IteratorAggregate
 
     /**
      * Sets the configuration of an entity.
-     *
-     * @param EntityDefinitionConfig|null $definition
      */
     public function setDefinition(EntityDefinitionConfig $definition = null)
     {
@@ -100,8 +98,6 @@ class Config implements \IteratorAggregate
 
     /**
      * Sets the configuration of filters.
-     *
-     * @param FiltersConfig|null $filters
      */
     public function setFilters(FiltersConfig $filters = null)
     {
@@ -130,8 +126,6 @@ class Config implements \IteratorAggregate
 
     /**
      * Sets the configuration of sorters.
-     *
-     * @param SortersConfig|null $sorters
      */
     public function setSorters(SortersConfig $sorters = null)
     {
@@ -160,8 +154,6 @@ class Config implements \IteratorAggregate
 
     /**
      * Sets the configuration of actions.
-     *
-     * @param ActionsConfig|null $actions
      */
     public function setActions(ActionsConfig $actions = null)
     {
@@ -190,8 +182,6 @@ class Config implements \IteratorAggregate
 
     /**
      * Sets the configuration of sub-resources.
-     *
-     * @param SubresourcesConfig|null $subresources
      */
     public function setSubresources(SubresourcesConfig $subresources = null)
     {

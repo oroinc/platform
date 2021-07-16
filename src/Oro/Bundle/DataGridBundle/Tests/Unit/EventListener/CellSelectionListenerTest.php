@@ -47,8 +47,6 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onBuildAfterDataProvider
-     * @param array $config
-     * @param array $expectedConfig
      */
     public function testOnBuildAfter(array $config, array $expectedConfig)
     {

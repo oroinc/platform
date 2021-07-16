@@ -40,11 +40,6 @@ class UrlInfoTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param string $expected
-     * @param string|null $route
-     * @param array|null $routeParams
-     * @param int|null $urlType
-     *
      * @dataProvider formData
      */
     public function testForm(string $expected, ?string $route, ?array $routeParams, ?int $urlType): void

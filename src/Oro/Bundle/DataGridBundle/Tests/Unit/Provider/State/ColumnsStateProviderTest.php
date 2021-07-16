@@ -28,10 +28,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenParameters(array $state, array $columns, array $expectedState): void
     {
@@ -44,10 +40,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @param array $state
-     * @param string $minifiedState
-     */
     private function mockParametersState(array $state, string $minifiedState): void
     {
         $this->datagridParametersHelper
@@ -63,9 +55,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
             ->willReturn($minifiedState);
     }
 
-    /**
-     * @param array $columns
-     */
     private function mockColumns(array $columns): void
     {
         $this->datagridConfiguration
@@ -76,8 +65,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function stateDataProvider(): array
@@ -355,10 +342,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider minifiedStateDataProvider
-     *
-     * @param string $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenMinifiedParameters(string $state, array $columns, array $expectedState): void
     {
@@ -371,9 +354,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     public function minifiedStateDataProvider(): array
     {
         return [
@@ -450,10 +430,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenCurrentGridView(array $state, array $columns, array $expectedState): void
     {
@@ -477,10 +453,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultGridView(array $state, array $columns, array $expectedState): void
     {
@@ -540,9 +512,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     private function getDefaultColumnsStates(): array
     {
         return [
@@ -580,10 +549,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateFromParameters(array $state, array $columns, array $expectedState): void
     {

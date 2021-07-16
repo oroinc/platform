@@ -30,11 +30,6 @@ class EntityDeleteHandlerCompilerPass implements CompilerPassInterface
         $this->register($container, self::EXTENSION_REGISTRY_SERVICE, self::EXTENSION_TAG_NAME);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $registryServiceId
-     * @param string           $tagName
-     */
     private function register(ContainerBuilder $container, string $registryServiceId, string $tagName): void
     {
         $services = [];

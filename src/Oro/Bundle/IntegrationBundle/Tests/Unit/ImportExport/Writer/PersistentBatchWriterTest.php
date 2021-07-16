@@ -47,8 +47,6 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     *
      * @dataProvider configurationProvider
      */
     public function testWrite(array $configuration)

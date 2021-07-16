@@ -44,8 +44,6 @@ class Context implements ContextInterface, BatchContextInterface
 
     /**
      * Constructor
-     *
-     * @param array $configuration
      */
     public function __construct(array $configuration)
     {
@@ -123,7 +121,6 @@ class Context implements ContextInterface, BatchContextInterface
 
     /**
      * Add a failure exception
-     * @param \Exception $e
      */
     public function addFailureException(\Exception $e)
     {

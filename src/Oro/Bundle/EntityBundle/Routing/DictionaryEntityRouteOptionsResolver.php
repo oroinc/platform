@@ -34,11 +34,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
     /** @var string[] */
     private $exclusions = [];
 
-    /**
-     * @param ChainDictionaryValueListProvider $dictionaryProvider
-     * @param EntityAliasResolver              $entityAliasResolver
-     * @param LoggerInterface                  $logger
-     */
     public function __construct(
         ChainDictionaryValueListProvider $dictionaryProvider,
         EntityAliasResolver $entityAliasResolver,
@@ -51,8 +46,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
     /**
      * Adds an entity to the exclusion list. Such entities is skipped by this route options resolver.
-     *
-     * @param string $entityClass
      */
     public function addExclusion(string $entityClass): void
     {

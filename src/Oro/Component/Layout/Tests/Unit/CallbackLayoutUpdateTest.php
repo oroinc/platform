@@ -36,10 +36,6 @@ class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
         $layoutUpdate->updateLayout($layoutManipulator, $item);
     }
 
-    /**
-     * @param LayoutManipulatorInterface $layoutManipulator
-     * @param LayoutItemInterface        $item
-     */
     public function callbackFunction(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
         $layoutManipulator->add('id', $item->getId(), $item->getTypeName());

@@ -12,9 +12,6 @@ class DelegateMessageProcessor implements MessageProcessorInterface
      */
     protected $registry;
 
-    /**
-     * @param MessageProcessorRegistryInterface $registry
-     */
     public function __construct(MessageProcessorRegistryInterface $registry)
     {
         $this->registry = $registry;

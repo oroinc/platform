@@ -117,10 +117,6 @@ class FrontendGridFilterManager extends Element
         return $filterCheckbox;
     }
 
-    /**
-     * @param string $title
-     * @return NodeElement|null
-     */
     private function findFilterCheckbox(string $title): ?NodeElement
     {
         return $this->find(

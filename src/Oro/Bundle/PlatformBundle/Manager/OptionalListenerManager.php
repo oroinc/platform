@@ -25,10 +25,6 @@ class OptionalListenerManager
      */
     protected $container;
 
-    /**
-     * @param array $optionalListeners
-     * @param ContainerInterface $container
-     */
     public function __construct(array $optionalListeners, ContainerInterface $container)
     {
         $this->optionalListeners = $optionalListeners;
@@ -65,8 +61,6 @@ class OptionalListenerManager
 
     /**
      * Disable specified listeners
-     *
-     * @param array $listeners
      */
     public function disableListeners(array $listeners)
     {
@@ -97,8 +91,6 @@ class OptionalListenerManager
 
     /**
      * Enable specified listeners
-     *
-     * @param array $listeners
      */
     public function enableListeners(array $listeners)
     {

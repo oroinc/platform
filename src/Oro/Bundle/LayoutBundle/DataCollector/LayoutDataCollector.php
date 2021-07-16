@@ -101,9 +101,6 @@ class LayoutDataCollector extends DataCollector
 
     /**
      * Collect view vars for BlockView-s, save root BlockView, check if block is visible
-     *
-     * @param BlockInterface $block
-     * @param BlockView      $view
      */
     public function collectBlockView(BlockInterface $block, BlockView $view)
     {
@@ -176,9 +173,6 @@ class LayoutDataCollector extends DataCollector
 
     /**
      * Add child BlockView-s with options and vars to parent BlockView recursively
-     *
-     * @param BlockView $blockView
-     * @param           $output
      */
     private function recursiveBuildFinalBlockTree(BlockView $blockView, &$output)
     {
@@ -210,9 +204,6 @@ class LayoutDataCollector extends DataCollector
         return $data;
     }
 
-    /**
-     * @param ContextInterface $context
-     */
     private function collectContextItems(ContextInterface $context)
     {
         $class = new \ReflectionClass(LayoutContext::class);
@@ -232,9 +223,6 @@ class LayoutDataCollector extends DataCollector
         }
     }
 
-    /**
-     * @param ContextInterface $context
-     */
     private function collectContextData(ContextInterface $context)
     {
         $class = new \ReflectionClass(ContextDataCollection::class);

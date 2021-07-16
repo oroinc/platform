@@ -173,16 +173,6 @@ class EntitySerializer
     /** @var QueryModifier */
     private $queryModifier;
 
-    /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param SerializationHelper   $serializationHelper
-     * @param DataAccessorInterface $dataAccessor
-     * @param QueryFactory          $queryFactory
-     * @param FieldAccessor         $fieldAccessor
-     * @param ConfigNormalizer      $configNormalizer
-     * @param ConfigConverter       $configConverter
-     * @param DataNormalizer        $dataNormalizer
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         SerializationHelper $serializationHelper,
@@ -209,9 +199,6 @@ class EntitySerializer
         );
     }
 
-    /**
-     * @param FieldFilterInterface $filter
-     */
     public function setFieldFilter(FieldFilterInterface $filter)
     {
         $this->fieldFilter = $filter;

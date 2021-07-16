@@ -9,10 +9,6 @@ interface FormLayoutBuilderInterface
 {
     /**
      * Builds the layout for the given form.
-     *
-     * @param FormAccessorInterface $formAccessor
-     * @param BlockBuilderInterface $builder
-     * @param Options               $options
      */
     public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, Options $options);
 }

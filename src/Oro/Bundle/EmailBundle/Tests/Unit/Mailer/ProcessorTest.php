@@ -233,9 +233,6 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider messageDataProvider
-     * @param array $data
-     * @param array $expectedMessageData
-     * @param bool  $needConverting
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */

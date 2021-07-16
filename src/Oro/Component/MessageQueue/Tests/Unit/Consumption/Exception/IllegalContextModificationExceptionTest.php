@@ -8,7 +8,7 @@ use Oro\Component\Testing\ClassExtensionTrait;
 class IllegalContextModificationExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
-    
+
     public function testShouldImplementExceptionInterface()
     {
         $this->assertClassImplements(ExceptionInterface::class, IllegalContextModificationException::class);
@@ -18,7 +18,7 @@ class IllegalContextModificationExceptionTest extends \PHPUnit\Framework\TestCas
     {
         $this->assertClassExtends(\LogicException::class, IllegalContextModificationException::class);
     }
-    
+
     public function testCouldBeConstructedWithoutAnyArguments()
     {
         new IllegalContextModificationException();

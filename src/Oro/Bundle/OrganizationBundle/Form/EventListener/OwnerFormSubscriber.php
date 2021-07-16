@@ -58,9 +58,6 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSetData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -97,9 +94,6 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     */
     protected function replaceOwnerField(FormInterface $form)
     {
         if ($this->isAssignGranted) {
@@ -123,9 +117,6 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param FormInterface $form
-     */
     protected function setPredefinedOwner(FormInterface $form)
     {
         $ownerForm = $form->get($this->fieldName);

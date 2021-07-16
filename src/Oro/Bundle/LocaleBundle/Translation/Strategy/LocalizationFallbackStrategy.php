@@ -34,10 +34,6 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
      */
     protected $entityClass;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param CacheProvider $cacheProvider
-     */
     public function __construct(ManagerRegistry $registry, CacheProvider $cacheProvider)
     {
         $this->registry = $registry;
@@ -83,9 +79,6 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         return $fallbacks;
     }
 
-    /**
-     * @return array
-     */
     private function getActualLocaleFallbacks(): array
     {
         /** All localizations always should have only one parent that equals to default language */

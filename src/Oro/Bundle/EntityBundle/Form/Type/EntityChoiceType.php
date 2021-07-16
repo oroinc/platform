@@ -21,9 +21,6 @@ class EntityChoiceType extends AbstractType
     /** @var array */
     protected $itemsCache;
 
-    /**
-     * @param EntityProvider $provider
-     */
     public function __construct(EntityProvider $provider)
     {
         $this->provider = $provider;

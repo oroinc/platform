@@ -34,12 +34,6 @@ class EmailAttributeProvider
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
-    /**
-     * @param Registry $registry
-     * @param ConfigManager $configManager
-     * @param NameFormatter $nameFormatter
-     * @param EmailAddressHelper $emailAddressHelper
-     */
     public function __construct(
         Registry $registry,
         ConfigManager $configManager,

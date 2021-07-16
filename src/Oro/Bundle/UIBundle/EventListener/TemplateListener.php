@@ -52,9 +52,6 @@ class TemplateListener implements ServiceSubscriberInterface
 
     /**
      * Find template reference in request attributes
-     *
-     * @param Request $request
-     * @return TemplateReferenceInterface|null
      */
     private function getTemplateReference(Request $request): ?TemplateReferenceInterface
     {
@@ -90,7 +87,6 @@ class TemplateListener implements ServiceSubscriberInterface
     /**
      * Allow to use the controller view directory name in CamelCase
      *
-     * @param TemplateReferenceInterface $templateReference
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function resolveControllerDir(TemplateReferenceInterface $templateReference): void
@@ -131,10 +127,6 @@ class TemplateListener implements ServiceSubscriberInterface
         }
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
     private function resolveActionName(string $name): string
     {
         return preg_match('/^(?<view>[^\/\.]+)(\.[a-z]+.[a-z]+)?$/', $name, $parsed)
@@ -142,10 +134,6 @@ class TemplateListener implements ServiceSubscriberInterface
             : $name;
     }
 
-    /**
-     * @param TemplateReferenceInterface $templateReference
-     * @param Request $request
-     */
     private function injectWidgetContainer(TemplateReferenceInterface $templateReference, Request $request): void
     {
         $widgetContainer = $request->query->get('_widgetContainerTemplate')
@@ -162,10 +150,6 @@ class TemplateListener implements ServiceSubscriberInterface
 
     /**
      * Check new template name based on container
-     *
-     * @param TemplateReferenceInterface $templateReference
-     * @param string $container
-     * @return bool
      */
     private function processContainer(TemplateReferenceInterface $templateReference, string $container): bool
     {
@@ -182,10 +166,6 @@ class TemplateListener implements ServiceSubscriberInterface
         return false;
     }
 
-    /**
-     * @param TemplateReferenceInterface $templateReference
-     * @return array|null
-     */
     private function parseTemplateReference(TemplateReferenceInterface $templateReference): ?array
     {
         $parameters = $templateReference->all();
@@ -198,9 +178,6 @@ class TemplateListener implements ServiceSubscriberInterface
         return \preg_match($pattern, $parameters['name'], $parts) ? $parts : null;
     }
 
-    /**
-     * @return Environment
-     */
     private function getTwig(): Environment
     {
         if (!$this->twig) {
@@ -210,9 +187,6 @@ class TemplateListener implements ServiceSubscriberInterface
         return $this->twig;
     }
 
-    /**
-     * @return Inflector
-     */
     private function getInflector(): Inflector
     {
         if (!$this->inflector) {
@@ -222,9 +196,6 @@ class TemplateListener implements ServiceSubscriberInterface
         return $this->inflector;
     }
 
-    /**
-     * @return TemplateNameParser
-     */
     private function getTemplateNameParser(): TemplateNameParser
     {
         if (!$this->templateNameParser) {

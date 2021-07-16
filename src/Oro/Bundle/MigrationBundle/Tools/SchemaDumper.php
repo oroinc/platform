@@ -26,9 +26,6 @@ class SchemaDumper extends AbstractVisitor
      */
     protected $twig;
 
-    /**
-     * @param Environment $twig
-     */
     public function __construct(Environment $twig)
     {
         $this->twig = $twig;

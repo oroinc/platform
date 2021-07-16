@@ -22,9 +22,6 @@ class LoadCountriesAndRegions extends AbstractFixture implements InitialFixtureI
         $this->loadRegions($manager);
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadCountries(ObjectManager $manager)
     {
         $repository = $manager->getRepository(Country::class);
@@ -34,9 +31,6 @@ class LoadCountriesAndRegions extends AbstractFixture implements InitialFixtureI
         $this->addReference('country_isle_of_man', $repository->find('IM'));
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadRegions(ObjectManager $manager)
     {
         $repository = $manager->getRepository(Region::class);

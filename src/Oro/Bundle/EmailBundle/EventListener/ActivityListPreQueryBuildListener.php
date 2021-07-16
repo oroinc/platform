@@ -15,9 +15,6 @@ class ActivityListPreQueryBuildListener implements FeatureToggleableInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper
     ) {
@@ -26,8 +23,6 @@ class ActivityListPreQueryBuildListener implements FeatureToggleableInterface
 
     /**
      * Add email thread ids to qb params
-     *
-     * @param ActivityListPreQueryBuildEvent $event
      */
     public function prepareIdsForEmailThreadEvent(ActivityListPreQueryBuildEvent $event)
     {

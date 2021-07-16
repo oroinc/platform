@@ -103,7 +103,6 @@ class EntityNameProvider implements EntityNameProviderInterface
             $fieldNames
         );
 
-
         $nameDQL = reset($fieldNames);
 
         if (count($fieldNames) > 1) {

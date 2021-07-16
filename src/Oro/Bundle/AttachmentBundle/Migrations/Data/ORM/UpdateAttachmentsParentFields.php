@@ -32,11 +32,6 @@ class UpdateAttachmentsParentFields extends AbstractFixture
         }
     }
 
-    /**
-     * @param EntityManager $manager
-     * @param bool $isMySql
-     * @return array
-     */
     private function getQueries(EntityManager $manager, bool $isMySql): array
     {
         $queries = [];

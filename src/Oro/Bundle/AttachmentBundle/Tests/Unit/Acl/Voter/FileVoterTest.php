@@ -96,9 +96,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function supportsDataProvider(): array
     {
         return [
@@ -137,8 +134,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider attributesDataProvider
-     *
-     * @param string $attribute
      */
     public function testVoteWhenNotCoveredByAcl(string $attribute): void
     {
@@ -157,9 +152,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function attributesDataProvider(): array
     {
         return [
@@ -176,10 +168,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::FILE_ID);
     }
 
-    /**
-     * @param File $file
-     * @param bool $isCoveredByAcl
-     */
     private function mockCoveredByAcl(File $file, bool $isCoveredByAcl): void
     {
         $this->fileAccessControlChecker
@@ -246,10 +234,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param File $file
-     * @param bool $isAllowed
-     */
     private function mockAllowedApps(File $file, bool $isAllowed): void
     {
         $this->fileApplicationsProvider
@@ -293,9 +277,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider voteDataProvider
-     *
-     * @param bool $isGranted
-     * @param int $expectedResult
      */
     public function testVote(bool $isGranted, int $expectedResult): void
     {
@@ -329,9 +310,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function voteDataProvider(): array
     {
         return [
@@ -346,9 +324,6 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return File
-     */
     private function getFile(): File
     {
         $file = new File();

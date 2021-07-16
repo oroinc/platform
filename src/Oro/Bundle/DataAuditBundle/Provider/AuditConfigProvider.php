@@ -18,9 +18,6 @@ class AuditConfigProvider
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -106,10 +103,6 @@ class AuditConfigProvider
         return $result;
     }
 
-    /**
-     * @param string $entityClass
-     * @return array
-     */
     public function getAuditableFields(string $entityClass): array
     {
         $result = [];

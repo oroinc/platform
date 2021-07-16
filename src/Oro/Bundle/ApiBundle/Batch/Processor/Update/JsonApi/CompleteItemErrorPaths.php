@@ -18,9 +18,6 @@ class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;

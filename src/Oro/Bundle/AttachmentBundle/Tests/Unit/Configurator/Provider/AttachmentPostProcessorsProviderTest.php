@@ -29,8 +29,6 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider postProcessingProvider
-     *
-     * @param bool $postProcessingEnabled
      */
     public function testPostProcessingEnabled(bool $postProcessingEnabled): void
     {
@@ -45,9 +43,6 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($postProcessingEnabled, $this->attachmentPostProcessorsProvider->isPostProcessingEnabled());
     }
 
-    /**
-     * @return array
-     */
     public function postProcessingProvider(): array
     {
         return [
@@ -62,8 +57,6 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider postProcessorProvider
-     *
-     * @param bool $postProcessorEnabled
      */
     public function testPostProcessorAllowed(bool $postProcessorEnabled): void
     {
@@ -78,9 +71,6 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($postProcessorEnabled, $this->attachmentPostProcessorsProvider->isPostProcessorsAllowed());
     }
 
-    /**
-     * @return array
-     */
     public function postProcessorProvider(): array
     {
         return [

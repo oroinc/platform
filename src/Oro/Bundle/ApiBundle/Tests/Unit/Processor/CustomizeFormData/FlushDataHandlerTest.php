@@ -397,7 +397,6 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
                 $calls[] = $eventName;
             });
 
-
         $this->formErrorsCollector->expects(self::any())
             ->method('process')
             ->willReturnCallback(function () use (&$calls) {

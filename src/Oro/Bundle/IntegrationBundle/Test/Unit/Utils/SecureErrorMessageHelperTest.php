@@ -6,7 +6,6 @@ use Oro\Bundle\IntegrationBundle\Utils\SecureErrorMessageHelper;
 
 class SecureErrorMessageHelperTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @dataProvider messageProvider
      *

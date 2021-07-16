@@ -31,11 +31,6 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
     /** @var array */
     private $entityVariableProcessors = [];
 
-    /**
-     * @param VariablesProvider $variablesProvider
-     * @param Cache             $cache
-     * @param string            $configCacheKey
-     */
     public function __construct(VariablesProvider $variablesProvider, Cache $cache, string $configCacheKey)
     {
         $this->variablesProvider = $variablesProvider;
@@ -97,7 +92,6 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadConfiguration(): array

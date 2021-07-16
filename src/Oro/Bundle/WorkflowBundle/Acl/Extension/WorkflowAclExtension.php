@@ -31,15 +31,6 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     /** @var WorkflowTransitionAclExtension */
     protected $transitionAclExtension;
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManager                            $workflowManager
-     * @param WorkflowAclMetadataProvider                $workflowMetadataProvider
-     * @param WorkflowTransitionAclExtension             $transitionAclExtension
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,

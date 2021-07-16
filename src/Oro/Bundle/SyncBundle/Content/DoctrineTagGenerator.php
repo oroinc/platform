@@ -22,10 +22,6 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(ManagerRegistry $doctrine, EntityClassResolver $entityClassResolver)
     {
         $this->doctrine = $doctrine;

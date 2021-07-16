@@ -52,16 +52,6 @@ class ActivityManager
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param ConfigProvider      $activityConfigProvider
-     * @param ConfigProvider      $groupingConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param AssociationManager  $associationManager
-     * @param FeatureChecker      $featureChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
@@ -82,9 +72,6 @@ class ActivityManager
         $this->featureChecker         = $featureChecker;
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;

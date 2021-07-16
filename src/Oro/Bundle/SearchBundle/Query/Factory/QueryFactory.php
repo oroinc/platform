@@ -10,9 +10,6 @@ class QueryFactory implements QueryFactoryInterface
     /** @var Indexer */
     protected $indexer;
 
-    /**
-     * @param Indexer $indexer
-     */
     public function __construct(Indexer $indexer)
     {
         $this->indexer = $indexer;

@@ -29,41 +29,26 @@ class ExtendedAssociationFilter extends AssociationFilter
     /** @var string|null */
     private $associationKind;
 
-    /**
-     * @param AssociationManager $associationManager
-     */
     public function setAssociationManager(AssociationManager $associationManager): void
     {
         $this->associationManager = $associationManager;
     }
 
-    /**
-     * @param EntityOverrideProviderRegistry $registry
-     */
     public function setEntityOverrideProviderRegistry(EntityOverrideProviderRegistry $registry): void
     {
         $this->entityOverrideProviderRegistry = $registry;
     }
 
-    /**
-     * @param string $associationOwnerClass
-     */
     public function setAssociationOwnerClass(string $associationOwnerClass): void
     {
         $this->associationOwnerClass = $associationOwnerClass;
     }
 
-    /**
-     * @param string $associationType
-     */
     public function setAssociationType(string $associationType): void
     {
         $this->associationType = $associationType;
     }
 
-    /**
-     * @param string|null $associationKind
-     */
     public function setAssociationKind(?string $associationKind): void
     {
         $this->associationKind = $associationKind;
@@ -89,11 +74,6 @@ class ExtendedAssociationFilter extends AssociationFilter
         return parent::doBuildExpression($fieldName, $path, $operator, $value);
     }
 
-    /**
-     * @param string $filterValueName
-     *
-     * @return string
-     */
     protected function getFieldName(string $filterValueName): string
     {
         $targetEntityClass = $this->getEntityClass($filterValueName);

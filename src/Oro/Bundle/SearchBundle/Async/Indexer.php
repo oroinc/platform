@@ -24,11 +24,6 @@ class Indexer implements IndexerInterface
      */
     protected $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param DoctrineHelper $doctrineHelper
-     * @param MessageTransformerInterface $transformer
-     */
     public function __construct(
         MessageProducerInterface $producer,
         DoctrineHelper $doctrineHelper,

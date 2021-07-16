@@ -18,9 +18,6 @@ class DoctrineParamConverterDecorator implements ParamConverterInterface
     /** @var ParamConverterInterface */
     private $paramConverter;
 
-    /**
-     * @param ParamConverterInterface $paramConverter
-     */
     public function __construct(ParamConverterInterface $paramConverter)
     {
         $this->paramConverter = $paramConverter;
@@ -47,8 +44,6 @@ class DoctrineParamConverterDecorator implements ParamConverterInterface
     }
 
     /**
-     * @param DriverException $exception
-     * @param ParamConverter $configuration
      * @throws DriverException
      */
     private function handleDriverException(DriverException $exception, ParamConverter $configuration)

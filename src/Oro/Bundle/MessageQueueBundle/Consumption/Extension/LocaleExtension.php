@@ -19,10 +19,6 @@ class LocaleExtension extends AbstractExtension
     /** @var TranslatableListener */
     private $translatableListener;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param TranslatableListener $translatableListener
-     */
     public function __construct(LocaleSettings $localeSettings, TranslatableListener $translatableListener)
     {
         $this->localeSettings = $localeSettings;

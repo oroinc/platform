@@ -39,9 +39,6 @@ class PostProcessItemStep extends ItemStep
         $this->contextSharedKeys = $this->scalarToArray($contextSharedKeys);
     }
 
-    /**
-     * @param JobExecutor $jobExecutor
-     */
     public function setJobExecutor(JobExecutor $jobExecutor)
     {
         $this->jobExecutor = $jobExecutor;

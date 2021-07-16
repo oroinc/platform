@@ -19,10 +19,6 @@ class LinkProperty extends UrlProperty
      */
     protected $twig;
 
-    /**
-     * @param RouterInterface $router
-     * @param Environment     $twig
-     */
     public function __construct(RouterInterface $router, Environment $twig)
     {
         $this->router = $router;

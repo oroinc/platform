@@ -79,8 +79,6 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
-     *
-     * @param ContainerBuilder $container
      */
     private function preparePostgreSql(ContainerBuilder $container)
     {

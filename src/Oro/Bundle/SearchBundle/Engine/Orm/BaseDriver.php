@@ -130,8 +130,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     private $indexUpdateData = [];
 
     /**
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata $class
      * @throws \InvalidArgumentException
      */
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
@@ -385,10 +383,6 @@ abstract class BaseDriver implements DBALPersisterInterface
         return [$joinAlias, $index, $i];
     }
 
-    /**
-     * @param AbstractPlatform $dbPlatform
-     * @param Connection $connection
-     */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
         $this->truncateTable($dbPlatform, $connection, $this->entityName);
@@ -580,9 +574,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Parses and applies the SELECT's columns (if selected)
      * from the casual query into the search index query.
-     *
-     * @param Query        $query
-     * @param QueryBuilder $qb
      */
     protected function applySelectToQB(Query $query, QueryBuilder $qb)
     {
@@ -615,9 +606,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Parses and applies the FROM part to the search engine's
      * query.
-     *
-     * @param Query $query
-     * @param QueryBuilder $qb
      */
     protected function applyFromToQB(Query $query, QueryBuilder $qb)
     {
@@ -657,9 +645,6 @@ abstract class BaseDriver implements DBALPersisterInterface
     /**
      * Applies the ORDER BY part from the Query to the
      * search engine's query.
-     *
-     * @param Query $query
-     * @param QueryBuilder $qb
      */
     protected function applyOrderByToQB(Query $query, QueryBuilder $qb)
     {
@@ -740,8 +725,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Adds AbstractItem of which data will be stored when 'flushWrites' method is called
-     *
-     * @param AbstractItem $item
      */
     public function writeItem(AbstractItem $item)
     {
@@ -754,9 +737,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Prepares index data for queries to be stored
-     *
-     * @param Connection $connection
-     * @param array $multiInsertQueryData
      */
     private function fillQueryData(Connection $connection, array &$multiInsertQueryData)
     {
@@ -799,9 +779,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Runs multi inserts taken from $multiInsertQueryData argument
-     *
-     * @param Connection $connection
-     * @param array $multiInsertQueryData
      */
     private function runMultiInserts(Connection $connection, array $multiInsertQueryData)
     {
@@ -812,9 +789,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Runs updates taken from $updateQueryData argument
-     *
-     * @param Connection $connection
-     * @param array $updateQueryData
      */
     private function runUpdates(Connection $connection, array $updateQueryData)
     {
@@ -832,8 +806,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Stores items from $this->writeableItemData and updates their ids
-     *
-     * @param Connection $connection
      */
     private function processItems(Connection $connection)
     {
@@ -871,8 +843,6 @@ abstract class BaseDriver implements DBALPersisterInterface
 
     /**
      * Converts $item into array and stores the result in the object
-     *
-     * @param AbstractItem $item
      */
     private function populateItem(AbstractItem $item)
     {

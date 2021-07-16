@@ -54,17 +54,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     /** @var array */
     protected $isEntityFieldFallbackValue = [];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ImportStrategyHelper $strategyHelper
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param TranslatorInterface $translator
-     * @param NewEntitiesHelper $newEntitiesHelper
-     * @param DoctrineHelper $doctrineHelper
-     * @param RelatedEntityStateHelper $relatedEntityStateHelper
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ImportStrategyHelper $strategyHelper,
@@ -84,9 +73,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->relatedEntityStateHelper = $relatedEntityStateHelper;
     }
 
-    /**
-     * @param EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter
-     */
     public function setOwnershipSetter(EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter): void
     {
         $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;
@@ -455,8 +441,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /**
      * Increment context counters.
-     *
-     * @param $entity
      */
     protected function updateContextCounters($entity)
     {

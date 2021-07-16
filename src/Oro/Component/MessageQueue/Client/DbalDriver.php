@@ -22,10 +22,6 @@ class DbalDriver implements DriverInterface
      */
     private $config;
 
-    /**
-     * @param SessionInterface $session
-     * @param Config $config
-     */
     public function __construct(SessionInterface $session, Config $config)
     {
         $this->session = $session;

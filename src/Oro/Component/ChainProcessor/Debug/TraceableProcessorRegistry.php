@@ -17,10 +17,6 @@ class TraceableProcessorRegistry implements ProcessorRegistryInterface
     /** @var TraceLogger */
     private $logger;
 
-    /**
-     * @param ProcessorRegistryInterface $processorRegistry
-     * @param TraceLogger                $logger
-     */
     public function __construct(ProcessorRegistryInterface $processorRegistry, TraceLogger $logger)
     {
         $this->processorRegistry = $processorRegistry;

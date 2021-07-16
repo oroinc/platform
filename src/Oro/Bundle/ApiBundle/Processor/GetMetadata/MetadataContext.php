@@ -96,8 +96,6 @@ class MetadataContext extends ApiContext
 
     /**
      * Sets the configuration of an entity.
-     *
-     * @param EntityDefinitionConfig $definition
      */
     public function setConfig(EntityDefinitionConfig $definition)
     {

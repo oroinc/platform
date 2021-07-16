@@ -74,9 +74,6 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
     public function submitDataProvider(): array
     {
         $localizationItem = $this->createLocalization('name', 'title', 0, 'en');
@@ -116,16 +113,6 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $title
-     * @param string $languageId
-     * @param string $formattingCode
-     * @param bool $rtlMode
-     * @param null|Localization $parentLocalization
-     *
-     * @return Localization
-     */
     protected function createLocalization(
         string $name,
         string $title,

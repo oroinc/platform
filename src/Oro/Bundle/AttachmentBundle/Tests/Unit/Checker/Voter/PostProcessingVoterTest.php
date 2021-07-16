@@ -28,10 +28,6 @@ class PostProcessingVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider qualityProvider
-     *
-     * @param int $jpegQuality
-     * @param int $pngQuality
-     * @param int $expected
      */
     public function testVote(int $jpegQuality, int $pngQuality, int $expected): void
     {
@@ -45,9 +41,6 @@ class PostProcessingVoterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $vote);
     }
 
-    /**
-     * @return array
-     */
     public function qualityProvider(): array
     {
         return [

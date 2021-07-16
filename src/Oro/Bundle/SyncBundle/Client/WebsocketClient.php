@@ -27,11 +27,6 @@ class WebsocketClient implements WebsocketClientInterface
     /** @var WampClient */
     private $wampClient;
 
-    /**
-     * @param WampClientFactoryInterface $wampClientFactory
-     * @param ClientAttributes $clientAttributes
-     * @param TicketProviderInterface $ticketProvider
-     */
     public function __construct(
         WampClientFactoryInterface $wampClientFactory,
         ClientAttributes $clientAttributes,
@@ -136,9 +131,6 @@ class WebsocketClient implements WebsocketClientInterface
         return true;
     }
 
-    /**
-     * @return WampClient
-     */
     private function getWampClient(): WampClient
     {
         if (!$this->wampClient) {

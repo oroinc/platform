@@ -43,12 +43,6 @@ class FieldType extends AbstractType
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         TranslatorInterface $translator,

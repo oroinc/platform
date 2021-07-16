@@ -25,11 +25,6 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $this->entityDataAccessor = $this->createMock(EntityDataAccessor::class);
     }
 
-    /**
-     * @param array $data
-     *
-     * @return TemplateData
-     */
     private function getTemplateData(array $data): TemplateData
     {
         return new TemplateData(

@@ -229,7 +229,6 @@ JSON;
     }
 
     /**
-     * @param callable $getNextSplitter
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function runTestSplitWhenTimeoutExceededAfterEachObject(callable $getNextSplitter)
@@ -426,7 +425,6 @@ JSON;
     }
 
     /**
-     * @param callable $getNextSplitter
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function runTestSplitWhenTimeoutExceededAfterFewObjects(callable $getNextSplitter)

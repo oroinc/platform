@@ -22,10 +22,6 @@ class MappedData implements DataInterface
      */
     protected $accessor = null;
 
-    /**
-     * @param array         $mapping
-     * @param DataInterface $sourceData
-     */
     public function __construct(array $mapping, DataInterface $sourceData)
     {
         $this->mapping = $mapping;

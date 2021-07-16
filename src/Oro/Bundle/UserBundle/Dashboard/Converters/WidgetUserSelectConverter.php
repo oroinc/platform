@@ -76,9 +76,6 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;

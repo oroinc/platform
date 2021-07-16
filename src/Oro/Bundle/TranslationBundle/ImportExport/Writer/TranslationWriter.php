@@ -16,10 +16,6 @@ class TranslationWriter implements ItemWriterInterface
     /** @var TranslationManager */
     protected $translationManager;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param TranslationManager $translationManager
-     */
     public function __construct(ManagerRegistry $registry, TranslationManager $translationManager)
     {
         $this->registry = $registry;

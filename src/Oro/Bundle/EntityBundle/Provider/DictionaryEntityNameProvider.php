@@ -25,11 +25,6 @@ class DictionaryEntityNameProvider implements EntityNameProviderInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param ConfigManager             $configManager
-     * @param ManagerRegistry           $doctrine
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine,

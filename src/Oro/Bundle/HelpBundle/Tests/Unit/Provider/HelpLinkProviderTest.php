@@ -40,12 +40,6 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache = $this->createMock(CacheProvider::class);
     }
 
-    /**
-     * @param array $defaultConfig
-     * @param array $config
-     *
-     * @return HelpLinkProvider
-     */
     private function getHelpLinkProvider(array $defaultConfig = [], array $config = []): HelpLinkProvider
     {
         $configProvider = $this->createMock(ConfigurationProvider::class);
@@ -159,7 +153,6 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
     public function configurationDataProvider(): array
     {

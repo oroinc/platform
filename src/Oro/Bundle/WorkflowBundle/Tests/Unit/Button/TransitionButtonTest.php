@@ -102,8 +102,6 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getTemplateDataDataProvider
-     *
-     * @param array $customData
      */
     public function testGetTemplateData(array $customData = [])
     {

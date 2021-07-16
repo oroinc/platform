@@ -34,12 +34,6 @@ class ErrorCollector extends \HTMLPurifier_ErrorCollector
         return $errorsList;
     }
 
-    /**
-     * @param array $errorsList
-     * @param \HTMLPurifier_ErrorStruct $struct
-     * @param string $place
-     * @return void
-     */
     protected function getErrors(array &$errorsList, \HTMLPurifier_ErrorStruct $struct, string $place): void
     {
         $stack = [$struct];

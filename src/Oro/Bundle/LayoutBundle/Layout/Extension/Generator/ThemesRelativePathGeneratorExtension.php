@@ -73,10 +73,6 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
     /**
      * Returns namespaced theme name (e.g. "@OroLayout/folder1/folder2/layout.html.twig")
      * if we can find a Bundle name or null otherwise.
-     *
-     * @param string $directoryPath
-     * @param string $absolutePath
-     * @return string|null
      */
     private function getNamespacedThemeName(string $directoryPath, string $absolutePath): ?string
     {
@@ -92,9 +88,6 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
 
     /**
      * Recursively find a Bundle class
-     *
-     * @param string $directoryPath
-     * @return array|null
      */
     private function findBundleClass(string $directoryPath): ?array
     {

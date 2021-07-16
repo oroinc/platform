@@ -47,13 +47,6 @@ class EntityStructureDataProvider
         'related_entity_name' => 'setRelatedEntityName'
     ];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param EntityWithFieldsProvider $entityWithFieldsProvider
-     * @param EntityClassNameHelper    $classNameHelper
-     * @param TranslatorInterface      $translator
-     * @param Cache                    $cache
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         EntityWithFieldsProvider $entityWithFieldsProvider,
@@ -146,10 +139,6 @@ class EntityStructureDataProvider
         return $model;
     }
 
-    /**
-     * @param EntityStructure $structure
-     * @param array           $fields
-     */
     private function processFields(EntityStructure $structure, array $fields)
     {
         foreach ($fields as $field) {
@@ -163,9 +152,6 @@ class EntityStructureDataProvider
         }
     }
 
-    /**
-     * @return string
-     */
     protected function getCacheKey(): string
     {
         return sprintf('data.%s', $this->translator->getLocale());

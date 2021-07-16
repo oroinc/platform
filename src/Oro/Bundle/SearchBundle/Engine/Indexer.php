@@ -44,12 +44,6 @@ class Indexer
     /** @var bool */
     protected $isAllowedApplyAcl = true;
 
-    /**
-     * @param ExtendedEngineInterface  $engine
-     * @param ObjectMapper             $mapper
-     * @param SecurityProvider         $securityProvider
-     * @param AclHelper                $searchAclHelper
-     */
     public function __construct(
         ExtendedEngineInterface $engine,
         ObjectMapper $mapper,
@@ -172,7 +166,6 @@ class Indexer
     }
 
     /**
-     *
      * @param string|null $searchString
      * @param null        $from
      *
@@ -256,8 +249,6 @@ class Indexer
 
     /**
      * Do query manipulations such as ACL apply etc.
-     *
-     * @param Query $query
      */
     protected function prepareQuery(Query $query)
     {
@@ -271,7 +262,6 @@ class Indexer
     /**
      * Apply special behavior of class inheritance processing
      *
-     * @param Query $query
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyModesBehavior(Query $query)

@@ -18,9 +18,6 @@ class AclFormExtension implements FormExtensionInterface
 
     /**
      * AclFormExtension constructor.
-     *
-     * @param AclProtectedFieldTypeExtension $aclFieldExtension
-     * @param FormExtensionInterface         $innerExtension
      */
     public function __construct(
         AclProtectedFieldTypeExtension $aclFieldExtension,

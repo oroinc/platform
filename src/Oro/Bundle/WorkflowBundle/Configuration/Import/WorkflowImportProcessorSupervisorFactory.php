@@ -18,10 +18,6 @@ class WorkflowImportProcessorSupervisorFactory implements ImportProcessorFactory
     /** @var WorkflowImportProcessorSupervisor */
     private $importSupervisor;
 
-    /**
-     * @param ConfigFileReaderInterface $reader
-     * @param WorkflowConfigFinderBuilder $configFinderBuilder
-     */
     public function __construct(ConfigFileReaderInterface $reader, WorkflowConfigFinderBuilder $configFinderBuilder)
     {
         $this->reader = $reader;
@@ -53,10 +49,6 @@ class WorkflowImportProcessorSupervisorFactory implements ImportProcessorFactory
         return $this->supervise($importProcessor);
     }
 
-    /**
-     * @param WorkflowImportProcessor $workflowImport
-     * @return WorkflowImportProcessorSupervisor
-     */
     private function supervise(WorkflowImportProcessor $workflowImport): WorkflowImportProcessorSupervisor
     {
         if (!$this->importSupervisor) {

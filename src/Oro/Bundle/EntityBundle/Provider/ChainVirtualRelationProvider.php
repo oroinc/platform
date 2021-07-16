@@ -80,12 +80,6 @@ class ChainVirtualRelationProvider implements VirtualRelationProviderInterface
             ->getTargetJoinAlias($className, $fieldName, $selectFieldName);
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return VirtualRelationProviderInterface
-     */
     private function findProvider(string $className, string $fieldName): VirtualRelationProviderInterface
     {
         foreach ($this->providers as $provider) {
@@ -101,11 +95,6 @@ class ChainVirtualRelationProvider implements VirtualRelationProviderInterface
         ));
     }
 
-    /**
-     * @param string $className
-     *
-     * @return bool
-     */
     private function isEntityAccessible(string $className): bool
     {
         return

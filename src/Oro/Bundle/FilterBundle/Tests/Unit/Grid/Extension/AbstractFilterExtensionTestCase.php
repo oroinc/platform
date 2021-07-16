@@ -151,10 +151,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         self::assertEquals($defaultFiltersState, $metadata->offsetGetByPath('[initialState][filters]'));
     }
 
-    /**
-     * @param array $filtersState
-     * @param array $defaultFiltersState
-     */
     protected function mockStateProviders(array $filtersState, array $defaultFiltersState): void
     {
         $this->filtersStateProvider
@@ -232,9 +228,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         return $filterForm;
     }
 
-    /**
-     * @return DatagridConfiguration
-     */
     protected function createCommonDatagridConfig(): DatagridConfiguration
     {
         $datagridConfig = $this->createDatagridConfig([
@@ -304,11 +297,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     /**
      * @dataProvider visitMetadataNoStateDataProvider
-     *
-     * @param array $filtersState
-     * @param array $defaultFiltersState
-     * @param array $isValid
-     * @param array $expectedMetadata
      */
     public function testVisitMetadataStatesAreValidated(
         array $filtersState,
@@ -359,9 +347,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         }
     }
 
-    /**
-     * @return array
-     */
     public function visitMetadataNoStateDataProvider(): array
     {
         return [
@@ -404,21 +389,11 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         ];
     }
 
-    /**
-     * @param array $datagridConfigArray
-     *
-     * @return DatagridConfiguration
-     */
     protected function createDatagridConfig(array $datagridConfigArray): DatagridConfiguration
     {
         return DatagridConfiguration::create($datagridConfigArray);
     }
 
-    /**
-     * @param array $metadataArray
-     *
-     * @return MetadataObject
-     */
     protected function createMetadataObject(array $metadataArray): MetadataObject
     {
         return MetadataObject::create($metadataArray);

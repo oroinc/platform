@@ -12,9 +12,6 @@ class ObjectCacheKeyGenerator
      */
     protected $converter;
 
-    /**
-     * @param ObjectCacheDataConverterInterface $converter
-     */
     public function __construct(ObjectCacheDataConverterInterface $converter)
     {
         $this->converter = $converter;

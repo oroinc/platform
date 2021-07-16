@@ -87,9 +87,6 @@ class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwar
         return $result;
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

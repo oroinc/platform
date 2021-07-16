@@ -22,9 +22,6 @@ class WorkflowOperationFilter implements OperationRegistryFilterInterface
      */
     private $disabledOperations;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

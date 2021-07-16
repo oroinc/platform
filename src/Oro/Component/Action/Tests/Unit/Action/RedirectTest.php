@@ -45,7 +45,6 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $options)

@@ -49,11 +49,6 @@ class EmailOriginApiEntityManager extends ApiEntityManager
         return $config;
     }
 
-    /**
-     * @param array $result
-     *
-     * @return array
-     */
     protected function postSerializeEmailOrigin(array $result): array
     {
         $properties = [];

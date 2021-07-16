@@ -12,9 +12,6 @@ class OAuth2ManagerRegistry
 
     /**
      * Adds new manager
-     *
-     * @param Oauth2ManagerInterface $manager
-     * @return self
      */
     public function addManager(Oauth2ManagerInterface $manager): self
     {
@@ -46,10 +43,6 @@ class OAuth2ManagerRegistry
         return array_values($this->managers);
     }
 
-    /**
-     * @param string $type
-     * @return Oauth2ManagerInterface
-     */
     public function getManager(string $type): Oauth2ManagerInterface
     {
         if (!array_key_exists($type, $this->managers)) {
@@ -61,9 +54,6 @@ class OAuth2ManagerRegistry
 
     /**
      * Returns true if registry contains certain manager
-     *
-     * @param string $type
-     * @return bool
      */
     public function hasManager(string $type): bool
     {
@@ -73,9 +63,6 @@ class OAuth2ManagerRegistry
     /**
      * Returns true if any registered manager is available or
      * manager available for given type
-     *
-     * @param string|null $type
-     * @return bool
      */
     public function isOauthImapEnabled(string $type = null): bool
     {

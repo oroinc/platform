@@ -15,9 +15,6 @@ class UpdateLoadedDataDecorator implements ProcessorInterface
     /** @var ProcessorInterface */
     private $innerProcessor;
 
-    /**
-     * @param ProcessorInterface $innerProcessor
-     */
     public function __construct(ProcessorInterface $innerProcessor)
     {
         $this->innerProcessor = $innerProcessor;

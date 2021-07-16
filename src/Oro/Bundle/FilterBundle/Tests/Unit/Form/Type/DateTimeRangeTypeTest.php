@@ -114,10 +114,6 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
     /**
      * Creates date time object from date string
      *
-     * @param string $dateString
-     * @param string|null $timeZone
-     * @param string|null $format
-     * @return \DateTime
      * @throws \Exception
      */
     private function createDateTime(

@@ -12,10 +12,6 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper as WDCHelper
 
 class WorkflowDefinitionCloner
 {
-    /**
-     * @param WorkflowDefinition $definition
-     * @param WorkflowDefinition $source
-     */
     public static function mergeDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
     {
         self::copyMainFields($definition, $source)

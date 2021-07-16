@@ -10,9 +10,6 @@ class ButtonSearchContextProvider
     /** @var ContextHelper */
     protected $contextHelper;
 
-    /**
-     * @param ContextHelper $contextHelper
-     */
     public function __construct(ContextHelper $contextHelper)
     {
         $this->contextHelper = $contextHelper;

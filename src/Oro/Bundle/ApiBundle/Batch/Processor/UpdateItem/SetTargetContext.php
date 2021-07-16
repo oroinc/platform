@@ -39,10 +39,6 @@ class SetTargetContext implements ProcessorInterface
         $context->setTargetContext($targetContext);
     }
 
-    /**
-     * @param ContextInterface       $targetContext
-     * @param BatchUpdateItemContext $context
-     */
     private function initializeTargetContext(ContextInterface $targetContext, BatchUpdateItemContext $context): void
     {
         if ($targetContext instanceof Context) {

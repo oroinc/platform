@@ -15,10 +15,6 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
     {
         parent::__construct($configManager);

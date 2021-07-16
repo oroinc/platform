@@ -9,9 +9,6 @@ interface DraftableFieldsExclusionProviderInterface
 {
     /**
      * Check if a provider supports given entity class name
-     *
-     * @param string $className
-     * @return bool
      */
     public function isSupport(string $className): bool;
 

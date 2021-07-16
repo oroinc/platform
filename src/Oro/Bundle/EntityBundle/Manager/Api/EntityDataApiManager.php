@@ -19,11 +19,6 @@ class EntityDataApiManager
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /**
-     * @param EntityFieldManager            $entityDataManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityRoutingHelper           $entityRoutingHelper
-     */
     public function __construct(
         EntityFieldManager $entityDataManager,
         AuthorizationCheckerInterface $authorizationChecker,

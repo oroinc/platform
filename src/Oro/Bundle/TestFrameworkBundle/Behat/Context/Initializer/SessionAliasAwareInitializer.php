@@ -14,17 +14,11 @@ class SessionAliasAwareInitializer implements ContextInitializer
      */
     private $provider;
 
-    /**
-     * @param SessionAliasProvider $provider
-     */
     public function __construct(SessionAliasProvider $provider)
     {
         $this->provider = $provider;
     }
 
-    /**
-     * @param Context $context
-     */
     public function initializeContext(Context $context)
     {
         if ($context instanceof SessionAliasProviderAwareInterface) {

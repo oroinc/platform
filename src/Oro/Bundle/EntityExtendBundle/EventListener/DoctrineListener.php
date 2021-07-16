@@ -59,9 +59,6 @@ class DoctrineListener
         $this->extendConfigProvider       = $extendConfigProvider;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
         $classMetadata = $event->getClassMetadata();
@@ -81,9 +78,6 @@ class DoctrineListener
         $this->processFieldMappings($classMetadata);
     }
 
-    /**
-     * @param OnFlushEventArgs $event
-     */
     public function onFlush(OnFlushEventArgs $event)
     {
         $this->multiEnumManager->handleOnFlush($event);
@@ -91,9 +85,6 @@ class DoctrineListener
 
     /**
      * Collecting discriminator map entries from child classes for entities with inheritance not equals NONE
-     *
-     * @param ClassMetadata $class
-     * @param EntityManager $em
      *
      * @throws MappingException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -165,9 +156,6 @@ class DoctrineListener
         return $this->collectedValues[$entityFQCN];
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     */
     protected function processFieldMappings(ClassMetadata $classMetadata)
     {
         $className = $classMetadata->getName();

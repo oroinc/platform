@@ -22,10 +22,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param ConfigManager   $configManager
-     * @param FieldTypeHelper $fieldTypeHelper
-     */
     public function __construct(ConfigManager $configManager, FieldTypeHelper $fieldTypeHelper)
     {
         $this->configManager = $configManager;
@@ -74,9 +70,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         }
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
     protected function createRelation(ConfigInterface $fieldConfig)
     {
         if (!$fieldConfig->is('relation_key')) {
@@ -104,9 +97,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         }
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
     private function createOwningSideOfRelation(ConfigInterface $fieldConfig)
     {
         $selfFieldId = $this->createFieldConfigId($fieldConfig);
@@ -127,9 +117,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $this->configManager->persist($selfConfig);
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
     private function createInverseSideOfRelation(ConfigInterface $fieldConfig)
     {
         $selfFieldId = $this->createFieldConfigId($fieldConfig);
@@ -197,9 +184,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         }
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
     private function completeRelation(ConfigInterface $fieldConfig)
     {
         $selfRelationKey = $fieldConfig->get('relation_key');
@@ -260,9 +244,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $this->configManager->persist($selfConfig);
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
     private function setRelationKeyToFieldConfig(ConfigInterface $fieldConfig)
     {
         /** @var FieldConfigId $fieldConfigId */
@@ -279,10 +260,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $this->configManager->persist($fieldConfig);
     }
 
-    /**
-     * @param array           $relation
-     * @param ConfigInterface $fieldConfig
-     */
     private function setRelationOptions(array &$relation, ConfigInterface $fieldConfig)
     {
         if ($fieldConfig->has('cascade')) {

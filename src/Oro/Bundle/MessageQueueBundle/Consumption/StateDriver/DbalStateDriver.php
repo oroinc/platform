@@ -115,9 +115,6 @@ class DbalStateDriver implements StateDriverInterface
         return $this->doctrine->getConnection('message_queue');
     }
 
-    /**
-     * @param \DateTime|null $date
-     */
     private function saveChangeStateDate(\DateTime $date = null)
     {
         $this->getConnection()->update(

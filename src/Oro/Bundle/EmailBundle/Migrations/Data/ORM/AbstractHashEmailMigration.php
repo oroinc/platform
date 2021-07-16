@@ -53,7 +53,6 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
      *     <template_name> => [<MD5_of_previous_version_allowed_to_update>],
      *     <template_name_2> => true
      * ]
-     * @return array
      */
     abstract protected function getEmailHashesToUpdate(): array;
 }

@@ -44,33 +44,21 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
      */
     protected $writer;
 
-    /**
-     * @param ExportHandler $exportHandler
-     */
     public function setExportHandler(ExportHandler $exportHandler)
     {
         $this->exportHandler = $exportHandler;
     }
 
-    /**
-     * @param DatagridExportConnector $exportConnector
-     */
     public function setExportConnector(DatagridExportConnector $exportConnector)
     {
         $this->exportConnector = $exportConnector;
     }
 
-    /**
-     * @param ExportProcessor $exportProcessor
-     */
     public function setExportProcessor(ExportProcessor $exportProcessor)
     {
         $this->exportProcessor = $exportProcessor;
     }
 
-    /**
-     * @param WriterChain $writerChain
-     */
     public function setWriterChain(WriterChain $writerChain)
     {
         $this->writerChain = $writerChain;
@@ -107,7 +95,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
 
         return $exportResult;
     }
-    
+
     /**
      * {@inheritDoc}
      */

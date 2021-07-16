@@ -17,17 +17,11 @@ class LocaleListener implements EventSubscriberInterface
 
     private TranslatableListener $translatableListener;
 
-    /**
-     * @param TranslatableListener $translatableListener
-     */
     public function __construct(TranslatableListener $translatableListener)
     {
         $this->translatableListener = $translatableListener;
     }
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -39,19 +33,11 @@ class LocaleListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     protected function isApiRequest(Request $request): bool
     {
         return strpos($request->getPathInfo(), self::API_PREFIX) === 0;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [

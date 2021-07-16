@@ -31,9 +31,6 @@ class OroEntityCreateOrSelectType extends AbstractType
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -114,10 +111,6 @@ class OroEntityCreateOrSelectType extends AbstractType
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param array $options
-     */
     protected function disableNewEntityValidation(FormInterface $form, array $options)
     {
         // disable all validation for new entity field

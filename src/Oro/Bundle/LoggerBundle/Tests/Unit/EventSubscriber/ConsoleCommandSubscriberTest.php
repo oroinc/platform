@@ -60,9 +60,6 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider consoleCommandProvider
-     *
-     * @param array $arguments
-     * @param array $options
      */
     public function testOnConsoleCommand(array $arguments, array $options)
     {
@@ -98,9 +95,6 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider consoleCommandProvider
-     *
-     * @param array $arguments
-     * @param array $options
      */
     public function testOnConsoleError(array $arguments, array $options)
     {

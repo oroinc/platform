@@ -21,9 +21,6 @@ class ConsoleContext extends RawMinkContext implements KernelAwareContext
      *
      * @Given /^(?:|I )run Symfony "(?P<command>[^\"]+)" command$/
      * @Given /^(?:|I )run Symfony "(?P<command>[^\"]+)" command in "(?P<env>[^\"]+)" environment$/
-     *
-     * @param string $command
-     * @param string $env
      */
     public function iRunSymfonyConsoleCommand(string $command, string $env = 'prod'): void
     {
@@ -45,9 +42,6 @@ class ConsoleContext extends RawMinkContext implements KernelAwareContext
      * Example: And I run Symfony "cache:clear" command with arguments "--env=prod"
      *
      * @Given /^(?:|I )run Symfony "(?P<command>[^\"]+)" command with arguments "(?P<args>[^\"]+)"$/
-     *
-     * @param string $command
-     * @param string $args
      */
     public function iRunSymfonyConsoleCommandWithArgs(string $command, string $args): void
     {

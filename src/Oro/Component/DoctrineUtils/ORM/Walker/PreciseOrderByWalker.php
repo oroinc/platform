@@ -36,9 +36,6 @@ class PreciseOrderByWalker extends TreeWalkerAdapter
     }
 
     /**
-     * @param AST\SelectStatement $AST
-     * @param                     $rootEntityClass
-     * @param                     $rootEntityAlias
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function updateQuery(AST\SelectStatement $AST, $rootEntityClass, $rootEntityAlias)

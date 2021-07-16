@@ -24,10 +24,6 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
     /** @var bool */
     private $isOrganizationOptional = false;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param string                 $organizationFieldName
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         string $organizationFieldName = 'organization'
@@ -36,9 +32,6 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
         $this->organizationFieldName = $organizationFieldName;
     }
 
-    /**
-     * @param bool $isOrganizationOptional
-     */
     public function setOrganizationOptional(bool $isOrganizationOptional): void
     {
         $this->isOrganizationOptional = $isOrganizationOptional;

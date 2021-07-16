@@ -54,7 +54,6 @@ class ActivityController extends RestGetController
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($activity, true));
 
-
         $result = $this->getManager()->getActivityTargetTypes();
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);

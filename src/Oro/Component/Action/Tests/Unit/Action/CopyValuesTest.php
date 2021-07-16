@@ -60,10 +60,6 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $options
-     * @param array $expectedData
-     *
      * @dataProvider executeProvider
      */
     public function testExecute(array $inputData, array $options, array $expectedData)

@@ -11,8 +11,6 @@ abstract class AbstractAssembler implements AssemblerInterface
 
     /**
      * Registers the configuration pass.
-     *
-     * @param ConfigurationPassInterface $configurationPass
      */
     public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
     {

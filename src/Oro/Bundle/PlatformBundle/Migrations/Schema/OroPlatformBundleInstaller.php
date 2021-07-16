@@ -44,9 +44,6 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
 
     /**
      * Makes sure oro_session table is up-to-date
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
      */
     public function oroSessionTable(Schema $schema, QueryBag $queries)
     {
@@ -72,8 +69,6 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
 
     /**
      * Create oro_session table
-     *
-     * @param Schema $schema
      */
     public function createOroSessionTable(Schema $schema)
     {

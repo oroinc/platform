@@ -19,10 +19,6 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigManager       $configManager
-     */
     public function __construct(TranslatorInterface $translator, ConfigManager $configManager)
     {
         $this->translator = $translator;
@@ -63,11 +59,6 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         return $this->getEntityVariableProcessors($entityClass);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
     private function getEntityVariableDefinitions(string $entityClass): array
     {
         $result = [];
@@ -82,11 +73,6 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         return $result;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
     private function getEntityVariableProcessors(string $entityClass): array
     {
         $result = [];
@@ -128,11 +114,6 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         return $routes;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityMetadata|null
-     */
     private function getEntityMetadata(string $entityClass): ?EntityMetadata
     {
         if (!$this->configManager->hasConfig($entityClass)
@@ -144,11 +125,6 @@ class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
         return $this->configManager->getEntityMetadata($entityClass);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
     private function getVariableLabel(string $name): string
     {
         return sprintf('oro.email.emailtemplate.variables.url.%s.label', $name);

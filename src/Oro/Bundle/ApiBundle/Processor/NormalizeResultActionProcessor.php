@@ -149,11 +149,6 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         }
     }
 
-    /**
-     * @param \Exception             $e
-     * @param string                 $processorId
-     * @param NormalizeResultContext $context
-     */
     protected function logException(\Exception $e, string $processorId, NormalizeResultContext $context)
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
@@ -222,8 +217,6 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * Executes processors from the "normalize_result" group.
      * These processors are intended to prepare valid response, regardless whether an error occurred or not.
      *
-     * @param NormalizeResultContext $context
-     *
      * @throws \Exception if some processor throws an exception
      */
     protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
@@ -247,11 +240,6 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         }
     }
 
-    /**
-     * @param NormalizeResultContext $context
-     *
-     * @return array
-     */
     protected function getLogContext(NormalizeResultContext $context): array
     {
         $result = [
@@ -284,11 +272,6 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         );
     }
 
-    /**
-     * @param Error $error
-     *
-     * @return array
-     */
     private function getErrorForLog(Error $error): array
     {
         $result = [];
@@ -334,11 +317,6 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         return $value;
     }
 
-    /**
-     * @param ErrorSource $errorSource
-     *
-     * @return array
-     */
     private function getErrorSourceForLog(ErrorSource $errorSource): array
     {
         $result = [];

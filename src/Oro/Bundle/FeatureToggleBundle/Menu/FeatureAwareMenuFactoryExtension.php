@@ -13,9 +13,6 @@ class FeatureAwareMenuFactoryExtension implements ExtensionInterface
 {
     private FeatureChecker $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

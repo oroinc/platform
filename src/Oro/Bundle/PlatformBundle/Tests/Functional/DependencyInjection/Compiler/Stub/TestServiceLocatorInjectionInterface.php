@@ -6,9 +6,6 @@ use Psr\Container\ContainerInterface;
 
 interface TestServiceLocatorInjectionInterface
 {
-    /**
-     * @return ContainerInterface
-     */
     public function getContainer(): ContainerInterface;
 
     public function validateInjectedServiceLocator(): void;

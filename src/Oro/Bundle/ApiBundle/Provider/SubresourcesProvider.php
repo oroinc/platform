@@ -22,11 +22,6 @@ class SubresourcesProvider
     /** @var ResourcesCache */
     private $resourcesCache;
 
-    /**
-     * @param ActionProcessorInterface $processor
-     * @param ResourcesProvider        $resourcesProvider
-     * @param ResourcesCache           $resourcesCache
-     */
     public function __construct(
         ActionProcessorInterface $processor,
         ResourcesProvider $resourcesProvider,

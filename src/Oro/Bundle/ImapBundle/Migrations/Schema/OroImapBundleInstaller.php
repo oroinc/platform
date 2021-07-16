@@ -41,9 +41,6 @@ class OroImapBundleInstaller implements Installation
         $this->changeEmailTokensLength($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function changeEmailTokensLength(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
@@ -53,8 +50,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add Imap fields to the oro_email_origin table
-     *
-     * @param Schema $schema
      */
     protected function addImapFieldsToOroEmailOriginTable(Schema $schema)
     {
@@ -68,8 +63,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Create oro_email_folder_imap table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailFolderImapTable(Schema $schema)
     {
@@ -83,8 +76,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Create oro_email_imap table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailImapTable(Schema $schema)
     {
@@ -100,8 +91,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add oro_email_folder_imap foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailFolderImapForeignKeys(Schema $schema)
     {
@@ -116,8 +105,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add oro_email_imap foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailImapForeignKeys(Schema $schema)
     {
@@ -139,8 +126,6 @@ class OroImapBundleInstaller implements Installation
 
     /**
      * Add oro_imap_wrong_creds_origin table.
-     *
-     * @param Schema $schema
      */
     protected function addOroImapWrongCredsOriginTable(Schema $schema)
     {
@@ -151,9 +136,6 @@ class OroImapBundleInstaller implements Installation
         $table->addIndex(['owner_id']);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addOriginOauthType(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');

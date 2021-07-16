@@ -21,10 +21,6 @@ class AttachmentHashProvider
      */
     private $attachmentFilterConfiguration;
 
-    /**
-     * @param AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider
-     * @param AttachmentFilterConfiguration $attachmentFilterConfiguration
-     */
     public function __construct(
         AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider,
         AttachmentFilterConfiguration $attachmentFilterConfiguration
@@ -40,10 +36,6 @@ class AttachmentHashProvider
      *
      * In this case, we have a service decorator that can return both the new filter and the original,
      * depending on the configuration.
-     *
-     * @param string $filterName
-     *
-     * @return string
      */
     public function getFilterConfigHash(string $filterName): string
     {

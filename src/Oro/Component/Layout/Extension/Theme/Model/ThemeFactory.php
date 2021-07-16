@@ -12,9 +12,6 @@ class ThemeFactory implements ThemeFactoryInterface
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
-    /**
-     * @param PropertyAccessor $propertyAccessor
-     */
     public function __construct(PropertyAccessor $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
@@ -41,10 +38,6 @@ class ThemeFactory implements ThemeFactoryInterface
         return $theme;
     }
 
-    /**
-     * @param Theme $theme
-     * @param array $themeDefinition
-     */
     private function applyThemeProperties(Theme $theme, array $themeDefinition)
     {
         $properties = [
@@ -66,10 +59,6 @@ class ThemeFactory implements ThemeFactoryInterface
         }
     }
 
-    /**
-     * @param array $themeDefinition
-     * @param Theme $theme
-     */
     private function addPageTemplatesConfig(array $themeDefinition, Theme $theme)
     {
         if (isset($themeDefinition['config']['page_templates']['titles'])) {

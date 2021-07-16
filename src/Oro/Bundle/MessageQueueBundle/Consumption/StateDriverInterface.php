@@ -9,8 +9,6 @@ interface StateDriverInterface
 {
     /**
      * Saves the date when a state was changed.
-     *
-     * @param \DateTime|null $date
      */
     public function setChangeStateDate(\DateTime $date = null);
 
@@ -27,7 +25,6 @@ interface StateDriverInterface
      *
      * @param \DateTime $date
      * @param integer $gapPeriod Gap period in seconds
-     *
      */
     public function setChangeStateDateWithTimeGap(\DateTime $date, $gapPeriod = 5);
 }

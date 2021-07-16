@@ -15,9 +15,6 @@ class FiltersConfigExtension extends AbstractConfigExtension
     /** @var FilterOperatorRegistry */
     private $filterOperatorRegistry;
 
-    /**
-     * @param FilterOperatorRegistry $filterOperatorRegistry
-     */
     public function __construct(FilterOperatorRegistry $filterOperatorRegistry)
     {
         $this->filterOperatorRegistry = $filterOperatorRegistry;

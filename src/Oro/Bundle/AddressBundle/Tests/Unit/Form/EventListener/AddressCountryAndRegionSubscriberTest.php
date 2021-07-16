@@ -275,7 +275,6 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->om->expects($this->once())->method('getRepository')->with($this->equalTo('OroAddressBundle:Country'))
             ->will($this->returnValue($repository));
 
-
         $startData = array(
             'region' => 'someRegion', 'region_text' => 'regionText', 'country' => self::TEST_COUNTRY_NAME
         );

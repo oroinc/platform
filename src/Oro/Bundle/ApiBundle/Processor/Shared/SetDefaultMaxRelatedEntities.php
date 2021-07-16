@@ -15,9 +15,6 @@ class SetDefaultMaxRelatedEntities implements ProcessorInterface
     /** @var int */
     private $maxRelatedEntitiesLimit;
 
-    /**
-     * @param int $maxRelatedEntitiesLimit
-     */
     public function __construct(int $maxRelatedEntitiesLimit)
     {
         $this->maxRelatedEntitiesLimit = $maxRelatedEntitiesLimit;

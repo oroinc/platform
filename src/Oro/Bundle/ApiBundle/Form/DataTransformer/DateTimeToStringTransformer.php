@@ -26,10 +26,6 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     /** @var bool */
     private $withDate;
 
-    /**
-     * @param bool $withTime
-     * @param bool $withDate
-     */
     public function __construct(bool $withTime = true, bool $withDate = true)
     {
         if (!$withTime && !$withDate) {
@@ -71,11 +67,6 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         return $this->reverseTransformValue($value);
     }
 
-    /**
-     * @param \DateTimeInterface $value
-     *
-     * @return string
-     */
     private function transformValue(\DateTimeInterface $value): string
     {
         if (!$this->withTime) {
@@ -94,9 +85,6 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return \DateTimeInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function reverseTransformValue(string $value): \DateTimeInterface
@@ -139,11 +127,6 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         return $this->convertToDateTime($value);
     }
 
-    /**
-     * @param string $value
-     *
-     * @return \DateTimeInterface
-     */
     private function reverseTransformDateValue(string $value): \DateTimeInterface
     {
         if (!preg_match(self::DATE_PATTERN, $value, $matches)) {
@@ -166,11 +149,6 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         return $this->convertToDateTime($value . 'T00:00:00Z');
     }
 
-    /**
-     * @param string $value
-     *
-     * @return \DateTimeInterface
-     */
     private function reverseTransformTimeValue(string $value): \DateTimeInterface
     {
         if (!preg_match(self::TIME_PATTERN, $value, $matches)) {
@@ -194,11 +172,6 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         return $this->convertToDateTime($beginningOfTime->format('Y-m-d\T') . $value . 'Z');
     }
 
-    /**
-     * @param string $value
-     *
-     * @return \DateTimeInterface
-     */
     private function convertToDateTime(string $value): \DateTimeInterface
     {
         try {

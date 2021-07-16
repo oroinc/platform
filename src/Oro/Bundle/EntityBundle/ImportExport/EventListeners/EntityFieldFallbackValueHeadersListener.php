@@ -11,9 +11,6 @@ use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
  */
 class EntityFieldFallbackValueHeadersListener
 {
-    /**
-     * @param LoadEntityRulesAndBackendHeadersEvent $event
-     */
     public function afterLoadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
         $header = ['value' => EntityFieldFallbackValueNormalizer::VIRTUAL_FIELD_NAME];

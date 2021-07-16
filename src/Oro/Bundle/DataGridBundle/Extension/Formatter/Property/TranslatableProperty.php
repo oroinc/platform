@@ -36,10 +36,6 @@ class TranslatableProperty extends FieldProperty
         );
     }
 
-    /**
-     * @param ResultRecordInterface $record
-     * @return array
-     */
     protected function getParameters(ResultRecordInterface $record): array
     {
         $params = $this->getOr(self::DIRECT_PARAMS_KEY, []);

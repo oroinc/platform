@@ -11,8 +11,6 @@ interface DatabasePlatformAwareInterface
 {
     /**
      * Sets the database platform
-     *
-     * @param AbstractPlatform $platform
      */
     public function setDatabasePlatform(AbstractPlatform $platform);
 }

@@ -39,9 +39,6 @@ class LoadLocalizedEmailTemplateData extends AbstractFixture implements
         $this->container = $container;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $owner = $this->getReference('simple_user');

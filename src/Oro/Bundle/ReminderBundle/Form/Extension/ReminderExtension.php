@@ -22,9 +22,6 @@ class ReminderExtension extends AbstractTypeExtension implements ServiceSubscrib
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -50,8 +47,6 @@ class ReminderExtension extends AbstractTypeExtension implements ServiceSubscrib
 
     /**
      * Set form data
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {

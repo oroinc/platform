@@ -14,21 +14,14 @@ class RebuildTranslationCacheResult
     /** @var string|null */
     private $failureMessage;
 
-    /**
-     * @param bool        $successful
-     * @param string|null $failureMessage
-     */
     public function __construct(bool $successful, string $failureMessage = null)
     {
         $this->successful = $successful;
         $this->failureMessage = $failureMessage;
     }
 
-
     /**
      * Indicates whether the translation cache was successfully rebuilt or not.
-     *
-     * @return bool
      */
     public function isSuccessful(): bool
     {
@@ -37,8 +30,6 @@ class RebuildTranslationCacheResult
 
     /**
      * Gets the message to be shown to a user when the translation cache rebuild failed.
-     *
-     * @return string|null
      */
     public function getFailureMessage(): ?string
     {

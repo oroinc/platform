@@ -16,18 +16,11 @@ class FileDigitalAssetChangedListener
     /** @var FileReflector */
     private $fileReflector;
 
-    /**
-     * @param FileReflector $fileReflector
-     */
     public function __construct(FileReflector $fileReflector)
     {
         $this->fileReflector = $fileReflector;
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function prePersist(File $file, LifecycleEventArgs $args): void
     {
         /** @var DigitalAsset|null $digitalAsset */
@@ -43,8 +36,6 @@ class FileDigitalAssetChangedListener
      * Reflects files from new digital assets which are yet going to be persisted.
      * Covers case when both child file and digital asset are new, but child file entity gets persisted before the
      * digital asset entity.
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
@@ -64,10 +55,6 @@ class FileDigitalAssetChangedListener
         }
     }
 
-    /**
-     * @param File $entity
-     * @param LifecycleEventArgs $args
-     */
     public function preUpdate(File $entity, LifecycleEventArgs $args): void
     {
         $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($entity);

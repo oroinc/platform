@@ -49,7 +49,6 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         return new ThemeManager($factory ?? $this->factory, $themeDefinitionBag, $enabledThemes);
     }
 
-
     public function testManagerWorkWithoutKnownThemes()
     {
         $manager = $this->createManager();

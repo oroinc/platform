@@ -14,17 +14,11 @@ use Oro\Bundle\DraftBundle\Manager\DraftManager;
  */
 class DateTimeExtension extends AbstractDuplicatorExtension
 {
-    /**
-     * @return Filter
-     */
     public function getFilter(): Filter
     {
         return new DateTimeFilter();
     }
 
-    /**
-     * @return Matcher
-     */
     public function getMatcher(): Matcher
     {
         return new PropertyTypeMatcher(\DateTime::class);

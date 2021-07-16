@@ -17,9 +17,6 @@ class DatagridRouteHelper
     /** @var RouterInterface */
     protected $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
@@ -52,11 +49,6 @@ class DatagridRouteHelper
 
     /**
      * Adds minified grid parameters to the specified URL.
-     *
-     * @param string $originalUrl
-     * @param string $gridName
-     * @param array $params
-     * @return string
      */
     public function appendGridParams(string $originalUrl, string $gridName, array $params): string
     {

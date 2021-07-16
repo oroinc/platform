@@ -34,10 +34,6 @@ class PermissionManager
     /** @var Permission[] */
     protected $loadedPermissions = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param CacheProvider $cache
-     */
     public function __construct(DoctrineHelper $doctrineHelper, CacheProvider $cache)
     {
         $this->doctrineHelper = $doctrineHelper;

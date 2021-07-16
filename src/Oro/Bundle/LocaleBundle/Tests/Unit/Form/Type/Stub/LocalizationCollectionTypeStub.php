@@ -9,9 +9,6 @@ class LocalizationCollectionTypeStub extends LocalizationCollectionType
     /** @var array */
     protected $localizations;
 
-    /**
-     * @param array $localizations
-     */
     public function __construct(array $localizations = [])
     {
         $this->localizations = $localizations;

@@ -89,9 +89,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         return $subresources;
     }
 
-    /**
-     * @param ConfigBag $configBag
-     */
     private function expectGetConfigBag(ConfigBag $configBag)
     {
         $this->configBagRegistry->expects(self::once())
@@ -100,9 +97,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
             ->willReturn($configBag);
     }
 
-    /**
-     * @param string $entityClass
-     */
     private function expectGetConfig(string $entityClass)
     {
         $config = new Config();
@@ -122,10 +116,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadata');
     }
 
-    /**
-     * @param string         $entityClass
-     * @param EntityMetadata $entityMetadata
-     */
     private function expectGetMetadata(string $entityClass, EntityMetadata $entityMetadata)
     {
         $config = new Config();

@@ -12,10 +12,8 @@ class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
     private const TEST_NAME = 'testGrid';
     private const PARAMETERS_CLASS = ParameterBag::class;
 
-    /** @var RequestStack */
     private RequestStack $requestStack;
 
-    /** @var RequestParameterBagFactory */
     private RequestParameterBagFactory $factory;
 
     protected function setUp(): void
@@ -45,7 +43,6 @@ class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expectedParameters, $parameters->all());
     }
-
 
     /**
      * @dataProvider queryDataProvider

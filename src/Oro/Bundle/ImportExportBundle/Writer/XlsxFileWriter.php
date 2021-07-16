@@ -20,9 +20,6 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
     /** @var DoctrineClearWriter */
     protected $clearWriter;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;
@@ -40,9 +37,6 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
         }
     }
 
-    /**
-     * @param DoctrineClearWriter $clearWriter
-     */
     public function setClearWriter(DoctrineClearWriter $clearWriter): void
     {
         $this->clearWriter = $clearWriter;

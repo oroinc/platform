@@ -802,10 +802,6 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mergeDataProvider
-     *
-     * @param array $expected
-     * @param array $first
-     * @param array $second
      */
     public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
     {

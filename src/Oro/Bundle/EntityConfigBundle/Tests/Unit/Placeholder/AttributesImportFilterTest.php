@@ -56,8 +56,6 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider applicableAliasDataProvider
-     * @param bool $hasAttributes
-     * @param bool $isApplicable
      */
     public function testIsApplicableAlias(bool $hasAttributes, bool $isApplicable)
     {
@@ -80,9 +78,6 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isApplicable, $this->attributesImportFilter->isApplicableAlias(self::ENTITY_ALIAS));
     }
 
-    /**
-     * @return array
-     */
     public function applicableAliasDataProvider(): array
     {
         return [
@@ -106,8 +101,6 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider applicableEntityDataProvider
-     * @param bool $hasAttributes
-     * @param bool $isApplicable
      */
     public function testIsApplicableEntity(bool $hasAttributes, bool $isApplicable)
     {
@@ -126,9 +119,6 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isApplicable, $this->attributesImportFilter->isApplicableEntity($entity));
     }
 
-    /**
-     * @return array
-     */
     public function applicableEntityDataProvider(): array
     {
         return [

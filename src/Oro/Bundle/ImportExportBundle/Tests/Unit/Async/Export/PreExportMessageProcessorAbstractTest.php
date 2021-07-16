@@ -144,9 +144,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
     }
 
-    /**
-     * @return array
-     */
     public function invalidUserTypeProvider(): array
     {
         $notObject = 'not_object';

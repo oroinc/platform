@@ -22,10 +22,6 @@ class TranslateAction extends AbstractAction
     /** @var array */
     protected $options;
 
-    /**
-     * @param ContextAccessor     $contextAccessor
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ContextAccessor $contextAccessor, TranslatorInterface $translator)
     {
         parent::__construct($contextAccessor);

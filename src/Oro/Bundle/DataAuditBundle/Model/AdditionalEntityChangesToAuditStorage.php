@@ -41,19 +41,11 @@ class AdditionalEntityChangesToAuditStorage
         }
     }
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @return bool
-     */
     public function hasEntityUpdates(EntityManagerInterface $entityManager): bool
     {
         return $this->additionalUpdates->contains($entityManager);
     }
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @return \SplObjectStorage
-     */
     public function getEntityUpdates(EntityManagerInterface $entityManager): \SplObjectStorage
     {
         if ($this->additionalUpdates->contains($entityManager)) {
@@ -63,9 +55,6 @@ class AdditionalEntityChangesToAuditStorage
         return new \SplObjectStorage();
     }
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     */
     public function clear(EntityManagerInterface $entityManager)
     {
         if ($this->additionalUpdates->contains($entityManager)) {

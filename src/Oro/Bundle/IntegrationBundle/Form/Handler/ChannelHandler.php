@@ -41,13 +41,6 @@ class ChannelHandler
     /** @var FormFactoryInterface */
     protected $formFactory;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param FormInterface $form
-     * @param EntityManager $em
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param FormFactoryInterface $formFactory
-     */
     public function __construct(
         RequestStack $requestStack,
         FormInterface $form,
@@ -97,9 +90,6 @@ class ChannelHandler
         return false;
     }
 
-    /**
-     * @param Integration $entity
-     */
     private function updateForm(Integration $entity)
     {
         // recreate form due to JS validation should be shown even in case when it was not validated on backend
@@ -120,10 +110,6 @@ class ChannelHandler
         }
     }
 
-    /**
-     * @param Integration $entity
-     * @param User|null $userOwner
-     */
     private function saveFormData(Integration $entity, User $userOwner = null)
     {
         $isNewEntity = !$entity->getId();

@@ -36,10 +36,6 @@ class EmailVoter implements VoterInterface
     /** @var MailboxManager */
     private $mailboxManager;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param MailboxManager                $mailboxManager
-     */
     public function __construct(AuthorizationCheckerInterface $authorizationChecker, MailboxManager $mailboxManager)
     {
         $this->authorizationChecker = $authorizationChecker;

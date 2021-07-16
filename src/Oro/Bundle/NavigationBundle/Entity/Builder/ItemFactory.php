@@ -12,9 +12,6 @@ class ItemFactory
     /** @var ContainerInterface */
     private $builders;
 
-    /**
-     * @param ContainerInterface $builders
-     */
     public function __construct(ContainerInterface $builders)
     {
         $this->builders = $builders;

@@ -59,7 +59,6 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
         ];
     }
 
-
     /**
      * @return array
      */

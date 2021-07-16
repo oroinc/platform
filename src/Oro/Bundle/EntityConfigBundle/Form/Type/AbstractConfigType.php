@@ -18,9 +18,6 @@ abstract class AbstractConfigType extends AbstractType
     /** @var ConfigTypeHelper */
     private $typeHelper;
 
-    /**
-     * @param ConfigTypeHelper $typeHelper
-     */
     public function __construct(ConfigTypeHelper $typeHelper)
     {
         $this->typeHelper = $typeHelper;

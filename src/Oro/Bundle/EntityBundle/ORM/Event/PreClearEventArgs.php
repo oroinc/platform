@@ -26,17 +26,11 @@ class PreClearEventArgs extends EventArgs
         $this->entityName = $entityName;
     }
 
-    /**
-     * @return EntityManager
-     */
     public function getEntityManager(): EntityManager
     {
         return $this->em;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEntityName(): ?string
     {
         return $this->entityName;

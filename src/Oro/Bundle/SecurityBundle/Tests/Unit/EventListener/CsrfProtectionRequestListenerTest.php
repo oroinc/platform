@@ -106,7 +106,6 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider useRequestDataProvider
-     * @param bool $useRequest
      */
     public function testOnKernelControllerCsrfPassed(bool $useRequest): void
     {
@@ -138,7 +137,6 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider useRequestDataProvider
-     * @param bool $useRequest
      */
     public function testOnKernelControllerCsrfFail(bool $useRequest): void
     {
@@ -169,9 +167,6 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    /**
-     * @return array
-     */
     public function useRequestDataProvider(): array
     {
         return [

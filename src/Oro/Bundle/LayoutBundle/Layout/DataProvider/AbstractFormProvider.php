@@ -25,10 +25,6 @@ abstract class AbstractFormProvider
     /** @var UrlGeneratorInterface */
     protected $router;
 
-    /**
-     * @param FormFactoryInterface  $formFactory
-     * @param UrlGeneratorInterface $router
-     */
     public function __construct(FormFactoryInterface $formFactory, UrlGeneratorInterface $router)
     {
         $this->formFactory = $formFactory;

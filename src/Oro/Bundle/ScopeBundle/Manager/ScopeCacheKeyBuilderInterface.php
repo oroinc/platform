@@ -9,10 +9,5 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
  */
 interface ScopeCacheKeyBuilderInterface
 {
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return string|null
-     */
     public function getCacheKey(ScopeCriteria $criteria): ?string;
 }

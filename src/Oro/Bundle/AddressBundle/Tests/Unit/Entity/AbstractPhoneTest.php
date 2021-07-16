@@ -92,7 +92,6 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-
     /**
      * @param string|null $phone
      * @param int $id

@@ -28,11 +28,6 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     /** * @var FeatureChecker */
     private $featureChecker;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param TransitionCronTriggerHelper $helper
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         TransitionCronTriggerHelper $helper,
@@ -88,10 +83,6 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
         return true;
     }
 
-    /**
-     * @param TransitionCronTrigger $trigger
-     * @param Workflow $workflow
-     */
     protected function processStartTransition(TransitionCronTrigger $trigger, Workflow $workflow)
     {
         $entities = $this->helper->fetchEntitiesWithoutWorkflowItems($trigger, $workflow);
@@ -107,8 +98,6 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     }
 
     /**
-     * @param TransitionCronTrigger $trigger
-     * @param Workflow $workflow
      * @throws \Exception
      */
     protected function processTransition(TransitionCronTrigger $trigger, Workflow $workflow)

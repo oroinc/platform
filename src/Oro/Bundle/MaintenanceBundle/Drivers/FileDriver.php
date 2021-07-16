@@ -73,7 +73,6 @@ class FileDriver extends AbstractDriver implements DriverTtlInterface
         return ($accessTime < $now);
     }
 
-
     /**
      * {@inheritdoc}
      */

@@ -27,8 +27,6 @@ class CumulativeResourceManager
 
     /**
      * Gets a singleton instance of the cumulative resource manager.
-     *
-     * @return CumulativeResourceManager
      */
     public static function getInstance(): CumulativeResourceManager
     {
@@ -48,8 +46,6 @@ class CumulativeResourceManager
 
     /**
      * Clears the state of this manager.
-     *
-     * @return CumulativeResourceManager
      */
     public function clear(): CumulativeResourceManager
     {
@@ -88,8 +84,6 @@ class CumulativeResourceManager
 
     /**
      * Gets the application root directory.
-     *
-     * @return string|null
      */
     public function getAppRootDir(): ?string
     {
@@ -98,10 +92,6 @@ class CumulativeResourceManager
 
     /**
      * Sets the application root directory.
-     *
-     * @param string|null $appRootDir
-     *
-     * @return CumulativeResourceManager
      */
     public function setAppRootDir(?string $appRootDir): CumulativeResourceManager
     {
@@ -112,10 +102,6 @@ class CumulativeResourceManager
 
     /**
      * Gets a directory for the given bundle.
-     *
-     * @param string $bundleClass
-     *
-     * @return string
      */
     public function getBundleDir(string $bundleClass): string
     {
@@ -131,10 +117,6 @@ class CumulativeResourceManager
 
     /**
      * Gets a directory for the given bundle in the application directory.
-     *
-     * @param string $bundleName
-     *
-     * @return string
      */
     public function getBundleAppDir(string $bundleName): string
     {
@@ -153,10 +135,6 @@ class CumulativeResourceManager
 
     /**
      * Checks if the given path is a directory.
-     *
-     * @param string $path
-     *
-     * @return bool
      */
     public function isDir(string $path): bool
     {

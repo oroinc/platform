@@ -14,9 +14,6 @@ class StripDangerousProtocolsBuilder implements BuilderInterface
     /** @var UriSecurityHelper */
     private $uriSecurityHelper;
 
-    /**
-     * @param UriSecurityHelper $uriSecurityHelper
-     */
     public function __construct(UriSecurityHelper $uriSecurityHelper)
     {
         $this->uriSecurityHelper = $uriSecurityHelper;
@@ -30,9 +27,6 @@ class StripDangerousProtocolsBuilder implements BuilderInterface
         $this->stripRecursively($menu);
     }
 
-    /**
-     * @param ItemInterface $menu
-     */
     private function stripRecursively(ItemInterface $menu): void
     {
         $menuChildren = $menu->getChildren();

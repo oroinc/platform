@@ -6,9 +6,6 @@ class ItemStub
 {
     protected $data = [];
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data = array())
     {
         $this->data = $data;

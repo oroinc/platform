@@ -230,8 +230,6 @@ class Job
      * Do not call from the outside.
      *
      * @internal
-     *
-     * @param Job $rootJob
      */
     public function setRootJob(Job $rootJob)
     {
@@ -251,8 +249,6 @@ class Job
      * Do not call from the outside.
      *
      * @internal
-     *
-     * @param \DateTime $createdAt
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
@@ -272,8 +268,6 @@ class Job
      * Do not call from the outside.
      *
      * @internal
-     *
-     * @param \DateTime $startedAt
      */
     public function setStartedAt(\DateTime $startedAt)
     {
@@ -312,8 +306,6 @@ class Job
      * Do not call from the outside.
      *
      * @internal
-     *
-     * @param \DateTime $stoppedAt
      */
     public function setStoppedAt(\DateTime $stoppedAt)
     {
@@ -349,9 +341,6 @@ class Job
         $this->childJobs = $childJobs;
     }
 
-    /**
-     * @param Job $childJob
-     */
     public function addChildJob(Job $childJob)
     {
         $this->childJobs[] = $childJob;
@@ -365,9 +354,6 @@ class Job
         return $this->data;
     }
 
-    /**
-     * @param array $data
-     */
     public function setData(array $data)
     {
         if (array_key_exists('_properties', $this->data)) {
@@ -388,9 +374,6 @@ class Job
         return $this->data['_properties'];
     }
 
-    /**
-     * @param array $properties
-     */
     public function setProperties(array $properties)
     {
         $this->data['_properties'] = $properties;

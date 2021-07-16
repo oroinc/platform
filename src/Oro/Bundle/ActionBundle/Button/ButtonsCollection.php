@@ -21,10 +21,6 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         $this->buttonsMap = new \SplObjectStorage();
     }
 
-    /**
-     * @param ButtonInterface $button
-     * @param ButtonProviderExtensionInterface $extension
-     */
     protected function addButton(ButtonInterface $button, ButtonProviderExtensionInterface $extension)
     {
         //map modified so initialized list should be cleared

@@ -33,11 +33,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param ConfigManager $configManager
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(
         ManagerRegistry $registry,
         ConfigManager $configManager,
@@ -117,10 +112,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         return $this->registry->getManagerForClass(EntityConfigModel::class)->find(EntityConfigModel::class, $entityId);
     }
 
-    /**
-     * @param FieldConfigModel $model
-     * @param array $options
-     */
     protected function updateModelConfig(FieldConfigModel $model, array $options)
     {
         $fieldProperties = $this->fieldTypeProvider->getFieldProperties($model->getType());

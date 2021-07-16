@@ -20,8 +20,6 @@ trait DbIsolationExtension
     protected static $dbIsolationConnections = [];
 
     /**
-     * @param bool $nestTransactionsWithSavepoints
-     *
      * @internal
      */
     protected function startTransaction(bool $nestTransactionsWithSavepoints = false)

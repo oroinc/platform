@@ -13,9 +13,6 @@ class ProcessDefinitionListConfiguration implements ConfigurationInterface
      */
     protected $definitionConfiguration;
 
-    /**
-     * @param ProcessDefinitionConfiguration $definitionConfiguration
-     */
     public function __construct(ProcessDefinitionConfiguration $definitionConfiguration)
     {
         $this->definitionConfiguration = $definitionConfiguration;

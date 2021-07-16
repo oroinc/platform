@@ -43,10 +43,6 @@ class ConfigBagRegistry implements ResetInterface
     /**
      * Returns the config bag that contains API resources configuration for the given request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return ConfigBagInterface
-     *
      * @throws \LogicException if a config bag does not exist for the given request type
      */
     public function getConfigBag(RequestType $requestType): ConfigBagInterface

@@ -11,9 +11,6 @@ class TableWithNameGenerator extends Table
      */
     protected $nameGenerator;
 
-    /**
-     * @param array $args
-     */
     public function __construct(array $args)
     {
         $this->nameGenerator = $args['nameGenerator'];

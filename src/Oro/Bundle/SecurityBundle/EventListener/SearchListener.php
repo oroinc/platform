@@ -24,9 +24,6 @@ class SearchListener
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     */
     public function __construct(OwnershipMetadataProviderInterface $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
@@ -34,8 +31,6 @@ class SearchListener
 
     /**
      * Add organization field to the entities
-     *
-     * @param SearchMappingCollectEvent $event
      */
     public function collectEntityMapEvent(SearchMappingCollectEvent $event)
     {
@@ -65,8 +60,6 @@ class SearchListener
 
     /**
      * Add organization field to the search mapping
-     *
-     * @param PrepareEntityMapEvent $event
      */
     public function prepareEntityMapEvent(PrepareEntityMapEvent $event)
     {

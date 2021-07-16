@@ -29,10 +29,6 @@ class EmailAttachmentType extends AbstractType
     /** @var EmailAttachmentTransformer */
     private $emailAttachmentTransformer;
 
-    /**
-     * @param ManagerRegistry            $doctrine
-     * @param EmailAttachmentTransformer $emailAttachmentTransformer
-     */
     public function __construct(ManagerRegistry $doctrine, EmailAttachmentTransformer $emailAttachmentTransformer)
     {
         $this->doctrine = $doctrine;
@@ -89,8 +85,6 @@ class EmailAttachmentType extends AbstractType
     }
 
     /**
-     * @param FormEvent $event
-     *
      * @throws FormException
      */
     public function initAttachmentEntity(FormEvent $event)

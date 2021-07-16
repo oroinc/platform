@@ -94,7 +94,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     * @param array $options
      */
     public function testConfigureOptionsUnsupportedOptions(array $options)
     {
@@ -143,9 +142,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider defaultsAndAutoFillOptionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testConfigureOptionsDefaultsAndAutoFill(array $options, array $expected)
     {
@@ -224,10 +220,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider formDataProvider
-     *
-     * @param array $data
-     * @param array $expectedDefinition
-     * @param $segmentName
      */
     public function testSubmitNew(array $data, array $expectedDefinition, $segmentName)
     {
@@ -278,10 +270,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider formDataProvider
-     *
-     * @param array $data
-     * @param array $expectedDefinition
-     * @param $segmentName
      */
     public function testSubmitNewWhenNoUserInStorage(array $data, array $expectedDefinition, $segmentName)
     {
@@ -324,10 +312,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider formDataProvider
-     *
-     * @param array $data
-     * @param array $expectedDefinition
-     * @param $segmentName
      */
     public function testSubmitExisting(array $data, array $expectedDefinition, $segmentName)
     {
@@ -589,9 +573,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($fieldConditionOptions, $formView->vars['field_condition_options']);
     }
 
-    /**
-     * @param $entityClass
-     */
     protected function assertNormalizersCalls($entityClass)
     {
         $em = $this->createMock(EntityManagerInterface::class);

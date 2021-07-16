@@ -29,9 +29,6 @@ class DisableHandlerWrapperTest extends TestCase
 
     /**
      * @dataProvider isHandlingProvider
-     *
-     * @param bool $expected
-     * @param bool $isActive
      */
     public function testIsHandling(bool $expected, bool $isActive): void
     {

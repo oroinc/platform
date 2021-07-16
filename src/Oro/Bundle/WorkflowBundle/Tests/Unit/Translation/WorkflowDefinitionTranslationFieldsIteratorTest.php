@@ -10,8 +10,6 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
 {
     /**
      * @dataProvider readWorkflowDefinitionFieldsProvider
-     * @param WorkflowDefinition $definition
-     * @param array $expected
      */
     public function testReadWorkflowDefinition(WorkflowDefinition $definition, array $expected)
     {
@@ -117,8 +115,6 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
     }
 
     /**
-     * @param WorkflowDefinition $actualDefinition
-     * @param WorkflowDefinition $expectedDefinitionState
      * @dataProvider writeWorkflowDefinitionDataProvider
      */
     public function testWriteWorkflowDefinition(

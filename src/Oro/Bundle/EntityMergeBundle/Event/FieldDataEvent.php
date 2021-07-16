@@ -12,9 +12,6 @@ class FieldDataEvent extends Event
      */
     protected $fieldData;
 
-    /**
-     * @param FieldData $fieldData
-     */
     public function __construct(FieldData $fieldData)
     {
         $this->fieldData = $fieldData;

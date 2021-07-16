@@ -76,11 +76,6 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getGroupedResultsBySearchQueryProvider
-     *
-     * @param array $documentsCountToClassName
-     * @param array $entityAliasMaps
-     * @param array $entityConfigMaps
-     * @param array $expectedResult
      */
     public function testGetGroupedResultsBySearchQuery(
         array $documentsCountToClassName,
@@ -216,13 +211,6 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string      $fqcn
-     * @param string|null $label
-     * @param string|null $icon
-     *
-     * @return ConfigInterface
-     */
     protected function getConfigEntity(string $fqcn, string $label = null, string $icon = null): ConfigInterface
     {
         $values = [];

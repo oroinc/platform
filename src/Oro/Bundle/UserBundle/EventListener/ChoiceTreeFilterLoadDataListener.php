@@ -15,17 +15,12 @@ class ChoiceTreeFilterLoadDataListener
 
     /**
      * IndexerPrepareQueryListener constructor.
-     *
-     * @param Registry $doctrine
      */
     public function __construct(Registry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param ChoiceTreeFilterLoadDataEvent $event
-     */
     public function fillData(ChoiceTreeFilterLoadDataEvent $event)
     {
         if ($event->getClassName() === static::SUPPORTED_CLASS_NAME) {

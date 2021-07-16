@@ -25,11 +25,6 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
     /** @var string|null */
     private $processorRegistryServiceId;
 
-    /**
-     * @param string      $simpleProcessorRegistryServiceId
-     * @param string      $processorTagName
-     * @param string|null $processorRegistryServiceId
-     */
     public function __construct(
         string $simpleProcessorRegistryServiceId,
         string $processorTagName,
@@ -72,11 +67,6 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param Definition $processorServiceDef
-     *
-     * @return bool
-     */
     private function isSimpleProcessor(Definition $processorServiceDef): bool
     {
         if ($processorServiceDef->isAbstract()) {

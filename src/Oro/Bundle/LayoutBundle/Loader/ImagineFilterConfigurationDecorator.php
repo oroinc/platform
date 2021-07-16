@@ -20,10 +20,6 @@ class ImagineFilterConfigurationDecorator extends FilterConfiguration
      */
     private $filterLoaderServiceLink;
 
-    /**
-     * @param FilterConfiguration $filterConfiguration
-     * @param ServiceLink $filterLoaderServiceLink
-     */
     public function __construct(FilterConfiguration $filterConfiguration, ServiceLink $filterLoaderServiceLink)
     {
         $this->filterConfiguration = $filterConfiguration;

@@ -154,9 +154,6 @@ HELP
         ];
     }
 
-    /**
-     * @return array
-     */
     private function getAllCollections(): array
     {
         $collections = [];

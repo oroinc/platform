@@ -9,9 +9,6 @@ class EventSubscriberStub implements EventSubscriberInterface
     /** @var array */
     private static $events = [];
 
-    /**
-     * @param array $events
-     */
     public static function setSubscribedEvents(array $events)
     {
         self::$events = $events;

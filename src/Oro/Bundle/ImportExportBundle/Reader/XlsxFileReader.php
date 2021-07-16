@@ -43,10 +43,6 @@ class XlsxFileReader extends AbstractFileReader
         return $this->normalizeRow($data);
     }
 
-    /**
-     * @param ContextInterface $context
-     * @return array
-     */
     private function readRow(ContextInterface $context): array
     {
         if ($this->isEof()) {
@@ -60,9 +56,6 @@ class XlsxFileReader extends AbstractFileReader
         return $data->toArray();
     }
 
-    /**
-     * @return bool
-     */
     private function isEof(): bool
     {
         if (!$this->rowIterator->valid()) {

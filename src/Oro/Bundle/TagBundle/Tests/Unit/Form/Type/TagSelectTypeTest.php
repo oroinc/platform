@@ -27,7 +27,6 @@ class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber')
             ->disableOriginalConstructor()
             ->getMock();

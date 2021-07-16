@@ -40,9 +40,6 @@ class RequestDataAccessor
         $this->getPropertyAccessor()->setValue($requestData, self::getPropertyPath($path), $value);
     }
 
-    /**
-     * @return PropertyAccessorInterface
-     */
     private function getPropertyAccessor(): PropertyAccessorInterface
     {
         if (null === $this->propertyAccessor) {
@@ -54,11 +51,6 @@ class RequestDataAccessor
         return $this->propertyAccessor;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private static function getPropertyPath(string $path): string
     {
         return '[' . str_replace(ConfigUtil::PATH_DELIMITER, '][', $path) . ']';

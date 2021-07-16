@@ -25,11 +25,6 @@ class RunTimeSubscriber implements EventSubscriberInterface
      */
     protected $prettyArtifactsSubscriber;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ProgressArtifactsSubscriber $progressArtifactsSubscriber
-     * @param PrettyArtifactsSubscriber $prettyArtifactsSubscriber
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ProgressArtifactsSubscriber $progressArtifactsSubscriber,

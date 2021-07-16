@@ -43,9 +43,6 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
     }
 
-    /**
-     * @param array $sleepBetweenAttempt
-     */
     public function setSleepBetweenAttempt(array $sleepBetweenAttempt)
     {
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;

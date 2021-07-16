@@ -18,10 +18,6 @@ class CalendarDateManager
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(DoctrineHelper $doctrineHelper, LocaleSettings $localeSettings)
     {
         $this->doctrineHelper = $doctrineHelper;

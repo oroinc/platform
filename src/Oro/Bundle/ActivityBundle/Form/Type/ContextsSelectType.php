@@ -41,14 +41,6 @@ class ContextsSelectType extends AbstractType
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param EntityManager            $entityManager
-     * @param ConfigManager            $configManager
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
-     * @param EntityNameResolver       $entityNameResolver
-     * @param FeatureChecker           $featureChecker
-     */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,

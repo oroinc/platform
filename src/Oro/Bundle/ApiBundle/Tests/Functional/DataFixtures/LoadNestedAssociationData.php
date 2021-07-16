@@ -9,9 +9,6 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNested
 
 class LoadNestedAssociationData extends AbstractFixture
 {
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         for ($i = 1; $i <= 3; $i++) {

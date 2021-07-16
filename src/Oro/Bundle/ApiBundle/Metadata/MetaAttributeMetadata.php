@@ -56,8 +56,6 @@ class MetaAttributeMetadata implements ToArrayInterface
 
     /**
      * Gets the name of the meta property.
-     *
-     * @return string
      */
     public function getName(): string
     {

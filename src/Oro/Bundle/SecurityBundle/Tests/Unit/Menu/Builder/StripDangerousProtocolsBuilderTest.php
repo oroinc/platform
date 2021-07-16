@@ -25,9 +25,6 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildDataProvider
-     *
-     * @param ItemInterface $menuItem
-     * @param ItemInterface $expectedMenuItem
      */
     public function testBuild(ItemInterface $menuItem, ItemInterface $expectedMenuItem)
     {
@@ -46,9 +43,6 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($expectedMenuItem, $menuItem);
     }
 
-    /**
-     * @return array
-     */
     public function buildDataProvider(): array
     {
         return [

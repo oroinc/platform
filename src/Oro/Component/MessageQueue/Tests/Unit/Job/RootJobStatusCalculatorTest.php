@@ -62,8 +62,6 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider testJobStoppedBeforeCalculateProvider
-     *
-     * @param Job $job
      */
     public function testJobStoppedBeforeCalculate(Job $job): void
     {

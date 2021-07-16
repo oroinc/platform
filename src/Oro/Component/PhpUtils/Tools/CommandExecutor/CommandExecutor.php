@@ -19,10 +19,6 @@ class CommandExecutor extends AbstractCommandExecutor implements CommandExecutor
     /** @var array */
     protected $defaultOptions = ['process-timeout' => self::DEFAULT_TIMEOUT];
 
-    /**
-     * @param string $consoleCmdPath
-     * @param string $env
-     */
     public function __construct(string $consoleCmdPath, string $env)
     {
         $this->consoleCmdPath = $consoleCmdPath;

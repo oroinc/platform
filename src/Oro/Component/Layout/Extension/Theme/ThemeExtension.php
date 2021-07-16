@@ -34,12 +34,6 @@ class ThemeExtension extends AbstractExtension
     /** @var array */
     protected $updates = [];
 
-    /**
-     * @param LayoutUpdateLoaderInterface $loader
-     * @param DependencyInitializer $dependencyInitializer
-     * @param PathProviderInterface $pathProvider
-     * @param ResourceProviderInterface $resourceProvider
-     */
     public function __construct(
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
@@ -52,9 +46,6 @@ class ThemeExtension extends AbstractExtension
         $this->resourceProvider = $resourceProvider;
     }
 
-    /**
-     * @param VisitorInterface $visitor
-     */
     public function addVisitor(VisitorInterface $visitor)
     {
         $this->visitors[] = $visitor;

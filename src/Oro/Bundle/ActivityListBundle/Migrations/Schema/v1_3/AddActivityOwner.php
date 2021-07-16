@@ -18,8 +18,6 @@ class AddActivityOwner implements Migration
 
     /**
      * Adds Activity Owner
-     *
-     * @param Schema $schema
      */
     public static function addActivityOwner(Schema $schema)
     {
@@ -32,8 +30,6 @@ class AddActivityOwner implements Migration
 
     /**
      * Create oro_activity_owner table
-     *
-     * @param Schema $schema
      */
     protected static function createOroActivityOwnerTable(Schema $schema)
     {
@@ -51,8 +47,6 @@ class AddActivityOwner implements Migration
 
     /**
      * Add oro_activity_owner foreign keys.
-     *
-     * @param Schema $schema
      */
     protected static function addOroActivityOwnerForeignKeys(Schema $schema)
     {

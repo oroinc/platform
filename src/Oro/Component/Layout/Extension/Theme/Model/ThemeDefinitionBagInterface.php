@@ -16,10 +16,6 @@ interface ThemeDefinitionBagInterface
 
     /**
      * Gets a theme definition.
-     *
-     * @param string $themeName
-     *
-     * @return array|null
      */
     public function getThemeDefinition(string $themeName): ?array;
 }

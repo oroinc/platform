@@ -37,13 +37,6 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /** @var array */
     private $declaredRoutes = [];
 
-    /**
-     * @param Router                        $router
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ClassAuthorizationChecker     $classAuthorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param LoggerInterface               $logger
-     */
     public function __construct(
         Router $router,
         AuthorizationCheckerInterface $authorizationChecker,

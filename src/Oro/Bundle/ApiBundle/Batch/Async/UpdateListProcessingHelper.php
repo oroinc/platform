@@ -29,12 +29,6 @@ class UpdateListProcessingHelper
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param FileManager              $fileManager
-     * @param FileNameProvider         $fileNameProvider
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface          $logger
-     */
     public function __construct(
         FileManager $fileManager,
         FileNameProvider $fileNameProvider,
@@ -47,11 +41,6 @@ class UpdateListProcessingHelper
         $this->logger = $logger;
     }
 
-    /**
-     * @param array $parentBody
-     *
-     * @return array
-     */
     public function getCommonBody(array $parentBody): array
     {
         return array_intersect_key(
@@ -60,20 +49,11 @@ class UpdateListProcessingHelper
         );
     }
 
-    /**
-     * @param float $startTimestamp
-     * @param int   $additionalAggregateTime
-     *
-     * @return int
-     */
     public function calculateAggregateTime(float $startTimestamp, int $additionalAggregateTime = 0): int
     {
         return (int)round(1000 * (microtime(true) - $startTimestamp)) + $additionalAggregateTime;
     }
 
-    /**
-     * @param string $fileName
-     */
     public function safeDeleteFile(string $fileName): void
     {
         try {
@@ -86,10 +66,6 @@ class UpdateListProcessingHelper
         }
     }
 
-    /**
-     * @param int    $operationId
-     * @param string $chunkFileNameTemplate
-     */
     public function safeDeleteChunkFiles(int $operationId, string $chunkFileNameTemplate): void
     {
         $fileNames = [];
@@ -108,11 +84,6 @@ class UpdateListProcessingHelper
         }
     }
 
-    /**
-     * @param int $operationId
-     *
-     * @return bool
-     */
     public function hasChunkIndex(int $operationId): bool
     {
         return $this->fileManager->hasFile(
@@ -120,11 +91,6 @@ class UpdateListProcessingHelper
         );
     }
 
-    /**
-     * @param int $operationId
-     *
-     * @return int
-     */
     public function getChunkIndexCount(int $operationId): int
     {
         $indexFileName = $this->fileNameProvider->getChunkIndexFileName($operationId);
@@ -172,9 +138,6 @@ class UpdateListProcessingHelper
         $this->fileManager->writeToStorage(JsonUtil::encode($data), $indexFileName);
     }
 
-    /**
-     * @param int $operationId
-     */
     public function deleteChunkIndex(int $operationId): void
     {
         $this->safeDeleteFile($this->fileNameProvider->getChunkIndexFileName($operationId));
@@ -209,23 +172,11 @@ class UpdateListProcessingHelper
         $this->fileManager->writeToStorage(JsonUtil::encode($data), $indexFileName);
     }
 
-    /**
-     * @param int $operationId
-     */
     public function deleteChunkJobIndex(int $operationId): void
     {
         $this->safeDeleteFile($this->fileNameProvider->getChunkJobIndexFileName($operationId));
     }
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param int       $operationId
-     * @param string    $chunkJobNameTemplate
-     * @param int       $firstChunkFileIndex
-     * @param int       $lastChunkFileIndex
-     *
-     * @return int
-     */
     public function createChunkJobs(
         JobRunner $jobRunner,
         int $operationId,
@@ -251,13 +202,6 @@ class UpdateListProcessingHelper
         return $fileIndex;
     }
 
-    /**
-     * @param Job      $rootJob
-     * @param string   $chunkJobNameTemplate
-     * @param array    $parentBody
-     * @param int      $firstChunkFileIndex
-     * @param int|null $previousAggregateTime
-     */
     public function sendMessageToCreateChunkJobs(
         Job $rootJob,
         string $chunkJobNameTemplate,
@@ -278,12 +222,6 @@ class UpdateListProcessingHelper
         $this->producer->send(Topics::UPDATE_LIST_CREATE_CHUNK_JOBS, $body);
     }
 
-    /**
-     * @param Job      $rootJob
-     * @param array    $parentBody
-     * @param int      $firstChunkFileIndex
-     * @param int|null $previousAggregateTime
-     */
     public function sendMessageToStartChunkJobs(
         Job $rootJob,
         array $parentBody,
@@ -302,12 +240,6 @@ class UpdateListProcessingHelper
         $this->producer->send(Topics::UPDATE_LIST_START_CHUNK_JOBS, $body);
     }
 
-    /**
-     * @param array     $parentBody
-     * @param Job       $job
-     * @param ChunkFile $chunkFile
-     * @param bool      $extraChunk
-     */
     public function sendProcessChunkMessage(
         array $parentBody,
         Job $job,

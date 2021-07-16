@@ -116,8 +116,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_activity_target table
-     *
-     * @param Schema $schema
      */
     protected function createTestActivityTargetTable(Schema $schema)
     {
@@ -129,8 +127,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_workflow_aware_entity table
-     *
-     * @param Schema $schema
      */
     protected function createTestWorkflowAwareEntityTable(Schema $schema)
     {
@@ -142,8 +138,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_department table
-     *
-     * @param Schema $schema
      */
     protected function createTestDepartmentTable(Schema $schema)
     {
@@ -155,8 +149,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_employee table
-     *
-     * @param Schema $schema
      */
     protected function createTestEmployeeTable(Schema $schema)
     {
@@ -171,8 +163,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_product table
-     *
-     * @param Schema $schema
      */
     protected function createTestProductTable(Schema $schema)
     {
@@ -186,8 +176,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_product_type table
-     *
-     * @param Schema $schema
      */
     protected function createTestProductTypeTable(Schema $schema)
     {
@@ -199,8 +187,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_search_item table
-     *
-     * @param Schema $schema
      */
     protected function createTestSearchItemTable(Schema $schema)
     {
@@ -224,8 +210,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_search_item2 table
-     *
-     * @param Schema $schema
      */
     protected function createTestSearchItem2Table(Schema $schema)
     {
@@ -236,8 +220,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_search_item_value table
-     *
-     * @param Schema $schema
      */
     protected function createTestSearchItemValueTable(Schema $schema)
     {
@@ -249,8 +231,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_search_product table
-     *
-     * @param Schema $schema
      */
     protected function createTestSearchProductTable(Schema $schema)
     {
@@ -262,8 +242,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_activity table
-     *
-     * @param Schema $schema
      */
     protected function createTestActivityTable(Schema $schema)
     {
@@ -280,8 +258,6 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create custom entity tables
      *
-     * @param Schema $schema
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function createTestCustomEntityTables(Schema $schema)
@@ -292,7 +268,7 @@ class OroTestFrameworkBundleInstaller implements
             'target_detailed' => ['id'],
             'target_grid' => ['id']
         ];
-        
+
         $table1 = $this->extendExtension->createCustomEntityTable($schema, 'TestEntity1');
         $table1->addColumn(
             'name',
@@ -476,8 +452,6 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create custom entity tables that have associations with "cascade"=['all'] option
      *
-     * @param Schema $schema
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function createTestCustomEntityTablesWithCascadeOption(Schema $schema)
@@ -607,8 +581,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Create test_user_ownership table
-     *
-     * @param Schema $schema
      */
     protected function createTestUserOwnershipTable(Schema $schema)
     {
@@ -632,8 +604,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Add test_search_item foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSearchItemForeignKeys(Schema $schema)
     {
@@ -654,8 +624,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Add test_search_item_value foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSearchItemValueForeignKeys(Schema $schema)
     {
@@ -670,8 +638,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Add test_activity foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestActivityForeignKeys(Schema $schema)
     {
@@ -692,8 +658,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Add test_employee foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestEmployeeForeignKeys(Schema $schema)
     {
@@ -708,8 +672,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Add test_product foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestProductForeignKeys(Schema $schema)
     {
@@ -724,8 +686,6 @@ class OroTestFrameworkBundleInstaller implements
 
     /**
      * Add test_user_ownership foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestUserOwnershipForeignKeys(Schema $schema)
     {
@@ -744,9 +704,6 @@ class OroTestFrameworkBundleInstaller implements
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function addAttributeFamilyRelationForTestActivityTarget(Schema $schema)
     {
         $table = $schema->getTable('test_activity_target');

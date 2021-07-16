@@ -47,9 +47,6 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
         unset($this->queryCalculator);
     }
 
-    /**
-     * @return array
-     */
     public function calculateProgressProvider(): array
     {
         return [
@@ -116,9 +113,6 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider calculateProgressProvider
-     *
-     * @param array $statuses
-     * @param float $expectedStatusProgress
      */
     public function testCalculateRootJobProgress(array $statuses, float $expectedStatusProgress): void
     {
@@ -134,9 +128,6 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedStatusProgress, $statusProgress);
     }
 
-    /**
-     * @return array
-     */
     public function statusCalculateProvider(): array
     {
         return [
@@ -196,9 +187,6 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider statusCalculateProvider
-     *
-     * @param array $statuses
-     * @param string $expectedStatus
      */
     public function testCalculateRootJobStatus(array $statuses, string $expectedStatus): void
     {

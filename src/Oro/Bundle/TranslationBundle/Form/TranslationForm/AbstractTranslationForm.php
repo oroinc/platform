@@ -27,10 +27,6 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
      */
     abstract protected function getTranslatableFields($class);
 
-    /**
-     * @param FormRegistry $formRegistry
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(FormRegistry $formRegistry, ManagerRegistry $managerRegistry)
     {
         $this->typeGuesser = $formRegistry->getTypeGuesser();

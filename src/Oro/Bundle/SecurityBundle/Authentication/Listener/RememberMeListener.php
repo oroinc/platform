@@ -56,10 +56,6 @@ class RememberMeListener extends AbstractListener
     /**
      * Checks whether the request is CSRF protected request
      * (cookies has the session cookie and the request has "X-CSRF-Header" header with valid CSRF token).
-     *
-     * @param Request $request
-     *
-     * @return bool
      */
     private function isCsrfProtectedRequest(Request $request): bool
     {

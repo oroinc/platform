@@ -13,9 +13,6 @@ class ResourceFileLocator implements FileLocatorInterface
     /** @var FileLocatorInterface */
     private $fileLocator;
 
-    /**
-     * @param FileLocatorInterface $fileLocator
-     */
     public function __construct(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;

@@ -9,8 +9,6 @@ interface RouteOptionsResolverAwareInterface
 {
     /**
      * Sets the RouteOptionsResolver.
-     *
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
      */
     public function setRouteOptionsResolver(RouteOptionsResolverInterface $routeOptionsResolver);
 }

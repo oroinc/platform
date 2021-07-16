@@ -43,12 +43,6 @@ class PostponedRowsHandler
      */
     private $translator;
 
-    /**
-     * @param FileManager              $fileManager
-     * @param MessageProducerInterface $messageProducer
-     * @param WriterChain              $writerChain
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(
         FileManager $fileManager,
         MessageProducerInterface $messageProducer,
@@ -144,11 +138,6 @@ class PostponedRowsHandler
         );
     }
 
-    /**
-     * @param Job $currentJob
-     * @param int $attempts
-     * @return string
-     */
     private function getDelayedJobName(Job $currentJob, int $attempts): string
     {
         $suffix = 'postponed:';

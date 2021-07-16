@@ -130,9 +130,6 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     private function expectConfigManager(ClassMetadata $metadata)
     {
         $this->configManager->expects(self::any())

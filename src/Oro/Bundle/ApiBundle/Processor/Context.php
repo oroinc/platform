@@ -113,10 +113,6 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** @var Criteria|null */
     private $criteria;
 
-    /**
-     * @param ConfigProvider   $configProvider
-     * @param MetadataProvider $metadataProvider
-     */
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         parent::__construct();
@@ -717,9 +713,6 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * @param Config|null $config
-     */
     protected function processLoadedConfig(?Config $config)
     {
         // add loaded config sections to the context
@@ -930,20 +923,12 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
     }
 
-    /**
-     * @param EntityMetadata|null $metadata
-     */
     protected function processLoadedMetadata(?EntityMetadata $metadata)
     {
         // add loaded metadata to the context
         $this->metadata = $metadata;
     }
 
-    /**
-     * @param EntityMetadata              $metadata
-     * @param string|null                 $path
-     * @param TargetMetadataAccessor|null $targetMetadataAccessor
-     */
     private function initializeMetadata(
         EntityMetadata $metadata,
         string $path = null,

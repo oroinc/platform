@@ -64,10 +64,6 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getEvaluateByObjectIdentityDescriptorDataProvider
-     *
-     * @param array $options
-     * @param array $isGrantedCalls
-     * @param bool $expectedResult
      */
     public function testEvaluateByObjectIdentityDescriptor(
         array $options,

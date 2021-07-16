@@ -24,26 +24,12 @@ class ImportExportResultManager
      */
     private $tokenAccessor;
 
-    /**
-     * @param ManagerRegistry $manager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(ManagerRegistry $manager, TokenAccessorInterface $tokenAccessor)
     {
         $this->registry = $manager;
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param int $jobId
-     * @param string $type
-     * @param string $entity
-     * @param User|null $owner
-     * @param string|null $fileName
-     * @param array $options
-     *
-     * @return ImportExportResult
-     */
     public function saveResult(
         int $jobId,
         string $type,
@@ -77,10 +63,6 @@ class ImportExportResultManager
         return $importExportResult;
     }
 
-    /**
-     * @param \DateTime $from
-     * @param \DateTime $to
-     */
     public function markResultsAsExpired(\DateTime $from, \DateTime $to): void
     {
         $em = $this->registry->getManagerForClass(ImportExportResult::class);

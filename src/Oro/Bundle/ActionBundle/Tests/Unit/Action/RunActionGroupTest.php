@@ -158,12 +158,6 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executeActionDataProvider
-     *
-     * @param array $context
-     * @param array $options
-     * @param ActionData $arguments
-     * @param $returnVal
-     * @param $expected
      */
     public function testExecuteAction(
         array $context,

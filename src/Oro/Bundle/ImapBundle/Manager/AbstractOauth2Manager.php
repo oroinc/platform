@@ -68,10 +68,6 @@ abstract class AbstractOauth2Manager implements Oauth2ManagerInterface
         $this->crypter = $crypter;
     }
 
-    /**
-     * @param string $accessTokenUrl
-     * @return self
-     */
     public function setAccessTokenUrl(string $accessTokenUrl): self
     {
         $this->accessTokenUrl = $accessTokenUrl;
@@ -211,10 +207,6 @@ abstract class AbstractOauth2Manager implements Oauth2ManagerInterface
         ];
     }
 
-    /**
-     * @param array $response
-     * @return string
-     */
     private function getFailureReason(array $response): string
     {
         $failureReason = [];
@@ -251,8 +243,6 @@ abstract class AbstractOauth2Manager implements Oauth2ManagerInterface
 
     /**
      * Returns access token URL for HTTP request
-     *
-     * @return string
      */
     protected function getAccessTokenUrl(): string
     {
@@ -288,8 +278,6 @@ abstract class AbstractOauth2Manager implements Oauth2ManagerInterface
 
     /**
      * Returns scope string
-     *
-     * @return string
      */
     protected function getScope(): string
     {
@@ -306,23 +294,16 @@ abstract class AbstractOauth2Manager implements Oauth2ManagerInterface
 
     /**
      * Returns request parameters
-     *
-     * @param string $code
-     * @return array
      */
     abstract protected function buildParameters(string $code): array;
 
     /**
      * Returns resource owner name
-     *
-     * @return string
      */
     abstract protected function getResourceOwnerName(): string;
 
     /**
      * Provides configuration parameters for request
-     *
-     * @return array
      */
     abstract protected function getConfigParameters(): array;
 }

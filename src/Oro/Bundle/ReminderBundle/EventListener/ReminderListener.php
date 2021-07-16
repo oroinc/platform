@@ -18,9 +18,6 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -49,8 +46,6 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
 
     /**
      * After entity with reminders was loaded, load reminders
-     *
-     * @param LifecycleEventArgs $args
      */
     public function postLoad(LifecycleEventArgs $args)
     {
@@ -62,8 +57,6 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
 
     /**
      * Save reminders for new entities
-     *
-     * @param LifecycleEventArgs $event
      */
     public function postPersist(LifecycleEventArgs $event)
     {
@@ -73,9 +66,6 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
         }
     }
 
-    /**
-     * @return ReminderManager
-     */
     private function getReminderManager(): ReminderManager
     {
         return $this->container->get('oro_reminder.entity.manager');

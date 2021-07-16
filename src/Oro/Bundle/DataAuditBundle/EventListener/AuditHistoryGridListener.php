@@ -28,8 +28,6 @@ class AuditHistoryGridListener
 
     /**
      * Used only for auditfield-log-grid grid (subscribed in services.yml)
-     *
-     * @param BuildBefore $event
      */
     public function onBuildBefore(BuildBefore $event)
     {
@@ -39,9 +37,6 @@ class AuditHistoryGridListener
         $config->offsetSetByPath('[columns][diffs][context][field_name]', $fieldName);
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();

@@ -53,7 +53,6 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postLoad($event);
     }
 
-
     /**
      * @param object $entity
      * @param bool $expected

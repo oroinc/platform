@@ -17,9 +17,6 @@ class ActionProcessorDataCollector extends DataCollector
     /** @var float */
     protected $totalTime;
 
-    /**
-     * @param TraceLogger $logger
-     */
     public function __construct(TraceLogger $logger)
     {
         $this->logger = $logger;

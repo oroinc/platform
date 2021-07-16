@@ -159,9 +159,6 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
 
     /**
      * Load countries and regions to DB
-     *
-     * @param ObjectManager $manager
-     * @param array $countries
      */
     protected function loadCountriesAndRegions(ObjectManager $manager, array $countries)
     {

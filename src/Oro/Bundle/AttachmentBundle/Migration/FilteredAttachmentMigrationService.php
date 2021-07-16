@@ -49,13 +49,6 @@ class FilteredAttachmentMigrationService implements FilteredAttachmentMigrationS
      */
     private $manager;
 
-    /**
-     * @param FilesystemMap $filesystemMap
-     * @param FilterConfiguration $filterConfiguration
-     * @param ImageFilterLoader $filterLoader
-     * @param string $fsName
-     * @param string $directory
-     */
     public function __construct(
         FilesystemMap $filesystemMap,
         FilterConfiguration $filterConfiguration,
@@ -159,9 +152,6 @@ class FilteredAttachmentMigrationService implements FilteredAttachmentMigrationS
         return $iterator;
     }
 
-    /**
-     * @return array
-     */
     private function getFilterPathMap(): array
     {
         $filterMap = [];

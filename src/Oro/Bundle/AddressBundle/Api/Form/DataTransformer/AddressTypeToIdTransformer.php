@@ -16,9 +16,6 @@ class AddressTypeToIdTransformer implements DataTransformerInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -51,10 +48,6 @@ class AddressTypeToIdTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param string $id
-     *
-     * @return AddressType
-     *
      * @throws TransformationFailedException if the address type does not exist
      */
     private function getEntity(string $id): AddressType

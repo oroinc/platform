@@ -124,9 +124,6 @@ class Widget
         return $this->options;
     }
 
-    /**
-     * @param array $options
-     */
     public function setOptions(array $options = [])
     {
         $this->options = $options;

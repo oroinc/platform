@@ -17,10 +17,6 @@ class StateManager
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param EntityManager          $em
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         EntityManager $em,
         TokenAccessorInterface $tokenAccessor

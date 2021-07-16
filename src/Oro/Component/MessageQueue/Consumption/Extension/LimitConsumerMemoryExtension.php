@@ -50,9 +50,6 @@ class LimitConsumerMemoryExtension extends AbstractExtension
         $this->checkMemory($context);
     }
 
-    /**
-     * @param Context $context
-     */
     protected function checkMemory(Context $context)
     {
         $memoryUsage = memory_get_usage(true);

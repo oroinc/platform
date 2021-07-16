@@ -25,13 +25,6 @@ class ControllerClassProvider extends PhpArrayConfigProvider
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param string             $cacheFile
-     * @param bool               $debug
-     * @param RouterInterface    $router
-     * @param ContainerInterface $container
-     * @param LoggerInterface    $logger
-     */
     public function __construct(
         string $cacheFile,
         bool $debug,
@@ -94,11 +87,6 @@ class ControllerClassProvider extends PhpArrayConfigProvider
         return $config;
     }
 
-    /**
-     * @param string $service
-     *
-     * @return bool
-     */
     private function isIgnoredService(string $service): bool
     {
         return \strpos($service, 'web_profiler.') === 0;
@@ -139,11 +127,6 @@ class ControllerClassProvider extends PhpArrayConfigProvider
         return [$className, $methodName];
     }
 
-    /**
-     * @param string $controller
-     *
-     * @return array
-     */
     private function resolveController(string $controller): array
     {
         // check for "class::method"
@@ -165,11 +148,6 @@ class ControllerClassProvider extends PhpArrayConfigProvider
         return [$className, $methodName];
     }
 
-    /**
-     * @param string $service
-     *
-     * @return string|null
-     */
     private function resolveControllerClass(string $service): ?string
     {
         if (!$this->container->has($service)) {

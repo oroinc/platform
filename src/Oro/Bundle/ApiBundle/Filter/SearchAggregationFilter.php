@@ -24,17 +24,11 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
     /** @var string[] */
     private $aggregations;
 
-    /**
-     * @param SearchFieldResolverFactory $searchFieldResolverFactory
-     */
     public function setSearchFieldResolverFactory(SearchFieldResolverFactory $searchFieldResolverFactory): void
     {
         $this->searchFieldResolverFactory = $searchFieldResolverFactory;
     }
 
-    /**
-     * @param string $entityClass
-     */
     public function setEntityClass(string $entityClass): void
     {
         $this->entityClass = $entityClass;
@@ -70,9 +64,6 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
         }
     }
 
-    /**
-     * @param SearchQueryInterface $query
-     */
     public function applyToSearchQuery(SearchQueryInterface $query): void
     {
         foreach ($this->aggregations as [$fieldName, $fieldType, $function, $alias]) {
@@ -135,11 +126,6 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
         ];
     }
 
-    /**
-     * @param string $aggregate
-     *
-     * @return InvalidFilterException
-     */
     private function createInvalidAggregateDefinitionException(string $aggregate): InvalidFilterException
     {
         return new InvalidFilterException(\sprintf(

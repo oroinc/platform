@@ -27,17 +27,11 @@ class MultiInsertQueryExecutor implements InsertQueryExecutorInterface
      */
     private $helper;
 
-    /**
-     * @param NativeQueryExecutorHelper $helper
-     */
     public function __construct(NativeQueryExecutorHelper $helper)
     {
         $this->helper = $helper;
     }
 
-    /**
-     * @param int $batchSize
-     */
     public function setBatchSize(int $batchSize)
     {
         $this->batchSize = $batchSize;
@@ -113,9 +107,6 @@ class MultiInsertQueryExecutor implements InsertQueryExecutorInterface
 
     /**
      * Scalar mapping should always contain unique numbers to support broken queries with duplicated column names.
-     *
-     * @param QueryBuilder $selectQueryBuilder
-     * @return Query
      */
     protected function getQuery(QueryBuilder $selectQueryBuilder): Query
     {

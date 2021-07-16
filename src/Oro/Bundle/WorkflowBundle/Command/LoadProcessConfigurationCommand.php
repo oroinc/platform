@@ -87,7 +87,7 @@ HELP
 
         $this->processConfigurator->setLogger($this->createConsoleLogger($output));
         $this->processConfigurator->configureProcesses($processConfiguration);
-        
+
         // update triggers cache
         $this->eventTriggerCache->build();
     }

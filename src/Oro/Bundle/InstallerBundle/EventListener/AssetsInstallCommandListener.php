@@ -24,19 +24,12 @@ class AssetsInstallCommandListener
     /** @var string */
     private $kernelProjectDir;
 
-    /**
-     * @param Filesystem $filesystem
-     * @param string     $kernelProjectDir
-     */
     public function __construct(Filesystem $filesystem, string $kernelProjectDir)
     {
         $this->filesystem = $filesystem;
         $this->kernelProjectDir = $kernelProjectDir;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function beforeExecute(ConsoleCommandEvent $event)
     {
         if ($this->isAssetsInstallCommand($event->getCommand())) {
@@ -48,9 +41,6 @@ class AssetsInstallCommandListener
         }
     }
 
-    /**
-     * @param ConsoleTerminateEvent $event
-     */
     public function afterExecute(ConsoleTerminateEvent $event)
     {
         if ($this->isAssetsInstallCommand($event->getCommand())) {

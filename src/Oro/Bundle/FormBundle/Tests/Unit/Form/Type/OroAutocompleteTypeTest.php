@@ -86,10 +86,6 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $options
-     * @param array $expectedFormOptions
-     * @param array $expectedComponentOptions
-     *
      * @dataProvider buildFormDataProvider
      */
     public function testBuildForm(array $options, array $expectedFormOptions, array $expectedComponentOptions)

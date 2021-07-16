@@ -22,10 +22,6 @@ class SetDefaultPaging implements ProcessorInterface
     /** @var int */
     private $defaultPageSize;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     * @param int                 $defaultPageSize
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry, int $defaultPageSize)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
@@ -60,10 +56,6 @@ class SetDefaultPaging implements ProcessorInterface
         $this->addPageNumberFilter($filterNames->getPageNumberFilterName(), $filters);
     }
 
-    /**
-     * @param string           $filterName
-     * @param FilterCollection $filters
-     */
     protected function addPageNumberFilter(string $filterName, FilterCollection $filters): void
     {
         /**
@@ -84,11 +76,6 @@ class SetDefaultPaging implements ProcessorInterface
         $filters->add($filterName, $pageNumberFilter, false);
     }
 
-    /**
-     * @param string           $filterName
-     * @param FilterCollection $filters
-     * @param int|null         $pageSize
-     */
     protected function addPageSizeFilter(string $filterName, FilterCollection $filters, ?int $pageSize): void
     {
         if (!$filters->has($filterName)) {

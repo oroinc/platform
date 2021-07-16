@@ -7,9 +7,6 @@ class ConfigChangeSet
     /** @var array */
     protected $changeSet = [];
 
-    /**
-     * @param array $changeSet
-     */
     public function __construct(array $changeSet)
     {
         $this->changeSet = $changeSet;
@@ -44,7 +41,6 @@ class ConfigChangeSet
      *
      * @return mixed
      * @throws \LogicException
-     *
      */
     public function getNewValue($name)
     {

@@ -60,7 +60,6 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($options, $this->action->xgetOptions());
     }
 
-
     /**
      * @dataProvider initializeExceptionDataProvider
      *

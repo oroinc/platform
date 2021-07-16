@@ -9,9 +9,6 @@ use Oro\Bundle\IntegrationBundle\Tests\Behat\Stub\Form\Type\TestTransport2Settin
 
 class TestTransport2 implements TransportInterface
 {
-    /**
-     * @param Transport $transportEntity
-     */
     public function init(Transport $transportEntity)
     {
     }

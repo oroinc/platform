@@ -29,9 +29,6 @@ class Acceptor
         }
     }
 
-    /**
-     * @param DatasourceInterface $datasource
-     */
     public function acceptDatasource(DatasourceInterface $datasource)
     {
         $extensions = $this->getExtensions();
@@ -40,9 +37,6 @@ class Acceptor
         }
     }
 
-    /**
-     * @param ResultsObject $result
-     */
     public function acceptResult(ResultsObject $result)
     {
         $extensions = $this->getExtensions();
@@ -51,9 +45,6 @@ class Acceptor
         }
     }
 
-    /**
-     * @param MetadataObject $data
-     */
     public function acceptMetadata(MetadataObject $data)
     {
         $extensions = $this->getExtensions();

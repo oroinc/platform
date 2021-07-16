@@ -31,18 +31,12 @@ class DataCollectorCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureDataCollectors(ContainerBuilder $container)
     {
         $this->configureDuplicateQueriesDataCollector($container);
         $this->configureOrmDataCollector($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureDuplicateQueriesDataCollector(ContainerBuilder $container)
     {
         $dataCollectorDef = $container->getDefinition('oro_entity.profiler.duplicate_queries_data_collector');
@@ -55,9 +49,6 @@ class DataCollectorCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureOrmDataCollector(ContainerBuilder $container)
     {
         $this->configureLoggingHydrators($container);
@@ -68,9 +59,6 @@ class DataCollectorCompilerPass implements CompilerPassInterface
             ->addArgument(new Reference(self::PROFILING_LOGGER_SERVICE_ID));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureLoggingHydrators(ContainerBuilder $container)
     {
         $hydrators = [];
@@ -84,9 +72,6 @@ class DataCollectorCompilerPass implements CompilerPassInterface
         $container->setParameter(self::LOGGING_HYDRATORS_PARAM_NAME, $hydrators);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureLoggingHydratorCacheWarmer(ContainerBuilder $container)
     {
         $cacheWarmerDef = $container->register(
@@ -98,9 +83,6 @@ class DataCollectorCompilerPass implements CompilerPassInterface
         $cacheWarmerDef->addTag('kernel.cache_warmer', ['priority' => 30]);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureProfilingLogger(ContainerBuilder $container)
     {
         $loggerDef = $container->register(
@@ -113,9 +95,6 @@ class DataCollectorCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureManagerRegistry(ContainerBuilder $container)
     {
         $container->setParameter(

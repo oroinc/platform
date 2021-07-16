@@ -43,12 +43,6 @@ class NormalizeMetadata implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param EntityMetadataFactory          $entityMetadataFactory
-     * @param MetadataProvider               $metadataProvider
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityMetadataFactory $entityMetadataFactory,
@@ -87,10 +81,6 @@ class NormalizeMetadata implements ProcessorInterface
     }
 
     /**
-     * @param EntityMetadata         $entityMetadata
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $processLinkedProperties
-     * @param MetadataContext        $context
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeMetadata(
@@ -143,10 +133,6 @@ class NormalizeMetadata implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityMetadata                  $entityMetadata
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     */
     private function normalizeAcceptableTargetClassNames(
         EntityMetadata $entityMetadata,
         EntityOverrideProviderInterface $entityOverrideProvider
@@ -170,16 +156,6 @@ class NormalizeMetadata implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param string                      $fieldName
-     * @param string                      $propertyPath
-     * @param EntityDefinitionConfig      $config
-     * @param EntityDefinitionFieldConfig $field
-     * @param MetadataContext             $context
-     *
-     * @return bool
-     */
     private function processLinkedProperty(
         EntityMetadata $entityMetadata,
         string $fieldName,
@@ -237,14 +213,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     * @param string         $linkedPropertyName
-     * @param string         $fieldName
-     * @param EntityMetadata $targetEntityMetadata
-     *
-     * @return bool
-     */
     private function copyLinkedProperty(
         EntityMetadata $entityMetadata,
         string $linkedPropertyName,
@@ -267,17 +235,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $isPropertyAdded;
     }
 
-    /**
-     * @param EntityMetadata         $entityMetadata
-     * @param string                 $linkedPropertyName
-     * @param string                 $fieldName
-     * @param string                 $propertyPath
-     * @param EntityDefinitionConfig $config
-     * @param ClassMetadata          $targetClassMetadata
-     * @param MetadataContext        $context
-     *
-     * @return bool
-     */
     private function addLinkedProperty(
         EntityMetadata $entityMetadata,
         string $linkedPropertyName,
@@ -325,11 +282,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $isPropertyAdded;
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     */
     private function setLinkedPropertyDirection(
         EntityMetadata $entityMetadata,
         string $fieldName,
@@ -383,13 +335,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $targetEntityMetadata;
     }
 
-    /**
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     * @param MetadataContext        $context
-     *
-     * @return EntityMetadata
-     */
     private function getMetadata(
         string $entityClass,
         EntityDefinitionConfig $config,
@@ -409,13 +354,6 @@ class NormalizeMetadata implements ProcessorInterface
         return $targetMetadata;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionConfig
-     */
     private function getTargetConfig(
         EntityDefinitionConfig $config,
         string $fieldName,

@@ -77,9 +77,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderRenderJsTranslationContent
-     *
-     * @param $params
-     * @param $expected
      */
     public function testRenderJsTranslationContent($params, $expected): void
     {
@@ -92,7 +89,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
                     return $params['json'];
                 }
             );
-
 
         $this->translator
             ->expects(self::any())
@@ -114,9 +110,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
     public function dataProviderRenderJsTranslationContent(): array
     {
         return [

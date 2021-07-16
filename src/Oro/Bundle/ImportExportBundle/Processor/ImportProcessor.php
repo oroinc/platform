@@ -60,17 +60,11 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         $this->serializer = $serializer;
     }
 
-    /**
-     * @param DataConverterInterface $dataConverter
-     */
     public function setDataConverter(DataConverterInterface $dataConverter)
     {
         $this->dataConverter = $dataConverter;
     }
 
-    /**
-     * @param StrategyInterface $strategy
-     */
     public function setStrategy(StrategyInterface $strategy)
     {
         $this->strategy = $strategy;

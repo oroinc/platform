@@ -65,9 +65,6 @@ class DraftManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($source, $publication->getDraftSource());
     }
 
-    /**
-     * @return iterable
-     */
     private function getExtensions(): iterable
     {
         $extension = new DraftSourceExtension();

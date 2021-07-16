@@ -23,10 +23,6 @@ class UpdateHtmlEscapedTypePreMigrationListener
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager
@@ -37,8 +33,6 @@ class UpdateHtmlEscapedTypePreMigrationListener
 
     /**
      * PRE UP event handler
-     *
-     * @param PreMigrationEvent $event
      */
     public function onPreUp(PreMigrationEvent $event): void
     {
@@ -93,11 +87,6 @@ class UpdateHtmlEscapedTypePreMigrationListener
         }
     }
 
-    /**
-     * @param Connection $connection
-     * @param string $tableName
-     * @param string $fieldName
-     */
     private function changeColumn(Connection $connection, string $tableName, string $fieldName): void
     {
         $isColumnExistsQuery = <<<SQL

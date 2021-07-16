@@ -32,11 +32,6 @@ class AddAttributesToTestActivityTargetMigration implements Migration
         $this->addAttribute($table, self::REGULAR_ATTRIBUTE_2, ExtendScope::OWNER_CUSTOM);
     }
 
-    /**
-     * @param Table  $table
-     * @param string $attributeName
-     * @param string $owner
-     */
     private function addAttribute(Table $table, string $attributeName, string $owner): void
     {
         if ($table->hasColumn($attributeName)) {

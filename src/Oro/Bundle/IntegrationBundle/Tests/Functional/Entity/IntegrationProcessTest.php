@@ -75,7 +75,6 @@ class IntegrationProcessTest extends WebTestCase
         self::assertCount(0, $traces);
     }
 
-
     /**
      * test for schedule_integration process
      */

@@ -17,9 +17,6 @@ class ImpersonationSuccessEvent extends Event
      */
     protected $impersonation;
 
-    /**
-     * @param Impersonation $impersonation
-     */
     public function __construct(Impersonation $impersonation)
     {
         $this->impersonation = $impersonation;

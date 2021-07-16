@@ -28,9 +28,6 @@ class IdentityTranslatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getNonMatchingMessages
-     * @param string $message
-     * @param int $number
-     * @param string $expected
      */
     public function testLogErrorIfMatchingMessageCannotBeFound(string $message, int $number, string $expected): void
     {
@@ -66,7 +63,6 @@ class IdentityTranslatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function transDataProvider(): array

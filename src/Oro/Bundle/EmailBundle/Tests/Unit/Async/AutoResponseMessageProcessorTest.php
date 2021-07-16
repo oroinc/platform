@@ -77,7 +77,6 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->identicalTo($email))
         ;
 
-
         $message = new Message();
         $message->setBody(json_encode(['id' => 123, 'jobId' => 4321]));
 

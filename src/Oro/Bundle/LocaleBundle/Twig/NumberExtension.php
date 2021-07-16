@@ -30,9 +30,6 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

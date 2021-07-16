@@ -35,8 +35,6 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function fillScopeHashesForExistingRows(
@@ -52,9 +50,6 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param array $newToOldScopeIdMap
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function switchReferencesFromOldToNewScopes(
@@ -83,8 +78,6 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @return array
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getNewToOldScopeIdMapping(LoggerInterface $logger): array
@@ -119,9 +112,6 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param array $newToOldScopeIdMap
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function removeScopeDuplicates(array $newToOldScopeIdMap, LoggerInterface $logger, bool $dryRun): void
@@ -138,11 +128,6 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param string $tableName
-     * @param string $columnName
-     * @param array $newToOldScopeIdMap
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function removeDuplicatesForUniqueRecords(
@@ -234,13 +219,6 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
         return $deleteSql;
     }
 
-    /**
-     * @param string $tableName
-     * @param string $columnName
-     * @param array $newToOldScopeIdMap
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
-     */
     protected function migrateDuplicateScopes(
         string $tableName,
         string $columnName,

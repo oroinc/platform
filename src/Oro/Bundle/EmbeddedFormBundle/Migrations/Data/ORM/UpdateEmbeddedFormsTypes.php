@@ -44,11 +44,6 @@ class UpdateEmbeddedFormsTypes extends AbstractFixture implements
         );
     }
 
-    /**
-     * @param string $formAlias
-     * @param string $formType
-     * @return int
-     */
     private function updateFormType(string $formAlias, string $formType): int
     {
         /** @var QueryBuilder $queryBuilder */

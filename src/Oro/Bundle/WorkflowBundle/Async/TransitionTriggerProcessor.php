@@ -25,11 +25,6 @@ class TransitionTriggerProcessor implements MessageProcessorInterface
     /** @var TransitionTriggerHandlerInterface */
     protected $handler;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param LoggerInterface $logger
-     * @param TransitionTriggerHandlerInterface $handler
-     */
     public function __construct(
         ManagerRegistry $registry,
         LoggerInterface $logger,

@@ -34,13 +34,6 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     /** @var string */
     private $eventName;
 
-    /**
-     * @param EventDispatcherInterface             $dispatcher
-     * @param MappingConfigurationProviderAbstract $mappingConfigProvider
-     * @param Cache                                $cache
-     * @param string                               $cacheKey
-     * @param string                               $eventName
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         MappingConfigurationProviderAbstract $mappingConfigProvider,
@@ -91,9 +84,6 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         $this->getMappingConfig();
     }
 
-    /**
-     * @return array|null
-     */
     private function fetchMappingConfigFromCache(): ?array
     {
         $config = null;
@@ -108,17 +98,11 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         return $config;
     }
 
-    /**
-     * @param array $config
-     */
     private function saveMappingConfigToCache(array $config): void
     {
         $this->cache->save($this->cacheKey, [$this->mappingConfigProvider->getCacheTimestamp(), $config]);
     }
 
-    /**
-     * @return array
-     */
     private function loadMappingConfig(): array
     {
         $event = new SearchMappingCollectEvent($this->mappingConfigProvider->getConfiguration());

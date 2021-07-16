@@ -88,12 +88,6 @@ class AssociationHandler extends EntityHandler
             && parent::isRedundantHandler($handler);
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionConfig|null
-     */
     private function getAssociationConfig(
         EntityDefinitionConfig $config,
         string $propertyPath

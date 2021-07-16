@@ -17,8 +17,6 @@ class EmailOwnerProvider
 
     /**
      * Constructor
-     *
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      */
     public function __construct(EmailOwnerProviderStorage $emailOwnerProviderStorage)
     {

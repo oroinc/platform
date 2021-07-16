@@ -97,7 +97,6 @@ class CommandExecutor extends AbstractCommandExecutor
             unset($params['--process-isolation']);
             $processArguments = [self::getPhpExecutable(), $_SERVER['argv'][0]];
 
-
             $processTimeout = null;
             if (array_key_exists('--process-timeout', $params)) {
                 $processTimeout = $params['--process-timeout'];

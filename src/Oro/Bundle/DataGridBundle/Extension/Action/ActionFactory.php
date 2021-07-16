@@ -16,9 +16,6 @@ class ActionFactory
     /** @var ContainerInterface */
     private $actionContainer;
 
-    /**
-     * @param ContainerInterface $actionContainer
-     */
     public function __construct(ContainerInterface $actionContainer)
     {
         $this->actionContainer = $actionContainer;

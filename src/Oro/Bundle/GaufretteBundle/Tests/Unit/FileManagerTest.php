@@ -45,12 +45,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->filesystemAdapter);
     }
 
-    /**
-     * @param bool        $useSubDirectory
-     * @param string|null $subDirectory
-     *
-     * @return FileManager
-     */
     private function getFileManager(bool $useSubDirectory, string $subDirectory = null): FileManager
     {
         $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDirectory);

@@ -42,17 +42,11 @@ class DuplicatorFactory
         return $this->duplicator;
     }
 
-    /**
-     * @param MatcherFactory $matcherFactory
-     */
     public function setMatcherFactory(MatcherFactory $matcherFactory)
     {
         $this->matcherFactory = $matcherFactory;
     }
 
-    /**
-     * @param FilterFactory $filterFactory
-     */
     public function setFilterFactory(FilterFactory$filterFactory)
     {
         $this->filterFactory = $filterFactory;

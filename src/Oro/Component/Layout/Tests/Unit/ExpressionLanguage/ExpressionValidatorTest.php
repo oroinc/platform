@@ -17,9 +17,6 @@ class ExpressionValidatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateDataProvider
-     *
-     * @param string $expression
-     * @param string|null $exception
      */
     public function testValidate(string $expression, ?string $exception = null): void
     {
@@ -34,8 +31,6 @@ class ExpressionValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * Note: exception messages must contain `around position` and `for expression` part
      * for correct syntax error exception
-     *
-     * @return array
      */
     public function validateDataProvider(): array
     {

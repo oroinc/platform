@@ -30,11 +30,6 @@ class IndexEntitiesByIdMessageProcessor implements
     /** @var AbstractIndexer */
     private $indexer;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param DoctrineHelper $doctrineHelper
-     * @param AbstractIndexer $indexer
-     */
     public function __construct(
         JobRunner $jobRunner,
         DoctrineHelper $doctrineHelper,

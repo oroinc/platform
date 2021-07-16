@@ -58,9 +58,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         }
     }
 
-    /**
-     * @param ExtendedContainerBuilder $container
-     */
     private function configureImagine(ExtendedContainerBuilder $container): void
     {
         $configs = $this->ensureImagineDefaultConfigSet($container->getExtensionConfig('liip_imagine'));
@@ -81,11 +78,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setExtensionConfig('liip_imagine', $configs);
     }
 
-    /**
-     * @param array $configs
-     *
-     * @return array
-     */
     private function ensureImagineDefaultConfigSet(array $configs): array
     {
         /**
@@ -119,11 +111,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         return $configs;
     }
 
-    /**
-     * @param array $configs
-     *
-     * @return int|null
-     */
     private function getImagineDefaultConfigIndex(array $configs): ?int
     {
         $lastIndex = null;
@@ -138,11 +125,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         return $lastIndex;
     }
 
-    /**
-     * @param array $configs
-     *
-     * @return bool
-     */
     private function isImagineDefaultLoaderFilesystem(array $configs): bool
     {
         foreach ($configs as $config) {
@@ -156,11 +138,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         return true;
     }
 
-    /**
-     * @param array $configs
-     *
-     * @return bool
-     */
     private function isImagineDefaultResolverOroGaufrette(array $configs): bool
     {
         foreach ($configs as $config) {
@@ -174,11 +151,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         return true;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return bool
-     */
     private function hasImagineDefaultLoaderDataRoot(array $config): bool
     {
         return
@@ -186,11 +158,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
             && \array_key_exists('data_root', $config['loaders']['default']['filesystem']);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return bool
-     */
     private function hasImagineDefaultLoaderBundleResourcesEnabled(array $config): bool
     {
         return
@@ -198,11 +165,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
             && \array_key_exists('enabled', $config['loaders']['default']['filesystem']['bundle_resources']);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return bool
-     */
     private function hasImagineDefaultResolverFileManagerService(array $config): bool
     {
         return

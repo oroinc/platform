@@ -15,17 +15,11 @@ class BeforeSaveJobEvent extends Event
     /** @var Job */
     private $job;
 
-    /**
-     * @param Job $job
-     */
     public function __construct(Job $job)
     {
         $this->job = $job;
     }
 
-    /**
-     * @return Job
-     */
     public function getJob(): Job
     {
         return $this->job;

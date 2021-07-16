@@ -20,11 +20,6 @@ class EntityIdResolverRegistry
     /** @var RequestExpressionMatcher */
     private $matcher;
 
-    /**
-     * @param array                    $resolvers
-     * @param ContainerInterface       $container
-     * @param RequestExpressionMatcher $matcher
-     */
     public function __construct(
         array $resolvers,
         ContainerInterface $container,
@@ -97,11 +92,6 @@ class EntityIdResolverRegistry
         return !$expression || $this->matcher->matchValue($expression, $requestType);
     }
 
-    /**
-     * @param string $serviceId
-     *
-     * @return EntityIdResolverInterface
-     */
     private function instantiateResolver(string $serviceId): EntityIdResolverInterface
     {
         return $this->container->get($serviceId);

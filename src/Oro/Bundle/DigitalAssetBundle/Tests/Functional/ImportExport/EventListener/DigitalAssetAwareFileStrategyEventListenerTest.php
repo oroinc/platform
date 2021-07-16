@@ -55,11 +55,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->assertEmpty($context->getErrors());
     }
 
-    /**
-     * @param array $itemData
-     *
-     * @return Context
-     */
     private function getContext(array $itemData = []): Context
     {
         $context = new Context([]);
@@ -68,12 +63,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         return $context;
     }
 
-    /**
-     * @param Context $context
-     * @param object $entity
-     *
-     * @return StrategyEvent
-     */
     private function getEvent(Context $context, object $entity): StrategyEvent
     {
         return new StrategyEvent(
@@ -196,9 +185,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
     }
 
-    /**
-     * @param bool $isEnabled
-     */
     private function toggleDam(bool $isEnabled): void
     {
         $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
@@ -375,9 +361,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         );
     }
 
-    /**
-     * @param User $user
-     */
     private function setToken(User $user): void
     {
         $token = new UsernamePasswordOrganizationToken(

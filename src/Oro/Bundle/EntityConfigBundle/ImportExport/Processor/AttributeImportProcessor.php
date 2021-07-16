@@ -36,17 +36,11 @@ class AttributeImportProcessor extends ImportProcessor implements StepExecutionA
         return parent::process($item);
     }
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function setContextRegistry(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

@@ -211,10 +211,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return $result;
     }
 
-    /**
-     * @param Job $job
-     * @param array $body
-     */
     private function createFinishJobs(Job $job, array $body): void
     {
         $context = $this->dependentJob->createDependentJobContext($job->getRootJob());
@@ -240,10 +236,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->dependentJob->saveDependentJob($context);
     }
 
-    /**
-     * @param array $body
-     * @param string $error
-     */
     protected function sendErrorNotification(array $body, string $error): void
     {
         $errorMessage = sprintf(
@@ -351,9 +343,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * @param array $body
-     */
     protected function dispatchBeforeChunksEvent(array $body)
     {
         if ($this->eventDispatcher) {

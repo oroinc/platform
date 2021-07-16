@@ -26,10 +26,6 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
     /** @var MessageProducerInterface */
     private $messageProducer;
 
-    /**
-     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
-     * @param MessageProducerInterface           $messageProducer
-     */
     public function __construct(
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
         MessageProducerInterface $messageProducer

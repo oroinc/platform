@@ -22,8 +22,6 @@ class Mode
     }
 
     /**
-     * @return bool
-     *
      * @see \Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver::createLock()
      */
     public function on(): bool
@@ -38,8 +36,6 @@ class Mode
     }
 
     /**
-     * @return bool
-     *
      * @see \Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver::createUnlock()
      */
     public function off(): bool
@@ -55,8 +51,6 @@ class Mode
 
     /**
      * Whether maintenance mode is on or not
-     *
-     * @return bool
      */
     public function isOn(): bool
     {

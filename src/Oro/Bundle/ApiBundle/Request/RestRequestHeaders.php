@@ -24,9 +24,6 @@ class RestRequestHeaders extends AbstractParameterBag
      */
     private $parameters;
 
-    /**
-     * @param Request $request
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -143,11 +140,6 @@ class RestRequestHeaders extends AbstractParameterBag
         return $result;
     }
 
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
     private function normalizeKey(string $key): string
     {
         return str_replace('_', '-', strtolower($key));
@@ -176,11 +168,6 @@ class RestRequestHeaders extends AbstractParameterBag
         return $this->request->headers->keys();
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     private function hasHeader(string $name): bool
     {
         return $this->request->headers->has($name);

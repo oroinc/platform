@@ -40,11 +40,6 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
     /** @var array [class name => [provider, ...], ...] */
     private $phoneProviders = [];
 
-    /**
-     * @param array              $phoneProviderMap
-     * @param ContainerInterface $phoneProviderContainer
-     * @param ConfigProvider     $extendConfigProvider
-     */
     public function __construct(
         array $phoneProviderMap,
         ContainerInterface $phoneProviderContainer,

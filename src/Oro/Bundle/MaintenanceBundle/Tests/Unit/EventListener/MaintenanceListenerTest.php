@@ -91,10 +91,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider routeFilterDataProvider
-     *
-     * @param bool $debug
-     * @param string|null $route
-     * @param bool $expected
      */
     public function testRouteFilter(bool $debug, ?string $route, bool $expected): void
     {
@@ -158,9 +154,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider pathFilterDataProvider
-     *
-     * @param string|null $path
-     * @param bool $expected
      */
     public function testPathFilter(?string $path, bool $expected): void
     {
@@ -209,9 +202,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hostFilterDataProvider
-     *
-     * @param string|null $host
-     * @param bool $expected
      */
     public function testHostFilter(?string $host, bool $expected): void
     {
@@ -260,9 +250,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider ipFilterDataProvider
-     *
-     * @param array $ips
-     * @param bool $expected
      */
     public function testIPFilter(array $ips, bool $expected): void
     {
@@ -307,10 +294,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider queryFilterDataProvider
-     *
-     * @param Request $request
-     * @param array|null $query
-     * @param bool $expected
      */
     public function testQueryFilter(Request $request, ?array $query, bool $expected): void
     {
@@ -362,12 +345,8 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     /**
      * @dataProvider cookieFilterDataProvider
-     *
-     * @param array|null $cookies
-     * @param bool $expected
      */
     public function testCookieFilter(?array $cookies, bool $expected): void
     {

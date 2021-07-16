@@ -20,11 +20,6 @@ class ExtendedAssociationFilterFactory
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param ValueNormalizer                $valueNormalizer
-     * @param AssociationManager             $associationManager
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         AssociationManager $associationManager,
@@ -37,10 +32,6 @@ class ExtendedAssociationFilterFactory
 
     /**
      * Creates a new instance of ExtendedAssociationFilter.
-     *
-     * @param string $dataType
-     *
-     * @return ExtendedAssociationFilter
      */
     public function createFilter(string $dataType): ExtendedAssociationFilter
     {

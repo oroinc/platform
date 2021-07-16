@@ -12,9 +12,6 @@ class TestButtonProviderExtension implements ButtonProviderExtensionInterface
     /** @var ButtonProviderExtensionInterface|null */
     private $decoratedExtension;
 
-    /**
-     * @param ButtonProviderExtensionInterface|null $decoratedExtension
-     */
     public function setDecoratedExtension(ButtonProviderExtensionInterface $decoratedExtension = null)
     {
         $this->decoratedExtension = $decoratedExtension;

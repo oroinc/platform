@@ -51,10 +51,6 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
         return $this->postProcessCallbacks[$section] ?? [];
     }
 
-    /**
-     * @param string                        $sectionName
-     * @param ConfigurationSectionInterface $section
-     */
     public function addExtraSection(string $sectionName, ConfigurationSectionInterface $section): void
     {
         $this->extraSections[$sectionName] = $section;

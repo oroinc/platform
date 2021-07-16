@@ -28,9 +28,6 @@ class HasActiveIntegration extends AbstractCondition implements ContextAccessorA
      */
     protected $type;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

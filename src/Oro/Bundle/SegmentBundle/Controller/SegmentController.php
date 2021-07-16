@@ -190,9 +190,6 @@ class SegmentController extends AbstractController
         ];
     }
 
-    /**
-     * @param Segment $segment
-     */
     protected function checkSegment(Segment $segment)
     {
         if ($segment->getEntity() &&

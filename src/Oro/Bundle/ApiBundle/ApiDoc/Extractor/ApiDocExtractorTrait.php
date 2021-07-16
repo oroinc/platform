@@ -28,8 +28,6 @@ trait ApiDocExtractorTrait
 
     /**
      * Sets the RouteOptionsResolver.
-     *
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
      */
     public function setRouteOptionsResolver(RouteOptionsResolverInterface $routeOptionsResolver)
     {
@@ -38,8 +36,6 @@ trait ApiDocExtractorTrait
 
     /**
      * Sets the RestDocViewDetector.
-     *
-     * @param RestDocViewDetector $docViewDetector
      */
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector)
     {
@@ -48,8 +44,6 @@ trait ApiDocExtractorTrait
 
     /**
      * Sets the ApiDocAnnotationHandler.
-     *
-     * @param ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler
      */
     public function setApiDocAnnotationHandler(ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler)
     {
@@ -164,10 +158,6 @@ trait ApiDocExtractorTrait
         return $array;
     }
 
-    /**
-     * @param array $array
-     * @param array $resources
-     */
     protected function doAddResources(array &$array, array $resources)
     {
         \rsort($resources);
@@ -194,9 +184,6 @@ trait ApiDocExtractorTrait
         }
     }
 
-    /**
-     * @param array $array
-     */
     protected function doSortAnnotations(array &$array)
     {
         $methodOrder = [

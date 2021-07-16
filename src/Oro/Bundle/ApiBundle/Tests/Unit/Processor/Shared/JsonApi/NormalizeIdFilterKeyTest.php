@@ -208,10 +208,6 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         ];
     }
 
-    /**
-     * @param array            $expectedFilters
-     * @param FilterCollection $actualFilters
-     */
     private function assertFilters(array $expectedFilters, FilterCollection $actualFilters)
     {
         foreach ($actualFilters as $filterKey => $filterDefinition) {

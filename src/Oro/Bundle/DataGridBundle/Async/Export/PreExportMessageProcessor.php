@@ -31,17 +31,11 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     protected $exportIdFetcher;
 
-    /**
-     * @param ExportHandler $exportHandler
-     */
     public function setExportHandler(ExportHandler $exportHandler)
     {
         $this->exportHandler = $exportHandler;
     }
 
-    /**
-     * @param DatagridExportIdFetcher $exportIdFetcher
-     */
     public function setExportIdFetcher(DatagridExportIdFetcher $exportIdFetcher)
     {
         $this->exportIdFetcher = $exportIdFetcher;

@@ -26,11 +26,6 @@ abstract class AbstractMapper
     /** @var array  */
     protected $mappingErrors = [];
 
-    /**
-     * @param SearchMappingProvider $mappingProvider
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param TypeCastingHandlerRegistry $handlerRegistry
-     */
     public function __construct(
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,
@@ -184,10 +179,6 @@ abstract class AbstractMapper
 
     /**
      * Fills "all_text" virtual field with data.
-     *
-     * @param array $objectData
-     *
-     * @return array
      */
     protected function generateAllTextField(array $objectData): array
     {
@@ -211,11 +202,6 @@ abstract class AbstractMapper
         return $objectData;
     }
 
-    /**
-     * @param string $alias
-     * @param string $targetField
-     * @param string $message
-     */
     private function addMappingError(string $alias, string $targetField, string $message): void
     {
         if (!array_key_exists($alias, $this->mappingErrors)) {
@@ -223,10 +209,7 @@ abstract class AbstractMapper
         }
         $this->mappingErrors[$alias][$targetField] = $message;
     }
-    
-    /**
-     * @return array
-     */
+
     public function getLastMappingErrors(): array
     {
         $errors = $this->mappingErrors;

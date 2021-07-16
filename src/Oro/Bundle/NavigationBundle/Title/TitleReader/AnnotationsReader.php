@@ -19,12 +19,6 @@ class AnnotationsReader extends PhpArrayConfigProvider implements ReaderInterfac
     /** @var Reader */
     private $reader;
 
-    /**
-     * @param string                  $cacheFile
-     * @param bool                    $debug
-     * @param ControllerClassProvider $controllerClassProvider
-     * @param Reader                  $reader
-     */
     public function __construct(
         string $cacheFile,
         bool $debug,

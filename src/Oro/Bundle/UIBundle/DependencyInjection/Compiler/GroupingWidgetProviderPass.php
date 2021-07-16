@@ -24,11 +24,6 @@ class GroupingWidgetProviderPass implements CompilerPassInterface
     /** @var int|null */
     private $pageType;
 
-    /**
-     * @param string   $serviceId
-     * @param string   $tagName
-     * @param int|null $pageType
-     */
     public function __construct(string $serviceId, string $tagName, int $pageType = null)
     {
         $this->serviceId = $serviceId;

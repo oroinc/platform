@@ -25,11 +25,6 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param ResetPasswordHandler   $resetPasswordHandler
-     * @param TranslatorInterface    $translator
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         ResetPasswordHandler $resetPasswordHandler,
         TranslatorInterface $translator,

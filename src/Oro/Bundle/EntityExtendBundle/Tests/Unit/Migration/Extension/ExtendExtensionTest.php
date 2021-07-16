@@ -422,7 +422,6 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-
     /**
      * @return array[]
      */
@@ -445,10 +444,6 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $exception
-     * @param string $exceptionMessage
-     * @param array $identityFields
-     *
      * @dataProvider createEnumWithInvalidIdentityFieldDataProvider
      */
     public function testCreateEnumWithInvalidIdentityField(

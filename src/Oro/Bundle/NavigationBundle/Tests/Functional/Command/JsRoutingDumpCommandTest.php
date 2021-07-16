@@ -44,19 +44,11 @@ class JsRoutingDumpCommandTest extends WebTestCase
         static::assertStringContainsString($endPath, $result);
     }
 
-    /**
-     * @param string $filename
-     * @param string $format
-     * @return string
-     */
     private function getEndPath(string $filename, string $format): string
     {
         return implode(DIRECTORY_SEPARATOR, ['', 'public', 'media', 'js', $filename . '.' . $format]);
     }
 
-    /**
-     * @return string
-     */
     private function getFilename(): string
     {
         return $this->filenamePrefix . 'routes';

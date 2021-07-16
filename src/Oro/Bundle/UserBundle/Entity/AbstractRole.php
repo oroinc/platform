@@ -41,9 +41,6 @@ abstract class AbstractRole extends Role
      */
     abstract public function getLabel();
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return (string)$this->getRole();

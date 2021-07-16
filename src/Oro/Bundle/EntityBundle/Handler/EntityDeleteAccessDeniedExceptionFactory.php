@@ -12,10 +12,6 @@ class EntityDeleteAccessDeniedExceptionFactory
 {
     /**
      * Creates AccessDeniedException that should be thrown when a deletion of an entity is denied.
-     *
-     * @param string $reason
-     *
-     * @return AccessDeniedException
      */
     public function createAccessDeniedException(string $reason = 'access denied'): AccessDeniedException
     {

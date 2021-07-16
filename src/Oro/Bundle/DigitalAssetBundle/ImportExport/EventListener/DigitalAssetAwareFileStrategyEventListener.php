@@ -51,14 +51,6 @@ class DigitalAssetAwareFileStrategyEventListener
     /** @var File[] */
     private $newFiles;
 
-    /**
-     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
-     * @param ImportStrategyHelper $importStrategyHelper
-     * @param DoctrineHelper $doctrineHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider,
         FieldHelper $fieldHelper,
@@ -75,9 +67,6 @@ class DigitalAssetAwareFileStrategyEventListener
         $this->translator = $translator;
     }
 
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessAfter(StrategyEvent $event): void
     {
         $errors = [[]];
@@ -113,11 +102,6 @@ class DigitalAssetAwareFileStrategyEventListener
         }
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
     private function getRelations(string $entityClass): array
     {
         return $this->fieldHelper->getRelations(
@@ -128,12 +112,6 @@ class DigitalAssetAwareFileStrategyEventListener
         );
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function isDamEnabled(object $entity, string $fieldName): bool
     {
         $attachmentConfig = $this->attachmentEntityConfigProvider
@@ -230,12 +208,6 @@ class DigitalAssetAwareFileStrategyEventListener
         return $errors;
     }
 
-    /**
-     * @param File $file
-     * @param string $originUuid
-     *
-     * @return DigitalAsset|null
-     */
     private function createDigitalAssetFromFile(File $file, string $originUuid): ?DigitalAsset
     {
         if (!$file->getFile()) {
@@ -257,11 +229,6 @@ class DigitalAssetAwareFileStrategyEventListener
         return $this->newDigitalAssets[$key];
     }
 
-    /**
-     * @param string $uuid
-     *
-     * @return File|null
-     */
     private function findFileByUuid(string $uuid): ?File
     {
         return $this->newFiles[$uuid] ??
@@ -303,9 +270,6 @@ class DigitalAssetAwareFileStrategyEventListener
         return array_merge(...$errors);
     }
 
-    /**
-     * @param PreFlushEventArgs $args
-     */
     public function preFlush(PreFlushEventArgs $args): void
     {
         $entityManager = $args->getEntityManager();

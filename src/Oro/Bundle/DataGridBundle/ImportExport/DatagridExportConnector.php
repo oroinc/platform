@@ -16,7 +16,6 @@ use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * Datagrid export connector reads items from data grid with configured batch size.
- *
  */
 class DatagridExportConnector implements
     ItemReaderInterface,
@@ -71,9 +70,6 @@ class DatagridExportConnector implements
      */
     protected $gridDataSource;
 
-    /**
-     * @param ServiceLink $gridManagerLink
-     */
     public function __construct(ServiceLink $gridManagerLink)
     {
         $this->gridManagerLink = $gridManagerLink;

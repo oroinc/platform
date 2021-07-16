@@ -55,11 +55,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected $propertyConfigBag;
 
-    /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param PropertyConfigBag    $propertyConfigBag
-     */
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
         EntityMetadataHelper $entityMetadataHelper,
@@ -1087,8 +1082,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
     /**
      * Makes sure that required for any extend field attributes are set
-     *
-     * @param array $options
      */
     protected function ensureExtendFieldSet(array &$options)
     {

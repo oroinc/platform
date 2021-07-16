@@ -14,8 +14,6 @@ class CommandArgsTokenizer
 
     /**
      * Registers a normalizer
-     *
-     * @param CommandArgsNormalizer $normalizer
      */
     public function addNormalizer(CommandArgsNormalizer $normalizer)
     {

@@ -16,17 +16,11 @@ class InvalidateTranslationCacheEvent extends Event
      */
     private $locale;
 
-    /**
-     * @param string|null $locale
-     */
     public function __construct(string $locale = null)
     {
         $this->locale = $locale;
     }
 
-    /**
-     * @return string|null
-     */
     public function getLocale(): ?string
     {
         return $this->locale;

@@ -12,8 +12,6 @@ class MetadataExtraCollection
 
     /**
      * Indicates whether the collection is empty.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -52,10 +50,6 @@ class MetadataExtraCollection
 
     /**
      * Checks whether some additional metadata info is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
     public function hasMetadataExtra(string $extraName): bool
     {
@@ -70,10 +64,6 @@ class MetadataExtraCollection
 
     /**
      * Gets a request for some additional metadata info by its name.
-     *
-     * @param string $extraName
-     *
-     * @return MetadataExtraInterface|null
      */
     public function getMetadataExtra(string $extraName): ?MetadataExtraInterface
     {
@@ -88,8 +78,6 @@ class MetadataExtraCollection
 
     /**
      * Adds a request for some additional metadata info.
-     *
-     * @param MetadataExtraInterface $extra
      *
      * @throws \InvalidArgumentException if a metadata extra with the same name already exists
      */
@@ -106,8 +94,6 @@ class MetadataExtraCollection
 
     /**
      * Removes a request for some additional metadata info.
-     *
-     * @param string $extraName
      */
     public function removeMetadataExtra(string $extraName): void
     {

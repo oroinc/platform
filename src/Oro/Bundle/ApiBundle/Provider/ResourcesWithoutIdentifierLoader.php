@@ -16,9 +16,6 @@ class ResourcesWithoutIdentifierLoader
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
@@ -44,13 +41,6 @@ class ResourcesWithoutIdentifierLoader
         return $resourcesWithoutIdentifier;
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
     private function hasIdentifierFields(string $entityClass, string $version, RequestType $requestType): bool
     {
         $config = $this->configProvider

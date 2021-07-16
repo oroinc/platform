@@ -27,11 +27,6 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate implements CacheW
     /** @var bool */
     private $onlyOptionalsEnabled = false;
 
-    /**
-     * @param ServiceLink               $cacheWarmerLink
-     * @param ServiceLink               $extendCacheWarmerLink
-     * @param CheckDatabaseStateManager $checkDatabaseStateManager
-     */
     public function __construct(
         ServiceLink $cacheWarmerLink,
         ServiceLink $extendCacheWarmerLink,

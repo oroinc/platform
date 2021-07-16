@@ -11,9 +11,6 @@ class LimitResultsListener
 {
     public const RESULTS_LIMIT = 1000;
 
-    /**
-     * @param SearchQueryAwareEventInterface $event
-     */
     public function onBeforeSearch(SearchQueryAwareEventInterface $event): void
     {
         $query = $event->getQuery();

@@ -31,12 +31,6 @@ class NoteApiHandler
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -111,9 +105,6 @@ class NoteApiHandler
         return $request;
     }
 
-    /**
-     * @param Note $entity
-     */
     protected function onSuccess(Note $entity)
     {
         $this->manager->persist($entity);

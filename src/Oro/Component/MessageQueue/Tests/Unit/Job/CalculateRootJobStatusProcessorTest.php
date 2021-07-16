@@ -69,7 +69,6 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message. Job id is missing.');
 
-
         $message = new Message();
         $message->setBody(\json_encode([]));
         $session = $this->createMock(SessionInterface::class);
@@ -94,7 +93,6 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('critical')
             ->with('Job was not found. id: "47"');
-
 
         $message = new Message();
         $message->setBody(\json_encode(['jobId' => 47]));
@@ -123,7 +121,6 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger
             ->expects($this->never())
             ->method('critical');
-
 
         $message = new Message();
         $message->setBody(\json_encode(['jobId' => 47]));

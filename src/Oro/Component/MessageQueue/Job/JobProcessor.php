@@ -26,11 +26,6 @@ class JobProcessor
     /** @var string */
     private $entityClass;
 
-    /**
-     * @param JobManagerInterface $jobManager
-     * @param ManagerRegistry $doctrine
-     * @param string $entityClass
-     */
     public function __construct(JobManagerInterface $jobManager, ManagerRegistry $doctrine, string $entityClass)
     {
         $this->jobManager = $jobManager;
@@ -38,10 +33,6 @@ class JobProcessor
         $this->entityClass = $entityClass;
     }
 
-    /**
-     * @param JobConfigurationProviderInterface $jobConfigurationProvider
-     * @return self
-     */
     public function setJobConfigurationProvider(JobConfigurationProviderInterface $jobConfigurationProvider): self
     {
         $this->jobConfigurationProvider = $jobConfigurationProvider;
@@ -49,9 +40,6 @@ class JobProcessor
         return $this;
     }
 
-    /**
-     * @return JobConfigurationProviderInterface
-     */
     public function getJobConfigurationProvider(): JobConfigurationProviderInterface
     {
         if (!$this->jobConfigurationProvider) {
@@ -60,11 +48,6 @@ class JobProcessor
         return $this->jobConfigurationProvider;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Job|null
-     */
     public function findJobById(int $id): ?Job
     {
         return $this->getJobRepository()->findJobById($id);
@@ -72,24 +55,12 @@ class JobProcessor
 
     /**
      * Finds root non interrupted job by name and given statuses.
-     *
-     * @param string $jobName
-     * @param array $statuses
-     *
-     * @return Job|null
      */
     public function findRootJobByJobNameAndStatuses(string $jobName, array $statuses): ?Job
     {
         return $this->getJobRepository()->findRootJobByJobNameAndStatuses($jobName, $statuses);
     }
 
-    /**
-     * @param string $ownerId
-     * @param string $jobName
-     * @param bool $unique
-     *
-     * @return Job|null
-     */
     public function findOrCreateRootJob(string $ownerId, string $jobName, bool $unique = false): ?Job
     {
         if (!$ownerId) {
@@ -148,9 +119,6 @@ class JobProcessor
         return $job;
     }
 
-    /**
-     * @param Job $job
-     */
     public function startChildJob(Job $job): void
     {
         if ($job->isRoot()) {
@@ -171,9 +139,6 @@ class JobProcessor
         $this->jobManager->saveJob($job);
     }
 
-    /**
-     * @param Job $job
-     */
     public function successChildJob(Job $job): void
     {
         if ($job->isRoot()) {
@@ -186,9 +151,6 @@ class JobProcessor
         $this->jobManager->saveJob($job);
     }
 
-    /**
-     * @param Job $job
-     */
     public function failChildJob(Job $job): void
     {
         if ($job->isRoot()) {
@@ -201,9 +163,6 @@ class JobProcessor
         $this->jobManager->saveJob($job);
     }
 
-    /**
-     * @param Job $job
-     */
     public function failAndRedeliveryChildJob(Job $job): void
     {
         if ($job->isRoot()) {
@@ -214,9 +173,6 @@ class JobProcessor
         $this->jobManager->saveJob($job);
     }
 
-    /**
-     * @param Job $job
-     */
     public function interruptRootJob(Job $job): void
     {
         if (!$job->isRoot()) {
@@ -246,11 +202,6 @@ class JobProcessor
 
     /**
      * Finds root non interrupted and non stale job by name and given statuses.
-     *
-     * @param string $jobName
-     * @param array $statuses
-     *
-     * @return Job|null
      */
     public function findNotStaleRootJobyJobNameAndStatuses(string $jobName, array $statuses): ?Job
     {
@@ -266,9 +217,6 @@ class JobProcessor
         return null;
     }
 
-    /**
-     * @param Job $rootJob
-     */
     private function staleRootJobAndChildren(Job $rootJob): void
     {
         if (!$rootJob->isRoot()) {
@@ -289,10 +237,6 @@ class JobProcessor
         });
     }
 
-    /**
-     * @param Job $job
-     * @return Job|null
-     */
     private function saveJobAndStaleDuplicateIfQualifies(Job $job): ?Job
     {
         try {
@@ -310,10 +254,6 @@ class JobProcessor
         return null;
     }
 
-    /**
-     * @param Job $job
-     * @return bool
-     */
     private function isJobStale(Job $job): bool
     {
         if ($job->getStatus() === Job::STATUS_STALE) {
@@ -332,11 +272,6 @@ class JobProcessor
         return false;
     }
 
-    /**
-     * @param Job $job
-     *
-     * @return bool
-     */
     private function hasNotStartedChild(Job $job): bool
     {
         foreach ($job->getChildJobs() as $childJob) {
@@ -364,9 +299,6 @@ class JobProcessor
         return [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
     }
 
-    /**
-     * @return JobRepositoryInterface
-     */
     private function getJobRepository(): JobRepositoryInterface
     {
         return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);

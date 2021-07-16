@@ -18,10 +18,6 @@ class DatabaseConnectionsClearExtension extends AbstractExtension
     /** @var array [connection name => connection service id, ...] */
     private $connections;
 
-    /**
-     * @param ContainerInterface $container
-     * @param array $connections
-     */
     public function __construct(ContainerInterface $container, array $connections)
     {
         $this->container = $container;

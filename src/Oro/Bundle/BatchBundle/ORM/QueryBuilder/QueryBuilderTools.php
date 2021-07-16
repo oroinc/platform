@@ -60,8 +60,6 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
 
     /**
      * Removes unused parameters from query builder
-     *
-     * @param QueryBuilder $qb
      */
     public function fixUnusedParameters(QueryBuilder $qb)
     {

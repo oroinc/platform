@@ -22,9 +22,6 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     /** @var RequestType */
     protected $requestType;
 
-    /**
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function __construct(ValueNormalizer $valueNormalizer)
     {
         $this->valueNormalizer = $valueNormalizer;

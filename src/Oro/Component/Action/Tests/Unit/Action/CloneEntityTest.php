@@ -78,7 +78,6 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executeDataProvider
-     * @param array $options
      */
     public function testExecute(array $options)
     {

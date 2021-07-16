@@ -11,9 +11,6 @@ class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
     /** @var Manager */
     private $dataGridManager;
 
-    /**
-     * @param Manager $dataGridManager
-     */
     public function __construct(Manager $dataGridManager)
     {
         $this->dataGridManager = $dataGridManager;

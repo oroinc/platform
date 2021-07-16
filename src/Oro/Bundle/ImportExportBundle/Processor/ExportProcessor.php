@@ -65,7 +65,6 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
     public function setImportExportContext(ContextInterface $context)
@@ -91,17 +90,11 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         }
     }
 
-    /**
-     * @param SerializerInterface $serializer
-     */
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
     }
 
-    /**
-     * @param DataConverterInterface $dataConverter
-     */
     public function setDataConverter(DataConverterInterface $dataConverter)
     {
         $this->dataConverter = $dataConverter;

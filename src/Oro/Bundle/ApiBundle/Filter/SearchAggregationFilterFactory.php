@@ -10,9 +10,6 @@ class SearchAggregationFilterFactory
     /** @var SearchFieldResolverFactory */
     private $searchFieldResolverFactory;
 
-    /**
-     * @param SearchFieldResolverFactory $searchFieldResolverFactory
-     */
     public function __construct(SearchFieldResolverFactory $searchFieldResolverFactory)
     {
         $this->searchFieldResolverFactory = $searchFieldResolverFactory;
@@ -20,10 +17,6 @@ class SearchAggregationFilterFactory
 
     /**
      * Creates a new instance of SearchAggregationFilter.
-     *
-     * @param string $dataType
-     *
-     * @return SearchAggregationFilter
      */
     public function createFilter(string $dataType): SearchAggregationFilter
     {

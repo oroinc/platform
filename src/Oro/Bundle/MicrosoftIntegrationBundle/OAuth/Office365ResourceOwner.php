@@ -14,17 +14,11 @@ class Office365ResourceOwner extends BaseResourceOwner
     /** @var SymmetricCrypterInterface */
     private $crypter;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     */
     public function setCrypter(SymmetricCrypterInterface $crypter): void
     {
         $this->crypter = $crypter;
     }
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function configureCredentials(ConfigManager $configManager): void
     {
         $clientId = $configManager->get('oro_microsoft_integration.client_id');

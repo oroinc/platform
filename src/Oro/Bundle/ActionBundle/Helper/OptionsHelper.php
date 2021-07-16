@@ -26,12 +26,6 @@ class OptionsHelper
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @param Router $router
-     * @param TranslatorInterface $translator
-     * @param FormProvider $formProvider
-     * @param HtmlTagHelper $htmlTagHelper
-     */
     public function __construct(
         Router $router,
         TranslatorInterface $translator,

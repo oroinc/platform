@@ -98,10 +98,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitProvider
-     *
-     * @param EmailNotification $defaultData
-     * @param array $submittedData
-     * @param EmailNotification $expectedData
      */
     public function testSubmit(EmailNotification $defaultData, array $submittedData, EmailNotification $expectedData)
     {

@@ -33,9 +33,6 @@ class SerializedFieldProvider
      */
     protected $extendConfigProvider;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
     public function __construct(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;

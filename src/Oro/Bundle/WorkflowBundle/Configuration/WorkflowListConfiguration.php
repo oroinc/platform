@@ -15,9 +15,6 @@ class WorkflowListConfiguration implements ConfigurationInterface
      */
     protected $workflowConfiguration;
 
-    /**
-     * @param WorkflowConfiguration $workflowConfiguration
-     */
     public function __construct(WorkflowConfiguration $workflowConfiguration)
     {
         $this->workflowConfiguration = $workflowConfiguration;

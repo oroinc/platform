@@ -326,9 +326,6 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider unsetIdentifierDataProvider
      */
     public function testUnsetIdentifier(array $source, array $expected)
@@ -579,9 +576,6 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $storageData
-     */
     protected function setStorage(array $storageData)
     {
         $session = new Session(new MockArraySessionStorage());

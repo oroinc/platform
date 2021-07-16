@@ -24,9 +24,6 @@ class OwnerTreeListener
     /** @var bool */
     protected $isCacheOutdated = false;
 
-    /**
-     * @param OwnerTreeProviderInterface $treeProvider
-     */
     public function __construct(OwnerTreeProviderInterface $treeProvider)
     {
         $this->treeProvider = $treeProvider;
@@ -43,7 +40,6 @@ class OwnerTreeListener
     }
 
     /**
-     * @param OnFlushEventArgs $args
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onFlush(OnFlushEventArgs $args)

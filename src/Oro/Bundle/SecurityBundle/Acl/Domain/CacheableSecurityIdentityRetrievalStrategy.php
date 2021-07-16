@@ -17,9 +17,6 @@ class CacheableSecurityIdentityRetrievalStrategy implements SecurityIdentityRetr
     /** @var array [user name => [SID, ...], ...] */
     private $sids = [];
 
-    /**
-     * @param SecurityIdentityRetrievalStrategyInterface $innerStrategy
-     */
     public function __construct(SecurityIdentityRetrievalStrategyInterface $innerStrategy)
     {
         $this->innerStrategy = $innerStrategy;

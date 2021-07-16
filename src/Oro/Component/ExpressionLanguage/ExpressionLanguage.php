@@ -25,10 +25,6 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
      */
     protected $parser;
 
-    /**
-     * @param CacheItemPoolInterface|null $cache
-     * @param array $providers
-     */
     public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
     {
         $this->cache = $cache ?: new ArrayAdapter();

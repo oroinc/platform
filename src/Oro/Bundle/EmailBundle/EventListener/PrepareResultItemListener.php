@@ -16,10 +16,6 @@ class PrepareResultItemListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(Router $router, DoctrineHelper $doctrineHelper)
     {
         $this->router = $router;
@@ -28,8 +24,6 @@ class PrepareResultItemListener
 
     /**
      * Change search results view for Email entity
-     *
-     * @param PrepareResultItemEvent $event
      */
     public function prepareEmailItemDataEvent(PrepareResultItemEvent $event)
     {

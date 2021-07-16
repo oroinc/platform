@@ -14,9 +14,6 @@ class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
     /** @var ActionProcessorBagInterface */
     protected $actionProcessorBag;
 
-    /**
-     * @param ActionProcessorBagInterface $actionProcessorBag
-     */
     public function __construct(ActionProcessorBagInterface $actionProcessorBag)
     {
         $this->actionProcessorBag = $actionProcessorBag;

@@ -21,9 +21,6 @@ class JobConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForJobNames
-     * @param string $jobName
-     * @param array  $configuration
-     * @param int    $expectedTime
      */
     public function testTimeBeforeStaleForJobName(string $jobName, array $configuration, int $expectedTime)
     {
@@ -32,9 +29,6 @@ class JobConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedTime, $provider->getTimeBeforeStaleForJobName($jobName));
     }
 
-    /**
-     * @return array
-     */
     public function dataProviderForJobNames(): array
     {
         return [

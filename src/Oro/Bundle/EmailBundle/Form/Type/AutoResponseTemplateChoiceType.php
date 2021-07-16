@@ -26,10 +26,6 @@ class AutoResponseTemplateChoiceType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param TranslatorInterface    $translator
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor, TranslatorInterface $translator)
     {
         $this->tokenAccessor = $tokenAccessor;

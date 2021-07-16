@@ -30,11 +30,6 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
      */
     private $cronFormatTransformer;
 
-    /**
-     * @param DeferredScheduler                                $deferredScheduler
-     * @param InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgumentsBuilder
-     * @param DateTimeToStringTransformerInterface             $cronFormatTransformer
-     */
     public function __construct(
         DeferredScheduler $deferredScheduler,
         InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgumentsBuilder,
@@ -45,9 +40,6 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
         $this->cronFormatTransformer = $cronFormatTransformer;
     }
 
-    /**
-     * @param DataStorageInterface $dataStorage
-     */
     public function handle(DataStorageInterface $dataStorage)
     {
         $scheduleTime = $dataStorage->get(self::PARAM_INVALIDATE_TIME);

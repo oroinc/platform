@@ -7,10 +7,5 @@ namespace Oro\Bundle\ApiBundle\Batch\Handler;
  */
 interface BatchFlushDataHandlerFactoryInterface
 {
-    /**
-     * @param string $entityClass
-     *
-     * @return BatchFlushDataHandlerInterface|null
-     */
     public function createHandler(string $entityClass): ?BatchFlushDataHandlerInterface;
 }

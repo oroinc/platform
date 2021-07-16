@@ -27,9 +27,6 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSetData(FormEvent $event)
     {
         /** @var Report $data */
@@ -63,9 +60,6 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
         $form->get(ReportType::DATE_GROUPING_FORM_NAME)->setData($dateGroupingModel);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event)
     {
         $data = $event->getData();

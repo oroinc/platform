@@ -16,10 +16,6 @@ abstract class Page
      */
     protected $route;
 
-    /**
-     * @param OroElementFactory $elementFactory
-     * @param $route
-     */
     public function __construct(OroElementFactory $elementFactory, $route)
     {
         $this->elementFactory = $elementFactory;
@@ -36,8 +32,6 @@ abstract class Page
 
     /**
      * Open page using parameters
-     *
-     * @param array $parameters
      */
     abstract public function open(array $parameters = []);
 

@@ -23,9 +23,6 @@ class EntityConfigMerger
     /** @var NodeInterface */
     private $configurationTree;
 
-    /**
-     * @param ConfigExtensionRegistry $configExtensionRegistry
-     */
     public function __construct(ConfigExtensionRegistry $configExtensionRegistry)
     {
         $this->configExtensionRegistry = $configExtensionRegistry;

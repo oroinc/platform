@@ -24,12 +24,6 @@ class GaufretteResolver implements ResolverInterface
     /** @var string */
     private $cachePrefix;
 
-    /**
-     * @param FileManager    $fileManager
-     * @param RequestContext $requestContext
-     * @param string         $urlPrefix
-     * @param string         $cachePrefix
-     */
     public function __construct(
         FileManager $fileManager,
         RequestContext $requestContext,
@@ -95,12 +89,6 @@ class GaufretteResolver implements ResolverInterface
         }
     }
 
-    /**
-     * @param string $path
-     * @param string $filter
-     *
-     * @return string
-     */
     private function getFilePath(string $path, string $filter): string
     {
         $path = $filter . '/' . $this->sanitizePath($path);
@@ -111,20 +99,11 @@ class GaufretteResolver implements ResolverInterface
         return $path;
     }
 
-    /**
-     * @param string $path
-     * @param string $filter
-     *
-     * @return string
-     */
     private function getFileUrl(string $path, string $filter): string
     {
         return $this->urlPrefix . '/' . $filter . '/' . $this->sanitizePath($path);
     }
 
-    /**
-     * @return string
-     */
     private function getBaseUrl(): string
     {
         $scheme = $this->requestContext->getScheme();
@@ -150,11 +129,6 @@ class GaufretteResolver implements ResolverInterface
             . $baseUrl;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private function sanitizePath(string $path): string
     {
         // crude way of sanitizing URL scheme ("protocol") part

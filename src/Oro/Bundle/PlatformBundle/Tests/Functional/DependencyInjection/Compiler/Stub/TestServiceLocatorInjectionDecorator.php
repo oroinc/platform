@@ -10,10 +10,6 @@ class TestServiceLocatorInjectionDecorator extends TestServiceLocatorInjection
     /** @var TestServiceLocatorInjectionInterface */
     private $innerService;
 
-    /**
-     * @param ContainerInterface                   $container
-     * @param TestServiceLocatorInjectionInterface $innerService
-     */
     public function __construct(ContainerInterface $container, TestServiceLocatorInjectionInterface $innerService)
     {
         parent::__construct($container);

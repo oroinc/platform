@@ -27,9 +27,6 @@ class ScopeType extends AbstractType
      */
     protected $scopeFields;
 
-    /**
-     * @param ScopeManager $scopeManager
-     */
     public function __construct(ScopeManager $scopeManager)
     {
         $this->scopeManager = $scopeManager;

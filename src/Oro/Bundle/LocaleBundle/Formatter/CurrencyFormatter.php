@@ -12,9 +12,6 @@ class CurrencyFormatter implements FormatterInterface
     /** @var NumberFormatter */
     private $formatter;
 
-    /**
-     * @param NumberFormatter $formatter
-     */
     public function __construct(NumberFormatter $formatter)
     {
         $this->formatter = $formatter;

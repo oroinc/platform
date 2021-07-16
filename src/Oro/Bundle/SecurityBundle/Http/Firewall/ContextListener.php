@@ -35,8 +35,6 @@ class ContextListener
 
     /**
      * Refresh organization context in token
-     *
-     * @param RequestEvent $event
      */
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -81,8 +79,6 @@ class ContextListener
     }
 
     /**
-     * @param RequestEvent $event
-     *
      * @throws OrganizationAccessDeniedException
      */
     private function denyAccess(RequestEvent $event): void

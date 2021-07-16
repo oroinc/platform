@@ -29,9 +29,6 @@ class GeneralMatcherTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($matches);
     }
 
-    /**
-     * @return array
-     */
     public function typeDataProvider(): array
     {
         return [

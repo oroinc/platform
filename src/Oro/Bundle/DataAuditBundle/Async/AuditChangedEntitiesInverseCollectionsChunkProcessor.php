@@ -32,11 +32,6 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
      */
     private $logger;
 
-    /**
-     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
         JobRunner $jobRunner,
@@ -47,12 +42,6 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
         $this->logger = $logger;
     }
 
-    /**
-     * @param MessageInterface $message
-     * @param SessionInterface $session
-     *
-     * @return string
-     */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $body = JSON::decode($message->getBody());
@@ -112,10 +101,6 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
         );
     }
 
-    /**
-     * @param array $body
-     * @param array $map
-     */
     private function convert(array $body, array $map): void
     {
         $this->entityChangesToAuditEntryConverter->convert(
@@ -129,9 +114,6 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
         );
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedTopics(): array
     {
         return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS_CHUNK];

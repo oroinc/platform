@@ -15,9 +15,6 @@ class YamlProcessor implements ConfigProcessorInterface
     /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

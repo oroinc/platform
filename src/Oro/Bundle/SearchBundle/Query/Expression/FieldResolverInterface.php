@@ -11,19 +11,11 @@ interface FieldResolverInterface
 {
     /**
      * Returns the name that should be used in search index for the given field.
-     *
-     * @param string $fieldName
-     *
-     * @return string
      */
     public function resolveFieldName(string $fieldName): string;
 
     /**
      * Returns the data-type of the given field.
-     *
-     * @param string $fieldName
-     *
-     * @return string
      */
     public function resolveFieldType(string $fieldName): string;
 }

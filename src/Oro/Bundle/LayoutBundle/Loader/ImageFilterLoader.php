@@ -35,11 +35,6 @@ class ImageFilterLoader
     /** @var bool */
     private $shouldBeLoaded = true;
 
-    /**
-     * @param ImageTypeProvider $imageTypeProvider
-     * @param FilterConfiguration $filterConfiguration
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         ImageTypeProvider $imageTypeProvider,
         FilterConfiguration $filterConfiguration,
@@ -73,9 +68,6 @@ class ImageFilterLoader
         $this->shouldBeLoaded = false;
     }
 
-    /**
-     * @param CustomImageFilterProviderInterface $provider
-     */
     public function addCustomImageFilterProvider(CustomImageFilterProviderInterface $provider)
     {
         $this->customFilterProviders[] = $provider;

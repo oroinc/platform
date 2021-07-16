@@ -73,9 +73,6 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         return 'entities.entity' === $section;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureSubresourceNode(NodeBuilder $node): void
     {
         $sectionName = 'subresources.subresource';
@@ -109,11 +106,6 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessSubresourceConfig(array $config): array
     {
         if (!empty($config[ConfigUtil::TARGET_TYPE]) && ConfigUtil::COLLECTION === $config[ConfigUtil::TARGET_TYPE]) {

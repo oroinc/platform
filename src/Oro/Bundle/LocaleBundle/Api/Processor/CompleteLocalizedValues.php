@@ -31,11 +31,6 @@ class CompleteLocalizedValues implements ProcessorInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param LocalizationHelper        $localizationHelper
-     * @param DoctrineHelper            $doctrineHelper
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         LocalizationHelper $localizationHelper,
         DoctrineHelper $doctrineHelper,
@@ -95,11 +90,6 @@ class CompleteLocalizedValues implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
     private function getFieldName(FormInterface $form): string
     {
         $propertyPath = $form->getPropertyPath();
@@ -110,12 +100,6 @@ class CompleteLocalizedValues implements ProcessorInterface
         return $form->getName();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     *
-     * @return bool
-     */
     private function isLocalizedFallbackValueAssociation(ClassMetadata $metadata, string $fieldName): bool
     {
         if (!$metadata->hasAssociation($fieldName)) {
@@ -177,12 +161,6 @@ class CompleteLocalizedValues implements ProcessorInterface
         return $localizations;
     }
 
-    /**
-     * @param Localization|null $localization
-     * @param string $className
-     *
-     * @return AbstractLocalizedFallbackValue
-     */
     private function createLocalizedFallbackValue(
         ?Localization $localization,
         string $className

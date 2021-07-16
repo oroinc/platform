@@ -15,8 +15,6 @@ class SmtpSettingsChecker
 
     /**
      * SmtpSettingsChecker constructor.
-     *
-     * @param DirectMailer $directMailer
      */
     public function __construct(DirectMailer $directMailer)
     {

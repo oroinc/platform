@@ -63,9 +63,6 @@ final class SubPatternsLexer implements LexerInterface
      */
     private $referenceLexer;
 
-    /**
-     * @param LexerInterface $referenceLexer
-     */
     public function __construct(LexerInterface $referenceLexer)
     {
         $this->referenceLexer = $referenceLexer;

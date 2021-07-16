@@ -25,10 +25,6 @@ class BusinessUnitType extends AbstractType
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param BusinessUnitManager    $businessUnitManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         BusinessUnitManager $businessUnitManager,
         TokenAccessorInterface $tokenAccessor
@@ -126,8 +122,6 @@ class BusinessUnitType extends AbstractType
      * Change the autocomplete handler to "parent-business-units" for parentBusinessUnit field in case of
      * edit Business Unit page. The "parent-business-units" handler returns a list of Business units excluding
      * the given Business unit and its children.
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {

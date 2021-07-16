@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;

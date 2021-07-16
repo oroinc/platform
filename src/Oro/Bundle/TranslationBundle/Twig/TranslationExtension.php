@@ -28,11 +28,6 @@ class TranslationExtension extends AbstractExtension implements ServiceSubscribe
     /** @var bool */
     private $isDebugJsTranslations;
 
-    /**
-     * @param ContainerInterface $container
-     * @param bool $isDebugTranslator
-     * @param bool $isDebugJsTranslations
-     */
     public function __construct(ContainerInterface $container, bool $isDebugTranslator, bool $isDebugJsTranslations)
     {
         $this->container = $container;

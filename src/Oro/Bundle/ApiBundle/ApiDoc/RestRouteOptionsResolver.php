@@ -63,15 +63,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
     /** @var array [request type + version => [path => true, ...], ...] */
     private $overrides = [];
 
-    /**
-     * @param string               $routeGroup
-     * @param RestRoutes           $routes
-     * @param RestActionMapper     $actionMapper
-     * @param RestDocViewDetector  $docViewDetector
-     * @param ResourcesProvider    $resourcesProvider
-     * @param SubresourcesProvider $subresourcesProvider
-     * @param ValueNormalizer      $valueNormalizer
-     */
     public function __construct(
         string $routeGroup,
         RestRoutes $routes,
@@ -124,10 +115,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
         $this->overrides = [];
     }
 
-    /**
-     * @param Route                   $route
-     * @param RouteCollectionAccessor $routes
-     */
     private function resolveTemplateRoute(Route $route, RouteCollectionAccessor $routes)
     {
         $routeName = $routes->getName($route);

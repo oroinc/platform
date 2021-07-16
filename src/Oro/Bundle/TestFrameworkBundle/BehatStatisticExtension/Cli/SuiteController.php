@@ -32,11 +32,6 @@ class SuiteController implements Controller
      */
     protected $featureStatisticManager;
 
-    /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     * @param SuiteRegistry $behatSuiteRegistry
-     * @param FeatureStatisticManager $featureStatisticManager
-     */
     public function __construct(
         SuiteConfigurationRegistry $suiteConfigRegistry,
         SuiteRegistry $behatSuiteRegistry,

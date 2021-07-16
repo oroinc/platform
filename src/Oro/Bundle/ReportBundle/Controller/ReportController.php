@@ -291,9 +291,6 @@ class ReportController extends AbstractController
         return $chartOptions;
     }
 
-    /**
-     * @param Report $report
-     */
     protected function checkReport(Report $report)
     {
         if ($report->getEntity() &&

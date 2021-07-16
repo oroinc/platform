@@ -137,7 +137,6 @@ class WorkflowItemRepositoryTest extends WebTestCase
             $workflowNames
         );
 
-
         $this->assertEquals($expectedData, $result);
     }
 

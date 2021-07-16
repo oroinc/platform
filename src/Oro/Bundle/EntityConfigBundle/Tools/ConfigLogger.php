@@ -12,9 +12,6 @@ class ConfigLogger extends AbstractLogger
      */
     protected $baseLogger;
 
-    /**
-     * @param LoggerInterface $baseLogger
-     */
     public function __construct(LoggerInterface $baseLogger)
     {
         $this->baseLogger = $baseLogger;

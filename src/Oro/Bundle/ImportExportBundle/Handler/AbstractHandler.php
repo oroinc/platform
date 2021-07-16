@@ -61,16 +61,6 @@ abstract class AbstractHandler
      */
     protected $fileManager;
 
-    /**
-     * @param JobExecutor         $jobExecutor
-     * @param ProcessorRegistry   $processorRegistry
-     * @param ConfigProvider      $entityConfigProvider
-     * @param TranslatorInterface $translator
-     * @param WriterChain         $writerChain
-     * @param ReaderChain         $readerChain
-     * @param BatchFileManager    $batchFileManager
-     * @param FileManager         $fileManager
-     */
     public function __construct(
         JobExecutor $jobExecutor,
         ProcessorRegistry $processorRegistry,

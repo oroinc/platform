@@ -68,11 +68,6 @@ class FileApiEntityManager extends ApiEntityManager
         return $config;
     }
 
-    /**
-     * @param array $result
-     *
-     * @return array
-     */
     protected function postSerializeFile(array $result): array
     {
         $result['content'] = new FileContentProvider($result['filename'], $this->fileManager);

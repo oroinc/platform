@@ -39,8 +39,5 @@ abstract class AbstractLoadSegmentData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @return array
-     */
     abstract protected function getSegmentsData(): array;
 }

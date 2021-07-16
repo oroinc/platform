@@ -16,10 +16,6 @@ class PageTemplatesManager
     /** @var ThemeManager */
     private $translator;
 
-    /**
-     * @param ThemeManager $themeManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ThemeManager $themeManager, TranslatorInterface $translator)
     {
         $this->themeManager = $themeManager;

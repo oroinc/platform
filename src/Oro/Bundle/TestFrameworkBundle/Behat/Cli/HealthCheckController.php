@@ -38,10 +38,6 @@ class HealthCheckController implements Controller, HealthCheckerAwareInterface
      */
     protected $resultInterpretation;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param ResultInterpreter $resultInterpreter
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ResultInterpreter $resultInterpreter,

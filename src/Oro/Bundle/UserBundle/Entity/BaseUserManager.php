@@ -24,11 +24,6 @@ class BaseUserManager
     /** @var EncoderFactoryInterface */
     private $encoderFactory;
 
-    /**
-     * @param UserLoaderInterface     $userLoader
-     * @param ManagerRegistry         $doctrine
-     * @param EncoderFactoryInterface $encoderFactory
-     */
     public function __construct(
         UserLoaderInterface $userLoader,
         ManagerRegistry $doctrine,
@@ -41,8 +36,6 @@ class BaseUserManager
 
     /**
      * Returns an empty user instance
-     *
-     * @return UserInterface
      */
     public function createUser(): UserInterface
     {
@@ -70,8 +63,6 @@ class BaseUserManager
 
     /**
      * Updates a user password if a plain password is set
-     *
-     * @param UserInterface $user
      */
     public function updatePassword(UserInterface $user): void
     {
@@ -85,10 +76,6 @@ class BaseUserManager
 
     /**
      * Generates a random string that can be used as a password for a user.
-     *
-     * @param int $maxLength
-     *
-     * @return string
      */
     public function generatePassword(int $maxLength = 30): string
     {
@@ -111,8 +98,6 @@ class BaseUserManager
 
     /**
      * Deletes a user
-     *
-     * @param UserInterface $user
      */
     public function deleteUser(UserInterface $user): void
     {
@@ -123,10 +108,6 @@ class BaseUserManager
 
     /**
      * Finds a user by the given criteria
-     *
-     * @param array $criteria
-     *
-     * @return UserInterface|null
      */
     public function findUserBy(array $criteria): ?UserInterface
     {
@@ -135,10 +116,6 @@ class BaseUserManager
 
     /**
      * Finds a user by email
-     *
-     * @param string $email
-     *
-     * @return UserInterface|null
      */
     public function findUserByEmail(string $email): ?UserInterface
     {
@@ -147,10 +124,6 @@ class BaseUserManager
 
     /**
      * Finds a user by username
-     *
-     * @param string $username
-     *
-     * @return UserInterface|null
      */
     public function findUserByUsername(string $username): ?UserInterface
     {
@@ -159,10 +132,6 @@ class BaseUserManager
 
     /**
      * Finds a user either by email or username
-     *
-     * @param string $usernameOrEmail
-     *
-     * @return UserInterface|null
      */
     public function findUserByUsernameOrEmail(string $usernameOrEmail): ?UserInterface
     {
@@ -171,10 +140,6 @@ class BaseUserManager
 
     /**
      * Finds a user by confirmation token
-     *
-     * @param string $token
-     *
-     * @return UserInterface|null
      */
     public function findUserByConfirmationToken(string $token): ?UserInterface
     {
@@ -183,8 +148,6 @@ class BaseUserManager
 
     /**
      * Reloads a user
-     *
-     * @param UserInterface $user
      */
     public function reloadUser(UserInterface $user): void
     {
@@ -193,8 +156,6 @@ class BaseUserManager
 
     /**
      * Returns user repository
-     *
-     * @return EntityRepository
      */
     protected function getRepository(): EntityRepository
     {
@@ -203,17 +164,12 @@ class BaseUserManager
 
     /**
      * Returns user entity manager
-     *
-     * @return EntityManagerInterface
      */
     protected function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($this->userLoader->getUserClass());
     }
 
-    /**
-     * @return string
-     */
     protected function generateToken(): string
     {
         return rtrim(strtr(base64_encode(hash('sha256', uniqid(mt_rand(), true), true)), '+/', '-_'), '=');

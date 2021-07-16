@@ -61,7 +61,6 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldsMetadata')
             ->will($this->returnValue(array($this->fieldMetadata)));
 
-
         $entityFieldsMetadata = & $this->entityFieldsMetadata;
         $this->entityMetadata->expects($this->any())
             ->method('getFieldsMetadata')

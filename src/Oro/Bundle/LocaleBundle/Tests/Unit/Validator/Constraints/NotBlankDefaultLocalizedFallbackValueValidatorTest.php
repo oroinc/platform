@@ -40,9 +40,6 @@ class NotBlankDefaultLocalizedFallbackValueValidatorTest extends ConstraintValid
         $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
     public function validLocalizationDataProvider(): array
     {
         return [
@@ -69,9 +66,6 @@ class NotBlankDefaultLocalizedFallbackValueValidatorTest extends ConstraintValid
             ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
     public function notValidLocalizationDataProvider(): array
     {
         return [

@@ -25,9 +25,6 @@ class BuildExtensionsPass implements CompilerPassInterface
         $this->processConsumptionExtensions($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processConsumptionExtensions(ContainerBuilder $container): void
     {
         $extensions = [];

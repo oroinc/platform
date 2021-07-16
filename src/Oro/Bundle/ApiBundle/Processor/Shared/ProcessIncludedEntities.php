@@ -32,11 +32,6 @@ class ProcessIncludedEntities implements ProcessorInterface
     /** @var ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
 
-    /**
-     * @param ActionProcessorBagInterface     $processorBag
-     * @param ErrorCompleterRegistry          $errorCompleterRegistry
-     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
-     */
     public function __construct(
         ActionProcessorBagInterface $processorBag,
         ErrorCompleterRegistry $errorCompleterRegistry,
@@ -141,9 +136,6 @@ class ProcessIncludedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Error $error
-     */
     private function completeErrorStatusCode(Error $error): void
     {
         $statusCode = $error->getStatusCode();

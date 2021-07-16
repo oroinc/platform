@@ -17,10 +17,6 @@ class ApiResolvedFormTypeFactory implements ResolvedFormTypeFactoryInterface
     /** @var FormExtensionCheckerInterface */
     private $formExtensionChecker;
 
-    /**
-     * @param ResolvedFormTypeFactoryInterface $defaultFactory
-     * @param FormExtensionCheckerInterface    $formExtensionChecker
-     */
     public function __construct(
         ResolvedFormTypeFactoryInterface $defaultFactory,
         FormExtensionCheckerInterface $formExtensionChecker

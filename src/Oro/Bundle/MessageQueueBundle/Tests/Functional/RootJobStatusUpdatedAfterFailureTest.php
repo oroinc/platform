@@ -71,9 +71,6 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
         return $this->getEntityManager();
     }
 
-    /**
-     * @return EntityManager
-     */
     private function getEntityManager(): EntityManager
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);

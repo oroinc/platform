@@ -24,11 +24,6 @@ class InitializeEntityMapper implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param EntityInstantiator             $entityInstantiator
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,

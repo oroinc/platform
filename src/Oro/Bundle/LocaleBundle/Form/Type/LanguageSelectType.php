@@ -21,10 +21,6 @@ class LanguageSelectType extends AbstractType
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param LocalizationChoicesProvider $provider
-     * @param ManagerRegistry $registry
-     */
     public function __construct(LocalizationChoicesProvider $provider, ManagerRegistry $registry)
     {
         $this->provider = $provider;

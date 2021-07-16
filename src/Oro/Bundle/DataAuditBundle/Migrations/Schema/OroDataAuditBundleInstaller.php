@@ -32,9 +32,6 @@ class OroDataAuditBundleInstaller implements Installation
         AddImpersonationColumn::addImpersonationColumn($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createAudit(Schema $schema)
     {
         $auditTable = $schema->createTable('oro_audit');
@@ -90,9 +87,6 @@ class OroDataAuditBundleInstaller implements Installation
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createAuditField(Schema $schema)
     {
         $auditFieldTable = $schema->createTable('oro_audit_field');

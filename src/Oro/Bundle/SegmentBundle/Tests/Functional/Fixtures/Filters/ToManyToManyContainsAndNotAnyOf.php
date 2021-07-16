@@ -138,7 +138,7 @@ class ToManyToManyContainsAndNotAnyOf implements FixtureInterface
                     ],
                  ],
             ]));
-        
+
         $em->persist($segment);
 
         return $segment;

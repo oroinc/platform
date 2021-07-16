@@ -65,8 +65,6 @@ class SegmentSnapshot
 
     /**
      * Constructor
-     *
-     * @param Segment $segment
      */
     public function __construct(Segment $segment)
     {
@@ -105,9 +103,6 @@ class SegmentSnapshot
         return $this->segment;
     }
 
-    /**
-     * @param \Datetime $createdAt
-     */
     public function setCreatedAt(\Datetime $createdAt)
     {
         $this->createdAt = $createdAt;

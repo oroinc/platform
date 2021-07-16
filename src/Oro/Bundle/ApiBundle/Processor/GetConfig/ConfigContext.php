@@ -288,8 +288,6 @@ class ConfigContext extends ApiContext
 
     /**
      * Removes a request for some configuration data.
-     *
-     * @param string $extraName
      */
     public function removeExtra(string $extraName)
     {
@@ -349,8 +347,6 @@ class ConfigContext extends ApiContext
 
     /**
      * Sets a definition of filters.
-     *
-     * @param FiltersConfig|null $filters
      */
     public function setFilters(FiltersConfig $filters = null)
     {
@@ -379,8 +375,6 @@ class ConfigContext extends ApiContext
 
     /**
      * Sets a definition of sorters.
-     *
-     * @param SortersConfig|null $sorters
      */
     public function setSorters(SortersConfig $sorters = null)
     {

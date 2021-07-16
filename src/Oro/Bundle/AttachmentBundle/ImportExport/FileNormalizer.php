@@ -23,10 +23,6 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     /** @var FileManager */
     private $fileManager;
 
-    /**
-     * @param AttachmentManager $attachmentManager
-     * @param FileManager       $fileManager
-     */
     public function __construct(
         AttachmentManager $attachmentManager,
         FileManager $fileManager
@@ -84,11 +80,6 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 
     /**
      * Creates file entity with non-fetched file that can be fetched later during import.
-     *
-     * @param string $uri
-     * @param string $uuid
-     *
-     * @return File
      */
     private function createFileEntity(string $uri, string $uuid): File
     {
@@ -106,11 +97,6 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
         return $file;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return bool
-     */
     private function isRelativePath(string $path): bool
     {
         return

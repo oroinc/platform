@@ -23,9 +23,6 @@ abstract class AbstractEntityVoter implements VoterInterface
     /** @var array */
     protected $supportedAttributes = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -33,8 +30,6 @@ abstract class AbstractEntityVoter implements VoterInterface
 
     /**
      * Sets the class name of an entity this voter works with.
-     *
-     * @param string $className
      */
     public function setClassName(string $className): void
     {

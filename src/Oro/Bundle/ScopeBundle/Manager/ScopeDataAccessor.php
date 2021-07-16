@@ -25,11 +25,6 @@ class ScopeDataAccessor
     /** @var ScopeCacheKeyBuilderInterface */
     private $scopeCacheKeyBuilder;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param CacheProvider                 $scopeCache
-     * @param ScopeCacheKeyBuilderInterface $scopeCacheKeyBuilder
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         CacheProvider $scopeCache,
@@ -40,11 +35,6 @@ class ScopeDataAccessor
         $this->scopeCacheKeyBuilder = $scopeCacheKeyBuilder;
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return Scope|null
-     */
     public function findMostSuitableByCriteria(ScopeCriteria $criteria): ?Scope
     {
         $qb = $this->doctrineHelper->createQueryBuilder(Scope::class, 'scope');
@@ -67,11 +57,6 @@ class ScopeDataAccessor
         return new BufferedIdentityQueryResultIterator($qb);
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return Scope|null
-     */
     public function findOneByCriteria(ScopeCriteria $criteria): ?Scope
     {
         $qb = $this->doctrineHelper->createQueryBuilder(Scope::class, 'scope');
@@ -87,11 +72,6 @@ class ScopeDataAccessor
         return $query->getOneOrNullResult();
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return int|null
-     */
     public function findIdentifierByCriteria(ScopeCriteria $criteria): ?int
     {
         $cacheKey = $this->scopeCacheKeyBuilder->getCacheKey($criteria);
@@ -162,11 +142,6 @@ class ScopeDataAccessor
         return $ids;
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return int|null
-     */
     private function loadIdentifierByCriteria(ScopeCriteria $criteria): ?int
     {
         $qb = $this->doctrineHelper->createQueryBuilder(Scope::class, 'scope');

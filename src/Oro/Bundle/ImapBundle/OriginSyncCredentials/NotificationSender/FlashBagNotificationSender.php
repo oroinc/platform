@@ -18,10 +18,6 @@ class FlashBagNotificationSender implements NotificationSenderInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param TranslatorInterface $translator
-     */
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator)
     {
         $this->translator = $translator;

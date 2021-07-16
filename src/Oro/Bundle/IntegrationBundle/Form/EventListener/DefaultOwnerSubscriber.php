@@ -21,10 +21,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
     /** @var TypesRegistry */
     protected $typesRegistry;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param TypesRegistry          $typesRegistry
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor, TypesRegistry $typesRegistry)
     {
         $this->tokenAccessor = $tokenAccessor;
@@ -45,8 +41,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Sets default data for create integrations form
-     *
-     * @param FormEvent $event
      */
     public function postSet(FormEvent $event)
     {
@@ -60,9 +54,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSet(FormEvent $event)
     {
         $data = $event->getData();
@@ -74,9 +65,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
         $this->setDefaultOwnerField($event->getForm(), $data->getType());
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -107,8 +95,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Adds business unit default owner field to form.
-     *
-     * @param FormInterface $form
      */
     protected function addUserOwnerField(FormInterface $form)
     {
@@ -131,8 +117,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Adds user default owner field to form.
-     *
-     * @param FormInterface $form
      */
     protected function addBusinessUnitField(FormInterface $form)
     {

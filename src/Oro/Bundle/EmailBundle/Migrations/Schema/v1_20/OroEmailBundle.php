@@ -18,9 +18,6 @@ class OroEmailBundle implements Migration
         $this->deleteBodySyncProcess($schema, $queries);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email');
@@ -31,9 +28,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Delete sync_email_body_after_email_synchronize process definition
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
      */
     protected function deleteBodySyncProcess(Schema $schema, QueryBag $queries)
     {

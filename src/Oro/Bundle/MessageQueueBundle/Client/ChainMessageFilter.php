@@ -17,10 +17,6 @@ class ChainMessageFilter implements MessageFilterInterface
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param array              $filters
-     * @param ContainerInterface $container
-     */
     public function __construct(array $filters, ContainerInterface $container)
     {
         $this->filters = $filters;

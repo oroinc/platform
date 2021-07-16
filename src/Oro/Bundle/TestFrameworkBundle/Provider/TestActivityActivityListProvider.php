@@ -20,10 +20,6 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /** @var ActivityAssociationHelper */
     protected $activityAssociationHelper;
 
-    /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ActivityAssociationHelper $activityAssociationHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ActivityAssociationHelper $activityAssociationHelper

@@ -20,11 +20,6 @@ class TransitionPageDataProvider
     /** @var RouterInterface */
     private $router;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param RouteProviderInterface $routeProvider
-     * @param RouterInterface $router
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         RouteProviderInterface $routeProvider,
@@ -36,10 +31,6 @@ class TransitionPageDataProvider
     }
 
     /**
-     * @param string $transition
-     * @param WorkflowItem $workflowItem
-     *
-     * @return array
      * @throws InvalidTransitionException
      */
     public function getData(string $transition, WorkflowItem $workflowItem): array
@@ -65,10 +56,6 @@ class TransitionPageDataProvider
         );
     }
 
-    /**
-     * @param array $parameters
-     * @return array
-     */
     protected function getUrls(array $parameters): array
     {
         return [

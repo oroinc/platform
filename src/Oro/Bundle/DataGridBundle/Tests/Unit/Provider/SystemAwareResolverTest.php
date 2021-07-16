@@ -49,9 +49,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expect, $gridDefinition['filters']['entityName']['choices']);
     }
 
-    /**
-     * @return array
-     */
     public function staticProvider(): array
     {
         $classConstant = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass::TEST';
@@ -73,8 +70,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider serviceProvider
-     *
-     * @param array $gridDefinition
      */
     public function testResolveServiceMethodCall(array $gridDefinition): void
     {
@@ -86,9 +81,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $gridDefinition['filters']['entityName']['choices']);
     }
 
-    /**
-     * @return array
-     */
     public function serviceProvider(): array
     {
         return [

@@ -23,9 +23,6 @@ class MessageProcessorClassProvider
     /** @var string|null */
     private $lastProcessorClass;
 
-    /**
-     * @param MessageProcessorRegistryInterface $messageProcessorRegistry
-     */
     public function __construct(MessageProcessorRegistryInterface $messageProcessorRegistry)
     {
         $this->messageProcessorRegistry = $messageProcessorRegistry;

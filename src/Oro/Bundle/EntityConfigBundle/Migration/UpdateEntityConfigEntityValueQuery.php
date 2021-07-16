@@ -87,9 +87,6 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $this->updateEntityConfig($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfigIndexValue(LoggerInterface $logger)
     {
         $sql =
@@ -117,9 +114,6 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $logger->debug($sql);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfig(LoggerInterface $logger)
     {
         $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';

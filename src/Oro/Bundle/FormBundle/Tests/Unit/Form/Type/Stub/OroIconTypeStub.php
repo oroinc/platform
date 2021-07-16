@@ -14,9 +14,6 @@ class OroIconTypeStub extends AbstractType
      */
     protected $kernel;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
@@ -37,7 +34,6 @@ class OroIconTypeStub extends AbstractType
             ]
         );
     }
-
 
     /**
      * @return string

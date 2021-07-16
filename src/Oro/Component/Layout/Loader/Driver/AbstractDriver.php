@@ -215,9 +215,6 @@ abstract class AbstractDriver implements DriverInterface
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
 
-    /**
-     * @param string $dir
-     */
     protected function createCacheDirectory(string $dir): void
     {
         if (!is_dir($dir)) {

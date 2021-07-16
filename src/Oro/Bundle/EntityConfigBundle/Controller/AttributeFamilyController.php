@@ -185,7 +185,6 @@ class AttributeFamilyController extends AbstractController
     }
 
     /**
-     * @param EntityConfigModel $entityConfigModel
      * @throws BadRequestHttpException
      */
     private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel)
@@ -204,9 +203,6 @@ class AttributeFamilyController extends AbstractController
         }
     }
 
-    /**
-     * @return TranslatorInterface
-     */
     private function getTranslator(): TranslatorInterface
     {
         return $this->get(TranslatorInterface::class);

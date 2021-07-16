@@ -106,9 +106,6 @@ class Transition
     /** @var TransitionOptionsResolver */
     protected $optionsResolver;
 
-    /**
-     * @param TransitionOptionsResolver $optionsResolver
-     */
     public function __construct(TransitionOptionsResolver $optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
@@ -368,8 +365,6 @@ class Transition
     /**
      * Run transition process.
      *
-     * @param WorkflowItem $workflowItem
-     * @param Collection|null $errors
      * @throws ForbiddenTransitionException
      */
     public function transit(WorkflowItem $workflowItem, Collection $errors = null)
@@ -385,8 +380,6 @@ class Transition
 
     /**
      * Makes transition without checking for preconditions and conditions.
-     *
-     * @param WorkflowItem $workflowItem
      */
     public function transitUnconditionally(WorkflowItem $workflowItem): void
     {

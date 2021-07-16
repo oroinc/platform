@@ -32,11 +32,6 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
      */
     private $logger;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ProcessHandler $processHandler
-     * @param LoggerInterface $logger
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ProcessHandler $processHandler, LoggerInterface $logger)
     {
         $this->doctrineHelper = $doctrineHelper;

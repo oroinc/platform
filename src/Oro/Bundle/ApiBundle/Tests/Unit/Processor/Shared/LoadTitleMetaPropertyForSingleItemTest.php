@@ -57,9 +57,6 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         return $config;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     */
     private function addTitleMetaProperty(EntityDefinitionConfig $config)
     {
         $titleField = $config->addField('__title__');

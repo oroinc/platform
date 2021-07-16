@@ -18,9 +18,6 @@ class SetUUIDFieldOfFileEntityQuery extends ParametrizedMigrationQuery
     /** @var AbstractPlatform */
     private $databasePlatform;
 
-    /**
-     * @param AbstractPlatform $databasePlatform
-     */
     public function __construct(AbstractPlatform $databasePlatform)
     {
         $this->databasePlatform = $databasePlatform;

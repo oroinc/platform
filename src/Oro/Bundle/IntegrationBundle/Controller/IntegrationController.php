@@ -156,9 +156,6 @@ class IntegrationController extends AbstractController
         ];
     }
 
-    /**
-     * @return TranslatorInterface
-     */
     private function getTranslator(): TranslatorInterface
     {
         return $this->get(TranslatorInterface::class);

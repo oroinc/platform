@@ -44,9 +44,6 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider executeProvider
      */
     public function testExecute(array $inputData, array $expectedData)

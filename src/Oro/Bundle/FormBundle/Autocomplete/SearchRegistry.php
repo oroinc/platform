@@ -12,19 +12,12 @@ class SearchRegistry
     /** @var ContainerInterface */
     private $searchHandlers;
 
-    /**
-     * @param ContainerInterface $searchHandlers
-     */
     public function __construct(ContainerInterface $searchHandlers)
     {
         $this->searchHandlers = $searchHandlers;
     }
 
     /**
-     * @param string $name
-     *
-     * @return SearchHandlerInterface
-     *
      * @throws \RuntimeException if a handler with the given name does not exist
      */
     public function getSearchHandler(string $name): SearchHandlerInterface
@@ -36,11 +29,6 @@ class SearchRegistry
         return $this->searchHandlers->get($name);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function hasSearchHandler(string $name): bool
     {
         return $this->searchHandlers->has($name);

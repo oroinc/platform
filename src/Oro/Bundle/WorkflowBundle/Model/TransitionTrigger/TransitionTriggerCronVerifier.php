@@ -23,19 +23,12 @@ class TransitionTriggerCronVerifier
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param WorkflowAssembler $workflowAssembler
-     * @param ManagerRegistry $registry
-     */
     public function __construct(WorkflowAssembler $workflowAssembler, ManagerRegistry $registry)
     {
         $this->workflowAssembler = $workflowAssembler;
         $this->registry = $registry;
     }
 
-    /**
-     * @param TransitionCronTrigger $trigger
-     */
     public function verify(TransitionCronTrigger $trigger)
     {
         $expressions = $this->prepareExpressions($trigger);

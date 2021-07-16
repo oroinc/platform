@@ -55,9 +55,6 @@ class LoadTagsData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadActivities(ObjectManager $manager)
     {
         $activity = new TestActivity();
@@ -78,9 +75,6 @@ class LoadTagsData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadTags(ObjectManager $manager)
     {
         $tag = new Tag();

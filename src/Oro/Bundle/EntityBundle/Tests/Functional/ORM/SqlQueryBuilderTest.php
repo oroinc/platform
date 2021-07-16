@@ -164,9 +164,6 @@ class SqlQueryBuilderTest extends WebTestCase
         $this->assertEquals([['first_name' => 'UPDATE FN5']], $result);
     }
 
-    /**
-     * @return SqlQueryBuilder
-     */
     protected function createSqlQueryBuilder(): SqlQueryBuilder
     {
         $registry = $this->getContainer()->get('doctrine');
@@ -179,12 +176,6 @@ class SqlQueryBuilderTest extends WebTestCase
         return new SqlQueryBuilder($em, $rsm);
     }
 
-    /**
-     * @param User $user
-     * @param bool $withoutTableAlias
-     *
-     * @return array
-     */
     protected function getUserFirstName(User $user, bool $withoutTableAlias = false): array
     {
         $qb = $this->createSqlQueryBuilder();

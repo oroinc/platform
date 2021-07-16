@@ -12,9 +12,6 @@ class TargetMetadataProvider
     /** @var ObjectAccessorInterface */
     private $objectAccessor;
 
-    /**
-     * @param ObjectAccessorInterface $objectAccessor
-     */
     public function __construct(ObjectAccessorInterface $objectAccessor)
     {
         $this->objectAccessor = $objectAccessor;

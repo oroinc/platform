@@ -9,10 +9,5 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
  */
 interface LocalizedFallbackValueExtractorInterface
 {
-    /**
-     * @param AbstractLocalizedFallbackValue $value
-     *
-     * @return string|null
-     */
     public function extractValue(AbstractLocalizedFallbackValue $value): ?string;
 }

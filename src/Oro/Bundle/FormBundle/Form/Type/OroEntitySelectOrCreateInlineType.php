@@ -33,12 +33,6 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     /** @var SearchRegistry */
     protected $searchRegistry;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ConfigManager                 $configManager
-     * @param EntityManager                 $entityManager
-     * @param SearchRegistry                $searchRegistry
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,
@@ -186,9 +180,6 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         return $createEnabled;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     protected function setConfigsNormalizer(OptionsResolver $resolver)
     {
         $resolver->setNormalizer(
@@ -245,7 +236,6 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     }
 
     /**
-     *
      * @param string      $entityClass
      * @param string|null $newItemPropertyName
      * @param bool        $newItemAllowEmptyProperty

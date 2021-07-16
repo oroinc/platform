@@ -21,10 +21,6 @@ class LoadParentResourceMetadata implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param MetadataProvider $metadataProvider
-     * @param DoctrineHelper   $doctrineHelper
-     */
     public function __construct(MetadataProvider $metadataProvider, DoctrineHelper $doctrineHelper)
     {
         $this->metadataProvider = $metadataProvider;

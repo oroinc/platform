@@ -36,7 +36,6 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
         return 'configurable';
     }
 
-
     public function __construct(ExpressionAssembler $assembler)
     {
         $this->assembler = $assembler;

@@ -95,7 +95,6 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
             );
         }
 
-
         $this->runProcess(implode(' && ', $commands));
     }
 

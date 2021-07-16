@@ -24,10 +24,6 @@ class EntityFieldValidator
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param Registry $registry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(Registry $registry, TranslatorInterface $translator)
     {
         $this->registry   = $registry;

@@ -25,10 +25,6 @@ class AttributeFieldValidator extends ConstraintValidator
      */
     protected $attributeConfigProvider;
 
-    /**
-     * @param FieldNameValidationHelper $validationHelper
-     * @param ConfigProvider $attributeConfigProvider
-     */
     public function __construct(FieldNameValidationHelper $validationHelper, ConfigProvider $attributeConfigProvider)
     {
         $this->validationHelper = $validationHelper;

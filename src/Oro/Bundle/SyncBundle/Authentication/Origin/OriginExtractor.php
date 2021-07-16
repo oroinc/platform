@@ -7,10 +7,6 @@ namespace Oro\Bundle\SyncBundle\Authentication\Origin;
  */
 class OriginExtractor
 {
-    /**
-     * @param null|string $url
-     * @return null|string
-     */
     public function fromUrl(?string $url): ?string
     {
         if ($url === null) {

@@ -16,10 +16,6 @@ class ActivityEntityDeleteHandlerExtension implements ActivityEntityDeleteHandle
     /** @var EntityDeleteAccessDeniedExceptionFactory */
     private $accessDeniedExceptionFactory;
 
-    /**
-     * @param AuthorizationCheckerInterface            $authorizationChecker
-     * @param EntityDeleteAccessDeniedExceptionFactory $accessDeniedExceptionFactory
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         EntityDeleteAccessDeniedExceptionFactory $accessDeniedExceptionFactory

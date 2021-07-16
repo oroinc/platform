@@ -51,12 +51,6 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider formatAddressHtmlDataProvider
-     *
-     * @param array $addressParts
-     * @param string $addressFormat
-     * @param string|null $country
-     * @param string $newLineSeparator
-     * @param string $expectedResult
      */
     public function testFormatAddressHtml(
         array $addressParts,

@@ -347,9 +347,6 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($options, $actualOptions['options']);
     }
 
-    /**
-     * @param array $metadataArray
-     */
     protected function setEntityMetadata(array $metadataArray)
     {
         $valueMap = [];

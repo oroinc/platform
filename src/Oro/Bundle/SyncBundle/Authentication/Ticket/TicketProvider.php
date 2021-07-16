@@ -16,10 +16,6 @@ class TicketProvider implements TicketProviderInterface
     /** @var string */
     private $secret;
 
-    /**
-     * @param TicketDigestGeneratorInterface $ticketDigestGenerator
-     * @param string $secret
-     */
     public function __construct(TicketDigestGeneratorInterface $ticketDigestGenerator, string $secret)
     {
         $this->ticketDigestGenerator = $ticketDigestGenerator;

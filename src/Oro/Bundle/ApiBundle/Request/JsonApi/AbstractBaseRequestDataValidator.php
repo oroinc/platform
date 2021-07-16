@@ -34,9 +34,6 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array $data
-     */
     protected function validateJsonApiSection(array $data): void
     {
         if (\array_key_exists(JsonApiDoc::JSONAPI, $data)) {
@@ -44,10 +41,6 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
     protected function validateMetaSection(array $data, string $pointer = self::ROOT_POINTER): void
     {
         if (\array_key_exists(JsonApiDoc::META, $data)) {
@@ -55,10 +48,6 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
     protected function validateLinksSection(array $data, string $pointer = self::ROOT_POINTER): void
     {
         if (\array_key_exists(JsonApiDoc::LINKS, $data)) {
@@ -66,10 +55,6 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $section
-     */
     protected function validateSectionNotExist(array $data, string $section): void
     {
         if (\array_key_exists($section, $data)) {
@@ -80,12 +65,6 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateTypeAndIdAreRequiredNotBlankString(array $data, string $pointer): bool
     {
         $isValid = true;
@@ -99,13 +78,6 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateRequired(array $data, string $property, string $pointer): bool
     {
         $isValid = true;
@@ -120,13 +92,6 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateRequiredNotBlankString(array $data, string $property, string $pointer): bool
     {
         return
@@ -134,13 +99,6 @@ abstract class AbstractBaseRequestDataValidator
             && $this->validateNotBlankString($data, $property, $pointer);
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateNotBlankString(array $data, string $property, string $pointer): bool
     {
         $isValid = true;
@@ -170,15 +128,6 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $property
-     * @param string $pointer
-     * @param bool   $notEmpty
-     * @param bool   $associative
-     *
-     * @return bool
-     */
     protected function validateArray(
         array $data,
         string $property,
@@ -211,21 +160,11 @@ abstract class AbstractBaseRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param string $parentPointer
-     * @param string $property
-     *
-     * @return string
-     */
     protected function buildPointer(string $parentPointer, string $property): string
     {
         return $parentPointer . '/' . $property;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $message
-     */
     protected function addError(string $pointer, string $message): void
     {
         $this->addErrorObject(
@@ -234,9 +173,6 @@ abstract class AbstractBaseRequestDataValidator
         );
     }
 
-    /**
-     * @param Error $error
-     */
     protected function addErrorObject(Error $error): void
     {
         $this->errors[] = $error;

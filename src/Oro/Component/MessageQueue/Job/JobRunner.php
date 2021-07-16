@@ -21,11 +21,6 @@ class JobRunner
     /** @var Job */
     private $rootJob;
 
-    /**
-     * @param JobProcessor       $jobProcessor
-     * @param ExtensionInterface $jobExtension
-     * @param Job|null           $rootJob
-     */
     public function __construct(JobProcessor $jobProcessor, ExtensionInterface $jobExtension, Job $rootJob = null)
     {
         $this->jobProcessor = $jobProcessor;

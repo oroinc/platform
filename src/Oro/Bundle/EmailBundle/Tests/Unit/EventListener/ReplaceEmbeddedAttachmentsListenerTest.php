@@ -21,8 +21,6 @@ class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider replaceDataProvider
-     * @param       $bodyTemplate
-     * @param array $attachments
      */
     public function testReplace($bodyTemplate, array $attachments)
     {

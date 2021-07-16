@@ -141,9 +141,6 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider completeArgumentsDataProvider
-     *
-     * @param array $arguments
-     * @param array $expectedResults
      */
     public function testCompleteArguments(array $arguments, array $expectedResults)
     {

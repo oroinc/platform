@@ -120,7 +120,6 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     *
      * @dataProvider isAllowedProvider
      *
      * @param ActionData $data
@@ -167,7 +166,6 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     *
      * @dataProvider getParametersProvider
      * @param array $config
      * @param Parameter[] $expected

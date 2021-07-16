@@ -25,12 +25,6 @@ class TagsReportExtension extends AbstractTagsExtension
     /** @var JoinIdentifierHelper */
     protected $joinIdentifierHelper;
 
-    /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $entityClassResolver
-     * @param TaggableHelper      $helper
-     * @param EntityRoutingHelper $entityRoutingHelper
-     */
     public function __construct(
         TagManager $tagManager,
         EntityClassResolver $entityClassResolver,

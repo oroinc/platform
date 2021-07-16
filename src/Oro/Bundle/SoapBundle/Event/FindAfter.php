@@ -13,9 +13,6 @@ class FindAfter extends Event
      */
     protected $entity;
 
-    /**
-     * @param $entity
-     */
     public function __construct($entity)
     {
         $this->entity = $entity;

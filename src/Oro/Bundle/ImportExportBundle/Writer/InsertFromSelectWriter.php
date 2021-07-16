@@ -16,9 +16,6 @@ class InsertFromSelectWriter extends AbstractNativeQueryWriter
      */
     protected $insertFromSelectQueryExecutor;
 
-    /**
-     * @param InsertFromSelectQueryExecutor $insertFromSelectQuery
-     */
     public function __construct(InsertFromSelectQueryExecutor $insertFromSelectQuery)
     {
         $this->insertFromSelectQueryExecutor = $insertFromSelectQuery;

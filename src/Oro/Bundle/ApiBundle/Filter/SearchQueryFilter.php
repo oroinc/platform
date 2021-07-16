@@ -32,33 +32,21 @@ class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
     /** @var array [field name => field name in search index, ...] */
     private $fieldMappings = [];
 
-    /**
-     * @param AbstractSearchMappingProvider $searchMappingProvider
-     */
     public function setSearchMappingProvider(AbstractSearchMappingProvider $searchMappingProvider): void
     {
         $this->searchMappingProvider = $searchMappingProvider;
     }
 
-    /**
-     * @param SearchFieldResolverFactory $searchFieldResolverFactory
-     */
     public function setSearchFieldResolverFactory(SearchFieldResolverFactory $searchFieldResolverFactory): void
     {
         $this->searchFieldResolverFactory = $searchFieldResolverFactory;
     }
 
-    /**
-     * @param ExpressionVisitor $searchQueryCriteriaVisitor
-     */
     public function setSearchQueryCriteriaVisitor(ExpressionVisitor $searchQueryCriteriaVisitor): void
     {
         $this->searchQueryCriteriaVisitor = $searchQueryCriteriaVisitor;
     }
 
-    /**
-     * @param string $entityClass
-     */
     public function setEntityClass(string $entityClass): void
     {
         $this->entityClass = $entityClass;
@@ -83,11 +71,6 @@ class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
         }
     }
 
-    /**
-     * @param FilterValue|null $value
-     *
-     * @return Expression|null
-     */
     private function createExpression(?FilterValue $value): ?Expression
     {
         if (null === $value) {
@@ -108,11 +91,6 @@ class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
         return $expr;
     }
 
-    /**
-     * @param string $whereExpression
-     *
-     * @return SearchQuery
-     */
     private function getSearchQuery(string $whereExpression): SearchQuery
     {
         $lexer = new SearchQueryLexer();

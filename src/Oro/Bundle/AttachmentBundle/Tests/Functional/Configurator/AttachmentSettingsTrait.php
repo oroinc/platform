@@ -8,11 +8,6 @@ trait AttachmentSettingsTrait
 {
     use ConfigManagerAwareTestTrait;
 
-    /**
-     * @param int $jpegQuality
-     * @param int $pngQuality
-     * @param bool $processorsAllowed
-     */
     public function changeProcessorsParameters(
         int $jpegQuality = 85,
         int $pngQuality = 100,

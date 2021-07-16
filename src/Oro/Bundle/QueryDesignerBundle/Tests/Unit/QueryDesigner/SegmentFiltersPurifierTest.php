@@ -18,8 +18,6 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider purifyFiltersDataProvider
-     * @param array $filters
-     * @param array $expectedFilters
      */
     public function testPurifyFilters(array $filters, array $expectedFilters)
     {

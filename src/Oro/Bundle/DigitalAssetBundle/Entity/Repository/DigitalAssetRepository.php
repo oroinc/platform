@@ -35,9 +35,6 @@ class DigitalAssetRepository extends EntityRepository
 
     /**
      * Find source file by digital asset id
-     *
-     * @param int $id
-     * @return File|null
      */
     public function findSourceFile(int $id): ?File
     {
@@ -109,10 +106,6 @@ class DigitalAssetRepository extends EntityRepository
         return $aclHelper->apply($qb)->getResult();
     }
 
-    /**
-     * @param int $fileId
-     * @return array
-     */
     public function getFileDataForTwigTag(int $fileId): array
     {
         $entityManager = $this->getEntityManager();

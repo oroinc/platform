@@ -30,11 +30,6 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param ResourcesProvider              $resourcesProvider
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ResourcesProvider $resourcesProvider,
@@ -107,15 +102,6 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig     $field
-     * @param ClassMetadata                   $targetMetadata
-     * @param string                          $version
-     * @param RequestType                     $requestType
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return bool
-     */
     private function isResourceForRelatedEntityAvailable(
         EntityDefinitionFieldConfig $field,
         ClassMetadata $targetMetadata,
@@ -140,14 +126,6 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         );
     }
 
-    /**
-     * @param ClassMetadata                   $targetMetadata
-     * @param string                          $version
-     * @param RequestType                     $requestType
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return bool
-     */
     private function isResourceForRelatedEntityKnown(
         ClassMetadata $targetMetadata,
         string $version,
@@ -171,14 +149,6 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         return false;
     }
 
-    /**
-     * @param ClassMetadata                   $targetMetadata
-     * @param string                          $version
-     * @param RequestType                     $requestType
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return bool
-     */
     private function isResourceForRelatedEntityAccessible(
         ClassMetadata $targetMetadata,
         string $version,
@@ -202,12 +172,6 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         return false;
     }
 
-    /**
-     * @param string                          $entityClass
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return string
-     */
     private function resolveEntityClass(
         string $entityClass,
         EntityOverrideProviderInterface $entityOverrideProvider

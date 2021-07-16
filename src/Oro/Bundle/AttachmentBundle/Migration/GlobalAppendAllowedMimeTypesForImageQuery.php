@@ -15,9 +15,6 @@ class GlobalAppendAllowedMimeTypesForImageQuery extends ParametrizedMigrationQue
     private const IMAGE_CONFIG_NAME = 'upload_image_mime_types';
     private const CONFIG_SECTION = 'oro_attachment';
 
-    /**
-     * @param array $mimeTypes
-     */
     public function __construct(array $mimeTypes)
     {
         $this->mimeTypes = $mimeTypes;

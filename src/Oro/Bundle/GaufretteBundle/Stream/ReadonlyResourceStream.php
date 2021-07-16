@@ -14,9 +14,6 @@ class ReadonlyResourceStream implements Stream
     /** @var resource */
     private $resource;
 
-    /**
-     * @param $resource
-     */
     public function __construct($resource)
     {
         $this->resource = $resource;

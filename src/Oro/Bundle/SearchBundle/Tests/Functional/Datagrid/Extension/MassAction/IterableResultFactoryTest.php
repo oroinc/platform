@@ -112,10 +112,6 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
         $this->assertRecordIds([$firstItem->getId(), $seventhItem->getId()], $iterableResult);
     }
 
-    /**
-     * @param array $expectedRecordTitles
-     * @param IterableResultInterface $result
-     */
     private function assertRecordIds(array $expectedRecordTitles, IterableResultInterface $result)
     {
         $items = iterator_to_array($result);

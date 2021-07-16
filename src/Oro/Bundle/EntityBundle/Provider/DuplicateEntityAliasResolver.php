@@ -19,19 +19,11 @@ class DuplicateEntityAliasResolver
     /** @var array [alias => TRUE, ...] */
     private $aliases;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityAlias|null
-     */
     public function getAlias(string $entityClass): ?EntityAlias
     {
         $this->ensureAliasesInitialized();
@@ -43,12 +35,6 @@ class DuplicateEntityAliasResolver
         return $this->classes[$entityClass];
     }
 
-    /**
-     * @param string $alias
-     * @param string $pluralAlias
-     *
-     * @return bool
-     */
     public function hasAlias(string $alias, string $pluralAlias): bool
     {
         $this->ensureAliasesInitialized();
@@ -56,12 +42,6 @@ class DuplicateEntityAliasResolver
         return isset($this->aliases[$alias]) || isset($this->aliases[$pluralAlias]);
     }
 
-    /**
-     * @param string $alias
-     * @param string $pluralAlias
-     *
-     * @return string
-     */
     public function getUniqueAlias(string $alias, string $pluralAlias): string
     {
         $this->ensureAliasesInitialized();
@@ -80,10 +60,6 @@ class DuplicateEntityAliasResolver
         return $generatedAlias;
     }
 
-    /**
-     * @param string      $entityClass
-     * @param EntityAlias $entityAlias
-     */
     public function saveAlias(string $entityClass, EntityAlias $entityAlias): void
     {
         $this->ensureAliasesInitialized();

@@ -34,12 +34,6 @@ class SwitchOrganizationController
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TranslatorInterface $translator
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         EventDispatcherInterface $eventDispatcher,
@@ -59,11 +53,6 @@ class SwitchOrganizationController
      *      requirements={"id"="\d+", "_format"="html|json"},
      *      defaults={"id"="0", "_format" = "html"}
      * )
-     *
-     * @param Organization $organization
-     * @param Request      $request
-     *
-     * @return Response
      */
     public function switchOrganizationAction(Organization $organization, Request $request): Response
     {
@@ -103,11 +92,6 @@ class SwitchOrganizationController
         return new RedirectResponse($this->urlGenerator->generate('oro_default'));
     }
 
-    /**
-     * @param Organization $organization
-     *
-     * @return AccessDeniedException
-     */
     private function createOrganizationAccessDeniedException(Organization $organization): AccessDeniedException
     {
         return new AccessDeniedException(

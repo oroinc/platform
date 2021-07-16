@@ -78,9 +78,6 @@ class ActivityListRepository extends EntityRepository
 
     /**
      * Delete activity lists by related activity data
-     *
-     * @param $class
-     * @param $id
      */
     public function deleteActivityListsByRelatedActivityData($class, $id)
     {

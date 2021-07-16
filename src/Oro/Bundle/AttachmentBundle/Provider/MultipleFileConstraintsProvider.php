@@ -10,9 +10,6 @@ class MultipleFileConstraintsProvider
     /** @var AttachmentEntityConfigProviderInterface */
     private $attachmentEntityConfigProvider;
 
-    /**
-     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
-     */
     public function __construct(AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider)
     {
         $this->attachmentEntityConfigProvider = $attachmentEntityConfigProvider;
@@ -20,8 +17,6 @@ class MultipleFileConstraintsProvider
 
     /**
      * Gets allowed max number of files.
-     *
-     * @return int
      */
     public function getMaxNumberOfFiles(): int
     {
@@ -30,10 +25,6 @@ class MultipleFileConstraintsProvider
 
     /**
      * Gets allowed max number of files from entity config.
-     *
-     * @param string $entityClass
-     *
-     * @return int
      */
     public function getMaxNumberOfFilesForEntity(string $entityClass): int
     {
@@ -51,11 +42,6 @@ class MultipleFileConstraintsProvider
 
     /**
      * Gets allowed max number of files from entity field config.
-     *
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return int
      */
     public function getMaxNumberOfFilesForEntityField(string $entityClass, string $fieldName): int
     {

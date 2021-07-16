@@ -42,15 +42,6 @@ class GridViewsLoadListener
      */
     protected $appearanceTypeManager;
 
-    /**
-     * @param ManagerRegistry               $registry
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclHelper                     $aclHelper
-     * @param TranslatorInterface           $translator
-     * @param GridViewManager               $gridViewManager
-     * @param AppearanceTypeManager         $appearanceTypeManager
-     */
     public function __construct(
         ManagerRegistry $registry,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -69,9 +60,6 @@ class GridViewsLoadListener
         $this->appearanceTypeManager = $appearanceTypeManager;
     }
 
-    /**
-     * @param GridViewsLoadEvent $event
-     */
     public function onViewsLoad(GridViewsLoadEvent $event)
     {
         $currentUser = $this->tokenAccessor->getUser();
@@ -107,9 +95,6 @@ class GridViewsLoadListener
     }
 
     /**
-     * @param AbstractUser $user
-     * @param GridViewsLoadEvent $event
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getGridViews(AbstractUser $user, GridViewsLoadEvent $event): array

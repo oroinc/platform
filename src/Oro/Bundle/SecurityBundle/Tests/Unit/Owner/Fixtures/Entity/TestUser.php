@@ -110,17 +110,11 @@ class TestUser
         return $this->businessUnits;
     }
 
-    /**
-     * @param Collection $businessUnits
-     */
     public function setBusinessUnits(Collection $businessUnits)
     {
         $this->businessUnits = $businessUnits;
     }
 
-    /**
-     * @param TestBusinessUnit $businessUnit
-     */
     public function addBusinessUnit(TestBusinessUnit $businessUnit)
     {
         if (!$this->businessUnits->contains($businessUnit)) {
@@ -128,9 +122,6 @@ class TestUser
         }
     }
 
-    /**
-     * @param TestBusinessUnit $businessUnit
-     */
     public function removeBusinessUnit(TestBusinessUnit $businessUnit)
     {
         if ($this->businessUnits->contains($businessUnit)) {
@@ -146,17 +137,11 @@ class TestUser
         return $this->organizations;
     }
 
-    /**
-     * @param Collection $organizations
-     */
     public function setOrganizations(Collection $organizations)
     {
         $this->organizations = $organizations;
     }
 
-    /**
-     * @param TestOrganization $organization
-     */
     public function addOrganization(TestOrganization $organization)
     {
         if (!$this->organizations->contains($organization)) {
@@ -164,9 +149,6 @@ class TestUser
         }
     }
 
-    /**
-     * @param TestOrganization $organization
-     */
     public function removeOrganization(TestOrganization $organization)
     {
         if ($this->organizations->contains($organization)) {

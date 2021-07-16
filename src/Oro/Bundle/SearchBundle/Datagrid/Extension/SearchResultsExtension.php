@@ -27,11 +27,6 @@ class SearchResultsExtension extends AbstractExtension
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @param ResultFormatter          $formatter
-     * @param ObjectMapper             $mapper
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         ResultFormatter $formatter,
         ObjectMapper $mapper,

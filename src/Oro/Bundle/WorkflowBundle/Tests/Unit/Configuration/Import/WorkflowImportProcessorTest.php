@@ -33,11 +33,6 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new WorkflowImportProcessor($this->reader, $this->finderBuilder);
     }
 
-    /**
-     * @param string $resource
-     * @param string $target
-     * @param array $replacements
-     */
     private function configureProcessor(string $resource, string $target, array $replacements = [])
     {
         $this->processor->setResource($resource);
@@ -190,11 +185,6 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $processed);
     }
 
-    /**
-     * @param ArrayCollection $expected
-     * @param ArrayCollection $files
-     * @return \PHPUnit\Framework\Constraint\Callback
-     */
     protected function callbackShouldFilterCurrentFile(
         ArrayCollection $expected,
         ArrayCollection $files
@@ -237,8 +227,6 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesToConfigure
-     * @param string $property
-     * @param string $type
      */
     public function testMustBeConfiguredBeforeUsage(string $property, string $type)
     {
@@ -353,7 +341,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->reader->expects($this->once())->method('read')
             ->with($file1)
             ->willReturn($content);
-        
+
         $this->configureProcessor('workflow_to_import', 'one', ['steps']);
         $processed = $this->processor->process($content, new \SplFileInfo(__FILE__));
         $this->assertEquals($result, $processed);

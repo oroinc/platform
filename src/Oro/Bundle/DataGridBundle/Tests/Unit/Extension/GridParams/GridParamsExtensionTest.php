@@ -20,9 +20,6 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $input
-     * @param $result
-     *
      * @dataProvider isApplicableProvider
      */
     public function testIsApplicable($input, $result)
@@ -61,8 +58,6 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $parameters
-     * @param $gridParameters
      * @dataProvider visitMetadataProvider
      */
     public function testVisitMetadata($parameters, $gridParameters)

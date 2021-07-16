@@ -357,8 +357,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Adds a validation constraint to the form options.
-     *
-     * @param Constraint $constraint
      */
     public function addFormConstraint(Constraint $constraint)
     {
@@ -377,8 +375,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Indicates whether a post processor is set.
-     *
-     * @return bool
      */
     public function hasPostProcessor(): bool
     {
@@ -387,8 +383,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Gets the type of a post processor.
-     *
-     * @return string|null
      */
     public function getPostProcessor(): ?string
     {
@@ -397,8 +391,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Sets the type of a post processor.
-     *
-     * @param string|null $type
      */
     public function setPostProcessor(?string $type): void
     {
@@ -415,8 +407,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Gets the options for a post processor.
-     *
-     * @return array|null
      */
     public function getPostProcessorOptions(): ?array
     {
@@ -425,8 +415,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Sets the options for a post processor.
-     *
-     * @param array|null $options
      */
     public function setPostProcessorOptions(?array $options): void
     {
@@ -497,8 +485,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Adds a field to a list of fields on which this field depends on.
-     *
-     * @param string $fieldName
      */
     public function addDependsOn(string $fieldName)
     {
@@ -639,8 +625,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Gets ORM query builder for a query that should be used to load data if the field is a to-many association.
-     *
-     * @return QueryBuilder|null
      */
     public function getAssociationQuery(): ?QueryBuilder
     {
@@ -652,8 +636,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      *
      * IMPORTANT: the query builder must follow the rules described in AssociationQuery class.
      * @see \Oro\Component\EntitySerializer\AssociationQuery
-     *
-     * @param QueryBuilder|null $query
      */
     public function setAssociationQuery(QueryBuilder $query = null)
     {

@@ -30,9 +30,6 @@ class AclConfigurationPass implements CompilerPassInterface
         $this->configureAclCache($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function substituteSecurityIdentityStrategy(ContainerBuilder $container): void
     {
         $container->setDefinition(
@@ -41,9 +38,6 @@ class AclConfigurationPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureAclExtensionSelector(ContainerBuilder $container): void
     {
         $extensions = [];
@@ -57,9 +51,6 @@ class AclConfigurationPass implements CompilerPassInterface
             ->setArgument(0, $extensions);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureDefaultAclProvider(ContainerBuilder $container): void
     {
         $container->getDefinition('security.acl.dbal.provider')
@@ -70,9 +61,6 @@ class AclConfigurationPass implements CompilerPassInterface
             );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureDefaultAclVoter(ContainerBuilder $container): void
     {
         $voterDef = $container->getDefinition('security.acl.voter.basic_permissions');
@@ -83,9 +71,6 @@ class AclConfigurationPass implements CompilerPassInterface
         $voterDef->replaceArgument(0, new Reference($newProviderId));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureAclCache(ContainerBuilder $container): void
     {
         $container->getDefinition('security.acl.cache.doctrine')

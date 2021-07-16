@@ -122,9 +122,6 @@ class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildContextValuesProvider
-     *
-     * @param array $expected
-     * @param array $arguments
      */
     public function testBuildContextValues(array $expected, array $arguments)
     {

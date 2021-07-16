@@ -36,9 +36,6 @@ class TestActivityScopeProvider implements ScopeCriteriaProviderInterface
         return TestActivity::class;
     }
 
-    /**
-     * @param TestActivity|null $currentTestActivity
-     */
     public function setCurrentTestActivity(?TestActivity $currentTestActivity)
     {
         $this->currentTestActivity = $currentTestActivity;

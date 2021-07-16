@@ -16,8 +16,6 @@ class DatasourceBindParametersListener
 {
     /**
      * Binds datagrid parameters to datasource query on event.
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {

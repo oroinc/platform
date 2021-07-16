@@ -34,8 +34,6 @@ class VariablesProvider
      * Gets system variables available in sandboxed TWIG templates.
      * Returned variables are sorted be name.
      * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface::getVariableDefinitions
-     *
-     * @return array
      */
     public function getSystemVariableDefinitions(): array
     {
@@ -55,8 +53,6 @@ class VariablesProvider
      * Gets entity related variables available in sandboxed TWIG templates.
      * Returned variables are sorted by name.
      * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface::getVariableDefinitions
-     *
-     * @return array
      */
     public function getEntityVariableDefinitions(): array
     {
@@ -80,8 +76,6 @@ class VariablesProvider
     /**
      * Gets values of system variables available in sandboxed TWIG templates.
      * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface::getVariableValues
-     *
-     * @return array
      */
     public function getSystemVariableValues(): array
     {
@@ -99,10 +93,6 @@ class VariablesProvider
     /**
      * Gets processors for entity related variables available in sandboxed TWIG templates.
      * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface::getVariableProcessors
-     *
-     * @param string $entityClass
-     *
-     * @return array
      */
     public function getEntityVariableProcessors(string $entityClass): array
     {
@@ -120,8 +110,6 @@ class VariablesProvider
     /**
      * Gets getters of entity related variables available in sandboxed TWIG templates.
      * @see \Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface::getVariableGetters
-     *
-     * @return array
      */
     public function getEntityVariableGetters(): array
     {
@@ -139,21 +127,11 @@ class VariablesProvider
         return $result;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return SystemVariablesProviderInterface
-     */
     private function getSystemVariablesProvider(string $name): SystemVariablesProviderInterface
     {
         return $this->providers->get($name);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return EntityVariablesProviderInterface
-     */
     private function getEntityVariablesProvider(string $name): EntityVariablesProviderInterface
     {
         return $this->providers->get($name);

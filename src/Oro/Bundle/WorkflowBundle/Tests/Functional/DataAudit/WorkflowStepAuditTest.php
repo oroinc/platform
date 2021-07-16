@@ -38,9 +38,6 @@ class WorkflowStepAuditTest extends WebTestCase
         );
     }
 
-    /**
-     * @param array $messageBody
-     */
     private function processMessage(array $messageBody)
     {
         $messageBody = array_replace(

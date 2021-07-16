@@ -49,12 +49,6 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
      */
     protected $context;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ImportStrategyHelper $strategyHelper
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ImportStrategyHelper $strategyHelper,

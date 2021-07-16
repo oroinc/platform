@@ -33,9 +33,6 @@ class OroCacheExtension extends Extension
         $this->loadMetadataFactoryDefinition($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     protected function loadMetadataFactoryDefinition(ContainerBuilder $container)
     {
         $configLoader = new CumulativeConfigLoader(

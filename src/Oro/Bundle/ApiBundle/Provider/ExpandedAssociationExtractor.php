@@ -93,12 +93,6 @@ class ExpandedAssociationExtractor
         return $result;
     }
 
-    /**
-     * @param string                 $fieldName
-     * @param EntityDefinitionConfig $config
-     *
-     * @return string|null
-     */
     private function resolveFirstLevelOfExpandedAssociation(
         string $fieldName,
         EntityDefinitionConfig $config
@@ -116,11 +110,6 @@ class ExpandedAssociationExtractor
         return $propertyPath;
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     *
-     * @return bool
-     */
     private function isExpandedAssociation(EntityDefinitionFieldConfig $field): bool
     {
         $targetConfig = $field->getTargetEntity();
@@ -140,11 +129,6 @@ class ExpandedAssociationExtractor
             || $this->hasNotIdentifierFields($targetConfig);
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     *
-     * @return bool
-     */
     private function hasNotIdentifierFields(EntityDefinitionConfig $config): bool
     {
         $idFieldNames = $config->getIdentifierFieldNames();

@@ -25,10 +25,6 @@ class RootAclWrapper
     /** @var array [field name => [sid => [[ace, ace index], ...], ...], ...] */
     private $groupedFieldAces = [];
 
-    /**
-     * @param Acl                                        $acl
-     * @param SecurityIdentityToStringConverterInterface $sidConverter
-     */
     public function __construct(Acl $acl, SecurityIdentityToStringConverterInterface $sidConverter)
     {
         $this->acl = $acl;

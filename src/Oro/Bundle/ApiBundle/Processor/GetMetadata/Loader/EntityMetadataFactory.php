@@ -21,10 +21,6 @@ class EntityMetadataFactory
     /** @var MetadataFactory */
     protected $metadataFactory;
 
-    /**
-     * @param MetadataHelper  $metadataHelper
-     * @param MetadataFactory $metadataFactory
-     */
     public function __construct(
         MetadataHelper $metadataHelper,
         MetadataFactory $metadataFactory

@@ -59,9 +59,6 @@ class RestException extends TransportException
         return $result;
     }
 
-    /**
-     * @param RestResponseInterface $response
-     */
     public function setResponse(RestResponseInterface $response)
     {
         $this->response = $response;

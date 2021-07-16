@@ -12,20 +12,10 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class PasswordChangeExceptionListener
 {
-    /**
-     * @var SessionInterface
-     */
     private SessionInterface $session;
 
-    /**
-     * @var TranslatorInterface
-     */
     private TranslatorInterface $translator;
 
-    /**
-     * @param SessionInterface $session
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         SessionInterface $session,
         TranslatorInterface $translator
@@ -34,9 +24,6 @@ class PasswordChangeExceptionListener
         $this->session = $session;
     }
 
-    /**
-     * @param ExceptionEvent $event
-     */
     public function onKernelException(ExceptionEvent $event)
     {
         if ($event->getThrowable() instanceof PasswordChangedException) {

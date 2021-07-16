@@ -24,10 +24,6 @@ class WorkflowDefinitionSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;

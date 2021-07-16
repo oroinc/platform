@@ -21,10 +21,6 @@ class AuditChangedEntitiesRelationsProcessor extends AbstractAuditProcessor impl
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
-     * @param LoggerInterface                    $logger
-     */
     public function __construct(
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
         LoggerInterface $logger

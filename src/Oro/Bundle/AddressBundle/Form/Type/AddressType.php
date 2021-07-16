@@ -28,10 +28,6 @@ class AddressType extends AbstractType
      */
     private $addressIdentifierSubscriber;
 
-    /**
-     * @param AddressCountryAndRegionSubscriber $eventListener
-     * @param AddressIdentifierSubscriber $addressIdentifierSubscriber
-     */
     public function __construct(
         AddressCountryAndRegionSubscriber $eventListener,
         AddressIdentifierSubscriber $addressIdentifierSubscriber

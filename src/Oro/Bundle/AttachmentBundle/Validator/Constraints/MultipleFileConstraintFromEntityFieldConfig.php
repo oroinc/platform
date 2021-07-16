@@ -42,17 +42,11 @@ class MultipleFileConstraintFromEntityFieldConfig extends Constraint
         return self::PROPERTY_CONSTRAINT;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return $this->entityClass;
     }
 
-    /**
-     * @return string
-     */
     public function getFieldName(): string
     {
         return $this->fieldName;

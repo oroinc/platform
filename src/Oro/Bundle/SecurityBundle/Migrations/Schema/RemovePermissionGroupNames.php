@@ -15,10 +15,6 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
     /** @var array */
     protected $removeGroupNames;
 
-    /**
-     * @param array $permissions
-     * @param $removeGroupNames
-     */
     public function __construct(array $permissions, array $removeGroupNames)
     {
         $this->permissions = $permissions;
@@ -102,9 +98,6 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param array           $rows
-     * @param LoggerInterface $logger
-     * @param                 $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     private function executeUpdates(array $rows, LoggerInterface $logger, $dryRun)

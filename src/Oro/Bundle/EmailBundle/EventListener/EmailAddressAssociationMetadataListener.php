@@ -15,17 +15,11 @@ class EmailAddressAssociationMetadataListener
     /** @var EmailAddressManager */
     private $emailAddressManager;
 
-    /**
-     * @param EmailAddressManager $emailAddressManager
-     */
     public function __construct(EmailAddressManager $emailAddressManager)
     {
         $this->emailAddressManager = $emailAddressManager;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
         $emailAddressProxyClass = $this->emailAddressManager->getEmailAddressProxyClass();

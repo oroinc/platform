@@ -15,9 +15,6 @@ class AddressFormatConfigurationProvider extends PhpArrayConfigProvider
 {
     private const CONFIG_FILE = 'Resources/config/oro/address_format.yml';
 
-    /**
-     * @return array
-     */
     public function getConfiguration(): array
     {
         return $this->doGetConfig();

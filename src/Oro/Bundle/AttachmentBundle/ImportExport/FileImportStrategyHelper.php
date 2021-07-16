@@ -38,14 +38,6 @@ class FileImportStrategyHelper
     /** @var array */
     private $fieldLabels = [];
 
-    /**
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigFileValidator $configFileValidator
-     * @param ConfigMultipleFileValidator $configMultipleFileValidator
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FieldHelper $fieldHelper,
         DatabaseHelper $databaseHelper,
@@ -98,13 +90,6 @@ class FileImportStrategyHelper
         return $violations;
     }
 
-    /**
-     * @param ConstraintViolationListInterface $constraintsViolationList
-     * @param string $messageKey
-     * @param array $messageParameters
-     *
-     * @return array
-     */
     private function getPlainErrorsFromViolationList(
         ConstraintViolationListInterface $constraintsViolationList,
         string $messageKey,
@@ -139,13 +124,6 @@ class FileImportStrategyHelper
         return $value ?? $default;
     }
 
-    /**
-     * @param Collection $fileItems
-     * @param object $entity
-     * @param string $fieldName
-     *
-     * @return array
-     */
     public function validateFileCollection(Collection $fileItems, object $entity, string $fieldName): array
     {
         $entityClass = $this->getClass($entity);
@@ -181,32 +159,16 @@ class FileImportStrategyHelper
         );
     }
 
-    /**
-     * @param object $entity
-     *
-     * @return string
-     */
     public function getClass(object $entity): string
     {
         return $this->doctrineHelper->getClass($entity);
     }
 
-    /**
-     * @param string $uuid
-     *
-     * @return File|null
-     */
     public function findFileByUuid(string $uuid): ?File
     {
         return $uuid ? $this->databaseHelper->findOneBy(File::class, ['uuid' => $uuid]) : null;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return string|null
-     */
     private function getFieldLabel(string $className, string $fieldName): ?string
     {
         if (!isset($this->fieldLabels[$className][$fieldName])) {

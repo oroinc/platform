@@ -86,8 +86,6 @@ class QueueConsumer
      * Runtime extension - is an extension or a collection of extensions which could be set on runtime.
      * Here's a good example: @see LimitsExtensionsCommandTrait
      *
-     * @param ExtensionInterface|null $runtimeExtension
-     *
      * @throws \Exception
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -232,9 +230,6 @@ class QueueConsumer
     }
 
     /**
-     * @param ExtensionInterface $extension
-     * @param Context $context
-     *
      * @throws \Exception
      */
     protected function onInterruptionByException(ExtensionInterface $extension, Context $context)
@@ -278,8 +273,6 @@ class QueueConsumer
 
     /**
      * Add information about memory usage difference and peak memory usage
-     *
-     * @param array $loggerContext
      */
     protected function addMemoryUsageInfo(array &$loggerContext)
     {

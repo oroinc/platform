@@ -57,10 +57,6 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $files
-     * @param array $options
-     * @param array $expected
-     *
      * @dataProvider optionsProvider
      */
     public function testFinishView(array $files, array $options, array $expected)

@@ -12,9 +12,6 @@ class EntityDataEvent extends Event
      */
     protected $entityData;
 
-    /**
-     * @param EntityData $entityData
-     */
     public function __construct(EntityData $entityData)
     {
         $this->entityData = $entityData;

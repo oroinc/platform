@@ -29,12 +29,6 @@ class RenameExtendedManyToOneAssociation20
     /** @var ExtendExtension */
     private $extendExtension;
 
-    /**
-     * @param Connection                      $connection
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param RenameExtension                 $renameExtension
-     * @param ExtendExtension                 $extendExtension
-     */
     public function __construct(
         Connection $connection,
         ExtendDbIdentifierNameGenerator $nameGenerator,

@@ -138,7 +138,7 @@ class ToManyToManyContainsAndContains implements FixtureInterface
                     ],
                  ],
             ]));
-        
+
         $em->persist($segment);
 
         return $segment;

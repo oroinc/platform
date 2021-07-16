@@ -84,9 +84,6 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
         return $this;
     }
 
-    /**
-     * @param array $contextSharedKeys
-     */
     public function setContextSharedKeys(array $contextSharedKeys)
     {
         $this->contextSharedKeys = $contextSharedKeys;

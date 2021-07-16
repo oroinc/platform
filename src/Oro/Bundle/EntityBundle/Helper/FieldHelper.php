@@ -48,11 +48,6 @@ class FieldHelper
     /** @var array */
     protected $identityFieldsCache = [];
 
-    /**
-     * @param EntityFieldProvider $fieldProvider
-     * @param ConfigProvider      $configProvider
-     * @param FieldTypeHelper     $fieldTypeHelper
-     */
     public function __construct(
         EntityFieldProvider $fieldProvider,
         ConfigProvider $configProvider,

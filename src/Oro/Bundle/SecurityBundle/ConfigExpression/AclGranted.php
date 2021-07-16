@@ -36,11 +36,6 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
     /** @var mixed */
     protected $object;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param ManagerRegistry               $doctrine
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,

@@ -38,15 +38,6 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param ObjectManager                 $om
-     * @param ConfigManager                 $configManager
-     * @param RouterInterface               $router
-     * @param EntityAliasResolver           $entityAliasResolver
-     * @param EntityNameResolver            $entityNameResolver
-     * @param FeatureChecker                $featureChecker
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         ObjectManager $om,
         ConfigManager $configManager,

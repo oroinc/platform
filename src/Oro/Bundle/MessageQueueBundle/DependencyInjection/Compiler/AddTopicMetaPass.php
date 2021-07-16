@@ -26,7 +26,7 @@ class AddTopicMetaPass implements CompilerPassInterface
     public function add($topicName, $topicDescription = '', array $topicSubscribers = [])
     {
         $this->topicsMeta[$topicName] = [];
-        
+
         if ($topicDescription) {
             $this->topicsMeta[$topicName]['description'] = $topicDescription;
         }
@@ -44,13 +44,13 @@ class AddTopicMetaPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $metaRegistryId = 'oro_message_queue.client.meta.topic_meta_registry';
-        
+
         if (false == $container->hasDefinition($metaRegistryId)) {
             return;
         }
 
         $metaRegistry = $container->getDefinition($metaRegistryId);
-        
+
         $metaRegistry->replaceArgument(0, array_merge_recursive($metaRegistry->getArgument(0), $this->topicsMeta));
     }
 

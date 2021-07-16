@@ -103,10 +103,6 @@ class MaintenanceListener
     }
 
     /**
-     * @param RequestEvent $event
-     *
-     * @return void
-     *
      * @throws ServiceUnavailableHttpException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -186,10 +182,6 @@ class MaintenanceListener
 
     /**
      * Rewrites the http code of the response
-     *
-     * @param ResponseEvent $event
-     *
-     * @return void
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
@@ -201,10 +193,6 @@ class MaintenanceListener
 
     /**
      * Checks if the requested IP is valid.
-     *
-     * @param string $requestedIp
-     * @param array $ips
-     * @return bool
      */
     protected function checkIps(string $requestedIp, array $ips): bool
     {

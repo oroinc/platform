@@ -94,10 +94,6 @@ class LoadNormalizedEntity implements ProcessorInterface
         return $getContext;
     }
 
-    /**
-     * @param GetContext        $getContext
-     * @param SingleItemContext $context
-     */
     protected function processGetResult(GetContext $getContext, SingleItemContext $context)
     {
         if ($getContext->hasErrors()) {

@@ -14,9 +14,6 @@ class WriterAfterFlushEvent extends Event
      */
     protected $entityManager;
 
-    /**
-     * @param EntityManager $entityManager
-     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;

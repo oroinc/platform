@@ -20,8 +20,6 @@ final class StatisticFormatterFactory implements FormatterFactory
 {
     /**
      * Builds formatter configuration.
-     *
-     * @param ContainerBuilder $container
      */
     public function buildFormatter(ContainerBuilder $container)
     {
@@ -32,8 +30,6 @@ final class StatisticFormatterFactory implements FormatterFactory
 
     /**
      * Processes formatter configuration.
-     *
-     * @param ContainerBuilder $container
      */
     public function processFormatter(ContainerBuilder $container)
     {
@@ -41,9 +37,6 @@ final class StatisticFormatterFactory implements FormatterFactory
         $subscriber->addMethodCall('setOutput', [$container->get('cli.output')]);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function defineStatisticModels(ContainerBuilder $container)
     {
         $container->setParameter(
@@ -56,8 +49,6 @@ final class StatisticFormatterFactory implements FormatterFactory
 
     /**
      * Loads formatter itself.
-     *
-     * @param ContainerBuilder $container
      */
     private function loadFormatter(ContainerBuilder $container)
     {
@@ -76,9 +67,6 @@ final class StatisticFormatterFactory implements FormatterFactory
         $container->setDefinition(OutputExtension::FORMATTER_TAG . '.statistic', $definition);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function loadSubscribers(ContainerBuilder $container)
     {
         $featureStatisticSubscriber = new Definition(

@@ -46,9 +46,6 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider renameTableWithSequencesProvider
-     *
-     * @param AbstractPlatform $platform
-     * @param array $expectedSql
      */
     public function testRenameTableWithSequences(AbstractPlatform $platform, array $expectedSql)
     {
@@ -73,7 +70,6 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $this->assertEquals($expectedSql, $actualQueries);
     }
-
 
     /**
      * @dataProvider renameColumnProvider

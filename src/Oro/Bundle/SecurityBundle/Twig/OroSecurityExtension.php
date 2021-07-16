@@ -28,9 +28,6 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -60,9 +57,6 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         return $this->container->get(PermissionManager::class);
     }
 
-    /**
-     * @return UriSecurityHelper
-     */
     private function getUriSecurityHelper(): UriSecurityHelper
     {
         return $this->container->get(UriSecurityHelper::class);

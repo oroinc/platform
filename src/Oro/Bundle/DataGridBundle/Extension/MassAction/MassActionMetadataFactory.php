@@ -10,9 +10,6 @@ class MassActionMetadataFactory
     /** @var ActionMetadataFactory */
     private $actionMetadataFactory;
 
-    /**
-     * @param ActionMetadataFactory $actionMetadataFactory
-     */
     public function __construct(ActionMetadataFactory $actionMetadataFactory)
     {
         $this->actionMetadataFactory = $actionMetadataFactory;

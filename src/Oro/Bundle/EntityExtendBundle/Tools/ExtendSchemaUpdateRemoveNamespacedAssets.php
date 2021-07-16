@@ -53,7 +53,6 @@ class ExtendSchemaUpdateRemoveNamespacedAssets extends AbstractVisitor
         }
     }
 
-
     /**
      * {@inheritdoc}
      */

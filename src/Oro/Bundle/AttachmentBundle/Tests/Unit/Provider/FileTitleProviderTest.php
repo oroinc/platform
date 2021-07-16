@@ -11,7 +11,7 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
     {
         $file = new File();
         $file->setOriginalFilename($title = 'sample title');
-        
+
         $this->assertEquals($title, (new FileTitleProvider())->getTitle($file));
     }
 }

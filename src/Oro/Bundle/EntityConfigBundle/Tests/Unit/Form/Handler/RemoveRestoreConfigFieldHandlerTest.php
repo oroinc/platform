@@ -76,10 +76,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param JsonResponse $response
-     * @param array $expectedContent
-     */
     private function expectsJsonResponseWithContent(JsonResponse $response, array $expectedContent)
     {
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -408,9 +404,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entity);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
     protected function prepareEntityConfig(): \PHPUnit\Framework\MockObject\MockObject
     {
         $entityConfig = $this->createMock(ConfigInterface::class);
@@ -428,9 +421,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
     protected function prepareFieldConfig(): \PHPUnit\Framework\MockObject\MockObject
     {
         $fieldConfig = $this->createMock(ConfigInterface::class);

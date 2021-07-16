@@ -49,11 +49,6 @@ class XssProvider extends BaseProvider
      */
     private $crypter;
 
-    /**
-     * @param Generator $generator
-     * @param XssPayloadProvider $payloadProvider
-     * @param SymmetricCrypterInterface $crypter
-     */
     public function __construct(
         Generator $generator,
         XssPayloadProvider $payloadProvider,

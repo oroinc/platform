@@ -17,7 +17,7 @@ class PostProcessorsVoterTest extends \PHPUnit\Framework\TestCase
     {
         $this->checkProcessors();
     }
-    
+
     public function testVoteWithAnyFeature(): void
     {
         $postProcessorVoter = new PostProcessorsVoter(null, null);

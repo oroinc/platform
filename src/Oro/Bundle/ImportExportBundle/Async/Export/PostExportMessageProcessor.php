@@ -67,15 +67,6 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     private $recipientUserId;
 
-    /**
-     * @param ExportHandler $exportHandler
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     * @param DoctrineHelper $doctrineHelper
-     * @param JobManagerInterface $jobManager
-     * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param NotificationSettings $notificationSettings
-     */
     public function __construct(
         ExportHandler $exportHandler,
         MessageProducerInterface $producer,

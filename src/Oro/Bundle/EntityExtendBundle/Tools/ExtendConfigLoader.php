@@ -13,10 +13,6 @@ class ExtendConfigLoader extends ConfigLoader
     /** @var int */
     private $snapshotSuffixOffset;
 
-    /**
-     * @param ConfigManager    $configManager
-     * @param EntityManagerBag $entityManagerBag
-     */
     public function __construct(ConfigManager $configManager, EntityManagerBag $entityManagerBag)
     {
         parent::__construct($configManager, $entityManagerBag);

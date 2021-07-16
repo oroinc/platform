@@ -136,7 +136,6 @@ class ImapEmailManagerTest extends TestCase
             ->method('getFlags')
             ->willReturn(['test1', 'test2']);
 
-
         $query = $this->createMock(SearchQuery::class);
 
         $imap = $this->createMock(Imap::class);
@@ -298,9 +297,6 @@ class ImapEmailManagerTest extends TestCase
         $this->assertEquals('Subject1', $email->getSubject());
     }
 
-    /**
-     * @return array
-     */
     public function getEmailsDataProvider(): array
     {
         return [
@@ -401,7 +397,6 @@ class ImapEmailManagerTest extends TestCase
         $msg->expects($this->once())
             ->method('getHeaders')
             ->willReturn($messageHeaders);
-
 
         return $msg;
     }

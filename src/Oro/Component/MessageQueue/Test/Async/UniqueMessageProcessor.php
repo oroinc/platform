@@ -20,9 +20,6 @@ class UniqueMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     /** @var JobRunner */
     private $jobRunner;
 
-    /**
-     * @param JobRunner $jobRunner
-     */
     public function __construct(JobRunner $jobRunner)
     {
         $this->jobRunner = $jobRunner;

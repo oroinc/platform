@@ -26,9 +26,6 @@ class OroDataGridBundleInstaller implements Installation
         $this->createOroGridViewUserTable($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function createAppearanceTypeTable(Schema $schema)
     {
         $table = $schema->createTable('oro_grid_appearance_type');
@@ -38,9 +35,6 @@ class OroDataGridBundleInstaller implements Installation
         $table->setPrimaryKey(['name']);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function createOroGridViewTable(Schema $schema)
     {
         $table = $schema->createTable('oro_grid_view');
@@ -83,9 +77,6 @@ class OroDataGridBundleInstaller implements Installation
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function createOroGridViewUserTable(Schema $schema)
     {
         $table = $schema->createTable('oro_grid_view_user_rel');

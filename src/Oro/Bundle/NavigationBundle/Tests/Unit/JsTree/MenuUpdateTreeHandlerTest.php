@@ -172,7 +172,6 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
         $item11 = new TreeItem('item1-1', 'item1-1');
         $item2 = new TreeItem('item2', 'item2');
 
-
         return [
             'include root' => [
                 'includeRoot' => true,

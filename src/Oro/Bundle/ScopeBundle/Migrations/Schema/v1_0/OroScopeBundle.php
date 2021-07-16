@@ -16,9 +16,6 @@ class OroScopeBundle implements Migration
         $this->createScopeTable($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function createScopeTable(Schema $schema)
     {
         $table = $schema->createTable('oro_scope');

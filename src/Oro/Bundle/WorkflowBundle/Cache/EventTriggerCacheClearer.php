@@ -14,9 +14,6 @@ class EventTriggerCacheClearer implements CacheClearerInterface
      */
     private $eventTriggerCaches = [];
 
-    /**
-     * @param EventTriggerCache $eventTriggerCache
-     */
     public function addEventTriggerCache(EventTriggerCache $eventTriggerCache): void
     {
         $this->eventTriggerCaches[] = $eventTriggerCache;

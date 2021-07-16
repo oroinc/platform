@@ -11,10 +11,6 @@ interface SecurityIdentityToStringConverterInterface
 {
     /**
      * Returns a string that unique identify the given security identity object.
-     *
-     * @param SecurityIdentityInterface $sid
-     *
-     * @return string
      */
     public function convert(SecurityIdentityInterface $sid): string;
 }

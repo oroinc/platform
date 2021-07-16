@@ -28,13 +28,6 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /**
-     * @param ActivityManager               $activityManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TranslatorInterface           $translator
-     * @param EntityIdAccessor              $entityIdAccessor
-     * @param EntityRoutingHelper           $entityRoutingHelper
-     */
     public function __construct(
         ActivityManager $activityManager,
         AuthorizationCheckerInterface $authorizationChecker,

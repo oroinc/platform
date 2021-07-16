@@ -13,9 +13,6 @@ class ApiResourceSubresources
     /** @var ApiSubresource[] */
     private $subresources = [];
 
-    /**
-     * @param $entityClass
-     */
     public function __construct($entityClass)
     {
         $this->entityClass = $entityClass;

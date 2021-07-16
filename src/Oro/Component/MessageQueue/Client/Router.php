@@ -21,17 +21,12 @@ class Router implements RecipientListRouterInterface
      * @var array
      */
     protected $routes;
-    
+
     /**
      * @var DestinationMetaRegistry
      */
     private $destinationMetaRegistry;
 
-    /**
-     * @param DriverInterface $driver
-     * @param DestinationMetaRegistry $destinationMetaRegistry
-     * @param array $routes
-     */
     public function __construct(
         DriverInterface $driver,
         DestinationMetaRegistry $destinationMetaRegistry,
@@ -68,11 +63,6 @@ class Router implements RecipientListRouterInterface
         $this->routes[$topicName][] = [$processorName, $queueName];
     }
 
-    /**
-     * @param string $topicName
-     *
-     * @return array
-     */
     public function getTopicSubscribers(string $topicName): array
     {
         return array_key_exists($topicName, $this->routes) ? $this->routes[$topicName] : [];
@@ -90,7 +80,7 @@ class Router implements RecipientListRouterInterface
                 Config::PARAMETER_TOPIC_NAME
             ));
         }
-        
+
         if (array_key_exists($topicName, $this->routes)) {
             foreach ($this->routes[$topicName] as $route) {
                 $recipient = $this->createRecipient(

@@ -14,9 +14,6 @@ class EmailTemplateGridHelper extends BaseGridHelper
 
     /**
      * Constructor
-     *
-     * @param EntityProvider      $entityProvider
-     * @param TranslatorInterface $translator
      */
     public function __construct(EntityProvider $entityProvider, TranslatorInterface $translator)
     {

@@ -191,11 +191,6 @@ MARKDOWN
 
     /**
      * Gets a short, human-readable description of API resource.
-     *
-     * @param string $action
-     * @param string $entityName
-     *
-     * @return string|null
      */
     public function getResourceDescription(string $action, string $entityName): ?string
     {
@@ -206,12 +201,6 @@ MARKDOWN
 
     /**
      * Gets a detailed documentation of API resource.
-     *
-     * @param string $action
-     * @param string $entitySingularName
-     * @param string $entityPluralName
-     *
-     * @return string|null
      */
     public function getResourceDocumentation(
         string $action,
@@ -235,12 +224,6 @@ MARKDOWN
 
     /**
      * Gets a short, human-readable description of API sub-resource.
-     *
-     * @param string $action
-     * @param string $associationName
-     * @param bool   $isCollection
-     *
-     * @return string|null
      */
     public function getSubresourceDescription(
         string $action,
@@ -261,12 +244,6 @@ MARKDOWN
 
     /**
      * Gets a detailed documentation of API sub-resource.
-     *
-     * @param string $action
-     * @param string $associationName
-     * @param bool   $isCollection
-     *
-     * @return string|null
      */
     public function getSubresourceDocumentation(
         string $action,

@@ -29,10 +29,6 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     /** @var string|null */
     private $lastProcessorClassName;
 
-    /**
-     * @param ContainerInterface            $container
-     * @param MessageProcessorClassProvider $messageProcessorClassProvider
-     */
     public function __construct(
         ContainerInterface $container,
         MessageProcessorClassProvider $messageProcessorClassProvider
@@ -53,9 +49,6 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
         );
     }
 
-    /**
-     * @param Context $context
-     */
     public function onIdle(Context $context)
     {
         // reset the extension state if no messages to process
@@ -85,9 +78,6 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param string $name
-     */
     private function resetService(string $name): void
     {
         $service = $this->container->get($name);

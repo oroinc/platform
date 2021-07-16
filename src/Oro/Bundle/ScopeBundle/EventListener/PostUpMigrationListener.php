@@ -25,10 +25,6 @@ class PostUpMigrationListener
      */
     protected $installed;
 
-    /**
-     * @param AddCommentToRoHashManager $manager
-     * @param string|null $installed
-     */
     public function __construct(AddCommentToRoHashManager $manager, ?string $installed)
     {
         $this->manager = $manager;
@@ -37,8 +33,6 @@ class PostUpMigrationListener
 
     /**
      * Added unique index for oro_scope table
-     *
-     * @param PostMigrationEvent $event
      */
     public function onPostUp(PostMigrationEvent $event): void
     {

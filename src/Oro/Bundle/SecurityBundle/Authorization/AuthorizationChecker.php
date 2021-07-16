@@ -28,12 +28,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ServiceLink     $authorizationCheckerLink
-     * @param ServiceLink     $objectIdentityFactoryLink
-     * @param ServiceLink     $annotationProviderLink
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ServiceLink $authorizationCheckerLink,
         ServiceLink $objectIdentityFactoryLink,
@@ -112,11 +106,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         return $authorizationChecker->isGranted($attribute, $object);
     }
 
-    /**
-     * @param string $annotationId
-     *
-     * @return AclAnnotation|null
-     */
     private function getAnnotation(string $annotationId): ?AclAnnotation
     {
         /** @var AclAnnotationProvider $annotationProvider */

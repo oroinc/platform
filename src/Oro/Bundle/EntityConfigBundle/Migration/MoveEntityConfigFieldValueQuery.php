@@ -84,10 +84,6 @@ class MoveEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
         $this->updateFieldConfig($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param bool            $dryRun
-     */
     protected function updateFieldConfig(LoggerInterface $logger, bool $dryRun = false): void
     {
         $sql = 'SELECT f.id, f.data FROM oro_entity_config_field as f

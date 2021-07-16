@@ -31,8 +31,6 @@ class ControllerListener
      *
      * This method is executed just before any controller action.
      *
-     * @param ControllerEvent $event
-     *
      * @throws AccessDeniedException
      */
     public function onKernelController(ControllerEvent $event): void

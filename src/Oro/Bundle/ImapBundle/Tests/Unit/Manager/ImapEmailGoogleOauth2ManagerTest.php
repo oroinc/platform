@@ -221,10 +221,6 @@ class ImapEmailGoogleOauth2ManagerTest extends TestCase
         return $userEmailOrigin;
     }
 
-    /**
-     * @param bool $isExpired
-     * @return \DateTime
-     */
     protected function getDateObject(bool $isExpired = false): \DateTime
     {
         $date = new \DateTime();
@@ -242,10 +238,6 @@ class ImapEmailGoogleOauth2ManagerTest extends TestCase
     }
 
     /**
-     * @param UserEmailOrigin $origin
-     * @param bool $isConfigEnabled
-     * @param string|null $currentToken
-     *
      * @dataProvider getExpirationCheckData
      */
     public function testGetAccessTokenWithCheckingExpiration(
@@ -340,7 +332,6 @@ class ImapEmailGoogleOauth2ManagerTest extends TestCase
         $expiredOriginNoToken1 = new TestUserEmailOrigin();
         $expiredOriginNoToken1->setAccessTokenExpiresAt($this->getDateObject(true));
         $expiredOriginNoToken1->setRefreshToken('sampleRefreshToken');
-
 
         $expiredOriginNoToken2 = new TestUserEmailOrigin();
         $expiredOriginNoToken2->setAccessTokenExpiresAt($this->getDateObject(true));

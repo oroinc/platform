@@ -12,9 +12,6 @@ class ConfigValueProvider
     /** @var ContainerInterface */
     private $converters;
 
-    /**
-     * @param ContainerInterface $converters
-     */
     public function __construct(ContainerInterface $converters)
     {
         $this->converters = $converters;
@@ -72,11 +69,6 @@ class ConfigValueProvider
         return $value;
     }
 
-    /**
-     * @param string $formType
-     *
-     * @return ConfigValueConverterAbstract|null
-     */
     private function getConverter(string $formType): ?ConfigValueConverterAbstract
     {
         if (!$this->converters->has($formType)) {

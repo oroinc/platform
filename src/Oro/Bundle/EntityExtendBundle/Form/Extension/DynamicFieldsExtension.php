@@ -45,14 +45,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
     /** @var bool */
     private $debug;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param LoggerInterface $logger
-     * @param TranslatorInterface $translator
-     * @param ContainerInterface $container
-     * @param bool $debug
-     */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
@@ -89,9 +81,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         }
     }
 
-    /**
-     * @param PreSetDataEvent $event
-     */
     public function preSetData(PreSetDataEvent $event): void
     {
         $form = $event->getForm();
@@ -135,11 +124,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         }
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!$this->isApplicable($options)) {
@@ -226,20 +210,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         return $this->getDynamicFieldsHelper()->isApplicableField($extendConfig, $extendConfigProvider);
     }
 
-    /**
-     * @return DynamicFieldsHelper
-     */
     protected function getDynamicFieldsHelper(): DynamicFieldsHelper
     {
         return $this->container->get('oro_entity_extend.form.extension.dynamic_fields_helper');
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function fieldExists(FormInterface $form, string $fieldName): bool
     {
         if ($form->has($fieldName)) {
@@ -257,31 +232,16 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
         return false;
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function isDynamicField(FormInterface $form, string $fieldName): bool
     {
         return $form->get($fieldName)->getConfig()->getOption('is_dynamic_field', false);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function isIgnoreException(FormInterface $form, string $fieldName): bool
     {
         return $form->get($fieldName)->getConfig()->getOption('dynamic_fields_ignore_exception', false);
     }
 
-    /**
-     * @param string $fieldName
-     */
     private function createException(string $fieldName): void
     {
         $message = $this->translator->trans('oro.entity_extend.form.field_exists', ['%fieldName%' => $fieldName]);
@@ -294,8 +254,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
 
     /**
      * Does not return any values ​​since the extension has a specific using.
-     *
-     * @return array
      */
     public static function getExtendedTypes(): array
     {

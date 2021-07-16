@@ -33,10 +33,6 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
 
     /**
      * @dataProvider filterDataProvider
-     * @param ArrayCollection $incomingDefinitions
-     * @param array $scopedWorkflowNames
-     * @param array $matchingScopesDefinitionsResult
-     * @param ArrayCollection $expectedResult
      */
     public function testFilter(
         ArrayCollection $incomingDefinitions,

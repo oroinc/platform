@@ -25,9 +25,6 @@ class EntityRouteVariableProcessorTest extends WebTestCase
     }
 
     /**
-     * @param $variable
-     * @param $expected
-     *
      * @dataProvider variablesDataProvider
      */
     public function testVariables($variable, $expected)
@@ -40,9 +37,6 @@ class EntityRouteVariableProcessorTest extends WebTestCase
         $this->assertEquals(1, preg_match($expected, $data), 'data: ' . $data);
     }
 
-    /**
-     * @return array
-     */
     public function variablesDataProvider(): array
     {
         $baseUrl = '(http|https)\:\/\/.*\/';
@@ -71,9 +65,6 @@ class EntityRouteVariableProcessorTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return Item
-     */
     private function createItemEntity(): Item
     {
         $testEntity = new Item();
@@ -86,11 +77,6 @@ class EntityRouteVariableProcessorTest extends WebTestCase
         return $testEntity;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityManagerInterface
-     */
     private function getEntityManager(string $entityClass): EntityManagerInterface
     {
         return self::getContainer()->get('doctrine')->getManagerForClass($entityClass);

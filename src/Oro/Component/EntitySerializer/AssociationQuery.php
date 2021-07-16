@@ -35,27 +35,17 @@ class AssociationQuery
     /** @var string */
     private $targetEntityClass;
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $targetEntityClass
-     */
     public function __construct(QueryBuilder $qb, string $targetEntityClass)
     {
         $this->qb = $qb;
         $this->targetEntityClass = $targetEntityClass;
     }
 
-    /**
-     * @return QueryBuilder
-     */
     public function getQueryBuilder(): QueryBuilder
     {
         return $this->qb;
     }
 
-    /**
-     * @return string
-     */
     public function getTargetEntityClass(): string
     {
         return $this->targetEntityClass;

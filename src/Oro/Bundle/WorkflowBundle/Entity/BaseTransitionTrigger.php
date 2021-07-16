@@ -151,9 +151,6 @@ abstract class BaseTransitionTrigger
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     */
     protected function importMainData(BaseTransitionTrigger $trigger)
     {
         $this->setQueued($trigger->isQueued())

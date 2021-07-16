@@ -41,11 +41,6 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $isEnabled
-     * @param string $entityClass
-     * @param string $permission
-     * @param bool $expectedValue
-     *
      * @dataProvider getIsApplicableDataProvider
      */
     public function testIsApplicable(
@@ -68,9 +63,6 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $this->rule->isApplicable($criteria));
     }
 
-    /**
-     * @return array
-     */
     public function getIsApplicableDataProvider(): array
     {
         return [

@@ -28,11 +28,6 @@ class WidgetModel implements EntityModelInterface
      */
     protected $state;
 
-    /**
-     * @param Widget      $widget
-     * @param array       $config
-     * @param WidgetState $widgetState
-     */
     public function __construct(Widget $widget, array $config, WidgetState $widgetState)
     {
         $this->entity = $widget;

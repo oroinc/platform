@@ -21,9 +21,6 @@ class TranslationOperationsTest extends ActionTestCase
         ]);
     }
 
-    /**
-     * @return RebuildTranslationCacheHandlerStub
-     */
     private function getRebuildTranslationCacheHandlerStub(): RebuildTranslationCacheHandlerStub
     {
         return self::getContainer()->get('oro_translation.rebuild_translation_cache_handler');

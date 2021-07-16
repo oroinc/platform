@@ -62,7 +62,6 @@ class ProfilingEntityManager extends OroEntityManager
         }
     }
 
-
     /**
      * {@inheritdoc}
      */

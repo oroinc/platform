@@ -14,9 +14,6 @@ class EmailUserAdded extends Event
      */
     protected $emailUser;
 
-    /**
-     * @param EmailUser $emailUser
-     */
     public function __construct(EmailUser $emailUser)
     {
         $this->setEmailUser($emailUser);

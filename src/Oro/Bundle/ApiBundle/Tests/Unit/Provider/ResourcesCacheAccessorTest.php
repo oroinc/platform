@@ -22,11 +22,6 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->configCacheStateRegistry = $this->createMock(ConfigCacheStateRegistry::class);
     }
 
-    /**
-     * @param bool $withoutConfigCacheStateRegistry
-     *
-     * @return ResourcesCacheAccessor
-     */
     private function getCacheAccessor(bool $withoutConfigCacheStateRegistry = false): ResourcesCacheAccessor
     {
         $cacheAccessor = new ResourcesCacheAccessor($this->cache);

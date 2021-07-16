@@ -36,14 +36,6 @@ class FileVoter extends AbstractEntityVoter
     /** @var TokenAccessorInterface */
     private $tokenAccessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param FileAccessControlChecker $fileAccessControlChecker
-     * @param FileApplicationsProvider $fileApplicationsProvider
-     * @param CurrentApplicationProviderInterface $currentApplicationProvider
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         FileAccessControlChecker $fileAccessControlChecker,

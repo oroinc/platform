@@ -28,14 +28,6 @@ class TemplateData
     /** @var string */
     private $computedSectionName;
 
-    /**
-     * @param array                  $data
-     * @param EntityVariableComputer $entityVariableComputer
-     * @param EntityDataAccessor     $entityDataAccessor
-     * @param string                 $systemSectionName
-     * @param string                 $entitySectionName
-     * @param string                 $computedSectionName
-     */
     public function __construct(
         array $data,
         EntityVariableComputer $entityVariableComputer,
@@ -64,8 +56,6 @@ class TemplateData
 
     /**
      * Checks if this object contains values for system variables.
-     *
-     * @return bool
      */
     public function hasSystemVariables(): bool
     {
@@ -74,8 +64,6 @@ class TemplateData
 
     /**
      * Gets values of system variables.
-     *
-     * @return array
      *
      * @throws \LogicException if this object does not contain values of system variables
      */
@@ -90,8 +78,6 @@ class TemplateData
 
     /**
      * Checks if this object contains the root entity.
-     *
-     * @return bool
      */
     public function hasRootEntity(): bool
     {
@@ -292,21 +278,11 @@ class TemplateData
         return $value;
     }
 
-    /**
-     * @param string $variable
-     *
-     * @return string
-     */
     private function buildComputedVariableName(string $variable): string
     {
         return \str_replace(self::PATH_SEPARATOR, self::COMPUTED_PATH_SEPARATOR, $variable);
     }
 
-    /**
-     * @param string $variable
-     *
-     * @return \LogicException
-     */
     private function createNoComputedVariableException(string $variable): \LogicException
     {
         return new \LogicException(sprintf('The computed variable "%s" does not exist.', $variable));

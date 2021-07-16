@@ -51,15 +51,6 @@ class EntityChangesToAuditEntryConverter
      */
     private $entityMetadataCache = [];
 
-    /**
-     * @param ManagerRegistry                          $doctrine
-     * @param AuditEntityMapper                        $auditEntityMapper
-     * @param AuditConfigProvider                      $configProvider
-     * @param EntityNameProvider                       $entityNameProvider
-     * @param SetNewAuditVersionService                $setNewAuditVersionService
-     * @param AuditRecordValidator                     $auditRecordValidator
-     * @param ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         AuditEntityMapper $auditEntityMapper,

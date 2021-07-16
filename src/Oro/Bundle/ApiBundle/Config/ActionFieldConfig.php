@@ -317,8 +317,6 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Adds a validation constraint to the form options.
-     *
-     * @param Constraint $constraint
      */
     public function addFormConstraint(Constraint $constraint)
     {
@@ -337,8 +335,6 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Indicates whether a post processor is set.
-     *
-     * @return bool
      */
     public function hasPostProcessor(): bool
     {
@@ -347,8 +343,6 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Gets the type of a post processor.
-     *
-     * @return string|null
      */
     public function getPostProcessor(): ?string
     {
@@ -357,8 +351,6 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Sets the type of a post processor.
-     *
-     * @param string|null $type
      */
     public function setPostProcessor(?string $type): void
     {
@@ -375,8 +367,6 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Gets the options for a post processor.
-     *
-     * @return array|null
      */
     public function getPostProcessorOptions(): ?array
     {
@@ -385,8 +375,6 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Sets the options for a post processor.
-     *
-     * @param array|null $options
      */
     public function setPostProcessorOptions(?array $options): void
     {

@@ -27,10 +27,6 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
      */
     private $attachmentHashProvider;
 
-    /**
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param AttachmentHashProvider $attachmentUrlProvider
-     */
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         AttachmentHashProvider $attachmentUrlProvider
@@ -97,10 +93,6 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
      *   has default value.
      * - If the system configuration has changed and is not equivalent to the prevent(default) configuration,
      *   then build a hash with the 'post_processors' parameter.
-     *
-     * @param string $filterName
-     *
-     * @return string
      */
     public function getFilterHash(string $filterName): string
     {

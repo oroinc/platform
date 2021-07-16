@@ -64,9 +64,6 @@ class TestMagazineModel2
         return $this->articles;
     }
 
-    /**
-     * @param TestArticleModel2 $article
-     */
     public function addArticle(TestArticleModel2 $article)
     {
         if (!$this->articles->contains($article)) {
@@ -74,9 +71,6 @@ class TestMagazineModel2
         }
     }
 
-    /**
-     * @param TestArticleModel2 $article
-     */
     public function removeArticle(TestArticleModel2 $article)
     {
         if ($this->articles->contains($article)) {

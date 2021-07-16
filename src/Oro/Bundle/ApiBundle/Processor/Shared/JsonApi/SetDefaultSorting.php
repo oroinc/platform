@@ -27,12 +27,6 @@ class SetDefaultSorting extends BaseSetDefaultSorting
         return $orderBy;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param SortersConfig|null     $configOfSorters
-     *
-     * @return bool
-     */
     private function isSorterByIdEnabled(EntityDefinitionConfig $config, ?SortersConfig $configOfSorters): bool
     {
         $idFieldNames = $config->getIdentifierFieldNames();

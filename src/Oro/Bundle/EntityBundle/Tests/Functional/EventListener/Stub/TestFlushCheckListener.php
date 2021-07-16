@@ -18,19 +18,12 @@ class TestFlushCheckListener
     /** @var WebTestCase */
     private $webTestCase;
 
-    /**
-     * @param DoctrineFlushProgressListener $listener
-     * @param WebTestCase $webTestCase
-     */
     public function __construct(DoctrineFlushProgressListener $listener, WebTestCase $webTestCase)
     {
         $this->listener = $listener;
         $this->webTestCase = $webTestCase;
     }
 
-    /**
-     * @param OnFlushEventArgs $event
-     */
     public function onFlush(OnFlushEventArgs $event)
     {
         $this->webTestCase->assertTrue($this->listener->isFlushInProgress($event->getEntityManager()));

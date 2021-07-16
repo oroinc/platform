@@ -30,12 +30,6 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param ManagerRegistry $doctrine
-     * @param string $entityClass
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         MessageProducerInterface $producer,
         ManagerRegistry $doctrine,
@@ -95,12 +89,6 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         return [Topics::ROOT_JOB_STOPPED];
     }
 
-    /**
-     * @param array $dependentJobs
-     * @param Job $job
-     *
-     * @return bool
-     */
     private function validateDependentJobs(array $dependentJobs, Job $job): bool
     {
         $result = true;
@@ -119,10 +107,6 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
         return $result;
     }
 
-    /**
-     * @param array $dependentJobs
-     * @param Job $job
-     */
     private function processDependentJobs(array $dependentJobs, Job $job): void
     {
         foreach ($dependentJobs as $dependentJob) {

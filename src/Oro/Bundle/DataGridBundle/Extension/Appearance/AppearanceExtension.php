@@ -26,10 +26,6 @@ class AppearanceExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param Configuration $configuration
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         Configuration $configuration,
         TranslatorInterface $translator
@@ -52,9 +48,6 @@ class AppearanceExtension extends AbstractExtension
         return count($options) > 0;
     }
 
-    /**
-    * @param ParameterBag $parameters
-    */
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {

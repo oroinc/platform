@@ -45,10 +45,6 @@ class TranslatablePropertyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valueDataProvider
-     *
-     * @param array $params
-     * @param array $data
-     * @param string $expected
      */
     public function testGetRawValue(array $params, array $data, string $expected): void
     {
@@ -57,9 +53,6 @@ class TranslatablePropertyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->property->getRawValue(new ResultRecord($data)));
     }
 
-    /**
-     * @return array
-     */
     public function valueDataProvider(): array
     {
         return [

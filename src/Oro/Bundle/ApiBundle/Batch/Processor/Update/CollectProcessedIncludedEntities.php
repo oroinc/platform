@@ -25,10 +25,6 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param IncludeMapManager $includeMapManager
-     * @param ValueNormalizer   $valueNormalizer
-     */
     public function __construct(IncludeMapManager $includeMapManager, ValueNormalizer $valueNormalizer)
     {
         $this->includeMapManager = $includeMapManager;

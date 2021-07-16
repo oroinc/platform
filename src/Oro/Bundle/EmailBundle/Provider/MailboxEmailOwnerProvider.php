@@ -7,7 +7,6 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 
 class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
 {
-
     /**
      * {@inheritdoc}
      */

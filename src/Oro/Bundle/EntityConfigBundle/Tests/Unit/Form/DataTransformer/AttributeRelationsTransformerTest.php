@@ -18,9 +18,6 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
         $this->dataTransformer = new AttributeRelationsTransformer(null);
     }
 
-    /**
-     * @return array
-     */
     public function transformDataProvider(): array
     {
         $relation = new AttributeGroupRelation();
@@ -54,9 +51,6 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectation, $this->dataTransformer->transform($collection));
     }
 
-    /**
-     * @return array
-     */
     public function reverseTransformDataProvider(): array
     {
         return [

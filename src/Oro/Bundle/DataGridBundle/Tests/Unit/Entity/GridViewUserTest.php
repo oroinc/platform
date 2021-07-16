@@ -10,8 +10,6 @@ class GridViewUserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provider
-     * @param $property
-     * @param $value
      */
     public function testSettersAndGetters($property, $value)
     {

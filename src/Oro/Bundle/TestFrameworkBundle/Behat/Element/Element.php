@@ -68,9 +68,6 @@ class Element extends NodeElement
     {
     }
 
-    /**
-     * @param array $options
-     */
     public function setOptions(array $options)
     {
         $this->options = $options;

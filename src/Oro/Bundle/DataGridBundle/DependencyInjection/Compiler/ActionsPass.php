@@ -21,10 +21,6 @@ class ActionsPass implements CompilerPassInterface
     /** @var string */
     private $tagName;
 
-    /**
-     * @param string $factoryServiceId
-     * @param string $tagName
-     */
     public function __construct(string $factoryServiceId, string $tagName)
     {
         $this->factoryServiceId = $factoryServiceId;

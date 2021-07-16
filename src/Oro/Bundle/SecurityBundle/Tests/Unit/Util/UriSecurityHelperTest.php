@@ -18,18 +18,12 @@ class UriSecurityHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stripDangerousProtocolsDataProvider
-     *
-     * @param string $uri
-     * @param string $expectedUri
      */
     public function testStripDangerousProtocols(string $uri, string $expectedUri): void
     {
         $this->assertEquals($expectedUri, $this->helper->stripDangerousProtocols($uri));
     }
 
-    /**
-     * @return array
-     */
     public function stripDangerousProtocolsDataProvider(): array
     {
         return [
@@ -50,18 +44,12 @@ class UriSecurityHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider uriHasDangerousProtocolDataProvider
-     *
-     * @param string $uri
-     * @param bool $expected
      */
     public function testUriHasDangerousProtocol(string $uri, bool $expected): void
     {
         $this->assertSame($expected, $this->helper->uriHasDangerousProtocol($uri));
     }
 
-    /**
-     * @return array
-     */
     public function uriHasDangerousProtocolDataProvider(): array
     {
         return [
@@ -86,18 +74,12 @@ class UriSecurityHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isDangerousProtocolDataProvider
-     *
-     * @param string $protocol
-     * @param bool $expected
      */
     public function testIsDangerousProtocol(string $protocol, bool $expected): void
     {
         $this->assertSame($expected, $this->helper->isDangerousProtocol($protocol));
     }
 
-    /**
-     * @return array
-     */
     public function isDangerousProtocolDataProvider(): array
     {
         return [

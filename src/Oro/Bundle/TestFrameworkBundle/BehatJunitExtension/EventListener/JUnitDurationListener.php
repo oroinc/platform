@@ -79,25 +79,16 @@ final class JUnitDurationListener implements EventListener
         return array_key_exists($key, $this->featureResultStore) ? $this->featureResultStore[$key] : '';
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     private function captureBeforeFeatureTested(BeforeFeatureTested $event)
     {
         $this->featureTimerStore[$this->getHash($event->getFeature())] = $this->startTimer();
     }
 
-    /**
-     * @param BeforeScenarioTested $event
-     */
     private function captureBeforeScenarioEvent(BeforeScenarioTested $event)
     {
         $this->scenarioTimerStore[$this->getHash($event->getScenario())] = $this->startTimer();
     }
 
-    /**
-     * @param AfterScenarioTested $event
-     */
     private function captureAfterScenarioEvent(AfterScenarioTested $event)
     {
         $key = $this->getHash($event->getScenario());
@@ -108,9 +99,6 @@ final class JUnitDurationListener implements EventListener
         }
     }
 
-    /**
-     * @param AfterFeatureTested $event
-     */
     private function captureAfterFeatureEvent(AfterFeatureTested $event)
     {
         $key = $this->getHash($event->getFeature());

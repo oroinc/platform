@@ -12,7 +12,7 @@ use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 class LocalizedFallbackValueTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
-    
+
     public function testAccessors(): void
     {
         $properties = [

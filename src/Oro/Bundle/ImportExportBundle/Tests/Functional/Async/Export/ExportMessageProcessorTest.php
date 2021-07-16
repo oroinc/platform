@@ -59,7 +59,6 @@ class ExportMessageProcessorTest extends WebTestCase
             'processorAlias' => 'alias',
         ]));
 
-
         $exportResult = [
             'success' => $resultSuccess,
             'url' => 'http://localhost',

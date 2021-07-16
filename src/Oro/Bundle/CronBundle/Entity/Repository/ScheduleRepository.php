@@ -32,9 +32,6 @@ class ScheduleRepository extends EntityRepository
         return $queryBuilder;
     }
 
-    /**
-     * @param FeatureChecker $checker
-     */
     public function setFeatureChecker(FeatureChecker $checker)
     {
         $this->featureChecker = $checker;

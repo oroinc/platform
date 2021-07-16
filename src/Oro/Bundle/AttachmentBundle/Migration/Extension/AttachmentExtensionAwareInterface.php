@@ -9,8 +9,6 @@ interface AttachmentExtensionAwareInterface
 {
     /**
      * Sets the AttachmentExtension
-     *
-     * @param AttachmentExtension $attachmentExtension
      */
     public function setAttachmentExtension(AttachmentExtension $attachmentExtension);
 }

@@ -27,11 +27,6 @@ class AddConsumerStateProcessor
     /** @var MessageToArrayConverterInterface */
     private $messageToArrayConverter;
 
-    /**
-     * @param ConsumerState $consumerState
-     * @param MessageProcessorClassProvider $messageProcessorClassProvider
-     * @param MessageToArrayConverterInterface $messageToArrayConverter
-     */
     public function __construct(
         ConsumerState $consumerState,
         MessageProcessorClassProvider $messageProcessorClassProvider,
@@ -84,8 +79,6 @@ class AddConsumerStateProcessor
 
     /**
      * Add current memory usage
-     *
-     * @param array $extra
      */
     protected function addMemoryUsageInfo(array &$extra)
     {
@@ -96,9 +89,6 @@ class AddConsumerStateProcessor
 
     /**
      * Move memory usage from context to extra parameters
-     *
-     * @param array $record
-     * @param array $keys
      */
     protected function moveMemoryUsageInfoFromContext(array &$record, array $keys)
     {
@@ -112,8 +102,6 @@ class AddConsumerStateProcessor
 
     /**
      * Add time passed since the consumer started processing message
-     *
-     * @param array $extra
      */
     protected function addTimeInfo(array &$extra)
     {
@@ -123,10 +111,6 @@ class AddConsumerStateProcessor
         }
     }
 
-    /**
-     * @param MessageInterface $message
-     * @param array            $extra
-     */
     protected function addMessageInfo(MessageInterface $message, array &$extra)
     {
         $items = $this->messageToArrayConverter->convert($message);
@@ -135,10 +119,6 @@ class AddConsumerStateProcessor
         }
     }
 
-    /**
-     * @param Job   $job
-     * @param array $extra
-     */
     protected function addJobInfo(Job $job, array &$extra)
     {
         $extra['job_id'] = $job->getId();

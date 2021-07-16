@@ -78,7 +78,6 @@ class MessageFactoryTest extends \PHPUnit\Framework\TestCase
             ->with('oro_config.global')
             ->willReturn(false);
 
-
         $messageFactory->setContainer($container);
         $messageFactory->createMessage('text', []);
     }

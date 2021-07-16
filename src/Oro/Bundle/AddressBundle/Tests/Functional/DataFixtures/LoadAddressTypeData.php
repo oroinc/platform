@@ -23,8 +23,6 @@ class LoadAddressTypeData extends AbstractFixture
 
     /**
      * Load address types
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

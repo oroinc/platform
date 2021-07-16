@@ -43,9 +43,6 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -341,9 +338,6 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $this->getDoctrine()->getRepository(File::class)->find($id);
     }
 
-    /**
-     * @return PropertyAccessorInterface
-     */
     private function getPropertyAccessor(): PropertyAccessorInterface
     {
         return $this->container->get(PropertyAccessorInterface::class);

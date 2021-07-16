@@ -99,9 +99,6 @@ final class BehatStatisticExtension implements TestworkExtension
         return array_filter($vars);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function loadSuiteConfiguration(ContainerBuilder $container)
     {
         $envConfig = $this->getEnvConfig(self::SUITE_ENV_VAR);
@@ -119,10 +116,6 @@ final class BehatStatisticExtension implements TestworkExtension
         $container->setParameter('suite.configurations', array_merge($suiteConfig, $envConfig));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array $sets
-     */
     protected function loadSuiteSetConfiguration(ContainerBuilder $container, array $sets)
     {
         $envConfig = $this->getEnvConfig(self::SUITE_SET_ENV_VAR);
@@ -220,7 +213,6 @@ final class BehatStatisticExtension implements TestworkExtension
 
     /**
      * Generators should be added before suite configurations
-     * @param ContainerBuilder $container
      */
     private function addGeneratorsToConfigurationRegistry(ContainerBuilder $container)
     {
@@ -233,7 +225,6 @@ final class BehatStatisticExtension implements TestworkExtension
     }
 
     /**
-     * @param ContainerBuilder $container
      * @throws ConnectionException
      * @throws DriverException
      * @throws PDOException
@@ -245,10 +236,6 @@ final class BehatStatisticExtension implements TestworkExtension
         $connection->ping();
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param \Exception $e
-     */
     private function showAlert(OutputInterface $output, \Exception $e)
     {
         $output->writeln(sprintf(
@@ -258,9 +245,6 @@ final class BehatStatisticExtension implements TestworkExtension
         ));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function skipStatisticSubscribers(ContainerBuilder $container)
     {
         $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber')

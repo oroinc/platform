@@ -128,10 +128,6 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
         $this->assertNode($actualNode, $tokenLine);
     }
 
-    /**
-     * @param PrintNode $node
-     * @param $expr
-     */
     private function prepareCompiler(PrintNode $node, $expr): void
     {
         $this->compiler->expects($this->once())
@@ -152,10 +148,6 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
     }
 
-    /**
-     * @param PrintNode $node
-     * @param int $tokenLine
-     */
     private function assertNode(PrintNode $node, int $tokenLine): void
     {
         $this->assertInstanceOf(PrintNode::class, $node);

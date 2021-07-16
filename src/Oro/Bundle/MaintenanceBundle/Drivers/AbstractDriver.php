@@ -29,22 +29,16 @@ abstract class AbstractDriver
 
     /**
      * Test if object exists
-     *
-     * @return bool
      */
     abstract public function isExists(): bool;
 
     /**
      * Result of creation of lock
-     *
-     * @return bool
      */
     abstract protected function createLock(): bool;
 
     /**
      * Result of create unlock
-     *
-     * @return bool
      */
     abstract protected function createUnlock(): bool;
 
@@ -68,8 +62,6 @@ abstract class AbstractDriver
 
     /**
      * The response of lock
-     *
-     * @return bool
      */
     public function lock(): bool
     {
@@ -82,8 +74,6 @@ abstract class AbstractDriver
 
     /**
      * The response of unlock
-     *
-     * @return bool
      */
     public function unlock(): bool
     {
@@ -96,8 +86,6 @@ abstract class AbstractDriver
 
     /**
      * Checks if the maintenance mode is on or off.
-     *
-     * @return bool
      */
     public function decide(): bool
     {
@@ -106,8 +94,6 @@ abstract class AbstractDriver
 
     /**
      * Options of driver
-     *
-     * @return array
      */
     public function getOptions(): array
     {

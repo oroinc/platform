@@ -58,9 +58,6 @@ class Attribute implements EntityParameterInterface
         return $this->type;
     }
 
-    /**
-     * @param array $entityAcl
-     */
     public function setEntityAcl(array $entityAcl)
     {
         $this->entityAcl = $entityAcl;

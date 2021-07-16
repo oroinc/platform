@@ -19,10 +19,6 @@ class AssignActiveUser extends AbstractAction
     /** @var array */
     protected $options;
 
-    /**
-     * @param ContextAccessor       $contextAccessor
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(ContextAccessor $contextAccessor, TokenStorageInterface $tokenStorage)
     {
         parent::__construct($contextAccessor);

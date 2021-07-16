@@ -89,10 +89,7 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
     }
 
     /**
-     * @param int $length
-     *
      * @throws \Exception
-     * @return string
      */
     private function generateToken(int $length = 8192): string
     {

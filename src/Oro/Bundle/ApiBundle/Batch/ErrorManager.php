@@ -37,11 +37,6 @@ class ErrorManager
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param FileNameProvider $fileNameProvider
-     * @param FileLockManager  $fileLockManager
-     * @param LoggerInterface  $logger
-     */
     public function __construct(
         FileNameProvider $fileNameProvider,
         FileLockManager $fileLockManager,
@@ -269,11 +264,6 @@ class ErrorManager
         return $serializedErrors;
     }
 
-    /**
-     * @param BatchError $error
-     *
-     * @return array
-     */
     private function serializeError(BatchError $error): array
     {
         $data = [];
@@ -302,12 +292,6 @@ class ErrorManager
         return $data;
     }
 
-    /**
-     * @param string $id
-     * @param array  $data
-     *
-     * @return BatchError
-     */
     private function deserializeError(string $id, array $data): BatchError
     {
         $error = new BatchError();
@@ -334,11 +318,6 @@ class ErrorManager
         return $error;
     }
 
-    /**
-     * @param ErrorSource $source
-     *
-     * @return array
-     */
     private function serializeErrorSource(ErrorSource $source): array
     {
         $data = [];
@@ -355,11 +334,6 @@ class ErrorManager
         return $data;
     }
 
-    /**
-     * @param array $data
-     *
-     * @return ErrorSource
-     */
     private function deserializeErrorSource(array $data): ErrorSource
     {
         $source = new ErrorSource();

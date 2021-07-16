@@ -12,33 +12,21 @@ class WorkflowDefinitionValidateListener
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
 
-    /**
-     * @param WorkflowAssembler $workflowAssembler
-     */
     public function __construct(WorkflowAssembler $workflowAssembler)
     {
         $this->workflowAssembler = $workflowAssembler;
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function onUpdateWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $this->tryAssemble($event->getDefinition());
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function onCreateWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $this->tryAssemble($event->getDefinition());
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     */
     protected function tryAssemble(WorkflowDefinition $workflowDefinition)
     {
         try {

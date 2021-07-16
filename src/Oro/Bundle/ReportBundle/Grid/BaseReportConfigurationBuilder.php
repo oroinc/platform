@@ -18,9 +18,6 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

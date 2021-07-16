@@ -38,19 +38,12 @@ class GuzzleRestClient implements RestClientInterface
      */
     protected $lastGuzzleRequest;
 
-    /**
-     * @param string $baseUrl
-     * @param array $defaultOptions
-     */
     public function __construct(string $baseUrl, array $defaultOptions = [])
     {
         $this->baseUrl = $baseUrl;
         $this->defaultOptions = $defaultOptions;
     }
 
-    /**
-     * @param GuzzleClient $client
-     */
     public function setGuzzleClient(GuzzleClient $client)
     {
         $this->guzzleClient = $client;

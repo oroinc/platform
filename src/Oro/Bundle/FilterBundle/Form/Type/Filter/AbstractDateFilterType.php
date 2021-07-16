@@ -61,11 +61,6 @@ abstract class AbstractDateFilterType extends AbstractType
     /** @var DateFilterSubscriber */
     protected $subscriber;
 
-    /**
-     * @param TranslatorInterface      $translator
-     * @param DateModifierInterface    $dateModifiers
-     * @param EventSubscriberInterface $subscriber
-     */
     public function __construct(
         TranslatorInterface $translator,
         DateModifierInterface $dateModifiers,
@@ -163,11 +158,6 @@ abstract class AbstractDateFilterType extends AbstractType
         return $this->dateVarsChoices;
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget_options'] = $options['widget_options'];

@@ -143,9 +143,6 @@ class GridViewController extends RestController
     }
 
     /**
-     * @param AbstractGridView $view
-     * @param Request $request
-     *
      * @throws AccessDeniedException
      */
     protected function checkSharedAccess(Request $request, AbstractGridView $view)
@@ -158,8 +155,6 @@ class GridViewController extends RestController
     }
 
     /**
-     * @param Request $request
-     *
      * @throws AccessDeniedException
      */
     protected function checkCreateSharedAccess(Request $request)

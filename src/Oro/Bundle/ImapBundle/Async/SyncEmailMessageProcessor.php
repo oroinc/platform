@@ -21,10 +21,6 @@ class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     private $logger;
 
-    /**
-     * @param EmailSynchronizerInterface $emailSynchronizer
-     * @param LoggerInterface $logger
-     */
     public function __construct(EmailSynchronizerInterface $emailSynchronizer, LoggerInterface $logger)
     {
         $this->emailSynchronizer = $emailSynchronizer;

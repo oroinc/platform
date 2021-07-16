@@ -27,19 +27,12 @@ class DoctrineEventListener
     /** @var bool */
     private $needToResetScopeCache = false;
 
-    /**
-     * @param ScopeCollection $scheduledForInsertScopes
-     * @param CacheProvider   $scopeCache
-     */
     public function __construct(ScopeCollection $scheduledForInsertScopes, CacheProvider $scopeCache)
     {
         $this->scheduledForInsertScopes = $scheduledForInsertScopes;
         $this->scopeCache = $scopeCache;
     }
 
-    /**
-     * @param PreFlushEventArgs $event
-     */
     public function preFlush(PreFlushEventArgs $event)
     {
         $em = $event->getEntityManager();
@@ -54,9 +47,6 @@ class DoctrineEventListener
         }
     }
 
-    /**
-     * @param OnFlushEventArgs $event
-     */
     public function onFlush(OnFlushEventArgs $event)
     {
         $em = $event->getEntityManager();
@@ -85,11 +75,6 @@ class DoctrineEventListener
         $this->needToResetScopeCache = false;
     }
 
-    /**
-     * @param EntityManagerInterface $em
-     *
-     * @return bool
-     */
     private function isScopeCacheAffected(EntityManagerInterface $em): bool
     {
         $uow = $em->getUnitOfWork();

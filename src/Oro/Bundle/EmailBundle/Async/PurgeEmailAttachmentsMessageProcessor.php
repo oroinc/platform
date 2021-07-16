@@ -41,12 +41,6 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
      */
     private $configManager;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param MessageProducerInterface $producer
-     * @param JobRunner $jobRunner
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         MessageProducerInterface $producer,

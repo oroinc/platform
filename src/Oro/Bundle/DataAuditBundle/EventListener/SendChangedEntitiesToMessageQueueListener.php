@@ -81,15 +81,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
-    /**
-     * @param MessageProducerInterface $messageProducer
-     * @param TokenStorageInterface $tokenStorage
-     * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
-     * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
-     * @param AuditConfigProvider $auditConfigProvider
-     * @param LoggerInterface $logger
-     * @param AuditMessageBodyProvider $auditMessageBodyProvider
-     */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $tokenStorage,
@@ -114,9 +105,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->allTokens = new \SplObjectStorage;
     }
 
-    /**
-     * @param OnFlushEventArgs $eventArgs
-     */
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
         if (!$this->enabled) {
@@ -136,9 +124,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $eventArgs
-     */
     public function postFlush(PostFlushEventArgs $eventArgs)
     {
         if (!$this->enabled) {
@@ -189,9 +174,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             : $this->tokenStorage->getToken();
     }
 
-    /**
-     * @param EntityManager $em
-     */
     private function findAuditableInsertions(EntityManager $em)
     {
         $uow = $em->getUnitOfWork();
@@ -209,9 +191,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allInsertions, $em, $insertions);
     }
 
-    /**
-     * @param EntityManager $em
-     */
     private function findAuditableUpdates(EntityManager $em)
     {
         $uow = $em->getUnitOfWork();
@@ -229,9 +208,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allUpdates, $em, $updates);
     }
 
-    /**
-     * @param EntityManager $em
-     */
     private function findAuditableDeletions(EntityManager $em)
     {
         $uow = $em->getUnitOfWork();
@@ -273,9 +249,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allDeletions, $em, $deletions);
     }
 
-    /**
-     * @param EntityManager $em
-     */
     private function findAuditableCollectionUpdates(EntityManager $em)
     {
         $uow = $em->getUnitOfWork();
@@ -320,11 +293,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allCollectionUpdates, $em, $collectionUpdates);
     }
 
-    /**
-     * @param \SplObjectStorage $storage
-     * @param EntityManager     $em
-     * @param \SplObjectStorage $changes
-     */
     private function saveChanges(\SplObjectStorage $storage, EntityManager $em, \SplObjectStorage $changes)
     {
         if ($changes->count() > 0) {
@@ -394,11 +362,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $updates;
     }
 
-    /**
-     * @param EntityManager $em
-     *
-     * @return array
-     */
     private function getUpdates(EntityManager $em): array
     {
         $updates = [];
@@ -524,34 +487,22 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $this->entityToArrayConverter->convertNamedEntityToArray($em, $entity, $changeSet, $entityName);
     }
 
-    /**
-     * @param AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
-     */
     public function setAdditionalEntityChangesStorage(
         AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
     ) {
         $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
     }
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function setEntityNameResolver(EntityNameResolver $entityNameResolver): void
     {
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    /**
-     * @param AuditMessageBodyProvider $auditMessageBodyProvider
-     */
     public function setAuditMessageBodyProvider(AuditMessageBodyProvider $auditMessageBodyProvider)
     {
         $this->auditMessageBodyProvider = $auditMessageBodyProvider;
     }
 
-    /**
-     * @param PropertyAccessor $propertyAccessor
-     */
     public function setPropertyAccessor(PropertyAccessor $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;

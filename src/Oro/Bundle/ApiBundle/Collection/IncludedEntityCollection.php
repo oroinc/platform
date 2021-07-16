@@ -82,8 +82,6 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Gets the primary entity.
-     *
-     * @return EntityMetadata|null
      */
     public function getPrimaryEntityMetadata(): ?EntityMetadata
     {

@@ -59,7 +59,6 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(123, $result);
     }
 
-
     public function testReverseTransformForSingleIdentifierWhenFieldDataTypeIsString()
     {
         $entityClass = 'Test\Class';

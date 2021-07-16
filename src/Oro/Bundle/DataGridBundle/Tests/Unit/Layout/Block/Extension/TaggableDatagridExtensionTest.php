@@ -25,8 +25,6 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expectedOptions
      */
     public function testConfigureOptions(array $options, array $expectedOptions)
     {

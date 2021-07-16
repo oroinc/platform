@@ -104,8 +104,6 @@ class IncludedEntityData
 
     /**
      * Sets metadata of the entity.
-     *
-     * @param EntityMetadata|null $metadata
      */
     public function setMetadata(EntityMetadata $metadata = null)
     {
@@ -124,8 +122,6 @@ class IncludedEntityData
 
     /**
      * Sets the form that is used to transform entity data.
-     *
-     * @param FormInterface|null $form
      */
     public function setForm(FormInterface $form = null)
     {

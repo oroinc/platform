@@ -20,7 +20,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
 
     /**
      * @BeforeScenario
-     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -31,8 +30,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
 
     /**
      * @Then /^(?:|I )should see avatar for user "(?P<username>[\w\s]+)"$/
-     *
-     * @param string $username
      */
     public function userAvatarIsGranted(string $username): void
     {
@@ -51,8 +48,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
 
     /**
      * @Then /^(?:|I )should not see avatar for user "(?P<userNameOrEmail>[\w\s]+)"$/
-     *
-     * @param string $username
      */
     public function userAvatarIsNotGranted(string $username): void
     {
@@ -69,11 +64,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
         $this->assertResponseFail($this->downloadAttachment($filteredAttachmentUrl));
     }
 
-    /**
-     * @param string $username
-     *
-     * @return User
-     */
     private function getUser(string $username): User
     {
         /** @var UserManager $userManager */
@@ -87,9 +77,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
         return $user;
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
     protected function assertResponseSuccess(ResponseInterface $response): void
     {
         $attachmentManager = $this->getContainer()->get('oro_attachment.manager');
@@ -98,9 +85,6 @@ class UserAttachmentContext extends AttachmentContext implements KernelAwareCont
         self::assertTrue($attachmentManager->isImageType($response->getHeader('Content-Type')[0]));
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
     protected function assertResponseFail(ResponseInterface $response): void
     {
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_FORBIDDEN]);

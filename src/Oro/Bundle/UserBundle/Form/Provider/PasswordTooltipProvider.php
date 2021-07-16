@@ -36,10 +36,6 @@ class PasswordTooltipProvider
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param PasswordComplexityConfigProvider $configProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(PasswordComplexityConfigProvider $configProvider, TranslatorInterface $translator)
     {
         $this->configProvider = $configProvider;

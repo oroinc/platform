@@ -21,10 +21,6 @@ class TranslationContextResolver implements TranslationContextResolverInterface
     /** @var TranslationKeyTemplateInterface[] */
     protected $templates;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param KeyTemplateParametersResolver $resolver
-     */
     public function __construct(TranslatorInterface $translator, KeyTemplateParametersResolver $resolver)
     {
         $this->translator = $translator;

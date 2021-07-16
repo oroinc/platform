@@ -28,9 +28,6 @@ class StringFilterTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    /**
-     * @return OrmFilterDatasourceAdapter
-     */
     private function getFilterDatasource(): OrmFilterDatasourceAdapter
     {
         $em = $this->createMock(EntityManagerInterface::class);

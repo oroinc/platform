@@ -21,8 +21,6 @@ class UpdateDataFixturesFixture extends AbstractFixture
 
     /**
      * Add data fixtures to be updated
-     *
-     * @param FixtureInterface $fixture
      */
     public function addFixture(FixtureInterface $fixture): void
     {

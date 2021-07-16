@@ -26,9 +26,6 @@ class UpdateAclAdministratorRole extends AbstractFixture implements DependentFix
         return [LoadRolesData::class];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */
@@ -44,10 +41,6 @@ class UpdateAclAdministratorRole extends AbstractFixture implements DependentFix
         $aclManager->flush();
     }
 
-    /**
-     * @param AclManager $aclManager
-     * @param Role       $role
-     */
     private function setPermissionsForAdminRole(AclManager $aclManager, Role $role)
     {
         $sid = $aclManager->getSid($role);

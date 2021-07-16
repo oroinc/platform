@@ -16,19 +16,11 @@ abstract class CompleteSection implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param EntityConfigInterface  $section
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $definition
-     */
     protected function complete(
         EntityConfigInterface $section,
         string $entityClass,
@@ -44,21 +36,12 @@ abstract class CompleteSection implements ProcessorInterface
         $this->applyFieldExclusions($section, $definition);
     }
 
-    /**
-     * @param EntityConfigInterface  $section
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $definition
-     */
     abstract protected function completeFields(
         EntityConfigInterface $section,
         string $entityClass,
         EntityDefinitionConfig $definition
     );
 
-    /**
-     * @param EntityConfigInterface  $section
-     * @param EntityDefinitionConfig $definition
-     */
     protected function applyFieldExclusions(EntityConfigInterface $section, EntityDefinitionConfig $definition)
     {
         $fields = $section->getFields();

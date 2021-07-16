@@ -20,8 +20,6 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
 
     /**
      * @BeforeScenario
-     *
-     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -51,10 +49,6 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
 
     /**
      * @Given /^(?:|I )check if field "(?P<field>.*)" "(?P<cond>.*)" in db table by entity class "(?P<class>.*)"$/
-     *
-     * @param string $field
-     * @param string $cond
-     * @param string $class
      */
     public function checkIfFieldNotOrIsInDbTableByEntityClass(string $field, string $cond, string $class)
     {

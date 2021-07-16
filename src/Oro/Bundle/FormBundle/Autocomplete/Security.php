@@ -15,31 +15,17 @@ class Security
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /**
-     * @param array                         $autocompleteAclResources
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(array $autocompleteAclResources, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->autocompleteAclResources = $autocompleteAclResources;
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string|null
-     */
     public function getAutocompleteAclResource(string $name): ?string
     {
         return $this->autocompleteAclResources[$name] ?? null;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function isAutocompleteGranted(string $name): bool
     {
         $aclResource = $this->getAutocompleteAclResource($name);

@@ -63,9 +63,6 @@ class SaveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param array $context
-     *
      * @dataProvider executeDataProvider
      */
     public function testExecuteAction(array $options, array $context)

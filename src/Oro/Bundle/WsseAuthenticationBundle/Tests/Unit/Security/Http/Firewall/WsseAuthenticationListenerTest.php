@@ -62,8 +62,6 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider handleWhenNoHeaderDataProvider
-     *
-     * @param array $header
      */
     public function testHandleWhenNoHeader(array $header): void
     {
@@ -104,9 +102,6 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
         ($this->listener)($this->responseEvent);
     }
 
-    /**
-     * @return WsseToken
-     */
     private function mockWsseTokenFactory(): WsseToken
     {
         $token = new WsseToken(self::USERNAME, self::PASSWORD, self::PROVIDER_KEY);

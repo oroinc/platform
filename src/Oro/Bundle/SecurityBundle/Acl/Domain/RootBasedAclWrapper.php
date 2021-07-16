@@ -27,10 +27,6 @@ class RootBasedAclWrapper implements AclInterface
     /** @var array */
     private $classFieldAces = [];
 
-    /**
-     * @param Acl            $acl
-     * @param RootAclWrapper $rootAcl
-     */
     public function __construct(Acl $acl, RootAclWrapper $rootAcl)
     {
         $this->acl = $acl;

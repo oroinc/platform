@@ -22,9 +22,6 @@ class FileType extends AbstractType
     /** @var EventSubscriberInterface */
     private $eventSubscriber;
 
-    /**
-     * @param EventSubscriberInterface $eventSubscriber
-     */
     public function setEventSubscriber(EventSubscriberInterface $eventSubscriber): void
     {
         $this->eventSubscriber = $eventSubscriber;
@@ -48,9 +45,6 @@ class FileType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
@@ -62,9 +56,6 @@ class FileType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event): void
     {
         /** @var File $entity */
@@ -99,12 +90,6 @@ class FileType extends AbstractType
         $resolver->setNormalizer('fileOptions', \Closure::fromCallable([$this, 'normalizeFileOptions']));
     }
 
-    /**
-     * @param Options $allOptions
-     * @param array $option
-     *
-     * @return array
-     */
     public function normalizeFileOptions(Options $allOptions, array $option): array
     {
         if (!array_key_exists('required', $option)) {

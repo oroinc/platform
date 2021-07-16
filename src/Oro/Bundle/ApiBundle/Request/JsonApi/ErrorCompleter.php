@@ -34,12 +34,6 @@ class ErrorCompleter extends AbstractErrorCompleter
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param ErrorTitleOverrideProvider      $errorTitleOverrideProvider
-     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
-     * @param ValueNormalizer                 $valueNormalizer
-     * @param FilterNamesRegistry             $filterNamesRegistry
-     */
     public function __construct(
         ErrorTitleOverrideProvider $errorTitleOverrideProvider,
         ExceptionTextExtractorInterface $exceptionTextExtractor,
@@ -62,7 +56,6 @@ class ErrorCompleter extends AbstractErrorCompleter
         $this->completeDetail($error);
         $this->completeSource($error, $requestType, $metadata);
     }
-
 
     /**
      * {@inheritdoc}
@@ -96,11 +89,6 @@ class ErrorCompleter extends AbstractErrorCompleter
         }
     }
 
-    /**
-     * @param Error               $error
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
-     */
     private function completeSource(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
     {
         $source = $error->getSource();
@@ -209,12 +197,6 @@ class ErrorCompleter extends AbstractErrorCompleter
         return $pointer;
     }
 
-    /**
-     * @param string|null $message
-     * @param string      $source
-     *
-     * @return string
-     */
     private function appendSourceToMessage(?string $message, string $source): string
     {
         if (!$message) {
@@ -228,23 +210,11 @@ class ErrorCompleter extends AbstractErrorCompleter
         return sprintf('%s Source: %s.', $message, $source);
     }
 
-    /**
-     * @param string $haystack
-     * @param string $needle
-     *
-     * @return bool
-     */
     private function endsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, -\strlen($needle)) === $needle;
     }
 
-    /**
-     * @param Error       $error
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
     private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType): string
     {
         $filterNames = $this->filterNamesRegistry->getFilterNames($requestType);
@@ -266,12 +236,6 @@ class ErrorCompleter extends AbstractErrorCompleter
         ));
     }
 
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
     private function getEntityType(string $entityClass, RequestType $requestType): ?string
     {
         return ValueNormalizerUtil::convertToEntityType(

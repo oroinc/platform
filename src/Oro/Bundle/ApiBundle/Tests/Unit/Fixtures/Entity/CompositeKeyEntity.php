@@ -78,9 +78,6 @@ class CompositeKeyEntity
         return $this->children;
     }
 
-    /**
-     * @param CompositeKeyEntity $child
-     */
     public function addChild(CompositeKeyEntity $child)
     {
         if (!$this->children->contains($child)) {
@@ -88,9 +85,6 @@ class CompositeKeyEntity
         }
     }
 
-    /**
-     * @param CompositeKeyEntity $child
-     */
     public function removeChild(CompositeKeyEntity $child)
     {
         if ($this->children->contains($child)) {

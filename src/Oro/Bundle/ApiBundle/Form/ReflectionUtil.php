@@ -64,9 +64,6 @@ class ReflectionUtil
      * Not submitted compound forms with "required" option equals to FALSE
      * and not required to be filled out simple forms will not be marked as submitted
      * to avoid validation of them.
-     *
-     * @param FormInterface             $form
-     * @param PropertyAccessorInterface $propertyAccessor
      */
     public static function markFormChildrenAsSubmitted(
         FormInterface $form,

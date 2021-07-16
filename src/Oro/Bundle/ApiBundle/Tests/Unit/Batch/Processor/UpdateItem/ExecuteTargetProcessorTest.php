@@ -20,9 +20,6 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor = new ExecuteTargetProcessor();
     }
 
-    /**
-     * @return Context
-     */
     private function getTargetContext(): Context
     {
         return new Context(

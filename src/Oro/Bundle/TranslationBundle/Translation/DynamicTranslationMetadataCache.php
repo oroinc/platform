@@ -18,8 +18,6 @@ class DynamicTranslationMetadataCache
 
     /**
      * Constructor
-     *
-     * @param CacheProvider $cacheImpl
      */
     public function __construct(CacheProvider $cacheImpl)
     {

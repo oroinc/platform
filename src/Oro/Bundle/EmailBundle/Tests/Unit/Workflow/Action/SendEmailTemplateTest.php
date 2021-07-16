@@ -95,9 +95,6 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
     public function initializeExceptionDataProvider(): array
     {
         return [
@@ -176,7 +173,6 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function optionsDataProvider(): array
@@ -295,9 +291,6 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $violationMessage
-     */
     private function mockValidatorViolations(string $violationMessage): void
     {
         $violationList = $this->createMock(ConstraintViolationListInterface::class);
@@ -377,8 +370,6 @@ class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function executeOptionsDataProvider(): array
     {

@@ -38,10 +38,6 @@ class AclPrivilegeRepository
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param AclManager          $manager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(AclManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;
@@ -319,11 +315,6 @@ class AclPrivilegeRepository
         return new ArrayCollection($privileges);
     }
 
-    /**
-     * @param SID             $sid
-     * @param OID             $oid
-     * @param ArrayCollection $privileges
-     */
     protected function saveFieldPrivileges(SID $sid, OID $oid, ArrayCollection $privileges)
     {
         /** @var AclPrivilege $privilege */
@@ -637,8 +628,6 @@ class AclPrivilegeRepository
     /**
      * Sorts the given privileges by name in alphabetical order.
      * The root privilege is moved at the top of the list.
-     *
-     * @param ArrayCollection $privileges
      */
     protected function sortPrivileges(ArrayCollection $privileges)
     {

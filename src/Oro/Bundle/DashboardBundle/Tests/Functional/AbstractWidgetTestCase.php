@@ -27,10 +27,6 @@ class AbstractWidgetTestCase extends WebTestCase
         $form[$fieldName] = $value;
     }
 
-    /**
-     * @param Widget $widget
-     * @param array $configFields
-     */
     protected function configureWidget(Widget $widget, array $configFields)
     {
         $this->client->request(

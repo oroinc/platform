@@ -22,10 +22,6 @@ class UniquePinbarTabUrlValidator extends ConstraintValidator
     /** @var PinbarTabUrlNormalizerInterface */
     private $pinbarTabUrlNormalizer;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param PinbarTabUrlNormalizerInterface $pinbarTabUrlNormalizer
-     */
     public function __construct(DoctrineHelper $doctrineHelper, PinbarTabUrlNormalizerInterface $pinbarTabUrlNormalizer)
     {
         $this->doctrineHelper = $doctrineHelper;

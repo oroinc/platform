@@ -29,7 +29,6 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-
     private function getListener(
         object $innerListener,
         TokenStorageInterface $tokenStorage,

@@ -116,11 +116,6 @@ class WorkflowController extends FOSRestController
         );
     }
 
-    /**
-     * @param Collection $errors
-     * @param \Exception $e
-     * @return string
-     */
     private function buildMessageString(Collection $errors, \Exception $e): string
     {
         $translator = $this->get('translator');

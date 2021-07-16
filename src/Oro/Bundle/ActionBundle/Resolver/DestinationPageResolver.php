@@ -21,10 +21,6 @@ class DestinationPageResolver
     const AVAILABLE_DESTINATIONS = ['view', 'name', self::DEFAULT_DESTINATION];
     const PARAM_ORIGINAL_URL = 'originalUrl';
 
-    /**
-     * @param EntityConfigHelper $entityConfigHelper
-     * @param RouterInterface $router
-     */
     public function __construct(
         EntityConfigHelper $entityConfigHelper,
         RouterInterface $router

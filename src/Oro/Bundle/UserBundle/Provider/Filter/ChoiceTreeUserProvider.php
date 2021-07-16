@@ -20,11 +20,6 @@ class ChoiceTreeUserProvider
     /** @var DQLNameFormatter */
     protected $dqlNameFormatter;
 
-    /**
-     * @param Registry $registry
-     * @param AclHelper $aclHelper
-     * @param DQLNameFormatter $dqlNameFormatter
-     */
     public function __construct(Registry $registry, AclHelper $aclHelper, DQLNameFormatter $dqlNameFormatter)
     {
         $this->registry = $registry;

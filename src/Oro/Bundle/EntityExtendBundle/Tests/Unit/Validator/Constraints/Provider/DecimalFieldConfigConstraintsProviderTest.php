@@ -21,8 +21,6 @@ class DecimalFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestC
     }
 
     /**
-     * @param array $options
-     *
      * @dataProvider createNoConstraintsProvider
      */
     public function testCreateNoConstraints(array $options): void
@@ -42,9 +40,6 @@ class DecimalFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestC
     }
 
     /**
-     * @param array $options
-     * @param array $expectedOptions
-     *
      * @dataProvider createProvider
      */
     public function testCreate(array $options, array $expectedOptions): void

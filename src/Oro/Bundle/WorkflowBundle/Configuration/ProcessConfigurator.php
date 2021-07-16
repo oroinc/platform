@@ -55,9 +55,6 @@ class ProcessConfigurator implements LoggerAwareInterface
         $this->triggersConfigurator->setLogger($logger);
     }
 
-    /**
-     * @param array $processConfigurations
-     */
     public function configureProcesses(array $processConfigurations = [])
     {
         if (array_key_exists(ProcessConfigurationProvider::NODE_DEFINITIONS, $processConfigurations)) {

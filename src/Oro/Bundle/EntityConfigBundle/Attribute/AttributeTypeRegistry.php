@@ -21,10 +21,6 @@ class AttributeTypeRegistry
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param ContainerInterface $attributeTypes
-     * @param DoctrineHelper     $doctrineHelper
-     */
     public function __construct(ContainerInterface $attributeTypes, DoctrineHelper $doctrineHelper)
     {
         $this->attributeTypes = $attributeTypes;

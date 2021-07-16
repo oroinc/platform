@@ -27,12 +27,6 @@ class PreviewMetadataProvider implements PreviewMetadataProviderInterface
     /** @var FileTitleProviderInterface */
     private $fileTitleProvider;
 
-    /**
-     * @param FileUrlProviderInterface $fileUrlProvider
-     * @param MimeTypeChecker $mimeTypeChecker
-     * @param FileIconProvider $fileIconProvider
-     * @param FileTitleProviderInterface $fileTitleProvider
-     */
     public function __construct(
         FileUrlProviderInterface $fileUrlProvider,
         MimeTypeChecker $mimeTypeChecker,

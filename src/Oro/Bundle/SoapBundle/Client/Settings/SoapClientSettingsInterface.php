@@ -9,13 +9,7 @@ interface SoapClientSettingsInterface
      */
     public function getWsdlFilePath();
 
-    /**
-     * @return string
-     */
     public function getMethodName(): string;
 
-    /**
-     * @return array
-     */
     public function getSoapOptions(): array;
 }

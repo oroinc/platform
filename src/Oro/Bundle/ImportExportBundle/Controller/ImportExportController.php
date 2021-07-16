@@ -156,10 +156,6 @@ class ImportExportController extends AbstractController
         ];
     }
 
-    /**
-     * @param string $configAlias
-     * @return array
-     */
     private function getImportConfigurations(string $configAlias): array
     {
         $configurationsByAlias = $this
@@ -570,10 +566,6 @@ class ImportExportController extends AbstractController
         );
     }
 
-    /**
-     * @param FormInterface $importForm
-     * @return array
-     */
     private function getImportData(FormInterface $importForm): array
     {
         $data = $importForm->getData();

@@ -64,7 +64,6 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->configureOptions($optionsResolver);
     }
 
-
     /**
      * @dataProvider buildViewDataProvider
      *

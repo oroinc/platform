@@ -32,10 +32,6 @@ class CommonTemplateDataProcessor implements ProcessorInterface
         );
     }
 
-    /**
-     * @param TransitionContext $context
-     * @return bool
-     */
     protected function isApplicable(TransitionContext $context): bool
     {
         if (!$context->getResultType() instanceof TemplateResultType) {

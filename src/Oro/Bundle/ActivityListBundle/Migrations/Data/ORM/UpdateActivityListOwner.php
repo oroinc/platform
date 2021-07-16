@@ -52,8 +52,6 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
 
     /**
      * Update ActivityList Owner
-     *
-     * @param ObjectManager $manager
      */
     public function updateActivityListOwner(ObjectManager $manager)
     {

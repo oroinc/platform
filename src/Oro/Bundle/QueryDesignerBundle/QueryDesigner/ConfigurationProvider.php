@@ -19,11 +19,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     /** @var Configuration */
     private $configuration;
 
-    /**
-     * @param string        $cacheFile
-     * @param bool          $debug
-     * @param Configuration $configuration
-     */
     public function __construct(
         string $cacheFile,
         bool $debug,
@@ -35,8 +30,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
     /**
      * Gets query designer configuration.
-     *
-     * @return array
      */
     public function getConfiguration(): array
     {
@@ -71,10 +64,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
     /**
      * Updates the label for all functions for the specified group type.
-     *
-     * @param array  $config
-     * @param string $groupType
-     * @param string $vendor
      */
     private function updateLabelsOfFunctions(array &$config, string $groupType, string $vendor): void
     {

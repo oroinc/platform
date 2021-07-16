@@ -28,10 +28,6 @@ class DeleteMassActionExtension extends AbstractExtension
     /** @var string|null */
     protected $entityClassName;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityClassResolver $entityClassResolver)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -158,7 +154,6 @@ class DeleteMassActionExtension extends AbstractExtension
 
         return sprintf('%s.%s', $rootAlias, $identifier);
     }
-
 
     /**
      * {@inheritdoc}

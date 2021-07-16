@@ -50,11 +50,6 @@ class RestDocUrlGenerator implements RestDocUrlGeneratorInterface
         return $this->urlGenerator->generate(self::ROUTE, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
-    /**
-     * @param string $view
-     *
-     * @return bool
-     */
     private function isDefaultView(string $view): bool
     {
         return $this->defaultView && $view === $this->defaultView;

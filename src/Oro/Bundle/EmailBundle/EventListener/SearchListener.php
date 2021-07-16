@@ -13,9 +13,6 @@ class SearchListener
     const EMAIL_CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\Email';
     const EMPTY_ORGANIZATION_ID = 0;
 
-    /**
-     * @param PrepareEntityMapEvent $event
-     */
     public function prepareEntityMapEvent(PrepareEntityMapEvent $event)
     {
         $data      = $event->getData();

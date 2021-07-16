@@ -19,10 +19,6 @@ class IntegrationUpdateEvent extends Event
      */
     protected $oldState;
 
-    /**
-     * @param Integration $integration
-     * @param Integration $oldState
-     */
     public function __construct(Integration $integration, Integration $oldState)
     {
         $this->integration = $integration;

@@ -20,8 +20,6 @@ abstract class AbstractQueryBuilderTools
 
     /**
      * Prepares an array of state passes by alias used in join WITH|ON condition
-     *
-     * @param array $joins
      */
     abstract public function prepareJoinTablePaths(array $joins);
 
@@ -92,8 +90,6 @@ abstract class AbstractQueryBuilderTools
 
     /**
      * Set join table paths.
-     *
-     * @param array $joinTablePaths
      */
     public function setJoinTablePaths(array $joinTablePaths)
     {

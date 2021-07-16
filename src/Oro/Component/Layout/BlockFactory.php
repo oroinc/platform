@@ -39,11 +39,6 @@ class BlockFactory implements BlockFactoryInterface
     /** @var Block */
     protected $block;
 
-    /**
-     * @param LayoutRegistryInterface            $registry
-     * @param DeferredLayoutManipulatorInterface $layoutManipulator
-     * @param ExpressionProcessor                $expressionProcessor
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         DeferredLayoutManipulatorInterface $layoutManipulator,
@@ -78,9 +73,6 @@ class BlockFactory implements BlockFactoryInterface
 
     /**
      * Initializes the state of this factory
-     *
-     * @param RawLayout        $rawLayout
-     * @param ContextInterface $context
      */
     protected function initializeState(RawLayout $rawLayout, ContextInterface $context)
     {
@@ -294,8 +286,6 @@ class BlockFactory implements BlockFactoryInterface
 
     /**
      * Processes expressions that don't work with data
-     *
-     * @param Options $options
      */
     protected function processExpressions(Options $options)
     {

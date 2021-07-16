@@ -256,8 +256,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider redirectDataProvider
-     * @param array $expected
-     * @param array $data
      */
     public function testRedirectWorks(array $expected, array $data)
     {

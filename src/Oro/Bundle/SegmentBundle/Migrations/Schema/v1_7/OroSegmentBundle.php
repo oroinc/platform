@@ -18,8 +18,6 @@ class OroSegmentBundle implements Migration
 
     /**
      * Add recordsLimit to segment
-     *
-     * @param Schema $schema
      */
     public static function addColumns(Schema $schema)
     {

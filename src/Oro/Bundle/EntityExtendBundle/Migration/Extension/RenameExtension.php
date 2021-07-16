@@ -15,9 +15,6 @@ class RenameExtension extends BaseRenameExtension
      */
     protected $extendOptionsManager;
 
-    /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     */
     public function __construct(ExtendOptionsManager $extendOptionsManager)
     {
         $this->extendOptionsManager = $extendOptionsManager;

@@ -357,11 +357,6 @@ class ControllersTest extends AbstractConfigControllerTest
         return $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
     }
 
-    /**
-     * @param $id
-     *
-     * @return EntityConfigModel
-     */
     private function getEntityConfigModelById($id): EntityConfigModel
     {
         $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
@@ -372,12 +367,6 @@ class ControllersTest extends AbstractConfigControllerTest
             ->find($id);
     }
 
-    /**
-     * @param $entityName
-     * @param $entityField
-     *
-     * @return array
-     */
     private function generateTranslationKeysByEntityField($entityName, $entityField): array
     {
         $enumCode = ExtendHelper::generateEnumCode($entityName, $entityField);

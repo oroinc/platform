@@ -85,8 +85,6 @@ class DigitalAssetRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider getFileDataForTwigTagDataProvider
-     *
-     * @param string $referenceName
      */
     public function testGetFileDataForTwigTag(string $referenceName): void
     {
@@ -102,9 +100,6 @@ class DigitalAssetRepositoryTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getFileDataForTwigTagDataProvider(): array
     {
         return [

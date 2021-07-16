@@ -10,10 +10,6 @@ use Doctrine\ORM\EntityRepository;
  */
 class ImportExportResultRepository extends EntityRepository
 {
-    /**
-     * @param \DateTime $from
-     * @param \DateTime $to
-     */
     public function updateExpiredRecords(\DateTime $from, \DateTime $to): void
     {
         $qb = $this->createQueryBuilder('importExportResult');

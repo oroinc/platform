@@ -18,8 +18,6 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getIdenticalQueriesDataProvider
-     * @param array $queries
-     * @param array $expectedIdenticalQueries
      */
     public function testGetIdenticalQueries(array $queries, array $expectedIdenticalQueries)
     {
@@ -84,8 +82,6 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getSimilarQueriesDataProvider
-     * @param array $queries
-     * @param array $expectedIdenticalQueries
      */
     public function testGetSimilarQueries(array $queries, array $expectedIdenticalQueries)
     {

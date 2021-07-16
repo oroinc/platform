@@ -24,10 +24,6 @@ class ChoicesGuesser implements GuesserInterface
     /** @var ChoiceFieldHelper */
     protected $choiceHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ChoiceFieldHelper $choiceHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ChoiceFieldHelper $choiceHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

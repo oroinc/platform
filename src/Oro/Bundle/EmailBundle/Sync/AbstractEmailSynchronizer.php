@@ -59,9 +59,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Constructor
-     *
-     * @param ManagerRegistry                 $doctrine
-     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
      */
     protected function __construct(
         ManagerRegistry $doctrine,
@@ -72,17 +69,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function setMessageProducer(MessageProducerInterface $producer)
     {
         $this->producer = $producer;
     }
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -296,11 +287,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         }
     }
 
-    /**
-     * @param EmailOrigin $origin
-     * @param AbstractEmailSynchronizationProcessor $processor
-     * @param SynchronizationProcessorSettings|null $settings
-     */
     protected function delegateToProcessor(
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
@@ -421,8 +407,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      *  Attempts to sets the state of a given email origin to failed.
-     *
-     * @param EmailOrigin $origin
      */
     protected function setOriginSyncStateToFailed(EmailOrigin $origin)
     {
@@ -512,8 +496,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
     /**
      * Modifies QueryBuilder to filter origins by enabled owner
-     *
-     * @param QueryBuilder $queryBuilder
      */
     protected function addOwnerFilter(QueryBuilder $queryBuilder)
     {
@@ -602,9 +584,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         return new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @param $maxExecTimeInMin
-     */
     protected function calculateClearInterval($maxExecTimeInMin)
     {
         if ($maxExecTimeInMin > 5) {
@@ -613,7 +592,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     }
 
     /**
-     * @param $failedOriginIds
      * @throws \Exception
      */
     private function assertSyncSuccess(array $failedOriginIds)

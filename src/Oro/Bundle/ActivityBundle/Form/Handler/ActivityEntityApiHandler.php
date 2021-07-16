@@ -20,13 +20,6 @@ class ActivityEntityApiHandler extends ApiFormHandler
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param FormInterface                 $form
-     * @param RequestStack                  $requestStack
-     * @param ObjectManager                 $entityManager
-     * @param ActivityManager               $activityManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,

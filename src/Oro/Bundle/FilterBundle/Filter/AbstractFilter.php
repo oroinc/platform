@@ -47,10 +47,6 @@ abstract class AbstractFilter implements FilterInterface
     /** @var string */
     protected $dataFieldName;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     */
     public function __construct(FormFactoryInterface $factory, FilterUtility $util)
     {
         $this->formFactory = $factory;
@@ -427,11 +423,6 @@ abstract class AbstractFilter implements FilterInterface
         return [FilterOrmQueryUtil::getSingleIdentifierFieldExpr($qb)];
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     *
-     * @return bool
-     */
     protected function isToOne(FilterDatasourceAdapterInterface $ds): bool
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
@@ -511,11 +502,6 @@ abstract class AbstractFilter implements FilterInterface
         return $qb->expr()->andX(...$subExprs);
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param array $data
-     * @return bool
-     */
     protected function shouldUseExists(FilterDatasourceAdapterInterface $ds, array $data): bool
     {
         // Exists is supported for OrmFilterDatasourceAdapter only

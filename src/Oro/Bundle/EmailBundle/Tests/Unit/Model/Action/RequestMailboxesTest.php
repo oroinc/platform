@@ -53,7 +53,6 @@ class RequestMailboxesTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-
     public function testExecuteAction()
     {
         $options = [

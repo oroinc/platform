@@ -16,8 +16,6 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     *
      * @dataProvider getDriverDataProvider
      */
     public function testGetDriver(array $options): void

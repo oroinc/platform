@@ -32,14 +32,6 @@ class SendEmailTemplate extends AbstractSendEmail
     /** @var EmailConstraints */
     private $emailConstraint;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param Processor $emailProcessor
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param ValidatorInterface $validator
-     * @param AggregatedEmailTemplatesSender $sender
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
@@ -149,9 +141,6 @@ class SendEmailTemplate extends AbstractSendEmail
         }
     }
 
-    /**
-     * @param array $options
-     */
     private function normalizeToOption(array &$options): void
     {
         if (empty($options['to'])) {
@@ -170,7 +159,6 @@ class SendEmailTemplate extends AbstractSendEmail
     }
 
     /**
-     * @param array $options
      * @throws InvalidParameterException
      */
     private function normalizeRecipientsOption(array &$options): void

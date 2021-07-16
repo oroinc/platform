@@ -26,9 +26,6 @@ class LayoutListener implements ServiceSubscriberInterface
 {
     private ContainerInterface $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -46,8 +43,6 @@ class LayoutListener implements ServiceSubscriberInterface
     }
 
     /**
-     * @param ViewEvent $event
-     *
      * @throws LogicException if @Layout annotation is used in incorrect way
      */
     public function onKernelView(ViewEvent $event): void
@@ -101,10 +96,6 @@ class LayoutListener implements ServiceSubscriberInterface
         $event->setResponse($response);
     }
 
-    /**
-     * @param ContextInterface $context
-     * @param LayoutAnnotation $layoutAnnotation
-     */
     private function configureContext(ContextInterface $context, LayoutAnnotation $layoutAnnotation): void
     {
         $action = $layoutAnnotation->getAction();
@@ -124,13 +115,6 @@ class LayoutListener implements ServiceSubscriberInterface
         }
     }
 
-    /**
-     * @param ContextInterface $context
-     * @param Request          $request
-     * @param LayoutManager    $layoutManager
-     *
-     * @return Response
-     */
     private function getLayoutResponse(
         ContextInterface $context,
         Request $request,

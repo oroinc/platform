@@ -17,19 +17,11 @@ class AssociationMetadataLoader
     /** @var MetadataProvider */
     private $metadataProvider;
 
-    /**
-     * @param MetadataProvider $metadataProvider
-     */
     public function __construct(MetadataProvider $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }
 
-    /**
-     * @param EntityMetadata         $entityMetadata
-     * @param EntityDefinitionConfig $config
-     * @param MetadataContext        $context
-     */
     public function completeAssociationMetadata(
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $config,
@@ -72,10 +64,6 @@ class AssociationMetadataLoader
         }
     }
 
-    /**
-     * @param AssociationMetadata $association
-     * @param string              $targetClass
-     */
     private function updateAssociationTargetClass(AssociationMetadata $association, string $targetClass): void
     {
         if ($association->getTargetClassName() !== $targetClass) {
@@ -89,11 +77,6 @@ class AssociationMetadataLoader
         }
     }
 
-    /**
-     * @param EntityMetadata $targetMetadata
-     *
-     * @return string
-     */
     private function getAssociationDataType(EntityMetadata $targetMetadata): string
     {
         $dataType = null;

@@ -24,10 +24,6 @@ class LocalizationVoter extends AbstractEntityVoter
      */
     protected $supportedAttributes = [BasicPermission::DELETE];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager $configManager
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
         parent::__construct($doctrineHelper);

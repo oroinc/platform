@@ -53,10 +53,6 @@ class TableRow extends Element
         );
     }
 
-    /**
-     * @param array $headers
-     * @return array
-     */
     public function getCellValues(array $headers): array
     {
         $values = [];
@@ -67,9 +63,6 @@ class TableRow extends Element
         return $values;
     }
 
-    /**
-     * @param Table $owner
-     */
     public function setOwner(Table $owner)
     {
         $this->owner = $owner;

@@ -203,8 +203,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider fieldsWithRelationsExpectedDataProvider
      */
     public function testGetFieldsWithRelations(array $expected)
@@ -259,8 +257,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider getFieldsWithRelationsAndDeepLevelDataProvider
      */
     public function testGetFieldsWithRelationsAndDeepLevel(array $expected)
@@ -313,8 +309,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider
      */
     public function testGetFieldsWithRelationsAndDeepLevelAndEntityDetails(array $expected)
@@ -370,8 +364,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndLastLevelRelations
      */
     public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelations(array $expected)
@@ -424,8 +416,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider
      */
     public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetails(array $expected)
@@ -481,8 +471,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndWithUnidirectional
      */
     public function testGetFieldsWithRelationsAndDeepLevelAndWithUnidirectional(array $expected)
@@ -533,8 +521,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider getFieldsWithVirtualRelationsAndEnumsDataProvider
      */
     public function testGetFieldsWithVirtualRelationsAndEnums(array $expected)
@@ -993,8 +979,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     *
      * @dataProvider relationsExpectedDataProvider
      */
     public function testGetRelations(array $expected)
@@ -1063,7 +1047,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
             ->with($fieldLabel, [], null, $locale)
             ->will($this->returnValue($fieldLabelTranslated));
         $this->prepare($config);
-
 
         $this->provider->setLocale($locale);
         $result = $this->provider->getFields('Acme:Test', false, false, false, false, true, $translate);

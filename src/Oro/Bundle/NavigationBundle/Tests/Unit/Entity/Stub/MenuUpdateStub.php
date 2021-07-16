@@ -97,10 +97,6 @@ class MenuUpdateStub implements MenuUpdateInterface
         return $this->getDefaultFallbackValue($this->descriptions);
     }
 
-    /**
-     * @param array $linkAttributes
-     * @return self
-     */
     public function setLinkAttributes(array $linkAttributes): self
     {
         $this->linkAttributes = $linkAttributes;

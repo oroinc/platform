@@ -20,10 +20,6 @@ class SegmentChoiceType extends AbstractType
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param AclHelper       $aclHelper
-     */
     public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper)
     {
         $this->doctrine = $doctrine;

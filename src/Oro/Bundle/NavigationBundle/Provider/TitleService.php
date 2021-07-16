@@ -69,12 +69,6 @@ class TitleService implements TitleServiceInterface
      */
     protected $userConfigManager;
 
-    /**
-     * @param TitleReaderRegistry        $titleReaderRegistry
-     * @param TitleTranslator            $titleTranslator
-     * @param ConfigManager              $userConfigManager
-     * @param BreadcrumbManagerInterface $breadcrumbManager
-     */
     public function __construct(
         TitleReaderRegistry $titleReaderRegistry,
         TitleTranslator $titleTranslator,
@@ -481,7 +475,6 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * @param array $params
      * @throws \InvalidArgumentException
      */
     private function validateParams(array $params)

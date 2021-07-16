@@ -127,10 +127,6 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     * @param EmailTemplate $defaultData
-     * @param array $localizations
-     * @param array $submittedData
-     * @param EmailTemplate $expectedData
      */
     public function testSubmit(
         EmailTemplate $defaultData,

@@ -84,11 +84,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         return $workflows->isEmpty() ? null : $workflows->first();
     }
 
-    /**
-     * @param string $title
-     *
-     * @return WorkflowDefinition|null
-     */
     private function getWorkflowDefinitionByTitle(string $title): ?WorkflowDefinition
     {
         /* @var WorkflowTranslationHelper $translationHelper */
@@ -115,8 +110,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      *            | Test Workflow | View Workflow:Global | Perform transitions:Global |
      *
      * @Then /^the role has following active workflow permissions:$/
-     *
-     * @param TableNode $table
      */
     public function iSeeFollowingWorkflowPermissions(TableNode $table)
     {
@@ -162,8 +155,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
 
     /**
      * @Given /^(?:I )?activate "(?P<workflowTitle>[^"]*)" workflow$/
-     *
-     * @param string $workflowTitle
      */
     public function activateWorkflow(string $workflowTitle): void
     {
@@ -226,7 +217,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         }
     }
 
-
     /**
      * @param array $commandOptions
      * @return array
@@ -247,8 +237,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
-     * @param array $workflowNames
-     *
      * @throws WorkflowException
      */
     private function deactivateWorkflows(array $workflowNames): void

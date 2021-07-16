@@ -28,14 +28,6 @@ class QueryComponent
     /** @var array|null */
     private $token;
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param array|null    $relation
-     * @param string|null   $parent
-     * @param string|null   $map
-     * @param int|null      $nestingLevel
-     * @param array|null    $token
-     */
     public function __construct(
         ClassMetadata $metadata,
         array $relation = null,
@@ -54,10 +46,6 @@ class QueryComponent
 
     /**
      * Generates and returns query component from array representation.
-     *
-     * @param array $componentArray
-     *
-     * @return QueryComponent|null
      */
     public static function fromArray(array $componentArray): ?QueryComponent
     {
@@ -76,49 +64,31 @@ class QueryComponent
         );
     }
 
-    /**
-     * @return ClassMetadata
-     */
     public function getMetadata(): ClassMetadata
     {
         return $this->metadata;
     }
 
-    /**
-     * @return array|null
-     */
     public function getRelation(): ?array
     {
         return $this->relation;
     }
 
-    /**
-     * @return null|string
-     */
     public function getParent(): ?string
     {
         return $this->parent;
     }
 
-    /**
-     * @return string|null
-     */
     public function getMap(): ?string
     {
         return $this->map;
     }
 
-    /**
-     * @return int|null
-     */
     public function getNestingLevel(): ?int
     {
         return $this->nestingLevel;
     }
 
-    /**
-     * @return array|null
-     */
     public function getToken(): ?array
     {
         return $this->token;
@@ -126,8 +96,6 @@ class QueryComponent
 
     /**
      * Returns array representation of query component.
-     *
-     * @return array
      */
     public function toArray(): array
     {

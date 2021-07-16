@@ -12,9 +12,6 @@ class StartInitDataProcessor implements ProcessorInterface
     /** @var ButtonSearchContextProvider */
     private $buttonSearchContextProvider;
 
-    /**
-     * @param ButtonSearchContextProvider $buttonSearchContextProvider
-     */
     public function __construct(ButtonSearchContextProvider $buttonSearchContextProvider)
     {
         $this->buttonSearchContextProvider = $buttonSearchContextProvider;

@@ -19,9 +19,6 @@ class AclHelper
     /** @var AccessRuleWalkerContextFactoryInterface */
     private $contextFactory;
 
-    /**
-     * @param AccessRuleWalkerContextFactoryInterface $contextFactory
-     */
     public function __construct(AccessRuleWalkerContextFactoryInterface $contextFactory)
     {
         $this->contextFactory = $contextFactory;

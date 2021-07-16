@@ -20,9 +20,6 @@ class NormalizeEntityId implements ProcessorInterface
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -69,11 +66,6 @@ class NormalizeEntityId implements ProcessorInterface
         }
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

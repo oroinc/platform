@@ -17,7 +17,6 @@ class FieldSessionStorage
 
     /**
      * FieldSessionStorage constructor.
-     * @param Session $session
      */
     public function __construct(Session $session)
     {
@@ -52,11 +51,6 @@ class FieldSessionStorage
         return $fieldName && $fieldType;
     }
 
-    /**
-     * @param EntityConfigModel $entityConfigModel
-     * @param $fieldName
-     * @param $fieldType
-     */
     public function saveFieldInfo(EntityConfigModel $entityConfigModel, $fieldName, $fieldType)
     {
         $this->session->set(

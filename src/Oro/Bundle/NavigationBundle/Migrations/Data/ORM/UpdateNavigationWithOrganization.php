@@ -33,8 +33,6 @@ class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
     }
     /**
      * Update navigation with organization
-     *
-     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

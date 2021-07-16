@@ -158,7 +158,6 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn($userId);
 
-
         self::assertSame($userId, $this->tokenAccessor->getUserId());
     }
 
@@ -249,7 +248,6 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         $organization->expects(self::once())
             ->method('getId')
             ->willReturn($organizationId);
-
 
         self::assertSame($organizationId, $this->tokenAccessor->getOrganizationId());
     }

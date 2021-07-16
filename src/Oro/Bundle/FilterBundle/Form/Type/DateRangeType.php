@@ -21,9 +21,6 @@ class DateRangeType extends AbstractType
     /** @var LocaleSettings */
     private $localeSettings;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(LocaleSettings $localeSettings)
     {
         $this->localeSettings = $localeSettings;
@@ -81,11 +78,6 @@ class DateRangeType extends AbstractType
         ]);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     * @param array                $parentOptions
-     */
     private function addDateField(FormBuilderInterface $builder, string $name, array $parentOptions): void
     {
         $builder->add(

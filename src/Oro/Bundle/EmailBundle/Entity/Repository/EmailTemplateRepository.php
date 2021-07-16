@@ -139,8 +139,6 @@ class EmailTemplateRepository extends EntityRepository
     }
 
     /**
-     * @param EmailTemplateCriteria $criteria
-     * @return EmailTemplate|null
      * @throws NonUniqueResultException|NoResultException
      */
     public function findWithLocalizations(EmailTemplateCriteria $criteria): ?EmailTemplate
@@ -154,10 +152,6 @@ class EmailTemplateRepository extends EntityRepository
         return $queryBuilder->getQuery()->getSingleResult();
     }
 
-    /**
-     * @param EmailTemplateCriteria $criteria
-     * @return bool
-     */
     public function isExist(EmailTemplateCriteria $criteria): bool
     {
         $queryBuilder = $this->createQueryBuilder('t')->select('1');
@@ -166,10 +160,6 @@ class EmailTemplateRepository extends EntityRepository
         return (bool)$queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param EmailTemplateCriteria $criteria
-     */
     private function resolveEmailTemplateCriteria(QueryBuilder $queryBuilder, EmailTemplateCriteria $criteria): void
     {
         $queryBuilder->andWhere($queryBuilder->expr()->eq('t.name', ':name'));

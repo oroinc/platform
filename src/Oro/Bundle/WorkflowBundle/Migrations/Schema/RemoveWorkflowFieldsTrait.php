@@ -11,10 +11,6 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 trait RemoveWorkflowFieldsTrait
 {
-    /**
-     * @param Table $table
-     * @param QueryBag $queries
-     */
     protected function removeWorkflowFields(Table $table)
     {
         $workflowTables = [

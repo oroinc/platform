@@ -25,10 +25,6 @@ class FixTypesOfAddresses implements ProcessorInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param string                    $addressesPropertyPath
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(string $addressesPropertyPath, PropertyAccessorInterface $propertyAccessor)
     {
         $this->addressesPropertyPath = $addressesPropertyPath;

@@ -21,10 +21,6 @@ class FileManager extends GaufretteFileManager
     /** @var ProtocolValidatorInterface */
     private $protocolValidator;
 
-    /**
-     * @param string                     $filesystemName
-     * @param ProtocolValidatorInterface $protocolValidator
-     */
     public function __construct(string $filesystemName, ProtocolValidatorInterface $protocolValidator)
     {
         parent::__construct($filesystemName);
@@ -122,10 +118,6 @@ class FileManager extends GaufretteFileManager
 
     /**
      * Makes a copy of File entity
-     *
-     * @param File $file
-     *
-     * @return File|null
      */
     public function cloneFileEntity(File $file): ?File
     {
@@ -159,8 +151,6 @@ class FileManager extends GaufretteFileManager
 
     /**
      * Updates File entity before upload
-     *
-     * @param File $entity
      */
     public function preUpload(File $entity): void
     {
@@ -193,8 +183,6 @@ class FileManager extends GaufretteFileManager
 
     /**
      * Uploads a file to the storage
-     *
-     * @param File $entity
      */
     public function upload(File $entity): void
     {

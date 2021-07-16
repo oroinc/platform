@@ -97,8 +97,6 @@ class EntityFieldProvider
 
     /**
      * Sets entity provider
-     *
-     * @param EntityProvider $entityProvider
      */
     public function setEntityProvider(EntityProvider $entityProvider)
     {
@@ -107,8 +105,6 @@ class EntityFieldProvider
 
     /**
      * Sets virtual field provider
-     *
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
      */
     public function setVirtualFieldProvider(VirtualFieldProviderInterface $virtualFieldProvider)
     {
@@ -125,8 +121,6 @@ class EntityFieldProvider
 
     /**
      * Sets exclusion provider
-     *
-     * @param ExclusionProviderInterface $exclusionProvider
      */
     public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
     {
@@ -848,8 +842,6 @@ class EntityFieldProvider
 
     /**
      * Sorts fields by its label (relations follows fields)
-     *
-     * @param array $fields
      */
     protected function sortFields(array &$fields)
     {

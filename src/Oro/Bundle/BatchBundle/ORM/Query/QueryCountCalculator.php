@@ -116,11 +116,6 @@ class QueryCountCalculator
         return $result ? (int)$result : 0;
     }
 
-    /**
-     * @param Query $query
-     *
-     * @return int
-     */
     private function executeOrmCountQueryUsingCountWalker(Query $query): int
     {
         $countQuery = QueryUtil::cloneQuery($query);
@@ -176,10 +171,6 @@ class QueryCountCalculator
             ->execute();
     }
 
-    /**
-     * @param Query              $query
-     * @param Query\ParserResult $parserResult
-     */
     private function unbindUnusedQueryParams(Query $query, Query\ParserResult $parserResult): void
     {
         $parameterMappings = $parserResult->getParameterMappings();

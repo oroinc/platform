@@ -108,7 +108,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
     protected function getUpdateQuery(array $data, $id)
     {
         $data['extend']['state'] = ExtendScope::STATE_DELETE;
-        
+
         return [
             'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
             ['data' => $data, 'id' => $id],

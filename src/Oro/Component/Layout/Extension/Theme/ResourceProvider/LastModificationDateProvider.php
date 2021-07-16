@@ -23,19 +23,12 @@ class LastModificationDateProvider
     /** @var PhpConfigCacheAccessor */
     private $cacheAccessor;
 
-    /**
-     * @param string $cacheFile
-     * @param bool   $debug
-     */
     public function __construct(string $cacheFile, bool $debug)
     {
         $this->cacheFile = $cacheFile;
         $this->debug = $debug;
     }
 
-    /**
-     * @return \DateTime|null
-     */
     public function getLastModificationDate(): ?\DateTime
     {
         $value = $this->getCacheAccessor()->load($this->getCache());
@@ -43,17 +36,11 @@ class LastModificationDateProvider
         return $value instanceof \DateTime ? $value : null;
     }
 
-    /**
-     * @param \DateTime|null $date
-     */
     public function updateLastModificationDate(?\DateTime $date): void
     {
         $this->getCacheAccessor()->save($this->getCache(), $date ?? false);
     }
 
-    /**
-     * @return ConfigCacheInterface
-     */
     private function getCache(): ConfigCacheInterface
     {
         if (null === $this->cache) {
@@ -66,9 +53,6 @@ class LastModificationDateProvider
         return $this->cache;
     }
 
-    /**
-     * @return PhpConfigCacheAccessor
-     */
     private function getCacheAccessor(): PhpConfigCacheAccessor
     {
         if (null === $this->cacheAccessor) {

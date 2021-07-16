@@ -20,12 +20,6 @@ class ParentEntity
     /** @var Collection */
     public $images;
 
-    /**
-     * @param int $id
-     * @param File|null $file
-     * @param array $files
-     * @param array $images
-     */
     public function __construct(int $id, ?File $file, array $files, array $images = [])
     {
         $this->id = $id;
@@ -34,9 +28,6 @@ class ParentEntity
         $this->images = new ArrayCollection($images);
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;

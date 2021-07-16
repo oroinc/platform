@@ -11,9 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 trait AdminUserTrait
 {
-    /**
-     * @return User
-     */
     protected function getAdminUser(): User
     {
         return static::getContainer()

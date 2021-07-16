@@ -12,9 +12,6 @@ class ChainImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     /** @var array|ImagePlaceholderProviderInterface[] */
     private $providers = [];
 
-    /**
-     * @param ImagePlaceholderProviderInterface $provider
-     */
     public function addProvider(ImagePlaceholderProviderInterface $provider): void
     {
         $this->providers[] = $provider;

@@ -14,10 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractVendorConnectionController extends AbstractController
 {
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
     protected function check(Request $request): JsonResponse
     {
         $connectionControllerManager = $this->get(ConnectionControllerManager::class);
@@ -40,11 +36,6 @@ abstract class AbstractVendorConnectionController extends AbstractController
         return new JsonResponse($response);
     }
 
-    /**
-     * @param Request $request
-     * @param string $type
-     * @return JsonResponse
-     */
     protected function handleAccessToken(Request $request, string $type): JsonResponse
     {
         $connectionControllerManager = $this->get(ConnectionControllerManager::class);
@@ -68,9 +59,6 @@ abstract class AbstractVendorConnectionController extends AbstractController
         return new JsonResponse($response);
     }
 
-    /**
-     * @return RequestStack
-     */
     protected function getRequestStack(): RequestStack
     {
         return $this->get('request_stack');

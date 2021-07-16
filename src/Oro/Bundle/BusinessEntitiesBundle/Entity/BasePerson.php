@@ -280,9 +280,6 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
         return $this;
     }
 
-    /**
-     * @return \DateTime|null
-     */
     public function getBirthday(): ?\DateTime
     {
         return $this->birthday;

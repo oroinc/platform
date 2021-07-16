@@ -28,7 +28,6 @@ class RestApiTest extends WebTestCase
 
     /**
      * @depends testGetCountries
-     * @param $countries
      */
     public function testGetCountry($countries)
     {

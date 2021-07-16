@@ -104,9 +104,6 @@ class ConfigurableLoggerPassTest extends WebTestCase
 
     /**
      * Loads YAML files service definitions
-     *
-     * @param ContainerBuilder $container
-     * @param string $fixtureFileName
      */
     private function loadYmlFixture(ContainerBuilder $container, string $fixtureFileName)
     {
@@ -114,9 +111,6 @@ class ConfigurableLoggerPassTest extends WebTestCase
         $loader->load($fixtureFileName.'.yml');
     }
 
-    /**
-     * @return LoggerLevelCommand
-     */
     private function getLoggerLevelCommand(): LoggerLevelCommand
     {
         /** @var ConfigManager $globalConfigManager */

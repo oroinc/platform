@@ -6,10 +6,6 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
 class ContextHelper
 {
-    /**
-     * @param ContextInterface $firstContext
-     * @param ContextInterface $context
-     */
     public static function mergeContextCounters(ContextInterface $firstContext, ContextInterface $context)
     {
         $firstContext->incrementReadCount($context->getReadCount());

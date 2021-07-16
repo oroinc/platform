@@ -21,26 +21,17 @@ class EmailNotificationDatagridListener
     /** @var TranslationKeyGenerator */
     protected $generator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
         $config->offsetSetByPath(sprintf('[filters][columns][%s][type]', 'workflow_definition'), 'workflow');
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         /** @var ResultRecord[] $records */

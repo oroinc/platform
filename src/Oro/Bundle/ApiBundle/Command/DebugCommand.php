@@ -431,11 +431,6 @@ HELP
     }
 
     /**
-     * @param array  $attributes
-     * @param string $action
-     *
-     * @return string
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function formatProcessorAttributes(array $attributes, string $action): string

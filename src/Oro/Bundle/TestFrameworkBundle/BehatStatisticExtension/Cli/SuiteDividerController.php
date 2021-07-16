@@ -16,9 +16,6 @@ class SuiteDividerController implements Controller
      */
     protected $suiteConfigRegistry;
 
-    /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     */
     public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry)
     {
         $this->suiteConfigRegistry = $suiteConfigRegistry;

@@ -40,9 +40,6 @@ class UserSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $submittedData = $event->getData();
@@ -58,9 +55,6 @@ class UserSubscriber implements EventSubscriberInterface
         $event->setData($submittedData);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         /* @var AbstractUser $entity */

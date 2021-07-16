@@ -43,7 +43,6 @@ interface IsolatorInterface
 
     /**
      * Restore initial state
-     * @param RestoreStateEvent $event
      */
     public function restoreState(RestoreStateEvent $event);
 

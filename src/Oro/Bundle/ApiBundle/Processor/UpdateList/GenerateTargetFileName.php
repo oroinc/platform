@@ -14,9 +14,6 @@ class GenerateTargetFileName implements ProcessorInterface
     /** @var FileNameProvider */
     private $fileNameProvider;
 
-    /**
-     * @param FileNameProvider $fileNameProvider
-     */
     public function __construct(FileNameProvider $fileNameProvider)
     {
         $this->fileNameProvider = $fileNameProvider;

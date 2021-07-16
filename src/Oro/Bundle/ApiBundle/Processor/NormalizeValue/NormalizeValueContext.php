@@ -45,8 +45,6 @@ class NormalizeValueContext extends Context
     /**
      * Gets the current request type.
      * A request can belong to several types, e.g. "rest" and "json_api".
-     *
-     * @return RequestType
      */
     public function getRequestType(): RequestType
     {
@@ -55,8 +53,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets API version.
-     *
-     * @return string
      */
     public function getVersion(): string
     {
@@ -65,8 +61,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets API version.
-     *
-     * @param string $version
      */
     public function setVersion(string $version): void
     {
@@ -75,8 +69,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets a flag indicates whether a suitable processor has processed a value.
-     *
-     * @return bool
      */
     public function isProcessed(): bool
     {
@@ -85,8 +77,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets a flag indicates whether a suitable processor has processed a value.
-     *
-     * @param bool $flag
      */
     public function setProcessed(bool $flag): void
     {
@@ -95,8 +85,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets data-type of a value.
-     *
-     * @return string
      */
     public function getDataType(): string
     {
@@ -105,8 +93,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets data-type of a value.
-     *
-     * @param string $dataType
      */
     public function setDataType(string $dataType): void
     {
@@ -115,8 +101,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Checks whether a regular expression that can be used to validate a value exists.
-     *
-     * @return bool
      */
     public function hasRequirement(): bool
     {
@@ -125,8 +109,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets a regular expression that can be used to validate a value.
-     *
-     * @return string|null
      */
     public function getRequirement(): ?string
     {
@@ -135,8 +117,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets a regular expression that can be used to validate a value.
-     *
-     * @param string $requirement
      */
     public function setRequirement(string $requirement): void
     {
@@ -153,8 +133,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets a flag determines if a value can be an array.
-     *
-     * @return bool
      */
     public function isArrayAllowed(): bool
     {
@@ -163,8 +141,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets a flag determines if a value can be an array.
-     *
-     * @param bool $flag
      */
     public function setArrayAllowed(bool $flag): void
     {
@@ -173,8 +149,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets a flag determines if a value can be a pair of "from" and "to" values.
-     *
-     * @return bool
      */
     public function isRangeAllowed(): bool
     {
@@ -183,8 +157,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets a flag determines if a value can be a pair of "from" and "to" values.
-     *
-     * @param bool $flag
      */
     public function setRangeAllowed(bool $flag): void
     {
@@ -193,8 +165,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets a delimiter that should be used to split a string to separate elements.
-     *
-     * @return string
      */
     public function getArrayDelimiter(): string
     {
@@ -203,8 +173,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets a delimiter that should be used to split a string to separate elements.
-     *
-     * @param string $delimiter
      */
     public function setArrayDelimiter(string $delimiter): void
     {
@@ -213,8 +181,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Gets a delimiter that should be used to split a string to a pair of "from" and "to" values.
-     *
-     * @return string
      */
     public function getRangeDelimiter(): string
     {
@@ -223,8 +189,6 @@ class NormalizeValueContext extends Context
 
     /**
      * Sets a delimiter that should be used to split a string to a pair of "from" and "to" values.
-     *
-     * @param string $delimiter
      */
     public function setRangeDelimiter(string $delimiter): void
     {

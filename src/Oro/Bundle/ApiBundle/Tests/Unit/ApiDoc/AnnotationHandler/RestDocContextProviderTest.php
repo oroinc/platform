@@ -56,9 +56,6 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Context
-     */
     private function getContext(): Context
     {
         return new Context(
@@ -67,9 +64,6 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return SubresourceContext
-     */
     private function getSubresourceContext(): SubresourceContext
     {
         return new SubresourceContext(
@@ -78,9 +72,6 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return OptionsContext
-     */
     private function getOptionsContext(): OptionsContext
     {
         return new OptionsContext(

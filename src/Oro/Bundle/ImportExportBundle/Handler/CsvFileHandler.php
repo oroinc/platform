@@ -16,8 +16,6 @@ class CsvFileHandler
 
     /**
      * Convert the ending-lines CR and LF in CRLF.
-     *
-     * @param SymfonyComponentFile $file
      */
     public function normalizeLineEndings(SymfonyComponentFile $file)
     {

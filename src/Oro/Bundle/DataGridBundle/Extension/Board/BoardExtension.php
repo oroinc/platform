@@ -67,16 +67,6 @@ class BoardExtension extends AbstractExtension
     /** @var array */
     private $boards = [];
 
-    /**
-     * @param ContainerInterface            $processorContainer
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param RequestStack                  $requestStack
-     * @param TranslatorInterface           $translator
-     * @param RestrictionManager            $restrictionManager
-     * @param Configuration                 $configuration
-     * @param EntityClassNameHelper         $entityClassNameHelper
-     * @param EntityClassResolver           $entityClassResolver
-     */
     public function __construct(
         ContainerInterface $processorContainer,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -213,11 +203,6 @@ class BoardExtension extends AbstractExtension
         return $ids;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return BoardProcessorInterface
-     */
     protected function getProcessor(string $name): BoardProcessorInterface
     {
         if (!$this->processorContainer->has($name)) {
@@ -229,8 +214,6 @@ class BoardExtension extends AbstractExtension
 
     /**
      * Normalize and process board configurations
-     *
-     * @param DatagridConfiguration $config
      */
     protected function initBoards(DatagridConfiguration $config)
     {
@@ -245,12 +228,6 @@ class BoardExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param array                 $boardConfig
-     *
-     * @return array
-     */
     protected function loadBoardOptions(DatagridConfiguration $config, array $boardConfig): array
     {
         $result = $this->validateConfiguration($this->configuration, ['board' => $boardConfig]);
@@ -289,8 +266,6 @@ class BoardExtension extends AbstractExtension
 
     /**
      * Overrides pager settings to show correct number of items in every column
-     *
-     * @param MetadataObject $data
      */
     protected function overridePagerOptions(MetadataObject $data)
     {

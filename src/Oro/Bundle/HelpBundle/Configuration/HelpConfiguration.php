@@ -31,9 +31,6 @@ class HelpConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param ArrayNodeDefinition $resourcesNode
-     */
     private function configureResourcesNodeDefinition(ArrayNodeDefinition $resourcesNode)
     {
         $resourcesNode
@@ -70,9 +67,6 @@ class HelpConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param ArrayNodeDefinition $vendorsNode
-     */
     private function configureVendorsNodeDefinition(ArrayNodeDefinition $vendorsNode)
     {
         $vendorsNode
@@ -95,9 +89,6 @@ class HelpConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param ArrayNodeDefinition $routesNode
-     */
     private function configureRoutesNodeDefinition(ArrayNodeDefinition $routesNode)
     {
         $routesNode
@@ -118,9 +109,6 @@ class HelpConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param array $vendors
-     */
     private function assertKeysAreValidVendorNames(array $vendors)
     {
         foreach (array_keys($vendors) as $vendorName) {
@@ -132,9 +120,6 @@ class HelpConfiguration implements ConfigurationInterface
         }
     }
 
-    /**
-     * @param array $resources
-     */
     private function assertKeysAreValidResourceNames(array $resources)
     {
         foreach (array_keys($resources) as $resourceName) {

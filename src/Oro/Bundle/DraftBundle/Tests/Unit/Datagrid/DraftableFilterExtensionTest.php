@@ -34,8 +34,6 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $parameters
-     * @param bool $expectedResult
      * @dataProvider getIsApplicableDataProvider
      */
     public function testIsApplicable(array $parameters, bool $expectedResult): void
@@ -47,9 +45,6 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->extension->isApplicable($datagridConfig));
     }
 
-    /**
-     * @return array
-     */
     public function getIsApplicableDataProvider(): array
     {
         return [

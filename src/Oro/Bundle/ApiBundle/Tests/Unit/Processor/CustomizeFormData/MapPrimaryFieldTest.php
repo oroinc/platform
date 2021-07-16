@@ -186,9 +186,6 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         return $form;
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function validateForm(FormInterface $form)
     {
         $this->formValidationHandler->preValidate($form);

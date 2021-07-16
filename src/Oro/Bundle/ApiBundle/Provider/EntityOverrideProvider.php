@@ -14,9 +14,6 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
     /** @var string[] [class name => substitute class name, ...] */
     private $substitutions;
 
-    /**
-     * @param ConfigCache $configCache
-     */
     public function __construct(ConfigCache $configCache)
     {
         $this->configCache = $configCache;

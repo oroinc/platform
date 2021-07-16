@@ -41,12 +41,6 @@ class ImportExportResultSummarizer
      */
     protected $registry;
 
-    /**
-     * @param Router $router
-     * @param ConfigManager $configManager
-     * @param FileManager $fileManager
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         Router $router,
         ConfigManager $configManager,
@@ -102,7 +96,6 @@ class ImportExportResultSummarizer
      *
      * @return null|string
      * @throws FileNotFound
-     *
      */
     public function getErrorLog(Job $job)
     {

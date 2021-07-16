@@ -110,10 +110,6 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
         return $this->viewType;
     }
 
-    /**
-     * @param string $localeCode
-     * @return LocaleSettings
-     */
     private function getLocaleSettings(string $localeCode): LocaleSettings
     {
         /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */

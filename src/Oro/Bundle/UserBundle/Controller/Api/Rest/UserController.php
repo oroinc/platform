@@ -166,7 +166,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     *
      * @ApiDoc(
      *      description="Get user roles",
      *      resource=true,

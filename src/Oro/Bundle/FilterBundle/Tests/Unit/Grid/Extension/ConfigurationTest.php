@@ -30,8 +30,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processConfigurationDataProvider
-     * @param array $configs
-     * @param array $expected
      */
     public function testProcessConfiguration(array $configs, array $expected)
     {
@@ -40,7 +38,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processInvalidConfigurationStructure
-     * @param array $configs
      */
     public function testInvalidConfigurationStructure(array $configs)
     {
@@ -50,7 +47,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processInvalidConfigurationValues
-     * @param array $configs
      */
     public function testInvalidConfigurationValues(array $configs)
     {

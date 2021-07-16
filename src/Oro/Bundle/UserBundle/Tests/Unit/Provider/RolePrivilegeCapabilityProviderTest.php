@@ -42,10 +42,6 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getCapabilitiesDataProvider
-     *
-     * @param array $categories
-     * @param array $privileges
-     * @param array $expected
      */
     public function testGetCapabilities(array $categories, array $privileges, array $expected)
     {
@@ -83,7 +79,6 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
             ->setIdentity($identityCapability)->setCategory($category1->getId());
         $privilegeEntity = new AclPrivilege();
         $privilegeEntity->addPermission($permission2)->setIdentity($identityEntity)->setCategory($category2->getId());
-
 
         return [
             'no categories' => [

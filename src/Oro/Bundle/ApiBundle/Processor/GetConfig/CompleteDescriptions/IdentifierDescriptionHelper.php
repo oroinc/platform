@@ -19,17 +19,11 @@ class IdentifierDescriptionHelper
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     */
     public function setDescriptionForEntityIdentifier(EntityDefinitionConfig $definition): void
     {
         if (!$definition->hasIdentifierDescription()) {
@@ -37,11 +31,6 @@ class IdentifierDescriptionHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     * @param string                 $targetAction
-     */
     public function setDescriptionForIdentifierField(
         EntityDefinitionConfig $definition,
         string $entityClass,
@@ -68,13 +57,6 @@ class IdentifierDescriptionHelper
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $identifierFieldName
-     * @param string $targetAction
-     *
-     * @return string
-     */
     private function getDescriptionForIdentifierField(
         string $entityClass,
         string $identifierFieldName,
@@ -92,12 +74,6 @@ class IdentifierDescriptionHelper
         return self::ID_DESCRIPTION;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $identifierFieldName
-     *
-     * @return bool
-     */
     private function hasIdentifierGenerator(string $entityClass, string $identifierFieldName): bool
     {
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {

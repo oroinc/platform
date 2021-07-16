@@ -23,11 +23,6 @@ class PropertyPathSecurityHelper
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ManagerRegistry               $managerRegistry
-     * @param ConfigProvider                $entityConfigProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ManagerRegistry $managerRegistry,

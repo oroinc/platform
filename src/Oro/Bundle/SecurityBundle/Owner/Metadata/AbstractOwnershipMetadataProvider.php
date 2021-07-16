@@ -23,9 +23,6 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
     /** @var OwnershipMetadataInterface */
     private $noOwnershipMetadata;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

@@ -14,9 +14,6 @@ class FeatureCheckerStub extends FeatureChecker
      */
     private $resourceEnabled;
 
-    /**
-     * @param bool|null $enabled
-     */
     public function setResourceEnabled(?bool $enabled): void
     {
         $this->resourceEnabled = $enabled;

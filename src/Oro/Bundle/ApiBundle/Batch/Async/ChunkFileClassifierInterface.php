@@ -11,19 +11,11 @@ interface ChunkFileClassifierInterface
 {
     /**
      * Checks whether the given chunk file contains primary data.
-     *
-     * @param ChunkFile $file
-     *
-     * @return bool
      */
     public function isPrimaryData(ChunkFile $file): bool;
 
     /**
      * Checks whether the given chunk file contains additional data included into the request.
-     *
-     * @param ChunkFile $file
-     *
-     * @return bool
      */
     public function isIncludedData(ChunkFile $file): bool;
 }

@@ -28,11 +28,6 @@ class VariableAssembler extends BaseAbstractAssembler
      */
     protected $translator;
 
-    /**
-     * @param WorkflowVariableNormalizer $dataNormalizer
-     * @param VariableGuesser            $variableGuesser
-     * @param TranslatorInterface        $translator
-     */
     public function __construct(
         WorkflowVariableNormalizer $dataNormalizer,
         VariableGuesser $variableGuesser,
@@ -181,7 +176,6 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param Variable $variable
      * @throws AssemblerException
      */
     protected function validateVariable(Variable $variable)
@@ -197,7 +191,6 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $options
      * @throws AssemblerException
      */
     protected function assertVariableEntityAcl(array $options)
@@ -214,7 +207,6 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param Variable $variable
      * @throws AssemblerException
      */
     protected function assertVariableHasValidType(Variable $variable)

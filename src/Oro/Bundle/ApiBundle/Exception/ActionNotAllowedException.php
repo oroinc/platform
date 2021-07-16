@@ -10,9 +10,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class ActionNotAllowedException extends HttpException
 {
-    /**
-     * @param string $message
-     */
     public function __construct(string $message = 'The action is not allowed.')
     {
         parent::__construct(Response::HTTP_METHOD_NOT_ALLOWED, $message);

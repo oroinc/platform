@@ -40,8 +40,6 @@ class OroIntegrationBundleInstaller implements Installation
 
     /**
      * Create oro_integration_change_set table
-     *
-     * @param Schema $schema
      */
     protected function createOroIntegrationFieldsChangesTable(Schema $schema)
     {
@@ -56,8 +54,6 @@ class OroIntegrationBundleInstaller implements Installation
 
     /**
      * Create oro_integration_channel table
-     *
-     * @param Schema $schema
      */
     protected function createOroIntegrationChannelTable(Schema $schema)
     {
@@ -85,8 +81,6 @@ class OroIntegrationBundleInstaller implements Installation
 
     /**
      * Create oro_integration_channel_status table
-     *
-     * @param Schema $schema
      */
     protected function createOroIntegrationChannelStatusTable(Schema $schema)
     {
@@ -106,8 +100,6 @@ class OroIntegrationBundleInstaller implements Installation
 
     /**
      * Create oro_integration_transport table
-     *
-     * @param Schema $schema
      */
     protected function createOroIntegrationTransportTable(Schema $schema)
     {
@@ -120,8 +112,6 @@ class OroIntegrationBundleInstaller implements Installation
 
     /**
      * Add oro_integration_channel foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroIntegrationChannelForeignKeys(Schema $schema)
     {
@@ -154,8 +144,6 @@ class OroIntegrationBundleInstaller implements Installation
 
     /**
      * Add oro_integration_channel_status foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroIntegrationChannelStatusForeignKeys(Schema $schema)
     {

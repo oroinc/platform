@@ -26,9 +26,6 @@ class AccessRuleOptionMatcher implements AccessRuleOptionMatcherInterface
     /** @var array|null */
     private $specialOptions;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;

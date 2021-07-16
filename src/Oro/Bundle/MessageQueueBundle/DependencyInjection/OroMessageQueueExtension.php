@@ -22,9 +22,6 @@ class OroMessageQueueExtension extends Extension
     /** @var TransportFactoryInterface[] */
     private $factories = [];
 
-    /**
-     * @param TransportFactoryInterface $transportFactory
-     */
     public function addTransportFactory(TransportFactoryInterface $transportFactory)
     {
         $this->factories[$transportFactory->getKey()] = $transportFactory;
@@ -104,10 +101,6 @@ class OroMessageQueueExtension extends Extension
         return new Configuration($this->factories);
     }
 
-    /**
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
     private function createTransport(array $config, ContainerBuilder $container)
     {
         $transportKey = $container->getParameter('message_queue_transport');
@@ -127,10 +120,6 @@ class OroMessageQueueExtension extends Extension
         $container->setAlias('oro_message_queue.transport.connection', $connectionId);
     }
 
-    /**
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
     private function buildOptionalExtensions(array $config, ContainerBuilder $container)
     {
         if ($config['client']['redelivery']['enabled']) {
@@ -149,9 +138,6 @@ class OroMessageQueueExtension extends Extension
     /**
      * Sets the services that should not be reset during container reset and
      * Message Queue processors that can work without container reset to container reset extension.
-     *
-     * @param array            $config
-     * @param ContainerBuilder $container
      */
     private function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container)
     {
@@ -165,10 +151,6 @@ class OroMessageQueueExtension extends Extension
         }
     }
 
-    /**
-     * @param array            $config
-     * @param ContainerBuilder $container
-     */
     private function setSecurityAgnosticTopicsAndProcessors(array $config, ContainerBuilder $container)
     {
         if (!empty($config['security_agnostic_topics'])) {
@@ -183,10 +165,6 @@ class OroMessageQueueExtension extends Extension
         }
     }
 
-    /**
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
     private function setJobConfigurationProvider(array $config, ContainerBuilder $container)
     {
         if (!empty($config['time_before_stale'])) {
@@ -195,9 +173,6 @@ class OroMessageQueueExtension extends Extension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureTestEnvironment(ContainerBuilder $container)
     {
         $container->getDefinition('oro_message_queue.client.buffered_message_producer')

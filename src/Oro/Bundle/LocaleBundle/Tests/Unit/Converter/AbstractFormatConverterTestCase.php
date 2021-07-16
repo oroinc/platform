@@ -106,10 +106,6 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     abstract protected function createFormatConverter(): DateTimeFormatConverterInterface;
 
     /**
-     * @param string $expected
-     * @param int|null $dateFormat
-     * @param string $locale
-     *
      * @dataProvider getDateFormatDataProvider
      */
     public function testGetDateFormat(string $expected, ?int $dateFormat, string $locale): void
@@ -120,10 +116,6 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     abstract public function getDateFormatDataProvider(): array;
 
     /**
-     * @param string $expected
-     * @param int|null $timeFormat
-     * @param string $locale
-     *
      * @dataProvider getTimeFormatDataProvider
      */
     public function testGetTimeFormat(string $expected, ?int $timeFormat, string $locale): void
@@ -134,11 +126,6 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     abstract public function getTimeFormatDataProvider(): array;
 
     /**
-     * @param string $expected
-     * @param int|null $dateFormat
-     * @param int|null $timeFormat
-     * @param string $locale
-     *
      * @dataProvider getDateTimeFormatDataProvider
      */
     public function testGetDateTimeFormat(string $expected, ?int $dateFormat, ?int $timeFormat, string $locale): void
@@ -149,9 +136,6 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     abstract public function getDateTimeFormatDataProvider(): array;
 
     /**
-     * @param string $expected
-     * @param string $locale
-     *
      * @dataProvider getDateFormatDayProvider
      */
     public function testGetDayFormat(string $expected, string $locale): void

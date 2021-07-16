@@ -42,14 +42,6 @@ class InitializeSubresources extends LoadSubresources
         }
     }
 
-    /**
-     * @param ApiResource $resource
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $accessibleResources
-     *
-     * @return ApiResourceSubresources|null
-     */
     private function createEntitySubresources(
         ApiResource $resource,
         string $version,

@@ -47,7 +47,6 @@ class SearchBundleWebTestCase extends WebTestCase
         parent::tearDown();
     }
 
-
     public static function tearDownAfterClass(): void
     {
         if (!static::isDbIsolationPerTest()) {
@@ -57,11 +56,6 @@ class SearchBundleWebTestCase extends WebTestCase
         parent::tearDownAfterClass();
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fixtureClass
-     * @param int $expectedCount
-     */
     protected function loadFixture(string $entityClass, string $fixtureClass, int $expectedCount): void
     {
         $doReindex = static::isDbIsolationPerTest() || !$this->isLoadedFixture($fixtureClass);
@@ -73,10 +67,6 @@ class SearchBundleWebTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param int $expectedCount
-     */
     protected function reindex(string $entityClass, int $expectedCount): void
     {
         static::$entitiesToClear[] = $entityClass;
@@ -89,9 +79,6 @@ class SearchBundleWebTestCase extends WebTestCase
         static::ensureItemsLoaded($alias, $expectedCount);
     }
 
-    /**
-     * @param string $entityClass
-     */
     protected static function clearIndex(string $entityClass): void
     {
         static::getSearchIndexer()->resetIndex($entityClass);

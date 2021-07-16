@@ -23,9 +23,6 @@ class PackageProvider
     /** @var array */
     protected $thirdPartyPackages = [];
 
-    /**
-     * @param LocalRepositoryFactory $localRepositoryFactory
-     */
     public function __construct(LocalRepositoryFactory $localRepositoryFactory)
     {
         $this->localRepositoryFactory = $localRepositoryFactory;

@@ -15,10 +15,6 @@ class TranslationReader extends AbstractReader
     /** @var LanguageRepository */
     protected $languageRepository;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     * @param LanguageRepository $languageRepository
-     */
     public function __construct(
         ContextRegistry $contextRegistry,
         LanguageRepository $languageRepository

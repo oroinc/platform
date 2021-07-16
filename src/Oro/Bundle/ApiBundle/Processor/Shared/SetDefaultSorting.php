@@ -22,9 +22,6 @@ class SetDefaultSorting implements ProcessorInterface
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
@@ -53,12 +50,6 @@ class SetDefaultSorting implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string                 $filterName
-     * @param FilterCollection       $filters
-     * @param EntityDefinitionConfig $config
-     * @param SortersConfig|null     $configOfSorters
-     */
     protected function addSortFilter(
         string $filterName,
         FilterCollection $filters,
@@ -83,9 +74,6 @@ class SetDefaultSorting implements ProcessorInterface
         }
     }
 
-    /**
-     * @return string
-     */
     protected function getSortFilterDescription(): string
     {
         return 'Result sorting. Comma-separated fields, e.g. \'field1,-field2\'.';
@@ -116,13 +104,6 @@ class SetDefaultSorting implements ProcessorInterface
         return $orderBy;
     }
 
-    /**
-     * @param string             $fieldName
-     * @param SortersConfig|null $configOfSorters
-     * @param bool               $byPropertyPath
-     *
-     * @return bool
-     */
     protected function isSorterEnabled(
         string $fieldName,
         ?SortersConfig $configOfSorters,
@@ -139,11 +120,6 @@ class SetDefaultSorting implements ProcessorInterface
         return !$sorter->isExcluded();
     }
 
-    /**
-     * @param array|null $value
-     *
-     * @return string
-     */
     protected function convertDefaultValueToString(?array $value): string
     {
         $result = [];

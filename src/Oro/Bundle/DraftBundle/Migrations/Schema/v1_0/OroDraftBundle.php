@@ -23,9 +23,6 @@ class OroDraftBundle implements Migration
         $this->addOroDraftProjectForeignKeys($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createOroDraftProjectTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_draft_project');
@@ -42,8 +39,6 @@ class OroDraftBundle implements Migration
 
     /**
      * Add oro_draft_project foreign keys.
-     *
-     * @param Schema $schema
      */
     private function addOroDraftProjectForeignKeys(Schema $schema): void
     {

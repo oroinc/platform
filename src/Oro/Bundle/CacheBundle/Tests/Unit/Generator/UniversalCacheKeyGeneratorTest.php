@@ -37,9 +37,6 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCacheKey, $this->generator->generate($arguments));
     }
 
-    /**
-     * @return array
-     */
     public function generateDataProvider(): array
     {
         return [

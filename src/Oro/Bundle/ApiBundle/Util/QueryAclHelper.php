@@ -17,9 +17,6 @@ class QueryAclHelper
     /** @var AclProtectedQueryFactory */
     private $queryFactory;
 
-    /**
-     * @param AclProtectedQueryFactory $queryFactory
-     */
     public function __construct(AclProtectedQueryFactory $queryFactory)
     {
         $this->queryFactory = $queryFactory;

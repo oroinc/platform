@@ -99,11 +99,6 @@ class RequestDataValidator extends AbstractRequestDataValidator
         });
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     * @param bool   $requirePrimaryResourceId
-     */
     protected function validatePrimaryDataObject(array $data, string $pointer, bool $requirePrimaryResourceId): void
     {
         $this->validateResourceObjectStructure($data, $pointer);

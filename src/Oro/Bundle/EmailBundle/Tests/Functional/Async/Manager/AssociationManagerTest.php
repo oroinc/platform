@@ -162,9 +162,6 @@ class AssociationManagerTest extends WebTestCase
         $this->assertMessagesEmpty(Topics::ADD_ASSOCIATION_TO_EMAILS);
     }
 
-    /**
-     * @param array $expected
-     */
     protected function assertDispatchedEvents(array $expected)
     {
         static::assertEqualsCanonicalizing($expected, $this->dispatched);

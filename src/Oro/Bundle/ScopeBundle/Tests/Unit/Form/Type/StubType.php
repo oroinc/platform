@@ -23,9 +23,6 @@ class StubType extends AbstractType
             ->add(self::FIELD_2, TextType::class);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

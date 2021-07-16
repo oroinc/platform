@@ -131,11 +131,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $internalConfiguration[$sectionName];
     }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
     private function resolveConfiguration(array $data): array
     {
         $dependencies = $this->resolveDependencies($data);

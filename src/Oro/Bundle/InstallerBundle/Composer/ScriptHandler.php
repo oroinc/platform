@@ -89,10 +89,7 @@ class ScriptHandler
     /**
      * Collects npm assets from extra.npm section of installed packages.
      *
-     * @param Composer $composer
      * @throws Exception
-     *
-     * @return array
      */
     private static function collectNpmAssets(Composer $composer): array
     {
@@ -132,10 +129,6 @@ class ScriptHandler
 
     /**
      * Runs "npm install", updates package-lock.json, installs assets to "node_modules/"
-     *
-     * @param IOInterface $inputOutput
-     * @param int $timeout
-     * @param bool $verbose
      */
     private static function npmInstall(
         IOInterface $inputOutput,
@@ -168,10 +161,6 @@ class ScriptHandler
 
     /**
      * Runs "npm ci", installs assets to "node_modules/" using only package-lock.json
-     *
-     * @param IOInterface $inputOutput
-     * @param int $timeout
-     * @param bool $verbose
      */
     private static function npmCi(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
     {
@@ -185,8 +174,6 @@ class ScriptHandler
 
     /**
      * Set permissions for directories
-     *
-     * @param Event $event
      */
     public static function setPermissions(Event $event)
     {

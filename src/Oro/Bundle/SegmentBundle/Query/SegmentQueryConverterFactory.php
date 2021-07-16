@@ -31,14 +31,6 @@ class SegmentQueryConverterFactory
     /** @var SegmentQueryConverterState */
     private $segmentQueryConverterState;
 
-    /**
-     * @param FunctionProviderInterface        $functionProvider
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param RestrictionBuilderInterface      $restrictionBuilder
-     * @param SegmentQueryConverterState       $segmentQueryConverterState
-     */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
@@ -55,9 +47,6 @@ class SegmentQueryConverterFactory
         $this->segmentQueryConverterState = $segmentQueryConverterState;
     }
 
-    /**
-     * @return SegmentQueryConverter
-     */
     public function createInstance(): SegmentQueryConverter
     {
         return new SegmentQueryConverter(

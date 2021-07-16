@@ -83,9 +83,6 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         $this->loadUsers($manager);
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadRoles(ObjectManager $manager)
     {
         /* @var AclManager $aclManager */
@@ -114,9 +111,6 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         $aclManager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadUsers(ObjectManager $manager)
     {
         /** @var UserManager $userManager */

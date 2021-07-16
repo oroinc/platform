@@ -17,9 +17,6 @@ class TestTransport2SettingsType extends AbstractType
     const BLOCK_PREFIX = 'oro_test_transport_2_settings';
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     *
      * @throws ConstraintDefinitionException
      * @throws InvalidOptionsException
      * @throws MissingOptionsException
@@ -37,8 +34,6 @@ class TestTransport2SettingsType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
      * @throws AccessException
      */
     public function configureOptions(OptionsResolver $resolver)

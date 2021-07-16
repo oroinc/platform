@@ -19,9 +19,6 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

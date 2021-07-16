@@ -18,9 +18,6 @@ class ParametersResolver
     ];
 
     /**
-     * @param ActionData $data
-     * @param ActionGroup $actionGroup
-     * @param Collection|null $errors
      * @throws InvalidParameterException
      */
     public function resolve(ActionData $data, ActionGroup $actionGroup, Collection $errors = null)
@@ -96,10 +93,6 @@ class ParametersResolver
         return false;
     }
 
-    /**
-     * @param array $violations
-     * @param Collection $errors
-     */
     private function delegateErrors(array &$violations, Collection $errors)
     {
         foreach ($violations as $errorBody) {

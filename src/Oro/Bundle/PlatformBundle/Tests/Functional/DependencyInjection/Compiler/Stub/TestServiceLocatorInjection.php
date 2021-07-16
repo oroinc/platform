@@ -13,17 +13,11 @@ class TestServiceLocatorInjection implements
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface|null $container
-     */
     public function __construct(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * @param ContainerInterface|null $container
-     */
     public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;

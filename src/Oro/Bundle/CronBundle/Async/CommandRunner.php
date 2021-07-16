@@ -12,9 +12,6 @@ class CommandRunner implements CommandRunnerInterface
      */
     private $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(MessageProducerInterface $producer)
     {
         $this->producer = $producer;

@@ -60,10 +60,6 @@ abstract class TemplateRenderer
 
     /**
      * Registers TWIG extension in the sandbox.
-     *
-     * @param ExtensionInterface $extension
-     *
-     * @return void
      */
     public function addExtension(ExtensionInterface $extension): void
     {
@@ -72,11 +68,6 @@ abstract class TemplateRenderer
 
     /**
      * Adds TWIG filter that should be applied to the given system variable if not any other filter is applied to it.
-     *
-     * @param string $variable
-     * @param string $filter
-     *
-     * @return void
      */
     public function addSystemVariableDefaultFilter(string $variable, string $filter): void
     {
@@ -85,11 +76,6 @@ abstract class TemplateRenderer
 
     /**
      * Renders the given TWIG template.
-     *
-     * @param string $template
-     * @param array  $templateParams
-     *
-     * @return string
      *
      * @throws \Twig\Error\Error if the given template cannot be rendered
      */
@@ -107,10 +93,6 @@ abstract class TemplateRenderer
     /**
      * Validates syntax of the given TWIG template.
      *
-     * @param string $template
-     *
-     * @return void
-     *
      * @throws \Twig\Error\SyntaxError if the given template has errors
      */
     public function validateTemplate(string $template): void
@@ -127,9 +109,6 @@ abstract class TemplateRenderer
      */
     abstract protected function getVariableNotFoundMessage(): ?string;
 
-    /**
-     * @return void
-     */
     protected function ensureSandboxConfigured(): void
     {
         if (!$this->sandboxConfigured) {
@@ -138,9 +117,6 @@ abstract class TemplateRenderer
         }
     }
 
-    /**
-     * @return void
-     */
     protected function configureSandbox(): void
     {
         $config = $this->configProvider->getConfiguration();
@@ -157,10 +133,6 @@ abstract class TemplateRenderer
         $this->environment->addExtension($formatExtension);
     }
 
-    /**
-     * @param array $configMethods
-     * @return array
-     */
     private function enableToStringMethod(array $configMethods): array
     {
         foreach ($configMethods as $className => &$methods) {
@@ -172,10 +144,6 @@ abstract class TemplateRenderer
 
     /**
      * Creates new instance of TemplateData that is used as the context for rendering of TWIG template.
-     *
-     * @param array $templateParams
-     *
-     * @return TemplateData
      */
     protected function createTemplateData(array $templateParams): TemplateData
     {
@@ -193,11 +161,6 @@ abstract class TemplateRenderer
 
     /**
      * Prepares the given TWIG template to render.
-     *
-     * @param string       $template
-     * @param TemplateData $data
-     *
-     * @return string
      */
     protected function prepareTemplate(string $template, TemplateData $data): string
     {
@@ -214,10 +177,6 @@ abstract class TemplateRenderer
     /**
      * Parses the given TWIG template and adds filters to the system variables
      * defined in $this->systemVariableDefaultFilters.
-     *
-     * @param string $template
-     *
-     * @return string
      */
     private function processDefaultFiltersForSystemVariables(string $template): string
     {
@@ -231,11 +190,6 @@ abstract class TemplateRenderer
     /**
      * Parses the given TWIG template and replaces entity variables
      * (they start with "entity." or "computed.entity__") with expression that adds default filters.
-     *
-     * @param string       $template
-     * @param TemplateData $data
-     *
-     * @return string
      */
     private function processDefaultFiltersForEntityVariables(string $template, TemplateData $data): string
     {
@@ -270,11 +224,6 @@ abstract class TemplateRenderer
     /**
      * Parses the given TWIG template and computes values for entity variables
      * (they start with "entity.") that has a processor.
-     *
-     * @param string       $template
-     * @param TemplateData $data
-     *
-     * @return string
      */
     private function processEntityVariables(string $template, TemplateData $data): string
     {
@@ -309,12 +258,6 @@ abstract class TemplateRenderer
         );
     }
 
-    /**
-     * @param string       $variable
-     * @param TemplateData $data
-     *
-     * @return string
-     */
     private function getFinalVariable(string $variable, TemplateData $data): string
     {
         if ($data->hasComputedVariable($variable)) {

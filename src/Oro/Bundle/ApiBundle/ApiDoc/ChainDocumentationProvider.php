@@ -20,11 +20,6 @@ class ChainDocumentationProvider implements DocumentationProviderInterface
     /** @var RequestExpressionMatcher */
     private $matcher;
 
-    /**
-     * @param array                    $providers
-     * @param ContainerInterface       $container
-     * @param RequestExpressionMatcher $matcher
-     */
     public function __construct(
         array $providers,
         ContainerInterface $container,
@@ -69,11 +64,6 @@ class ChainDocumentationProvider implements DocumentationProviderInterface
         return !$expression || $this->matcher->matchValue($expression, $requestType);
     }
 
-    /**
-     * @param string $serviceId
-     *
-     * @return DocumentationProviderInterface
-     */
     private function instantiateProvider(string $serviceId): DocumentationProviderInterface
     {
         return $this->container->get($serviceId);

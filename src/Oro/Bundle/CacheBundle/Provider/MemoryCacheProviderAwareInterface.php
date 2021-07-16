@@ -7,8 +7,5 @@ namespace Oro\Bundle\CacheBundle\Provider;
  */
 interface MemoryCacheProviderAwareInterface
 {
-    /**
-     * @param MemoryCacheProviderInterface|null $memoryCacheProvider
-     */
     public function setMemoryCacheProvider(?MemoryCacheProviderInterface $memoryCacheProvider): void;
 }

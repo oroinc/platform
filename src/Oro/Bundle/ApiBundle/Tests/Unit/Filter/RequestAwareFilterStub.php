@@ -11,9 +11,6 @@ class RequestAwareFilterStub extends ComparisonFilter implements RequestAwareFil
     /** @var RequestType|null */
     private $requestType;
 
-    /**
-     * @return RequestType|null
-     */
     public function getRequestType(): ?RequestType
     {
         return $this->requestType;

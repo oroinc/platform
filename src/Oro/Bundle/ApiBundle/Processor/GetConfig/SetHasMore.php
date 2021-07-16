@@ -27,9 +27,6 @@ class SetHasMore implements ProcessorInterface
         $this->setHasMore($definition);
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     */
     private function setHasMore(EntityDefinitionConfig $definition): void
     {
         $definition->setHasMore(true);

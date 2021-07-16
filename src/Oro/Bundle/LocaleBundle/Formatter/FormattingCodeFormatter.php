@@ -17,10 +17,6 @@ class FormattingCodeFormatter
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(TranslatorInterface $translator, LocaleSettings $localeSettings)
     {
         $this->translator = $translator;

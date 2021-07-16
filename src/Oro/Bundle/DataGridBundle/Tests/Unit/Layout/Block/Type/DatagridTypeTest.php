@@ -261,8 +261,6 @@ class DatagridTypeTest extends BlockTypeTestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expectedOptions
      */
     public function testConfigureOptions(array $options, array $expectedOptions)
     {

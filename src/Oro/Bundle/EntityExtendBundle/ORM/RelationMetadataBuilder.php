@@ -76,11 +76,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param ClassMetadataBuilder $metadataBuilder
-     * @param FieldConfigId        $fieldId
-     * @param array                $relation
-     */
     protected function buildManyToOneRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
@@ -141,11 +136,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param ClassMetadataBuilder $metadataBuilder
-     * @param FieldConfigId        $fieldId
-     * @param array                $relation
-     */
     protected function buildManyToManyRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
@@ -168,11 +158,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param ClassMetadataBuilder $metadataBuilder
-     * @param FieldConfigId        $fieldId
-     * @param array                $relation
-     */
     protected function buildManyToManyOwningSideRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
@@ -240,7 +225,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param ClassMetadataBuilder $metadataBuilder
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
-     *
      */
     protected function buildDefaultRelation(
         ClassMetadataBuilder $metadataBuilder,
@@ -407,10 +391,6 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
     }
 
-    /**
-     * @param AssociationBuilder $builder
-     * @param string             $fetch
-     */
     private function setFetchOption(AssociationBuilder $builder, string $fetch)
     {
         $method = $this->inflector->camelize('fetch_' . $fetch);

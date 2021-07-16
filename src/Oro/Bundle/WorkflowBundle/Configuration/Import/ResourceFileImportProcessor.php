@@ -78,11 +78,6 @@ class ResourceFileImportProcessor implements ConfigImportProcessorInterface
         $this->parent = $parentProcessor;
     }
 
-    /**
-     * @param \SplFileInfo $contentSource
-     *
-     * @return \SplFileInfo
-     */
     private function getImportFile(\SplFileInfo $contentSource): \SplFileInfo
     {
         if ('@' === $this->importResource[0]) {

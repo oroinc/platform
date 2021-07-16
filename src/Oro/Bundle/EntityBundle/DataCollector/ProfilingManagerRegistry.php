@@ -18,8 +18,6 @@ class ProfilingManagerRegistry extends BaseRegistry
 
     /**
      * Sets a profiling logger.
-     *
-     * @param OrmLogger $logger
      */
     public function setProfilingLogger(OrmLogger $logger)
     {
@@ -28,8 +26,6 @@ class ProfilingManagerRegistry extends BaseRegistry
 
     /**
      * Sets logging hydrators are used for the profiling.
-     *
-     * @param array $hydrators
      */
     public function setLoggingHydrators(array $hydrators)
     {

@@ -64,8 +64,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_department table
-     *
-     * @param Schema $schema
      */
     private function createTestDepartmentTable(Schema $schema)
     {
@@ -98,8 +96,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_person table
-     *
-     * @param Schema $schema
      */
     private function createTestPersonTable(Schema $schema)
     {
@@ -140,8 +136,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_default_and_null table
-     *
-     * @param Schema $schema
      */
     private function createTestDefaultAndNullTable(Schema $schema)
     {
@@ -166,8 +160,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_nested_objects table
-     *
-     * @param Schema $schema
      */
     public function createTestNestedObjectsTable(Schema $schema)
     {
@@ -201,8 +193,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_without_id_generator table
-     *
-     * @param Schema $schema
      */
     private function createTestWithoutIdGeneratorTable(Schema $schema)
     {
@@ -218,8 +208,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_composite_id table
-     *
-     * @param Schema $schema
      */
     private function createTestCompositeIdentifierTable(Schema $schema)
     {
@@ -251,8 +239,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_custom_id and test_api_custom_composite_id tables
-     *
-     * @param Schema $schema
      */
     private function createTestCustomIdentifierTables(Schema $schema)
     {
@@ -302,8 +288,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_composite_id table
-     *
-     * @param Schema $schema
      */
     private function createTestAllDataTypesTable(Schema $schema)
     {
@@ -342,8 +326,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create custom entity tables
-     *
-     * @param Schema $schema
      */
     private function createTestCustomEntityTables(Schema $schema)
     {
@@ -546,8 +528,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      * * test_api_owner
      * * test_api_target
      * * test_api_activity
-     *
-     * @param Schema $schema
      */
     private function createTestEntityTables(Schema $schema)
     {
@@ -615,8 +595,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_product table
-     *
-     * @param Schema $schema
      */
     private function createTestProductTable(Schema $schema)
     {
@@ -632,8 +610,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_order and test_api_order_line_item tables
-     *
-     * @param Schema $schema
      */
     private function createTestOrderTables(Schema $schema)
     {
@@ -682,8 +658,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      * * test_api_override_target
      * * test_api_override_a_target
      * * test_api_override_activity
-     *
-     * @param Schema $schema
      */
     private function createTestOverrideClassEntityTables(Schema $schema)
     {
@@ -772,8 +746,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_magazine and test_api_article tables
-     *
-     * @param Schema $schema
      */
     private function createTestMagazineTables(Schema $schema)
     {
@@ -807,8 +779,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
     /**
      * Create test_api_coll and test_api_coll_item tables
-     *
-     * @param Schema $schema
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -955,11 +925,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
     }
 
-    /**
-     * @param Table  $table
-     * @param Table  $targetTable
-     * @param string $columnName
-     */
     private function addCollectionTableForeignKeyConstraint(Table $table, Table $targetTable, string $columnName)
     {
         $table->addForeignKeyConstraint(

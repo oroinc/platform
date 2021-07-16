@@ -30,8 +30,6 @@ class EntityAliasLoader
     /**
      * Loads entity aliases into the storage.
      *
-     * @param EntityAliasStorage $storage
-     *
      * @throws InvalidEntityAliasException if an alias or a plural alias for any entity is not valid
      * @throws DuplicateEntityAliasException if duplicated entity alias is detected
      */
@@ -50,11 +48,6 @@ class EntityAliasLoader
         }
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityAlias|null
-     */
     protected function getEntityAlias(string $entityClass): ?EntityAlias
     {
         $entityAlias = null;

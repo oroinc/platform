@@ -16,23 +16,16 @@ interface Oauth2ManagerInterface
 {
     /**
      * Returns unique type name of the manager implementation
-     *
-     * @return string
      */
     public function getType(): string;
 
-
     /**
      * Returns form type class name for check connection widget
-     *
-     * @return string
      */
     public function getConnectionFormTypeClass(): string;
 
     /**
      * Sets user email origin defaults
-     *
-     * @param UserEmailOrigin $origin
      */
     public function setOriginDefaults(UserEmailOrigin $origin): void;
 
@@ -66,25 +59,17 @@ interface Oauth2ManagerInterface
     /**
      * Refreshes access token for given User Email Origin
      *
-     * @param UserEmailOrigin $origin
-     *
      * @throws RefreshOAuthAccessTokenFailureException
      */
     public function refreshAccessToken(UserEmailOrigin $origin);
 
     /**
      * Provides access token data object by auth code
-     *
-     * @param string $code
-     * @return TokenInfo
      */
     public function getAccessTokenDataByAuthCode(string $code): TokenInfo;
 
     /**
      * Provides access token data object by auth code
-     *
-     * @param string $refreshToken
-     * @return TokenInfo
      */
     public function getAccessTokenDataByRefreshToken(string $refreshToken): TokenInfo;
 
@@ -98,15 +83,11 @@ interface Oauth2ManagerInterface
 
     /**
      * Returns authentication mode for email transport
-     *
-     * @return string
      */
     public function getAuthMode(): string;
 
     /**
      * Returns true if OAuth is enabled for this certain type
-     *
-     * @return bool
      */
     public function isOAuthEnabled(): bool;
 }

@@ -26,8 +26,6 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
 
     /**
      * Register functions
-     *
-     * @param ContainerBuilder $container
      */
     private function registerFunctions(ContainerBuilder $container)
     {
@@ -39,8 +37,6 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
 
     /**
      * Register filters
-     *
-     * @param ContainerBuilder $container
      */
     private function registerFilters(ContainerBuilder $container)
     {
@@ -69,8 +65,6 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
 
     /**
      * Register a twig extensions
-     *
-     * @param ContainerBuilder $container
      */
     private function registerTwigExtensions(ContainerBuilder $container)
     {

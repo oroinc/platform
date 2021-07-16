@@ -64,7 +64,6 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getHeaders')
             ->will($this->returnValue($headers));
 
-
         $result = ReflectionUtil::callMethod($this->processor, 'getPartContentType', [$this->part]);
 
         $this->assertNull($result);
@@ -72,12 +71,6 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider extractContentProvider
-     * @param $contentTransferEncoding
-     * @param $contentType
-     * @param $contentCharset
-     * @param $contentValue
-     * @param $expected
-     * @param $decodedValue
      */
     public function testExtractContent(
         $contentTransferEncoding,
