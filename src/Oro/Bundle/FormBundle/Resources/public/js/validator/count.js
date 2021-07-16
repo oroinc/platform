@@ -1,5 +1,8 @@
-define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const numberValidator = require('oroform/js/validator/number');
 
     const defaultParam = {
         exactMessage: 'This collection should contain exactly {{ limit }} element.|' +
@@ -95,7 +98,7 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
         function(param, element) {
             const value = getCount(this, element);
             const placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             placeholders.count = value;
             return numberValidator[2].call(this, param, element, value, placeholders);
         }

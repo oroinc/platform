@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const numberFormatter = require('orolocale/js/formatter/number');
     const defaultParam = {
@@ -33,7 +32,7 @@ define(function(require) {
             const normalizedValue = numberFormatter.unformatStrict(value);
             const normalizedMin = numberFormatter.unformatStrict(param.min);
             const normalizedMax = numberFormatter.unformatStrict(param.max);
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             if (isNaN(normalizedValue)) {
                 message = param.invalidMessage;
             } else if (param.max !== null && param.min !== null &&

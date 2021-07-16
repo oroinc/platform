@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const moment = require('moment');
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
     const defaultParam = {
@@ -25,13 +24,13 @@ define(function(require) {
     function between(valueMoment, min, max) {
         const format = datetimeFormatter.getBackendDateTimeFormat();
         let result = true;
-        if (!_.isUndefined(min) && min === max) {
+        if (min !== void 0 && min === max) {
             result = moment(min, format).diff(valueMoment) === 0 || 0;
         } else {
-            if (!_.isUndefined(min) && min !== null) {
+            if (min !== void 0 && min !== null) {
                 result = moment(min, format).diff(valueMoment) <= 0 || -1;
             }
-            if (result === true && !_.isUndefined(max) && max !== null) {
+            if (result === true && max !== void 0 && max !== null) {
                 result = moment(max, format).diff(valueMoment) >= 0 || 1;
             }
         }
@@ -58,7 +57,7 @@ define(function(require) {
                 ? datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
             const valueMoment = moment(String(value), format, true);
             const placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             placeholders.value = value;
 
             if (!valueMoment.isValid()) {
