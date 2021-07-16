@@ -140,7 +140,6 @@ oro_behat_extension:
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
-        - OroSecurityBundle::PermissionContext
         - OroLocaleBundle::LocalizationContext
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext

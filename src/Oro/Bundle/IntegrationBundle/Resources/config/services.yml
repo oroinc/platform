@@ -192,6 +192,7 @@ services:
     oro_integration.provider.settings_provider:
         class: Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
         public: false
+        parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/integrations.php'
             - '%kernel.debug%'
