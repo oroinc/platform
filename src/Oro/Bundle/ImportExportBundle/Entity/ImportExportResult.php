@@ -104,9 +104,6 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
         return $this->id;
     }
 
-    /**
-     * @return User|null
-     */
     public function getOwner(): ?User
     {
         return $this->owner;
@@ -124,9 +121,6 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFilename(): ?string
     {
         return $this->filename;
@@ -184,19 +178,11 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     *
-     * @return ImportExportResult
-     */
     public function setType(string $type): ImportExportResult
     {
         $this->type = $type;
@@ -204,19 +190,11 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getEntity(): ?string
     {
         return $this->entity;
     }
 
-    /**
-     * @param string $entity
-     *
-     * @return ImportExportResult
-     */
     public function setEntity(string $entity): ImportExportResult
     {
         $this->entity = $entity;

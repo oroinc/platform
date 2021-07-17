@@ -32,12 +32,6 @@ class EmailTemplateContentProvider
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param EmailRenderer $emailRenderer
-     * @param PropertyAccessor $propertyAccessor
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailRenderer $emailRenderer,
@@ -52,11 +46,6 @@ class EmailTemplateContentProvider
 
     /**
      * Get localized email template
-     *
-     * @param EmailTemplateCriteria $criteria
-     * @param Localization $localization
-     * @param array $templateParams
-     * @return EmailTemplateModel
      */
     public function getTemplateContent(
         EmailTemplateCriteria $criteria,
@@ -100,11 +89,6 @@ class EmailTemplateContentProvider
         return $emailTemplateModel;
     }
 
-    /**
-     * @param EmailTemplate $entity
-     * @param Localization $localization
-     * @return EmailTemplateModel
-     */
     public function getLocalizedModel(EmailTemplate $entity, Localization $localization): EmailTemplateModel
     {
         $model = new EmailTemplateModel();
@@ -133,12 +117,6 @@ class EmailTemplateContentProvider
      * Finding the right template for the localization tree based on the fallback attribute.
      * When not exist template or specified fallback for localization without a parent
      * used default attribute value from entity.
-     *
-     * @param array $templateIndex
-     * @param Localization $localization
-     * @param EmailTemplateModel $model
-     * @param EmailTemplate $entity
-     * @param string $attribute
      */
     private function populateAttribute(
         array $templateIndex,

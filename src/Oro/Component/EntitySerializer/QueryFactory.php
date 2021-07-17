@@ -26,10 +26,6 @@ class QueryFactory
     /** @var QueryResolver */
     private $queryResolver;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param QueryResolver  $queryResolver
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         QueryResolver $queryResolver
@@ -57,12 +53,6 @@ class QueryFactory
         return $query;
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $entityIds
-     *
-     * @return QueryBuilder
-     */
     public function getRelatedItemsQueryBuilder(string $entityClass, array $entityIds): QueryBuilder
     {
         $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'r');
@@ -72,12 +62,6 @@ class QueryFactory
         return $qb;
     }
 
-    /**
-     * @param array $associationMapping
-     * @param array $entityIds
-     *
-     * @return QueryBuilder
-     */
     public function getToManyAssociationQueryBuilder(array $associationMapping, array $entityIds): QueryBuilder
     {
         $qb = $this->getNotInitializedToManyAssociationQueryBuilder($associationMapping);
@@ -86,11 +70,6 @@ class QueryFactory
         return $qb;
     }
 
-    /**
-     * @param array $associationMapping
-     *
-     * @return QueryBuilder
-     */
     public function getNotInitializedToManyAssociationQueryBuilder(array $associationMapping): QueryBuilder
     {
         if ($associationMapping['mappedBy'] && $associationMapping['type'] === ClassMetadata::ONE_TO_MANY) {
@@ -104,11 +83,6 @@ class QueryFactory
             ->innerJoin('e.' . $associationMapping['fieldName'], 'r');
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $entityClass
-     * @param array        $entityIds
-     */
     public function initializeToManyAssociationQueryBuilder(
         QueryBuilder $qb,
         string $entityClass,
@@ -158,13 +132,6 @@ class QueryFactory
         return $rows;
     }
 
-    /**
-     * @param Query $subQueryTemplate
-     * @param array $entityIds
-     * @param int   $relatedRecordsLimit
-     *
-     * @return SqlQueryBuilder
-     */
     private function getRelatedItemsUnionAllQuery(
         Query $subQueryTemplate,
         array $entityIds,
@@ -208,13 +175,6 @@ class QueryFactory
         return $qb;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $targetEntityClass
-     * @param EntityConfig $config
-     *
-     * @return Query
-     */
     private function getRelatedItemsIdsQuery(QueryBuilder $qb, string $targetEntityClass, EntityConfig $config): Query
     {
         $qb->addSelect(\sprintf(
@@ -225,12 +185,6 @@ class QueryFactory
         return $this->getQuery($qb, $config);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     * @param string       $entityIdField
-     * @param array        $entityIds
-     */
     private function applyEntityIdentifierRestriction(
         QueryBuilder $qb,
         string $alias,

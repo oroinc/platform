@@ -24,11 +24,6 @@ class OriginalUrlProvider
     /** @var UrlConverter */
     private $datagridUrlConverter;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param RouterInterface $router
-     * @param UrlConverter    $datagridUrlConverter
-     */
     public function __construct(
         RequestStack $requestStack,
         RouterInterface $router,
@@ -44,10 +39,6 @@ class OriginalUrlProvider
      * when action forwards us to a page that doesn't have any relation with the previous page.
      * We can't use js for this, because it doesn't cover the situation
      * when one user shares this link to another user.
-     *
-     * @param ButtonSearchContext|null $buttonSearchContext
-     *
-     * @return string|null
      */
     public function getOriginalUrl(ButtonSearchContext $buttonSearchContext = null): ?string
     {
@@ -73,9 +64,6 @@ class OriginalUrlProvider
         return $this->datagridUrlConverter->convertGridUrlToPageUrl($datagridName, $originalUrl);
     }
 
-    /**
-     * @return string|null
-     */
     private function getMasterRequestUri(): ?string
     {
         $request = $this->requestStack->getMasterRequest();

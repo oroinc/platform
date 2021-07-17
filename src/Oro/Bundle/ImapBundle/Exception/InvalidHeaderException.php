@@ -21,11 +21,6 @@ class InvalidHeaderException extends \RuntimeException
         parent::__construct($message, $exception->getCode(), $exception);
     }
 
-    /**
-     * @param $header
-     *
-     * @return string
-     */
     private function getHeaderName(string $header): string
     {
         $headerName = '';

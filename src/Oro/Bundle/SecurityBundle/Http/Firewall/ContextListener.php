@@ -26,11 +26,6 @@ class ContextListener
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param ManagerRegistry       $doctrine
-     * @param LoggerInterface       $logger
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         ManagerRegistry $doctrine,
@@ -43,8 +38,6 @@ class ContextListener
 
     /**
      * Refresh organization context in token
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -74,11 +67,6 @@ class ContextListener
         }
     }
 
-    /**
-     * @param Organization $organization
-     *
-     * @return Organization|null
-     */
     private function refreshOrganization(Organization $organization): ?Organization
     {
         $organizationId = $organization->getId();
@@ -94,8 +82,6 @@ class ContextListener
     }
 
     /**
-     * @param GetResponseEvent $event
-     *
      * @throws OrganizationAccessDeniedException
      */
     private function denyAccess(GetResponseEvent $event): void

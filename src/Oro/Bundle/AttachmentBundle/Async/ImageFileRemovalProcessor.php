@@ -26,10 +26,6 @@ class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubsc
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param FileRemovalManagerInterface $imageRemovalManager
-     * @param LoggerInterface             $logger
-     */
     public function __construct(
         FileRemovalManagerInterface $imageRemovalManager,
         LoggerInterface $logger
@@ -85,9 +81,6 @@ class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubsc
         return self::ACK;
     }
 
-    /**
-     * @return OptionsResolver
-     */
     private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
@@ -108,14 +101,6 @@ class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubsc
         return $resolver;
     }
 
-    /**
-     * @param int    $id
-     * @param string $filename
-     * @param string $originalFileName
-     * @param string $parentEntityClass
-     *
-     * @return File
-     */
     private function getFile(int $id, string $filename, string $originalFileName, string $parentEntityClass): File
     {
         $file = new FileModel();

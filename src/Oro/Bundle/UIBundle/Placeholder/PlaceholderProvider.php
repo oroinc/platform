@@ -27,12 +27,6 @@ class PlaceholderProvider
     /** @var FeatureChecker */
     private $featureChecker;
 
-    /**
-     * @param PlaceholderConfigurationProvider $configProvider
-     * @param ResolverInterface                $resolver
-     * @param AuthorizationCheckerInterface    $authorizationChecker
-     * @param FeatureChecker                   $featureChecker
-     */
     public function __construct(
         PlaceholderConfigurationProvider $configProvider,
         ResolverInterface $resolver,
@@ -72,11 +66,6 @@ class PlaceholderProvider
 
     /**
      * Gets item by name.
-     *
-     * @param string $itemName
-     * @param array  $variables
-     *
-     * @return array|null
      */
     public function getItem(string $itemName, array $variables): ?array
     {

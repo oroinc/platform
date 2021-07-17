@@ -140,9 +140,6 @@ class Builder implements MemoryCacheProviderAwareInterface
      * Try to find datasource adapter and process it
      * Datasource object should be self-acceptable to grid
      *
-     * @param DatagridInterface     $grid
-     * @param DatagridConfiguration $config
-     *
      * @throws RuntimeException
      */
     private function buildDataSource(DatagridInterface $grid, DatagridConfiguration $config)

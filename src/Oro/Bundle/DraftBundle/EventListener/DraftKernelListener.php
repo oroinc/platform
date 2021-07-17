@@ -26,19 +26,12 @@ class DraftKernelListener
      */
     private $draftHelper;
 
-    /**
-     * @param DraftManager $draftManager
-     * @param DraftHelper $draftHelper
-     */
     public function __construct(DraftManager $draftManager, DraftHelper $draftHelper)
     {
         $this->draftManager = $draftManager;
         $this->draftHelper = $draftHelper;
     }
 
-    /**
-     * @param FilterControllerArgumentsEvent $event
-     */
     public function onKernelControllerArguments(FilterControllerArgumentsEvent $event): void
     {
         if ($event->isMasterRequest() && $this->draftHelper->isSaveAsDraftAction()) {
@@ -47,11 +40,6 @@ class DraftKernelListener
         }
     }
 
-    /**
-     * @param array $arguments
-     *
-     * @return array
-     */
     private function updateArguments(array $arguments = []): array
     {
         return array_map(function ($argument) {

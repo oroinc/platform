@@ -15,17 +15,11 @@ class UpdateUserCommandEventListener
     /** @var UserManager */
     protected $userManager;
 
-    /**
-     * @param UserManager $userManager
-     */
     public function __construct(UserManager $userManager)
     {
         $this->userManager = $userManager;
     }
 
-    /**
-     * @param ConsoleTerminateEvent $event
-     */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
         if ($event->getCommand() instanceof UpdateUserCommand) {

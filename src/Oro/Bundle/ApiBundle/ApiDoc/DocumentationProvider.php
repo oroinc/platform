@@ -28,10 +28,6 @@ class DocumentationProvider implements DocumentationProviderInterface
     /** @var FileLocatorInterface */
     private $fileLocator;
 
-    /**
-     * @param string               $resource
-     * @param FileLocatorInterface $fileLocator
-     */
     public function __construct(string $resource, FileLocatorInterface $fileLocator)
     {
         $this->resource = $resource;

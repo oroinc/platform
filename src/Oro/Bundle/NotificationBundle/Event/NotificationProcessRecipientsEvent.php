@@ -43,9 +43,6 @@ class NotificationProcessRecipientsEvent extends Event
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getRecipients(): array
     {
         return $this->recipients;

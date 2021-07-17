@@ -21,9 +21,6 @@ class Criteria extends BaseCriteria
     /** @var Join[] */
     private $joins = [];
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(EntityClassResolver $entityClassResolver)
     {
         parent::__construct();
@@ -186,11 +183,6 @@ class Criteria extends BaseCriteria
         return $joinObject;
     }
 
-    /**
-     * @param string $entityName
-     *
-     * @return string|null
-     */
     private function resolveEntityClass(string $entityName): ?string
     {
         try {

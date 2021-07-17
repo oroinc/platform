@@ -16,7 +16,6 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
     protected $serializer;
 
     /**
-     * @param SerializerInterface $serializer
      * @throws InvalidArgumentException
      */
     public function setSerializer(SerializerInterface $serializer)

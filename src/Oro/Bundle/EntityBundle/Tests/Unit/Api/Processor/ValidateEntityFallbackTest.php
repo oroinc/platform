@@ -88,9 +88,6 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         return $includedEntities;
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private static function assertFormSubmittedAndValid(FormInterface $form)
     {
         self::assertTrue($form->isSynchronized());

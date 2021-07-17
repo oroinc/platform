@@ -26,12 +26,6 @@ class CriteriaConnector
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
-    /**
-     * @param CriteriaNormalizer            $criteriaNormalizer
-     * @param CriteriaPlaceholdersResolver  $placeholdersResolver
-     * @param QueryExpressionVisitorFactory $expressionVisitorFactory
-     * @param EntityClassResolver           $entityClassResolver
-     */
     public function __construct(
         CriteriaNormalizer $criteriaNormalizer,
         CriteriaPlaceholdersResolver $placeholdersResolver,
@@ -46,9 +40,6 @@ class CriteriaConnector
 
     /**
      * Adds the given criteria to the query builder.
-     *
-     * @param QueryBuilder   $qb
-     * @param CommonCriteria $criteria
      */
     public function applyCriteria(QueryBuilder $qb, CommonCriteria $criteria): void
     {
@@ -68,9 +59,6 @@ class CriteriaConnector
      * Adds criteria to the query.
      * This is a copy of QueryBuilder addCriteria method. We should set another QueryExpressionVisitor that is able
      * to add own comparison or composite expressions.
-     *
-     * @param QueryBuilder   $qb
-     * @param CommonCriteria $criteria
      */
     private function addCriteria(QueryBuilder $qb, CommonCriteria $criteria): void
     {
@@ -89,10 +77,6 @@ class CriteriaConnector
         }
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
-     */
     private function addJoins(QueryBuilder $qb, Criteria $criteria): void
     {
         $joins = $criteria->getJoins();
@@ -110,11 +94,6 @@ class CriteriaConnector
         }
     }
 
-    /**
-     * @param QueryBuilder   $qb
-     * @param CommonCriteria $criteria
-     * @param array          $aliases
-     */
     private function processWhere(QueryBuilder $qb, CommonCriteria $criteria, array $aliases): void
     {
         $whereExpression = $criteria->getWhereExpression();
@@ -131,11 +110,6 @@ class CriteriaConnector
         }
     }
 
-    /**
-     * @param QueryBuilder   $qb
-     * @param CommonCriteria $criteria
-     * @param array          $aliases
-     */
     private function processOrderings(QueryBuilder $qb, CommonCriteria $criteria, array $aliases): void
     {
         $orderings = $criteria->getOrderings();

@@ -20,10 +20,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var array */
     private $processedConfiguration = [];
 
-    /**
-     * @param RawConfigurationProvider $rawConfigurationProvider
-     * @param SystemAwareResolver      $resolver
-     */
     public function __construct(RawConfigurationProvider $rawConfigurationProvider, SystemAwareResolver $resolver)
     {
         $this->rawConfigurationProvider = $rawConfigurationProvider;

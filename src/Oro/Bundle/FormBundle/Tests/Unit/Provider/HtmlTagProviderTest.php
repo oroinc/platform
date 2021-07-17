@@ -83,9 +83,6 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->htmlTagProvider->getUriSchemes($scope));
     }
 
-    /**
-     * @return array
-     */
     public function allowedElementsDataProvider(): array
     {
         return [
@@ -131,9 +128,6 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function allowedTagsDataProvider(): array
     {
         return [
@@ -152,9 +146,6 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function iframeRegexpDataProvider(): array
     {
         return [
@@ -174,9 +165,6 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function uriSchemesDataProvider(): array
     {
         return [

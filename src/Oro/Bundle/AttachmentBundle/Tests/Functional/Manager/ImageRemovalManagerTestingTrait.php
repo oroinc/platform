@@ -13,19 +13,11 @@ use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 
 trait ImageRemovalManagerTestingTrait
 {
-    /**
-     * @return EntityManagerInterface
-     */
     private function getEntityManager(): EntityManagerInterface
     {
         return self::getContainer()->get('doctrine')->getManagerForClass(File::class);
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return File
-     */
     private function createFileEntity(string $fileName = 'original_attachment.jpg'): File
     {
         /** @var FileManager $fileManager */
@@ -34,9 +26,6 @@ trait ImageRemovalManagerTestingTrait
         return $fileManager->createFileEntity(__DIR__ . '/../Provider/files/' . $fileName);
     }
 
-    /**
-     * @param File $file
-     */
     private function saveFileEntity(File $file): void
     {
         $em = $this->getEntityManager();
@@ -44,10 +33,6 @@ trait ImageRemovalManagerTestingTrait
         $em->flush();
     }
 
-    /**
-     * @param File   $file
-     * @param string $filterName
-     */
     private function applyImageFilter(File $file, string $filterName): void
     {
         /** @var ImageResizeManagerInterface $imageResizeManager */
@@ -55,11 +40,6 @@ trait ImageRemovalManagerTestingTrait
         $imageResizeManager->applyFilter($file, $filterName);
     }
 
-    /**
-     * @param File $file
-     * @param int  $width
-     * @param int  $height
-     */
     private function resizeImage(File $file, int $width, int $height): void
     {
         /** @var ImageResizeManagerInterface $imageResizeManager */
@@ -67,9 +47,6 @@ trait ImageRemovalManagerTestingTrait
         $imageResizeManager->resize($file, $width, $height);
     }
 
-    /**
-     * @param File $file
-     */
     private function removeFiles(File $file): void
     {
         /** @var FileRemovalManagerInterface $imageRemovalManager */

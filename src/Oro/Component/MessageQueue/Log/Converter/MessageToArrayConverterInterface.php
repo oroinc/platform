@@ -11,10 +11,6 @@ interface MessageToArrayConverterInterface
 {
     /**
      * Converts the given message to its array representation.
-     *
-     * @param MessageInterface $message
-     *
-     * @return array
      */
     public function convert(MessageInterface $message): array;
 }

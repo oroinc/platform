@@ -78,12 +78,6 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     /** @var int */
     protected $oldOwner;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ContainerInterface            $container
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TokenAccessorInterface $tokenAccessor,
@@ -111,9 +105,6 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws \LogicException when getOwner method isn't implemented for entity with ownership type
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -191,8 +182,6 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
 
     /**
      * Save old owner id of record
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -208,7 +197,6 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     /**
      * Validate owner
      *
-     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function postSubmit(FormEvent $event)
@@ -259,8 +247,6 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
 
     /**
      * Process form after data is set and remove/disable owner field depending on permissions
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
@@ -589,41 +575,26 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
         return $this->getOrganization()->getId();
     }
 
-    /**
-     * @return AclVoterInterface
-     */
     protected function getAclVoter(): AclVoterInterface
     {
         return $this->container->get('security.acl.voter.basic_permissions');
     }
 
-    /**
-     * @return OwnershipMetadataProviderInterface
-     */
     protected function getOwnershipMetadataProvider(): OwnershipMetadataProviderInterface
     {
         return $this->container->get('oro_security.owner.ownership_metadata_provider');
     }
 
-    /**
-     * @return EntityOwnerAccessor
-     */
     protected function getEntityOwnerAccessor(): EntityOwnerAccessor
     {
         return $this->container->get('oro_security.owner.entity_owner_accessor');
     }
 
-    /**
-     * @return OwnerTreeProvider
-     */
     protected function getOwnerTreeProvider(): OwnerTreeProvider
     {
         return $this->container->get('oro_security.ownership_tree_provider');
     }
 
-    /**
-     * @return BusinessUnitManager
-     */
     protected function getBusinessUnitManager(): BusinessUnitManager
     {
         return $this->container->get('oro_organization.business_unit_manager');

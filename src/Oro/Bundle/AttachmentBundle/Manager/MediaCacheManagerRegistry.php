@@ -20,11 +20,6 @@ class MediaCacheManagerRegistry implements MediaCacheManagerRegistryInterface
     /** @var GaufretteFileManager */
     private $protectedMediaCacheManager;
 
-    /**
-     * @param FileAccessControlChecker $fileAccessControlChecker
-     * @param GaufretteFileManager $publicMediaCacheManager
-     * @param GaufretteFileManager $protectedMediaCacheManager
-     */
     public function __construct(
         FileAccessControlChecker $fileAccessControlChecker,
         GaufretteFileManager $publicMediaCacheManager,

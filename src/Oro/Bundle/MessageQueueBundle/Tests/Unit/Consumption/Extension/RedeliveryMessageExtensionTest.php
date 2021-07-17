@@ -32,9 +32,6 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     *
-     * @param array $properties
-     * @param array $expectedProperties
      */
     public function testOnPreReceived(array $properties, array $expectedProperties)
     {

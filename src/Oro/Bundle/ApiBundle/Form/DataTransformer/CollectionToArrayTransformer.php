@@ -10,9 +10,6 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     /** @var DataTransformerInterface */
     protected $elementTransformer;
 
-    /**
-     * @param DataTransformerInterface $elementTransformer
-     */
     public function __construct(DataTransformerInterface $elementTransformer)
     {
         $this->elementTransformer = $elementTransformer;

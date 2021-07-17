@@ -13,10 +13,6 @@ class CachingTranslationLoader implements LoaderInterface
     /** @var Cache */
     private $cache = [];
 
-    /**
-     * @param LoaderInterface $innerLoader
-     * @param Cache           $cache
-     */
     public function __construct(LoaderInterface $innerLoader, Cache $cache)
     {
         $this->innerLoader = $innerLoader;

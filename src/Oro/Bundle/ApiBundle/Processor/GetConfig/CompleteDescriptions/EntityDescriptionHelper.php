@@ -73,16 +73,6 @@ class EntityDescriptionHelper implements ResetInterface
         $this->humanizedAssociationNames = [];
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     * @param string                 $entityClass
-     * @param bool                   $isInherit
-     * @param string                 $targetAction
-     * @param bool                   $isCollection
-     * @param string|null            $associationName
-     * @param string|null            $parentEntityClass
-     */
     public function setDescriptionForEntity(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
@@ -130,16 +120,6 @@ class EntityDescriptionHelper implements ResetInterface
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     * @param string                 $entityClass
-     * @param bool                   $isInherit
-     * @param string                 $targetAction
-     * @param bool                   $isCollection
-     * @param string|null            $associationName
-     * @param string|null            $parentEntityClass
-     */
     private function setDocumentationForEntity(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
@@ -195,10 +175,6 @@ class EntityDescriptionHelper implements ResetInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     */
     private function registerDocumentationResources(EntityDefinitionConfig $definition, RequestType $requestType): void
     {
         $resourceDocParser = $this->resourceDocParserProvider->getResourceDocParser($requestType);
@@ -210,10 +186,6 @@ class EntityDescriptionHelper implements ResetInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     */
     private function processInheritDocForEntity(EntityDefinitionConfig $definition, string $entityClass): void
     {
         $documentation = $definition->getDocumentation();
@@ -223,15 +195,6 @@ class EntityDescriptionHelper implements ResetInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     * @param string                 $entityClass
-     * @param bool                   $isInherit
-     * @param string                 $targetAction
-     * @param string|null            $associationName
-     * @param string|null            $parentEntityClass
-     */
     private function loadDocumentationForEntity(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
@@ -267,15 +230,6 @@ class EntityDescriptionHelper implements ResetInterface
         }
     }
 
-    /**
-     * @param RequestType $requestType
-     * @param string      $entityClass
-     * @param string      $targetAction
-     * @param string|null $associationName
-     * @param string|null $parentEntityClass
-     *
-     * @return string|null
-     */
     private function getDocumentationForEntity(
         RequestType $requestType,
         string $entityClass,
@@ -295,12 +249,6 @@ class EntityDescriptionHelper implements ResetInterface
         return $resourceDocParser->getActionDocumentation($entityClass, $targetAction);
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $targetAction
-     * @param string                 $entitySingularName
-     * @param string                 $entityPluralName
-     */
     private function setDocumentationForResource(
         EntityDefinitionConfig $definition,
         string $targetAction,
@@ -317,12 +265,6 @@ class EntityDescriptionHelper implements ResetInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $associationDescription
-     * @param string                 $targetAction
-     * @param bool                   $isCollection
-     */
     private function setDocumentationForSubresource(
         EntityDefinitionConfig $definition,
         string $associationDescription,
@@ -339,12 +281,6 @@ class EntityDescriptionHelper implements ResetInterface
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param bool   $isCollection
-     *
-     * @return string
-     */
     private function getEntityDescription(string $entityClass, bool $isCollection): string
     {
         if ($isCollection) {
@@ -379,11 +315,6 @@ class EntityDescriptionHelper implements ResetInterface
         return $entityDescription;
     }
 
-    /**
-     * @param string $associationName
-     *
-     * @return string
-     */
     private function getAssociationDescription(string $associationName): string
     {
         if (isset($this->humanizedAssociationNames[$associationName])) {
@@ -396,11 +327,6 @@ class EntityDescriptionHelper implements ResetInterface
         return $humanizedAssociationName;
     }
 
-    /**
-     * @param Label $label
-     *
-     * @return string|null
-     */
     private function trans(Label $label): ?string
     {
         return $label->trans($this->translator) ?: null;

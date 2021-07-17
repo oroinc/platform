@@ -22,11 +22,6 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
     /** @var EmailOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
 
-    /**
-     * @param FormFactoryInterface      $factory
-     * @param FilterUtility             $util
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -72,9 +67,6 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         return true;
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     */
     protected function applyInboxFilter(OrmFilterDatasourceAdapter $ds)
     {
         $qb = $ds->getQueryBuilder();
@@ -124,9 +116,6 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
             ->andWhere($qb->expr()->exists($dql));
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     */
     protected function applySentFilter(OrmFilterDatasourceAdapter $ds)
     {
         $qb = $ds->getQueryBuilder();

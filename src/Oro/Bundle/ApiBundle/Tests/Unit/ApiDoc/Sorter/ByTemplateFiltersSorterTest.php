@@ -6,12 +6,6 @@ use Oro\Bundle\ApiBundle\ApiDoc\Sorter\ByTemplateFiltersSorter;
 
 class ByTemplateFiltersSorterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $sortingTemplate
-     * @param bool  $addOtherFiltersToBegin
-     *
-     * @return ByTemplateFiltersSorter
-     */
     private function getSorter(array $sortingTemplate, bool $addOtherFiltersToBegin): ByTemplateFiltersSorter
     {
         return new ByTemplateFiltersSorter($sortingTemplate, $addOtherFiltersToBegin);

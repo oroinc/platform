@@ -47,14 +47,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
     /** @var array */
     protected $groups;
 
-    /**
-     * @param ButtonProvider $buttonProvider
-     * @param ContextHelper $contextHelper
-     * @param MassActionProviderRegistry $providerRegistry
-     * @param OptionsHelper $optionsHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ButtonProvider $buttonProvider,
         ContextHelper $contextHelper,
@@ -71,9 +63,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * @param array $groups
-     */
     public function setGroups(array $groups)
     {
         $this->groups = $groups;
@@ -85,9 +74,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         return 0 !== count($this->getButtons($this->getButtonSearchContext($configuration), $configuration));
     }
 
-    /**
-     * @param DatagridConfiguration $configuration
-     */
     public function applyActions(DatagridConfiguration $configuration)
     {
         if (!$this->hasActions($configuration)) {
@@ -222,9 +208,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     protected function applyContextConfig(DatagridConfiguration $config)
     {
         $context = $this->contextHelper->getContext();
@@ -237,10 +220,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param ButtonSearchContext $context
-     */
     protected function applyActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)
     {
         $actionsConfig = $config->offsetGetOr(ActionExtension::ACTION_KEY, []);
@@ -286,10 +265,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         return $config;
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param ButtonSearchContext $context
-     */
     protected function processMassActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)
     {
         $actions = $config->offsetGetOr('mass_actions', []);

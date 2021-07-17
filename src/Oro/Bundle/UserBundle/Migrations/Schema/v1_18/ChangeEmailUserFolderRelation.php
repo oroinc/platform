@@ -36,7 +36,6 @@ class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterf
     /**
      * Add many to many relation table
      *
-     * @param Schema $schema
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function createOroEmailUserFoldersTable(Schema $schema)
@@ -57,7 +56,6 @@ class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterf
     /**
      * Add foreign keys
      *
-     * @param Schema $schema
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addOroEmailUserFoldersForeignKeys(Schema $schema)
@@ -80,7 +78,6 @@ class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterf
     /**
      * Add origin to EmailUser
      *
-     * @param Schema $schema
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function updateOroEmailUserTable(Schema $schema)

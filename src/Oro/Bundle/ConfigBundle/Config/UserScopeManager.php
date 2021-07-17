@@ -18,8 +18,6 @@ class UserScopeManager extends AbstractScopeManager
 
     /**
      * Sets the security context
-     *
-     * @param TokenStorageInterface $securityContext
      */
     public function setSecurityContext(TokenStorageInterface $securityContext)
     {

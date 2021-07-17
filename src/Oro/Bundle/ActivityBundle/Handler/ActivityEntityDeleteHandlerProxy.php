@@ -14,9 +14,6 @@ class ActivityEntityDeleteHandlerProxy extends DeleteHandler
     /** @var ActivityEntityDeleteHandler */
     private $activityEntityDeleteHandler;
 
-    /**
-     * @param ActivityEntityDeleteHandler $activityEntityDeleteHandler
-     */
     public function __construct(ActivityEntityDeleteHandler $activityEntityDeleteHandler)
     {
         $this->activityEntityDeleteHandler = $activityEntityDeleteHandler;

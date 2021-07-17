@@ -21,9 +21,6 @@ class ChangeRoleSubscriber implements EventSubscriberInterface
         return [FormEvents::SUBMIT => ['onSubmit', 10]];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event)
     {
         /** @var AbstractRole $role */

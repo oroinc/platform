@@ -32,9 +32,6 @@ class DateFilterModifier
         DateModifierInterface::PART_YEAR  => 'Y',
     ];
 
-    /**
-     * @param Compiler $compiler
-     */
     public function __construct(Compiler $compiler)
     {
         $this->dateCompiler = $compiler;
@@ -270,11 +267,6 @@ class DateFilterModifier
         return $this->dateFormat($date);
     }
 
-    /**
-     * @param \DateTime $date
-     *
-     * @return string
-     */
     protected function dateFormat(\DateTime $date): string
     {
         return $date->format('Y-m-d H:i');
@@ -391,9 +383,6 @@ class DateFilterModifier
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTimeZone(): ?string
     {
         return $this->timeZone;

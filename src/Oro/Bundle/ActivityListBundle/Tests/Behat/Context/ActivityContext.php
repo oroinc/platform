@@ -189,10 +189,6 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      *            | Close          |
      *
      * @Given /^(?:|I )should see (?P<only>|only )following actions on "(?P<content>[\w\s]*)" in activity list:$/
-     *
-     * @param bool $only
-     * @param string $content
-     * @param TableNode $actions
      */
     public function iShouldSeeFollowingActionsInActivityItem(bool $only, string $content, TableNode $actions): void
     {
@@ -303,8 +299,6 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      * Example: Then I should see Ask how his mood text in activity
      *
      * @Then /^(?:|I )should see (?P<text>.+) text in activity$/
-     *
-     * @param string $text
      */
     public function iShouldSeeTextInCollapsedActivityItem(string $text)
     {
@@ -323,8 +317,6 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      * Example: Then I should not see Ask how his mood text in activity
      *
      * @Then /^(?:|I )should not see (?P<text>.+) text in activity$/
-     *
-     * @param string $text
      */
     public function iShouldNotSeeTextInCollapsedActivityItem(string $text)
     {

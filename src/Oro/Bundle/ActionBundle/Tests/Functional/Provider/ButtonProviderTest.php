@@ -176,9 +176,6 @@ class ButtonProviderTest extends WebTestCase
         return $config;
     }
 
-    /**
-     * @param array $operations
-     */
     private function setOperationsConfig(array $operations)
     {
         $config = $this->configProvider->getConfiguration();

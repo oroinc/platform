@@ -47,8 +47,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Create oro_security_perm_apply_entity table
-     *
-     * @param Schema $schema
      */
     protected function createOroSecurityPermApplyEntityTable(Schema $schema)
     {
@@ -60,8 +58,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Create oro_security_perm_excl_entity table
-     *
-     * @param Schema $schema
      */
     protected function createOroSecurityPermExclEntityTable(Schema $schema)
     {
@@ -73,8 +69,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Create oro_security_permission table
-     *
-     * @param Schema $schema
      */
     protected function createOroSecurityPermissionTable(Schema $schema)
     {
@@ -91,8 +85,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Create oro_security_permission_entity table
-     *
-     * @param Schema $schema
      */
     protected function createOroSecurityPermissionEntityTable(Schema $schema)
     {
@@ -105,8 +97,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Create rememberme_token table
-     *
-     * @param Schema $schema
      */
     private function createRememberMeTokenTable(Schema $schema)
     {
@@ -121,8 +111,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Add oro_security_perm_apply_entity foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSecurityPermApplyEntityForeignKeys(Schema $schema)
     {
@@ -143,8 +131,6 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
 
     /**
      * Add oro_security_perm_excl_entity foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSecurityPermExclEntityForeignKeys(Schema $schema)
     {

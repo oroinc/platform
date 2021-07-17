@@ -17,9 +17,6 @@ class CsrfRequestManager
     /** @var CsrfTokenManagerInterface */
     private $csrfTokenManager;
 
-    /**
-     * @param CsrfTokenManagerInterface $csrfTokenManager
-     */
     public function __construct(CsrfTokenManagerInterface $csrfTokenManager)
     {
         $this->csrfTokenManager = $csrfTokenManager;
@@ -27,11 +24,6 @@ class CsrfRequestManager
 
     /**
      * Checks that the given request is not a CSRF attack.
-     *
-     * @param Request $request
-     * @param bool    $useRequestValue
-     *
-     * @return bool
      */
     public function isRequestTokenValid(Request $request, bool $useRequestValue = false): bool
     {

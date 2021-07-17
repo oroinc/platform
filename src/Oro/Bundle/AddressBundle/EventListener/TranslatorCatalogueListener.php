@@ -21,17 +21,11 @@ class TranslatorCatalogueListener
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
-    /**
-     * @param AfterCatalogueDump $event
-     */
     public function onAfterCatalogueDump(AfterCatalogueDump $event)
     {
         $catalogue = $event->getCatalogue();
@@ -41,11 +35,6 @@ class TranslatorCatalogueListener
         $this->updateTranslations($catalogue, Region::class, 'region.');
     }
 
-    /**
-     * @param MessageCatalogueInterface $catalogue
-     * @param string $className
-     * @param string $prefix
-     */
     private function updateTranslations(MessageCatalogueInterface $catalogue, string $className, string $prefix)
     {
         $repository = $this->getRepository($className);

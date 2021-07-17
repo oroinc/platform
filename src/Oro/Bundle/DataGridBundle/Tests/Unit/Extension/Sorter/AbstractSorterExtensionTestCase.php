@@ -30,10 +30,6 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     /**
      * @dataProvider visitMetadataDataProvider
-     *
-     * @param array $sorters
-     * @param array $columns
-     * @param array $expectedData
      */
     public function testVisitMetadata(array $sorters, array $columns, array $expectedData): void
     {
@@ -56,8 +52,6 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function visitMetadataDataProvider(): array
@@ -318,9 +312,6 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->extension->visitMetadata($config, $data);
     }
 
-    /**
-     * @return array
-     */
     public function visitMetadataUnknownColumnDataProvider(): array
     {
         return [

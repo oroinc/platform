@@ -21,9 +21,6 @@ class SetDataCustomizationHandler implements ProcessorInterface
     /** @var ActionProcessorInterface */
     private $customizationProcessor;
 
-    /**
-     * @param ActionProcessorInterface $customizationProcessor
-     */
     public function __construct(ActionProcessorInterface $customizationProcessor)
     {
         $this->customizationProcessor = $customizationProcessor;
@@ -45,10 +42,6 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $this->setCustomizationHandler($definition, $context);
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ConfigContext          $context
-     */
     private function setCustomizationHandler(EntityDefinitionConfig $definition, ConfigContext $context)
     {
         $version = $context->getVersion();
@@ -83,12 +76,6 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $this->processAssociations($context, $definition, $entityClass);
     }
 
-    /**
-     * @param ConfigContext          $context
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $rootEntityClass
-     * @param string|null            $fieldPath
-     */
     private function processAssociations(
         ConfigContext $context,
         EntityDefinitionConfig $definition,
@@ -108,11 +95,6 @@ class SetDataCustomizationHandler implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     *
-     * @return bool
-     */
     private function isCustomizableAssociation(EntityDefinitionFieldConfig $field): bool
     {
         return
@@ -121,12 +103,6 @@ class SetDataCustomizationHandler implements ProcessorInterface
             && !DataType::isAssociationAsField($field->getDataType());
     }
 
-    /**
-     * @param ConfigContext               $context
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $rootEntityClass
-     * @param string                      $fieldPath
-     */
     private function setAssociationCustomizationHandler(
         ConfigContext $context,
         EntityDefinitionFieldConfig $field,
@@ -171,12 +147,6 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $this->processAssociations($context, $targetEntity, $rootEntityClass, $fieldPath);
     }
 
-    /**
-     * @param string      $fieldName
-     * @param string|null $parentFieldPath
-     *
-     * @return string
-     */
     private function buildFieldPath(string $fieldName, ?string $parentFieldPath = null): string
     {
         return null !== $parentFieldPath

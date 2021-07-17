@@ -7,11 +7,6 @@ use Symfony\Component\Config\Definition\Processor;
 
 class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $configs
-     *
-     * @return array
-     */
     private function processConfiguration(array $configs): array
     {
         $processor = new Processor();
@@ -20,8 +15,6 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param array $expected
      * @dataProvider processDataProvider
      */
     public function testProcess(array $input, array $expected): void
@@ -29,9 +22,6 @@ class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->processConfiguration([$input]));
     }
 
-    /**
-     * @return array
-     */
     public function processDataProvider(): array
     {
         return [

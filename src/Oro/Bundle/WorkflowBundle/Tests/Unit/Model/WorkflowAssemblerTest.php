@@ -98,9 +98,6 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->workflowAssembler = new WorkflowAssembler($this->container);
     }
 
-    /**
-     * @return Workflow
-     */
     protected function createWorkflow(): Workflow
     {
         /** @var DoctrineHelper $doctrineHelper */
@@ -341,10 +338,6 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $configuration
-     * @return WorkflowDefinition
-     */
     private function createWorkflowDefinition(array $configuration): WorkflowDefinition
     {
         return (new WorkflowDefinition())
@@ -353,11 +346,6 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
             ->setConfiguration($configuration);
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param array $configuration
-     * @return ArrayCollection
-     */
     private function expectsAttributeAssembleCalls(
         WorkflowDefinition $workflowDefinition,
         array $configuration

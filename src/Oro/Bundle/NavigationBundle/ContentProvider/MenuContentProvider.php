@@ -16,10 +16,6 @@ class MenuContentProvider implements ContentProviderInterface
     /** @var string */
     private $menu;
 
-    /**
-     * @param MenuExtension $menuExtension
-     * @param string        $menu
-     */
     public function __construct(MenuExtension $menuExtension, string $menu)
     {
         $this->menuExtension = $menuExtension;

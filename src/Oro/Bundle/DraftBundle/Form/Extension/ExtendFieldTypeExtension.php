@@ -47,11 +47,6 @@ class ExtendFieldTypeExtension extends AbstractTypeExtension
         return [FieldType::class];
     }
 
-    /**
-     * @param string $className
-     *
-     * @return bool
-     */
     private function isSupport(string $className): bool
     {
         return is_a($className, DraftableInterface::class, true);

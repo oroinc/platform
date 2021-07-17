@@ -35,9 +35,6 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider normalizeWithoutObjectsInVarsProvider
-     *
-     * @param array $expectedResult
-     * @param BlockView $actualView
      */
     public function testNormalizeWithoutObjectsInVars(array $expectedResult, BlockView $actualView)
     {
@@ -160,9 +157,6 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider denormalizeWithoutObjectsInVarsProvider
-     *
-     * @param BlockView $expectedView
-     * @param array $actualData
      */
     public function testDenormalizeWithoutObjectsInVars(BlockView $expectedView, array $actualData)
     {

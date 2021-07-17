@@ -16,9 +16,6 @@ class AttributeImportStrategy extends EntityFieldImportStrategy
      */
     protected $configHelper;
 
-    /**
-     * @param ConfigHelper $configHelper
-     */
     public function setConfigHelper(ConfigHelper $configHelper)
     {
         $this->configHelper = $configHelper;
@@ -35,9 +32,6 @@ class AttributeImportStrategy extends EntityFieldImportStrategy
         return parent::processEntity($entity);
     }
 
-    /**
-     * @return array
-     */
     protected function getValidationGroups(): array
     {
         return array_merge(parent::getValidationGroups(), ['AttributeField']);

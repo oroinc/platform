@@ -6,9 +6,6 @@ use Oro\Bundle\ApiBundle\Batch\Encoder\JsonDataEncoder;
 
 class JsonApiDataEncoderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return JsonDataEncoder
-     */
     private function getEncoder(): JsonDataEncoder
     {
         $encoder = new JsonDataEncoder();

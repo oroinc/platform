@@ -24,9 +24,6 @@ class TranslationStrategyProvider
         $this->strategies = $strategies;
     }
 
-    /**
-     * @param TranslationStrategyInterface $strategy
-     */
     public function setStrategy(TranslationStrategyInterface $strategy)
     {
         $this->strategy = $strategy;

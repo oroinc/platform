@@ -16,9 +16,6 @@ class LastModifiedDateContextConfigurator implements ContextConfiguratorInterfac
     /** @var LastModificationDateProvider */
     private $lastModificationDateProvider;
 
-    /**
-     * @param LastModificationDateProvider $lastModificationDateProvider
-     */
     public function __construct(LastModificationDateProvider $lastModificationDateProvider)
     {
         $this->lastModificationDateProvider = $lastModificationDateProvider;

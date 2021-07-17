@@ -76,7 +76,6 @@ class ChoiceFilter extends AbstractFilter
             $fieldView->vars['choices']
         );
 
-
         $metadata = parent::getMetadata();
         $metadata['choices'] = $choices;
         $metadata['populateDefault'] = $formView->vars['populate_default'];

@@ -23,9 +23,6 @@ class SymfonyDebugToolbarReplaceListener
         $this->kernel = $kernel;
     }
 
-    /**
-     * @param ResponseEvent $event
-     */
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$this->kernel->isDebug()) {

@@ -83,8 +83,6 @@ class ApiEntityManager
 
     /**
      * Sets a event dispatcher
-     *
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
@@ -93,8 +91,6 @@ class ApiEntityManager
 
     /**
      * Sets the doctrine helper
-     *
-     * @param DoctrineHelper $doctrineHelper
      */
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
@@ -103,8 +99,6 @@ class ApiEntityManager
 
     /**
      * Sets the entity class name helper
-     *
-     * @param EntityClassNameHelper $entityClassNameHelper
      */
     public function setEntityClassNameHelper(EntityClassNameHelper $entityClassNameHelper)
     {
@@ -113,8 +107,6 @@ class ApiEntityManager
 
     /**
      * Sets the entity serializer
-     *
-     * @param EntitySerializer $entitySerializer
      */
     public function setEntitySerializer(EntitySerializer $entitySerializer)
     {

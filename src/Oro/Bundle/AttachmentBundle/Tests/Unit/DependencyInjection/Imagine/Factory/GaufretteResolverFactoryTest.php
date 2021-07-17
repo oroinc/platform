@@ -21,12 +21,6 @@ class GaufretteResolverFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new GaufretteResolverFactory();
     }
 
-    /**
-     * @param TreeBuilder $treeBuilder
-     * @param array       $configs
-     *
-     * @return array
-     */
     private function processConfigTree(TreeBuilder $treeBuilder, array $configs): array
     {
         $processor = new Processor();

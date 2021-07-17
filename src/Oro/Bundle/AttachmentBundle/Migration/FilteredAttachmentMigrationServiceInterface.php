@@ -10,15 +10,8 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 interface FilteredAttachmentMigrationServiceInterface
 {
-    /**
-     * @param EntityManagerInterface $manager
-     */
     public function setManager(EntityManagerInterface $manager);
 
-    /**
-     * @param string $fromPrefix
-     * @param string $toPrefix
-     */
     public function migrate(string $fromPrefix, string $toPrefix);
 
     /**

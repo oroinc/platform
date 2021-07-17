@@ -17,9 +17,6 @@ class AttributeFieldConfigExtension extends AbstractTypeExtension
      */
     protected $attributeConfigProvider;
 
-    /**
-     * @param ConfigProvider $attributeConfigProvider
-     */
     public function __construct(ConfigProvider $attributeConfigProvider)
     {
         $this->attributeConfigProvider = $attributeConfigProvider;
@@ -33,9 +30,6 @@ class AttributeFieldConfigExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPostSetData']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSetData(FormEvent $event)
     {
         /** @var FieldConfigModel $entity */

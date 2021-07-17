@@ -31,11 +31,6 @@ class BuildCustomTypes implements ProcessorInterface
     /** @var ValueTransformer */
     private $valueTransformer;
 
-    /**
-     * @param AssociationManager $associationManager
-     * @param DoctrineHelper     $doctrineHelper
-     * @param ValueTransformer   $valueTransformer
-     */
     public function __construct(
         AssociationManager $associationManager,
         DoctrineHelper $doctrineHelper,
@@ -68,14 +63,6 @@ class BuildCustomTypes implements ProcessorInterface
         ));
     }
 
-    /**
-     * @param array                  $data
-     * @param EntityDefinitionConfig $config
-     * @param string                 $entityClass
-     * @param array                  $context
-     *
-     * @return array
-     */
     private function processCustomTypes(
         array $data,
         EntityDefinitionConfig $config,
@@ -103,13 +90,6 @@ class BuildCustomTypes implements ProcessorInterface
         return $data;
     }
 
-    /**
-     * @param array  $data
-     * @param string $entityClass
-     * @param string $dataType
-     *
-     * @return array|null
-     */
     private function buildExtendedAssociation(array $data, string $entityClass, string $dataType): ?array
     {
         [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
@@ -223,23 +203,12 @@ class BuildCustomTypes implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param string $dataType
-     *
-     * @return bool
-     */
     private function isNestedObject(string $dataType): bool
     {
         return DataType::isNestedObject($dataType) || DataType::isNestedAssociation($dataType);
     }
 
     /**
-     * @param array                  $data
-     * @param EntityDefinitionConfig $config
-     * @param EntityDefinitionConfig $parentConfig
-     * @param array                  $context
-     *
-     * @return array|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function buildNestedObject(

@@ -205,7 +205,6 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
         return $workflow;
     }
 
-
     /**
      * @param $isAvailable
      * @param bool $isExistWorkflowItem
@@ -238,8 +237,6 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
             ->willReturn($isAvailable);
         $workflow->expects($this->any())->method('getStepManager')
             ->willReturn($stepManager);
-
-
 
         if (true === $isExistWorkflowItem) {
             $workflowItem = $this->createMock(WorkflowItem::class);

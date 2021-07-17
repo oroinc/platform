@@ -28,10 +28,6 @@ class Layout
     /** @var TemplateNameParser */
     private static $templateNameParser;
 
-    /**
-     * @param BlockView                       $view
-     * @param LayoutRendererRegistryInterface $rendererRegistry
-     */
     public function __construct(BlockView $view, LayoutRendererRegistryInterface $rendererRegistry)
     {
         $this->view             = $view;
@@ -48,8 +44,6 @@ class Layout
 
     /**
      * Renders the layout
-     *
-     * @return string
      */
     public function render(): string
     {
@@ -83,18 +77,11 @@ class Layout
         return $themes;
     }
 
-    /**
-     * @param string $file
-     * @return bool
-     */
     private function isAbsolutePath(string $file): bool
     {
         return (bool) preg_match('#^(?:/|[a-zA-Z]:)#', $file);
     }
 
-    /**
-     * @return TemplateNameParser
-     */
     private function getTemplateNameParser(): TemplateNameParser
     {
         if (!static::$templateNameParser) {

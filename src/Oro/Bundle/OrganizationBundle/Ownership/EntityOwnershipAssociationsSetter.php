@@ -25,11 +25,6 @@ class EntityOwnershipAssociationsSetter
     /** @var OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
-    /**
-     * @param PropertyAccessorInterface          $propertyAccessor
-     * @param TokenAccessorInterface             $tokenAccessor
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         TokenAccessorInterface $tokenAccessor,
@@ -143,12 +138,6 @@ class EntityOwnershipAssociationsSetter
         return $user->getOwner();
     }
 
-    /**
-     * @param User         $user
-     * @param Organization $organization
-     *
-     * @return BusinessUnit|null
-     */
     private function getBusinessUnit(User $user, Organization $organization): ?BusinessUnit
     {
         $result = null;

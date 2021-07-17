@@ -117,10 +117,6 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $recipient
-     * @param string $expectedName
-     * @param string $expectedEmail
-     *
      * @dataProvider getTestToRecipientDataProvider
      */
     public function testToRecipient(string $recipient, string $expectedName, string $expectedEmail)
@@ -348,9 +344,6 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $email
-     * @param string $expectedContextMessage
-     *
      * @dataProvider getTestValidateRecipientEmailAddressDataProvider
      */
     public function testValidateRecipientEmailAddress(string $email, string $expectedContextMessage)

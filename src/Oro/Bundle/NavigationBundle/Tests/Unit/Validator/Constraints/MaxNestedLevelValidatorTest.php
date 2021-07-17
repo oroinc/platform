@@ -75,7 +75,6 @@ class MaxNestedLevelValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('addViolation')
             ->with("Item \"item-1-1-1\" can't be saved. Max nesting level is reached.");
 
-
         $this->validator->validate($update, $constraint);
 
         $item = $menu->getChild('item-1')

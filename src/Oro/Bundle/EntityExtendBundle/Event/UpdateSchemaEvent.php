@@ -21,10 +21,6 @@ class UpdateSchemaEvent extends Event
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     * @param LoggerInterface $logger
-     */
     public function __construct(CommandExecutor $commandExecutor, LoggerInterface $logger)
     {
         $this->commandExecutor = $commandExecutor;

@@ -65,13 +65,6 @@ class JobExecutor
     /** var ContextAggregatorRegistry */
     protected $contextAggregatorRegistry;
 
-    /**
-     * @param ConnectorRegistry         $jobRegistry
-     * @param BatchJobRepository        $batchJobRepository
-     * @param ContextRegistry           $contextRegistry
-     * @param ManagerRegistry           $managerRegistry
-     * @param ContextAggregatorRegistry $contextAggregatorRegistry
-     */
     public function __construct(
         ConnectorRegistry $jobRegistry,
         BatchJobRepository $batchJobRepository,
@@ -206,8 +199,6 @@ class JobExecutor
 
     /**
      * Try to save batch entities only in case when it's possible
-     *
-     * @param JobExecution $jobExecution
      */
     protected function saveFailedJobExecution(JobExecution $jobExecution)
     {
@@ -329,9 +320,6 @@ class JobExecutor
      * Set data to JobResult
      * TODO: Find a way to work with multiple amount of job and step executions
      * TODO https://magecore.atlassian.net/browse/BAP-2600
-     *
-     * @param JobResult   $jobResult
-     * @param JobInstance $jobInstance
      */
     protected function setJobResultData(JobResult $jobResult, JobInstance $jobInstance)
     {
@@ -433,10 +421,6 @@ class JobExecutor
         return $this->validationMode;
     }
 
-    /**
-     * @param JobExecution $jobExecution
-     * @param JobResult    $jobResult
-     */
     protected function dispatchAfterJobExecutionEvent(JobExecution $jobExecution, JobResult $jobResult)
     {
         if ($this->eventDispatcher && $this->eventDispatcher->hasListeners(Events::AFTER_JOB_EXECUTION)) {

@@ -21,9 +21,6 @@ class GoogleOAuthUserProvider implements OAuthUserProviderInterface
 
     /**
      * Constructor
-     *
-     * @param UserManager   $userManager
-     * @param ConfigManager $configManager
      */
     public function __construct(UserManager $userManager, ConfigManager $configManager)
     {

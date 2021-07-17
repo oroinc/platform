@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Form;
 
-use \Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Allows to mock static getSubscribedEvents() function of event listener class
@@ -16,9 +16,6 @@ class MutableFormEventSubscriber implements EventSubscriberInterface
     /** @var \Symfony\Component\EventDispatcher\EventSubscriberInterface */
     protected $wrapped;
 
-    /**
-     * @param \Symfony\Component\EventDispatcher\EventSubscriberInterface $wrapped
-     */
     public function __construct(EventSubscriberInterface $wrapped)
     {
         $this->wrapped = $wrapped;
@@ -32,9 +29,6 @@ class MutableFormEventSubscriber implements EventSubscriberInterface
         return self::$events;
     }
 
-    /**
-     * @param array $events
-     */
     public static function setSubscribedEvents(array $events)
     {
         self::$events = $events;

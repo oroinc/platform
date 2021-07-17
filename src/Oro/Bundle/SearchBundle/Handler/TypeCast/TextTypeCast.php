@@ -23,19 +23,11 @@ class TextTypeCast extends AbstractTypeCastingHandler
         return parent::castValue($value);
     }
 
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
     public function isSupported($value): bool
     {
         return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
     }
 
-    /**
-     * @return string
-     */
     public static function getType(): string
     {
         return Query::TYPE_TEXT;

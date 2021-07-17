@@ -20,10 +20,6 @@ class FindEntities extends AbstractAction
     /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
     {
         parent::__construct($contextAccessor);

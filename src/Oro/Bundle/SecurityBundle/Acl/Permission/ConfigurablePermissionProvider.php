@@ -15,9 +15,6 @@ class ConfigurablePermissionProvider
     /** @var ConfigurablePermissionConfigurationProvider */
     private $configurationProvider;
 
-    /**
-     * @param ConfigurablePermissionConfigurationProvider $configurationProvider
-     */
     public function __construct(ConfigurablePermissionConfigurationProvider $configurationProvider)
     {
         $this->configurationProvider = $configurationProvider;

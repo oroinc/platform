@@ -35,10 +35,6 @@ class PopulateIntegrationOwner extends AbstractAction
      */
     protected $defaultOwnerHelper;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param DefaultOwnerHelper $defaultOwnerHelper
-     */
     public function __construct(ContextAccessor $contextAccessor, DefaultOwnerHelper $defaultOwnerHelper)
     {
         parent::__construct($contextAccessor);

@@ -52,8 +52,6 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
 
     /**
      * @dataProvider getDataForTestWithRestrictions
-     * @param string $username
-     * @param array $expected
      */
     public function testGetIdsWithRestrictions(string $username, array $expected): void
     {

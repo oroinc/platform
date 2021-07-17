@@ -16,9 +16,6 @@ class StubScope extends Scope
      */
     protected $scopeField;
 
-    /**
-     * @param array $attributes
-     */
     public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;

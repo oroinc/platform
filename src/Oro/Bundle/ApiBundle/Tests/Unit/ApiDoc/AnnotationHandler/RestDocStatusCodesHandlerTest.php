@@ -16,11 +16,6 @@ class RestDocStatusCodesHandlerTest extends \PHPUnit\Framework\TestCase
         $this->statusCodesHandler = new RestDocStatusCodesHandler();
     }
 
-    /**
-     * @param ApiDoc $annotation
-     *
-     * @return array|null
-     */
     private function getAnnotationStatusCodes(ApiDoc $annotation): ?array
     {
         $data = $annotation->toArray();

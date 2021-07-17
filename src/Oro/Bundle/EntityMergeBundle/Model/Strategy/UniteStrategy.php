@@ -20,10 +20,6 @@ class UniteStrategy implements StrategyInterface
      */
     protected $doctrineHelper;
 
-    /**
-     * @param AccessorInterface $accessor
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         AccessorInterface $accessor,
         DoctrineHelper $doctrineHelper

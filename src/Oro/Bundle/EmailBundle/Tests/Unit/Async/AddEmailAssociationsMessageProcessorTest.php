@@ -225,7 +225,6 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
 
-
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */

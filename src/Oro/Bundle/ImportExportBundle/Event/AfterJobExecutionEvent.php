@@ -14,10 +14,6 @@ class AfterJobExecutionEvent extends Event
     /** @var JobResult */
     protected $jobResult;
 
-    /**
-     * @param JobExecution $jobExecution
-     * @param JobResult $jobResult
-     */
     public function __construct(JobExecution $jobExecution, JobResult $jobResult)
     {
         $this->jobExecution = $jobExecution;

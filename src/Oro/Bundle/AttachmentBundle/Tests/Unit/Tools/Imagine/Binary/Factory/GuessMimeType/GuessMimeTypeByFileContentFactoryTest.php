@@ -46,7 +46,6 @@ class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
             ->with($content)
             ->willReturn($mimeType);
 
-
         $this->extensionGuesser
             ->method('guess')
             ->with($mimeType)

@@ -14,9 +14,6 @@ class OroOptions
     /** @var array */
     private $options;
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options = [])
     {
         $this->options = $options;

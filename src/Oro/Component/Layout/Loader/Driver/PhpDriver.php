@@ -26,7 +26,7 @@ class PhpDriver extends AbstractDriver
     {
         return sprintf('/^(?!.*html\.%s$).*\.%s$/', $fileExtension, $fileExtension);
     }
-    
+
     /**
      * {@inheritdoc}
      */

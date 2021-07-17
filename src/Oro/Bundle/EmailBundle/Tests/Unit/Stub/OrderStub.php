@@ -13,11 +13,6 @@ class OrderStub
     /** @var string */
     private $email;
 
-    /**
-     * @param UserStub $user
-     * @param CustomerStub $customer
-     * @param string $email
-     */
     public function __construct(UserStub $user, CustomerStub $customer, string $email = '')
     {
         $this->user = $user;

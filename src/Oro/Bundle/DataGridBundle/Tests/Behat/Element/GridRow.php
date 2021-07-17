@@ -74,7 +74,6 @@ class GridRow extends TableRow
 
         $this->assertTrue($isElementFilled, "Could not fill field in '$header' column with value '$value'");
 
-
         $this->getDriver()->waitForAjax();
 
         return $cell;

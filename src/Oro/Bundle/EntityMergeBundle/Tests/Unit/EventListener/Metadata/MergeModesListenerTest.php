@@ -51,7 +51,6 @@ class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
             ->method('addMergeMode')
             ->will($this->returnValue([$this->fieldMetadata]));
 
-
         $this->listener->onCreateMetadata($event);
     }
 

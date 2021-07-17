@@ -10,9 +10,6 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isImageFieldProvider
-     *
-     * @param string $inputType
-     * @param bool $expectedResult
      */
     public function testIsImageField(string $inputType, bool $expectedResult)
     {
@@ -21,9 +18,6 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, FieldConfigHelper::isImageField($fieldConfigId));
     }
 
-    /**
-     * @return array
-     */
     public function isImageFieldProvider(): array
     {
         return [
@@ -44,9 +38,6 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isFileFieldProvider
-     *
-     * @param string $inputType
-     * @param bool $expectedResult
      */
     public function testIsFileField(string $inputType, bool $expectedResult)
     {
@@ -55,9 +46,6 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, FieldConfigHelper::isFileField($fieldConfigId));
     }
 
-    /**
-     * @return array
-     */
     public function isFileFieldProvider(): array
     {
         return [
@@ -78,9 +66,6 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isMultiFieldProvider
-     *
-     * @param string $inputType
-     * @param bool $expectedResult
      */
     public function testIsMultiField(string $inputType, bool $expectedResult)
     {
@@ -89,9 +74,6 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, FieldConfigHelper::isMultiField($fieldConfigId));
     }
 
-    /**
-     * @return array
-     */
     public function isMultiFieldProvider(): array
     {
         return [

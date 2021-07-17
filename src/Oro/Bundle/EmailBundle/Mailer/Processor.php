@@ -60,16 +60,6 @@ class Processor
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
-    /**
-     * @param DoctrineHelper           $doctrineHelper
-     * @param DirectMailer             $mailer
-     * @param EmailAddressHelper       $emailAddressHelper
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param EmailActivityManager     $emailActivityManager
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param SymmetricCrypterInterface $encryptor
-     * @param EmailOriginHelper        $emailOriginHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         DirectMailer $mailer,
@@ -219,9 +209,6 @@ class Processor
 
     /**
      * Process inline images. Convert it to embedded attachments and update message body.
-     *
-     * @param \Swift_Message  $message
-     * @param EmailModel|null $model
      */
     public function processEmbeddedImages(\Swift_Message $message, EmailModel $model = null)
     {
@@ -282,10 +269,6 @@ class Processor
         $message->setBody($body);
     }
 
-    /**
-     * @param \Swift_Message $message
-     * @param EmailModel     $model
-     */
     protected function addAttachments(\Swift_Message $message, EmailModel $model)
     {
         /** @var EmailAttachmentModel $emailAttachmentModel */
@@ -306,10 +289,6 @@ class Processor
         }
     }
 
-    /**
-     * @param EmailModel $model
-     * @param Email      $email
-     */
     protected function persistAttachments(EmailModel $model, Email $email)
     {
         /** @var EmailAttachmentModel $emailAttachmentModel */
@@ -334,8 +313,6 @@ class Processor
     }
 
     /**
-     * @param EmailModel $model
-     *
      * @throws \InvalidArgumentException
      */
     protected function assertModel(EmailModel $model)

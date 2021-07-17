@@ -37,9 +37,6 @@ class OroDurationTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param $value
-     * @param $expected
      */
     public function testSubmit($value, $expected)
     {

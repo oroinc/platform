@@ -11,9 +11,6 @@ class CustomImageFilterProvidersCompilerPass implements CompilerPassInterface
     const IMAGE_LOADER_PROVIDER_SERVICE_ID = 'oro_layout.loader.image_filter';
     const TAG_NAME = 'layout.image_filter.provider';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->has(self::IMAGE_LOADER_PROVIDER_SERVICE_ID)) {

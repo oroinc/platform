@@ -15,10 +15,6 @@ class ApplicationOriginProvider implements OriginProviderInterface
     /** @var OriginExtractor */
     private $originExtractor;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param OriginExtractor $originExtractor
-     */
     public function __construct(
         ConfigManager $configManager,
         OriginExtractor $originExtractor

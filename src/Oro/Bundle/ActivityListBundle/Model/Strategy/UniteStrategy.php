@@ -23,10 +23,6 @@ class UniteStrategy implements StrategyInterface
     /** @var DoctrineHelper  */
     protected $doctrineHelper;
 
-    /**
-     * @param ActivityListManager $activityListManager
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ActivityListManager $activityListManager, DoctrineHelper $doctrineHelper)
     {
         $this->activityListManager = $activityListManager;

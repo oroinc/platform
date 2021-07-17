@@ -37,7 +37,6 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->exportHandler->setLogger($this->logger);
     }
 
-
     public function testHandleExceptionsAreAddedToContext()
     {
         $reader = $this->createMock(ItemReaderInterface::class);

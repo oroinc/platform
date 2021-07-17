@@ -73,9 +73,6 @@ class GuzzleRestResponseTest extends TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function methodDelegationDataProvider(): array
     {
         return [

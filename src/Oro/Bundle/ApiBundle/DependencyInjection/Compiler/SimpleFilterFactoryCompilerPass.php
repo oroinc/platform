@@ -44,11 +44,6 @@ class SimpleFilterFactoryCompilerPass implements CompilerPassInterface
             ->replaceArgument(2, ServiceLocatorTagPass::register($container, $factoryServices));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $factoryServiceId
-     * @param string           $factoryMethod
-     */
     private function validateFilterFactory(
         ContainerBuilder $container,
         string $factoryServiceId,

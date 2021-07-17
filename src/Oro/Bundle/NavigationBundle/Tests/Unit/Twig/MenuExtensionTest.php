@@ -549,12 +549,6 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         return $menu;
     }
 
-    /**
-     * @param $menu
-     * @param $menuInstance
-     * @param $options
-     * @param $renderer
-     */
     protected function assertRender($menu, $menuInstance, $options, $renderer)
     {
         $this->helper->expects($this->once())

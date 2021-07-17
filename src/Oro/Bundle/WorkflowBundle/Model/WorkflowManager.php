@@ -49,13 +49,6 @@ class WorkflowManager implements LoggerAwareInterface
     /** @var StartedWorkflowsBag */
     private $startedWorkflowsBag;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param WorkflowEntityConnector $entityConnector
-     * @param StartedWorkflowsBag $startedWorkflowsBag
-     */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         DoctrineHelper $doctrineHelper,
@@ -464,7 +457,6 @@ class WorkflowManager implements LoggerAwareInterface
      *      ...
      * )
      *
-     * @param array $data
      * @throws \Exception
      */
     public function massTransit(array $data)
@@ -763,9 +755,6 @@ class WorkflowManager implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param WorkflowApplicabilityFilterInterface $applicabilityFilter
-     */
     public function addApplicabilityFilter(WorkflowApplicabilityFilterInterface $applicabilityFilter)
     {
         $this->applicabilityFilters[] = $applicabilityFilter;

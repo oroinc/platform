@@ -45,8 +45,6 @@ final class CorsSettings
 
     /**
      * Gets the amount of seconds the user agent is allowed to cache CORS preflight requests.
-     *
-     * @return int
      */
     public function getPreflightMaxAge(): int
     {
@@ -65,8 +63,6 @@ final class CorsSettings
 
     /**
      * Indicates whether CORS request can include user credentials.
-     *
-     * @return bool
      */
     public function isCredentialsAllowed(): bool
     {

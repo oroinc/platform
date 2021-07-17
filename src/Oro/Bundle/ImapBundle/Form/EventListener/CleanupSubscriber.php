@@ -31,8 +31,6 @@ class CleanupSubscriber implements EventSubscriberInterface
     /**
      * Performs unneeded fields cleanup
      * when IMAP Oauth-aware
-     *
-     * @param FormEvent $formEvent
      */
     public function cleanupEmptyFields(FormEvent $formEvent): void
     {

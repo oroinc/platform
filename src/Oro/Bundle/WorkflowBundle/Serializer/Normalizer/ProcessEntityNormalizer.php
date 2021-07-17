@@ -19,10 +19,6 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
      */
     protected $doctrineHelper;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;

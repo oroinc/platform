@@ -8,8 +8,5 @@ namespace Oro\Bundle\MessageQueueBundle\Client;
  */
 interface MessageFilterInterface
 {
-    /**
-     * @param MessageBuffer $buffer
-     */
     public function apply(MessageBuffer $buffer): void;
 }

@@ -25,22 +25,12 @@ abstract class AbstractStateProvider implements DatagridStateProviderInterface
     /** @var array */
     private $defaultGridView = [];
 
-    /**
-     * @param GridViewManager $gridViewManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(GridViewManager $gridViewManager, TokenAccessorInterface $tokenAccessor)
     {
         $this->gridViewManager = $gridViewManager;
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param DatagridConfiguration $datagridConfiguration
-     * @param ParameterBag $datagridParameters
-     *
-     * @return ViewInterface|null
-     */
     protected function getActualGridView(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters
@@ -104,11 +94,6 @@ abstract class AbstractStateProvider implements DatagridStateProviderInterface
         return $this->defaultGridView[$gridName];
     }
 
-    /**
-     * @param ParameterBag $datagridParameters
-     *
-     * @return bool
-     */
     private function gridViewsDisabled(ParameterBag $datagridParameters): bool
     {
         $parameters = $datagridParameters->get(GridViewsExtension::GRID_VIEW_ROOT_PARAM, []);

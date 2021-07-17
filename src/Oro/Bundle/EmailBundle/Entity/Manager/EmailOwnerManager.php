@@ -30,9 +30,6 @@ class EmailOwnerManager
 
     /**
      * Constructor.
-     *
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param EmailAddressManager       $emailAddressManager
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
@@ -144,12 +141,6 @@ class EmailOwnerManager
         );
     }
 
-    /**
-     * @param array               $emailOwnerData
-     * @param                     $emailField
-     * @param EmailOwnerInterface $owner
-     * @param array               $changeSet
-     */
     protected function processEntityChanges(
         array &$emailOwnerData,
         $emailField,

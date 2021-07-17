@@ -76,9 +76,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     protected $renderedWidgets = [];
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -261,14 +258,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         return $event->getFormData();
     }
 
-    /**
-     * @param TwigEnvironment $environment
-     * @param FormView $form
-     * @param string $label
-     * @param array $additionalData
-     *
-     * @return array
-     */
     public function renderAdditionalData(
         TwigEnvironment $environment,
         FormView $form,
@@ -382,8 +371,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * @param array $options
-     *
      * @throws \InvalidArgumentException
      */
     protected function validateOptions(array $options)
@@ -536,11 +523,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         return $subject;
     }
 
-    /**
-     * @param string $url
-     * @param array $parameters
-     * @return string
-     */
     public function urlAddQueryParameters(string $url, array $parameters): string
     {
         $urlParts = parse_url($url);
@@ -571,7 +553,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     {
         return $this->getUserAgent()->isMobile();
     }
-
 
     /**
      * Check by user-agent if request was not from mobile device
@@ -713,9 +694,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         return $environment->render($templateName, ['options' => $options]);
     }
 
-    /**
-     * @return string
-     */
     public function getDefaultPage(): string
     {
         return $this->container->get(RouterInterface::class)->generate('oro_default');

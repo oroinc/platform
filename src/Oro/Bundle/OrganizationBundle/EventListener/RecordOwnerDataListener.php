@@ -13,9 +13,6 @@ class RecordOwnerDataListener
     /** @var EntityOwnershipAssociationsSetter */
     private $entityOwnershipAssociationsSetter;
 
-    /**
-     * @param EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter
-     */
     public function __construct(EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter)
     {
         $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;
@@ -23,8 +20,6 @@ class RecordOwnerDataListener
 
     /**
      * Handle prePersist.
-     *
-     * @param LifecycleEventArgs $args
      *
      * @throws \LogicException when getOwner method isn't implemented for entity with ownership type
      */

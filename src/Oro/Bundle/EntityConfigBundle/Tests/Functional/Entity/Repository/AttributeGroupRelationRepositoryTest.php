@@ -75,10 +75,6 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
         );
     }
 
-    /**
-     * @param array $families
-     * @return array
-     */
     private function prepareFamilyForComparison(array $families): array
     {
         foreach ($families as $attributeId => $familyRows) {

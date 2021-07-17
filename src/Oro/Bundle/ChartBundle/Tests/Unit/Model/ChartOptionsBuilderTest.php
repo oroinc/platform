@@ -17,10 +17,6 @@ class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $chartOptions
-     * @param array $gridConfig
-     * @param array $expected
-     *
      * @dataProvider dataProvider
      */
     public function testBuildOptions(array $chartOptions, array $gridConfig, array $expected)

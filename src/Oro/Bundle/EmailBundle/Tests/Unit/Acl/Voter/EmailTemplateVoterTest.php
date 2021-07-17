@@ -51,8 +51,6 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedAttributesDataProvider
-     *
-     * @param array $attributes
      */
     public function testAbstainOnUnsupportedClass(array $attributes)
     {
@@ -73,8 +71,6 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedAttributesDataProvider
-     *
-     * @param array $attributes
      */
     public function testGrantedOnExistingNotSystemEmailTemplate(array $attributes)
     {
@@ -96,8 +92,6 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedAttributesDataProvider
-     *
-     * @param array $attributes
      */
     public function testDeniedOnExistingSystemEmailTemplate(array $attributes)
     {

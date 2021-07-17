@@ -36,9 +36,6 @@ class MixinListener
         return $parameters->get(self::GRID_MIXIN, false) || $config->offsetGetOr(self::MIXINS, false);
     }
 
-    /**
-     * @param PreBuild $event
-     */
     public function onPreBuild(PreBuild $event)
     {
         $parameters = $event->getParameters();

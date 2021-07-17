@@ -38,14 +38,6 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param UpdateListProcessingHelper $processingHelper
-     * @param AsyncOperationManager       $operationManager
-     * @param FileManager                $fileManager
-     * @param IncludeMapManager          $includeMapManager
-     * @param FileNameProvider           $fileNameProvider
-     * @param LoggerInterface            $logger
-     */
     public function __construct(
         UpdateListProcessingHelper $processingHelper,
         AsyncOperationManager $operationManager,
@@ -112,10 +104,6 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
         return self::ACK;
     }
 
-    /**
-     * @param int    $operationId
-     * @param string $dataFileName
-     */
     private function handleNotProcessedIncludedItems(int $operationId, string $dataFileName): void
     {
         $notLinkedIncludedItemIndexes = $this->includeMapManager->getNotLinkedIncludedItemIndexes(

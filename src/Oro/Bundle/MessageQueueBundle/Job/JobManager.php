@@ -30,11 +30,6 @@ class JobManager implements JobManagerInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param UniqueJobHandler $uniqueJobHandler
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         UniqueJobHandler $uniqueJobHandler,
@@ -138,10 +133,6 @@ class JobManager implements JobManagerInterface
             ->execute();
     }
 
-    /**
-     * @param Job $job
-     * @param EntityManager $em
-     */
     private function insertJob(Job $job, EntityManager $em): void
     {
         $tableName = $em->getClassMetadata(JobEntity::class)->getTableName();
@@ -204,10 +195,6 @@ class JobManager implements JobManagerInterface
         $job->setId($connection->lastInsertId());
     }
 
-    /**
-     * @param Job $job
-     * @param EntityManager $em
-     */
     private function updateJob(Job $job, EntityManager $em): void
     {
         $tableName = $em->getClassMetadata(JobEntity::class)->getTableName();
@@ -269,9 +256,6 @@ class JobManager implements JobManagerInterface
         $qb->execute();
     }
 
-    /**
-     * @return EntityManager
-     */
     private function getEntityManager(): EntityManager
     {
         return $this->doctrineHelper->getEntityManager(JobEntity::class);

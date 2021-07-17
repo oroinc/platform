@@ -26,8 +26,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Sets the ExtendExtension
-     *
-     * @param ExtendExtension $extendExtension
      */
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
@@ -65,8 +63,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Create oro_localization table
-     *
-     * @param Schema $schema
      */
     protected function createOroLocalizationTable(Schema $schema)
     {
@@ -85,8 +81,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Create oro_fallback_localization_val table
-     *
-     * @param Schema $schema
      */
     protected function createOroFallbackLocalizedValueTable(Schema $schema)
     {
@@ -103,8 +97,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Create oro_localization_title table
-     *
-     * @param Schema $schema
      */
     protected function createOroLocalizationTitleTable(Schema $schema)
     {
@@ -117,8 +109,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Add oro_localization foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroLocalizationForeignKeys(Schema $schema)
     {
@@ -139,8 +129,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Add oro_fallback_localization_val foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroFallbackLocalizedValueForeignKeys(Schema $schema)
     {
@@ -155,8 +143,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
 
     /**
      * Add oro_localization_title foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroLocalizationTitleForeignKeys(Schema $schema)
     {
@@ -175,9 +161,6 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addRelationsToScope(Schema $schema)
     {
         $this->extendExtension->addManyToOneRelation(

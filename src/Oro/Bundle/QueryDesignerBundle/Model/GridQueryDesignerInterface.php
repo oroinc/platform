@@ -9,8 +9,6 @@ interface GridQueryDesignerInterface
 {
     /**
      * Gets a prefix for the datagrid name.
-     *
-     * @return string
      */
     public function getGridPrefix(): string;
 }

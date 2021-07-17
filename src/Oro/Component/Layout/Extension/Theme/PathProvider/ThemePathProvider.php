@@ -18,9 +18,6 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
     /** @var ContextInterface */
     protected $context;
 
-    /**
-     * @param ThemeManager $themeManager
-     */
     public function __construct(ThemeManager $themeManager)
     {
         $this->themeManager = $themeManager;

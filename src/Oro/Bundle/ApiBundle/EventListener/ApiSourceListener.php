@@ -34,9 +34,6 @@ class ApiSourceListener
         $this->cacheManager->clearApiDocCache();
     }
 
-    /**
-     * @param FeaturesChange $event
-     */
     public function onFeaturesChange(FeaturesChange $event): void
     {
         // do not clear the cache if only excluded features are changed

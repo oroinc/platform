@@ -65,9 +65,6 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
         }
     }
 
-    /**
-     * @param array $row
-     */
     private function processRow(array $row)
     {
         $definition = $this->connection->convertToPHPValue($row['definition'], Types::JSON_ARRAY);

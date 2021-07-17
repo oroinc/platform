@@ -68,8 +68,6 @@ class Comparison implements ExpressionInterface
 
     /**
      * Returns comparison operator.
-     *
-     * @return string
      */
     public function getOperator(): string
     {

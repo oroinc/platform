@@ -20,10 +20,6 @@ class WorkflowDefinitionHandler
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ManagerRegistry $registry
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher, ManagerRegistry $registry)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -55,7 +51,6 @@ class WorkflowDefinitionHandler
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
      * @throws \Exception
      */
     public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition)
@@ -98,7 +93,6 @@ class WorkflowDefinitionHandler
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
      * @throws \Exception
      */
     protected function process(WorkflowDefinition $workflowDefinition)

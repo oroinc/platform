@@ -41,13 +41,6 @@ class AuditFilter extends EntityFilter
     /** @var string */
     protected $objectClassParam;
 
-    /**
-     * @param FormFactoryInterface   $factory
-     * @param FilterUtility          $util
-     * @param ManagerRegistry        $doctrine
-     * @param FilterExecutionContext $filterExecutionContext
-     * @param QueryDesignerManager   $queryDesignerManager
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

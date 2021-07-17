@@ -31,19 +31,11 @@ class ScopeManagerTest extends WebTestCase
         ));
     }
 
-    /**
-     * @return ScopeManager
-     */
     private function getScopeManager(): ScopeManager
     {
         return $this->getContainer()->get('oro_scope.scope_manager');
     }
 
-    /**
-     * @param string $reference
-     *
-     * @return Scope
-     */
     private function getScope(string $reference): Scope
     {
         return $this->getReference($reference);

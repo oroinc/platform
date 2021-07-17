@@ -16,7 +16,6 @@ use Doctrine\Inflector\Rules\English\InflectorFactory;
 class Form extends Element
 {
     /**
-     * @param TableNode $table
      * @throws ElementNotFoundException
      */
     public function fill(TableNode $table)
@@ -89,9 +88,6 @@ class Form extends Element
         $this->getDriver()->typeIntoInput($field->getXpath(), $value);
     }
 
-    /**
-     * @param TableNode $table
-     */
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
@@ -490,11 +486,6 @@ class Form extends Element
         }, $errorSpans);
     }
 
-    /**
-     * @param $label
-     * @param NodeElement $field
-     * @return NodeElement
-     */
     private function wrapField($label, NodeElement $field): NodeElement
     {
         if (isset($this->options['mapping'][$label]['element'])) {

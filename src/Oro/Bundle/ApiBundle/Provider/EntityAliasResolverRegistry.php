@@ -44,10 +44,6 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
     /**
      * Returns the entity alias resolver that contains entity aliases for the given request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return EntityAliasResolver
-     *
      * @throws \LogicException if a entity alias resolver does not exist for the given request type
      */
     public function getEntityAliasResolver(RequestType $requestType): EntityAliasResolver

@@ -38,7 +38,6 @@ class PriceTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
         return [
             new PreloadedExtension(
                 [

@@ -102,9 +102,6 @@ class ArrayPager implements PagerInterface
         return $this->nbResults;
     }
 
-    /**
-     * @param ArrayDatasource $datasource
-     */
     public function apply(ArrayDatasource $datasource)
     {
         $source = $datasource->getArraySource();

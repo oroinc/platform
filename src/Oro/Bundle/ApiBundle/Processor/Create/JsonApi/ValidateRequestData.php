@@ -20,9 +20,6 @@ class ValidateRequestData implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function __construct(ValueNormalizer $valueNormalizer)
     {
         $this->valueNormalizer = $valueNormalizer;

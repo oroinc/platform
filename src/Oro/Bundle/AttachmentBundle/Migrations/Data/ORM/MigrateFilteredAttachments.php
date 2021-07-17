@@ -36,9 +36,6 @@ class MigrateFilteredAttachments implements FixtureInterface, ContainerAwareInte
         $migrationService->migrate(static::PREFIX, static::PREFIX);
     }
 
-    /**
-     * @return FilteredAttachmentMigrationServiceInterface
-     */
     protected function getMigrationService(): FilteredAttachmentMigrationServiceInterface
     {
         return $this->container->get('oro_attachment.filtered_attachment_migration');

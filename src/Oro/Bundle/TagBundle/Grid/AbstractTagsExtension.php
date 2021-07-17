@@ -30,10 +30,6 @@ abstract class AbstractTagsExtension extends AbstractExtension
     /** @var string|null */
     protected $entityClassName;
 
-    /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(
         TagManager $tagManager,
         EntityClassResolver $entityClassResolver

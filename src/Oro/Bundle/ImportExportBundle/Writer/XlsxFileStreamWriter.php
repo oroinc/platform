@@ -22,9 +22,6 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
     /** @var WriterInterface */
     private $writer;
 
-    /**
-     * @return WriterInterface
-     */
     public function getWriter(): WriterInterface
     {
         if (!$this->writer) {

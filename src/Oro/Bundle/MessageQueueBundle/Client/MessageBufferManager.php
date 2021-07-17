@@ -51,11 +51,6 @@ class MessageBufferManager
         }
     }
 
-    /**
-     * @param Connection $connection
-     *
-     * @return bool
-     */
     protected function isTransactionActive(Connection $connection): bool
     {
         return $connection->getTransactionNestingLevel() === 0;

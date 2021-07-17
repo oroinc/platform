@@ -47,12 +47,6 @@ class EmailOriginHelper
     /** @var array */
     protected $origins = [];
 
-    /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EmailOwnerProvider     $emailOwnerProvider
-     * @param EmailAddressHelper     $emailAddressHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TokenAccessorInterface $tokenAccessor,
@@ -65,9 +59,6 @@ class EmailOriginHelper
         $this->emailAddressHelper = $emailAddressHelper;
     }
 
-    /**
-     * @param EmailModel $model
-     */
     public function setEmailModel(EmailModel $model)
     {
         $this->emailModel = $model;

@@ -70,9 +70,6 @@ class OroUserBundle implements
 
     /**
      * Enables Email activity for User entity
-     *
-     * @param Schema            $schema
-     * @param ActivityExtension $activityExtension
      */
     public static function addActivityAssociations(Schema $schema, ActivityExtension $activityExtension)
     {

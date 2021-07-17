@@ -39,11 +39,6 @@ class CollectFormErrors implements ProcessorInterface
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
-    /**
-     * @param ConstraintTextExtractorInterface $constraintTextExtractor
-     * @param ErrorCompleterRegistry           $errorCompleterRegistry
-     * @param PropertyAccessorInterface        $propertyAccessor
-     */
     public function __construct(
         ConstraintTextExtractorInterface $constraintTextExtractor,
         ErrorCompleterRegistry $errorCompleterRegistry,
@@ -76,9 +71,6 @@ class CollectFormErrors implements ProcessorInterface
         $context->setProcessed(self::OPERATION_NAME);
     }
 
-    /**
-     * @param FormContext $context
-     */
     protected function collectFormErrors(FormContext $context): void
     {
         $form = $context->getForm();
@@ -88,7 +80,6 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param FormContext $context
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function collectIncludedFormErrors(FormContext $context): void
@@ -134,10 +125,6 @@ class CollectFormErrors implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param FormContext   $context
-     */
     protected function processForm(FormInterface $form, FormContext $context): void
     {
         /** @var Error[] $foundErrors */
@@ -225,12 +212,6 @@ class CollectFormErrors implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string                  $propertyPath
-     * @param Error                   $error
-     * @param RequestType             $requestType
-     * @param IncludedEntityData|null $includedData
-     */
     protected function fixErrorPath(
         string $propertyPath,
         Error $error,
@@ -251,11 +232,6 @@ class CollectFormErrors implements ProcessorInterface
         );
     }
 
-    /**
-     * @param FormError $error
-     *
-     * @return string|null
-     */
     protected function getFormErrorPropertyPath(FormError $error): ?string
     {
         $result = null;
@@ -274,12 +250,6 @@ class CollectFormErrors implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param FormError     $error
-     * @param FormInterface $field
-     *
-     * @return string|null
-     */
     protected function getFieldErrorPropertyPath(FormError $error, FormInterface $field): ?string
     {
         $result = null;
@@ -347,13 +317,6 @@ class CollectFormErrors implements ProcessorInterface
         return $path;
     }
 
-    /**
-     * @param string     $key
-     * @param Collection $source
-     * @param Collection $target
-     *
-     * @return string
-     */
     protected function resolveCollectionKey(string $key, Collection $source, Collection $target): string
     {
         if ($source->containsKey($key)) {
@@ -382,11 +345,6 @@ class CollectFormErrors implements ProcessorInterface
         return $this->propertyAccessor->getValue($parentData, $propertyName);
     }
 
-    /**
-     * @param ConstraintViolation $constraintViolation
-     *
-     * @return string|null
-     */
     protected function getConstraintViolationPropertyPath(ConstraintViolation $constraintViolation): ?string
     {
         $path = $this->getConstraintViolationPath($constraintViolation);
@@ -444,12 +402,6 @@ class CollectFormErrors implements ProcessorInterface
         return $field->getConfig()->getCompound();
     }
 
-    /**
-     * @param FormError   $formError
-     * @param string|null $propertyPath
-     *
-     * @return Error
-     */
     protected function createErrorObject(FormError $formError, string $propertyPath = null): Error
     {
         $error = Error::createValidationError($this->getFormErrorTitle($formError), $formError->getMessage());
@@ -464,11 +416,6 @@ class CollectFormErrors implements ProcessorInterface
         return $error;
     }
 
-    /**
-     * @param FormError $formError
-     *
-     * @return string
-     */
     protected function getFormErrorTitle(FormError $formError): string
     {
         $cause = $formError->getCause();
@@ -488,11 +435,6 @@ class CollectFormErrors implements ProcessorInterface
         return Constraint::FORM;
     }
 
-    /**
-     * @param FormError $formError
-     *
-     * @return int|null
-     */
     protected function getFormErrorStatusCode(FormError $formError): ?int
     {
         $cause = $formError->getCause();
@@ -511,10 +453,6 @@ class CollectFormErrors implements ProcessorInterface
      * We have to do this because this type of validation does not have own validator
      * and a validation is performed by main form validator.
      * @see \Symfony\Component\Form\Extension\Validator\Constraints\FormValidator::validate
-     *
-     * @param ConstraintViolation $cause
-     *
-     * @return bool
      */
     protected function isExtraFieldsConstraint(ConstraintViolation $cause): bool
     {

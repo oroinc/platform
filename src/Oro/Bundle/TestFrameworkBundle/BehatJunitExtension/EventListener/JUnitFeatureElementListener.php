@@ -58,11 +58,6 @@ class JUnitFeatureElementListener
 
     /**
      * Initializes listener.
-     *
-     * @param FeaturePrinter $featurePrinter
-     * @param JUnitScenarioPrinter $scenarioPrinter
-     * @param StepPrinter $stepPrinter
-     * @param SetupPrinter $setupPrinter
      */
     public function __construct(
         FeaturePrinter $featurePrinter,
@@ -97,8 +92,6 @@ class JUnitFeatureElementListener
 
     /**
      * Captures scenario tested event.
-     *
-     * @param ScenarioTested $event
      */
     private function captureScenarioEvent(ScenarioTested $event)
     {
@@ -116,8 +109,6 @@ class JUnitFeatureElementListener
 
     /**
      * Captures feature on BEFORE event.
-     *
-     * @param Event $event
      */
     private function captureFeatureOnBeforeEvent(Event $event)
     {
@@ -130,8 +121,6 @@ class JUnitFeatureElementListener
 
     /**
      * Captures step tested event.
-     *
-     * @param Event $event
      */
     private function captureStepEvent(Event $event)
     {
@@ -145,9 +134,6 @@ class JUnitFeatureElementListener
 
     /**
      * Prints the feature on AFTER event.
-     *
-     * @param Formatter $formatter
-     * @param Event     $event
      */
     public function printFeatureOnAfterEvent(Formatter $formatter, Event $event)
     {

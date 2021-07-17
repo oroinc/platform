@@ -32,14 +32,6 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var EmailRecipientsHelper */
     protected $emailRecipientsHelper;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param RelatedEmailsProvider  $relatedEmailsProvider
-     * @param AclHelper              $aclHelper
-     * @param Registry               $registry
-     * @param EmailOwnerProvider     $emailOwnerProvider
-     * @param EmailRecipientsHelper  $emailRecipientsHelper
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         RelatedEmailsProvider $relatedEmailsProvider,
@@ -111,9 +103,6 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
         return $this->emailRecipientsHelper->createRecipientEntity($owner, $metadata);
     }
 
-    /**
-     * @param array $result
-     */
     protected function emailsFromResult(array $result)
     {
         $emails = [];

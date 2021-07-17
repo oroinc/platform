@@ -123,7 +123,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
         $aclHelper = $this->createMock(AclHelper::class);
 
         $this->familyManager->setAclHelper($aclHelper);
-        
+
         $this->familyRepository->expects($this->once())
             ->method('getFamilyByCode')
             ->with('test', $aclHelper)

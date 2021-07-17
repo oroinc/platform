@@ -19,9 +19,6 @@ class DefaultOwnerSetEvent extends Event
     /** @var Integration */
     protected $integration;
 
-    /**
-     * @param Integration $integration
-     */
     public function __construct(Integration $integration)
     {
         $this->integration = $integration;

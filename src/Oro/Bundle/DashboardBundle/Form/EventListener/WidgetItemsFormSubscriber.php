@@ -16,10 +16,6 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param WidgetConfigs       $widgetConfigs
-     * @param TranslatorInterface $translator
-     */
     public function __construct(WidgetConfigs $widgetConfigs, TranslatorInterface $translator)
     {
         $this->widgetConfigs = $widgetConfigs;
@@ -36,9 +32,6 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSet(FormEvent $event)
     {
         $widgetName   = $event->getForm()->getConfig()->getOption('widget_name');

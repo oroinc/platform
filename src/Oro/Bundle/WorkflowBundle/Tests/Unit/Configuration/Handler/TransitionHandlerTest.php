@@ -18,8 +18,6 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     * @param array $input
      * @dataProvider handleDataProvider
      */
     public function testHandle(array $expected, array $input)

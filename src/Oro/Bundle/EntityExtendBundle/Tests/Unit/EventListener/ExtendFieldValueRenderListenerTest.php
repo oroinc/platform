@@ -65,9 +65,6 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider collectionDataProvider
-     *
-     * @param array $data
-     * @param array $expected
      */
     public function testBeforeValueRenderProceedCollection(array $data, array $expected)
     {
@@ -121,9 +118,6 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider relationsDataProvider
-     *
-     * @param array $data
-     * @param array $expected
      */
     public function testBeforeValueRenderProceedSingleRelations(array $data, array $expected)
     {
@@ -352,7 +346,6 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->willReturnMap($grantedEntitiesMap);
-
 
         return $value;
     }

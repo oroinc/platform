@@ -33,7 +33,6 @@ class ContainsPrimaryValidatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validItemsDataProvider
-     * @param array $items
      */
     public function testValidateValid(array $items)
     {

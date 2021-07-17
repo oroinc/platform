@@ -119,9 +119,6 @@ abstract class ApiTestCase extends WebTestCase
         return $result;
     }
 
-    /**
-     * @param callable $callback
-     */
     protected function runForEntities(callable $callback)
     {
         $entities = $this->getEntities();
@@ -164,9 +161,6 @@ abstract class ApiTestCase extends WebTestCase
         return $result;
     }
 
-    /**
-     * @param callable $callback
-     */
     protected function runForSubresources(callable $callback)
     {
         $subresources = $this->getSubresources();
@@ -334,11 +328,6 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param array  $expectedContent
-     * @param array  $content
-     * @param string $key
-     * @param string $placeholder
-     * @param array  $path
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function walkResponseContent(
@@ -514,10 +503,6 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Asserts response status code equals to 405 (Method Not Allowed)
      * and "Allow" response header equals to the expected value.
-     *
-     * @param Response $response
-     * @param string   $expectedAllowedMethods
-     * @param string   $message
      */
     protected static function assertMethodNotAllowedResponse(
         Response $response,

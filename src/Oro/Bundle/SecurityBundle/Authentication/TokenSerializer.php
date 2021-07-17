@@ -19,9 +19,6 @@ class TokenSerializer implements TokenSerializerInterface
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

@@ -328,7 +328,6 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper->getEntityReference('Acme_Bundle_TestClass', 123);
     }
 
-
     public function testGetEntityReferenceForNewNotManageableEntity()
     {
         $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);

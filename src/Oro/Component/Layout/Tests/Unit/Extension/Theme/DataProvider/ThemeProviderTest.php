@@ -135,11 +135,6 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stylesOutputDataProvider
-     *
-     * @param bool $themeRtl
-     * @param bool $localRtl
-     * @param string $output
-     * @param string $expected
      */
     public function testGetStylesOutputRtl(bool $themeRtl, bool $localRtl, string $output, string $expected): void
     {

@@ -15,9 +15,6 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -35,8 +32,6 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Preset default values if default checkbox set
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {

@@ -11,8 +11,6 @@ interface ConfigAwareFilterInterface
 {
     /**
      * Sets the entity configuration.
-     *
-     * @param EntityDefinitionConfig $config
      */
     public function setConfig(EntityDefinitionConfig $config): void;
 }

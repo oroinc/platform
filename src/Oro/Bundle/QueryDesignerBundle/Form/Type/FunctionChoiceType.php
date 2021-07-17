@@ -16,14 +16,10 @@ class FunctionChoiceType extends AbstractType
     /** @var Manager */
     protected $manager;
 
-    /**
-     * @param Manager $manager
-     */
     public function __construct(Manager $manager)
     {
         $this->manager = $manager;
     }
-
 
     /**
      * {@inheritdoc}

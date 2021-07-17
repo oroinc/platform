@@ -180,10 +180,6 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->massActionHelper->isRequestMethodAllowed($massAction, Request::METHOD_DELETE));
     }
 
-    /**
-     * @param $datagrid
-     * @param array $extensions
-     */
     private function setDatagridExtensions($datagrid, array $extensions)
     {
         $acceptor = $this->createMock(Acceptor::class);

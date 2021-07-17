@@ -32,10 +32,6 @@ class DraftableFilter extends SQLFilter
         return $platform->getIsNullExpression($targetTableAlias . '.' . $targetEntity->getColumnName('draftUuid'));
     }
 
-    /**
-     * @param ClassMetadata $targetEntity
-     * @return bool
-     */
     private function isDraftableEntity(ClassMetadata $targetEntity): bool
     {
         return $targetEntity->reflClass->implementsInterface(DraftableInterface::class)

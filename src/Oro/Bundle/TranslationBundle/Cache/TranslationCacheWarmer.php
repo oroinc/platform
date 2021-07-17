@@ -19,10 +19,6 @@ class TranslationCacheWarmer implements CacheWarmerInterface, ServiceSubscriberI
      */
     protected $strategyProvider;
 
-    /**
-     * @param TranslationsCacheWarmer $innerWarmer
-     * @param TranslationStrategyProvider $strategyProvider
-     */
     public function __construct(TranslationsCacheWarmer $innerWarmer, TranslationStrategyProvider $strategyProvider)
     {
         $this->innerWarmer = $innerWarmer;

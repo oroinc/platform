@@ -21,10 +21,6 @@ class TranslationExtractor implements ExtractorInterface
     /** @var string */
     private $prefix;
 
-    /**
-     * @param TitleReaderRegistry     $titleReaderRegistry
-     * @param ControllerClassProvider $controllerClassProvider
-     */
     public function __construct(
         TitleReaderRegistry $titleReaderRegistry,
         ControllerClassProvider $controllerClassProvider

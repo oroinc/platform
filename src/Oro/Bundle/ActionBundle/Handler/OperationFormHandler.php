@@ -31,12 +31,6 @@ class OperationFormHandler
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param FormFactoryInterface $formFactory
-     * @param ContextHelper $contextHelper
-     * @param OperationRegistry $operationRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
         ContextHelper $contextHelper,

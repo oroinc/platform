@@ -41,12 +41,6 @@ class NotLessThanOriginalValueValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param FieldConfigModel $model
-     * @param Constraint       $constraint
-     *
-     * @return bool
-     */
     private function isValidatorShouldBeExecuted(FieldConfigModel $model, Constraint $constraint): bool
     {
         // validator should be executed only during editing the field.
@@ -67,9 +61,6 @@ class NotLessThanOriginalValueValidator extends ConstraintValidator
         return true;
     }
 
-    /**
-     * @return FieldConfigModel
-     */
     private function getFieldConfigModel(): FieldConfigModel
     {
         /** @var FormInterface $form */
@@ -93,11 +84,6 @@ class NotLessThanOriginalValueValidator extends ConstraintValidator
         return $fieldConfigModel;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return FormInterface
-     */
     private function getRootForm(FormInterface $form): FormInterface
     {
         if ($form->isRoot()) {

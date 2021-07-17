@@ -55,11 +55,6 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         ],
     ];
 
-    /**
-     * @param DateTimeFormatterInterface $formatter
-     * @param Compiler $dateCompiler
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         DateTimeFormatterInterface $formatter,
         Compiler $dateCompiler,

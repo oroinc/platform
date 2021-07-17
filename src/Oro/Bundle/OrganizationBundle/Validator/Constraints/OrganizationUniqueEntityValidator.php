@@ -16,11 +16,6 @@ class OrganizationUniqueEntityValidator extends UniqueEntityValidator
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param ManagerRegistry                    $registry
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param DoctrineHelper                     $doctrineHelper
-     */
     public function __construct(
         ManagerRegistry $registry,
         OwnershipMetadataProviderInterface $metadataProvider,

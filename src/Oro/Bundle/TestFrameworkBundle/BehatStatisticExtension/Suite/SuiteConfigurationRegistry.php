@@ -212,9 +212,6 @@ class SuiteConfigurationRegistry
         }
     }
 
-    /**
-     * @param SuiteGenerator $generator
-     */
     public function addSuiteGenerator(SuiteGenerator $generator)
     {
         array_unshift($this->suiteGenerators, $generator);

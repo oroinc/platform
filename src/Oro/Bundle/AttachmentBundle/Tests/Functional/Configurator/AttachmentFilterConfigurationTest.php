@@ -54,11 +54,6 @@ class AttachmentFilterConfigurationTest extends WebTestCase
         }
     }
 
-    /**
-     * @param array $filter
-     * @param int $jpegQuality
-     * @param int $pngQuality
-     */
     private function assertFilterEqual(array $filter, int $jpegQuality = 85, int $pngQuality = 100)
     {
         $this->assertEquals(

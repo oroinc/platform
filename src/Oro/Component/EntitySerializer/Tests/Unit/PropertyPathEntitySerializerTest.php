@@ -1084,7 +1084,6 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
             ]
         );
 
-
         $this->assertArrayEquals(
             [
                 [
@@ -1150,7 +1149,6 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         );
-
 
         $this->assertArrayEquals(
             [

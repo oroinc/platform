@@ -47,8 +47,6 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addEntityFieldsDataProvider
-     * @param $permissions
-     * @param $isMyProfile
      */
     public function testAddEntityFields($permissions, $isMyProfile)
     {
@@ -209,10 +207,6 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param $builder \PHPUnit\Framework\MockObject\MockObject
-     * @param $order
-     */
     protected function mockSetDefaultUserFields($builder, &$order = -1)
     {
         $parameters = array(

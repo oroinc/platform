@@ -27,14 +27,6 @@ class LocaleSettings extends BaseLocaleSettings
      */
     protected $currencyProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param CalendarFactoryInterface $calendarFactory
-     * @param LocalizationManager $localizationManager
-     * @param LocaleConfigurationProvider $localeConfigProvider
-     * @param ViewTypeProviderInterface $viewTypeProvider
-     * @param CurrencyProviderInterface $currencyProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         CalendarFactoryInterface $calendarFactory,

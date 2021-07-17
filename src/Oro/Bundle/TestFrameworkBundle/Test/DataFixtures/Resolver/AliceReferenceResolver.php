@@ -27,9 +27,6 @@ class AliceReferenceResolver implements ResolverInterface, ReferencesAwareInterf
      */
     protected $references;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

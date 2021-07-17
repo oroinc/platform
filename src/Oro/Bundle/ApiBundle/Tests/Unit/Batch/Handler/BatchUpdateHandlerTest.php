@@ -45,10 +45,6 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new BatchUpdateHandler($this->processor, $this->itemProcessor);
     }
 
-    /**
-     * @param BatchUpdateContext $context
-     * @param BatchUpdateRequest $request
-     */
     private function assertBatchUpdateContext(BatchUpdateContext $context, BatchUpdateRequest $request)
     {
         self::assertEquals($request->getVersion(), $context->getVersion());

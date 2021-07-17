@@ -23,11 +23,6 @@ class FileTitleProvider implements FileTitleProviderInterface
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param FileTitleProviderInterface $innerFileTitleProvider
-     * @param LocalizationHelper $localizationHelper
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(
         FileTitleProviderInterface $innerFileTitleProvider,
         LocalizationHelper $localizationHelper,

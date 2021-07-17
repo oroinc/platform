@@ -21,9 +21,6 @@ class DiscriminatorMapListener
         $this->supportedClassNames[$key] = $supportedClassName;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $eventArgs
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
     {
         if (!$this->supportedClassNames) {

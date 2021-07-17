@@ -17,9 +17,6 @@ class CurrencyConfigOrganizationMigration implements Migration
         self::migrateOrganizationCurrencyConfig($queries);
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     public static function migrateOrganizationCurrencyConfig(QueryBag $queries)
     {
         $queries->addPreQuery(

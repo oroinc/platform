@@ -11,9 +11,6 @@ class AddAccessorCompilerPass implements CompilerPassInterface
     const ACCESSOR_TAG = 'oro_entity_merge.accessor';
     const DELEGATE_ACCESSOR_SERVICE = 'oro_entity_merge.accessor.delegate';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $normalizerDefinition = $container->getDefinition(self::DELEGATE_ACCESSOR_SERVICE);

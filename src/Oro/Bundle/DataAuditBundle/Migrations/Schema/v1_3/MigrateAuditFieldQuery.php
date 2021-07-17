@@ -58,9 +58,6 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         }
     }
 
-    /**
-     * @param array $row
-     */
     private function processRow(array $row)
     {
         $data = $row['data'];
@@ -110,10 +107,6 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         $this->connection->insert('oro_audit_field', $dbData, $types);
     }
 
-    /**
-     * @param array $row
-     * @param array $data
-     */
     private function processArrayData(array $row, array $data)
     {
         foreach ($data as $field => $values) {

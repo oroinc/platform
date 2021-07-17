@@ -46,13 +46,6 @@ class EmailType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param EmailRenderer                 $emailRenderer
-     * @param EmailModelBuilderHelper       $emailModelBuilderHelper
-     * @param ConfigManager                 $configManager
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -191,9 +184,6 @@ class EmailType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
-    /**
-     * @param PostSubmitEvent $event
-     */
     public function postSubmit(PostSubmitEvent $event)
     {
         $form = $event->getForm();
@@ -216,7 +206,6 @@ class EmailType extends AbstractType
     }
 
     /**
-     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function initChoicesByEntityName(FormEvent $event)
@@ -263,9 +252,6 @@ class EmailType extends AbstractType
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function fillFormByTemplate(FormEvent $event)
     {
         /** @var Email|null $data */

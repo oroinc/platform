@@ -15,12 +15,6 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param FunctionProviderInterface        $functionProvider
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param DoctrineHelper                   $doctrineHelper
-     */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
@@ -93,11 +87,6 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
         return sprintf('%s.%s = %s', $joinAlias, $joinFieldName, $joinTableAlias);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ClassMetadata
-     */
     private function getClassMetadata(string $entityClass): ClassMetadata
     {
         return $this->doctrineHelper->getEntityMetadataForClass($entityClass);

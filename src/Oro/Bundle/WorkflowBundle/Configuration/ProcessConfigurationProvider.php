@@ -28,11 +28,6 @@ class ProcessConfigurationProvider extends AbstractConfigurationProvider
      */
     protected $triggerConfiguration;
 
-    /**
-     * @param array $kernelBundles
-     * @param ProcessDefinitionListConfiguration $definitionConfiguration
-     * @param ProcessTriggerListConfiguration $triggerConfiguration
-     */
     public function __construct(
         array $kernelBundles,
         ProcessDefinitionListConfiguration $definitionConfiguration,

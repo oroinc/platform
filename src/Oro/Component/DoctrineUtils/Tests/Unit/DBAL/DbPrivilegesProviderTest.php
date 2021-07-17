@@ -65,10 +65,6 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing(['CREATE', 'INSERT', 'SELECT', 'TEMPORARY', 'TRIGGER'], $privileges);
     }
 
-    /**
-     * @param string $dbName
-     * @param \PDO $pdo
-     */
     private function assertPgSqlPrivilegesFetch(string $dbName, \PDO $pdo): void
     {
         $stmt = $this->createMock(\PDOStatement::class);

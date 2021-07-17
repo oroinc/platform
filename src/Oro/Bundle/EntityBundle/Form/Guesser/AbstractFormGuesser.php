@@ -22,10 +22,6 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
      */
     protected $entityConfigProvider;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider  $entityConfigProvider
-     */
     public function __construct(ManagerRegistry $managerRegistry, ConfigProvider $entityConfigProvider)
     {
         $this->managerRegistry      = $managerRegistry;

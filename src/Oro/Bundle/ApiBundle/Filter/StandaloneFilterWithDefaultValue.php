@@ -34,8 +34,6 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
 
     /**
      * Checks if the filter default value is set.
-     *
-     * @return bool
      */
     public function hasDefaultValue(): bool
     {
@@ -68,8 +66,6 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
 
     /**
      * Gets a string representation of the filter default value.
-     *
-     * @return string
      */
     public function getDefaultValueString(): string
     {

@@ -45,22 +45,11 @@ class SubresourceUtil
         ApiAction::DELETE_RELATIONSHIP
     ];
 
-    /**
-     * @param ApiResource $resource
-     *
-     * @return bool
-     */
     public static function isSubresourcesEnabled(ApiResource $resource): bool
     {
         return !\in_array(ApiAction::GET_SUBRESOURCE, $resource->getExcludedActions(), true);
     }
 
-    /**
-     * @param ApiSubresource $subresource
-     * @param array          $accessibleResources
-     *
-     * @return bool
-     */
     public static function isAccessibleSubresource(ApiSubresource $subresource, array $accessibleResources): bool
     {
         $targetClassNames = $subresource->getAcceptableTargetClassNames();
@@ -113,11 +102,6 @@ class SubresourceUtil
         }
     }
 
-    /**
-     * @param ApiSubresource $subresource
-     * @param array          $accessibleResources
-     * @param array|null     $subresourceExcludedActions
-     */
     public static function setSubresourceExcludedActions(
         ApiSubresource $subresource,
         array $accessibleResources,
@@ -136,10 +120,6 @@ class SubresourceUtil
         }
     }
 
-    /**
-     * @param ApiSubresource $subresource
-     * @param string         $action
-     */
     public static function ensureActionExcluded(ApiSubresource $subresource, string $action): void
     {
         if (!$subresource->isExcludedAction($action)) {

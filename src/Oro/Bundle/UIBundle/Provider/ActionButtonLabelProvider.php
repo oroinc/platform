@@ -20,10 +20,6 @@ class ActionButtonLabelProvider
      */
     protected $labels;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param array               $labels
-     */
     public function __construct(
         TranslatorInterface $translator,
         array $labels

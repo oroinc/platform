@@ -11,9 +11,6 @@ class HelpViewOptionForDumpApiDocCommands extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @param string $output
-     */
     private function assertOutputContainsViewOption(string $output)
     {
         self::assertContains('--view[=VIEW]', $output);

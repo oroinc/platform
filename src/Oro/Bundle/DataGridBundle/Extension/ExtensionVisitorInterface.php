@@ -61,8 +61,6 @@ interface ExtensionVisitorInterface
 
     /**
      * Set instance of parameters used for current grid
-     *
-     * @param ParameterBag $parameters
      */
     public function setParameters(ParameterBag $parameters);
 

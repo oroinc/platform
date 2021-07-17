@@ -41,8 +41,6 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /**
      * Modifies form based on data that comes from DB
-     *
-     * @param FormEvent $event
      */
     public function preSet(FormEvent $event)
     {
@@ -88,8 +86,6 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /**
      * Set not mapped field
-     *
-     * @param FormEvent $event
      */
     public function postSet(FormEvent $event)
     {
@@ -124,8 +120,6 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /**
      * Modifies form based on submitted data
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -303,7 +297,6 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             FormUtils::replaceField($form, 'type', ['disabled' => true]);
             FormUtils::replaceField($form, 'connectors', ['disabled' => true, 'attr' => ['class' => 'hide']]);
         }
-
 
         if ($integration->getId()) {
             // disable enabled field for not new integrations

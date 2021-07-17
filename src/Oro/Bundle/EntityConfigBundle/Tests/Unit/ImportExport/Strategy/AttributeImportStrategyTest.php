@@ -122,9 +122,6 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->strategy->process($entity));
     }
 
-    /**
-     * @return array
-     */
     public function validationGroupsDataProvider(): array
     {
         return [

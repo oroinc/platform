@@ -33,12 +33,6 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileSystem = new SymfonyFilesystem();
     }
 
-    /**
-     * @param bool        $useSubDir
-     * @param string|null $subDir
-     *
-     * @return FileManager
-     */
     private function getFileManager(bool $useSubDir, string $subDir = null): FileManager
     {
         $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDir);

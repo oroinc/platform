@@ -16,17 +16,11 @@ class RemoveAttributeGroupRelationListener
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param PostFlushConfigEvent $event
-     */
     public function onPostFlushConfig(PostFlushConfigEvent $event)
     {
         $configManager = $event->getConfigManager();

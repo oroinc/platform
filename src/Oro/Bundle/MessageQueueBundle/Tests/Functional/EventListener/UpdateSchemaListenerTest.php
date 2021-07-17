@@ -39,7 +39,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 
         $this->assertTrue($isListenerExist);
     }
-    
+
     public function testMustCreateFileIfNotExistOnUpdateSchemaEvent()
     {
         $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');

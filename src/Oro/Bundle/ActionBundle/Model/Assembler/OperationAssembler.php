@@ -22,12 +22,6 @@ class OperationAssembler extends AbstractAssembler
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
-    /**
-     * @param ActionFactoryInterface $actionFactory
-     * @param ConditionFactory $conditionFactory
-     * @param AttributeAssembler $attributeAssembler
-     * @param FormOptionsAssembler $formOptionsAssembler
-     */
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
@@ -115,9 +109,6 @@ class OperationAssembler extends AbstractAssembler
         $operationDefinition->setConditions(OperationDefinition::PRECONDITIONS, $newDefinition);
     }
 
-    /**
-     * @param OperationDefinition $operationDefinition
-     */
     protected function addFeaturePrecondition(OperationDefinition $operationDefinition)
     {
         $featureResourceDefinition = [

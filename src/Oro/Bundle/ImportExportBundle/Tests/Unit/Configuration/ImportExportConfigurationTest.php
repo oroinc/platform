@@ -82,9 +82,6 @@ class ImportExportConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     protected function getConfigurationParameters(): array
     {
         return [

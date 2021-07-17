@@ -60,9 +60,6 @@ class WriterErrorEvent extends Event
         return $this->couldBeSkipped;
     }
 
-    /**
-     * @param \Exception $exception
-     */
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;

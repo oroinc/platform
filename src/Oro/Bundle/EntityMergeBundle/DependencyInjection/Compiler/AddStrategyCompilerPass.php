@@ -12,9 +12,6 @@ class AddStrategyCompilerPass implements CompilerPassInterface
     const DELEGATE_STRATEGY_SERVICE = 'oro_entity_merge.strategy.delegate';
     const PRIORITY = 'priority';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $normalizerDefinition = $container->getDefinition(self::DELEGATE_STRATEGY_SERVICE);

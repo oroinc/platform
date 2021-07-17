@@ -58,8 +58,6 @@ class ContentProviderManager implements ResetInterface
 
     /**
      * Disables the given content provider.
-     *
-     * @param string $name
      */
     public function disableContentProvider(string $name): void
     {
@@ -72,8 +70,6 @@ class ContentProviderManager implements ResetInterface
 
     /**
      * Enables the given content provider.
-     *
-     * @param string $name
      */
     public function enableContentProvider(string $name): void
     {

@@ -14,8 +14,6 @@ class MultiCurrencyTypeFormatter implements TypeFormatterInterface
 
     /**
      * MultiCurrencyTypeFormatter constructor.
-     *
-     * @param NumberFormatter $formatter
      */
     public function __construct(NumberFormatter $formatter)
     {

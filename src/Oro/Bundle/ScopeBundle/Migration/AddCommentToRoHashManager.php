@@ -15,17 +15,11 @@ class AddCommentToRoHashManager
      */
     protected $em;
 
-    /**
-     * @param EntityManagerInterface $em
-     */
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
     }
 
-    /**
-     * @return string
-     */
     public function getRelations(): string
     {
         $foreignKeys = $this->em->getConnection()->getSchemaManager()->listTableForeignKeys('oro_scope');
@@ -40,7 +34,6 @@ class AddCommentToRoHashManager
     }
 
     /**
-     * @param Schema $schema
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function addRowHashComment(Schema $schema): void

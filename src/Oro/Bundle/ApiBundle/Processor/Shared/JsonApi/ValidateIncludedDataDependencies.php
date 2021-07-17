@@ -64,12 +64,6 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $checked
-     * @param array $toCheck
-     * @param array $includedData
-     * @param array $primaryObject
-     */
     protected function processDirectRelationships(
         array &$checked,
         array &$toCheck,
@@ -108,11 +102,6 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $checked
-     * @param array $toCheck
-     * @param array $includedData
-     */
     protected function processIndirectRelationships(array &$checked, array &$toCheck, array $includedData)
     {
         $hasChanges = true;

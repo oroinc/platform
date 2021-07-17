@@ -10,8 +10,6 @@ class LoadSegmentTypes extends AbstractFixture
 {
     /**
      * Load available segment types
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

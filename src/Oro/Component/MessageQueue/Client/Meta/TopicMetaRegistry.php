@@ -8,9 +8,6 @@ class TopicMetaRegistry
      */
     protected $topicsMeta;
 
-    /**
-     * @param array $topicsMeta
-     */
     public function __construct(array $topicsMeta)
     {
         $this->topicsMeta = $topicsMeta;

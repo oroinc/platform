@@ -33,9 +33,6 @@ class OroGoogleIntegrationInstaller implements Installation, ContainerAwareInter
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function updateUserEntity(Schema $schema): void
     {
         $userTable = $schema->getTable('oro_user');
@@ -49,9 +46,6 @@ class OroGoogleIntegrationInstaller implements Installation, ContainerAwareInter
         }
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     private function renameGoogleSsoConfigOptions(QueryBag $queries): void
     {
         $queries->addQuery(

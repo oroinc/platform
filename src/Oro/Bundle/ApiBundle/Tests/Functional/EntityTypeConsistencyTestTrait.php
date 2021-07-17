@@ -51,19 +51,11 @@ trait EntityTypeConsistencyTestTrait
         }
     }
 
-    /**
-     * @param string $entityType
-     *
-     * @return bool
-     */
     private function isValidEntityType(string $entityType): bool
     {
         return 1 === preg_match('/^[a-z]+[0-9a-z]*$/', $entityType);
     }
 
-    /**
-     * @return string
-     */
     private function getValidEntityTypeMessage(): string
     {
         return 'It should contain only lowercase alphabetic symbols and numbers.';

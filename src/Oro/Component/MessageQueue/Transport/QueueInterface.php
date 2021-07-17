@@ -10,8 +10,6 @@ interface QueueInterface
 {
     /**
      * Gets the name of this queue.
-     *
-     * @return string
      */
     public function getQueueName(): string;
 }

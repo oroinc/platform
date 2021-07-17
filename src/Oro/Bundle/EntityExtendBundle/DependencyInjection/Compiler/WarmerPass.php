@@ -34,12 +34,6 @@ class WarmerPass implements CompilerPassInterface
         $container->setDefinition(self::CACHE_WARMER_SERVICE, $cacheWarmerAggregateDefinition);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     *
-     * @return string
-     */
     private function addServiceLink(ContainerBuilder $container, string $serviceId): string
     {
         $linkServiceId = $serviceId . '.link';

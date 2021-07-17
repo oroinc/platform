@@ -13,20 +13,11 @@ interface ErrorCompleterInterface
 {
     /**
      * Completes all properties of the given Error object.
-     *
-     * @param Error               $error
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
      */
     public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void;
 
     /**
      * Adds the given entity path to the source of the given Error object.
-     *
-     * @param string              $entityPath
-     * @param Error               $error
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
      */
     public function fixIncludedEntityPath(
         string $entityPath,

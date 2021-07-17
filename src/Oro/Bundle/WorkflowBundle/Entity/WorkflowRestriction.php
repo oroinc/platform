@@ -74,7 +74,7 @@ class WorkflowRestriction
      * @ORM\Column(name="mode", type="string", length=8)
      */
     protected $mode;
-    
+
     /**
      * @var array
      *
@@ -178,7 +178,7 @@ class WorkflowRestriction
     public function setAttribute($attribute)
     {
         $this->attribute = $attribute;
-        
+
         return $this;
     }
 
@@ -218,7 +218,7 @@ class WorkflowRestriction
     public function setMode($mode)
     {
         $this->mode = $mode;
-        
+
         return $this;
     }
 
@@ -238,7 +238,7 @@ class WorkflowRestriction
     public function setValues(array $values)
     {
         $this->values = $values;
-        
+
         return $this;
     }
 
@@ -278,7 +278,6 @@ class WorkflowRestriction
      * @param WorkflowRestriction $restriction
      *
      * @return WorkflowEntityAcl
-     *
      */
     public function import(WorkflowRestriction $restriction)
     {
@@ -294,7 +293,7 @@ class WorkflowRestriction
                 $this->getDefinition()->getStepByName($restriction->getStep()->getName())
             );
         }
-        
+
         return $this;
     }
 }

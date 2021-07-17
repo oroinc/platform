@@ -18,9 +18,6 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -41,11 +38,6 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
         }
     }
 
-    /**
-     * @param string $value
-     *
-     * @return bool
-     */
     private function hasPrefix(string $value): bool
     {
         return false !== \strpos($value, self::PREFIX);
@@ -53,10 +45,6 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
 
     /**
      * Replaces %parameter% with it's value.
-     *
-     * @param string $value
-     *
-     * @return string
      */
     private function resolvePrefix(string $value): string
     {

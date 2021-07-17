@@ -14,7 +14,6 @@ interface DatagridActionProviderInterface
 
     /**
      * Point to add additional configuration to datagrid config that will provide custom actions.
-     * @param DatagridConfiguration $configuration
      */
     public function applyActions(DatagridConfiguration $configuration);
 }

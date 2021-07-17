@@ -17,12 +17,6 @@ trait MessageProcessTrait
 {
     use MessageQueueExtension;
 
-    /**
-     * @param ContainerInterface $container
-     * @param Client $client
-     *
-     * @return string
-     */
     protected function processExportMessage(ContainerInterface $container, Client $client): string
     {
         $sentMessage = $this->getSentMessage(ImportExportTopics::PRE_EXPORT);

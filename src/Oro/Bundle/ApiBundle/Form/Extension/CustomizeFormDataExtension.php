@@ -30,10 +30,6 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
     /** @var CustomizeFormDataHandler */
     private $customizationHandler;
 
-    /**
-     * @param ActionProcessorInterface $customizationProcessor
-     * @param CustomizeFormDataHandler $customizationHandler
-     */
     public function __construct(
         ActionProcessorInterface $customizationProcessor,
         CustomizeFormDataHandler $customizationHandler
@@ -79,9 +75,6 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
         return [FormType::class];
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     private function addEventListeners(FormBuilderInterface $builder): void
     {
         // the same context object is used for all listeners to allow sharing the data between them
@@ -116,20 +109,11 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
         );
     }
 
-    /**
-     * @return CustomizeFormDataContext
-     */
     private function createContext(): CustomizeFormDataContext
     {
         return $this->customizationProcessor->createContext();
     }
 
-    /**
-     * @param string    $eventName
-     * @param FormEvent $event
-     *
-     * @return CustomizeFormDataContext|null
-     */
     private function handleFormEvent(string $eventName, FormEvent $event): ?CustomizeFormDataContext
     {
         return $this->customizationHandler->handleFormEvent($eventName, $event);

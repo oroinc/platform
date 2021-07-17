@@ -52,9 +52,6 @@ class DbalConfigurationLoader
     private const PORT               = 'port';
     private const CHARSET            = 'charset';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public static function load(ContainerBuilder $container): void
     {
         $doctrineConfig = $container->getExtensionConfig(self::DOCTRINE);
@@ -86,13 +83,6 @@ class DbalConfigurationLoader
         }
     }
 
-    /**
-     * @param array       $doctrineConfig
-     * @param array       $commonConfig
-     * @param string|null $defaultConnectionName
-     *
-     * @return string
-     */
     private static function getDefaultCharset(
         array $doctrineConfig,
         array $commonConfig,
@@ -121,14 +111,6 @@ class DbalConfigurationLoader
             && \strpos($optionValue, '%') === 0;
     }
 
-    /**
-     * @param array  $doctrineConfig
-     * @param array  $commonConfig
-     * @param string $defaultConnectionName
-     * @param string $defaultConnectionKey
-     *
-     * @return array
-     */
     private static function applyCommonConfig(
         array $doctrineConfig,
         array $commonConfig,
@@ -159,16 +141,6 @@ class DbalConfigurationLoader
         return $doctrineConfig;
     }
 
-    /**
-     * @param array  $doctrineConfig
-     * @param array  $config
-     * @param int    $index
-     * @param array  $connectionNames
-     * @param string $defaultConnectionName
-     * @param string $defaultConnectionKey
-     *
-     * @return array
-     */
     private static function getAdditionalConfig(
         array $doctrineConfig,
         array $config,
@@ -195,14 +167,6 @@ class DbalConfigurationLoader
         return $additionalConfig;
     }
 
-    /**
-     * @param array  $doctrineConfig
-     * @param string $connectionName
-     * @param string $optionName
-     * @param int    $lastIndex
-     *
-     * @return bool
-     */
     private static function hasDbalConnectionOption(
         array $doctrineConfig,
         string $connectionName,
@@ -270,13 +234,6 @@ class DbalConfigurationLoader
         return $optionValue;
     }
 
-    /**
-     * @param array $doctrineConfig
-     * @param array $config
-     * @param int   $index
-     *
-     * @return array
-     */
     private static function insertConfigAt(array $doctrineConfig, array $config, int $index): array
     {
         if (-1 === $index) {
@@ -290,11 +247,6 @@ class DbalConfigurationLoader
         );
     }
 
-    /**
-     * @param array $doctrineConfig
-     *
-     * @return array
-     */
     private static function getCommonDbalConfig(array $doctrineConfig): array
     {
         /**
@@ -319,11 +271,6 @@ class DbalConfigurationLoader
         return $commonConfig;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return bool
-     */
     private static function hasCommonDbalConfig(array $config): bool
     {
         /**
@@ -336,11 +283,6 @@ class DbalConfigurationLoader
             && !\array_key_exists(self::CONNECTION, $config[self::DBAL]);
     }
 
-    /**
-     * @param array $doctrineConfig
-     *
-     * @return string|null
-     */
     private static function getDefaultDbalConnectionName(array $doctrineConfig): ?string
     {
         $defaultConnectionName = null;
@@ -374,10 +316,6 @@ class DbalConfigurationLoader
     }
 
     /**
-     * @param array  $doctrineConfig
-     * @param string $connectionName
-     *
-     * @return string|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private static function getDbalConnectionKey(array $doctrineConfig, string $connectionName): ?string
@@ -414,11 +352,6 @@ class DbalConfigurationLoader
         return \sprintf('%s|%s|%s|%s', $driver, $dbname, $host, $port);
     }
 
-    /**
-     * @param array $dbalConfig
-     *
-     * @return array|null
-     */
     private static function getDbalConnections(array $dbalConfig): ?array
     {
         if (!empty($dbalConfig[self::CONNECTIONS]) && \is_array($dbalConfig[self::CONNECTIONS])) {

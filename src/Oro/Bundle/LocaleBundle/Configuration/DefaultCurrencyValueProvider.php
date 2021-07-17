@@ -16,10 +16,6 @@ class DefaultCurrencyValueProvider implements ValueProviderInterface
     /** @var LocaleDataConfigurationProvider */
     private $localeDataConfigProvider;
 
-    /**
-     * @param string                          $country
-     * @param LocaleDataConfigurationProvider $localeDataConfigProvider
-     */
     public function __construct(string $country, LocaleDataConfigurationProvider $localeDataConfigProvider)
     {
         $this->country = $country;

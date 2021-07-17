@@ -30,14 +30,6 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
         $this->process($queryBuilder, $rootEntity, $filters, $rootEntityAlias);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $rootEntity
-     * @param array        $filters
-     * @param string       $rootEntityAlias
-     *
-     * @return QueryBuilder
-     */
     public function process(
         QueryBuilder $qb,
         string $rootEntity,

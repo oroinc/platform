@@ -40,11 +40,6 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param ContextRegistry                    $contextRegistry
-     * @param ManagerRegistry                    $registry
-     * @param OwnershipMetadataProviderInterface $ownershipMetadata
-     */
     public function __construct(
         ContextRegistry $contextRegistry,
         ManagerRegistry $registry,
@@ -57,7 +52,6 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
     protected function initializeFromContext(ContextInterface $context)
@@ -79,17 +73,11 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         }
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     */
     public function setSourceQueryBuilder(QueryBuilder $queryBuilder)
     {
         $this->setSourceIterator($this->createSourceIterator($queryBuilder));
     }
 
-    /**
-     * @param Query $query
-     */
     public function setSourceQuery(Query $query)
     {
         $this->setSourceIterator($this->createSourceIterator($query));
@@ -220,17 +208,11 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         return $queryBuilder;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;

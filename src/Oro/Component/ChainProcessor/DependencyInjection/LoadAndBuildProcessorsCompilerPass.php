@@ -19,10 +19,6 @@ class LoadAndBuildProcessorsCompilerPass implements CompilerPassInterface
     /** @var string */
     private $processorTagName;
 
-    /**
-     * @param string $processorBagConfigProviderServiceId
-     * @param string $processorTagName
-     */
     public function __construct(string $processorBagConfigProviderServiceId, string $processorTagName)
     {
         $this->processorBagConfigProviderServiceId = $processorBagConfigProviderServiceId;
@@ -46,10 +42,6 @@ class LoadAndBuildProcessorsCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $processorBagConfigProviderServiceDef
-     */
     private function registerProcessors(
         ContainerBuilder $container,
         Definition $processorBagConfigProviderServiceDef

@@ -24,11 +24,6 @@ class ActivityEntityDeleteHandler
     /** @var ActivityEntityDeleteHandlerExtensionInterface */
     private $extension;
 
-    /**
-     * @param ManagerRegistry                               $doctrine
-     * @param ActivityManager                               $activityManager
-     * @param ActivityEntityDeleteHandlerExtensionInterface $extension
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         ActivityManager $activityManager,

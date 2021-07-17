@@ -25,13 +25,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param float $from
-     * @param string $to
-     * @param int|null $scale
-     * @param bool|null $grouping
-     * @param int|null $roundingMode
-     * @param string|null $locale
-     *
      * @dataProvider transformDataProvider
      */
     public function testTransform(

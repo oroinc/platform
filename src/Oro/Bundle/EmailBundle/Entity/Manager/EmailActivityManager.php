@@ -37,14 +37,6 @@ class EmailActivityManager
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param ActivityManager           $activityManager
-     * @param EmailActivityListProvider $activityListProvider
-     * @param EmailThreadProvider       $emailThreadProvider
-     * @param TokenStorageInterface     $tokenStorage
-     * @param ServiceLink               $entityOwnerAccessorLink
-     * @param EntityManager             $em
-     */
     public function __construct(
         ActivityManager $activityManager,
         EmailActivityListProvider $activityListProvider,
@@ -61,9 +53,6 @@ class EmailActivityManager
         $this->em                      = $em;
     }
 
-    /**
-     * @param array $createdEmails
-     */
     public function updateActivities(array $createdEmails)
     {
         foreach ($createdEmails as $email) {
@@ -161,9 +150,6 @@ class EmailActivityManager
         }
     }
 
-    /**
-     * @param Email $email
-     */
     protected function copyContexts(Email $email)
     {
         $thread = $email->getThread();
@@ -186,7 +172,6 @@ class EmailActivityManager
             }
         }
     }
-
 
     /**
      * Returns contexts of all referenced emails excluding contexts
@@ -214,10 +199,6 @@ class EmailActivityManager
         return $referencedContexts;
     }
 
-    /**
-     * @param Email         $email
-     * @param [] $contexts
-     */
     protected function addContextsToThread(Email $email, $contexts)
     {
         $relatedEmails = [$email];
@@ -230,10 +211,6 @@ class EmailActivityManager
         }
     }
 
-    /**
-     * @param Email         $email
-     * @param [] $contexts
-     */
     protected function changeContexts(Email $email, $contexts)
     {
         $oldContexts    = $this->emailActivityListProvider->getTargetEntities($email);

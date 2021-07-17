@@ -18,9 +18,6 @@ class CommentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();

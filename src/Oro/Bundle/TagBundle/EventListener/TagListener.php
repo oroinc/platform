@@ -33,9 +33,6 @@ class TagListener implements ContainerAwareInterface
         $this->container = $container;
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function preRemove(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();

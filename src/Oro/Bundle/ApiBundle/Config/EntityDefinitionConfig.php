@@ -361,8 +361,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Checks whether this configuration represent a request for the entity identifier only
      * or values of other fields should be returned as well.
-     *
-     * @return bool
      */
     public function isIdentifierOnlyRequested(): bool
     {
@@ -597,8 +595,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Adds a validation constraint to the form options.
-     *
-     * @param Constraint $constraint
      */
     public function addFormConstraint(Constraint $constraint)
     {
@@ -885,8 +881,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /**
      * Sets response status codes.
-     *
-     * @param StatusCodesConfig|null $statusCodes
      */
     public function setStatusCodes(StatusCodesConfig $statusCodes = null)
     {

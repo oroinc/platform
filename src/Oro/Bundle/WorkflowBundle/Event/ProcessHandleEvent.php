@@ -18,10 +18,6 @@ class ProcessHandleEvent extends Event
      */
     protected $processData;
 
-    /**
-     * @param ProcessTrigger $processTrigger
-     * @param ProcessData $processData
-     */
     public function __construct(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         $this->processTrigger = $processTrigger;

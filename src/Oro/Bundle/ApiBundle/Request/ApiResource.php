@@ -13,9 +13,6 @@ class ApiResource
     /** @var string[] */
     private $excludedActions = [];
 
-    /**
-     * @param $entityClass
-     */
     public function __construct($entityClass)
     {
         $this->entityClass = $entityClass;

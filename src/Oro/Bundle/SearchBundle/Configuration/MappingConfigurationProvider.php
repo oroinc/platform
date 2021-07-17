@@ -17,8 +17,6 @@ class MappingConfigurationProvider extends MappingConfigurationProviderAbstract
 
     /**
      * Gets website search mapping configuration.
-     *
-     * @return array
      */
     public function getConfiguration(): array
     {

@@ -23,9 +23,6 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loadDataProvider
-     *
-     * @param array $kernelBundles
-     * @param array $expectedParameters
      */
     public function testLoad(array $kernelBundles, array $expectedParameters)
     {

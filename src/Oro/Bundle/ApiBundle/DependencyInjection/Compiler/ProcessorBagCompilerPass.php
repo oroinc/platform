@@ -186,10 +186,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     /**
      * Normalizes processors for "customize_loaded_data" action
      * and split them to "item" and "collection" groups.
-     *
-     * @param array $processors
-     *
-     * @return array
      */
     private function normalizeCustomizeLoadedDataProcessors(array $processors): array
     {
@@ -276,9 +272,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
      * Normalizes processors for "get_config" action.
      * Moves "identifier_fields_only" config extra to "identifier_fields_only" attribute.
      *
-     * @param array $processors
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeGetConfigProcessors(array $processors): array
@@ -332,10 +325,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
 
     /**
      * Normalizes processors for "get_metadata" action.
-     *
-     * @param array $processors
-     *
-     * @return array
      */
     private function normalizeGetMetadataProcessors(array $processors): array
     {
@@ -348,10 +337,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
 
     /**
      * Validates processors for "normalize_value" action.
-     *
-     * @param array $processors
-     *
-     * @return array
      */
     private function normalizeNormalizeValueProcessors(array $processors): array
     {
@@ -368,12 +353,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         return $result;
     }
 
-    /**
-     * @param string $processorId
-     * @param array  $attributes
-     * @param string $action
-     * @param string $expectedAttributeName
-     */
     private function assertNoGroupAttribute(
         string $processorId,
         array $attributes,
@@ -392,10 +371,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param string $processorId
-     * @param array  $attributes
-     */
     private function assertExtraAttribute(string $processorId, array $attributes): void
     {
         if (array_key_exists(self::EXTRA_ATTRIBUTE, $attributes)
@@ -525,14 +500,6 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         return $items;
     }
 
-    /**
-     * @param string $processorId
-     * @param string $attributeName
-     * @param string $action
-     * @param string $description
-     *
-     * @return LogicException
-     */
     private function createInvalidAttributeWhenOnlyOrExpressionIsAllowedException(
         string $processorId,
         string $attributeName,

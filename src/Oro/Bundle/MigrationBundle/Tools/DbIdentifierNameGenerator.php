@@ -12,8 +12,6 @@ class DbIdentifierNameGenerator
 
     /**
      * Gets the max size of an identifier
-     *
-     * @return int
      */
     public function getMaxIdentifierSize(): int
     {

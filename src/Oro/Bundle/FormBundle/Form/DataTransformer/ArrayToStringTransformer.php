@@ -17,7 +17,6 @@ class ArrayToStringTransformer extends AbstractArrayToStringTransformer
         $this->allowNull = $allowNull;
     }
 
-
     /**
      * {@inheritdoc}
      */

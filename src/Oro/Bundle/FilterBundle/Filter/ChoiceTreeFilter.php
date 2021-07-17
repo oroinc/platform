@@ -20,12 +20,6 @@ class ChoiceTreeFilter extends AbstractFilter
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @param FormFactoryInterface     $factory
-     * @param FilterUtility            $util
-     * @param RouterInterface          $router
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

@@ -17,17 +17,11 @@ class RoleListener
      */
     protected $aclSidManagerLink;
 
-    /**
-     * @param ServiceLink $aclSidManagerLink
-     */
     public function __construct(ServiceLink $aclSidManagerLink)
     {
         $this->aclSidManagerLink = $aclSidManagerLink;
     }
 
-    /**
-     * @param PreUpdateEventArgs $eventArgs
-     */
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
         if ($eventArgs->getEntity() instanceof RoleInterface && $eventArgs->hasChangedField('role')) {
@@ -42,7 +36,6 @@ class RoleListener
     /**
      * Pre persist event listener
      *
-     * @param LifecycleEventArgs $args
      * @throws \LogicException
      */
     public function prePersist(LifecycleEventArgs $args)

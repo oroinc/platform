@@ -34,8 +34,6 @@ class OroApiBundleInstaller implements Installation
 
     /**
      * Create oro_api_async_operation table
-     *
-     * @param Schema $schema
      */
     protected function createOroApiAsyncOperationTable(Schema $schema)
     {
@@ -61,8 +59,6 @@ class OroApiBundleInstaller implements Installation
 
     /**
      * Create oro_api_async_data table
-     *
-     * @param Schema $schema
      */
     protected function createOroApiAsyncDataTable(Schema $schema)
     {
@@ -76,8 +72,6 @@ class OroApiBundleInstaller implements Installation
 
     /**
      * Add oro_api_async_operation foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroApiAsyncOperationForeignKeys(Schema $schema)
     {

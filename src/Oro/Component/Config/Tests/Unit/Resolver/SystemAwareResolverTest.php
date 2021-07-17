@@ -90,8 +90,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolveProvider
-     * @param $config
-     * @param $expected
      */
     public function testResolve($config, $expected)
     {

@@ -135,8 +135,6 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitWhenInvalidWebsiteDataProvider
-     *
-     * @param string $website
      */
     public function testSubmitWhenInvalidWebsite(string $website): void
     {
@@ -157,9 +155,6 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedBusinessUnit, $form->getData());
     }
 
-    /**
-     * @return array
-     */
     public function submitWhenInvalidWebsiteDataProvider(): array
     {
         return [

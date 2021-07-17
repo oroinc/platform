@@ -41,9 +41,6 @@ class ButtonTest extends WebTestCase
 
     /**
      * @dataProvider displayButtonsDataProvider
-     *
-     * @param array $context
-     * @param array $expected
      */
     public function testDisplayButtons(array $context, array $expected = [])
     {

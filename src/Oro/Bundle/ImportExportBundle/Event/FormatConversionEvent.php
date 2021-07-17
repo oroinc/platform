@@ -12,10 +12,6 @@ class FormatConversionEvent extends Event
     /** @var array */
     protected $result = [];
 
-    /**
-     * @param array $record
-     * @param array $result
-     */
     public function __construct(array $record, array $result = [])
     {
         $this->record = $record;

@@ -38,7 +38,6 @@ class BundleTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $bundle->{$getter}());
     }
 
-
     /**
      * @return array
      */

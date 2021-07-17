@@ -30,8 +30,6 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
 
     /**
      * Initializes handler.
-     *
-     * @param ContextFactory $factory
      */
     public function __construct(ContextFactory $factory, KernelInterface $kernel)
     {
@@ -41,8 +39,6 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
 
     /**
      * Registers context class resolver.
-     *
-     * @param ClassResolver $resolver
      */
     public function registerClassResolver(ClassResolver $resolver)
     {

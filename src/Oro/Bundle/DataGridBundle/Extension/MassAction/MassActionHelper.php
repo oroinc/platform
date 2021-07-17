@@ -19,17 +19,12 @@ class MassActionHelper
      */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
     /**
-     * @param MassActionInterface $massAction
-     * @return MassActionHandlerInterface
      * @throws UnexpectedTypeException
      * @throws LogicException
      */
@@ -53,11 +48,6 @@ class MassActionHelper
         return $handler;
     }
 
-    /**
-     * @param MassActionInterface $massAction
-     * @param string $httpMethod
-     * @return bool
-     */
     public function isRequestMethodAllowed(MassActionInterface $massAction, string $httpMethod): bool
     {
         $configuredMethods = $massAction->getOptions()->offsetGetOr(MassActionExtension::ALLOWED_REQUEST_TYPES, []);

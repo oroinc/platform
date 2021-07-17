@@ -19,43 +19,26 @@ class ProcessorHelper
      */
     private $parameterBag;
 
-    /**
-     * @param ParameterBagInterface $parameterBag
-     */
     public function __construct(ParameterBagInterface $parameterBag)
     {
         $this->parameterBag = $parameterBag;
     }
 
-    /**
-     * @return bool
-     */
     public function librariesExists(): bool
     {
         return $this->getPNGQuantLibrary() && $this->getJPEGOptimLibrary();
     }
 
-    /**
-     * @return string|null
-     */
     public function getPNGQuantLibrary(): ?string
     {
         return $this->getLibrary(self::PNGQUANT) ?? $this->findLibrary(self::PNGQUANT);
     }
 
-    /**
-     * @return string|null
-     */
     public function getJPEGOptimLibrary(): ?string
     {
         return $this->getLibrary(self::JPEGOPTIM) ?? $this->findLibrary(self::JPEGOPTIM);
     }
 
-    /**
-     * @param $name
-     *
-     * @return string|null
-     */
     private function getLibrary($name): ?string
     {
         $binary = null;
@@ -78,11 +61,6 @@ class ProcessorHelper
         return null;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string|null
-     */
     private function findLibrary(string $name): ?string
     {
         $processorExecutableFinder = new ProcessorExecutableFinder();
@@ -95,11 +73,6 @@ class ProcessorHelper
         return null;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
     public function generateParameter(string $name): string
     {
         return sprintf('liip_imagine.%s.binary', $name);

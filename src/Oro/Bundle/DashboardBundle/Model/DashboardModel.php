@@ -27,11 +27,6 @@ class DashboardModel implements EntityModelInterface
      */
     protected $widgets;
 
-    /**
-     * @param Dashboard $dashboard
-     * @param Collection $widgets
-     * @param array $config
-     */
     public function __construct(Dashboard $dashboard, Collection $widgets, array $config)
     {
         $this->entity  = $dashboard;

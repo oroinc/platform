@@ -37,12 +37,6 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,

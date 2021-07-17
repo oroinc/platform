@@ -75,11 +75,8 @@ class FakeRestClient implements RestClientInterface
         return $this->lastResponse;
     }
 
-
     /**
      * Allows set any response to fake client in case you need stub some data
-     *
-     * @param RestResponseInterface $fakeResponse
      */
     public function setDefaultResponse(RestResponseInterface $fakeResponse)
     {
@@ -95,7 +92,6 @@ class FakeRestClient implements RestClientInterface
     {
         $this->fakeResponseList = $responseList;
     }
-
 
     /**
      * Creates fake response for all CRUD methods

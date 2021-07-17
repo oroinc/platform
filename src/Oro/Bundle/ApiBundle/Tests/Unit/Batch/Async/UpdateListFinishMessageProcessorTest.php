@@ -83,12 +83,6 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $this->createMock(SessionInterface::class);
     }
 
-    /**
-     * @param string $sectionName
-     * @param int    $itemIndex
-     *
-     * @return BatchError
-     */
     private function getUnlinkedIncludedDataError(string $sectionName, int $itemIndex): BatchError
     {
         $error = BatchError::createValidationError(

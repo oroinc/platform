@@ -47,11 +47,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @param FieldHelper $fieldHelper
-     * @param RelationCalculatorInterface $relationCalculator
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(
         FieldHelper $fieldHelper,
         RelationCalculatorInterface $relationCalculator,
@@ -62,9 +57,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $this->localeSettings = $localeSettings;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -327,11 +319,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         return $this->prepareDataAfterSort($event, true, true);
     }
 
-    /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @return bool
-     */
     protected function isFieldAvailableForExport(string $entityName, string $fieldName): bool
     {
         return !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded');

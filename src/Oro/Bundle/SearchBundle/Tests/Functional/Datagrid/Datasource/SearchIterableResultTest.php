@@ -66,9 +66,6 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
         $this->assertAllRecordTitles($result);
     }
 
-    /**
-     * @param SearchIterableResult $result
-     */
     private function assertAllRecordTitles(SearchIterableResult $result)
     {
         $items = iterator_to_array($result);

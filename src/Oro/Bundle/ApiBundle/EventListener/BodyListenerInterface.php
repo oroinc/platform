@@ -10,8 +10,5 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 interface BodyListenerInterface
 {
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onKernelRequest(GetResponseEvent $event): void;
 }

@@ -29,13 +29,6 @@ class EntityExtendUpdateProcessor
     /** @var Profiler|null */
     private $profiler;
 
-    /**
-     * @param MaintenanceMode          $maintenance
-     * @param CommandExecutor          $commandExecutor
-     * @param LoggerInterface          $logger
-     * @param EventDispatcherInterface $dispatcher
-     * @param Profiler|null            $profiler
-     */
     public function __construct(
         MaintenanceMode $maintenance,
         CommandExecutor $commandExecutor,
@@ -52,8 +45,6 @@ class EntityExtendUpdateProcessor
 
     /**
      * Updates the database schema and all related caches to reflect changes made in extended entities.
-     *
-     * @return bool
      */
     public function processUpdate(): bool
     {
@@ -88,10 +79,6 @@ class EntityExtendUpdateProcessor
         return true;
     }
 
-    /**
-     * @param string $command
-     * @param array  $options
-     */
     private function executeCommand(string $command, array $options = []): void
     {
         try {

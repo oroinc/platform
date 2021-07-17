@@ -105,7 +105,6 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
             );
         }
 
-
         $this->runProcess(implode(' & ', $commands));
     }
 

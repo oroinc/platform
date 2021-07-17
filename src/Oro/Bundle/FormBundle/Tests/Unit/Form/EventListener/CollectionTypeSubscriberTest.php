@@ -122,9 +122,6 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider preSubmitDataProvider
-     *
-     * @param array $data
-     * @param array $expected
      */
     public function testPreSubmit(array $data, array $expected)
     {
@@ -135,7 +132,6 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $formConfig->expects($this->once())->method('getOption')
             ->with('handle_primary')
             ->will($this->returnValue(true));
-
 
         $event = $this->createEvent($data, $form);
         $this->subscriber->preSubmit($event);

@@ -48,8 +48,6 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
 
     /**
      * Gets the name of the action for which the configuration is requested.
-     *
-     * @return string|null
      */
     public function getAction(): ?string
     {
@@ -59,8 +57,6 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     /**
      * Gets a flag indicates whether a configuration is requested
      * for a list of entities resource or a single entity resource,
-     *
-     * @return bool
      */
     public function isCollection(): bool
     {
@@ -69,8 +65,6 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
 
     /**
      * Gets the class name of the parent entity for which the configuration is requested.
-     *
-     * @return string|null
      */
     public function getParentClassName(): ?string
     {
@@ -79,8 +73,6 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
 
     /**
      * Gets the association name of a sub-resource for which the configuration is requested.
-     *
-     * @return string|null
      */
     public function getAssociationName(): ?string
     {

@@ -21,11 +21,6 @@ class CommandWithArgsFilter extends StringFilter
     /** @var FilterDatasourceAdapterInterface */
     protected $ds;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param CommandArgsTokenizer $tokenizer
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

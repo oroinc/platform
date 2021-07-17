@@ -49,9 +49,6 @@ class CsvFileReaderTest extends TestCase
 
     /**
      * @dataProvider readSeveralEntitiesProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testEnsureThatHeaderIsCleared(array $options, array $expected)
     {

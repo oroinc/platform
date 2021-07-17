@@ -26,7 +26,6 @@ class ChartTypeEventListener implements EventSubscriberInterface
     }
 
     /**
-     * @param FormEvent $event
      * @throws InvalidArgumentException
      */
     public function onSubmit(FormEvent $event)
@@ -51,7 +50,6 @@ class ChartTypeEventListener implements EventSubscriberInterface
     }
 
     /**
-     * @param FormEvent $event
      * @throws InvalidArgumentException
      */
     public function preSetData(FormEvent $event)

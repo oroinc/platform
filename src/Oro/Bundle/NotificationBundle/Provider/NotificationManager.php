@@ -44,11 +44,6 @@ class NotificationManager implements ResetInterface
 
     /**
      * Process the given event by handlers.
-     *
-     * @param NotificationEvent $event
-     * @param string            $eventName
-     *
-     * @return NotificationEvent
      */
     public function process(NotificationEvent $event, string $eventName): NotificationEvent
     {
@@ -103,12 +98,6 @@ class NotificationManager implements ResetInterface
         return $filteredRules;
     }
 
-    /**
-     * @param string $entityName
-     * @param string $eventName
-     *
-     * @return bool
-     */
     private function hasRules(string $entityName, string $eventName): bool
     {
         $ruleMap = $this->cache->fetch(self::RULES_CACHE_KEY);
@@ -168,9 +157,6 @@ class NotificationManager implements ResetInterface
             ->getResult();
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
     private function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass(EmailNotification::class);

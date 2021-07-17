@@ -35,9 +35,6 @@ trait MessageQueueExtension
         self::disableMessageBuffering();
     }
 
-    /**
-     * @return BufferedMessageProducer
-     */
     protected static function getBufferedMessageProducer(): BufferedMessageProducer
     {
         return self::getContainer()->get('oro_message_queue.client.buffered_message_producer');

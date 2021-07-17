@@ -23,11 +23,6 @@ class EntityIdByCriteriaProvider implements ValueProviderInterface
      */
     private $defaultEntityCriteria;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param string         $entityClass
-     * @param array          $defaultEntityCriteria
-     */
     public function __construct(DoctrineHelper $doctrineHelper, string $entityClass, array $defaultEntityCriteria)
     {
         $this->doctrineHelper = $doctrineHelper;

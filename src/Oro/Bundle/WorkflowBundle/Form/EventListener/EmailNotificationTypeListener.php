@@ -21,17 +21,11 @@ class EmailNotificationTypeListener
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function __construct(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSetData(FormEvent $event)
     {
         $data = $event->getData();
@@ -45,9 +39,6 @@ class EmailNotificationTypeListener
         $this->addWorkflowFields($form, $data);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -60,10 +51,6 @@ class EmailNotificationTypeListener
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param EmailNotification $data
-     */
     private function updateEventField(FormInterface $form, EmailNotification $data)
     {
         $entityName = $data->getEntityName();
@@ -81,10 +68,6 @@ class EmailNotificationTypeListener
         FormUtils::replaceField($form, 'eventName', ['choices' => $choices]);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param EmailNotification $data
-     */
     private function addWorkflowFields(FormInterface $form, EmailNotification $data)
     {
         if (!$data->getEntityName() ||
@@ -99,9 +82,6 @@ class EmailNotificationTypeListener
         $this->updateTemplateField($form);
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function updateTemplateField(FormInterface $form)
     {
         $template = $form->get('template');

@@ -149,9 +149,6 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     *
-     */
     private function getCatalogueEnMap()
     {
         return [

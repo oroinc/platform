@@ -57,12 +57,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
     /**
      * Constructor
-     *
-     * @param EntityManager $em
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
-     * @param ImapEmailManager $manager
-     * @param ImapEmailRemoveManager $removeManager
      */
     public function __construct(
         EntityManager $em,
@@ -76,9 +70,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->removeManager = $removeManager;
     }
 
-    /**
-     * @param LoggerInterface $emailErrorsLogger
-     */
     public function setEmailErrorsLogger(LoggerInterface $emailErrorsLogger)
     {
         $this->emailErrorsLogger = $emailErrorsLogger;
@@ -605,8 +596,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
     /**
      * Process actions when email folder can't be selected.
-     *
-     * @param EmailFolder $folder
      */
     protected function processUnselectableFolderException(EmailFolder $folder)
     {
@@ -639,7 +628,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         return false === $this->getSettings()->isForceMode()
             && time() - $this->processStartTime > self::MAX_ORIGIN_SYNC_TIME;
     }
-
 
     /**
      * @param \Exception $e

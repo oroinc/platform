@@ -34,10 +34,6 @@ class ImapClearManager implements LoggerAwareInterface
     /** @var Indexer */
     protected $indexer;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param Indexer $indexer
-     */
     public function __construct(DoctrineHelper $doctrineHelper, Indexer $indexer)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -98,9 +94,6 @@ class ImapClearManager implements LoggerAwareInterface
         return $origins;
     }
 
-    /**
-     * @param UserEmailOrigin $origin
-     */
     protected function clearOrigin(UserEmailOrigin $origin)
     {
         $em = $this->getEntityManager();

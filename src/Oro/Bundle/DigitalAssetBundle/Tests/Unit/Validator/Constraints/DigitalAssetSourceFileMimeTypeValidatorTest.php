@@ -257,9 +257,6 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
         );
     }
 
-    /**
-     * @return Collection
-     */
     private function mockChildFiles(): Collection
     {
         $childFiles = new ArrayCollection([$childFile = $this->createMock(File::class)]);
@@ -296,9 +293,6 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
         );
     }
 
-    /**
-     * @param string $type
-     */
     private function mockFieldConfigModel(string $type): void
     {
         $this->entityConfigManager
@@ -346,10 +340,6 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
         $this->validator->validate($digitalAsset, $constraint);
     }
 
-    /**
-     * @param string $message
-     * @param array $parameters
-     */
     private function assertViolation(string $message, array $parameters): void
     {
         $this->context

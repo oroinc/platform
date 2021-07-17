@@ -104,9 +104,6 @@ class ConfigTranslationTest extends WebTestCase
         $this->assertMissingTranslationKeysEmpty($missingTranslationKeys);
     }
 
-    /**
-     * @param array $missingTranslationKeys
-     */
     public function assertMissingTranslationKeysEmpty(array $missingTranslationKeys)
     {
         if ($missingTranslationKeys) {
@@ -118,10 +115,6 @@ class ConfigTranslationTest extends WebTestCase
         }
     }
 
-    /**
-     * @param array           $missingTranslationKeys
-     * @param ConfigInterface $config
-     */
     private function addMissingTranslationKeysForEntity(array &$missingTranslationKeys, ConfigInterface $config)
     {
         $configId = $config->getId();
@@ -140,10 +133,6 @@ class ConfigTranslationTest extends WebTestCase
         }
     }
 
-    /**
-     * @param array           $missingTranslationKeys
-     * @param ConfigInterface $config
-     */
     private function addMissingTranslationKeysForField(array &$missingTranslationKeys, ConfigInterface $config)
     {
         $configId = $config->getId();

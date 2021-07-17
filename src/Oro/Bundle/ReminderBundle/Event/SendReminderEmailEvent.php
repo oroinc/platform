@@ -12,9 +12,6 @@ class SendReminderEmailEvent extends Event
      */
     protected $reminder;
 
-    /**
-     * @param Reminder $reminder
-     */
     public function __construct(Reminder $reminder)
     {
         $this->reminder = $reminder;

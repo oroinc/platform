@@ -107,9 +107,6 @@ class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->loadClassMetadata($this->event);
     }
 
-    /**
-     * @return array
-     */
     private function getPropertyMetadata(): array
     {
         return [

@@ -27,8 +27,6 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $dataSchema
-     *
      * @dataProvider dataSchemaProvider
      */
     public function testBuildForm(array $dataSchema)

@@ -26,11 +26,6 @@ class FormValidationHandler
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param ValidatorInterface        $validator
-     * @param CustomizeFormDataHandler  $customizationHandler
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         ValidatorInterface $validator,
         CustomizeFormDataHandler $customizationHandler,
@@ -43,8 +38,6 @@ class FormValidationHandler
 
     /**
      * Dispatches "pre_validate" event for the given form.
-     *
-     * @param FormInterface $form
      *
      * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
      */
@@ -60,8 +53,6 @@ class FormValidationHandler
 
     /**
      * Validates the given form.
-     *
-     * @param FormInterface $form
      *
      * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
      */
@@ -94,8 +85,6 @@ class FormValidationHandler
     /**
      * Dispatches "post_validate" event for the given form.
      *
-     * @param FormInterface $form
-     *
      * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
      */
     public function postValidate(FormInterface $form): void
@@ -108,9 +97,6 @@ class FormValidationHandler
         }
     }
 
-    /**
-     * @return ValidationListener
-     */
     protected function getValidationListener(): ValidationListener
     {
         return new ValidationListener(
@@ -120,8 +106,6 @@ class FormValidationHandler
     }
 
     /**
-     * @param FormInterface $form
-     *
      * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
      */
     private function assertSubmittedRootForm(FormInterface $form): void
@@ -134,37 +118,21 @@ class FormValidationHandler
         }
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return FormEvent
-     */
     private function createFormEvent(FormInterface $form): FormEvent
     {
         return new FormEvent($form, $form->getViewData());
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return bool
-     */
     private function hasApiEventContext(FormInterface $form): bool
     {
         return $form->getConfig()->hasAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     private function dispatchPreValidateEvent(FormEvent $event): void
     {
         $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_PRE_VALIDATE, $event);
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function dispatchPreValidateEventForChildren(FormInterface $form): void
     {
         /** @var FormInterface $child */
@@ -178,17 +146,11 @@ class FormValidationHandler
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     private function dispatchPostValidateEvent(FormEvent $event): void
     {
         $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_POST_VALIDATE, $event);
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function dispatchPostValidateEventForChildren(FormInterface $form): void
     {
         /** @var FormInterface $child */

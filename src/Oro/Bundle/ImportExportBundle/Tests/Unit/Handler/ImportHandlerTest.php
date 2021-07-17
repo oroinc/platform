@@ -71,9 +71,6 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider splitImportFileDataProvider
-     *
-     * @param int|null $batchSize
-     * @param array $expectedOptions
      */
     public function testSplitImportFile(?int $batchSize, array $expectedOptions): void
     {
@@ -114,9 +111,6 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['data'], $this->importHandler->splitImportFile($jobName, $processorType, $writer));
     }
 
-    /**
-     * @return array
-     */
     public function splitImportFileDataProvider(): array
     {
         return [

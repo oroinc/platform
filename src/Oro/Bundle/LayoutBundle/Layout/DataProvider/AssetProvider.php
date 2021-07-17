@@ -9,9 +9,6 @@ class AssetProvider
     /** @var Packages */
     protected $packages;
 
-    /**
-     * @param Packages $packages
-     */
     public function __construct(Packages $packages)
     {
         $this->packages = $packages;

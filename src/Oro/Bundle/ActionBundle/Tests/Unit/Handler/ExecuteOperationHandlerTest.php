@@ -63,7 +63,6 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn('test_operation');
 
-
         $this->handler = new ExecuteOperationHandler(
             $this->requestStack,
             $this->formProvider,

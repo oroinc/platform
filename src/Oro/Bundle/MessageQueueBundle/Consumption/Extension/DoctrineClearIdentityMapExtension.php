@@ -18,10 +18,6 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension
     /** @var array [manager name => manager service id, ...] */
     private $managers;
 
-    /**
-     * @param ContainerInterface $container
-     * @param array $managers
-     */
     public function __construct(ContainerInterface $container, array $managers)
     {
         $this->container = $container;

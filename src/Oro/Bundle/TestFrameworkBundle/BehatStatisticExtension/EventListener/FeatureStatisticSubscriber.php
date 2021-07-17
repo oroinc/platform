@@ -37,9 +37,6 @@ final class FeatureStatisticSubscriber implements EventListener
      */
     private $output;
 
-    /**
-     * @param FeatureStatisticManager $statisticManager
-     */
     public function __construct(FeatureStatisticManager $statisticManager)
     {
         $this->statisticManager = $statisticManager;
@@ -79,7 +76,6 @@ final class FeatureStatisticSubscriber implements EventListener
 
     /**
      * Finish tracking and save stats
-     * @param AfterFeatureTested $event
      */
     public function captureStats(AfterFeatureTested $event)
     {
@@ -110,17 +106,11 @@ final class FeatureStatisticSubscriber implements EventListener
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
     }
 
-    /**
-     * @param bool $skip
-     */
     public function setSkip(bool $skip)
     {
         $this->skip = $skip;

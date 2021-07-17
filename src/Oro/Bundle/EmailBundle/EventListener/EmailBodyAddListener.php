@@ -38,15 +38,6 @@ class EmailBodyAddListener
     /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @param EmailAttachmentManager        $attachmentManager
-     * @param ConfigProvider                $configProvider
-     * @param EmailActivityListProvider     $activityListProvider
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface         $tokenStorage
-     * @param ActivityListChainProvider     $chainProvider
-     * @param EntityManager                 $entityManager
-     */
     public function __construct(
         EmailAttachmentManager $attachmentManager,
         ConfigProvider $configProvider,
@@ -65,9 +56,6 @@ class EmailBodyAddListener
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param EmailBodyAdded $event
-     */
     public function linkToScope(EmailBodyAdded $event)
     {
         if (null !== $this->tokenStorage->getToken()
@@ -88,8 +76,6 @@ class EmailBodyAddListener
     }
 
     /**
-     * @param EmailBodyAdded $event
-     *
      * @throws \Exception
      */
     public function updateActivityDescription(EmailBodyAdded $event)

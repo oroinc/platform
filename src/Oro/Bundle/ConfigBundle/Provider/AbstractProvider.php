@@ -58,14 +58,6 @@ abstract class AbstractProvider implements ProviderInterface
     /** @var FormRegistryInterface  */
     protected $formRegistry;
 
-    /**
-     * @param ConfigBag $configBag
-     * @param TranslatorInterface $translator
-     * @param FormFactoryInterface $factory
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ChainSearchProvider $searchProvider
-     * @param FormRegistryInterface $formRegistry
-     */
     public function __construct(
         ConfigBag $configBag,
         TranslatorInterface $translator,
@@ -89,9 +81,6 @@ abstract class AbstractProvider implements ProviderInterface
      */
     abstract protected function getParentCheckboxLabel();
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function setFeatureChecker(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
@@ -480,10 +469,6 @@ abstract class AbstractProvider implements ProviderInterface
         return $this->authorizationChecker->isGranted($resourceName);
     }
 
-    /**
-     * @param FormBuilderInterface $form
-     * @param FieldNodeDefinition  $fieldDefinition
-     */
     protected function addFieldToForm(FormBuilderInterface $form, FieldNodeDefinition $fieldDefinition)
     {
         if ($fieldDefinition->getAclResource() && !$this->checkIsGranted($fieldDefinition->getAclResource())) {

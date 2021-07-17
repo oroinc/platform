@@ -65,10 +65,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
      */
     private $deleteStatement;
 
-    /**
-     * @param DbalSessionInterface $session
-     * @param QueueInterface $queue
-     */
     public function __construct(DbalSessionInterface $session, QueueInterface $queue)
     {
         $this->session = $session;
@@ -78,9 +74,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
         $this->consumerId = uniqid('', true);
     }
 
-    /**
-     * @return string
-     */
     public function getConsumerId(): string
     {
         return $this->consumerId;
@@ -88,8 +81,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
     /**
      * Set polling interval in milliseconds
-     *
-     * @param int $msec
      */
     public function setPollingInterval(int $msec): void
     {
@@ -98,8 +89,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
     /**
      * Get polling interval in milliseconds
-     *
-     * @return int
      */
     public function getPollingInterval(): int
     {
@@ -193,7 +182,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
      * Receive message, set consumer for message assigned to current queue
      * Return data of received message.
      *
-     * @return MessageInterface|null
      * @throws \Doctrine\DBAL\DBALException
      */
     private function receiveMessage(): ?MessageInterface
@@ -229,11 +217,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
         return null;
     }
 
-    /**
-     * @param array $dbalMessage
-     *
-     * @return MessageInterface
-     */
     private function convertMessage(array $dbalMessage): MessageInterface
     {
         $message = $this->session->createMessage();
@@ -255,7 +238,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return Statement
      * @throws \Doctrine\DBAL\DBALException
      */
     private function getSelectStatement(): Statement
@@ -273,7 +255,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return Statement
      * @throws \Doctrine\DBAL\DBALException
      */
     private function getUpdateStatement(): Statement
@@ -305,7 +286,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return Statement
      * @throws \Doctrine\DBAL\DBALException
      */
     private function getDeleteStatement(): Statement
@@ -329,8 +309,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @param DbalMessageInterface $message
-     * @return int
      * @throws \Doctrine\DBAL\DBALException
      */
     private function deleteMessage(DbalMessageInterface $message): int
@@ -345,7 +323,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
      * Try to delete message from queue
      * retry once with delay of 0.5 second if DB query failed
      *
-     * @param DbalMessageInterface $message
      * @throws \Doctrine\DBAL\DBALException|\LogicException
      */
     private function deleteMessageWithRetry(DbalMessageInterface $message): void

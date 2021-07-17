@@ -19,11 +19,6 @@ class SearchQueryFilterFactory
     /** @var ExpressionVisitor|null */
     private $searchQueryCriteriaVisitor;
 
-    /**
-     * @param AbstractSearchMappingProvider $searchMappingProvider
-     * @param SearchFieldResolverFactory    $searchFieldResolverFactory
-     * @param ExpressionVisitor|null        $searchQueryCriteriaVisitor
-     */
     public function __construct(
         AbstractSearchMappingProvider $searchMappingProvider,
         SearchFieldResolverFactory $searchFieldResolverFactory,
@@ -36,10 +31,6 @@ class SearchQueryFilterFactory
 
     /**
      * Creates a new instance of SearchQueryFilter.
-     *
-     * @param string $dataType
-     *
-     * @return SearchQueryFilter
      */
     public function createFilter(string $dataType): SearchQueryFilter
     {

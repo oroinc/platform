@@ -19,7 +19,7 @@ class ProcessDefinitionRepository extends EntityRepository
         }
 
         $qb = $this->createQueryBuilder('p');
-        
+
         return $qb->where($qb->expr()->like('p.name', sprintf(":nameLike ESCAPE '%s'", $escapeChar)))
             ->setParameter('nameLike', $like)
             ->getQuery()

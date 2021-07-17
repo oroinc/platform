@@ -47,9 +47,6 @@ class ContextRegistry
         return new StepExecutionProxyContext($stepExecution);
     }
 
-    /**
-     * @param JobInstance|null $jobInstance
-     */
     public function clear(JobInstance $jobInstance = null)
     {
         $alias = self::DEFAULT_ALIAS;

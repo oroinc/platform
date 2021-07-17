@@ -12,9 +12,6 @@ class ChannelDeleteActionHandler implements ChannelActionHandlerInterface
      */
     private $deleteManager;
 
-    /**
-     * @param DeleteManager $deleteManager
-     */
     public function __construct(DeleteManager $deleteManager)
     {
         $this->deleteManager = $deleteManager;

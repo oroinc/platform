@@ -34,11 +34,6 @@ class ClientEventListener implements LoggerAwareInterface
     /** @var ClientStorageInterface */
     private $clientStorage;
 
-    /**
-     * @param GosClientEventListener $decoratedClientEventListener
-     * @param WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider
-     * @param ClientStorageInterface $clientStorage
-     */
     public function __construct(
         GosClientEventListener $decoratedClientEventListener,
         WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider,
@@ -51,8 +46,6 @@ class ClientEventListener implements LoggerAwareInterface
     }
 
     /**
-     * @param ClientEvent $event
-     *
      * @throws StorageException
      * @throws BadCredentialsException
      */
@@ -90,17 +83,11 @@ class ClientEventListener implements LoggerAwareInterface
         $this->logger->info('{username} connected', ['storage_id' => $storageId] + $loggerContext);
     }
 
-    /**
-     * @param ClientDisconnectedEvent $event
-     */
     public function onClientDisconnect(ClientDisconnectedEvent $event)
     {
         $this->decoratedClientEventListener->onClientDisconnect($event);
     }
 
-    /**
-     * @param ClientErrorEvent $event
-     */
     public function onClientError(ClientErrorEvent $event)
     {
         $exception = $event->getThrowable();
@@ -125,18 +112,11 @@ class ClientEventListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param ClientRejectedEvent $event
-     */
     public function onClientRejected(ClientRejectedEvent $event)
     {
         $this->decoratedClientEventListener->onClientRejected($event);
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param int $status
-     */
     private function closeConnection(ConnectionInterface $connection, int $status): void
     {
         $response = new Response($status);

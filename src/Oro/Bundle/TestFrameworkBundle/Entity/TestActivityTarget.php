@@ -124,7 +124,7 @@ class TestActivityTarget extends ExtendTestActivityTarget implements
         }
 
         $this->serialized_data[$fieldName] = $arguments[0];
-        
+
         return $this;
     }
 }

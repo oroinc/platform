@@ -60,8 +60,6 @@ class SearchResult
 
     /**
      * Gets the number of search query result records without limit parameters.
-     *
-     * @return int
      */
     public function getRecordsCount(): int
     {
@@ -74,8 +72,6 @@ class SearchResult
      * Gets aggregated data collected when execution the query.
      * Format for the "count" function: [aggregating name => ['value' => field value, 'count' => count value], ...]
      * Format for mathematical functions: [aggregating name => aggregated value, ...]
-     *
-     * @return array
      */
     public function getAggregatedData(): array
     {
@@ -86,9 +82,6 @@ class SearchResult
         });
     }
 
-    /**
-     * @return Result
-     */
     private function getSearchResult(): Result
     {
         if (null === $this->searchResult) {
@@ -128,11 +121,6 @@ class SearchResult
         }
     }
 
-    /**
-     * @param array $aggregatedData
-     *
-     * @return array
-     */
     private function normalizeAggregatedData(array $aggregatedData): array
     {
         $result = [];

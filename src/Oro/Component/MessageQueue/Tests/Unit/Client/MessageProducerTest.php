@@ -196,9 +196,6 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->send('topic.name', new Message());
     }
 
-    /**
-     * @return array
-     */
     public function validMessageDataProvider(): array
     {
         return [
@@ -253,9 +250,6 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function invalidMessageDataProvider(): array
     {
         return [
@@ -272,9 +266,6 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return Message
-     */
     private function getExpectedMessage(): Message
     {
         $expectedMessage = new Message();

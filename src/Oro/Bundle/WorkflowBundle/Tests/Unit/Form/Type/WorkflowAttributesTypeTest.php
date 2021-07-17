@@ -98,9 +98,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     }
 
     /**
-     * @param array $attributeField
-     * @param array $expectedOptions
-     *
      * @dataProvider buildFormProvider
      */
     public function testBuildForm(array $attributeField, array $expectedOptions)
@@ -232,12 +229,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @dataProvider submitDataProvider
-     * @param array $submitData
-     * @param WorkflowData $formData
-     * @param array $formOptions
-     * @param array $childrenOptions
-     * @param array $guessedData
-     * @param WorkflowData|null $sourceWorkflowData
      */
     public function testSubmit(
         array $submitData,

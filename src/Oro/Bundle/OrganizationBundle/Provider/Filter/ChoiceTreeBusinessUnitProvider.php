@@ -25,12 +25,6 @@ class ChoiceTreeBusinessUnitProvider
     /** @var ChainOwnerTreeProvider */
     protected $treeProvider;
 
-    /**
-     * @param Registry                $registry
-     * @param TokenAccessorInterface  $tokenAccessor
-     * @param AclHelper               $aclHelper
-     * @param ChainOwnerTreeProvider  $treeProvider
-     */
     public function __construct(
         Registry $registry,
         TokenAccessorInterface $tokenAccessor,
@@ -88,9 +82,6 @@ class ChoiceTreeBusinessUnitProvider
         return $businessUnit->getName();
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     protected function addBusinessUnitName(QueryBuilder $qb)
     {
         $qb->addSelect('businessUnit.name');

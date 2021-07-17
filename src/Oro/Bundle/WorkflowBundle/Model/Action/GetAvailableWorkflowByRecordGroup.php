@@ -16,10 +16,6 @@ class GetAvailableWorkflowByRecordGroup extends AbstractAction
     /** @var array */
     protected $options;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param WorkflowManager $manager
-     */
     public function __construct(ContextAccessor $contextAccessor, WorkflowManager $manager)
     {
         parent::__construct($contextAccessor);

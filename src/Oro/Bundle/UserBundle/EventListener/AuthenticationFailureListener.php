@@ -20,19 +20,12 @@ class AuthenticationFailureListener
     /** @var string */
     private $messageKey;
 
-    /**
-     * @param string $providerKey
-     * @param string $messageKey
-     */
     public function __construct(string $providerKey, string $messageKey)
     {
         $this->providerKey = $providerKey;
         $this->messageKey = $messageKey;
     }
 
-    /**
-     * @param AuthenticationFailureEvent $event
-     */
     public function onAuthenticationFailure(AuthenticationFailureEvent $event)
     {
         if ($this->isApplicable($event->getAuthenticationException(), $event->getAuthenticationToken())) {

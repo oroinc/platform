@@ -40,11 +40,6 @@ class PermissionConfigurationBuilder
      */
     private $processedEntities = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ValidatorInterface $validator
-     * @param EntityManager $entityManager
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ValidatorInterface $validator,
@@ -142,8 +137,6 @@ class PermissionConfigurationBuilder
     }
 
     /**
-     * @param array $configuration
-     * @param array $requiredOptions
      * @throws MissedRequiredOptionException
      */
     protected function assertConfigurationOptions(array $configuration, array $requiredOptions)
@@ -189,11 +182,6 @@ class PermissionConfigurationBuilder
         );
     }
 
-    /**
-     * @param array $classNames
-     * @param array $configuration
-     * @return array
-     */
     private function getClassesByInterfaces(array $classNames, array $configuration): array
     {
         return array_filter(

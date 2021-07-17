@@ -22,9 +22,6 @@ class DelegateStrategy implements StrategyInterface
      */
     protected $ordered = false;
 
-    /**
-     * @param array $strategies
-     */
     public function __construct(array $strategies = array())
     {
         $this->elements = array();

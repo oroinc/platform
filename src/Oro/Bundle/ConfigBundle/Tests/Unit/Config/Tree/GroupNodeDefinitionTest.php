@@ -64,8 +64,6 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider nodeDefinitionProvider
-     *
-     * @param GroupNodeDefinition $node
      */
     public function testToBlockConfig(GroupNodeDefinition $node)
     {
@@ -89,8 +87,6 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider nodeDefinitionProvider
-     *
-     * @param GroupNodeDefinition $node
      */
     public function testToViewData(GroupNodeDefinition $node)
     {

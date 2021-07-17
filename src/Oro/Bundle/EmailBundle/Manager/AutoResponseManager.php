@@ -126,9 +126,6 @@ class AutoResponseManager
         return false;
     }
 
-    /**
-     * @param Email $email
-     */
     public function sendAutoResponses(Email $email)
     {
         $mailboxes = $this->getMailboxRepository()->findForEmail($email);
@@ -170,10 +167,6 @@ class AutoResponseManager
         ];
     }
 
-    /**
-     * @param Mailbox $mailbox
-     * @param Email $email
-     */
     protected function processMailbox(Mailbox $mailbox, Email $email)
     {
         $rules = $this->getApplicableRules($mailbox, $email);
@@ -216,11 +209,6 @@ class AutoResponseManager
         });
     }
 
-    /**
-     * @param EmailModel $emailModel
-     * @param EmailTemplate $template
-     * @param Email $email
-     */
     protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {
         $translatedSubjects = [];
@@ -301,10 +289,6 @@ class AutoResponseManager
         return $this->createGroupExpr([$definition['filters']], $email);
     }
 
-    /**
-     * @param array $group
-     * @param Email $email
-     */
     protected function createGroupExpr(array $group, Email $email)
     {
         $exprs = [];

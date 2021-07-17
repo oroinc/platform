@@ -32,10 +32,6 @@ class DateTimeFormatConverterRegistry implements ResetInterface
     /**
      * Gets a format converter by its name.
      *
-     * @param string $name
-     *
-     * @return DateTimeFormatConverterInterface
-     *
      * @throws \LogicException if a format converter for the given name was not found
      */
     public function getFormatConverter(string $name): DateTimeFormatConverterInterface

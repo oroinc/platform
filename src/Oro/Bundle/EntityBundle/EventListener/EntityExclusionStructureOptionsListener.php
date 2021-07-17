@@ -22,19 +22,12 @@ class EntityExclusionStructureOptionsListener
     /** @var ExclusionProviderInterface */
     private $exclusionProvider;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ExclusionProviderInterface $exclusionProvider
-     */
     public function __construct(ManagerRegistry $managerRegistry, ExclusionProviderInterface $exclusionProvider)
     {
         $this->managerRegistry = $managerRegistry;
         $this->exclusionProvider = $exclusionProvider;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();
@@ -54,7 +47,6 @@ class EntityExclusionStructureOptionsListener
         }
         $event->setData($data);
     }
-
 
     /**
      * @param array|EntityFieldStructure[] $fields

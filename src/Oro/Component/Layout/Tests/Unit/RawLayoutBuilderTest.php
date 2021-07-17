@@ -265,7 +265,6 @@ class RawLayoutBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreStart
     /**
      * @dataProvider             emptyStringDataProvider
-     *
      */
     // @codingStandardsIgnoreEnd
     public function testSetOptionWithEmptyName($name)

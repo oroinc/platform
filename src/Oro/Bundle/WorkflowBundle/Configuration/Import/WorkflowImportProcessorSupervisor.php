@@ -60,27 +60,16 @@ class WorkflowImportProcessorSupervisor implements ConfigImportProcessorInterfac
         return $content;
     }
 
-    /**
-     * @param WorkflowImportProcessor $processor
-     * @return string
-     */
     private function getProcessorKey(WorkflowImportProcessor $processor): string
     {
         return sprintf('%s->%s', $processor->getResource(), $processor->getTarget());
     }
 
-    /**
-     * @param WorkflowImportProcessor $processor
-     */
     private function addProcessed(WorkflowImportProcessor $processor)
     {
         $this->processed[$this->getProcessorKey($processor)] = $processor;
     }
 
-    /**
-     * @param WorkflowImportProcessor $processor
-     * @return bool
-     */
     private function isProcessed(WorkflowImportProcessor $processor): bool
     {
         return isset($this->processed[$this->getProcessorKey($processor)]);
@@ -104,10 +93,6 @@ class WorkflowImportProcessorSupervisor implements ConfigImportProcessorInterfac
         return $this->imports->filter($filter);
     }
 
-    /**
-     * @param \SplFileInfo $contentSource
-     * @param WorkflowImportProcessor $current
-     */
     private function checkCircularReferences(\SplFileInfo $contentSource, WorkflowImportProcessor $current)
     {
         foreach ($this->getInProgress() as $importProcessor) {
@@ -128,10 +113,6 @@ class WorkflowImportProcessorSupervisor implements ConfigImportProcessorInterfac
         }
     }
 
-    /**
-     * @param WorkflowImportProcessor $current
-     * @return bool
-     */
     private function shouldSkip(WorkflowImportProcessor $current): bool
     {
         //same import was already processed (incorrect usage)

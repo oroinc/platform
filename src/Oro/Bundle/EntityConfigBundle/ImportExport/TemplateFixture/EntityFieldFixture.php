@@ -11,9 +11,6 @@ class EntityFieldFixture implements TemplateFixtureInterface
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
 
-    /**
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(FieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;

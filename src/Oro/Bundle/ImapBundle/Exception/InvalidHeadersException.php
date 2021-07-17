@@ -25,9 +25,6 @@ class InvalidHeadersException extends \Exception
         $this->headers = $headers;
     }
 
-    /**
-     * @return Headers
-     */
     public function getHeaders(): Headers
     {
         return $this->headers;

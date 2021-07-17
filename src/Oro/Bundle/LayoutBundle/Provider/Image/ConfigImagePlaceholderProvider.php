@@ -24,12 +24,6 @@ class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterfac
     /** @var string */
     private $configKey;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param AttachmentManager $attachmentManager
-     * @param string $configKey
-     */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,

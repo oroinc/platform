@@ -154,7 +154,6 @@ abstract class AbstractExpression implements ExpressionInterface
             }
         }
 
-
         $compiled =
             $factoryAccessor
             . '->create(\''

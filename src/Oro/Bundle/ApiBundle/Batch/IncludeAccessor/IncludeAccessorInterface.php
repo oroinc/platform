@@ -9,18 +9,11 @@ interface IncludeAccessorInterface
 {
     /**
      * Gets the data part of the given primary data item.
-     *
-     * @param array $item
-     *
-     * @return array
      */
     public function getPrimaryItemData(array $item): array;
 
     /**
      * Sets the data part to the given primary data item.
-     *
-     * @param array $item
-     * @param array $data
      */
     public function setPrimaryItemData(array &$item, array $data): void;
 

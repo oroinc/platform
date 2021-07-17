@@ -318,8 +318,6 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * Initializes layout updates.
      *
-     * @param ContextInterface $context
-     *
      * @throws Exception\UnexpectedTypeException if any registered layout update is not
      *                                           an instance of LayoutUpdateInterface
      *                                           or layout item id is not a string

@@ -29,10 +29,6 @@ class EntityData
      */
     protected $fields = array();
 
-    /**
-     * @param EntityMetadata $metadata
-     * @param array $entities
-     */
     public function __construct(EntityMetadata $metadata, array $entities)
     {
         $this->metadata = $metadata;

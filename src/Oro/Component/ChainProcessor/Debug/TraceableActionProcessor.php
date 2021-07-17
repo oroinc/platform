@@ -13,10 +13,6 @@ class TraceableActionProcessor implements ActionProcessorInterface
     /** @var TraceLogger */
     protected $logger;
 
-    /**
-     * @param ActionProcessorInterface $actionProcessor
-     * @param TraceLogger              $logger
-     */
     public function __construct(ActionProcessorInterface $actionProcessor, TraceLogger $logger)
     {
         $this->actionProcessor = $actionProcessor;

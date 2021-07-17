@@ -21,17 +21,11 @@ class AttributeFamilyManager
     /** @var array */
     private $attributeFamilies = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function setAclHelper(AclHelper $aclHelper): void
     {
         $this->aclHelper = $aclHelper;
@@ -60,10 +54,6 @@ class AttributeFamilyManager
         return true;
     }
 
-    /**
-     * @param string $code
-     * @return AttributeFamily|null
-     */
     public function getAttributeFamilyByCode(string $code): ?AttributeFamily
     {
         if (!array_key_exists($code, $this->attributeFamilies)) {

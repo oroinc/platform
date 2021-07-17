@@ -7,8 +7,5 @@ namespace Oro\Bundle\ActionBundle\Configuration;
  */
 interface ConfigurationProviderInterface
 {
-    /**
-     * @return array
-     */
     public function getConfiguration(): array;
 }

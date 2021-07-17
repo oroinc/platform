@@ -28,11 +28,6 @@ class ConfigSubscriber implements EventSubscriberInterface
     /** @var Translator */
     protected $translator;
 
-    /**
-     * @param ConfigTranslationHelper $translationHelper
-     * @param ConfigManager $configManager
-     * @param Translator $translator
-     */
     public function __construct(
         ConfigTranslationHelper $translationHelper,
         ConfigManager $configManager,
@@ -54,9 +49,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $formConfig = $event->getForm()->getConfig();
@@ -73,9 +65,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         $form        = $event->getForm();

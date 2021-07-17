@@ -33,8 +33,6 @@ class Email extends EmailHeader
 
     /**
      * Constructor
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {

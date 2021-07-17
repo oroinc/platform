@@ -303,9 +303,6 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         return [$dispatcher, $builder];
     }
 
-    /**
-     * @param FormInterface $formField
-     */
     protected function addFieldModificationDeniedFormError(FormInterface $formField)
     {
         $formField->addError(new FormError('You have no access to modify this field.'));

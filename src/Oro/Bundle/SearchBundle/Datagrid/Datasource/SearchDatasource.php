@@ -30,10 +30,6 @@ class SearchDatasource implements DatasourceInterface
     /** @var YamlToSearchQueryConverter */
     protected $yamlToSearchQueryConverter;
 
-    /**
-     * @param QueryFactoryInterface    $factory
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(QueryFactoryInterface $factory, EventDispatcherInterface $eventDispatcher)
     {
         $this->queryFactory               = $factory;

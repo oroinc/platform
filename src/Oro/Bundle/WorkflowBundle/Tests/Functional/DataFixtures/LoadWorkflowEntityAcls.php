@@ -22,11 +22,6 @@ class LoadWorkflowEntityAcls extends AbstractFixture implements DependentFixture
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param string $workflowName
-     * @param string $attribute
-     */
     private function createAcl(ObjectManager $manager, string $workflowName, string $attribute): void
     {
         /** @var WorkflowDefinition $workflow */

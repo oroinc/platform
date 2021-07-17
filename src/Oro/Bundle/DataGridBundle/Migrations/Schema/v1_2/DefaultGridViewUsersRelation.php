@@ -16,8 +16,6 @@ class DefaultGridViewUsersRelation implements Migration
     /**
      * Creates 'oro_grid_view_user' table which represents relationship between grid views and
      * users who chosen this grid view as default.
-     *
-     * @param Schema $schema
      */
     public static function createOroDefaultGridViewUsersTable(Schema $schema)
     {

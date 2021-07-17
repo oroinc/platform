@@ -12,11 +12,6 @@ class FieldDescriptionUtil
 {
     public const MODIFY_READ_ONLY_FIELD_DESCRIPTION = '**The read-only field. A passed value will be ignored.**';
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $fieldName
-     * @param string                 $description
-     */
     public static function updateFieldDescription(
         EntityDefinitionConfig $definition,
         string $fieldName,
@@ -31,11 +26,6 @@ class FieldDescriptionUtil
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $fieldName
-     * @param string                 $targetAction
-     */
     public static function updateReadOnlyFieldDescription(
         EntityDefinitionConfig $definition,
         string $fieldName,

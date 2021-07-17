@@ -23,9 +23,6 @@ abstract class AbstractEntityFallbackProvider implements EntityFallbackProviderI
         return true;
     }
 
-    /**
-     * @param ConfigProvider $provider
-     */
     public function setConfigProvider(ConfigProvider $provider)
     {
         $this->configProvider = $provider;

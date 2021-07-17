@@ -48,9 +48,6 @@ class SystemConfigurationPass implements CompilerPassInterface
         $this->processManagers($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processManagers(ContainerBuilder $container): void
     {
         $managers = $this->findAndSortTaggedServices(self::SCOPE_MANAGER_TAG_NAME, 'scope', $container);
@@ -96,11 +93,6 @@ class SystemConfigurationPass implements CompilerPassInterface
         $container->getAlias(self::MAIN_MANAGER_SERVICE)->setPublic(true);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function loadSettings(ContainerBuilder $container): array
     {
         $settings = [];
@@ -127,12 +119,6 @@ class SystemConfigurationPass implements CompilerPassInterface
         return $settings;
     }
 
-    /**
-     * @param ContainerBuilder $containerBuilder
-     * @param array            $configSettings
-     *
-     * @return array
-     */
     private function replaceServiceIdsWithDefinitions(ContainerBuilder $containerBuilder, array $configSettings): array
     {
         foreach ($configSettings as &$configSetting) {
@@ -150,12 +136,6 @@ class SystemConfigurationPass implements CompilerPassInterface
         return $configSettings;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $settings
-     *
-     * @return array
-     */
     private function processConfig(ContainerBuilder $container, array $settings): array
     {
         $processor = new ProcessorDecorator(
@@ -168,12 +148,6 @@ class SystemConfigurationPass implements CompilerPassInterface
         return $config;
     }
 
-    /**
-     * @param ContainerBuilder   $container
-     * @param ProcessorDecorator $processor
-     *
-     * @return array
-     */
     private function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor): array
     {
         $config = [];

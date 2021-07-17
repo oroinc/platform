@@ -37,8 +37,6 @@ class RefreshExtendCachePostUpMigrationListener
 
     /**
      * PRE UP event handler
-     *
-     * @param PreMigrationEvent $event
      */
     public function onPreUp(PreMigrationEvent $event)
     {
@@ -49,8 +47,6 @@ class RefreshExtendCachePostUpMigrationListener
 
     /**
      * POST UP event handler
-     *
-     * @param PostMigrationEvent $event
      */
     public function onPostUp(PostMigrationEvent $event)
     {

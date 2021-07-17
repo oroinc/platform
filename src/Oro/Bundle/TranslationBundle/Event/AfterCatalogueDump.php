@@ -15,17 +15,11 @@ class AfterCatalogueDump extends Event
     /** @var MessageCatalogueInterface */
     private $catalogue;
 
-    /**
-     * @param MessageCatalogueInterface $catalogue
-     */
     public function __construct(MessageCatalogueInterface $catalogue)
     {
         $this->catalogue = $catalogue;
     }
 
-    /**
-     * @return MessageCatalogueInterface
-     */
     public function getCatalogue(): MessageCatalogueInterface
     {
         return $this->catalogue;

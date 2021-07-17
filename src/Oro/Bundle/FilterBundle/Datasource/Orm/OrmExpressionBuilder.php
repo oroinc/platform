@@ -19,9 +19,6 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     /** @var bool */
     protected $caseInsensitive;
 
-    /**
-     * @param Expr $expr
-     */
     public function __construct(Expr $expr)
     {
         $this->expr = $expr;

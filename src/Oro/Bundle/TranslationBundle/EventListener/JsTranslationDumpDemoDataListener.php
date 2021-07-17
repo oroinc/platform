@@ -51,9 +51,6 @@ class JsTranslationDumpDemoDataListener
         }
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     private function rebuildLocaleTranslations(MigrationDataFixturesEvent $event): void
     {
         $rebuildLocales = $this->getRebuildLocales();
@@ -64,9 +61,6 @@ class JsTranslationDumpDemoDataListener
         }
     }
 
-    /**
-     * @return array
-     */
     private function getRebuildLocales(): array
     {
         $locales = $this->languageProvider->getAvailableLanguageCodes();

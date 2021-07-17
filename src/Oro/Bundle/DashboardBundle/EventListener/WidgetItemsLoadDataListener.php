@@ -6,9 +6,6 @@ use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 
 class WidgetItemsLoadDataListener
 {
-    /**
-     * @param WidgetItemsLoadDataEvent $event
-     */
     public function filterItemsByItemsChoice(WidgetItemsLoadDataEvent $event)
     {
         $widgetConfig = $event->getWidgetConfig();
@@ -25,9 +22,6 @@ class WidgetItemsLoadDataListener
         $event->setItems(array_intersect_key($items, array_flip($visibleItems)));
     }
 
-    /**
-     * @param WidgetItemsLoadDataEvent $event
-     */
     public function filterItems(WidgetItemsLoadDataEvent $event)
     {
         $widgetConfig = $event->getWidgetConfig();

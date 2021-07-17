@@ -12,7 +12,6 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -83,13 +82,6 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformDataProvider
-     *
-     * @param $className
-     * @param $property
-     * @param $queryBuilderCallback
-     * @param $value
-     * @param $expectedValue
-     * @param array $expectedCalls
      */
     public function testReverseTransform(
         $className,

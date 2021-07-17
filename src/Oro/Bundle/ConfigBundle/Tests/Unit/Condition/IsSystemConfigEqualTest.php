@@ -27,8 +27,6 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider initializeDataProvider
-     * @param array $options
-     * @param $message
      */
     public function testInitializeExceptions(array $options, $message)
     {

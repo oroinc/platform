@@ -34,12 +34,6 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $this->featureAccessListener = $this->createMock(FeatureAccessListener::class);
     }
 
-    /**
-     * @param array $map
-     * @param array $featureDependedFirewalls
-     *
-     * @return FeatureDependedFirewallMap
-     */
     private function getFirewallMap(array $map, array $featureDependedFirewalls): FeatureDependedFirewallMap
     {
         return new FeatureDependedFirewallMap(

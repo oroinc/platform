@@ -51,8 +51,6 @@ class JsonPartialFileParser extends Parser
 
     /**
      * Gets the state of the parser.
-     *
-     * @return array
      */
     public function getState(): array
     {
@@ -68,8 +66,6 @@ class JsonPartialFileParser extends Parser
 
     /**
      * Restores the state of the parser.
-     *
-     * @param array $data
      */
     public function setState(array $data): void
     {
@@ -149,9 +145,6 @@ class JsonPartialFileParser extends Parser
         }
     }
 
-    /**
-     * @return JsonPartialFileSplitterListener
-     */
     private function getListener(): JsonPartialFileSplitterListener
     {
         return $this->getPrivateProperty('listener');

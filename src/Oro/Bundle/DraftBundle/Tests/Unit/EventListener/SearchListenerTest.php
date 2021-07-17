@@ -25,9 +25,6 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $event->getData());
     }
 
-    /**
-     * @return array
-     */
     public function getPrepareEntityMapEvent(): array
     {
         $draft = new DraftableEntityStub();

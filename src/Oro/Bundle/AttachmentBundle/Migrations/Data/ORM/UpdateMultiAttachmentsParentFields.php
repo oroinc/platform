@@ -37,11 +37,6 @@ class UpdateMultiAttachmentsParentFields extends AbstractFixture implements Cont
         }
     }
 
-    /**
-     * @param EntityManager $manager
-     * @param bool $isMySql
-     * @return array
-     */
     private function getQueries(EntityManager $manager, bool $isMySql): array
     {
         $metadataFactory = $manager->getMetadataFactory();

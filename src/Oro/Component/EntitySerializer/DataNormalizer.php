@@ -25,10 +25,6 @@ class DataNormalizer
         return $data;
     }
 
-    /**
-     * @param array        $rows
-     * @param EntityConfig $config
-     */
     protected function normalizeRows(array &$rows, EntityConfig $config)
     {
         foreach ($rows as $key => &$row) {
@@ -38,10 +34,6 @@ class DataNormalizer
         }
     }
 
-    /**
-     * @param array        $row
-     * @param EntityConfig $config
-     */
     protected function normalizeRow(array &$row, EntityConfig $config)
     {
         $fields = $config->getFields();
@@ -92,10 +84,6 @@ class DataNormalizer
         }
     }
 
-    /**
-     * @param array        $row
-     * @param EntityConfig $config
-     */
     protected function removeExcludedFields(array &$row, EntityConfig $config)
     {
         $excludedFields = $config->get(ConfigUtil::EXCLUDED_FIELDS);

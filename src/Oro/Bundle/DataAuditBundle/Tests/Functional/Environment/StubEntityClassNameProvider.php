@@ -24,11 +24,6 @@ class StubEntityClassNameProvider implements EntityClassNameProviderInterface
         return $this->isTestEntity($entityClass) ? $entityClass : null;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
     private function isTestEntity(string $entityClass): bool
     {
         return

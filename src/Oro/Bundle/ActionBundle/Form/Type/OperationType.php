@@ -24,10 +24,6 @@ class OperationType extends AbstractType
     /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @param RequiredAttributesListener $requiredAttributesListener
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor
@@ -89,10 +85,6 @@ class OperationType extends AbstractType
         $this->addAttributes($builder, $options);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     protected function initialization(FormBuilderInterface $builder, array $options)
     {
         /** @var ActionData $data */
@@ -103,10 +95,6 @@ class OperationType extends AbstractType
         $operation->init($data);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     protected function addEventListeners(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options['attribute_default_values'])) {
@@ -131,8 +119,6 @@ class OperationType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
      * @throws InvalidConfigurationException
      */
     protected function addAttributes(FormBuilderInterface $builder, array $options)

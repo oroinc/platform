@@ -29,10 +29,6 @@ class MenuUpdateProvider implements MenuUpdateProviderInterface
      */
     private $scopeIds = [];
 
-    /**
-     * @param ScopeManager $scopeManager
-     * @param MenuUpdateManager $menuUpdateManager
-     */
     public function __construct(ScopeManager $scopeManager, MenuUpdateManager $menuUpdateManager)
     {
         $this->scopeManager = $scopeManager;

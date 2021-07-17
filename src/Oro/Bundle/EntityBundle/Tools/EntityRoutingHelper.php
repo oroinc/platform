@@ -28,11 +28,6 @@ class EntityRoutingHelper
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
-    /**
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param DoctrineHelper        $doctrineHelper
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(
         EntityClassNameHelper $entityClassNameHelper,
         DoctrineHelper $doctrineHelper,

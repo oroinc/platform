@@ -31,12 +31,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         });
     }
 
-    /**
-     * @param array  $data
-     * @param string $rootSection
-     *
-     * @return bool
-     */
     protected function validateRequestData(array $data, string $rootSection): bool
     {
         $isValid = true;
@@ -57,12 +51,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validateResourceObjectStructure(array $data, string $pointer): bool
     {
         $isValid = true;
@@ -103,12 +91,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         ];
     }
 
-    /**
-     * @param array  $data
-     * @param string $rootSection
-     *
-     * @return bool
-     */
     protected function validateRequestDataCollection(array $data, string $rootSection): bool
     {
         $isValid = true;
@@ -129,10 +111,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
     protected function validateAttributesAndRelationships(array $data, string $pointer): void
     {
         if (\array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
@@ -149,10 +127,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
     }
 
     /**
-     * @param array  $data
-     * @param string $pointer
-     *
-     * @return bool
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validateRelationships(array $data, string $pointer): bool
@@ -197,9 +171,6 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $isValid;
     }
 
-    /**
-     * @param array $data
-     */
     protected function validateIncludedResources(array $data): void
     {
         if (\array_key_exists(JsonApiDoc::INCLUDED, $data)

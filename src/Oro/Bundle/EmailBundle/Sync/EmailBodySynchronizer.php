@@ -38,10 +38,6 @@ class EmailBodySynchronizer implements LoggerAwareInterface
 
     /**
      * EmailBodySynchronizer constructor.
-     *
-     * @param EmailBodyLoaderSelector  $selector
-     * @param ManagerRegistry          $doctrine
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EmailBodyLoaderSelector $selector,

@@ -9,8 +9,6 @@ interface ExtendExtensionAwareInterface
 {
     /**
      * Sets the ExtendExtension
-     *
-     * @param ExtendExtension $extendExtension
      */
     public function setExtendExtension(ExtendExtension $extendExtension);
 }

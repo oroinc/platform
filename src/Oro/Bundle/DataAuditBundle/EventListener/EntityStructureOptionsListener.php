@@ -16,17 +16,11 @@ class EntityStructureOptionsListener
     /** @var AuditConfigProvider */
     private $auditConfigProvider;
 
-    /**
-     * @param AuditConfigProvider $auditConfigProvider
-     */
     public function __construct(AuditConfigProvider $auditConfigProvider)
     {
         $this->auditConfigProvider = $auditConfigProvider;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();

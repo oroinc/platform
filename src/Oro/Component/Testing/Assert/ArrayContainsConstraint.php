@@ -89,11 +89,6 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
         }
     }
 
-    /**
-     * @param array $expected
-     * @param array $actual
-     * @param array $path
-     */
     protected function matchAssocArray(array $expected, array $actual, array $path)
     {
         $lastPathIndex = count($path);
@@ -107,9 +102,6 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     }
 
     /**
-     * @param array $expected
-     * @param array $actual
-     * @param array $path
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function matchIndexedArray(array $expected, array $actual, array $path)

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;

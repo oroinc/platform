@@ -243,12 +243,6 @@ class TargetConfigExtraBuilder
         }
     }
 
-    /**
-     * @param ExpandRelatedEntitiesConfigExtra $extra
-     * @param string|null                      $associationPath
-     *
-     * @return ExpandRelatedEntitiesConfigExtra|null
-     */
     public static function buildExpandRelatedEntitiesConfigExtra(
         ExpandRelatedEntitiesConfigExtra $extra,
         ?string $associationPath
@@ -271,12 +265,6 @@ class TargetConfigExtraBuilder
             : null;
     }
 
-    /**
-     * @param ExpandRelatedEntitiesConfigExtra $extra
-     * @param string                           $associationName
-     *
-     * @return ExpandRelatedEntitiesConfigExtra
-     */
     public static function buildParentExpandRelatedEntitiesConfigExtra(
         ExpandRelatedEntitiesConfigExtra $extra,
         string $associationName

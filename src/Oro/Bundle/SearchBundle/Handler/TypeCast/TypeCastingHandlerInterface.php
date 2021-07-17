@@ -16,17 +16,11 @@ interface TypeCastingHandlerInterface
 
     /**
      * Will return boolean true if the typecasting handler can cast the value, and false otherwise.
-     *
-     * @param $value
-     *
-     * @return bool
      */
     public function isSupported($value): bool;
 
     /**
      * A key that specifies the type that the handler can process.
-     *
-     * @return string
      */
     public static function getType(): string;
 }

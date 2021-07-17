@@ -72,19 +72,12 @@ class ImportExportContext extends OroFeatureContext implements
     /** @var null|string */
     private $absoluteUrl;
 
-    /**
-     * @param EntityAliasResolver $aliasResolver
-     * @param ProcessorRegistry $processorRegistry
-     */
     public function __construct(EntityAliasResolver $aliasResolver, ProcessorRegistry $processorRegistry)
     {
         $this->aliasResolver = $aliasResolver;
         $this->processorRegistry = $processorRegistry;
     }
 
-    /**
-     * @param string|null $absoluteUrl
-     */
     public function setAbsoluteUrl(?string $absoluteUrl): void
     {
         $this->absoluteUrl = $absoluteUrl;
@@ -106,7 +99,6 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @AfterFeature
-     * @param AfterFeatureScope $event
      */
     public static function afterFeature(AfterFeatureScope $event)
     {
@@ -233,8 +225,6 @@ class ImportExportContext extends OroFeatureContext implements
      * Runs export internally.
      *
      * @When /^(?:|I )run export for "(?P<entity>([\w\s]+))"$/
-     *
-     * @param string $entity
      */
     public function iRunExportForEntity(string $entity)
     {
@@ -254,17 +244,11 @@ class ImportExportContext extends OroFeatureContext implements
         $exportButton->click();
     }
 
-    /**
-     * @return string
-     */
     public static function getRecentExportFilePath(): string
     {
         return end(static::$exportFiles);
     }
 
-    /**
-     * @param string $filePath
-     */
     public static function rememberExport(string $filePath): void
     {
         static::$exportFiles[] = $filePath;
@@ -381,10 +365,6 @@ class ImportExportContext extends OroFeatureContext implements
         }
     }
 
-    /**
-     * @param string $filePath
-     * @param TableNode $expectedEntities
-     */
     private function assertFileContainsAtLeastFollowingColumns(string $filePath, TableNode $expectedEntities)
     {
         $exportedFile = new \SplFileObject($filePath, 'rb');
@@ -584,11 +564,6 @@ class ImportExportContext extends OroFeatureContext implements
         }
     }
 
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
     private function processFunctions(string $value): string
     {
         switch (true) {
@@ -627,11 +602,6 @@ class ImportExportContext extends OroFeatureContext implements
         return $value;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private function getAbsoluteUrl(string $path): string
     {
         if (!$this->absoluteUrl) {
@@ -641,11 +611,6 @@ class ImportExportContext extends OroFeatureContext implements
         return sprintf('%s/%s', $this->absoluteUrl, ltrim($path, '/'));
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private function getAbsolutePath(string $path): string
     {
         return sprintf('%s/%s', $this->getContainer()->getParameter('kernel.project_dir'), ltrim($path, '/'));
@@ -713,11 +678,6 @@ class ImportExportContext extends OroFeatureContext implements
         return $foundValue;
     }
 
-    /**
-     * @param string $csvFilePath
-     *
-     * @return array
-     */
     private function parseCsv(string $csvFilePath): array
     {
         $csvData = array_map('str_getcsv', file($csvFilePath));
@@ -867,8 +827,6 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * @Given /^I change the export batch size to (?P<size>\d+)/
-     *
-     * @param int $size
      */
     public function changeExportBatchSize(int $size): void
     {
@@ -915,9 +873,6 @@ class ImportExportContext extends OroFeatureContext implements
         return $validateFileButton;
     }
 
-    /**
-     * @return bool
-     */
     protected function isMultiImportModal(): bool
     {
         return $this->createElement('ImportNavTabsContainer')->isIsset();
@@ -967,9 +922,6 @@ class ImportExportContext extends OroFeatureContext implements
         return $filePath;
     }
 
-    /**
-     * @return string
-     */
     private function getExportFile(): string
     {
         $exportFileUrl = $this->emailContext->getLinkUrlFromEmail('Download');
@@ -1000,10 +952,6 @@ class ImportExportContext extends OroFeatureContext implements
 
     /**
      * Returns the path in /tmp directory where to store temporary files
-     *
-     * @param string $prefix
-     *
-     * @return string
      */
     private function getTempFilePath(string $prefix): string
     {

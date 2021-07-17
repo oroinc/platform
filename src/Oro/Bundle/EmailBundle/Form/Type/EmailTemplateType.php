@@ -28,10 +28,6 @@ class EmailTemplateType extends AbstractType
     /** @var LocalizationManager */
     private $localizationManager;
 
-    /**
-     * @param ConfigManager $userConfig
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(ConfigManager $userConfig, LocalizationManager $localizationManager)
     {
         $this->userConfig = $userConfig;

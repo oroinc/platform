@@ -15,9 +15,6 @@ class ContentProviderPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $items = [];

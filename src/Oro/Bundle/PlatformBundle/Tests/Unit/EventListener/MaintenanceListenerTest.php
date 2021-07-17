@@ -15,10 +15,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider routeProviderWithDebugContext
-     *
-     * @param bool $debug
-     * @param string|null $route
-     * @param bool $expected
      */
     public function testRouteFilter(bool $debug, ?string $route, bool $expected): void
     {
@@ -57,9 +53,6 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onKernelRequest($event);
     }
 
-    /**
-     * @return array
-     */
     public function routeProviderWithDebugContext(): array
     {
         return [

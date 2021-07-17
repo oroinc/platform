@@ -12,9 +12,6 @@ class MessageProcessorProxy implements MessageProcessorInterface, ValueHolderInt
     /** @var MessageProcessorInterface */
     private $messageProcessor;
 
-    /**
-     * @param MessageProcessorInterface $messageProcessor
-     */
     public function __construct(MessageProcessorInterface $messageProcessor)
     {
         $this->messageProcessor = $messageProcessor;

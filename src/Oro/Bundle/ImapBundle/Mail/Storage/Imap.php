@@ -246,8 +246,6 @@ class Imap extends \Laminas\Mail\Storage\Imap
 
     /**
      * Does a folder post initialization actions
-     *
-     * @param Folder $folder
      */
     protected function postInitFolder(Folder $folder)
     {

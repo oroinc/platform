@@ -30,13 +30,6 @@ class ResizedImageProvider implements ResizedImageProviderInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param FileManager                                $fileManager
-     * @param ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory
-     * @param ImagineBinaryFilterInterface               $imagineBinaryFilter
-     * @param FilterConfiguration                        $filterConfig
-     * @param LoggerInterface                            $logger
-     */
     public function __construct(
         FileManager $fileManager,
         ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory,
@@ -118,12 +111,6 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         );
     }
 
-    /**
-     * @param int $width
-     * @param int $height
-     *
-     * @return string
-     */
     private function getResizedImageFilterName(int $width, int $height): string
     {
         $filterName = sprintf('attachment_%s_%s', $width, $height);
@@ -132,12 +119,6 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         return $filterName;
     }
 
-    /**
-     * @param File   $file
-     * @param string $filterName
-     *
-     * @return string|null
-     */
     private function getImageContent(File $file, string $filterName): ?string
     {
         try {
@@ -149,12 +130,6 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         }
     }
 
-    /**
-     * @param string $fileName
-     * @param string $filterName
-     *
-     * @return string|null
-     */
     private function getImageContentByPath(string $fileName, string $filterName): ?string
     {
         try {
@@ -166,13 +141,6 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         }
     }
 
-    /**
-     * @param string      $content
-     * @param string      $filterName
-     * @param string|null $fileName
-     *
-     * @return BinaryInterface|null
-     */
     private function filterImage(string $content, string $filterName, ?string $fileName): ?BinaryInterface
     {
         $originalImageBinary = $this->imagineBinaryFactory->createImagineBinary($content);
@@ -187,11 +155,6 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         return $filteredBinary;
     }
 
-    /**
-     * @param \Exception  $exception
-     * @param string      $filterName
-     * @param string|null $fileName
-     */
     private function logException(\Exception $exception, string $filterName, ?string $fileName): void
     {
         $this->logger->warning(

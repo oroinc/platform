@@ -41,9 +41,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         ]
     ];
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         // Preload all required Languages
@@ -119,9 +116,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     protected function updateEnabledLocalizations(ObjectManager $manager)
     {
         /* @var $configManager ConfigManager */

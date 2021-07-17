@@ -19,9 +19,6 @@ class RemoveNoteConfigurationScopeListener
      */
     protected $isApplicable;
 
-    /**
-     * @param PostMigrationEvent $event
-     */
     public function onPostUp(PostMigrationEvent $event)
     {
         if ($this->isApplicable) {
@@ -29,9 +26,6 @@ class RemoveNoteConfigurationScopeListener
         }
     }
 
-    /**
-     * @param PreMigrationEvent $event
-     */
     public function onPreUp(PreMigrationEvent $event)
     {
         $version = $event->getLoadedVersion('OroNoteBundle');

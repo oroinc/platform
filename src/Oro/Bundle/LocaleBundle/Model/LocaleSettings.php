@@ -120,12 +120,6 @@ class LocaleSettings
     /** @var ThemeRegistry */
     private $themeRegistry;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param CalendarFactoryInterface $calendarFactory
-     * @param LocalizationManager $localizationManager
-     * @param LocaleConfigurationProvider $localeConfigProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         CalendarFactoryInterface $calendarFactory,
@@ -138,9 +132,6 @@ class LocaleSettings
         $this->localeConfigProvider = $localeConfigProvider;
     }
 
-    /**
-     * @param ThemeRegistry $themeRegistry
-     */
     public function setThemeRegistry(ThemeRegistry $themeRegistry): void
     {
         $this->themeRegistry = $themeRegistry;
@@ -148,8 +139,6 @@ class LocaleSettings
 
     /**
      * Adds name formats.
-     *
-     * @param array $formats
      */
     public function addNameFormats(array $formats)
     {
@@ -172,8 +161,6 @@ class LocaleSettings
 
     /**
      * Adds address formats.
-     *
-     * @param array $formats
      */
     public function addAddressFormats(array $formats)
     {
@@ -196,8 +183,6 @@ class LocaleSettings
 
     /**
      * Adds locale data.
-     *
-     * @param array $data
      */
     public function addLocaleData(array $data)
     {
@@ -268,9 +253,6 @@ class LocaleSettings
         return $this->language;
     }
 
-    /**
-     * @return bool
-     */
     public function isRtlMode(): bool
     {
         if (null === $this->rtlMode) {
@@ -541,9 +523,6 @@ class LocaleSettings
         return $this->get('oro_locale.quarter_start')['day'];
     }
 
-    /**
-     * @return string
-     */
     private function getLanguageConfigurationValue(): string
     {
         $localization = $this->getLocalizationData();
@@ -551,9 +530,6 @@ class LocaleSettings
         return $localization['languageCode'] ?? Configuration::DEFAULT_LANGUAGE;
     }
 
-    /**
-     * @return array
-     */
     private function getLocalizationData(): array
     {
         return $this->localizationManager->getLocalizationData(

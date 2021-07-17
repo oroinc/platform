@@ -24,19 +24,11 @@ class EmailConfigurationHandler
     /** @var FormInterface $form */
     protected $form;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param ConfigManager   $manager
-     * @param ConfigChangeSet $changeSet
-     * @param FormInterface   $form
-     */
     public function process(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form)
     {
         $this->configManager = $manager;
@@ -45,7 +37,6 @@ class EmailConfigurationHandler
 
         $this->processSmtpSettings();
     }
-
 
     protected function processSmtpSettings()
     {

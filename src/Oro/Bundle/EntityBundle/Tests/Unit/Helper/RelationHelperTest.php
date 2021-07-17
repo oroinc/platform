@@ -38,9 +38,6 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $targetEntityClass
-     * @param int $expectedResult
-     *
      * @dataProvider getMetadataTypeForVirtualJoin
      */
     public function testGetMetadataTypeForVirtualJoin(string $targetEntityClass, int $expectedResult)
@@ -56,9 +53,6 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getMetadataTypeForVirtualJoin(): array
     {
         return [
@@ -89,9 +83,6 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getRelations(): array
     {
         return [

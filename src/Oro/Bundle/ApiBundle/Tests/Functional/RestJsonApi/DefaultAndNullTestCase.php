@@ -73,9 +73,6 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
         return $entity;
     }
 
-    /**
-     * @param TestDefaultAndNull $entity
-     */
     protected function saveTestEntity(TestDefaultAndNull $entity)
     {
         $em = $this->getEntityManager();

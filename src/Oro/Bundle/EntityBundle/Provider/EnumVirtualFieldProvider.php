@@ -20,9 +20,6 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
     /** @var array */
     private $virtualFieldQueries = [];
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

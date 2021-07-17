@@ -236,9 +236,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider isAvailableProvider
      */
     public function testIsAvailable(array $inputData, array $expectedData)
@@ -417,9 +414,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param array $expected
-     *
      * @dataProvider getFormOptionsDataProvider
      */
     public function testGetFormOptions(array $input, array $expected)

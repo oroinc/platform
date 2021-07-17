@@ -143,8 +143,6 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * Asserts the response data are not empty.
-     *
-     * @param Response $response
      */
     protected static function assertResponseNotEmpty(Response $response)
     {
@@ -398,12 +396,6 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         return $content[JsonApiDoc::DATA][JsonApiDoc::ID];
     }
 
-    /**
-     * @param Response $response
-     * @param string   $includeId
-     *
-     * @return string
-     */
     protected static function getNewResourceIdFromIncludedSection(Response $response, string $includeId): string
     {
         $responseContent = self::jsonToArray($response->getContent());

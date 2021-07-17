@@ -147,7 +147,6 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     /**
      * @param mixed $id
      *

@@ -16,9 +16,6 @@ class LoginAttemptsLogSubscriber implements EventSubscriberInterface
     /** @var LoginAttemptsHandlerInterface */
     private $loginAttemptsHandler;
 
-    /**
-     * @param LoginAttemptsHandlerInterface $loginAttemptsHandler
-     */
     public function __construct(LoginAttemptsHandlerInterface $loginAttemptsHandler)
     {
         $this->loginAttemptsHandler = $loginAttemptsHandler;

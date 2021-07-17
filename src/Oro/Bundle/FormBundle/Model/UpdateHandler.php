@@ -41,13 +41,6 @@ class UpdateHandler
      */
     protected $formHandler;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     * @param FormHandler $formHandler
-     */
     public function __construct(
         RequestStack $requestStack,
         Session $session,

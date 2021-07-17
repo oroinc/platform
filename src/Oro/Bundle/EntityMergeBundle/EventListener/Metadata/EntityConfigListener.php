@@ -16,17 +16,11 @@ class EntityConfigListener
      */
     protected $entityConfigHelper;
 
-    /**
-     * @param EntityConfigHelper $entityConfigHelper
-     */
     public function __construct(EntityConfigHelper $entityConfigHelper)
     {
         $this->entityConfigHelper = $entityConfigHelper;
     }
 
-    /**
-     * @param EntityMetadataEvent $event
-     */
     public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
@@ -38,9 +32,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     */
     protected function applyEntityMetadataConfig(EntityMetadata $entityMetadata)
     {
         $className = $entityMetadata->getClassName();
@@ -52,9 +43,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param FieldMetadata $fieldMetadata
-     */
     protected function applyFieldMetadataConfig(FieldMetadata $fieldMetadata)
     {
         $this->entityConfigHelper->prepareFieldMetadataPropertyPath($fieldMetadata);

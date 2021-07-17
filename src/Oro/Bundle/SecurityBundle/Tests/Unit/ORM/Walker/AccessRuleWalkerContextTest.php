@@ -75,7 +75,6 @@ class AccessRuleWalkerContextTest extends TestCase
         $this->assertEquals(75, $context->getUserId());
     }
 
-
     public function testOrganizationIdWithDefaultValue()
     {
         $context = new AccessRuleWalkerContext(

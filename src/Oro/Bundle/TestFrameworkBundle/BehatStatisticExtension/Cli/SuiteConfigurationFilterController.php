@@ -28,11 +28,6 @@ class SuiteConfigurationFilterController implements Controller
      */
     private $sets;
 
-    /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     * @param array $suiteConfig
-     * @param array $sets
-     */
     public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry, array $suiteConfig, array $sets)
     {
         $this->suiteConfigRegistry = $suiteConfigRegistry;

@@ -34,11 +34,6 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
      */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(ManagerRegistry $doctrine, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;

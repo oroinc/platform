@@ -11,9 +11,6 @@ class OroKernelStub extends OroKernel
     /** @var string */
     private $appDir;
 
-    /**
-     * @param string $appDir
-     */
     public function setAppDir(string $appDir)
     {
         $this->appDir = $appDir;
@@ -69,7 +66,6 @@ class OroKernelStub extends OroKernel
         return sys_get_temp_dir() . $appDir . '/var/log';
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -97,9 +93,6 @@ class OroKernelStub extends OroKernel
         );
     }
 
-    /**
-     * @param array $bundleMap
-     */
     public function setBundleMap(array $bundleMap)
     {
         $this->bundleMap = $bundleMap;

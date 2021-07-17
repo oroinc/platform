@@ -19,9 +19,6 @@ class FeatureExtension extends AbstractExtension
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

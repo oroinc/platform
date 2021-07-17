@@ -59,15 +59,6 @@ class NormalizeIncludedData implements ProcessorInterface
     /** @var EntityMetadata[] */
     private $entityMetadata;
 
-    /**
-     * @param DoctrineHelper              $doctrineHelper
-     * @param EntityInstantiator          $entityInstantiator
-     * @param EntityLoader                $entityLoader
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     * @param ConfigProvider              $configProvider
-     * @param MetadataProvider            $metadataProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
@@ -285,11 +276,6 @@ class NormalizeIncludedData implements ProcessorInterface
         return null;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

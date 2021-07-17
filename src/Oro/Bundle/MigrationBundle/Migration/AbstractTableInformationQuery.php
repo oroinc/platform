@@ -14,15 +14,9 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
 {
     /**
      * Get query description info.
-     *
-     * @return string
      */
     abstract protected function getInfo(): string;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
-     */
     abstract public function doExecute(LoggerInterface $logger, bool $dryRun = false): void;
 
     /**
@@ -46,9 +40,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param string $tableName
-     * @param LoggerInterface|null $logger
-     * @return array
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getReferenceTables(string $tableName, ?LoggerInterface $logger): array
@@ -69,8 +60,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param string $tableName
-     * @return array
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getTableForeignKeys(string $tableName): array
@@ -83,8 +72,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param string $tableName
-     * @return string
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getListTableForeignKeysSQL(string $tableName): string
@@ -126,9 +113,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
         );
     }
 
-    /**
-     * @return string
-     */
     protected function getPgSqlReferenceTableListQuery(): string
     {
         return 'SELECT 
@@ -148,9 +132,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
                     AND u.table_catalog = :db_name';
     }
 
-    /**
-     * @return string
-     */
     protected function getMySqlReferenceTableListQuery(): string
     {
         return 'SELECT 
@@ -211,9 +192,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
         return $this->connection->fetchAll($sql, $params, $types);
     }
 
-    /**
-     * @return string
-     */
     protected function getPgSqlUniqueColumnNamesQuery(): string
     {
         return 'SELECT DISTINCT attr.attname as column_name
@@ -229,9 +207,6 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
                     AND attr.attname NOT IN (:ignored_fields)';
     }
 
-    /**
-     * @return string
-     */
     protected function getMySqlUniqueColumnNamesQuery(): string
     {
         return 'SELECT DISTINCT COLUMN_NAME as column_name

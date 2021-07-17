@@ -40,13 +40,6 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /** @var HtmlTagHelper */
     private $htmlTagHelper;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EntityNameResolver $entityNameResolver
-     * @param ConfigManager $configManager
-     * @param HtmlTagHelper $htmlTagHelper
-     */
     public function __construct(
         TranslatorInterface $translator,
         TokenAccessorInterface $tokenAccessor,

@@ -25,10 +25,6 @@ class UrlGenerator
         PackageProvider::PACKAGE_CRM => 'r',
     ];
 
-    /**
-     * @param PackageProvider $packageProvider
-     * @param CacheProvider $cacheProvider
-     */
     public function __construct(PackageProvider $packageProvider, CacheProvider $cacheProvider)
     {
         $this->packageProvider = $packageProvider;

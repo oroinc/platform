@@ -27,11 +27,6 @@ class DatagridType extends AbstractContainerType
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param NameStrategyInterface         $nameStrategy
-     * @param ManagerInterface              $manager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         NameStrategyInterface $nameStrategy,
         ManagerInterface $manager,

@@ -9,9 +9,6 @@ class BigNumberFormatter
     /** @var NumberFormatter */
     protected $numberFormatter;
 
-    /**
-     * @param NumberFormatter $numberFormatter
-     */
     public function __construct(NumberFormatter $numberFormatter)
     {
         $this->numberFormatter = $numberFormatter;

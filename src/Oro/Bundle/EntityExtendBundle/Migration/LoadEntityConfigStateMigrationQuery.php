@@ -13,9 +13,6 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
     /** @var DataStorageInterface */
     protected $storage;
 
-    /**
-     * @param DataStorageInterface $storage
-     */
     public function __construct(DataStorageInterface $storage)
     {
         $this->storage = $storage;
@@ -40,9 +37,6 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
         $this->loadEntityConfigStates($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function loadEntityConfigStates(LoggerInterface $logger)
     {
         if (!$this->connection->getSchemaManager()->tablesExist(['oro_entity_config', 'oro_entity_config_field'])) {

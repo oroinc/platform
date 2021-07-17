@@ -17,17 +17,11 @@ class AuditGridOrganizationListener
      */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function addOrganizationSupport(OrmResultAfter $event)
     {
         foreach ($event->getRecords() as $record) {

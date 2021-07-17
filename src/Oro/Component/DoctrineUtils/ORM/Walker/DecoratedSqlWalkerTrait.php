@@ -34,11 +34,6 @@ trait DecoratedSqlWalkerTrait
         $this->initializeWalkers($query, $parserResult, $queryComponents);
     }
 
-    /**
-     * @param AbstractQuery $query
-     * @param ParserResult $parserResult
-     * @param array $queryComponents
-     */
     private function initializeWalkers(AbstractQuery $query, ParserResult $parserResult, array $queryComponents)
     {
         if ($query->hasHint(OutputAstWalkerInterface::HINT_AST_WALKERS)) {

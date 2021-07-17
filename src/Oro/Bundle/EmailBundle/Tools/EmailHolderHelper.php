@@ -28,9 +28,6 @@ class EmailHolderHelper implements ResetInterface
     /** @var string[] */
     private $sortedTargetEntities;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
     public function __construct(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;

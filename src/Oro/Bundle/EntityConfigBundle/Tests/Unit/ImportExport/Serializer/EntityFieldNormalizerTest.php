@@ -74,9 +74,6 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider normalizeProvider
      */
     public function testNormalize(array $inputData, array $expectedData)
@@ -93,8 +90,6 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider denormalizeExceptionDataProvider
-     *
-     * @param array $data
      */
     public function testDenormalizeException(array $data)
     {
@@ -123,9 +118,6 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param FieldConfigModel $expectedData
-     *
      * @dataProvider denormalizeProvider
      */
     public function testDenormalize(array $inputData, FieldConfigModel $expectedData)

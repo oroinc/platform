@@ -369,12 +369,6 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    /**
-     * @param $enumValueClassName
-     * @param $enumCode
-     * @param $configManagerAt
-     * @param $relationBuilderAt
-     */
     protected function setAddEnumValueEntityFieldsExpectations(
         $enumValueClassName,
         $enumCode,

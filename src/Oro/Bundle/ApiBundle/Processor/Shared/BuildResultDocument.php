@@ -23,10 +23,6 @@ abstract class BuildResultDocument implements ProcessorInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ErrorCompleterRegistry $errorCompleterRegistry
-     * @param LoggerInterface        $logger
-     */
     public function __construct(ErrorCompleterRegistry $errorCompleterRegistry, LoggerInterface $logger)
     {
         $this->errorCompleterRegistry = $errorCompleterRegistry;
@@ -71,11 +67,6 @@ abstract class BuildResultDocument implements ProcessorInterface
         }
     }
 
-    /**
-     * @param DocumentBuilderInterface $documentBuilder
-     * @param Context                  $context
-     * @param \Exception               $e
-     */
     protected function processException(DocumentBuilderInterface $documentBuilder, Context $context, \Exception $e)
     {
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -104,9 +95,5 @@ abstract class BuildResultDocument implements ProcessorInterface
         ];
     }
 
-    /**
-     * @param DocumentBuilderInterface $documentBuilder
-     * @param Context                  $context
-     */
     abstract protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context);
 }

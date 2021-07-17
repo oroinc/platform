@@ -12,9 +12,6 @@ class EntityMetadata
     /** @var ClassMetadata */
     private $metadata;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public function __construct(ClassMetadata $metadata)
     {
         $this->metadata = $metadata;
@@ -52,8 +49,6 @@ class EntityMetadata
 
     /**
      * Gets the name of entity identifier field if an entity has a single field identifier.
-     *
-     * @return string
      */
     public function getSingleIdentifierFieldName(): string
     {
@@ -63,8 +58,6 @@ class EntityMetadata
     /**
      * Checks whether an entity is participate in an inheritance hierarchy,
      * e.g. in the JOINED or SINGLE_TABLE inheritance mapping.
-     *
-     * @return bool
      */
     public function hasInheritance(): bool
     {
@@ -89,10 +82,6 @@ class EntityMetadata
 
     /**
      * Gets the data type of the given field.
-     *
-     * @param string $fieldName
-     *
-     * @return string|null
      */
     public function getFieldType(string $fieldName): ?string
     {
@@ -101,10 +90,6 @@ class EntityMetadata
 
     /**
      * Gets the mapping of the given association.
-     *
-     * @param string $fieldName
-     *
-     * @return array
      */
     public function getAssociationMapping(string $fieldName): array
     {
@@ -113,10 +98,6 @@ class EntityMetadata
 
     /**
      * Gets the target class name for the given association.
-     *
-     * @param string $fieldName
-     *
-     * @return string
      */
     public function getAssociationTargetClass(string $fieldName): string
     {
@@ -125,10 +106,6 @@ class EntityMetadata
 
     /**
      * Checks whether the given field is a mapped property.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
     public function isField(string $fieldName): bool
     {
@@ -137,10 +114,6 @@ class EntityMetadata
 
     /**
      * Checks whether the given field is a mapped association.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
     public function isAssociation(string $fieldName): bool
     {
@@ -149,10 +122,6 @@ class EntityMetadata
 
     /**
      * Checks whether the given field is a mapped single valued association.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
     public function isSingleValuedAssociation(string $fieldName): bool
     {
@@ -161,21 +130,12 @@ class EntityMetadata
 
     /**
      * Checks whether the given field is a mapped collection valued association.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
     public function isCollectionValuedAssociation(string $fieldName): bool
     {
         return $this->isAssociation($fieldName) && $this->isCollectionValued($fieldName);
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function isCollectionValued(string $fieldName): bool
     {
         $mapping = $this->getAssociationMapping($fieldName);

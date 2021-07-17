@@ -14,28 +14,17 @@ class FileDeleteListener
     /** @var BaseFileDeleteListener */
     private $innerFileDeleteListener;
 
-    /**
-     * @param BaseFileDeleteListener $fileDeleteListener
-     */
     public function __construct(BaseFileDeleteListener $fileDeleteListener)
     {
         $this->innerFileDeleteListener = $fileDeleteListener;
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function preRemove(File $file, LifecycleEventArgs $args): void
     {
         // Initializes proxy because it will be needed in postRemove().
         $file->getDigitalAsset();
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function postRemove(File $file, LifecycleEventArgs $args): void
     {
         if (!$file->getDigitalAsset()) {
@@ -43,10 +32,6 @@ class FileDeleteListener
         }
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function postUpdate(File $file, LifecycleEventArgs $args): void
     {
         $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($file);

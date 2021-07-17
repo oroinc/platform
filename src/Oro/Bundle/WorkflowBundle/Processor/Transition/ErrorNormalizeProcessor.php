@@ -21,9 +21,6 @@ class ErrorNormalizeProcessor implements ProcessorInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -70,10 +67,6 @@ class ErrorNormalizeProcessor implements ProcessorInterface
         $context->set('responseMessage', $responseMessage);
     }
 
-    /**
-     * @param TransitionContext $context
-     * @return bool
-     */
     protected function isApplicable(TransitionContext $context): bool
     {
         if (!$context->hasError()) {

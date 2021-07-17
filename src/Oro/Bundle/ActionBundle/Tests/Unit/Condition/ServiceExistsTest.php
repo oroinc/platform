@@ -81,8 +81,6 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(get_class($contextAccessor), $reflection->getValue($this->serviceExists));
     }
 
-
-
     /**
      * @dataProvider dataProvider
      * @param bool $hasService

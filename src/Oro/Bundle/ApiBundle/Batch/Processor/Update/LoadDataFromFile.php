@@ -29,11 +29,5 @@ abstract class LoadDataFromFile implements ProcessorInterface
         );
     }
 
-    /**
-     * @param string      $fileName
-     * @param FileManager $fileManager
-     *
-     * @return array
-     */
     abstract protected function loadData(string $fileName, FileManager $fileManager): array;
 }

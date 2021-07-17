@@ -26,9 +26,6 @@ class ValueNormalizer implements ResetInterface
         DataType::ENTITY_CLASS => []
     ];
 
-    /**
-     * @param ActionProcessorInterface $processor
-     */
     public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
@@ -37,8 +34,6 @@ class ValueNormalizer implements ResetInterface
     /**
      * Enables local cache for given data type values.
      * Values of this type should be scalar or objects that can be represented as string (by method __toString).
-     *
-     * @param string $dataType
      */
     public function enableCacheForDataType(string $dataType)
     {

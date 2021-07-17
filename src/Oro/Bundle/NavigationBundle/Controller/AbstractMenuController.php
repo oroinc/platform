@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractMenuController extends AbstractController
 {
     /**
-     * @param array $context
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     protected function checkAcl(array $context)
@@ -362,10 +361,6 @@ abstract class AbstractMenuController extends AbstractController
         return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
     }
 
-    /**
-     * @param MenuUpdateInterface $menuUpdate
-     * @param ItemInterface $menu
-     */
     protected function updateDependentMenuUpdateUrls(MenuUpdateInterface $menuUpdate)
     {
         $repo = $this->getMenuUpdateManager()->getRepository();

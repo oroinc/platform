@@ -13,9 +13,6 @@ class PredefinedIdDocumentationProvider implements DocumentationProviderInterfac
     /** @var EntityIdResolverRegistry */
     private $entityIdResolverRegistry;
 
-    /**
-     * @param EntityIdResolverRegistry $entityIdResolverRegistry
-     */
     public function __construct(EntityIdResolverRegistry $entityIdResolverRegistry)
     {
         $this->entityIdResolverRegistry = $entityIdResolverRegistry;
@@ -39,9 +36,6 @@ class PredefinedIdDocumentationProvider implements DocumentationProviderInterfac
         return \sprintf($this->getTemplate(), \implode("\n", $items));
     }
 
-    /**
-     * @return string
-     */
     private function getTemplate(): string
     {
         return <<<MARKDOWN

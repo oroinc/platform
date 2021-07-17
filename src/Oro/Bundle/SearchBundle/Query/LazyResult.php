@@ -58,8 +58,6 @@ class LazyResult extends Result
 
     /**
      * Fill internal storage of ArrayCollection to maintain compatibility with Collection interface
-     *
-     * @param array $elements
      */
     protected function fillCollectionElements(array $elements)
     {

@@ -398,9 +398,6 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
     }
 
-    /**
-     * @return FileManager
-     */
     private function getImportExportFileManager(): FileManager
     {
         return $this->getContainer()->get('oro_importexport.file.file_manager');

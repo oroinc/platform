@@ -39,8 +39,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @dataProvider getExceptionProvider
      */
     public function testSetTargetUnsafeMethod(\Exception $exception): void
@@ -57,8 +55,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @dataProvider getExceptionProvider
      */
     public function testSetTargetXmlHttpRequest(\Exception $exception): void
@@ -76,7 +72,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider shouldSetTargetPathForNonExcludedRoutesProvider
-     * @param string|null $route
      */
     public function testShouldSetTargetPathForNonExcludedRoutes(?string $route): void
     {
@@ -108,7 +103,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider shouldNotSetTargetPathForExcludedRoutesProvider
-     * @param string|null $route
      */
     public function testShouldNotSetTargetPathForExcludedRoutes(?string $route): void
     {

@@ -24,9 +24,6 @@ class ColumnsExtension extends AbstractExtension
     /** @var DatagridStateProviderInterface|ColumnsStateProvider DatagridStateProviderInterface */
     private $columnsStateProvider;
 
-    /**
-     * @param DatagridStateProviderInterface $columnsStateProvider
-     */
     public function __construct(DatagridStateProviderInterface $columnsStateProvider)
     {
         $this->columnsStateProvider = $columnsStateProvider;
@@ -72,19 +69,11 @@ class ColumnsExtension extends AbstractExtension
         $this->updateMetadataDefaultGridView($metadata, $defaultColumnsState);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function setInitialColumnsState(MetadataObject $metadata, array $columnsState): void
     {
         $metadata->offsetAddToArray('initialState', ['columns' => $columnsState]);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function updateMetadataDefaultGridView(MetadataObject $metadata, array $columnsState): void
     {
         $defaultGridViewKey = array_search(
@@ -101,19 +90,11 @@ class ColumnsExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function setColumnsState(MetadataObject $metadata, array $columnsState): void
     {
         $metadata->offsetAddToArray('state', ['columns' => $columnsState]);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function updateMetadataColumns(MetadataObject $metadata, array $columnsState): void
     {
         $columns = $metadata->offsetGetOr('columns', []);

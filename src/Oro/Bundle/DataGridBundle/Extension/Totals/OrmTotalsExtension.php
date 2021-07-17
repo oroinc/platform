@@ -42,12 +42,6 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var array */
     protected $groupParts = [];
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param NumberFormatter $numberFormatter
-     * @param DateTimeFormatterInterface $dateTimeFormatter
-     * @param AclHelper $aclHelper
-     */
     public function __construct(
         TranslatorInterface $translator,
         NumberFormatter $numberFormatter,

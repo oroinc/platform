@@ -33,11 +33,6 @@ class GridEntityNameProvider
      */
     protected $translator;
 
-    /**
-     * @param ConfigProvider      $configProvider
-     * @param EntityManager       $entityManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ConfigProvider $configProvider,
         EntityManager $entityManager,

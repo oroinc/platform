@@ -19,8 +19,6 @@ interface OrganizationAwareTokenInterface extends TokenInterface
 
     /**
      * Sets the organization.
-     *
-     * @param Organization $organization
      */
     public function setOrganization(Organization $organization);
 }

@@ -15,9 +15,6 @@ class TestImap extends Imap
         $this->messageClass = 'Oro\Bundle\ImapBundle\Mail\Storage\Message';
     }
 
-    /**
-     * @param Protocol $protocol
-     */
     public function setProtocol(Protocol $protocol)
     {
         $this->protocol = $protocol;

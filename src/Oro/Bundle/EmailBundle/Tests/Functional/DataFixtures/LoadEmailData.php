@@ -94,9 +94,6 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         $this->attachmentFile = file_get_contents($dictionaryDir . DIRECTORY_SEPARATOR. "test.png");
     }
 
-    /**
-     * @param ObjectManager $om
-     */
     protected function loadEmailsDemo(ObjectManager $om)
     {
         $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');

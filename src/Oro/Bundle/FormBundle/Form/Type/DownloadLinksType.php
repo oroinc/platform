@@ -14,9 +14,6 @@ class DownloadLinksType extends AbstractType
     /** @var AssetHelper */
     protected $assetHelper;
 
-    /**
-     * @param AssetHelper $assetHelper
-     */
     public function __construct(AssetHelper $assetHelper)
     {
         $this->assetHelper = $assetHelper;

@@ -31,13 +31,6 @@ class RemoveRestoreConfigFieldHandler
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param FieldNameValidationHelper $validationHelper
-     * @param ConfigHelper $configHelper
-     * @param Session $session
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         ConfigManager $configManager,
         FieldNameValidationHelper $validationHelper,

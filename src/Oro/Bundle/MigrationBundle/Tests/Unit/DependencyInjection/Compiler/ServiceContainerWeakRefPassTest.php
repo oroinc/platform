@@ -115,12 +115,6 @@ class ServiceContainerWeakRefPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param bool $isPublic
-     * @param bool $isAbstract
-     * @param bool $withError
-     * @return Definition
-     */
     private function createDefinition(bool $isPublic, bool $isAbstract, bool $withError): Definition
     {
         $definition = new Definition();

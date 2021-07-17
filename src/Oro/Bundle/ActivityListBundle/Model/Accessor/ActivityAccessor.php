@@ -14,9 +14,6 @@ class ActivityAccessor extends DefaultAccessor
     /** @var Registry */
     protected $registry;
 
-    /**
-     * @param Registry $registry
-     */
     public function __construct(Registry $registry)
     {
         $this->registry = $registry;

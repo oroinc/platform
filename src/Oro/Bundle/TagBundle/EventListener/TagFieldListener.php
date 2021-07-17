@@ -18,8 +18,6 @@ class TagFieldListener
 
     /**
      * Add tag field as last field in first data block
-     *
-     * @param BeforeViewRenderEvent $event
      */
     public function addTagField(BeforeViewRenderEvent $event)
     {

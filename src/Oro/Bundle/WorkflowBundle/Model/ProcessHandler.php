@@ -31,11 +31,6 @@ class ProcessHandler
      */
     protected $processes = [];
 
-    /**
-     * @param ProcessFactory $factory
-     * @param ProcessLogger $logger
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ProcessFactory $factory,
         ProcessLogger $logger,
@@ -47,8 +42,6 @@ class ProcessHandler
     }
 
     /**
-     * @param ProcessTrigger $processTrigger
-     * @param ProcessData $processData
      * @throws InvalidParameterException
      */
     public function handleTrigger(ProcessTrigger $processTrigger, ProcessData $processData)
@@ -69,18 +62,11 @@ class ProcessHandler
         );
     }
 
-    /**
-     * @param ProcessJob $processJob
-     */
     public function handleJob(ProcessJob $processJob)
     {
         $this->handleTrigger($processJob->getProcessTrigger(), $processJob->getData());
     }
 
-    /**
-     * @param ProcessTrigger $processTrigger
-     * @param ProcessData $processData
-     */
     public function finishTrigger(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         $this->eventDispatcher->dispatch(
@@ -89,9 +75,6 @@ class ProcessHandler
         );
     }
 
-    /**
-     * @param ProcessJob $processJob
-     */
     public function finishJob(ProcessJob $processJob)
     {
         $this->finishTrigger($processJob->getProcessTrigger(), $processJob->getData());

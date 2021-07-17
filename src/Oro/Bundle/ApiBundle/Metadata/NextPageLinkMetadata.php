@@ -17,11 +17,6 @@ class NextPageLinkMetadata extends LinkMetadataDecorator
     /** @var QueryStringAccessorInterface|null */
     private $queryStringAccessor;
 
-    /**
-     * @param LinkMetadataInterface             $link
-     * @param string                            $pageNumberFilterName
-     * @param QueryStringAccessorInterface|null $queryStringAccessor
-     */
     public function __construct(
         LinkMetadataInterface $link,
         string $pageNumberFilterName,
@@ -66,11 +61,6 @@ class NextPageLinkMetadata extends LinkMetadataDecorator
         return QueryStringUtil::addQueryString($baseUrl, $queryString);
     }
 
-    /**
-     * @param DataAccessorInterface $dataAccessor
-     *
-     * @return bool
-     */
     private function hasMoreRecords(DataAccessorInterface $dataAccessor): bool
     {
         $hasMore = null;

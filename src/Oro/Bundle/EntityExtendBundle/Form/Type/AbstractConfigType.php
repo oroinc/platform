@@ -23,10 +23,6 @@ abstract class AbstractConfigType extends BaseAbstractConfigType
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigTypeHelper $typeHelper
-     * @param ConfigManager    $configManager
-     */
     public function __construct(ConfigTypeHelper $typeHelper, ConfigManager $configManager)
     {
         parent::__construct($typeHelper);

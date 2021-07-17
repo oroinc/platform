@@ -49,13 +49,6 @@ class EmailEntityBuilder
     /** @var array [entity class => [field name => length, ...], ...] */
     private $fieldLength = [];
 
-    /**
-     * @param EmailEntityBatchProcessor $batch
-     * @param EmailAddressManager       $emailAddressManager
-     * @param EmailAddressHelper        $emailAddressHelper
-     * @param ManagerRegistry           $doctrine
-     * @param LoggerInterface           $logger
-     */
     public function __construct(
         EmailEntityBatchProcessor $batch,
         EmailAddressManager $emailAddressManager,
@@ -219,8 +212,6 @@ class EmailEntityBuilder
 
     /**
      * Check is email address valid
-     *
-     * @param $email
      */
     private function validateEmailAddress($email)
     {

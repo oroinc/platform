@@ -19,17 +19,11 @@ class DoctrinePreRemoveListener
     /** @var array */
     private $deleteEntities = [];
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function preRemove(LifecycleEventArgs $args): void
     {
         $entity = $args->getEntity();
@@ -45,9 +39,6 @@ class DoctrinePreRemoveListener
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         if ($this->deleteEntities) {

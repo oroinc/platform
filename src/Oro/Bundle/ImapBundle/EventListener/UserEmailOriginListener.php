@@ -40,12 +40,6 @@ class UserEmailOriginListener
      */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     * @param ImapConnectorFactory $connectorFactory
-     * @param Registry $doctrine
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         SymmetricCrypterInterface $crypter,
         ImapConnectorFactory $connectorFactory,
@@ -60,9 +54,6 @@ class UserEmailOriginListener
 
     /**
      * Create ImapEmailFolder instances for each newly created EmailFolder related to UserEmailOrigin
-     *
-     * @param UserEmailOrigin    $origin
-     * @param LifecycleEventArgs $args
      */
     public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $args)
     {

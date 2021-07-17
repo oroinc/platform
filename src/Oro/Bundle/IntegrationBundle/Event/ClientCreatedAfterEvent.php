@@ -31,10 +31,6 @@ class ClientCreatedAfterEvent extends Event
      */
     protected $additionalParameterBag;
 
-    /**
-     * @param RestClientInterface            $client
-     * @param RestTransportSettingsInterface $transportEntity
-     */
     public function __construct(
         RestClientInterface $client,
         RestTransportSettingsInterface $transportEntity
@@ -51,9 +47,6 @@ class ClientCreatedAfterEvent extends Event
         return $this->client;
     }
 
-    /**
-     * @param RestClientInterface $client
-     */
     public function setClient(RestClientInterface $client)
     {
         $this->client = $client;

@@ -25,9 +25,6 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider processTransitionTranslationsProvider
      */
     public function testProcessTransitionTranslations(array $inputData, array $expectedData)

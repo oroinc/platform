@@ -24,10 +24,6 @@ class DateFilterSubmitContext
 
     /**
      * Adds all values from the context to model data and clears the context.
-     *
-     * @param array $data
-     *
-     * @return array
      */
     public function applyValues(array $data): array
     {

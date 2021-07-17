@@ -35,9 +35,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processBundleAutoloadProvider
-     * @param array $suiteConfig
-     * @param array $bundlesConfig
-     * @param array $expectedSuiteConfig
      */
     public function testProcessBundleAutoload(array $suiteConfig, array $bundlesConfig, array $expectedSuiteConfig)
     {
@@ -307,9 +304,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         return $containerBuilder;
     }
 
-    /**
-     * @param ContainerBuilder $containerBuilder
-     */
     private function updateNelmioServiceDefinitions(ContainerBuilder $containerBuilder): void
     {
         $nelmioServices = [

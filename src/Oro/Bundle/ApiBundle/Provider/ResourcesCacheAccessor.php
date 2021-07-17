@@ -16,17 +16,11 @@ class ResourcesCacheAccessor
     /** @var ConfigCacheStateRegistry|null */
     private $configCacheStateRegistry;
 
-    /**
-     * @param CacheProvider $cache
-     */
     public function __construct(CacheProvider $cache)
     {
         $this->cache = $cache;
     }
 
-    /**
-     * @param ConfigCacheStateRegistry $configCacheStateRegistry
-     */
     public function setConfigCacheStateRegistry(ConfigCacheStateRegistry $configCacheStateRegistry): void
     {
         $this->configCacheStateRegistry = $configCacheStateRegistry;
@@ -82,13 +76,6 @@ class ResourcesCacheAccessor
         $this->cache->save($this->getCacheKey($version, $requestType, $id), [$timestamp, $data]);
     }
 
-    /**
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param string      $id
-     *
-     * @return string
-     */
     private function getCacheKey(string $version, RequestType $requestType, string $id): string
     {
         return $id . $version . (string)$requestType;

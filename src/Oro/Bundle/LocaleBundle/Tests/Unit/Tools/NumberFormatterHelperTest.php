@@ -9,8 +9,6 @@ class NumberFormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider parseConstantValueDataProvider
-     *
-     * @param $name
      */
     public function testParseConstantValue($name): void
     {
@@ -20,9 +18,6 @@ class NumberFormatterHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function parseConstantValueDataProvider(): array
     {
         return [

@@ -61,9 +61,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     * @param array $expectedAcls
      * @dataProvider buildFromConfigurationDataProvider
      */
     public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = [])

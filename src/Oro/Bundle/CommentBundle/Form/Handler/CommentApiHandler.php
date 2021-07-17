@@ -25,12 +25,6 @@ class CommentApiHandler
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -68,9 +62,6 @@ class CommentApiHandler
         return false;
     }
 
-    /**
-     * @param Comment $entity
-     */
     protected function onSuccess(Comment $entity)
     {
         $this->manager->persist($entity);

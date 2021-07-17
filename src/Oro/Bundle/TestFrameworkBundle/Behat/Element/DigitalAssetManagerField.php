@@ -37,8 +37,6 @@ class DigitalAssetManagerField extends Element implements SuiteAwareInterface
     }
 
     /**
-     * @param string $filename
-     *
      * @throws \Behat\Mink\Exception\ElementNotFoundException
      */
     public function upload(string $filename): void
@@ -61,11 +59,6 @@ class DigitalAssetManagerField extends Element implements SuiteAwareInterface
         $this->getDriver()->waitForAjax();
     }
 
-    /**
-     * @param string $rowContent
-     *
-     * @return bool
-     */
     public function hasRow(string $rowContent): bool
     {
         $grid = $this->getGrid();
@@ -75,9 +68,6 @@ class DigitalAssetManagerField extends Element implements SuiteAwareInterface
         return $gridRow && $gridRow->isValid();
     }
 
-    /**
-     * @return Table
-     */
     private function getGrid(): Table
     {
         /** @var Table $grid */

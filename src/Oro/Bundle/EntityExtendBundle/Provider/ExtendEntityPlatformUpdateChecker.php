@@ -15,14 +15,10 @@ class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterfac
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
-
 
     /**
      * {@inheritDoc}
@@ -52,11 +48,6 @@ class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterfac
         ];
     }
 
-    /**
-     * @param ConfigInterface $config
-     *
-     * @return bool
-     */
     private function isSchemaUpdateRequired(ConfigInterface $config): bool
     {
         return

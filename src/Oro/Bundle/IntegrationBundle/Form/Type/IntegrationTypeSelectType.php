@@ -21,10 +21,6 @@ class IntegrationTypeSelectType extends AbstractType
     /** @var array */
     protected $itemsCache;
 
-    /**
-     * @param TypesRegistry $registry
-     * @param AssetHelper   $assetHelper
-     */
     public function __construct(TypesRegistry $registry, AssetHelper $assetHelper)
     {
         $this->registry    = $registry;

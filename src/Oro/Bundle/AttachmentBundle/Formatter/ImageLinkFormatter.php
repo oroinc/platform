@@ -22,10 +22,6 @@ class ImageLinkFormatter implements FormatterInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param AttachmentManager   $manager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(AttachmentManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;

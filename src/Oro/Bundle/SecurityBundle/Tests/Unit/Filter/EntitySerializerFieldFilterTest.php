@@ -29,11 +29,6 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
     }
 
-    /**
-     * @param bool $isIdFieldProtected
-     *
-     * @return EntitySerializerFieldFilter
-     */
     private function getFieldFilter(bool $isIdFieldProtected = true): EntitySerializerFieldFilter
     {
         return new EntitySerializerFieldFilter(

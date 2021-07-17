@@ -158,7 +158,6 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
         $this->relationBuilder->expects($this->exactly($getOwnerClassMethodNameCalls))
             ->method('addManyToOneRelation');
 
-
         switch ($getOwnerClassMethodNameCalls) {
             case 1:
                 $this->relationBuilder->expects($this->once())

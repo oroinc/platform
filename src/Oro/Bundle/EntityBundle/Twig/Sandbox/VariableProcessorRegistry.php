@@ -12,29 +12,16 @@ class VariableProcessorRegistry
     /** @var ContainerInterface */
     private $processors;
 
-    /**
-     * @param ContainerInterface $processors
-     */
     public function __construct(ContainerInterface $processors)
     {
         $this->processors = $processors;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return bool
-     */
     public function has(string $alias): bool
     {
         return $this->processors->has($alias);
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return VariableProcessorInterface
-     */
     public function get(string $alias): VariableProcessorInterface
     {
         if (!$this->processors->has($alias)) {

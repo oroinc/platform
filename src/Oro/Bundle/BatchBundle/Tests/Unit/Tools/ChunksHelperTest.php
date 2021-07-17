@@ -8,9 +8,6 @@ class ChunksHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider chunksDataProvider
-     *
-     * @param array $data
-     * @param array $expectedChunks
      */
     public function testSplitInChunks(array $data, array $expectedChunks): void
     {
@@ -65,9 +62,6 @@ class ChunksHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider chunksDataProvider
-     *
-     * @param array $data
-     * @param array $expectedChunks
      */
     public function testSplitInChunksByColumn(array $data, array $expectedChunks): void
     {
@@ -78,9 +72,6 @@ class ChunksHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider splitInChunksAssocDataProvider
-     *
-     * @param array $data
-     * @param array $expectedChunks
      */
     public function testSplitInChunksAssoc(array $data, array $expectedChunks): void
     {

@@ -45,9 +45,6 @@ class GridColumnManager extends Element
         $this->untickCheckbox($visibilityCheckbox);
     }
 
-    /**
-     * @param NodeElement $visibilityCheckbox
-     */
     private function untickCheckbox(NodeElement $visibilityCheckbox): void
     {
         $this->ensureManagerVisible();
@@ -66,8 +63,6 @@ class GridColumnManager extends Element
 
     /**
      * Hide all columns in grid exception mentioned in exceptions array
-     *
-     * @param array $exceptions
      */
     public function hideAllColumns(array $exceptions = [])
     {
@@ -95,9 +90,6 @@ class GridColumnManager extends Element
         }
     }
 
-    /**
-     * @param NodeElement $visibilityCheckbox
-     */
     private function tickCheckbox(NodeElement $visibilityCheckbox): void
     {
         $this->ensureManagerVisible();
@@ -113,8 +105,6 @@ class GridColumnManager extends Element
 
     /**
      * Show all columns in grid except mentioned in exceptions array
-     *
-     * @param array $exceptions
      */
     public function showAllColumns(array $exceptions = []): void
     {
@@ -145,9 +135,6 @@ class GridColumnManager extends Element
     /**
      * Returns first letters of each word in column name.
      * Example: "Sample Complex Long Column Name" becomes "SCLCN"
-     *
-     * @param string $name
-     * @return string
      */
     public function getColumnShortName(string $name): string
     {
@@ -216,11 +203,6 @@ class GridColumnManager extends Element
         return $visibilityCheckbox;
     }
 
-    /**
-     * @param TableRow $tableRow
-     *
-     * @return NodeElement|null
-     */
     private function getVisibilityCheckboxFromRow(TableRow $tableRow): ?NodeElement
     {
         $visibilityCheckbox = $tableRow->find('css', '.visibility-cell input[type=checkbox]');

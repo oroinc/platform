@@ -21,17 +21,11 @@ class ConstraintsProvider implements ConstraintsProviderInterface
     /** @var array */
     protected $metadataConstraintsCache;
 
-    /**
-     * @param MetadataFactoryInterface $metadataFactory
-     */
     public function __construct(MetadataFactoryInterface $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;
     }
 
-    /**
-     * @param ConstraintConverterInterface $constraintConverter
-     */
     public function setConstraintConverter(ConstraintConverterInterface $constraintConverter): void
     {
         $this->constraintConverter = $constraintConverter;

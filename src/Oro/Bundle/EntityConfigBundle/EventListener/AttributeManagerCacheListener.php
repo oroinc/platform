@@ -12,9 +12,6 @@ class AttributeManagerCacheListener
     /** @var AttributeManager */
     private $attributeManager;
 
-    /**
-     * @param AttributeManager $attributeManager
-     */
     public function __construct(AttributeManager $attributeManager)
     {
         $this->attributeManager = $attributeManager;

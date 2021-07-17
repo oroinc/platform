@@ -17,9 +17,6 @@ class BuildMonologHandlersPass implements CompilerPassInterface
     private const CONSOLE_ERROR_HANDLER_ID = 'oro_message_queue.log.handler.console_error';
     private const VERBOSITY_FILTER_HANDLER_ID = 'oro_message_queue.log.handler.verbosity_filter';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $extension = $container->getExtension('monolog');
@@ -40,12 +37,6 @@ class BuildMonologHandlersPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array $handler
-     *
-     * @return void
-     */
     private function buildHandler(ContainerBuilder $container, array $handler): void
     {
         if (!in_array($handler['id'], [self::CONSOLE_ERROR_HANDLER_ID, self::VERBOSITY_FILTER_HANDLER_ID], true)) {

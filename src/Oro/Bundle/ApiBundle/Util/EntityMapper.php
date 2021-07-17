@@ -38,11 +38,6 @@ class EntityMapper
     /** @var \SplObjectStorage */
     private $processing;
 
-    /**
-     * @param DoctrineHelper                  $doctrineHelper
-     * @param EntityInstantiator              $entityInstantiator
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
@@ -134,9 +129,6 @@ class EntityMapper
 
     /**
      * Adds the mapping between an entity and its model, in additional to the default mapping.
-     *
-     * @param string $entityClass
-     * @param string $modelClass
      */
     public function mapEntity(string $entityClass, string $modelClass): void
     {
@@ -417,10 +409,6 @@ class EntityMapper
 
     /**
      * Gets the model class name that should be used for the given entity.
-     *
-     * @param string $entityClass
-     *
-     * @return string
      */
     private function getModelClass(string $entityClass): string
     {
@@ -434,10 +422,6 @@ class EntityMapper
 
     /**
      * Gets the entity class name for the given model.
-     *
-     * @param string $modelClass
-     *
-     * @return string
      */
     private function getEntityClass(string $modelClass): string
     {
@@ -447,9 +431,6 @@ class EntityMapper
     /**
      * Checks if the given classes for an entity and a model
      * represent valid relationship between an entity and its model.
-     *
-     * @param string $entityClass
-     * @param string $modelClass
      *
      * @throws \InvalidArgumentException if the entity class or the model class is not valid
      */
@@ -475,8 +456,6 @@ class EntityMapper
 
     /**
      * Checks if the given entity class is a manageable entity.
-     *
-     * @param string $entityClass
      *
      * @throws \InvalidArgumentException if the entity class is not a manageable entity
      */
@@ -520,11 +499,6 @@ class EntityMapper
 
     /**
      * Gets ORM metadata for the given entity class.
-     *
-     * @param string      $entityClass
-     * @param string|null $modelClass
-     *
-     * @return ClassMetadata
      */
     private function getEntityMetadata(string $entityClass, string $modelClass = null): ClassMetadata
     {
@@ -538,10 +512,6 @@ class EntityMapper
 
     /**
      * Checks if an entity is a mapped supperclass or a base class for a table inheritance.
-     *
-     * @param ClassMetadata $metadata
-     *
-     * @return bool
      */
     private static function isParentEntityClass(ClassMetadata $metadata): bool
     {
@@ -665,9 +635,6 @@ class EntityMapper
         );
     }
 
-    /**
-     * @return bool
-     */
     private function hasModels(): bool
     {
         foreach ($this->modelMap as $model) {

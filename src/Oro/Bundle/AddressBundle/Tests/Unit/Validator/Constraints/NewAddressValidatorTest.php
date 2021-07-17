@@ -59,9 +59,6 @@ class NewAddressValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * Cannot use EntityTrait because setValue declarations in trait and ConstraintValidatorTestCase are different.
-     *
-     * @param $entity
-     * @param $idValue
      */
     private function setId($entity, $idValue)
     {

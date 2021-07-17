@@ -25,10 +25,6 @@ class ConnectorContextMediator
     /** @var TransportInterface[] */
     protected $transportByIntegration = [];
 
-    /**
-     * @param ServiceLink $registryLink
-     * @param ManagerRegistry $doctrineRegistry
-     */
     public function __construct(ServiceLink $registryLink, ManagerRegistry $doctrineRegistry)
     {
         $this->registryLink     = $registryLink;

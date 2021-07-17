@@ -12,9 +12,6 @@ class BusinessUnitGridService
     /** @var array */
     protected $choices;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;

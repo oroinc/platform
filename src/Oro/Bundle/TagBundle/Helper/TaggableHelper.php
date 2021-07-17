@@ -13,9 +13,6 @@ class TaggableHelper
     /** @var ConfigProvider */
     private $tagConfigProvider;
 
-    /**
-     * @param ConfigProvider $tagConfigProvider
-     */
     public function __construct(ConfigProvider $tagConfigProvider)
     {
         $this->tagConfigProvider = $tagConfigProvider;

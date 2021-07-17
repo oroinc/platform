@@ -35,11 +35,6 @@ class GroupNodeConditionsValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param GroupNode $rootNode
-     *
-     * @return bool
-     */
     private function isValid(GroupNode $rootNode): bool
     {
         if ($rootNode->getType() !== GroupNode::TYPE_MIXED) {

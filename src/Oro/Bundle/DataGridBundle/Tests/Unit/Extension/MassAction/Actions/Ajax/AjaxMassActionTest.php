@@ -21,8 +21,6 @@ class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider setOptionsDataProvider
      */
     public function testSetOptions(array $source, array $expected)

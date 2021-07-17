@@ -22,12 +22,6 @@ class StatisticProvider
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /**
-     * @param EntityManager       $entityManager
-     * @param SecurityProvider    $securityProvider
-     * @param ConfigProvider      $configProvider
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(
         EntityManager $entityManager,
         SecurityProvider $securityProvider,

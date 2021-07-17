@@ -11,8 +11,6 @@ class EntityAliasesConfiguration
 {
     /**
      * Builds the definition of a section configuration.
-     *
-     * @param NodeBuilder $node
      */
     public function configure(NodeBuilder $node): void
     {

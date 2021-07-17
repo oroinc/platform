@@ -18,9 +18,6 @@ class GroupAttributesValidator extends ConstraintValidator
      */
     protected $attributeManager;
 
-    /**
-     * @param AttributeManager $attributeManager
-     */
     public function __construct(AttributeManager $attributeManager)
     {
         $this->attributeManager = $attributeManager;

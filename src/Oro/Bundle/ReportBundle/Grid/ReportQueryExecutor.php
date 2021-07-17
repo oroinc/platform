@@ -49,7 +49,6 @@ class ReportQueryExecutor implements QueryExecutorInterface
         $this->reportDatagridPrefixes[] = Report::GRID_PREFIX;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -78,11 +77,6 @@ class ReportQueryExecutor implements QueryExecutorInterface
         }
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return bool
-     */
     private function isApplicable(string $gridName): bool
     {
         foreach ($this->reportDatagridPrefixes as $prefix) {

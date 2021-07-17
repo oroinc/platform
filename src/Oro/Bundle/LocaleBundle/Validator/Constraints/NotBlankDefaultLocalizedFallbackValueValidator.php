@@ -52,11 +52,6 @@ class NotBlankDefaultLocalizedFallbackValueValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param AbstractLocalizedFallbackValue $localizedFallbackValue
-     *
-     * @return bool
-     */
     private function isLocalizationEmpty(AbstractLocalizedFallbackValue $localizedFallbackValue): bool
     {
         $notEmptyValues = array_filter(

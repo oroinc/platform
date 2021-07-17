@@ -35,12 +35,6 @@ class MassActionDispatcher
      */
     protected $iterableResultFactoryRegistry;
 
-    /**
-     * @param Manager $manager
-     * @param MassActionHelper $massActionHelper
-     * @param MassActionParametersParser $massActionParametersParser
-     * @param IterableResultFactoryRegistry $iterableResultFactoryRegistry
-     */
     public function __construct(
         Manager $manager,
         MassActionHelper $massActionHelper,
@@ -125,9 +119,6 @@ class MassActionDispatcher
     /**
      * Perform http method check
      *
-     * @param MassActionInterface $massAction
-     * @param array $data
-     *
      * @throws LogicException
      */
     protected function assertRequestType(MassActionInterface $massAction, array $data)
@@ -151,10 +142,6 @@ class MassActionDispatcher
     }
 
     /**
-     * @param DatagridInterface $datagrid
-     * @param MassActionInterface $massAction
-     * @param SelectedItems $selectedItems
-     * @return IterableResultInterface
      * @throws LogicException
      */
     protected function getIterator(

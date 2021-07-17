@@ -10,9 +10,6 @@ class OptimizeJoinsFieldVisitorFactory
     /** @var OptimizeJoinsDecisionMakerInterface */
     private $decisionMaker;
 
-    /**
-     * @param OptimizeJoinsDecisionMakerInterface $decisionMaker
-     */
     public function __construct(OptimizeJoinsDecisionMakerInterface $decisionMaker)
     {
         $this->decisionMaker = $decisionMaker;

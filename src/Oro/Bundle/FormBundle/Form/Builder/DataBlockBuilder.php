@@ -44,9 +44,6 @@ class DataBlockBuilder
         return $this->formConfig;
     }
 
-    /**
-     * @param FormView $form
-     */
     public function doBuild(FormView $form)
     {
         if (isset($form->vars['block_config'])) {

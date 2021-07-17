@@ -15,9 +15,6 @@ class RoleDeleteHandlerExtension extends AbstractEntityDeleteHandlerExtension
     /** @var AclSidManager */
     private $aclSidManager;
 
-    /**
-     * @param AclSidManager $aclSidManager
-     */
     public function __construct(AclSidManager $aclSidManager)
     {
         $this->aclSidManager = $aclSidManager;

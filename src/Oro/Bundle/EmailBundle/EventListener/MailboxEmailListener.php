@@ -19,7 +19,6 @@ abstract class MailboxEmailListener
     protected $emailBodies = [];
 
     /**
-     * @param OnFlushEventArgs $args
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onFlush(OnFlushEventArgs $args)

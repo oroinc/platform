@@ -42,10 +42,6 @@ class AddAvatarToAdminUser extends AbstractFixture implements ContainerAwareInte
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param Entity\User $adminUser
-     */
     protected function addAvatarToUser(ObjectManager $manager, Entity\User $adminUser)
     {
         try {

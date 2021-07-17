@@ -28,12 +28,6 @@ class AsyncOperationManager
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param FileManager     $fileManager
-     * @param ErrorManager    $errorManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         FileManager $fileManager,
@@ -46,9 +40,6 @@ class AsyncOperationManager
         $this->logger = $logger;
     }
 
-    /**
-     * @param int $operationId
-     */
     public function markAsRunning(int $operationId): void
     {
         $this->updateOperation($operationId, function () {
@@ -60,11 +51,6 @@ class AsyncOperationManager
         });
     }
 
-    /**
-     * @param int    $operationId
-     * @param string $dataFileName
-     * @param string $errorMessage
-     */
     public function markAsFailed(int $operationId, string $dataFileName, string $errorMessage): void
     {
         $updated = $this->updateOperation($operationId, function () {
@@ -100,10 +86,6 @@ class AsyncOperationManager
         }
     }
 
-    /**
-     * @param int $operationId
-     * @param int $milliseconds
-     */
     public function incrementAggregateTime(int $operationId, int $milliseconds): void
     {
         $em = $this->getEntityManager();
@@ -193,12 +175,6 @@ class AsyncOperationManager
         });
     }
 
-    /**
-     * @param int      $operationId
-     * @param callable $callback
-     *
-     * @return bool
-     */
     private function updateOperation(int $operationId, callable $callback): bool
     {
         $em = $this->getEntityManager();
@@ -236,9 +212,6 @@ class AsyncOperationManager
         return 0 !== $affectedRows;
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
     private function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass(AsyncOperation::class);

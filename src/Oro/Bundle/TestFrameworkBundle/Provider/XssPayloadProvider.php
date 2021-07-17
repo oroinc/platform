@@ -39,9 +39,6 @@ class XssPayloadProvider
         return sprintf($payload, $elementId, $jsPayload);
     }
 
-    /**
-     * @return array
-     */
     protected function getPayloads(): array
     {
         if (!$this->payloads) {

@@ -39,9 +39,6 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
         return [LoadOrganization::class, LoadBusinessUnit::class];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         /** @var UserManager $userManager */

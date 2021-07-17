@@ -8,9 +8,6 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider parseProvider
-     *
-     * @param string $strDate
-     * @param string $expectedDate
      */
     public function testParse(string $strDate, string $expectedDate = '2011-06-30 23:59:59 UTC'): void
     {
@@ -20,9 +17,6 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function parseProvider(): array
     {
         return [
@@ -58,9 +52,6 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider parseFailureProvider
-     *
-     * @param string $strDate
-     * @param string $exceptionMessage
      */
     public function testParseFailure(string $strDate, string $exceptionMessage)
     {

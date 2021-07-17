@@ -36,7 +36,6 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider wrongOptionsDataProvider
-     * @param array $options
      */
     public function testInitializeWrongOptions(array $options)
     {
@@ -70,7 +69,6 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
     public function testInitialize(array $options)
     {
@@ -100,8 +98,6 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider toArrayDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testToArray(array $options, array $expected)
     {

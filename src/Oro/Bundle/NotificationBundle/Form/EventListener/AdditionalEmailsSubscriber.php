@@ -22,9 +22,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
     /** @var ChainAdditionalEmailAssociationProvider */
     private $associationProvider;
 
-    /**
-     * @param ChainAdditionalEmailAssociationProvider $associationProvider
-     */
     public function __construct(ChainAdditionalEmailAssociationProvider $associationProvider)
     {
         $this->associationProvider = $associationProvider;
@@ -41,9 +38,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event): void
     {
         /** @var EmailNotification|null $notification */
@@ -57,9 +51,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         $this->initAdditionalRecipientChoices($entityName, $event->getForm());
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event): void
     {
         $data = $event->getData();
@@ -71,10 +62,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         $this->initAdditionalRecipientChoices($entityName, $event->getForm());
     }
 
-    /**
-     * @param string|null   $entityName
-     * @param FormInterface $form
-     */
     private function initAdditionalRecipientChoices(?string $entityName, FormInterface $form): void
     {
         $choices = [];
@@ -129,13 +116,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param array  $parentPath
-     * @param string $association
-     * @param string $glue
-     *
-     * @return string
-     */
     private function buildPath(array $parentPath, string $association, string $glue): string
     {
         if (!$parentPath) {

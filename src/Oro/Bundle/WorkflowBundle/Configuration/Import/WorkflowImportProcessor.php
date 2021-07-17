@@ -23,10 +23,6 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
     /** @var \SplFileInfo */
     protected $inProgress;
 
-    /**
-     * @param ConfigFileReaderInterface $reader
-     * @param WorkflowConfigFinderBuilder $configFinderBuilder
-     */
     public function __construct(ConfigFileReaderInterface $reader, WorkflowConfigFinderBuilder $configFinderBuilder)
     {
         $this->reader = $reader;
@@ -39,17 +35,11 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         $this->parent = $parentProcessor;
     }
 
-    /**
-     * @return bool
-     */
     public function inProgress(): bool
     {
         return null !== $this->inProgress;
     }
 
-    /**
-     * @return \SplFileInfo
-     */
     public function getProgressFile(): \SplFileInfo
     {
         return $this->inProgress;
@@ -92,10 +82,6 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         return $content;
     }
 
-    /**
-     * @param \SplFileInfo $contentSource
-     * @return array
-     */
     private function findResourceData(\SplFileInfo $contentSource): array
     {
         $finder = $this->configFinderBuilder->create();
@@ -118,11 +104,6 @@ class WorkflowImportProcessor implements ConfigImportProcessorInterface
         );
     }
 
-    /**
-     * @param array $content
-     * @param \SplFileInfo $contentSource
-     * @return array
-     */
     private function processParent(array $content, \SplFileInfo $contentSource): array
     {
         if ($this->parent) {

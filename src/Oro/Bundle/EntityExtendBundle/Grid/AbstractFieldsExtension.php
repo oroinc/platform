@@ -38,12 +38,6 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     /** @var FieldsHelper */
     protected $fieldsHelper;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param EntityClassResolver $entityClassResolver
-     * @param DatagridGuesser $datagridGuesser
-     * @param FieldsHelper $fieldsHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         EntityClassResolver $entityClassResolver,
@@ -257,10 +251,6 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         return $this->fieldsHelper->getFields($this->getEntityName($config));
     }
 
-    /**
-     * @param FieldConfigId $field
-     * @param array $columnOptions
-     */
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
     {
         $fieldName = $field->getFieldName();

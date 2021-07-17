@@ -30,10 +30,6 @@ class RememberMeListener extends AbstractListener implements ListenerInterface
     /** @var SessionInterface|null */
     private $session;
 
-    /**
-     * @param OrigRememberMeListener $innerListener
-     * @param SessionInterface|null  $session
-     */
     public function __construct(
         OrigRememberMeListener $innerListener,
         SessionInterface $session = null
@@ -65,9 +61,6 @@ class RememberMeListener extends AbstractListener implements ListenerInterface
         $this->ajaxCsrfOnlyFlag = true;
     }
 
-    /**
-     * @param CsrfRequestManager $csrfRequestManager
-     */
     public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager): void
     {
         $this->csrfRequestManager = $csrfRequestManager;
@@ -76,10 +69,6 @@ class RememberMeListener extends AbstractListener implements ListenerInterface
     /**
      * Checks whether the request is CSRF protected request
      * (cookies has the session cookie and the request has "X-CSRF-Header" header with valid CSRF token).
-     *
-     * @param Request $request
-     *
-     * @return bool
      */
     private function isCsrfProtectedRequest(Request $request): bool
     {

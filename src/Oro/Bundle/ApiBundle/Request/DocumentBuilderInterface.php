@@ -13,8 +13,6 @@ interface DocumentBuilderInterface
 {
     /**
      * Returns built document.
-     *
-     * @return array
      */
     public function getDocument(): array;
 
@@ -25,11 +23,6 @@ interface DocumentBuilderInterface
 
     /**
      * Gets the type of the given entity.
-     *
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string|null
      */
     public function getEntityAlias(string $entityClass, RequestType $requestType): ?string;
 
@@ -91,16 +84,11 @@ interface DocumentBuilderInterface
 
     /**
      * Adds a link for a whole document data.
-     *
-     * @param string                $name
-     * @param LinkMetadataInterface $link
      */
     public function addLinkMetadata(string $name, LinkMetadataInterface $link): void;
 
     /**
      * Sets an error.
-     *
-     * @param Error $error
      */
     public function setErrorObject(Error $error): void;
 

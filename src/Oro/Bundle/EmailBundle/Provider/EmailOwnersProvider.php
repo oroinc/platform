@@ -20,11 +20,6 @@ class EmailOwnersProvider
     /** @var Registry */
     protected $registry;
 
-    /**
-     * @param ActivityListChainProvider $activityListChainProvider
-     * @param EmailOwnerProviderStorage $emailOwnerStorage
-     * @param Registry $registry
-     */
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
         EmailOwnerProviderStorage $emailOwnerStorage,

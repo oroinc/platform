@@ -17,9 +17,6 @@ class FeatureToggleConfiguration implements ConfigurationInterface
     /** @var ConfigurationExtensionInterface[] */
     private $extensions = [];
 
-    /**
-     * @param ConfigurationExtensionInterface $extension
-     */
     public function addExtension(ConfigurationExtensionInterface $extension)
     {
         $this->extensions[] = $extension;
@@ -43,9 +40,6 @@ class FeatureToggleConfiguration implements ConfigurationInterface
         return $builder;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function addFeatureConfiguration(NodeBuilder $node)
     {
         $node

@@ -42,12 +42,6 @@ class UserType extends AbstractType
     /** @var PasswordFieldOptionsProvider */
     protected $optionsProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param RequestStack                  $requestStack
-     * @param PasswordFieldOptionsProvider  $optionsProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -147,9 +141,6 @@ class UserType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], 10);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -232,8 +223,6 @@ class UserType extends AbstractType
 
     /**
      * Set user fields
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function setDefaultUserFields(FormBuilderInterface $builder)
     {
@@ -251,8 +240,6 @@ class UserType extends AbstractType
 
     /**
      * Add Invite user fields
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function addInviteUserField(FormBuilderInterface $builder)
     {
@@ -269,9 +256,6 @@ class UserType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addOrganizationField(FormBuilderInterface $builder)
     {
         if ($this->authorizationChecker->isGranted('oro_organization_view')

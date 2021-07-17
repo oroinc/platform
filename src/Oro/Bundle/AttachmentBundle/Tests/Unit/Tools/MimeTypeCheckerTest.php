@@ -9,9 +9,6 @@ class MimeTypeCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isImageMimeTypeDataProvider
-     *
-     * @param string $mimeType
-     * @param bool $expectedResult
      */
     public function testIsImageMimeType(string $mimeType, bool $expectedResult): void
     {
@@ -26,9 +23,6 @@ class MimeTypeCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedResult, $typeGuesser->isImageMimeType($mimeType));
     }
 
-    /**
-     * @return array
-     */
     public function isImageMimeTypeDataProvider(): array
     {
         return [

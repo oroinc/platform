@@ -24,12 +24,6 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param EntityManager  $entityManager
-     * @param SearchRegistry $registry
-     * @param ConfigProvider $configProvider
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         SearchRegistry $registry,

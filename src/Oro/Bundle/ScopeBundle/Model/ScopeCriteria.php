@@ -45,8 +45,6 @@ class ScopeCriteria implements \IteratorAggregate
 
     /**
      * Gets unique identifier of a set of parameters represented by this criteria object.
-     *
-     * @return string
      */
     public function getIdentifier(): string
     {
@@ -107,8 +105,6 @@ class ScopeCriteria implements \IteratorAggregate
      * Returns all parameters.
      * The parameters are sorted by priority, the higher the priority,
      * the closer the parameter to the top of the parameter list.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -272,12 +268,6 @@ class ScopeCriteria implements \IteratorAggregate
         return $part;
     }
 
-    /**
-     * @param array $parts
-     * @param bool  $withPriority
-     *
-     * @return string
-     */
     private function getConditionFromParts(array $parts, bool $withPriority): string
     {
         if ($withPriority) {
@@ -292,11 +282,6 @@ class ScopeCriteria implements \IteratorAggregate
         return implode(' AND ', $parts);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $condition
-     * @param Join         $join
-     */
     private function applyJoinWithModifiedCondition(QueryBuilder $qb, string $condition, Join $join): void
     {
         if (Join::INNER_JOIN === $join->getJoinType()) {
@@ -340,22 +325,11 @@ class ScopeCriteria implements \IteratorAggregate
         return $fields;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ClassMetadata
-     */
     private function getClassMetadata(string $entityClass): ClassMetadata
     {
         return $this->classMetadataFactory->getMetadataFor($entityClass);
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $field
-     *
-     * @return bool
-     */
     private function isCollectionValuedAssociation(ClassMetadata $classMetadata, string $field): bool
     {
         if (!$classMetadata->hasAssociation($field)) {
@@ -365,9 +339,6 @@ class ScopeCriteria implements \IteratorAggregate
         return $classMetadata->isCollectionValuedAssociation($field);
     }
 
-    /**
-     * @return string
-     */
     private function buildIdentifier(): string
     {
         $result = '';

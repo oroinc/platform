@@ -338,7 +338,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadata')
             ->willReturn(new OwnershipMetadata());
 
-
         $result = $this->extension->getAccessLevelNames($object);
 
         self::assertEquals(
@@ -378,7 +377,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadata')
             ->willReturn(new OwnershipMetadata());
 
-
         $result = $this->extension->getAccessLevelNames($object);
 
         self::assertEquals(
@@ -409,7 +407,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadata')
             ->with('\stdClass')
             ->willReturn(new OwnershipMetadata('user', 'user', 'user'));
-
 
         $result = $this->extension->getAccessLevelNames($object);
 
@@ -452,7 +449,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('\stdClass')
             ->willReturn(new OwnershipMetadata('user', 'user', 'user'));
 
-
         $result = $this->extension->getAccessLevelNames($object);
 
         self::assertEquals(
@@ -491,7 +487,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(null)
             ->willReturn(new OwnershipMetadata());
 
-
         $result = $this->extension->getAccessLevelNames($object);
 
         self::assertEquals(
@@ -529,7 +524,6 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadata')
             ->with(null)
             ->willReturn(new OwnershipMetadata());
-
 
         $result = $this->extension->getAccessLevelNames($object);
 

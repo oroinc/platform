@@ -25,17 +25,11 @@ class JobListener
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param BeforeSaveJobEvent $event
-     */
     public function onBeforeSaveJob(BeforeSaveJobEvent $event): void
     {
         /** @var Job $job */
@@ -59,22 +53,11 @@ class JobListener
         }
     }
 
-    /**
-     * @param Job $job
-     *
-     * @return bool
-     */
     private function isRootJobUpdate(Job $job): bool
     {
         return $job->isRoot() && null !== $job->getId();
     }
 
-    /**
-     * @param AsyncOperation $operation
-     * @param Job            $job
-     *
-     * @return bool
-     */
     private function updateOperation(AsyncOperation $operation, Job $job): bool
     {
         $hasChanges = false;
@@ -106,11 +89,6 @@ class JobListener
         return $hasChanges;
     }
 
-    /**
-     * @param string $jobStatus
-     *
-     * @return string|null
-     */
     private function getOperationStatus(string $jobStatus): ?string
     {
         switch ($jobStatus) {
@@ -130,12 +108,6 @@ class JobListener
         return null;
     }
 
-    /**
-     * @param Job            $job
-     * @param AsyncOperation $operation
-     *
-     * @return array
-     */
     private function getTotalSummary(Job $job, AsyncOperation $operation): array
     {
         $totalSummary = [
@@ -170,10 +142,6 @@ class JobListener
         return $totalSummary;
     }
 
-    /**
-     * @param array $summary
-     * @param array $toMerge
-     */
     private static function mergeSummary(array &$summary, array $toMerge): void
     {
         self::mergeSummaryItem($summary, $toMerge, self::AGGREGATE_TIME);
@@ -184,11 +152,6 @@ class JobListener
         self::mergeSummaryItem($summary, $toMerge, self::UPDATE_COUNT);
     }
 
-    /**
-     * @param array  $summary
-     * @param array  $toMerge
-     * @param string $itemName
-     */
     private static function mergeSummaryItem(array &$summary, array $toMerge, string $itemName): void
     {
         if (isset($toMerge[$itemName])) {

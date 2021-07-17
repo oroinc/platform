@@ -68,9 +68,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedResult, $this->extension->isApplicable($this->datagridConfiguration));
     }
 
-    /**
-     * @return array
-     */
     public function isApplicableDataProvider(): array
     {
         return [
@@ -87,8 +84,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider visitMetadataWhenNoDefaultGridViewDataProvider
-     *
-     * @param array $metadataGridViews
      */
     public function testVisitMetadataWhenNoDefaultGridView(array $metadataGridViews): void
     {
@@ -116,9 +111,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($this->datagridConfiguration, $this->metadataObject);
     }
 
-    /**
-     * @return array
-     */
     public function visitMetadataWhenNoDefaultGridViewDataProvider(): array
     {
         return [
@@ -131,9 +123,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $defaultState
-     */
     private function assertInitialStateIsSet(array $defaultState): void
     {
         $this->columnsStateProvider
@@ -148,9 +137,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('initialState', [Configuration::COLUMNS_KEY => $defaultState]);
     }
 
-    /**
-     * @param array $state
-     */
     private function assertStateIsSet(array $state): void
     {
         $this->columnsStateProvider
@@ -165,10 +151,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('state', [Configuration::COLUMNS_KEY => $state]);
     }
 
-    /**
-     * @param string $columnName
-     * @param array $columnsState
-     */
     private function assertMetadataColumnsUpdated(string $columnName, array $columnsState): void
     {
         $this->metadataObject
@@ -216,9 +198,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($this->datagridConfiguration, $this->metadataObject);
     }
 
-    /**
-     * @param $defaultState
-     */
     private function assertMetadataDefaultGridViewUpdated($defaultState): void
     {
         $this->metadataObject
@@ -252,10 +231,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($this->datagridConfiguration, $this->metadataObject);
     }
 
-    /**
-     * @param array $columnsState
-     * @param array $metadata
-     */
     private function assertMetadataNotUpdated(array $columnsState, array $metadata): void
     {
         $this->columnsStateProvider

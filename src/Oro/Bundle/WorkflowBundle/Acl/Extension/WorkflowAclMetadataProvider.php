@@ -33,10 +33,6 @@ class WorkflowAclMetadataProvider
     /** @var array|null */
     private $localCache;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param FeatureChecker  $featureChecker
-     */
     public function __construct(ManagerRegistry $doctrine, FeatureChecker $featureChecker)
     {
         $this->doctrine = $doctrine;

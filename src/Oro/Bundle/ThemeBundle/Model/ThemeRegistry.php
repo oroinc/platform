@@ -24,9 +24,6 @@ class ThemeRegistry
      */
     protected $themes;
 
-    /**
-     * @param array $themeSettings
-     */
     public function __construct(array $themeSettings)
     {
         $this->themeSettings = $themeSettings;

@@ -60,10 +60,6 @@ class OrmMetadataFactoryClearer implements ClearerInterface
         }
     }
 
-    /**
-     * @param EntityManager   $em
-     * @param LoggerInterface $logger
-     */
     private function disconnectEntityManager(EntityManager $em, LoggerInterface $logger)
     {
         $em->close();
@@ -72,9 +68,6 @@ class OrmMetadataFactoryClearer implements ClearerInterface
         $this->clearConnection($em->getConnection());
     }
 
-    /**
-     * @param EntityManager $em
-     */
     private function clearRepositoryFactory(EntityManager $em)
     {
         $repositoryFactory = $em->getConfiguration()->getRepositoryFactory();
@@ -83,10 +76,6 @@ class OrmMetadataFactoryClearer implements ClearerInterface
         }
     }
 
-    /**
-     * @param EntityManager   $em
-     * @param LoggerInterface $logger
-     */
     private function clearEventManager(EntityManager $em, LoggerInterface $logger)
     {
         $eventsToKeep = [
@@ -123,9 +112,6 @@ class OrmMetadataFactoryClearer implements ClearerInterface
         $em->getConfiguration()->getEntityListenerResolver()->clear();
     }
 
-    /**
-     * @param Connection $connection
-     */
     private function clearConnection(Connection $connection)
     {
         // make sure that the connection is closed

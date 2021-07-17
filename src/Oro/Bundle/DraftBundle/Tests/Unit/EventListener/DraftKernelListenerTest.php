@@ -54,9 +54,6 @@ class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($source, $draftableArgument->getDraftSource());
     }
 
-    /**
-     * @return DraftManager
-     */
     private function getDraftManager(): DraftManager
     {
         $extension = new DraftSourceExtension();

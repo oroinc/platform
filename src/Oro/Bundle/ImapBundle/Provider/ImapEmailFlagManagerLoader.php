@@ -27,11 +27,6 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,

@@ -18,9 +18,6 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -43,12 +40,6 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
             || $this->isTargetSideOfManyToManyAttribute($metadata->name, $associationMapping);
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $associationMapping
-     *
-     * @return bool
-     */
     private function isOwningSideOfOneToManyAttribute(string $entityClass, array $associationMapping): bool
     {
         if (!$associationMapping['isOwningSide']
@@ -74,12 +65,6 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
             && $this->isAttribute($targetEntityClass, $targetFieldName);
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $associationMapping
-     *
-     * @return bool
-     */
     private function isTargetSideOfManyToOneAttribute(string $entityClass, array $associationMapping): bool
     {
         if ($associationMapping['isOwningSide']
@@ -105,12 +90,6 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
             && $this->isAttribute($targetEntityClass, $targetFieldName);
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $associationMapping
-     *
-     * @return bool
-     */
     private function isTargetSideOfManyToManyAttribute(string $entityClass, array $associationMapping): bool
     {
         if ($associationMapping['isOwningSide']
@@ -135,12 +114,6 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
             && $this->isAttribute($targetEntityClass, $targetFieldName);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $relationKey
-     *
-     * @return bool
-     */
     private function hasRelation(string $entityClass, string $relationKey): bool
     {
         $relations = $this->configManager->getEntityConfig('extend', $entityClass)->get('relation', false, []);
@@ -148,12 +121,6 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
         return isset($relations[$relationKey]);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function isAttribute(string $entityClass, string $fieldName): bool
     {
         return

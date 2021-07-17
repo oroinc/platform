@@ -32,10 +32,6 @@ class WorkflowStepSelectType extends AbstractType
     /** @var MessageCatalogueInterface */
     private $translatorCatalogue;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;

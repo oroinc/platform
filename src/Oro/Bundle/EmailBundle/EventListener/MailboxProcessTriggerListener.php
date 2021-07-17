@@ -29,9 +29,6 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -67,8 +64,6 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
      * Processes email bodies using processes provided in MailboxProcessProviders.
      * Processes are triggered using this listener instead of normal triggers.
      * Processes are triggered for new email bodies and email bodies of emails newly bound to some mailbox.
-     *
-     * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
@@ -93,11 +88,6 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
 
     /**
      * Schedules EmailBody for processing.
-     *
-     * @param EmailBody             $emailBody
-     * @param EntityRepository      $processRepository
-     * @param MailboxProcessStorage $processStorage
-     * @param ProcessHandler        $handler
      */
     protected function scheduleProcess(
         EmailBody $emailBody,

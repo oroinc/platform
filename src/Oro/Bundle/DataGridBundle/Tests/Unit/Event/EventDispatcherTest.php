@@ -33,9 +33,6 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider eventDataProvider
-     *
-     * @param array $config
-     * @param array $expectedEvents
      */
     public function testDispatchGridEvent(array $config, array $expectedEvents)
     {
@@ -75,9 +72,6 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider eventDataProvider
-     *
-     * @param array $config
-     * @param array $expectedEvents
      */
     public function testDispatchGridConfigEvent(array $config, array $expectedEvents)
     {

@@ -37,7 +37,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         WorkflowDefinitionCloner::mergeDefinition($definition, $sourceDefinition);
 
         $this->assertSameMainFields($definition, $sourceDefinition);
-        
+
         $this->assertEquals($definition, $sourceDefinition);
         $this->assertNotSame($definition, $sourceDefinition);
 
@@ -46,10 +46,6 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         $this->assertObjectsDefinitions($definition, $sourceDefinition);
     }
 
-    /**
-     * @param WorkflowDefinition $definition1
-     * @param WorkflowDefinition $definition2
-     */
     protected function assertSameMainFields(WorkflowDefinition $definition1, WorkflowDefinition $definition2)
     {
         $this->assertSame($definition1->getName(), $definition2->getName());

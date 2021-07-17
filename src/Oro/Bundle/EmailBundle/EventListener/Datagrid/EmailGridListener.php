@@ -39,12 +39,6 @@ class EmailGridListener
      */
     protected $filterJoins;
 
-    /**
-     * @param EmailQueryFactory $factory
-     * @param DatagridStateProviderInterface $filtersStateProvider
-     * @param ConfigManager $configManager
-     * @param EmailGridResultHelper $resultHelper
-     */
     public function __construct(
         EmailQueryFactory $factory,
         DatagridStateProviderInterface $filtersStateProvider,
@@ -57,9 +51,6 @@ class EmailGridListener
         $this->resultHelper = $resultHelper;
     }
 
-    /**
-     * @param OrmResultBeforeQuery $event
-     */
     public function onResultBeforeQuery(OrmResultBeforeQuery $event)
     {
         $qb = $event->getQueryBuilder();
@@ -71,8 +62,6 @@ class EmailGridListener
 
     /**
      * Add required filters
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {
@@ -119,9 +108,6 @@ class EmailGridListener
         }
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         /** @var ResultRecord[] $records */
@@ -176,11 +162,6 @@ class EmailGridListener
         }
     }
 
-    /**
-     *
-     * @param QueryBuilder $qb
-     * @param              $part
-     */
     protected function removeGroupByPart(QueryBuilder $qb, $part)
     {
         $groupByParts = $qb->getDQLPart('groupBy');

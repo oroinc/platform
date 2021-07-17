@@ -27,9 +27,6 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
     /** @var array */
     private static $attributesData = [];
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         if (!empty(self::$attributesData)) {
@@ -49,22 +46,11 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
         }
     }
 
-    /**
-     * @param string $attributeName
-     *
-     * @return int|null
-     */
     public static function getAttributeIdByName(string $attributeName): ?int
     {
         return self::$attributesData[$attributeName] ?? null;
     }
 
-    /**
-     * @param ConfigManager $configManager
-     * @param string        $attributeName
-     *
-     * @return FieldConfigModel
-     */
     public static function getAttribute(ConfigManager $configManager, string $attributeName): FieldConfigModel
     {
         $attribute = $configManager->getConfigFieldModel(self::ENTITY_CONFIG_MODEL, $attributeName);

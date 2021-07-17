@@ -28,10 +28,6 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $submittedData
-     * @param ScheduleIntervalInterface $expected
-     * @param ScheduleIntervalInterface|null $data
      */
     public function testSubmit(
         array $submittedData,

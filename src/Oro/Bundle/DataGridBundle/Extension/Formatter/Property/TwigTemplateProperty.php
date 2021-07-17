@@ -27,9 +27,6 @@ class TwigTemplateProperty extends AbstractProperty
     /** @var array */
     protected $templates = [];
 
-    /**
-     * @param Environment $environment
-     */
     public function __construct(Environment $environment)
     {
         $this->environment = $environment;

@@ -13,9 +13,6 @@ class TitleSerializedContentProvider implements ContentProviderInterface
     /** @var TitleServiceInterface */
     private $titleService;
 
-    /**
-     * @param TitleServiceInterface $titleService
-     */
     public function __construct(TitleServiceInterface $titleService)
     {
         $this->titleService = $titleService;

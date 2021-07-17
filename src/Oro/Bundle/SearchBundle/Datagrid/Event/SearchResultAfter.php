@@ -27,11 +27,6 @@ class SearchResultAfter extends Event implements GridEventInterface
      */
     protected $records;
 
-    /**
-     * @param DatagridInterface    $datagrid
-     * @param SearchQueryInterface $query
-     * @param array                $records
-     */
     public function __construct(DatagridInterface $datagrid, SearchQueryInterface $query, array $records)
     {
         $this->datagrid = $datagrid;
@@ -63,9 +58,6 @@ class SearchResultAfter extends Event implements GridEventInterface
         return $this->records;
     }
 
-    /**
-     * @param array $records
-     */
     public function setRecords(array $records)
     {
         $this->records = $records;

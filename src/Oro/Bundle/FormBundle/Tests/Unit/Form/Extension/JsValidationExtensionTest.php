@@ -28,11 +28,6 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider finishViewAddOptionalGroupAttributeDataProvider
-     *
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $options
-     * @param array $expectedAttributes
      */
     public function testFinishViewAddOptionalGroupAttribute(
         FormView $view,
@@ -142,11 +137,6 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider finishViewAddDataValidationAttributeDataProvider
-     *
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $expectedConstraints
-     * @param array $expectedAttributes
      */
     public function testFinishViewAddDataValidationAttribute(
         FormView $view,

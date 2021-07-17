@@ -21,10 +21,6 @@ class IdToEntityTransformer implements DataTransformerInterface
      */
     private $className;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param string $className
-     */
     public function __construct(ManagerRegistry $registry, string $className)
     {
         $this->registry = $registry;
@@ -64,9 +60,6 @@ class IdToEntityTransformer implements DataTransformerInterface
         return reset($identifiers);
     }
 
-    /**
-     * @return ObjectManager
-     */
     protected function getObjectManager(): ObjectManager
     {
         return $this->registry->getManagerForClass($this->className);

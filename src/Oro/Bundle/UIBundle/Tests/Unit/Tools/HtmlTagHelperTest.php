@@ -173,17 +173,11 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->helper->getLastErrorCollector());
     }
 
-    /**
-     * @return array
-     */
     public function dataProvider(): array
     {
         return array_merge($this->sanitizeDataProvider(), $this->xssDataProvider());
     }
 
-    /**
-     * @return array
-     */
     public function errorCollectorWithoutErrorsDataProvider(): array
     {
         return [
@@ -195,9 +189,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function errorCollectorWithErrorsDataProvider(): array
     {
         return [
@@ -246,8 +237,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @link https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
-     *
-     * @return array
      */
     protected function xssDataProvider(): array
     {
@@ -262,9 +251,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function sanitizeDataProvider(): array
     {
         $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">'.
@@ -399,8 +385,6 @@ HTML;
 
     /**
      * @dataProvider longStringProvider
-     * @param $value
-     * @param $expected
      */
     public function testStripLongWords($value, $expected)
     {

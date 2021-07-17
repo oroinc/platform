@@ -19,9 +19,6 @@ class LoadEntityByOrmQuery implements ProcessorInterface
     /** @var QueryHintResolverInterface */
     private $queryHintResolver;
 
-    /**
-     * @param QueryHintResolverInterface $queryHintResolver
-     */
     public function __construct(QueryHintResolverInterface $queryHintResolver)
     {
         $this->queryHintResolver = $queryHintResolver;
@@ -50,11 +47,6 @@ class LoadEntityByOrmQuery implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return array
-     */
     private function getHints(?EntityDefinitionConfig $config): array
     {
         if (null === $config) {

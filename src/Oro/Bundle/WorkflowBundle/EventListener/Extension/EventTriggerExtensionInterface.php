@@ -25,9 +25,6 @@ interface EventTriggerExtensionInterface
      */
     public function schedule($entity, $event, array $changeSet = null);
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function process(ObjectManager $manager);
 
     /**

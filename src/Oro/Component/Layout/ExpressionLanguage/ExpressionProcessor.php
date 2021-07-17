@@ -285,13 +285,6 @@ class ExpressionProcessor
         return $this->visible ? $value($context, $data) : null;
     }
 
-    /**
-     * @param OptionValueBag             $value
-     * @param ContextInterface           $context
-     * @param DataAccessorInterface|null $data
-     * @param bool                       $evaluate
-     * @param string|null                $encoding
-     */
     protected function processOptionValueBag(
         OptionValueBag $value,
         ContextInterface $context,

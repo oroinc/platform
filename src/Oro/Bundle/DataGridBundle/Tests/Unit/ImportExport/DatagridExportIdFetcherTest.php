@@ -105,10 +105,6 @@ class DatagridExportIdFetcherTest extends OrmTestCase
 
     /**
      * @dataProvider getGridDataIdsDataProvider
-     *
-     * @param callable $qbCallback
-     * @param string $expectedDQL
-     * @param string $resultKey
      */
     public function testGetGridDataIds(callable $qbCallback, string $expectedDQL, string $resultKey)
     {

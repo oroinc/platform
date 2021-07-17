@@ -38,11 +38,6 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** @var  Process */
     protected $copyDumpToTempDirProcess;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param array $cacheDirectories
-     * @param array $cacheFiles
-     */
     public function __construct(KernelInterface $kernel, array $cacheDirectories, array $cacheFiles = [])
     {
         $this->cacheDir     = realpath($kernel->getCacheDir());

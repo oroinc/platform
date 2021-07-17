@@ -24,16 +24,6 @@ class ScheduleSendEmailTemplate extends SendEmailTemplate
     /** @var MessageProducerInterface */
     private $messageProducer;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param Processor $emailProcessor
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param ValidatorInterface $validator
-     * @param AggregatedEmailTemplatesSender $sender
-     * @param DoctrineHelper $doctrineHelper
-     * @param MessageProducerInterface $messageProducer
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,

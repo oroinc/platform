@@ -27,8 +27,6 @@ class OroNotificationBundle implements Migration
 
     /**
      * Generate table oro_notification_email_spool
-     *
-     * @param Schema $schema
      */
     public static function oroNotificationEmailSpoolTable(Schema $schema)
     {
@@ -66,8 +64,6 @@ class OroNotificationBundle implements Migration
 
     /**
      * Generate table oro_notification_event
-     *
-     * @param Schema $schema
      */
     public static function oroNotificationEventTable(Schema $schema)
     {

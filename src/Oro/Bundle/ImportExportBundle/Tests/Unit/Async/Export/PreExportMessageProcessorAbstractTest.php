@@ -73,9 +73,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PreExportMessageProcessorStub::REJECT, $result);
     }
 
-    /**
-     * @return array
-     */
     public function uniqueJobResultProvider(): array
     {
         return [
@@ -157,9 +154,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PreExportMessageProcessorStub::ACK, $result);
     }
 
-    /**
-     * @return array
-     */
     public function invalidUserTypeProvider(): array
     {
         $notObject = 'not_object';

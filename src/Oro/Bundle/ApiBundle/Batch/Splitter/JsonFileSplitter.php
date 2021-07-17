@@ -172,9 +172,6 @@ class JsonFileSplitter implements FileSplitterInterface
         }
     }
 
-    /**
-     * @param Parser $parser
-     */
     protected function parse(Parser $parser): void
     {
         $parser->parse();
@@ -195,9 +192,6 @@ class JsonFileSplitter implements FileSplitterInterface
         return new Parser($stream, $this->getParserListener());
     }
 
-    /**
-     * @return ListenerInterface
-     */
     protected function getParserListener(): ListenerInterface
     {
         return new JsonFileSplitterListener(
@@ -215,9 +209,6 @@ class JsonFileSplitter implements FileSplitterInterface
         );
     }
 
-    /**
-     * @param string $item
-     */
     protected function processSection(string $item): void
     {
         if (!$this->sectionName && $item && $this->headerSectionName === $item) {
@@ -250,9 +241,6 @@ class JsonFileSplitter implements FileSplitterInterface
         }
     }
 
-    /**
-     * @param array $header
-     */
     protected function processHeader(array $header): void
     {
         $this->headerSectionData = $header;
@@ -313,12 +301,6 @@ class JsonFileSplitter implements FileSplitterInterface
         return $fileName;
     }
 
-    /**
-     * @param FileManager $fileManager
-     * @param string      $fileName
-     *
-     * @return Stream
-     */
     private function openFileStreamToRead(FileManager $fileManager, string $fileName): Stream
     {
         $stream = $fileManager->getStream($fileName);
@@ -338,9 +320,6 @@ class JsonFileSplitter implements FileSplitterInterface
         return $stream;
     }
 
-    /**
-     * @param Stream $stream
-     */
     private function parseStream(Stream $stream): void
     {
         $resource = $stream->cast('stream');

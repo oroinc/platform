@@ -10,8 +10,6 @@ use Symfony\Component\Yaml\Yaml;
 class DeploymentConfigResolver
 {
     /**
-     * @param string $projectDir
-     * @return string|null
      * @throws \LogicException
      */
     public static function resolveConfig(string $projectDir): ?string

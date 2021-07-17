@@ -50,7 +50,6 @@ trait LoggerAwareTraitTestTrait
 
     /**
      * Be sure to call this method in the setUp() method of the testCase class
-     * @param LoggerAwareInterface $testedObject
      */
     protected function setUpLoggerMock(LoggerAwareInterface $testedObject)
     {

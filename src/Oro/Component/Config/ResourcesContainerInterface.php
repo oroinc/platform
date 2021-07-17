@@ -18,8 +18,6 @@ interface ResourcesContainerInterface
 
     /**
      * Adds a resource to the container.
-     *
-     * @param ResourceInterface $resource
      */
     public function addResource(ResourceInterface $resource): void;
 }

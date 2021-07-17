@@ -49,13 +49,6 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     /** @var array [security type => [class name => [group, [field name => field alias, ...]], ...], ...] */
     private $shortLocalCache = [];
 
-    /**
-     * @param ConfigManager             $configManager
-     * @param ManagerRegistry           $doctrine
-     * @param CacheProvider             $cache
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param AclGroupProviderInterface $aclGroupProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine,

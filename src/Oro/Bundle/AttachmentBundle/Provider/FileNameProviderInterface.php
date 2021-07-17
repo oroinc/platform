@@ -12,10 +12,6 @@ interface FileNameProviderInterface
 {
     /**
      * Gets a filename for the given File entity.
-     *
-     * @param File $file
-     *
-     * @return string
      */
     public function getFileName(File $file): string;
 }

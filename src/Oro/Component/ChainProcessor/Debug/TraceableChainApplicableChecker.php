@@ -11,9 +11,6 @@ class TraceableChainApplicableChecker extends ChainApplicableChecker
     /** @var TraceLogger */
     protected $logger;
 
-    /**
-     * @param TraceLogger $logger
-     */
     public function __construct(TraceLogger $logger)
     {
         $this->logger = $logger;

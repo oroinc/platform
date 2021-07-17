@@ -66,7 +66,6 @@ class ContentProcessorTest extends TestCase
             ->method('getHeaders')
             ->will($this->returnValue($headers));
 
-
         $result = $this->callProtectedMethod($this->processor, 'getPartContentType', [$this->part]);
 
         $this->assertNull($result);
@@ -74,12 +73,6 @@ class ContentProcessorTest extends TestCase
 
     /**
      * @dataProvider extractContentProvider
-     * @param $contentTransferEncoding
-     * @param $contentType
-     * @param $contentCharset
-     * @param $contentValue
-     * @param $expected
-     * @param $decodedValue
      */
     public function testExtractContent(
         $contentTransferEncoding,

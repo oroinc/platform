@@ -131,7 +131,6 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * @When /^(?:|I )attach "(?P<fileName>.*)" file to email$/
-     * @param string $fileName
      */
     public function iAttachFileToEmail(string $fileName)
     {
@@ -157,9 +156,6 @@ JS;
      * Example: I follow "Reply All" on "Merry Christmas" email notification
      *
      * @Given /^I follow "(?P<locator>[^"]+)" on "(?P<emailTitle>[^"]+)" email notification$/
-     *
-     * @param string $locator
-     * @param string $emailTitle
      */
     public function iFollowLinkOnEmailNotification(string $locator, string $emailTitle): void
     {

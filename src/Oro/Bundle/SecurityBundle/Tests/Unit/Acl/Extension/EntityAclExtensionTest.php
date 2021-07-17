@@ -159,7 +159,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
          *
          * bu1   bu2   bu3   bu31   bu4   bu411
          * bu2         bu2
-         *
          */
         $this->tree->addBusinessUnit('bu1', null);
         $this->tree->addBusinessUnit('bu2', null);
@@ -451,9 +450,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider getAllowedPermissionsProvider
      */
     public function testGetAllowedPermissions(array $inputData, array $expectedData)
@@ -756,9 +752,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param OwnershipMetadata $metadata
-     * @param array $expected
-     *
      * @dataProvider accessLevelProvider
      */
     public function testGetAccessLevelNamesForNonRoot(OwnershipMetadata $metadata, array $expected)

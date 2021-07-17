@@ -12,18 +12,11 @@ class WorkflowVariableFormatter
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param Variable $workflowVariable
-     * @return string
-     */
     public function formatWorkflowVariableValue(Variable $workflowVariable): string
     {
         $value = $workflowVariable->getValue();

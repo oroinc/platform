@@ -28,8 +28,6 @@ class UserEmailOrigins implements Migration, OrderedMigrationInterface
 
     /**
      * Generate table oro_user_email_origin
-     *
-     * @param Schema $schema
      */
     public static function oroUserEmailOriginTable(Schema $schema)
     {
@@ -45,8 +43,6 @@ class UserEmailOrigins implements Migration, OrderedMigrationInterface
 
     /**
      * Generate foreign keys for table oro_user_email_origin
-     *
-     * @param Schema $schema
      */
     public static function oroUserEmailOriginForeignKeys(Schema $schema)
     {

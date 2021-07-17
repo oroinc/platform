@@ -299,10 +299,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string|null $container
-     * @return TemplateReference
-     */
     private function templateWithContainer(?string $container = null): TemplateReference
     {
         return new TemplateReference(
@@ -314,11 +310,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $controller
-     * @param string $action
-     * @return TemplateReference
-     */
     private function templateWithController(string $controller, string $action = 'test'): TemplateReference
     {
         return new TemplateReference('TestBundle', $controller, $action, 'html', 'twig');

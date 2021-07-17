@@ -8,8 +8,6 @@ interface ChainExtensionAwareInterface
 {
     /**
      * Sets an extension that contains all other extensions.
-     *
-     * @param ExtensionInterface $chainExtension
      */
     public function setChainExtension(ExtensionInterface $chainExtension);
 }

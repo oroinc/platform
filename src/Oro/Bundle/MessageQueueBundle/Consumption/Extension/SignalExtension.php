@@ -38,9 +38,6 @@ class SignalExtension extends AbstractExtension
         $this->interruptConsumption = false;
     }
 
-    /**
-     * @param Context $context
-     */
     public function onBeforeReceive(Context $context)
     {
         pcntl_signal_dispatch();
@@ -68,9 +65,6 @@ class SignalExtension extends AbstractExtension
         $this->interruptExecutionIfNeeded($context);
     }
 
-    /**
-     * @param Context $context
-     */
     protected function interruptExecutionIfNeeded(Context $context)
     {
         if ($this->interruptConsumption && !$context->isExecutionInterrupted()) {
@@ -90,7 +84,7 @@ class SignalExtension extends AbstractExtension
         if ($this->logger) {
             $this->logger->debug(sprintf('Caught signal: %s', $signal));
         }
-        
+
         switch ($signal) {
             case SIGTERM:  // 15 : supervisor default stop
             case SIGQUIT:  // 3  : kill -s QUIT

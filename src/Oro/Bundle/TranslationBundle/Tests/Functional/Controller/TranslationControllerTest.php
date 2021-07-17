@@ -100,7 +100,6 @@ class TranslationControllerTest extends WebTestCase
         $this->assertArrayHasKey('count', $result);
         $this->assertEquals(2, $result['count']);
 
-
         /** @var TranslationRepository $repo */
         $repo = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(Translation::class);
 

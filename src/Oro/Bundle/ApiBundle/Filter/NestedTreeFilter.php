@@ -44,11 +44,6 @@ class NestedTreeFilter extends StandaloneFilter implements FieldFilterInterface
         }
     }
 
-    /**
-     * @param FilterValue|null $value
-     *
-     * @return Expression|null
-     */
     private function createExpression(?FilterValue $value): ?Expression
     {
         if (null === $value) {
@@ -67,11 +62,6 @@ class NestedTreeFilter extends StandaloneFilter implements FieldFilterInterface
         );
     }
 
-    /**
-     * @param string|null $operator
-     *
-     * @return string
-     */
     private function getComparisonExpressionOperator(?string $operator): string
     {
         if ($operator && \in_array($operator, $this->getSupportedOperators(), true)) {

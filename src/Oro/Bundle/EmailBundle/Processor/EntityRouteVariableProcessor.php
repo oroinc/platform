@@ -23,11 +23,6 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param DoctrineHelper  $doctrineHelper
-     * @param UrlProvider     $urlProvider
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         UrlProvider $urlProvider,
@@ -46,13 +41,6 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
         $data->setComputedVariable($variable, $this->getUrl($processorArguments['route'], $variable, $data));
     }
 
-    /**
-     * @param string       $routeName
-     * @param string       $variable
-     * @param TemplateData $data
-     *
-     * @return string|null
-     */
     private function getUrl(string $routeName, string $variable, TemplateData $data): ?string
     {
         $entity = $data->getEntityVariable($data->getParentVariablePath($variable));

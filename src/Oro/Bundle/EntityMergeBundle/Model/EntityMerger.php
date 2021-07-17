@@ -35,8 +35,6 @@ class EntityMerger implements EntityMergerInterface
 
     /**
      * Add merge step
-     *
-     * @param MergeStepInterface $step
      */
     protected function addMergeStep(MergeStepInterface $step)
     {
@@ -45,8 +43,6 @@ class EntityMerger implements EntityMergerInterface
 
     /**
      * Merge entities
-     *
-     * @param EntityData $data
      */
     public function merge(EntityData $data)
     {

@@ -327,9 +327,6 @@ class GetAttrNodeTest extends AbstractNodeDefinitionTest
         $this->assertSame($expectedData, $node->evaluate([], $variables));
     }
 
-    /**
-     * @return array
-     */
     public function sumMethodEvaluateDataProvider(): array
     {
         return [

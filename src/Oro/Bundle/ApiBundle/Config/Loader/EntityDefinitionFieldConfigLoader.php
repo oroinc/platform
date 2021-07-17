@@ -57,10 +57,6 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         return $field;
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param array|null                  $config
-     */
     protected function loadField(EntityDefinitionFieldConfig $field, array $config = null)
     {
         if (empty($config)) {

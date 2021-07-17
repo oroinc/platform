@@ -40,8 +40,6 @@ class UpdateListContext extends Context
 
     /**
      * Gets the name of a file that is used to store request data.
-     *
-     * @return string|null
      */
     public function getTargetFileName(): ?string
     {
@@ -50,8 +48,6 @@ class UpdateListContext extends Context
 
     /**
      * Sets the name of a file that is used to store request data.
-     *
-     * @param string|null $targetFileName
      */
     public function setTargetFileName(string $targetFileName = null): void
     {
@@ -60,8 +56,6 @@ class UpdateListContext extends Context
 
     /**
      * Gets an identifier of an asynchronous operation.
-     *
-     * @return int|null
      */
     public function getOperationId(): ?int
     {
@@ -70,8 +64,6 @@ class UpdateListContext extends Context
 
     /**
      * Sets an identifier of an asynchronous operation.
-     *
-     * @param int|null $operationId
      */
     public function setOperationId(int $operationId = null): void
     {

@@ -30,9 +30,6 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     protected function appendActionGroups(NodeBuilder $builder)
     {
         $children = $builder
@@ -62,9 +59,6 @@ class Configuration implements ConfigurationInterface
         ->end();
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     protected function appendOperations(NodeBuilder $builder)
     {
         $children = $builder
@@ -150,9 +144,6 @@ class Configuration implements ConfigurationInterface
         }
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     protected function appendConditionsNodes(NodeBuilder $builder)
     {
         foreach (OperationDefinition::getAllowedConditions() as $nodeName) {
@@ -331,7 +322,6 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param array $config
      * @throws \Exception
      */
     protected function checkEntityAcl(array $config)
@@ -360,7 +350,6 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param array $config
      * @throws \Exception
      */
     protected function checkPropertyPath(array $config)

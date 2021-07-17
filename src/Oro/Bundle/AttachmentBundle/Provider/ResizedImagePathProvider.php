@@ -12,9 +12,6 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
     /** @var FileUrlProviderInterface */
     private $fileUrlProvider;
 
-    /**
-     * @param FileUrlProviderInterface $fileUrlProvider
-     */
     public function __construct(FileUrlProviderInterface $fileUrlProvider)
     {
         $this->fileUrlProvider = $fileUrlProvider;
@@ -40,11 +37,6 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
         );
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private function normalizePath(string $path): string
     {
         return '/' . ltrim($path, '/');

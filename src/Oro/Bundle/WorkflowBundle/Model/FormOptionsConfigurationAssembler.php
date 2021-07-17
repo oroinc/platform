@@ -19,11 +19,6 @@ class FormOptionsConfigurationAssembler
     /** @var FormTemplateDataProviderRegistry */
     protected $templateDataProviderRegistry;
 
-    /**
-     * @param FormRegistryInterface $formRegistry
-     * @param FormHandlerRegistry $formHandlerRegistry
-     * @param FormTemplateDataProviderRegistry $templateDataProviderRegistry
-     */
     public function __construct(
         FormRegistryInterface $formRegistry,
         FormHandlerRegistry $formHandlerRegistry,
@@ -35,8 +30,6 @@ class FormOptionsConfigurationAssembler
     }
 
     /**
-     * @param array $transitionConfiguration
-     *
      * @throws AssemblerException
      */
     public function assemble(array $transitionConfiguration)

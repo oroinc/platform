@@ -144,9 +144,6 @@ class UniquePinbarTabUrlValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $this->constraint);
     }
 
-    /**
-     * @return NavigationItem
-     */
     private function createNavigationItem(): NavigationItem
     {
         return new NavigationItem([

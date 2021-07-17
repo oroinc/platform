@@ -27,10 +27,6 @@ class FieldData
      */
     protected $mode = MergeModes::REPLACE;
 
-    /**
-     * @param EntityData $entityData
-     * @param FieldMetadata $metadata
-     */
     public function __construct(EntityData $entityData, FieldMetadata $metadata)
     {
         $this->entityData = $entityData;

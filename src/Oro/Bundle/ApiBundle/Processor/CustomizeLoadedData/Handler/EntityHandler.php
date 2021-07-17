@@ -102,8 +102,6 @@ class EntityHandler
 
     /**
      * Creates the customization context based on the state of this handler.
-     *
-     * @return CustomizeLoadedDataContext
      */
     protected function createCustomizationContext(): CustomizeLoadedDataContext
     {
@@ -121,10 +119,6 @@ class EntityHandler
     /**
      * Checks whether this handler does the same work as the given handler
      * and can be used instead of it.
-     *
-     * @param callable $handler
-     *
-     * @return bool
      */
     protected function isRedundantHandler(callable $handler): bool
     {
@@ -135,9 +129,6 @@ class EntityHandler
             && \is_a($this->entityClass, $handler->entityClass, true);
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $customizationContext
-     */
     private function adjustPropertyPath(CustomizeLoadedDataContext $customizationContext): void
     {
         /** @var RootPathConfigExtra|null $rootPathConfigExtra */
@@ -159,10 +150,6 @@ class EntityHandler
 
     /**
      * Returns a previous handler to be executed.
-     *
-     * @param callable|null $previousHandler
-     *
-     * @return callable|null
      */
     private function getPreviousHandler(?callable $previousHandler): ?callable
     {
@@ -182,11 +169,6 @@ class EntityHandler
         return $result;
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return bool
-     */
     private function isIdentifierOnlyRequested(?EntityDefinitionConfig $config): bool
     {
         return

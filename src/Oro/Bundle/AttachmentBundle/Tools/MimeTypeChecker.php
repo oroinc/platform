@@ -12,9 +12,6 @@ class MimeTypeChecker
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -22,10 +19,6 @@ class MimeTypeChecker
 
     /**
      * Checks if the given mime type belongs to the image mime types.
-     *
-     * @param string $mimeType
-     *
-     * @return bool
      */
     public function isImageMimeType(string $mimeType): bool
     {

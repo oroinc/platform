@@ -40,9 +40,6 @@ class EntityConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     private function appendExclusions(NodeBuilder $builder)
     {
         $children = $builder
@@ -60,9 +57,6 @@ class EntityConfiguration implements ConfigurationInterface
             ->scalarNode('field')->end();
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     private function appendEntityAliases(NodeBuilder $builder)
     {
         $children = $builder
@@ -117,9 +111,6 @@ class EntityConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     private function appendEntityAliasExclusions(NodeBuilder $builder)
     {
         $builder
@@ -135,9 +126,6 @@ class EntityConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     private function appendVirtualFields(NodeBuilder $builder)
     {
         $children = $builder
@@ -198,9 +186,6 @@ class EntityConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     private function appendVirtualRelations(NodeBuilder $builder)
     {
         $children = $builder
@@ -261,9 +246,6 @@ class EntityConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $builder
-     */
     private function appendEntityNameFormats(NodeBuilder $builder)
     {
         $builder
@@ -300,7 +282,6 @@ class EntityConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param array $v
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */

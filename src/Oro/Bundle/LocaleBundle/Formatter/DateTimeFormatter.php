@@ -25,10 +25,6 @@ class DateTimeFormatter implements DateTimeFormatterInterface
     /** @var string[] */
     protected $cachedPatterns = [];
 
-    /**
-     * @param LocaleSettings      $localeSettings
-     * @param TranslatorInterface $translator
-     */
     public function __construct(LocaleSettings $localeSettings, TranslatorInterface $translator)
     {
         $this->localeSettings = $localeSettings;
@@ -84,7 +80,6 @@ class DateTimeFormatter implements DateTimeFormatterInterface
 
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
-
 
     /**
      * {@inheritdoc}

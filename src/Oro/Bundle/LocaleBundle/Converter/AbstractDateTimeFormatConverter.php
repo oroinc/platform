@@ -135,10 +135,6 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param DateTimeFormatterInterface $formatter
-     * @param TranslatorInterface $translator
-     */
     public function __construct(DateTimeFormatterInterface $formatter, TranslatorInterface $translator)
     {
         $this->formatter  = $formatter;

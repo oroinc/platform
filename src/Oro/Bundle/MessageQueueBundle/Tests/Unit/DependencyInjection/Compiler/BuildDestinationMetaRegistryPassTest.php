@@ -182,7 +182,6 @@ class BuildDestinationMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
         $pass = new BuildDestinationMetaRegistryPass();
         $pass->process($container);
 
-
         $this->assertTrue($processor->isPublic());
     }
 }

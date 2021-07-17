@@ -51,12 +51,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->setFilesystemMap($filesystemMap);
     }
 
-    /**
-     * @param string $originalFileName
-     * @param string $fileName
-     *
-     * @return TestFile
-     */
     private function createFileEntity(
         string $originalFileName = 'testFile.txt',
         string $fileName = 'testFile.txt'

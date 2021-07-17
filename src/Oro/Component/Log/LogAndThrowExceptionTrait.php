@@ -20,11 +20,6 @@ trait LogAndThrowExceptionTrait
      * under named keys in the context as required by Oro logging conventions.
      * @see https://doc.oroinc.com/backend/logging/#message
      * @see https://github.com/Seldaek/monolog/blob/2.2.0/doc/message-structure.md
-     * @param string $exceptionClassname
-     * @param string $message
-     * @param array $context
-     * @param \Throwable|null $previous
-     * @param int $code
      */
     protected function throwErrorException(
         string $exceptionClassname,
@@ -52,11 +47,6 @@ trait LogAndThrowExceptionTrait
      * under named keys in the context as required by Oro logging conventions.
      * @see https://doc.oroinc.com/backend/logging/#message
      * @see https://github.com/Seldaek/monolog/blob/2.2.0/doc/message-structure.md
-     * @param string $exceptionClassname
-     * @param string $message
-     * @param array $context
-     * @param \Throwable|null $previous
-     * @param int $code
      */
     protected function throwCriticalException(
         string $exceptionClassname,

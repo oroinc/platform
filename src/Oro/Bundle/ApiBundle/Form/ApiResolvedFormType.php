@@ -22,9 +22,6 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
     /** @var ResolvedFormTypeInterface */
     private $innerType;
 
-    /**
-     * @param ResolvedFormTypeInterface $innerType
-     */
     public function __construct(ResolvedFormTypeInterface $innerType)
     {
         $this->innerType = $innerType;

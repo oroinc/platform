@@ -72,23 +72,11 @@ class HtmlTagHelper implements TranslatorAwareInterface
         return $this->lastErrorCollector;
     }
 
-    /**
-     * @param string $elementName
-     * @param string $attributeName
-     * @param string $attributeType
-     */
     public function setAttribute(string $elementName, string $attributeName, string $attributeType): void
     {
         $this->additionalAttributes[$elementName][$attributeName] = $attributeType;
     }
 
-    /**
-     * @param string $elementName
-     * @param string $type
-     * @param string $contents
-     * @param string $attributeCollections
-     * @param bool $excludeSameElement
-     */
     public function setElement(
         string $elementName,
         string $type,
@@ -258,11 +246,6 @@ class HtmlTagHelper implements TranslatorAwareInterface
         return $purifier->purify($string);
     }
 
-    /**
-     * @param string $string
-     * @param int $maxLength
-     * @return string
-     */
     public function stripLongWords(string $string, int $maxLength = self::MAX_STRING_LENGTH): string
     {
         $words = preg_split('/\s+/', $string);

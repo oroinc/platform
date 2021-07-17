@@ -20,9 +20,6 @@ class PreExportMessageProcessor extends BasePreExportMessageProcessor
     /** @var CacheProvider */
     private $cache;
 
-    /**
-     * @return int
-     */
     protected function getBatchSize(): int
     {
         $cache = $this->getCache();
@@ -36,17 +33,11 @@ class PreExportMessageProcessor extends BasePreExportMessageProcessor
         return $batchSize;
     }
 
-    /**
-     * @return CacheProvider
-     */
     public function getCache(): CacheProvider
     {
         return $this->cache;
     }
 
-    /**
-     * @param CacheProvider $cache
-     */
     public function setCache(CacheProvider $cache): void
     {
         $this->cache = $cache;

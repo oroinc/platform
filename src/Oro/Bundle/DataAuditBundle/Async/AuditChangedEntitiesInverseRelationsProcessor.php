@@ -29,10 +29,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     /** @var AuditConfigProvider */
     private $auditConfigProvider;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
@@ -41,9 +37,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
     }
 
-    /**
-     * @param AuditConfigProvider $auditConfigProvider
-     */
     public function setAuditConfigProvider(AuditConfigProvider $auditConfigProvider)
     {
         $this->auditConfigProvider = $auditConfigProvider;
@@ -93,9 +86,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
 
     /**
      * Add fields from change sets to the map
-     *
-     * @param array $sourceEntitiesData
-     * @param array $map
      */
     private function processFields(array $sourceEntitiesData, array &$map)
     {
@@ -130,9 +120,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
 
     /**
      * Add to one and to many associations from change sets to the map
-     *
-     * @param array $sourceEntitiesData
-     * @param array $map
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -247,13 +234,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
 
     /**
      * Add inserted entities to the map
-     *
-     * @param array $map
-     * @param array $new
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param string $sourceEntityClass
-     * @param string $sourceEntityId
      */
     private function processInsert(
         array &$map,
@@ -280,13 +260,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
 
     /**
      * Add deleted entities to the map
-     *
-     * @param array $map
-     * @param array $old
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param string $sourceEntityClass
-     * @param string $sourceEntityId
      */
     private function processDelete(
         array &$map,

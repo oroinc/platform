@@ -20,8 +20,6 @@ class LimitResultsListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onBeforeSearchDataProvider
-     * @param int $maxResults
-     * @param int $expectedMaxResults
      */
     public function testOnBeforeSearch(int $maxResults, int $expectedMaxResults): void
     {
@@ -41,9 +39,6 @@ class LimitResultsListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedMaxResults, $query->getCriteria()->getMaxResults());
     }
 
-    /**
-     * @return array
-     */
     public function onBeforeSearchDataProvider(): array
     {
         return [

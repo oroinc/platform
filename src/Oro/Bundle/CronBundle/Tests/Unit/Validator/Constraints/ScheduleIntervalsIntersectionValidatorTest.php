@@ -61,8 +61,6 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
 
     /**
      * @dataProvider validateSuccessDataProvider
-     *
-     * @param array $collection
      */
     public function testValidateSuccess(array $collection)
     {
@@ -123,8 +121,6 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
 
     /**
      * @dataProvider validateFailDataProvider
-     *
-     * @param array $collection
      */
     public function testValidateFail(array $collection)
     {

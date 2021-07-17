@@ -34,7 +34,6 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $data->expects($this->never())
             ->method($this->anything());
 
-
         $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
             ->getMock();

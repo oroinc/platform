@@ -14,9 +14,6 @@ class TransitionFormProvider extends AbstractFormProvider
     /** @var WorkflowManager */
     protected $workflowManager;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     */
     public function setWorkflowManager(WorkflowManager $workflowManager)
     {
         $this->workflowManager = $workflowManager;

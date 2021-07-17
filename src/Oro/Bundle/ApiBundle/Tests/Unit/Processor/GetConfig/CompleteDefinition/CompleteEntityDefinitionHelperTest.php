@@ -1929,7 +1929,6 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ['Test\Association1Target', true, $associationMetadata]
             ]);
 
-
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())

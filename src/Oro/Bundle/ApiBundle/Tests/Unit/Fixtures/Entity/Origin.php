@@ -85,9 +85,6 @@ class Origin
         return $this->mailbox;
     }
 
-    /**
-     * @param Mailbox|null $mailbox
-     */
     public function setMailbox(Mailbox $mailbox = null)
     {
         $this->mailbox = $mailbox;
@@ -101,9 +98,6 @@ class Origin
         return $this->user;
     }
 
-    /**
-     * @param User|null $user
-     */
     public function setUser(User $user = null)
     {
         $this->user = $user;
@@ -117,9 +111,6 @@ class Origin
         return $this->users;
     }
 
-    /**
-     * @param User $user
-     */
     public function addUser(User $user)
     {
         if (!$this->users->contains($user)) {
@@ -127,9 +118,6 @@ class Origin
         }
     }
 
-    /**
-     * @param User $user
-     */
     public function removeUser(User $user)
     {
         if ($this->users->contains($user)) {

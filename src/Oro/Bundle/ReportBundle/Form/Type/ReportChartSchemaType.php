@@ -20,9 +20,6 @@ class ReportChartSchemaType extends AbstractType
      */
     protected $manager;
 
-    /**
-     * @param Manager $manager
-     */
     public function __construct(Manager $manager)
     {
         $this->manager = $manager;

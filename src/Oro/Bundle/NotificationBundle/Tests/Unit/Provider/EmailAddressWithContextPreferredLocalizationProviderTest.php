@@ -40,9 +40,6 @@ class EmailAddressWithContextPreferredLocalizationProviderTest extends \PHPUnit\
         }
     }
 
-    /**
-     * @return array
-     */
     public function supportsDataProvider(): array
     {
         return [

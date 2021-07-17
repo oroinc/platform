@@ -29,10 +29,6 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
     /** @var Cache */
     private $entitiesWithWorkflowCache;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param Cache $entitiesWithWorkflowCache
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         Cache $entitiesWithWorkflowCache

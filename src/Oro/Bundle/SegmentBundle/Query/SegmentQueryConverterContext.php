@@ -34,17 +34,11 @@ class SegmentQueryConverterContext extends QueryBuilderGroupingOrmQueryConverter
         return $tableAlias;
     }
 
-    /**
-     * @return string|null
-     */
     public function getAliasPrefix(): ?string
     {
         return $this->aliasPrefix;
     }
 
-    /**
-     * @param string $aliasPrefix
-     */
     public function setAliasPrefix(string $aliasPrefix): void
     {
         $this->aliasPrefix = $aliasPrefix;

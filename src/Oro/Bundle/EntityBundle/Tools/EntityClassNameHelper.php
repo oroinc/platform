@@ -14,9 +14,6 @@ class EntityClassNameHelper
     /** @var EntityAliasResolver */
     private $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;

@@ -46,12 +46,6 @@ class TranslationManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param TranslationDomainProvider $domainProvider
-     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $registry,
         TranslationDomainProvider $domainProvider,

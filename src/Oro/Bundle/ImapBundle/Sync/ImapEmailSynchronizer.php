@@ -43,14 +43,6 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /** @var SyncCredentialsIssueManager */
     private $credentialsIssueManager;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
-     * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
@@ -67,10 +59,6 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-
-    /**
-     * @param SyncCredentialsIssueManager $credentialsIssueManager
-     */
     public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager)
     {
         $this->credentialsIssueManager = $credentialsIssueManager;
@@ -84,10 +72,6 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         return ($origin instanceof UserEmailOrigin) && $this->isTypeSupported($origin->getAccountType());
     }
 
-    /**
-     * @param string $accountType
-     * @return bool
-     */
     protected function isTypeSupported(string $accountType): bool
     {
         return (AccountTypeModel::ACCOUNT_TYPE_OTHER === $accountType)

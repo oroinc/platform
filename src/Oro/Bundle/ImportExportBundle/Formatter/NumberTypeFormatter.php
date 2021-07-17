@@ -16,8 +16,6 @@ class NumberTypeFormatter implements TypeFormatterInterface
 
     /**
      * NumberTypeFormatter constructor.
-     *
-     * @param NumberFormatter $numberFormatter
      */
     public function __construct(NumberFormatter $numberFormatter)
     {

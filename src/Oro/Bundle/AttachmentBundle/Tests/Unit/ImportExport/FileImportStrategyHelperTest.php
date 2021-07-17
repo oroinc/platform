@@ -147,9 +147,6 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $violations);
     }
 
-    /**
-     * @return array
-     */
     public function validateSingleFileWhenViolationsDataProvider(): array
     {
         return [
@@ -174,11 +171,6 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $errorMessage
-     *
-     * @return ConstraintViolation
-     */
     private function createViolation(string $errorMessage): ConstraintViolation
     {
         $violation = $this->createMock(ConstraintViolation::class);
@@ -314,9 +306,6 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateFileCollectionWhenNoViolationsDataProvider
-     *
-     * @param string $fieldType
-     * @param string $methodName
      */
     public function testValidateFileCollectionWhenNoViolations(string $fieldType, string $methodName): void
     {
@@ -347,9 +336,6 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->helper->validateFileCollection($fileItems, $entity, $fieldName));
     }
 
-    /**
-     * @return array
-     */
     public function validateFileCollectionWhenNoViolationsDataProvider(): array
     {
         return [
@@ -366,11 +352,6 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateFileCollectionWhenViolationsDataProvider
-     *
-     * @param string $fieldType
-     * @param string $methodName
-     * @param array $violations
-     * @param array $expectedViolations
      */
     public function testValidateFileCollectionWhenViolations(
         string $fieldType,
@@ -417,9 +398,6 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function validateFileCollectionWhenViolationsDataProvider(): array
     {
         return [

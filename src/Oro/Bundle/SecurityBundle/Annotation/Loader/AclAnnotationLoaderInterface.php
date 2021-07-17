@@ -12,9 +12,6 @@ interface AclAnnotationLoaderInterface
 {
     /**
      * Loads ACL annotations.
-     *
-     * @param AclAnnotationStorage        $storage
-     * @param ResourcesContainerInterface $resourcesContainer
      */
     public function load(AclAnnotationStorage $storage, ResourcesContainerInterface $resourcesContainer): void;
 }

@@ -66,9 +66,6 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider finishViewDataProvider
-     * @param array $options
-     * @param array $children
-     * @param array $expected
      */
     public function testFinishView(array $options, array $children, array $expected)
     {

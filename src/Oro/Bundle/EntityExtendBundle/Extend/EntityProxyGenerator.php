@@ -65,8 +65,6 @@ class EntityProxyGenerator
     }
     /**
      * Generate doctrine proxy classes for extended entities for the given entity manager
-     *
-     * @param EntityManager $em
      */
     protected function generateEntityManagerProxies(EntityManager $em)
     {

@@ -36,10 +36,6 @@ class ResourceDocParserRegistry
      * Gets an instance of ResourceDocParserInterface
      * responsible to parse documentation for API resources for the specific request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return ResourceDocParserInterface
-     *
      * @throws \LogicException if a parser cannot be created for the given request type
      */
     public function getParser(RequestType $requestType): ResourceDocParserInterface

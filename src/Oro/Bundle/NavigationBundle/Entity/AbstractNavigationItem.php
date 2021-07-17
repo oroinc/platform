@@ -153,8 +153,6 @@ abstract class AbstractNavigationItem implements
 
     /**
      * Set entity properties
-     *
-     * @param array $values
      */
     public function setValues(array $values)
     {

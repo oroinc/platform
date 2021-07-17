@@ -42,9 +42,6 @@ class GetAttrNode extends Node
         $this->inflector = (new InflectorFactory())->build();
     }
 
-    /**
-     * @param Compiler $compiler
-     */
     public function compile(Compiler $compiler)
     {
         switch ($this->attributes['type']) {

@@ -29,11 +29,6 @@ class WorkflowScopeManager
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param ScopeManager $scopeManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(ManagerRegistry $registry, ScopeManager $scopeManager, LoggerInterface $logger)
     {
         $this->registry = $registry;

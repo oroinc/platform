@@ -107,7 +107,6 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executionDataProvider
-     * @param array $options
      */
     public function testExecuteWithCustomEntityAndAttributeOptions(array $options)
     {

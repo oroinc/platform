@@ -18,17 +18,11 @@ class DraftableFilterListener
      */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function onKernelController(FilterControllerEvent $event): void
     {
         $request = $event->getRequest();
@@ -48,10 +42,6 @@ class DraftableFilterListener
         $this->allowDraftAction($id, $className);
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     * @return string|null
-     */
     private function getClassName(FilterControllerEvent $event): ?string
     {
         $r = $this->getReflectionFunctionByController($event->getController());
@@ -69,10 +59,6 @@ class DraftableFilterListener
         return null;
     }
 
-    /**
-     * @param callable $controller
-     * @return \ReflectionFunctionAbstract
-     */
     private function getReflectionFunctionByController(callable $controller): \ReflectionFunctionAbstract
     {
         if (\is_array($controller)) {

@@ -32,11 +32,6 @@ class ComputeTreeNodePathField implements ProcessorInterface
     /** @var string|null */
     protected $sourceEntityClass;
 
-    /**
-     * @param EntitySerializer $entitySerializer
-     * @param DoctrineHelper   $doctrineHelper
-     * @param string           $pathField
-     */
     public function __construct(
         EntitySerializer $entitySerializer,
         DoctrineHelper $doctrineHelper,
@@ -47,25 +42,16 @@ class ComputeTreeNodePathField implements ProcessorInterface
         $this->pathField = $pathField;
     }
 
-    /**
-     * @param string $materializedPathField
-     */
     public function setMaterializedPathField(string $materializedPathField): void
     {
         $this->materializedPathField = $materializedPathField;
     }
 
-    /**
-     * @param string $materializedPathDelimiter
-     */
     public function setMaterializedPathDelimiter(string $materializedPathDelimiter): void
     {
         $this->materializedPathDelimiter = $materializedPathDelimiter;
     }
 
-    /**
-     * @param string $sourceEntityClass
-     */
     public function setSourceEntityClass(string $sourceEntityClass): void
     {
         $this->sourceEntityClass = $sourceEntityClass;
@@ -113,12 +99,6 @@ class ComputeTreeNodePathField implements ProcessorInterface
         $context->setData($data);
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $context
-     * @param EntityDefinitionConfig     $config
-     *
-     * @return string
-     */
     protected function getNodeEntityClass(
         CustomizeLoadedDataContext $context,
         EntityDefinitionConfig $config
@@ -191,12 +171,6 @@ class ComputeTreeNodePathField implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param string $nodeEntityClass
-     * @param array  $nodeIds
-     *
-     * @return QueryBuilder
-     */
     protected function getQueryForLoadNodes(string $nodeEntityClass, array $nodeIds): QueryBuilder
     {
         return $this->doctrineHelper

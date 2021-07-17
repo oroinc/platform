@@ -37,10 +37,6 @@ class BusinessUnitSelectAutocomplete extends AbstractType
 
     /**
      * BusinessUnitSelectAutocomplete constructor.
-     *
-     * @param EntityManager $entityManager
-     * @param $entityClass
-     * @param BusinessUnitManager $businessUnitManager
      */
     public function __construct(
         EntityManager $entityManager,

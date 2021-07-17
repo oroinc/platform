@@ -8,9 +8,6 @@ interface DatasourceInterface
 {
     /**
      * Add source to datagrid
-     *
-     * @param DatagridInterface $grid
-     * @param array             $config
      */
     public function process(DatagridInterface $grid, array $config);
 

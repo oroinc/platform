@@ -38,7 +38,6 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
 
     /**
      * StatisticRepository constructor.
-     * @param Connection $connection
      */
     public function __construct(Connection $connection)
     {
@@ -257,9 +256,6 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->className = $className;
     }
 
-    /**
-     * @param AvgStrategyInterface $avgStrategy
-     */
     public function setAvgStrategy(AvgStrategyInterface $avgStrategy)
     {
         $this->avgStrategy = $avgStrategy;

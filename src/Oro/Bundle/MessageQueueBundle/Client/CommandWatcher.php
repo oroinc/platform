@@ -16,9 +16,6 @@ class CommandWatcher implements EventSubscriberInterface
     /** @var BufferedMessageProducer */
     private $producer;
 
-    /**
-     * @param BufferedMessageProducer $producer
-     */
     public function __construct(BufferedMessageProducer $producer)
     {
         $this->producer = $producer;
@@ -40,9 +37,6 @@ class CommandWatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onCommandStart(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();

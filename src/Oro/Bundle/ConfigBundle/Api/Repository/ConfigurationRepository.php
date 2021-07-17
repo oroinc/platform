@@ -11,9 +11,6 @@ class ConfigurationRepository
     /** @var ConfigApiManager */
     protected $configManager;
 
-    /**
-     * @param ConfigApiManager $configManager
-     */
     public function __construct(ConfigApiManager $configManager)
     {
         $this->configManager = $configManager;

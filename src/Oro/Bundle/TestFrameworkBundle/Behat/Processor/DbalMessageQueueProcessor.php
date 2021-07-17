@@ -19,10 +19,6 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
     /** @var MessageQueueProcessorInterface */
     private $baseMessageQueueProcessor;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param MessageQueueProcessorInterface $baseMessageQueueProcessor
-     */
     public function __construct(KernelInterface $kernel, MessageQueueProcessorInterface $baseMessageQueueProcessor)
     {
         $this->kernel = $kernel;

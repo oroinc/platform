@@ -56,9 +56,6 @@ final class FeatureAvgTimeRegistry implements AvgTimeProviderInterface
         return $this->averageTime;
     }
 
-    /**
-     * @param AvgTimeProviderInterface $provider
-     */
     public function addProvider(AvgTimeProviderInterface $provider)
     {
         $this->providers[] = $provider;

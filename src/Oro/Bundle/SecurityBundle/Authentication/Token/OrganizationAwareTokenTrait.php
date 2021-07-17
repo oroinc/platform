@@ -25,8 +25,6 @@ trait OrganizationAwareTokenTrait
 
     /**
      * Sets the organization.
-     *
-     * @param Organization $organization
      */
     public function setOrganization(Organization $organization)
     {

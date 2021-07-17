@@ -40,8 +40,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Create oro_dashboard_active table
-     *
-     * @param Schema $schema
      */
     protected function createOroDashboardActiveTable(Schema $schema)
     {
@@ -58,8 +56,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Create oro_dashboard table
-     *
-     * @param Schema $schema
      */
     protected function createOroDashboardTable(Schema $schema)
     {
@@ -80,8 +76,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Create oro_dashboard_widget table
-     *
-     * @param Schema $schema
      */
     protected function createOroDashboardWidgetTable(Schema $schema)
     {
@@ -97,8 +91,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Create oro_dashboard_widget_state table
-     *
-     * @param Schema $schema
      */
     protected function createOroDashboardWidgetStateTable(Schema $schema)
     {
@@ -114,8 +106,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Add oro_dashboard_active foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroDashboardActiveForeignKeys(Schema $schema)
     {
@@ -142,8 +132,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Add oro_dashboard foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroDashboardForeignKeys(Schema $schema)
     {
@@ -164,8 +152,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Add oro_dashboard_widget foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroDashboardWidgetForeignKeys(Schema $schema)
     {
@@ -180,8 +166,6 @@ class OroDashboardBundleInstaller implements Installation
 
     /**
      * Add oro_dashboard_widget_state foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroDashboardWidgetStateForeignKeys(Schema $schema)
     {

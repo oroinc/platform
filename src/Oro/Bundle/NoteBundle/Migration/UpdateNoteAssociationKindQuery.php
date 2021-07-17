@@ -44,12 +44,6 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
      */
     protected $oldClassNames = [];
 
-    /**
-     * @param Schema                          $schema
-     * @param ActivityExtension               $activityExtension
-     * @param ExtendExtension                 $extendExtension
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(
         Schema $schema,
         ActivityExtension $activityExtension,

@@ -18,17 +18,12 @@ class TestSessionListener implements EventSubscriberInterface
 
     /**
      * Indicates whether the session was started in the current request.
-     *
-     * @return bool
      */
     public function isSessionStarted(): bool
     {
         return $this->isSessionStarted;
     }
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {
@@ -49,9 +44,6 @@ class TestSessionListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ResponseEvent $event
-     */
     public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {

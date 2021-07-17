@@ -181,21 +181,11 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
         return null;
     }
 
-    /**
-     * @param AdvancedApiUserInterface $user
-     *
-     * @return Collection|null
-     */
     private function getSecret(AdvancedApiUserInterface $user): ?Collection
     {
         return $user->getApiKeys();
     }
 
-    /**
-     * @param string $created
-     *
-     * @return bool
-     */
     private function isTokenExpired(string $created): bool
     {
         return ($this->lifetime === -1)
@@ -238,19 +228,11 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
         return hash_equals($expected, $digest);
     }
 
-    /**
-     * @return string
-     */
     private function getCurrentTime(): string
     {
         return gmdate(DATE_ATOM);
     }
 
-    /**
-     * @param string $created
-     *
-     * @return bool
-     */
     private function isTokenFromFuture(string $created): bool
     {
         return strtotime($created) > strtotime($this->getCurrentTime());
@@ -266,10 +248,6 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
         return (bool)preg_match($this->dateFormat, $created);
     }
 
-    /**
-     * @param string $nonce
-     * @return string
-     */
     private function getNonceCacheKey(string $nonce): string
     {
         $key = preg_replace('/[^a-zA-Z0-9_.]/', '_', $nonce);

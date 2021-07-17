@@ -14,10 +14,6 @@ class AttributeRenderRegistry
     /** @var array */
     private $renderedAttributesByFamily = [];
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param AttributeGroup  $attributeGroup
-     */
     public function setGroupRendered(AttributeFamily $attributeFamily, AttributeGroup $attributeGroup)
     {
         $this->renderedGroupsByFamily[$attributeFamily->getCode()][$attributeGroup->getCode()] = true;

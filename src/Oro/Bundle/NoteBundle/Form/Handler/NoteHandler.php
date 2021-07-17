@@ -37,12 +37,6 @@ class NoteHandler
      */
     protected $activityManager;
 
-    /**
-     * @param FormInterface   $form
-     * @param RequestStack    $requestStack
-     * @param ManagerRegistry $managerRegistry
-     * @param ActivityManager $activityManager
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -80,9 +74,6 @@ class NoteHandler
         return false;
     }
 
-    /**
-     * @param Note $entity
-     */
     protected function onSuccess(Note $entity)
     {
         $em = $this->getEntityManager();

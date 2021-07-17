@@ -68,11 +68,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildFormDataProvider
-     *
-     * @param array $options
-     * @param string $expectedTooltip
-     * @param string $expectedLabel
-     * @param array $expectedConstraints
      */
     public function testBuildForm(
         array $options,
@@ -121,9 +116,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         $this->formType->buildForm($builder, $options);
     }
 
-    /**
-     * @return array
-     */
     public function buildFormDataProvider(): array
     {
         return [
@@ -163,10 +155,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param DigitalAsset $defaultData
-     * @param array $submittedData
-     * @param DigitalAsset $expectedData
      */
     public function testSubmit(DigitalAsset $defaultData, array $submittedData, DigitalAsset $expectedData): void
     {
@@ -185,9 +173,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         $this->assertInstanceOf(\DateTime::class, $form->getData()->getSourceFile()->getUpdatedAt());
     }
 
-    /**
-     * @return array
-     */
     public function submitDataProvider(): array
     {
         $sourceFile = new File();
@@ -294,9 +279,6 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     protected function getValidators(): array
     {
         $fileConstraintFromSystemConfigValidator = $this->createMock(FileConstraintFromSystemConfigValidator::class);

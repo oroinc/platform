@@ -14,9 +14,6 @@ class OrmDataCollector extends DataCollector
     /** @var OrmLogger */
     protected $logger;
 
-    /**
-     * @param OrmLogger $logger
-     */
     public function __construct(OrmLogger $logger)
     {
         $this->logger = $logger;

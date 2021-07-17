@@ -290,9 +290,6 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAllowedTreeDataProvider
-     * @param array $menuOptions
-     * @param bool $displayChildren
-     * @param bool $expected
      */
     public function testBuildExtraIsAllowed(array $menuOptions, bool $displayChildren, bool $expected)
     {
@@ -330,9 +327,6 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $menu->getExtra('isAllowed'));
     }
 
-    /**
-     * @return array
-     */
     public function isAllowedTreeDataProvider(): array
     {
         return [

@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UniqueEntityExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /** @var ValidatorInterface */
     protected $validator;
 
@@ -27,12 +27,6 @@ class UniqueEntityExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param ValidatorInterface  $validator
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider      $entityConfigProvider
-     * @param DoctrineHelper      $doctrineHelper
-     */
     public function __construct(
         ValidatorInterface $validator,
         TranslatorInterface $translator,

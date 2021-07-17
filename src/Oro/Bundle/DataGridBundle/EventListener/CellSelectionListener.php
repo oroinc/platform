@@ -53,9 +53,6 @@ class CellSelectionListener
         'selector'
     ];
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();

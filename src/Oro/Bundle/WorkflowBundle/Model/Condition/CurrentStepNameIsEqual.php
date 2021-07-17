@@ -37,9 +37,6 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
      */
     private $workflowManager;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     */
     public function __construct(WorkflowManager $workflowManager)
     {
         $this->workflowManager = $workflowManager;
@@ -96,7 +93,6 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
 
         return false;
     }
-
 
     /**
      * {@inheritdoc}

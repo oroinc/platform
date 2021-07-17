@@ -188,9 +188,6 @@ class EntityToEntityChangeArrayConverter
         }
     }
 
-    /**
-     * @param AuditFieldTypeProvider $auditFieldTypeProvider
-     */
     public function setAuditFieldTypeProvider(AuditFieldTypeProvider $auditFieldTypeProvider)
     {
         $this->auditFieldTypeProvider = $auditFieldTypeProvider;

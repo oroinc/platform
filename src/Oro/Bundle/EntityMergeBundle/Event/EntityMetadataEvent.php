@@ -12,9 +12,6 @@ class EntityMetadataEvent extends Event
      */
     protected $entityMetadata;
 
-    /**
-     * @param EntityMetadata $entityMetadata
-     */
     public function __construct(EntityMetadata $entityMetadata)
     {
         $this->entityMetadata = $entityMetadata;

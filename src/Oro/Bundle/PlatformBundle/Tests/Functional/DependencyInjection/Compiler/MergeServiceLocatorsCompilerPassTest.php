@@ -12,10 +12,6 @@ class MergeServiceLocatorsCompilerPassTest extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @param TestServiceLocatorInjectionInterface $service
-     * @param string                               $id
-     */
     private function validateInjectedServiceLocator(TestServiceLocatorInjectionInterface $service, string $id): void
     {
         try {
@@ -25,12 +21,6 @@ class MergeServiceLocatorsCompilerPassTest extends WebTestCase
         }
     }
 
-    /**
-     * @param string $id
-     * @param string $serviceLocatorId
-     *
-     * @return \LogicException
-     */
     private function getServiceLocatorEqualsException(string $id, string $serviceLocatorId): \LogicException
     {
         return new \LogicException(sprintf(
@@ -40,12 +30,6 @@ class MergeServiceLocatorsCompilerPassTest extends WebTestCase
         ));
     }
 
-    /**
-     * @param string $id
-     * @param string $serviceLocatorId
-     *
-     * @return \LogicException
-     */
     private function getServiceLocatorNotEqualsException(string $id, string $serviceLocatorId): \LogicException
     {
         throw new \LogicException(sprintf(

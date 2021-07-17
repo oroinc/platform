@@ -23,8 +23,6 @@ class BasenameTwigExtension extends AbstractExtension
 
     /**
      * @var string $value
-     *
-     * @return string
      */
     public function basenameFilter(string $value): string
     {

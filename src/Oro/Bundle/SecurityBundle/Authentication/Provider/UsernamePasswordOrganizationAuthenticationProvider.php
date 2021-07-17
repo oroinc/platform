@@ -23,17 +23,11 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
     /** @var OrganizationGuesserInterface */
     private $organizationGuesser;
 
-    /**
-     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     */
     public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
     }
 
-    /**
-     * @param OrganizationGuesserInterface $organizationGuesser
-     */
     public function setOrganizationGuesser(OrganizationGuesserInterface $organizationGuesser)
     {
         $this->organizationGuesser = $organizationGuesser;
@@ -71,12 +65,6 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
         );
     }
 
-    /**
-     * @param AbstractUser   $user
-     * @param TokenInterface $token
-     *
-     * @return Organization
-     */
     private function guessOrganization(AbstractUser $user, TokenInterface $token): Organization
     {
         $organization = $this->organizationGuesser->guess($user, $token);

@@ -31,9 +31,6 @@ class PartialIndexListener
         $this->indexName = $indexName;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
         $platform = $event->getEntityManager()->getConnection()->getDatabasePlatform();

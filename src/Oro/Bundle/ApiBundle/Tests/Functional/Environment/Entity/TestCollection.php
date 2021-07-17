@@ -303,9 +303,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->withOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->withOrphanRemovalItems->contains($item)) {
@@ -314,9 +311,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->withOrphanRemovalItems->contains($item)) {
@@ -344,9 +338,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->withoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->withoutOrphanRemovalItems->contains($item)) {
@@ -355,9 +346,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->withoutOrphanRemovalItems->contains($item)) {
@@ -385,9 +373,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->lazyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->lazyWithOrphanRemovalItems->contains($item)) {
@@ -396,9 +381,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->lazyWithOrphanRemovalItems->contains($item)) {
@@ -426,9 +408,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->lazyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->lazyWithoutOrphanRemovalItems->contains($item)) {
@@ -437,9 +416,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->lazyWithoutOrphanRemovalItems->contains($item)) {
@@ -467,9 +443,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->extraLazyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addExtraLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->extraLazyWithOrphanRemovalItems->contains($item)) {
@@ -478,9 +451,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeExtraLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->extraLazyWithOrphanRemovalItems->contains($item)) {
@@ -508,9 +478,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->extraLazyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addExtraLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->extraLazyWithoutOrphanRemovalItems->contains($item)) {
@@ -519,9 +486,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeExtraLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->extraLazyWithoutOrphanRemovalItems->contains($item)) {
@@ -546,9 +510,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->manyToManyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addManyToManyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getManyToManyWithOrphanRemovalItems()->contains($item)) {
@@ -557,9 +518,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeManyToManyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getManyToManyWithOrphanRemovalItems()->contains($item)) {
@@ -584,9 +542,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->manyToManyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addManyToManyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getManyToManyWithoutOrphanRemovalItems()->contains($item)) {
@@ -595,9 +550,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeManyToManyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getManyToManyWithoutOrphanRemovalItems()->contains($item)) {
@@ -622,9 +574,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->manyToManyLazyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addManyToManyLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getManyToManyLazyWithOrphanRemovalItems()->contains($item)) {
@@ -633,9 +582,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeManyToManyLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getManyToManyLazyWithOrphanRemovalItems()->contains($item)) {
@@ -660,9 +606,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->manyToManyLazyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addManyToManyLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getManyToManyLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -671,9 +614,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeManyToManyLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getManyToManyLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -698,9 +638,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->manyToManyExtraLazyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addManyToManyExtraLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getManyToManyExtraLazyWithOrphanRemovalItems()->contains($item)) {
@@ -709,9 +646,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeManyToManyExtraLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getManyToManyExtraLazyWithOrphanRemovalItems()->contains($item)) {
@@ -736,9 +670,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->manyToManyExtraLazyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addManyToManyExtraLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getManyToManyExtraLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -747,9 +678,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeManyToManyExtraLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getManyToManyExtraLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -774,9 +702,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->inverseManyToManyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addInverseManyToManyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getInverseManyToManyWithOrphanRemovalItems()->contains($item)) {
@@ -785,9 +710,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeInverseManyToManyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getInverseManyToManyWithOrphanRemovalItems()->contains($item)) {
@@ -812,9 +734,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->inverseManyToManyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addInverseManyToManyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getInverseManyToManyWithoutOrphanRemovalItems()->contains($item)) {
@@ -823,9 +742,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeInverseManyToManyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getInverseManyToManyWithoutOrphanRemovalItems()->contains($item)) {
@@ -850,9 +766,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->inverseManyToManyLazyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addInverseManyToManyLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getInverseManyToManyLazyWithOrphanRemovalItems()->contains($item)) {
@@ -861,9 +774,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeInverseManyToManyLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getInverseManyToManyLazyWithOrphanRemovalItems()->contains($item)) {
@@ -888,9 +798,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->inverseManyToManyLazyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addInverseManyToManyLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getInverseManyToManyLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -899,9 +806,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeInverseManyToManyLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getInverseManyToManyLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -926,9 +830,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->inverseManyToManyExtraLazyWithOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addInverseManyToManyExtraLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getInverseManyToManyExtraLazyWithOrphanRemovalItems()->contains($item)) {
@@ -937,9 +838,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeInverseManyToManyExtraLazyWithOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getInverseManyToManyExtraLazyWithOrphanRemovalItems()->contains($item)) {
@@ -964,9 +862,6 @@ class TestCollection implements TestFrameworkEntityInterface
         $this->inverseManyToManyExtraLazyWithoutOrphanRemovalItems = $items;
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function addInverseManyToManyExtraLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if (!$this->getInverseManyToManyExtraLazyWithoutOrphanRemovalItems()->contains($item)) {
@@ -975,9 +870,6 @@ class TestCollection implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestCollectionItem $item
-     */
     public function removeInverseManyToManyExtraLazyWithoutOrphanRemovalItem(TestCollectionItem $item)
     {
         if ($this->getInverseManyToManyExtraLazyWithoutOrphanRemovalItems()->contains($item)) {

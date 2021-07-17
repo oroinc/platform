@@ -27,12 +27,6 @@ class LoadMetadata implements ProcessorInterface
     /** @var AssociationMetadataLoader */
     protected $associationMetadataLoader;
 
-    /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ObjectMetadataLoader      $objectMetadataLoader
-     * @param EntityMetadataLoader      $entityMetadataLoader
-     * @param AssociationMetadataLoader $associationMetadataLoader
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ObjectMetadataLoader $objectMetadataLoader,

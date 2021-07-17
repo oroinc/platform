@@ -20,11 +20,6 @@ class RequestAuthorizationChecker
     /** @var ServiceLink */
     private $annotationProviderLink;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ServiceLink                   $entityClassResolverLink
-     * @param ServiceLink                   $annotationProviderLink
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ServiceLink $entityClassResolverLink,

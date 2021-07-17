@@ -16,17 +16,11 @@ class DriverLockCommandListener
      */
     protected $dispatcher;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param ConsoleTerminateEvent $event
-     */
     public function afterExecute(ConsoleTerminateEvent $event)
     {
         switch ($event->getCommand()->getName()) {

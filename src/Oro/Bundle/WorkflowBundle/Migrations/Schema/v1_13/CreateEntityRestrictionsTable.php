@@ -16,9 +16,6 @@ class CreateEntityRestrictionsTable implements Migration
         self::createOroWorkflowEntityRestrictionsTable($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function createOroWorkflowEntityRestrictionsTable(Schema $schema)
     {
         $table = $schema->createTable('oro_workflow_restriction');

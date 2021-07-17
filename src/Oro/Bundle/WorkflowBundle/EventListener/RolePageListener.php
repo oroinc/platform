@@ -20,10 +20,6 @@ class RolePageListener
     /** @var RequestStack */
     protected $requestStack;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param RequestStack $requestStack
-     */
     public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
     {
         $this->translator = $translator;
@@ -32,8 +28,6 @@ class RolePageListener
 
     /**
      * Adds rendered Workflows ACL datagrid block on edit role page.
-     *
-     * @param BeforeFormRenderEvent $event
      */
     public function onUpdatePageRender(BeforeFormRenderEvent $event)
     {
@@ -66,8 +60,6 @@ class RolePageListener
 
     /**
      * Adds rendered readonly Workflows ACL datagrid block on edit role page.
-     *
-     * @param BeforeViewRenderEvent $event
      */
     public function onViewPageRender(BeforeViewRenderEvent $event)
     {

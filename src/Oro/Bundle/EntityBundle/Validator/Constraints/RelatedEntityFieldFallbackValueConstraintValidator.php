@@ -15,9 +15,6 @@ class RelatedEntityFieldFallbackValueConstraintValidator extends ConstraintValid
     /** @var EntityFallbackResolver */
     private $fallbackResolver;
 
-    /**
-     * @param EntityFallbackResolver $resolver
-     */
     public function __construct(EntityFallbackResolver $resolver)
     {
         $this->fallbackResolver = $resolver;

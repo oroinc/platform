@@ -9,14 +9,6 @@ use Oro\Component\ChainProcessor\AbstractMatcher;
  */
 class AbstractTextProcessor
 {
-    /**
-     * @param string   $text
-     * @param string   $startTag
-     * @param string   $endTag
-     * @param callable $valueMatcher
-     *
-     * @return string
-     */
     protected function processText(
         string $text,
         string $startTag,
@@ -55,12 +47,6 @@ class AbstractTextProcessor
         return $text;
     }
 
-    /**
-     * @param string   $expression
-     * @param callable $valueMatcher
-     *
-     * @return bool
-     */
     private function matchExpression(string $expression, callable $valueMatcher): bool
     {
         if (strpos($expression, AbstractMatcher::OPERATOR_AND)) {
@@ -88,12 +74,6 @@ class AbstractTextProcessor
         return $this->matchItem($expression, $valueMatcher);
     }
 
-    /**
-     * @param string   $expression
-     * @param callable $valueMatcher
-     *
-     * @return bool
-     */
     private function matchItem(string $expression, callable $valueMatcher): bool
     {
         if (0 === strpos($expression, AbstractMatcher::OPERATOR_NOT)) {

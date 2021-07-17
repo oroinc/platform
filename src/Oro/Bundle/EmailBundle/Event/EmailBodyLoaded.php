@@ -12,9 +12,6 @@ class EmailBodyLoaded extends Event
     /** @var Email */
     protected $email;
 
-    /**
-     * @param Email $email
-     */
     public function __construct(Email $email)
     {
         $this->email = $email;

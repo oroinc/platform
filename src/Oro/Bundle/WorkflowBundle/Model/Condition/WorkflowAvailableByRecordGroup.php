@@ -16,9 +16,6 @@ class WorkflowAvailableByRecordGroup extends AbstractCondition
     /** @var array */
     protected $options;
 
-    /**
-     * @param WorkflowManager $manager
-     */
     public function __construct(WorkflowManager $manager)
     {
         $this->manager = $manager;

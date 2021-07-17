@@ -37,9 +37,6 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $actual
-     * @param $expected
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      *
@@ -80,9 +77,6 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $importExportResult);
     }
 
-    /**
-     * @return array
-     */
     public function saveResultProvider(): array
     {
         $user = new User();

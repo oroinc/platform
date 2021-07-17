@@ -34,10 +34,6 @@ class DataEncoderRegistry
 
     /**
      * Returns the data encoder for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return DataEncoderInterface|null
      */
     public function getEncoder(RequestType $requestType): ?DataEncoderInterface
     {

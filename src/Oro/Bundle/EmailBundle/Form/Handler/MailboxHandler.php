@@ -36,13 +36,6 @@ class MailboxHandler implements FormAwareInterface
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @param FormFactoryInterface     $formFactory
-     * @param RequestStack             $requestStack
-     * @param Registry                 $doctrine
-     * @param MailboxProcessStorage    $mailboxProcessStorage
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
         RequestStack $requestStack,

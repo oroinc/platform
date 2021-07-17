@@ -117,17 +117,11 @@ class Theme
         $this->screenshot = $screenshot;
     }
 
-    /**
-     * @return bool
-     */
     public function isRtlSupport(): bool
     {
         return $this->rtlSupport;
     }
 
-    /**
-     * @param bool $rtlSupport
-     */
     public function setRtlSupport(bool $rtlSupport): void
     {
         $this->rtlSupport = $rtlSupport;

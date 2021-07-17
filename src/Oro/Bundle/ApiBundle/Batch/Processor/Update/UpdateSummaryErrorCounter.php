@@ -14,9 +14,6 @@ class UpdateSummaryErrorCounter implements ProcessorInterface
     /** @var RetryHelper */
     private $retryHelper;
 
-    /**
-     * @param RetryHelper $retryHelper
-     */
     public function __construct(RetryHelper $retryHelper)
     {
         $this->retryHelper = $retryHelper;

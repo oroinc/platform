@@ -27,9 +27,6 @@ class SuiteAwareSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param BeforeSuiteTested $event
-     */
     public function injectSuite(BeforeSuiteTested $event)
     {
         foreach ($this->services as $service) {

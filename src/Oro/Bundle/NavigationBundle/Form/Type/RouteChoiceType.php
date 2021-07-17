@@ -51,13 +51,6 @@ class RouteChoiceType extends AbstractType
      */
     private $cache;
 
-    /**
-     * @param RouterInterface $router
-     * @param TitleReaderRegistry $readerRegistry
-     * @param TitleTranslator $titleTranslator
-     * @param TitleServiceInterface $titleService
-     * @param Cache $cache
-     */
     public function __construct(
         RouterInterface $router,
         TitleReaderRegistry $readerRegistry,

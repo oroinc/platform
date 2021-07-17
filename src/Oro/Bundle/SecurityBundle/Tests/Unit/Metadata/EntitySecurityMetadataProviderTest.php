@@ -257,9 +257,6 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->provider->isProtectedEntity($entityClass));
     }
 
-    /**
-     * @return array
-     */
     public function isProtectedEntityDataProvider(): array
     {
         return [
@@ -331,9 +328,6 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getProtectedFieldName($entityClass, $fieldName));
     }
 
-    /**
-     * @return array
-     */
     public function getProtectedFieldNameDataProvider(): array
     {
         return [

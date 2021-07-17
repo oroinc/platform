@@ -12,9 +12,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class MaintenancePropagationListener
 {
-    /**
-     * @param RequestEvent $event
-     */
     public function onKernelRequest(RequestEvent $event): void
     {
         if ($this->isMaintenanceMode($event->getRequest())) {
@@ -22,11 +19,6 @@ class MaintenancePropagationListener
         }
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     private function isMaintenanceMode(Request $request): bool
     {
         $exception = $request->attributes->get('exception');

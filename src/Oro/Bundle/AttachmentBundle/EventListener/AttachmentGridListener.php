@@ -26,9 +26,6 @@ class AttachmentGridListener
         $this->paramsToBind = $paramsToBind;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $parameters = $event->getDatagrid()->getParameters();
@@ -46,9 +43,6 @@ class AttachmentGridListener
         );
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid   = $event->getDatagrid();

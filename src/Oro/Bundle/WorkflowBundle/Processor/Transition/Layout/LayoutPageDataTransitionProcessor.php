@@ -13,9 +13,6 @@ class LayoutPageDataTransitionProcessor implements ProcessorInterface
     /** @var TransitionTranslationHelper */
     protected $helper;
 
-    /**
-     * @param TransitionTranslationHelper $helper
-     */
     public function __construct(TransitionTranslationHelper $helper)
     {
         $this->helper = $helper;

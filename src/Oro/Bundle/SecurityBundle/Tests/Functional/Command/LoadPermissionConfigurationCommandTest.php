@@ -51,9 +51,6 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
     /**
      * @dataProvider executeDataProvider
-     *
-     * @param array $expectedMessages
-     * @param array $expectedPermissions
      */
     public function testExecute(array $expectedMessages, array $expectedPermissions)
     {
@@ -139,10 +136,6 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         return $processor->processConfiguration(new PermissionConfiguration(), [$config]);
     }
 
-    /**
-     * @param PermissionConfigurationProvider $provider
-     * @param array $newPermissions
-     */
     private function appendPermissionConfig(PermissionConfigurationProvider $provider, array $newPermissions)
     {
         $provider->ensureCacheWarmedUp();

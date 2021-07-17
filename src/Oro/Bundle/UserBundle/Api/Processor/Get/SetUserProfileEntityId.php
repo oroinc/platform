@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\UserBundle\Api\Processor\Get;
 
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
@@ -17,9 +16,6 @@ class SetUserProfileEntityId implements ProcessorInterface
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;

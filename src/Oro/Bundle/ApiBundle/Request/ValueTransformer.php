@@ -18,10 +18,6 @@ class ValueTransformer
     /** @var DataTransformerInterface */
     private $dataTransformer;
 
-    /**
-     * @param DataTransformerRegistry  $dataTransformerRegistry
-     * @param DataTransformerInterface $dataTransformer
-     */
     public function __construct(
         DataTransformerRegistry $dataTransformerRegistry,
         DataTransformerInterface $dataTransformer

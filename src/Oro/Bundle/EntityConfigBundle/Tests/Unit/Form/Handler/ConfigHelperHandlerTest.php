@@ -131,7 +131,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
-
         $this->formFactory
             ->expects($this->once())
             ->method('create')

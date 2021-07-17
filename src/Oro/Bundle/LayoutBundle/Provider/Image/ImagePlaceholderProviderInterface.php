@@ -7,9 +7,5 @@ namespace Oro\Bundle\LayoutBundle\Provider\Image;
  */
 interface ImagePlaceholderProviderInterface
 {
-    /**
-     * @param string $filter
-     * @return string|null
-     */
     public function getPath(string $filter): ?string;
 }

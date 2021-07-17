@@ -30,12 +30,6 @@ class LoadFromConfigBag extends LoadSubresources
     /** @var ConfigBagRegistry */
     private $configBagRegistry;
 
-    /**
-     * @param ConfigLoaderFactory $configLoaderFactory
-     * @param ConfigBagRegistry   $configBagRegistry
-     * @param ConfigProvider      $configProvider
-     * @param MetadataProvider    $metadataProvider
-     */
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
         ConfigBagRegistry $configBagRegistry,
@@ -167,12 +161,6 @@ class LoadFromConfigBag extends LoadSubresources
         return $subresourcesConfig->getSubresources();
     }
 
-    /**
-     * @param SubresourceConfig $subresourceConfig
-     * @param array             $accessibleResources
-     *
-     * @return ApiSubresource
-     */
     private function createSubresourceFromConfig(
         SubresourceConfig $subresourceConfig,
         array $accessibleResources
@@ -202,10 +190,6 @@ class LoadFromConfigBag extends LoadSubresources
         return $subresource;
     }
 
-    /**
-     * @param ApiSubresource    $subresource
-     * @param SubresourceConfig $subresourceConfig
-     */
     private function updateSubresourceTargetFromConfig(
         ApiSubresource $subresource,
         SubresourceConfig $subresourceConfig
@@ -219,14 +203,6 @@ class LoadFromConfigBag extends LoadSubresources
         }
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $associationName
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return AssociationMetadata|null
-     */
     private function getAssociationMetadata(
         string $entityClass,
         string $associationName,
@@ -251,12 +227,6 @@ class LoadFromConfigBag extends LoadSubresources
         return $metadata->getAssociation($resolvedAssociationName);
     }
 
-    /**
-     * @param string            $entityClass
-     * @param string            $associationName
-     * @param ApiSubresource    $subresource
-     * @param SubresourceConfig $subresourceConfig
-     */
     private function validateExistingSubresource(
         string $entityClass,
         string $associationName,
@@ -290,10 +260,6 @@ class LoadFromConfigBag extends LoadSubresources
         }
     }
 
-    /**
-     * @param ApiSubresource    $subresource
-     * @param SubresourceConfig $subresourceConfig
-     */
     private function updateSubresourceActions(ApiSubresource $subresource, SubresourceConfig $subresourceConfig): void
     {
         $actions = $subresourceConfig->getActions();
@@ -310,12 +276,6 @@ class LoadFromConfigBag extends LoadSubresources
 
     /**
      * Loads configuration from the "subresources" section from "Resources/config/oro/api.yml"
-     *
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return SubresourcesConfig|null
      */
     private function getSubresourcesConfig(
         string $entityClass,
@@ -340,11 +300,6 @@ class LoadFromConfigBag extends LoadSubresources
         return $subresources;
     }
 
-    /**
-     * @param SubresourceConfig  $subresource
-     * @param string             $actionName
-     * @param ActionsConfig|null $actions
-     */
     private function updateSubresourceActionExclusion(
         SubresourceConfig $subresource,
         string $actionName,
@@ -366,11 +321,6 @@ class LoadFromConfigBag extends LoadSubresources
         }
     }
 
-    /**
-     * @param array $subresourcesConfig
-     *
-     * @return SubresourcesConfig
-     */
     private function loadSubresourcesConfig(array $subresourcesConfig): SubresourcesConfig
     {
         $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES);
@@ -378,11 +328,6 @@ class LoadFromConfigBag extends LoadSubresources
         return $actionsLoader->load($subresourcesConfig);
     }
 
-    /**
-     * @param array $actionsConfig
-     *
-     * @return ActionsConfig
-     */
     private function loadActionsConfig(array $actionsConfig): ActionsConfig
     {
         $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);

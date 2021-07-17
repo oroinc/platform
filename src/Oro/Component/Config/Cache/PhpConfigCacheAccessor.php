@@ -12,9 +12,6 @@ class PhpConfigCacheAccessor
     /** @var callable|null */
     private $configValidator;
 
-    /**
-     * @param callable|null $configValidator
-     */
     public function __construct(callable $configValidator = null)
     {
         $this->configValidator = $configValidator;

@@ -29,10 +29,6 @@ class FlushData implements ProcessorInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param BatchFlushDataHandlerFactoryRegistry $flushDataHandlerFactoryRegistry
-     * @param LoggerInterface                      $logger
-     */
     public function __construct(
         BatchFlushDataHandlerFactoryRegistry $flushDataHandlerFactoryRegistry,
         LoggerInterface $logger
@@ -179,11 +175,6 @@ class FlushData implements ProcessorInterface
         return false;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return BatchFlushDataHandlerInterface
-     */
     private function getFlushDataHandler(string $entityClass): BatchFlushDataHandlerInterface
     {
         $flushHandler = $this->flushDataHandlerFactoryRegistry->getFactory($entityClass)->createHandler($entityClass);

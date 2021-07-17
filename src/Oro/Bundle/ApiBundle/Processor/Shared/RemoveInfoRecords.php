@@ -193,12 +193,6 @@ abstract class RemoveInfoRecords implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param AssociationMetadata $association
-     * @param array               $data
-     *
-     * @return EntityMetadata
-     */
     private function getAssociationTargetMetadata(AssociationMetadata $association, array $data): EntityMetadata
     {
         if (is_a($association->getTargetClassName(), EntityIdentifier::class, true)
@@ -210,12 +204,6 @@ abstract class RemoveInfoRecords implements ProcessorInterface
         return $association->getTargetMetadata();
     }
 
-    /**
-     * @param string $propertyPath
-     * @param string $nextKey
-     *
-     * @return string
-     */
     private function buildPath(string $propertyPath, string $nextKey): string
     {
         return '' !== $propertyPath

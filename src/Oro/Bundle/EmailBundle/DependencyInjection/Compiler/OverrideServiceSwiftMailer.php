@@ -11,9 +11,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class OverrideServiceSwiftMailer implements CompilerPassInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         /* @var $definition \Symfony\Component\DependencyInjection\ChildDefinition */

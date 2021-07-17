@@ -53,9 +53,6 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
         ];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $configManager = $this->container->get('oro_entity_config.config_manager');

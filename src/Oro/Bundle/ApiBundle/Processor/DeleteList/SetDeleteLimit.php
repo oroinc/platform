@@ -14,9 +14,6 @@ class SetDeleteLimit implements ProcessorInterface
     /** @var int */
     private $maxDeleteEntitiesLimit;
 
-    /**
-     * @param int $maxDeleteEntitiesLimit
-     */
     public function __construct(int $maxDeleteEntitiesLimit)
     {
         $this->maxDeleteEntitiesLimit = $maxDeleteEntitiesLimit;
@@ -51,11 +48,6 @@ class SetDeleteLimit implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return int
-     */
     private function getMaxDeleteEntitiesLimit(?EntityDefinitionConfig $config): int
     {
         if (null === $config) {

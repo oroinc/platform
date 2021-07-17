@@ -21,9 +21,6 @@ class BuildFormBuilder implements ProcessorInterface
     /** @var FormHelper */
     protected $formHelper;
 
-    /**
-     * @param FormHelper $formHelper
-     */
     public function __construct(FormHelper $formHelper)
     {
         $this->formHelper = $formHelper;

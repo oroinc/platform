@@ -26,9 +26,6 @@ class IterableResultFactory implements IterableResultFactoryInterface
      */
     private $aclHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
@@ -93,11 +90,6 @@ class IterableResultFactory implements IterableResultFactoryInterface
         return $this->getIterableResult($qb);
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string $identifierField
-     * @return bool
-     */
     private function isIdentifierFieldPresent(QueryBuilder $queryBuilder, string $identifierField): bool
     {
         $identifierFieldFound = false;

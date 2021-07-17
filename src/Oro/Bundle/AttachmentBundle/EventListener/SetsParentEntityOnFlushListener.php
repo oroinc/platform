@@ -32,10 +32,6 @@ class SetsParentEntityOnFlushListener
     /** @var \SplObjectStorage */
     private $scheduledForUpdate;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param ConfigManager $configManager
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor, ConfigManager $configManager)
     {
         $this->propertyAccessor = $propertyAccessor;
@@ -45,8 +41,6 @@ class SetsParentEntityOnFlushListener
 
     /**
      * Sets parent class name, id and field name for File entities.
-     *
-     * @param OnFlushEventArgs $event
      */
     public function onFlush(OnFlushEventArgs $event): void
     {
@@ -95,9 +89,6 @@ class SetsParentEntityOnFlushListener
         $this->onFlushCollections($event);
     }
 
-    /**
-     * @param OnFlushEventArgs $event
-     */
     private function onFlushCollections(OnFlushEventArgs $event)
     {
         $entityManager = $event->getEntityManager();
@@ -182,10 +173,6 @@ class SetsParentEntityOnFlushListener
         }
     }
 
-    /**
-     * @param array $mapping
-     * @return bool
-     */
     private function isMetadataAcceptable(array $mapping): bool
     {
         return ($mapping['isOwningSide'] && $mapping['targetEntity'] === File::class) ||
@@ -194,8 +181,6 @@ class SetsParentEntityOnFlushListener
 
     /**
      * Schedules for update the File entities which should be updated with parent class name, id and field name.
-     *
-     * @param LifecycleEventArgs $event
      */
     public function prePersist(LifecycleEventArgs $event): void
     {
@@ -216,8 +201,6 @@ class SetsParentEntityOnFlushListener
 
     /**
      * Applies the scheduled updates of the File entities.
-     *
-     * @param LifecycleEventArgs $event
      */
     public function postPersist(LifecycleEventArgs $event): void
     {
@@ -301,11 +284,6 @@ class SetsParentEntityOnFlushListener
         }
     }
 
-    /**
-     * @param EntityManager $entityManager
-     * @param File $file
-     * @param array $extraUpdateChangeSet
-     */
     private function applyExtraUpdates(EntityManager $entityManager, File $file, array $extraUpdateChangeSet): void
     {
         $unitOfWork = $entityManager->getUnitOfWork();

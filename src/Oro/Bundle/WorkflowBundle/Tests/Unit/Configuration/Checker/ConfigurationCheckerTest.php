@@ -18,9 +18,6 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isCleanDataProvider
-     *
-     * @param array $config
-     * @param $expected
      */
     public function testIsClean(array $config, $expected)
     {

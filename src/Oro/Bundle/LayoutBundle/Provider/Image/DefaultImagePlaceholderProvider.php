@@ -16,10 +16,6 @@ class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterfa
     /** @var string */
     private $defaultPath;
 
-    /**
-     * @param CacheManager $imagineCacheManager
-     * @param string $defaultPath
-     */
     public function __construct(CacheManager $imagineCacheManager, string $defaultPath)
     {
         $this->imagineCacheManager = $imagineCacheManager;

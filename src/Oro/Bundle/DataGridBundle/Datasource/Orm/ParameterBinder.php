@@ -181,9 +181,6 @@ class ParameterBinder implements ParameterBinderInterface
 
     /**
      * Adds parameter to collection and removes all other parameters with same name.
-     *
-     * @param ArrayCollection $parameters
-     * @param Parameter $newParameter
      */
     protected function addOrReplaceParameter(ArrayCollection $parameters, Parameter $newParameter)
     {

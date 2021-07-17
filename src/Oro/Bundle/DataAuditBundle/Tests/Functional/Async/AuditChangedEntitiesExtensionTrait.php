@@ -38,7 +38,7 @@ trait AuditChangedEntitiesExtensionTrait
 
         return $child;
     }
-    
+
     private function assertStoredAuditCount($expected)
     {
         $this->assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());
@@ -87,7 +87,6 @@ trait AuditChangedEntitiesExtensionTrait
             'entities_deleted' => [],
             'collections_updated' => [],
         ], $body);
-
 
         $message = new Message();
         $message->setBody(json_encode($body));

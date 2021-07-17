@@ -38,12 +38,6 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
      */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         JobRunner $jobRunner,

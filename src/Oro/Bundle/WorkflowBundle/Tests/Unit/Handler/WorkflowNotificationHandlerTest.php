@@ -73,9 +73,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider handleDataProvider
-     *
-     * @param array $notifications
-     * @param array $expected
      */
     public function testHandle(array $notifications, array $expected)
     {

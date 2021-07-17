@@ -21,10 +21,6 @@ class InitializeCriteria implements ProcessorInterface
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityClassResolver $entityClassResolver)
     {
         $this->doctrineHelper = $doctrineHelper;

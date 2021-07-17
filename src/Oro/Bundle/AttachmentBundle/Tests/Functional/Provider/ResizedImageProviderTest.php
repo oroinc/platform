@@ -23,27 +23,16 @@ class ResizedImageProviderTest extends WebTestCase
         $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    /**
-     * @return FileManager
-     */
     private function getFileManager(): FileManager
     {
         return self::getContainer()->get('oro_attachment.file_manager');
     }
 
-    /**
-     * @return ResizedImageProviderInterface
-     */
     private function getResizedImageProvider(): ResizedImageProviderInterface
     {
         return self::getContainer()->get('oro_attachment.provider.resized_image');
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return array
-     */
     private function loadImage(string $fileName): array
     {
         $data = file_get_contents(__DIR__ . '/files/' . $fileName);
@@ -52,9 +41,6 @@ class ResizedImageProviderTest extends WebTestCase
         return [$data, $width, $height];
     }
 
-    /**
-     * @param string $fileName
-     */
     private function assertImageSizeShrink(string $fileName): void
     {
         [$data, $width, $height] = $this->loadImage($fileName);
@@ -72,9 +58,6 @@ class ResizedImageProviderTest extends WebTestCase
     }
 
     /**
-     * @param string $fileName
-     * @param int    $quality
-     *
      * @dataProvider pngDataProvider
      */
     public function testGetPNG(string $fileName, int $quality): void

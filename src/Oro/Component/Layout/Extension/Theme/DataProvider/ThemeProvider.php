@@ -20,17 +20,11 @@ class ThemeProvider
     /** @var Theme[] */
     protected $themes = [];
 
-    /**
-     * @param ThemeManager $themeManager
-     */
     public function __construct(ThemeManager $themeManager)
     {
         $this->themeManager = $themeManager;
     }
 
-    /**
-     * @param LocalizationProviderInterface $localizationProvider
-     */
     public function setLocalizationProvider(LocalizationProviderInterface $localizationProvider): void
     {
         $this->localizationProvider = $localizationProvider;
@@ -101,12 +95,6 @@ class ThemeProvider
         return $this->themes[$themeName];
     }
 
-    /**
-     * @param string $themeName
-     * @param string $sectionName
-     *
-     * @return string|null
-     */
     private function getOutputPath(string $themeName, string $sectionName): ?string
     {
         $theme = $this->getTheme($themeName);

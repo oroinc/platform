@@ -16,9 +16,6 @@ class HtmlTagProvider
     /** @var array */
     private $purifierConfig = [];
 
-    /**
-     * @param array $purifierConfig
-     */
     public function __construct(array $purifierConfig)
     {
         $this->purifierConfig = $purifierConfig;
@@ -26,8 +23,6 @@ class HtmlTagProvider
 
     /**
      * Returns the list of supported scopes.
-     *
-     * @return array
      */
     public function getScopes(): array
     {
@@ -36,9 +31,6 @@ class HtmlTagProvider
 
     /**
      * Returns array of allowed elements
-     *
-     * @param string $scope
-     * @return array
      */
     public function getAllowedElements(string $scope): array
     {
@@ -57,9 +49,6 @@ class HtmlTagProvider
 
     /**
      * Returns array of allowed iframe domains
-     *
-     * @param string $scope
-     * @return array
      */
     public function getAllowedIframeDomains(string $scope): array
     {
@@ -68,9 +57,6 @@ class HtmlTagProvider
 
     /**
      * Returns string consisted from allowed tags
-     *
-     * @param string $scope
-     * @return string
      */
     public function getAllowedTags(string $scope): string
     {
@@ -87,10 +73,6 @@ class HtmlTagProvider
         return $allowedTags;
     }
 
-    /**
-     * @param string $scope
-     * @return string
-     */
     public function getIframeRegexp(string $scope): string
     {
         $iframeDomains = $this->getPurifierConfigByKey($scope, self::ALLOWED_IFRAME_DOMAINS);
@@ -101,10 +83,6 @@ class HtmlTagProvider
         return sprintf('<^https?://(www.)?(%s)>', implode('|', $iframeDomains));
     }
 
-    /**
-     * @param string $scope
-     * @return array
-     */
     public function getUriSchemes(string $scope): array
     {
         $result = [];

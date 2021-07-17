@@ -22,8 +22,6 @@ class OroBatchBundle implements Migration
 
     /**
      * Create akeneo_batch_warning table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchWarningTable(Schema $schema)
     {
@@ -40,8 +38,6 @@ class OroBatchBundle implements Migration
 
     /**
      * Update akeneo_batch_step_execution table
-     *
-     * @param Schema $schema
      */
     protected function updateAkeneoBatchStepExecutionTable(Schema $schema)
     {
@@ -51,8 +47,6 @@ class OroBatchBundle implements Migration
 
     /**
      * Update akeneo_batch_job_execution table
-     *
-     * @param Schema $schema
      */
     protected function updateAkeneoBatchJobExecutionTable(Schema $schema)
     {
@@ -63,8 +57,6 @@ class OroBatchBundle implements Migration
 
     /**
      * Add akeneo_batch_warning foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchWarningForeignKeys(Schema $schema)
     {

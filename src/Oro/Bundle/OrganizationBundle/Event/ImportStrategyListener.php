@@ -36,11 +36,6 @@ class ImportStrategyListener implements ImportStrategyListenerInterface
     /** @var array */
     protected $organizationFieldByEntity = [];
 
-    /**
-     * @param ManagerRegistry        $registry
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param ServiceLink            $metadataProviderLink
-     */
     public function __construct(
         ManagerRegistry $registry,
         TokenAccessorInterface $tokenAccessor,

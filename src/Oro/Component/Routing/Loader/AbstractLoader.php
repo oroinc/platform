@@ -14,9 +14,6 @@ abstract class AbstractLoader extends Loader
     /** @var RouteOptionsResolverInterface */
     protected $routeOptionsResolver;
 
-    /**
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
-     */
     public function __construct(RouteOptionsResolverInterface $routeOptionsResolver)
     {
         $this->routeOptionsResolver = $routeOptionsResolver;
@@ -44,9 +41,6 @@ abstract class AbstractLoader extends Loader
         return $routes;
     }
 
-    /**
-     * @param RouteCollection $routes
-     */
     protected function loadRoutes(RouteCollection $routes)
     {
         $resources = $this->getResources();

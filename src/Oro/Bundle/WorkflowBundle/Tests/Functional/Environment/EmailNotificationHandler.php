@@ -9,9 +9,6 @@ class EmailNotificationHandler extends BaseEmailNotificationHandler
 {
     private $handleCount = 0;
 
-    /**
-     * @return int
-     */
     public function getHandleCount(): int
     {
         return $this->handleCount;

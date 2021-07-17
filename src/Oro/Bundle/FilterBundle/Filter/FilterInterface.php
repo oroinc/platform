@@ -61,10 +61,6 @@ interface FilterInterface
      * This method is used instead of the form when the data are already valid,
      * e.g. when loading a segment or a report data.
      *
-     * @param array $data
-     *
-     * @return array
-     *
      * @throw \Throwable if a filter value normalization failed
      */
     public function prepareData(array $data): array;

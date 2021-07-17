@@ -18,11 +18,6 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     /** @var ManyRelationBuilder */
     protected $manyRelationBuilder;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManyRelationBuilder  $manyRelationBuilder
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

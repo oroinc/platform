@@ -12,9 +12,6 @@ class ConsoleCommandListener
 {
     use SchemaTrait;
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         $commandName = $event->getCommand()->getName();

@@ -111,9 +111,6 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         }
     }
 
-    /**
-     * @param int $batchSize
-     */
     private function assertMessagesCreatedAndEntityIdsIsSplitting(int $batchSize): void
     {
         foreach (self::getSentMessages() as $sentMessage) {

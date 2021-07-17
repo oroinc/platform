@@ -131,7 +131,6 @@ class LayoutContextStub implements ContextInterface
         $this->remove($name);
     }
 
-
     /**
      * {@inheritdoc}
      */

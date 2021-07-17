@@ -17,9 +17,6 @@ class CollectListManager
     /** @var ActivityListChainProvider */
     protected $chainProvider;
 
-    /**
-     * @param ActivityListChainProvider $chainProvider
-     */
     public function __construct(ActivityListChainProvider $chainProvider)
     {
         $this->chainProvider = $chainProvider;

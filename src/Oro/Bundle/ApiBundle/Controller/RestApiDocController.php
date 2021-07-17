@@ -22,11 +22,6 @@ class RestApiDocController
     /** @var SessionInterface */
     private $session;
 
-    /**
-     * @param ApiDocExtractor    $extractor
-     * @param FormatterInterface $formatter
-     * @param SessionInterface   $session
-     */
     public function __construct(ApiDocExtractor $extractor, FormatterInterface $formatter, SessionInterface $session)
     {
         $this->extractor = $extractor;
@@ -34,11 +29,6 @@ class RestApiDocController
         $this->session = $session;
     }
 
-    /**
-     * @param string $view
-     *
-     * @return Response
-     */
     public function indexAction(string $view = ApiDoc::DEFAULT_VIEW): Response
     {
         $response = $this->getHtmlResponse(
@@ -49,12 +39,6 @@ class RestApiDocController
         return $response;
     }
 
-    /**
-     * @param string $view
-     * @param string $resource
-     *
-     * @return Response
-     */
     public function resourceAction(string $view, string $resource): Response
     {
         $apiResource = $this->getApiResource($view, $resource);
@@ -70,12 +54,6 @@ class RestApiDocController
         return $response;
     }
 
-    /**
-     * @param string $view
-     * @param string $resource
-     *
-     * @return ApiDoc|null
-     */
     private function getApiResource(string $view, string $resource): ?ApiDoc
     {
         $apiResource = null;
@@ -91,11 +69,6 @@ class RestApiDocController
         return $apiResource;
     }
 
-    /**
-     * @param ApiDoc $annotation
-     *
-     * @return string
-     */
     private function getResourceId(ApiDoc $annotation): string
     {
         return
@@ -104,11 +77,6 @@ class RestApiDocController
             . str_replace('/', '-', $annotation->getRoute()->getPath());
     }
 
-    /**
-     * @param string $content
-     *
-     * @return Response
-     */
     private function getHtmlResponse(string $content): Response
     {
         return new Response(
@@ -118,9 +86,6 @@ class RestApiDocController
         );
     }
 
-    /**
-     * @return Response
-     */
     private function getResourceNotFoundResponse(): Response
     {
         return new Response('', Response::HTTP_NOT_FOUND);

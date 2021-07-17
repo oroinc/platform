@@ -20,9 +20,6 @@ class AuditMessageBodyProvider
     /** @var string */
     private $transactionId;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(
         EntityNameResolver $entityNameResolver
     ) {
@@ -80,9 +77,6 @@ class AuditMessageBodyProvider
         return $body;
     }
 
-    /**
-     * @return string
-     */
     private function getTransactionId(): string
     {
         if (!$this->transactionId) {

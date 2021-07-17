@@ -34,14 +34,6 @@ final class FilterValue
         $this->operator = $operator;
     }
 
-    /**
-     * @param string      $sourceKey
-     * @param string      $path
-     * @param string      $value
-     * @param string|null $operator
-     *
-     * @return FilterValue
-     */
     public static function createFromSource(
         string $sourceKey,
         string $path,
@@ -55,9 +47,6 @@ final class FilterValue
         return $filterValue;
     }
 
-    /**
-     * @param FilterValue $source
-     */
     public function setSource(FilterValue $source): void
     {
         $this->sourceKey = $source->sourceKey;
@@ -66,8 +55,6 @@ final class FilterValue
 
     /**
      * Gets a path the filter is applied.
-     *
-     * @return string
      */
     public function getPath(): string
     {
@@ -76,8 +63,6 @@ final class FilterValue
 
     /**
      * Sets a path the filter is applied.
-     *
-     * @param string $path
      */
     public function setPath(string $path): void
     {
@@ -106,8 +91,6 @@ final class FilterValue
 
     /**
      * Gets an operator of a filter.
-     *
-     * @return string|null
      */
     public function getOperator(): ?string
     {
@@ -116,8 +99,6 @@ final class FilterValue
 
     /**
      * Sets an operator of a filter.
-     *
-     * @param string|null $operator
      */
     public function setOperator(?string $operator): void
     {
@@ -127,8 +108,6 @@ final class FilterValue
     /**
      * Gets a key this value was come from a request.
      * E.g. it can be URI query parameter for REST API filters.
-     *
-     * @return string|null
      */
     public function getSourceKey(): ?string
     {
@@ -138,8 +117,6 @@ final class FilterValue
     /**
      * Gets a value was come from a request.
      * E.g. it can be URI query parameter value for REST API filters.
-     *
-     * @return string|null
      */
     public function getSourceValue(): ?string
     {

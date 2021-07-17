@@ -31,12 +31,6 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
      */
     private $errorHandler;
 
-    /**
-     * @param EventDispatcherInterface           $dispatcher
-     * @param ChannelActionEventFactoryInterface $eventFactory
-     * @param ChannelActionHandlerInterface      $actionHandler
-     * @param ChannelActionErrorHandlerInterface $errorHandler
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ChannelActionEventFactoryInterface $eventFactory,

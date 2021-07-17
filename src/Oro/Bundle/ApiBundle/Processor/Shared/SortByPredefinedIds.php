@@ -31,12 +31,6 @@ class SortByPredefinedIds implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $data
-     * @param array $sortedIds
-     *
-     * @return array
-     */
     private function sortData(array $data, array $sortedIds): array
     {
         $map = [];

@@ -30,11 +30,6 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $sorters
-     *
-     * @return FiltersSorterRegistry
-     */
     private function getRegistry(array $sorters): FiltersSorterRegistry
     {
         return new FiltersSorterRegistry(

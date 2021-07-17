@@ -24,9 +24,6 @@ class ChannelRepository extends EntityRepository
      */
     private $aclHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
@@ -152,9 +149,6 @@ class ChannelRepository extends EntityRepository
 
     /**
      * Adds status to integration, manual persist of newly created statuses and do flush.
-     *
-     * @param Integration $integration
-     * @param Status      $status
      */
     public function addStatusAndFlush(Integration $integration, Status $status)
     {

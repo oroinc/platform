@@ -27,12 +27,6 @@ class PriorityNamedTaggedServiceCompilerPass implements CompilerPassInterface
     /** @var bool */
     private $isServiceOptional;
 
-    /**
-     * @param string $serviceId
-     * @param string $tagName
-     * @param string $nameAttribute
-     * @param bool   $isServiceOptional
-     */
     public function __construct(
         string $serviceId,
         string $tagName,

@@ -56,10 +56,6 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider runCommandProvider
-     *
-     * @param array $runCommand
-     * @param array $cacheManager
-     * @param int $expected
      */
     public function testRunCommand(array $runCommand, array $cacheManager, int $expected): void
     {
@@ -79,9 +75,6 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $exitCode);
     }
 
-    /**
-     * @return array
-     */
     public function runCommandProvider(): array
     {
         return [

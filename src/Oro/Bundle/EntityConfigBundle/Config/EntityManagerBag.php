@@ -16,9 +16,6 @@ class EntityManagerBag
     /** @var string[] */
     protected $managerNames;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

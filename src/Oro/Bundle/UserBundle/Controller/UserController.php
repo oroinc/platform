@@ -254,11 +254,6 @@ class UserController extends AbstractController
         return $token->getOrganization();
     }
 
-    /**
-     * @param User $entity
-     *
-     * @return bool
-     */
     private function isDeleteGranted(User $entity): bool
     {
         return $this->get('oro_entity.delete_handler_registry')
@@ -277,10 +272,6 @@ class UserController extends AbstractController
                || $this->isGranted('MANAGE_API_KEY', $entity);
     }
 
-    /**
-     * @param User    $user
-     * @param UserApi $userApi
-     */
     private function saveUserApi(User $user, UserApi $userApi)
     {
         $em = $this->getDoctrine()->getManagerForClass(User::class);

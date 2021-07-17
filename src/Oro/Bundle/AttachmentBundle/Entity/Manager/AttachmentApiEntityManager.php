@@ -88,11 +88,6 @@ class AttachmentApiEntityManager extends ApiEntityManager
         return $config;
     }
 
-    /**
-     * @param array $result
-     *
-     * @return array
-     */
     protected function postSerializeAttachment(array $result): array
     {
         if (!empty($result['file'])) {

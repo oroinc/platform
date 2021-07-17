@@ -22,9 +22,6 @@ class MultiInsertQueryExecutor extends AbstractInsertQueryExecutor
      */
     private $batchSize = 5000;
 
-    /**
-     * @param int $batchSize
-     */
     public function setBatchSize(int $batchSize)
     {
         $this->batchSize = $batchSize;
@@ -100,9 +97,6 @@ class MultiInsertQueryExecutor extends AbstractInsertQueryExecutor
 
     /**
      * Scalar mapping should always contain unique numbers to support broken queries with duplicated column names.
-     *
-     * @param QueryBuilder $selectQueryBuilder
-     * @return Query
      */
     protected function getQuery(QueryBuilder $selectQueryBuilder): Query
     {

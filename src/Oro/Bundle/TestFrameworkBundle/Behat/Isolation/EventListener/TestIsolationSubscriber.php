@@ -129,9 +129,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $this->output->writeln('<comment>Application ready for tests</comment>');
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     public function beforeFeature(BeforeFeatureTested $event)
     {
         if ($this->skip) {
@@ -200,9 +197,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ExerciseCompleted $event
-     */
     public function afterExercise(ExerciseCompleted $event)
     {
         if ($this->skip) {
@@ -232,17 +226,11 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $this->output->writeln('<comment>Isolation environment is clean</comment>');
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
     }
 
-    /**
-     * @param InputInterface $input
-     */
     public function setInput(InputInterface $input)
     {
         $this->input = $input;

@@ -26,9 +26,6 @@ class MigrateEmailTemplatesQuery extends ParametrizedMigrationQuery
     /** @var Schema */
     private $schema;
 
-    /**
-     * @param Schema $schema
-     */
     public function __construct(Schema $schema)
     {
         $this->schema = $schema;
@@ -54,8 +51,6 @@ class MigrateEmailTemplatesQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     private function doExecute(LoggerInterface $logger, bool $dryRun): void

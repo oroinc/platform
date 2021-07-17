@@ -30,11 +30,6 @@ class ResolveDestinationPage extends AbstractAction
     /** @var PropertyPathInterface */
     protected $attribute;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param DestinationPageResolver $resolver
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         DestinationPageResolver $resolver,

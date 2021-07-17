@@ -47,12 +47,6 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
      */
     protected $logger;
 
-    /**
-     * @param ImportExportResultManager $importExportResultManager
-     * @param UserManager $userManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ImportExportResultManager $importExportResultManager,
         UserManager $userManager,
@@ -137,9 +131,6 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
     }
 
     /**
-     * @param Job $job
-     * @param array $parameters
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -156,17 +147,11 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
         );
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedTopics(): array
     {
         return [Topics::SAVE_IMPORT_EXPORT_RESULT];
     }
 
-    /**
-     * @return JobRepository
-     */
     private function getJobRepository(): JobRepository
     {
         return $this->doctrineHelper->getEntityRepository(JobEntity::class);

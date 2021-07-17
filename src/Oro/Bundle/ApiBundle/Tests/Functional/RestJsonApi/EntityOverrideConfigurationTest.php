@@ -23,12 +23,6 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class EntityOverrideConfigurationTest extends RestJsonApiTestCase
 {
-    /**
-     * @param string $entityClass
-     * @param string $action
-     *
-     * @return EntityDefinitionConfig
-     */
     private function getConfig(string $entityClass, string $action): EntityDefinitionConfig
     {
         /** @var ConfigProvider $configProvider */
@@ -46,12 +40,6 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
         return $config->getDefinition();
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $action
-     *
-     * @return EntityMetadata
-     */
     private function getMetadata(string $entityClass, string $action): EntityMetadata
     {
         /** @var MetadataProvider $metadataProvider */

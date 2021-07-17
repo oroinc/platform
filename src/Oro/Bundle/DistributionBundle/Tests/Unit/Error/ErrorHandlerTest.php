@@ -52,7 +52,6 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider silinceDataProvider
-     * @param string $message
      */
     public function testSilenceReflectionToString(string $message): void
     {
@@ -68,7 +67,6 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider silinceDataProvider
-     * @param string $message
      */
     public function testNotSilenceReflectionToString(string $message): void
     {

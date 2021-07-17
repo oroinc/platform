@@ -21,8 +21,6 @@ class OroBatchBundle implements Migration
 
     /**
      * Delete old akeneo job execution records
-     *
-     * @param QueryBag $queries
      */
     protected function deleteJobExecutions(QueryBag $queries)
     {
@@ -43,8 +41,6 @@ SQL;
 
     /**
      * Delete old akeneo job instance records
-     *
-     * @param QueryBag $queries
      */
     protected function deleteObsoleteJobInstances(QueryBag $queries)
     {

@@ -23,8 +23,6 @@ class FilterFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidConfigDataProvider
-     *
-     * @param array $filterConfig
      */
     public function testCreateFilterWhenInvalidConfig(array $filterConfig): void
     {

@@ -13,17 +13,11 @@ class AttributeGroupGridListener
      */
     protected $attributeManager;
 
-    /**
-     * @param AttributeManager $attributeManager
-     */
     public function __construct(AttributeManager $attributeManager)
     {
         $this->attributeManager = $attributeManager;
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         /** @var ResultRecord[] $records */

@@ -80,9 +80,6 @@ class AclProvider implements AclProviderInterface
         $this->cache = $cache;
     }
 
-    /**
-     * @param SecurityIdentityToStringConverterInterface $converter
-     */
     public function setSecurityIdentityToStringConverter(SecurityIdentityToStringConverterInterface $converter): void
     {
         $this->sidConverter = $converter;
@@ -409,8 +406,6 @@ class AclProvider implements AclProviderInterface
 
     /**
      * This method is called when an ACL instance is retrieved from the cache.
-     *
-     * @param AclInterface $acl
      */
     private function updateAceIdentityMap(AclInterface $acl)
     {
@@ -766,22 +761,11 @@ class AclProvider implements AclProviderInterface
         return [$sql, $params, $types];
     }
 
-    /**
-     * @param string      $classType
-     * @param string|null $objectIdentifier
-     *
-     * @return string
-     */
     protected function getOidKey(string $classType, ?string $objectIdentifier): string
     {
         return $objectIdentifier . $classType;
     }
 
-    /**
-     * @param array $sids
-     *
-     * @return string
-     */
     protected function getSidKey(array $sids): string
     {
         $sidsString = 'sid';
@@ -794,10 +778,6 @@ class AclProvider implements AclProviderInterface
 
     /**
      * Get Security Identifier and Username flag to create SQL queries
-     *
-     * @param SecurityIdentityInterface $sid
-     *
-     * @return array
      *
      * @throws \InvalidArgumentException
      */
@@ -813,12 +793,6 @@ class AclProvider implements AclProviderInterface
         throw new \InvalidArgumentException('Unsupported SID type: %s.' . get_class($sid));
     }
 
-    /**
-     * @param string      $securityIdentifier
-     * @param string|null $username
-     *
-     * @return SecurityIdentityInterface
-     */
     protected function buildSecurityIdentity(string $securityIdentifier, ?string $username): SecurityIdentityInterface
     {
         if ($username) {

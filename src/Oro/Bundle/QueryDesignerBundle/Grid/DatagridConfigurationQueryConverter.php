@@ -25,14 +25,6 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /**
-     * @param FunctionProviderInterface        $functionProvider
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param DatagridGuesser                  $datagridGuesser
-     * @param EntityNameResolver               $entityNameResolver
-     */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
@@ -48,11 +40,6 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 
     /**
      * Converts a query specified in $source parameter to a datagrid configuration
-     *
-     * @param string                $gridName
-     * @param AbstractQueryDesigner $source
-     *
-     * @return DatagridConfiguration
      */
     public function convert(string $gridName, AbstractQueryDesigner $source): DatagridConfiguration
     {
@@ -185,11 +172,6 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 
     /**
      * Get target entity class for virtual field.
-     *
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return string
      */
     protected function getTargetEntityClass(string $entityClass, string $fieldName): string
     {

@@ -20,10 +20,6 @@ class ChoiceFieldHelper
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param AclHelper $aclHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper, AclHelper $aclHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

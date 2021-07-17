@@ -93,7 +93,6 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->transformer->reverseTransform(0));
     }
 
-
     public function testReverseTransformNullValue()
     {
         $this->assertNull($this->transformer->reverseTransform(null));

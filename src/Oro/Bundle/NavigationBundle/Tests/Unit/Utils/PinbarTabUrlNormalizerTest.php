@@ -8,9 +8,6 @@ class PinbarTabUrlNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider urlsDataProvider
-     *
-     * @param string $url
-     * @param string $expectedUrl
      */
     public function testGetNormalizedUrl(string $url, string $expectedUrl): void
     {
@@ -19,9 +16,6 @@ class PinbarTabUrlNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedUrl, $normalizer->getNormalizedUrl($url));
     }
 
-    /**
-     * @return array
-     */
     public function urlsDataProvider(): array
     {
         return [

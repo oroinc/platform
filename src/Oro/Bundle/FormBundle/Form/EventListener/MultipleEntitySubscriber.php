@@ -24,9 +24,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
     protected $doctrineHelper;
     private Inflector $inflector;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -44,9 +41,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSet(FormEvent $event)
     {
         $form       = $event->getForm();
@@ -65,9 +59,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         $form->get('removed')->setData($removed);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         $form = $event->getForm();

@@ -33,12 +33,6 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
     /** @var Processor */
     private $emailProcessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param LocalizedTemplateProvider $localizedTemplateProvider
-     * @param EmailOriginHelper $emailOriginHelper
-     * @param Processor $emailProcessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizedTemplateProvider $localizedTemplateProvider,

@@ -15,19 +15,12 @@ class RecentEmailGridListener
     /** @var  EmailQueryFactory */
     protected $emailQueryFactory;
 
-    /**
-     * @param EmailGridHelper   $emailGridHelper
-     * @param EmailQueryFactory $emailQueryFactory
-     */
     public function __construct(EmailGridHelper $emailGridHelper, EmailQueryFactory $emailQueryFactory)
     {
         $this->emailGridHelper = $emailGridHelper;
         $this->emailQueryFactory = $emailQueryFactory;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         /** @var OrmDatasource $datasource */

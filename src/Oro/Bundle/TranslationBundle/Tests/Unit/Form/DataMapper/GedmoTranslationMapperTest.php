@@ -29,7 +29,6 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mapDataToFormsEmptyDataProvider
-     * @param $data
      */
     public function testMapDataToFormsEmptyData($data)
     {

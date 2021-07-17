@@ -23,11 +23,6 @@ class SecurityAwareJobExtension extends AbstractExtension
     /** @var JobManagerInterface */
     private $jobManager;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param TokenSerializerInterface $tokenSerializer
-     * @param JobManagerInterface $jobManager
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         TokenSerializerInterface $tokenSerializer,

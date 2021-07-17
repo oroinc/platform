@@ -21,9 +21,6 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
     /** @var array */
     private $exclusions;
 
-    /**
-     * @param ConfigCache $configCache
-     */
     public function __construct(ConfigCache $configCache)
     {
         $this->configCache = $configCache;

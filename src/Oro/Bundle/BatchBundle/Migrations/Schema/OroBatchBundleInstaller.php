@@ -38,8 +38,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_job_execution table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchJobExecutionTable(Schema $schema)
     {
@@ -63,8 +61,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_job_instance table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchJobInstanceTable(Schema $schema)
     {
@@ -83,8 +79,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_mapping_field table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchMappingFieldTable(Schema $schema)
     {
@@ -100,8 +94,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_mapping_item table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchMappingItemTable(Schema $schema)
     {
@@ -112,8 +104,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_step_execution table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchStepExecutionTable(Schema $schema)
     {
@@ -139,8 +129,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Create akeneo_batch_warning table
-     *
-     * @param Schema $schema
      */
     protected function createAkeneoBatchWarningTable(Schema $schema)
     {
@@ -157,8 +145,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_job_execution foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchJobExecutionForeignKeys(Schema $schema)
     {
@@ -173,8 +159,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_mapping_field foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchMappingFieldForeignKeys(Schema $schema)
     {
@@ -189,8 +173,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_step_execution foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchStepExecutionForeignKeys(Schema $schema)
     {
@@ -205,8 +187,6 @@ class OroBatchBundleInstaller implements Installation
 
     /**
      * Add akeneo_batch_warning foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addAkeneoBatchWarningForeignKeys(Schema $schema)
     {

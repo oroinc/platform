@@ -63,17 +63,11 @@ class UniqueJobHandler
         }
     }
 
-    /**
-     * @param bool $upsertSupport
-     */
     public function setUpsertSupport(bool $upsertSupport): void
     {
         $this->upsertSupport = $upsertSupport;
     }
 
-    /**
-     * @param bool $preSelectSupport
-     */
     public function setPreSelectSupport(bool $preSelectSupport): void
     {
         $this->preSelectSupport = $preSelectSupport;

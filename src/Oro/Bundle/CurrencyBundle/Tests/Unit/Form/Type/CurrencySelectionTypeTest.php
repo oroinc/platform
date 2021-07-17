@@ -34,7 +34,6 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
      */
     protected $currencyNameHelper;
 
-
     /**
      * {@inheritDoc}
      */
@@ -87,7 +86,6 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     *
      * @dataProvider submitDataProvider
      *
      * @param array $allowedCurrencies

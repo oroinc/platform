@@ -40,9 +40,6 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    /**
-     * @return OrmFilterDatasourceAdapter
-     */
     protected function getFilterDatasource(): OrmFilterDatasourceAdapter
     {
         $em = $this->createMock(EntityManagerInterface::class);

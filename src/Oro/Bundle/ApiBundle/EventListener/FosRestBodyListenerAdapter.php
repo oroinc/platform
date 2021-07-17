@@ -13,9 +13,6 @@ class FosRestBodyListenerAdapter implements BodyListenerInterface
     /** @var BodyListener */
     private $listener;
 
-    /**
-     * @param BodyListener $listener
-     */
     public function __construct(BodyListener $listener)
     {
         $this->listener = $listener;

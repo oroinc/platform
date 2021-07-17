@@ -46,12 +46,6 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     /** @var AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param WorkflowManager $workflowManager
-     * @param AclGroupProviderInterface $aclGroupProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -160,8 +154,6 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     }
 
     /**
-     * @param WorkflowItem $context
-     * @return DomainObjectWrapper
      * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      */
     protected function getDomainObjectWrapper(WorkflowItem $context): DomainObjectWrapper

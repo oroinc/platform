@@ -74,9 +74,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $token->getUser());
     }
 
-    /**
-     * @return User
-     */
     public function getUser(): User
     {
         $organization = new Organization();
@@ -139,9 +136,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->authenticate($token);
     }
 
-    /**
-     * @return array
-     */
     public function wrongUserProvider(): array
     {
         $organization1 = new Organization();
@@ -317,9 +311,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         return $token;
     }
 
-    /**
-     * @return string
-     */
     private function getNonce(): string
     {
         return base64_encode(uniqid(self::TEST_NONCE, true));

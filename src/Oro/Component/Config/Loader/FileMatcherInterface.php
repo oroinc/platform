@@ -9,10 +9,6 @@ interface FileMatcherInterface extends \Serializable
 {
     /**
      * Decides whether the given file is matched the the rule(s) implemented by this class.
-     *
-     * @param \SplFileInfo $file
-     *
-     * @return bool
      */
     public function isMatched(\SplFileInfo $file): bool;
 }

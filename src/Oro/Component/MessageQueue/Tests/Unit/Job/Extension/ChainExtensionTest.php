@@ -97,7 +97,6 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onCancel($job);
     }
 
-
     public function testOnError()
     {
         $job = new Job();

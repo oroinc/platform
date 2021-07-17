@@ -57,12 +57,6 @@ class GridViewManager
     /** @var string */
     protected $gridViewUserClassName;
 
-    /**
-     * @param AclHelper $aclHelper
-     * @param Registry $registry
-     * @param Manager $gridManager
-     * @param RestrictionManager $restrictionManager
-     */
     public function __construct(
         AclHelper $aclHelper,
         Registry $registry,

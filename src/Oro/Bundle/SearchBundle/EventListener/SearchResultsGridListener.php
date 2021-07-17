@@ -15,8 +15,6 @@ class SearchResultsGridListener
     /**
      * Adjust query for tag-results-grid (tag search result grid)
      * after datasource has been built
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {

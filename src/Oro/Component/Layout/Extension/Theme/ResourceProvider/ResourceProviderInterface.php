@@ -9,8 +9,6 @@ interface ResourceProviderInterface
 {
     /**
      * Gets all resources.
-     *
-     * @return array
      */
     public function getResources(): array;
 

@@ -143,8 +143,6 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getLocaleFallbacksCacheDataProvider
-     *
-     * @param array $localizations
      */
     public function testGetLocaleFallbacksCache(array $localizations)
     {

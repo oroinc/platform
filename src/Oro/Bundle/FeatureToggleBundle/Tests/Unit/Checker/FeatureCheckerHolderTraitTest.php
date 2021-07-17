@@ -9,7 +9,6 @@ class FeatureCheckerHolderTraitTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isFeatureEnabledDataProvider
-     * @param $expectedStatus
      */
     public function testIsFeatureEnabled($expectedStatus)
     {

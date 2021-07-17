@@ -20,18 +20,11 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
     /** @var AdditionalEntityChangesToAuditStorage */
     private $storage;
 
-    /**
-     * @param AdditionalEntityChangesToAuditStorage $storage
-     */
     public function __construct(AdditionalEntityChangesToAuditStorage $storage)
     {
         $this->storage = $storage;
     }
 
-    /**
-     * @param WorkflowTransitionRecord $transitionRecord
-     * @param LifecycleEventArgs       $eventArgs
-     */
     public function postPersist(WorkflowTransitionRecord $transitionRecord, LifecycleEventArgs $eventArgs)
     {
         if (!$this->enabled) {

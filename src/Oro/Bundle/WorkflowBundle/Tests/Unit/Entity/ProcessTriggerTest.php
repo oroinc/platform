@@ -72,8 +72,6 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateInterval $interval
-     * @param $seconds
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
     public function testConvertDateIntervalToSeconds(\DateInterval $interval, $seconds)
@@ -82,8 +80,6 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateInterval $interval
-     * @param $seconds
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
     public function testConvertSecondsToDateInterval(\DateInterval $interval, $seconds)

@@ -51,9 +51,6 @@ class DeletedAttributeRelationListener
         $this->topic = (string) $topic;
     }
 
-    /**
-     * @param OnFlushEventArgs $eventArgs
-     */
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
         $uow = $eventArgs->getEntityManager()->getUnitOfWork();
@@ -68,13 +65,13 @@ class DeletedAttributeRelationListener
                 $this->deletedAttributes[$attributeFamily->getId()][] = $attributeRelation->getEntityConfigFieldId();
             }
         }
-        
+
         foreach ($this->deletedAttributes as $attributeFamilyId => $attributeIds) {
             $attributes = $this->deletedAttributeProvider->getAttributesByIds($attributeIds);
             foreach ($attributes as &$attribute) {
                 $attribute = $this->inflector->camelize($attribute->getFieldName());
             }
-            
+
             $this->deletedAttributes[$attributeFamilyId] = $attributes;
         }
     }

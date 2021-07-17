@@ -13,11 +13,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class DoctrineHelperTest extends OrmRelatedTestCase
 {
-    /**
-     * @param string $entityClass
-     *
-     * @return ClassMetadata
-     */
     private function getClassMetadata(string $entityClass): ClassMetadata
     {
         return $this->doctrineHelper->getEntityMetadataForClass($entityClass);

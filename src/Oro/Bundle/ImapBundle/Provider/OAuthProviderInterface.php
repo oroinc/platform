@@ -47,10 +47,6 @@ interface OAuthProviderInterface
 
     /**
      * Requests the information about a user issued the given assess token.
-     *
-     * @param string $accessToken
-     *
-     * @return UserResponseInterface
      */
     public function getUserInfo(string $accessToken): UserResponseInterface;
 }

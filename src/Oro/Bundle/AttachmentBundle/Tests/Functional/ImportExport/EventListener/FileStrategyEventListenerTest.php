@@ -61,11 +61,6 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->assertEmpty($context->getErrors());
     }
 
-    /**
-     * @param array $itemData
-     *
-     * @return Context
-     */
     private function getContext(array $itemData = []): Context
     {
         $context = new Context([]);
@@ -74,12 +69,6 @@ class FileStrategyEventListenerTest extends WebTestCase
         return $context;
     }
 
-    /**
-     * @param Context $context
-     * @param object $entity
-     *
-     * @return StrategyEvent
-     */
     private function getEvent(Context $context, object $entity): StrategyEvent
     {
         return new StrategyEvent(
@@ -191,9 +180,6 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->assertEquals($existingFileUuid, $existingUser->getAvatar()->getUuid());
     }
 
-    /**
-     * @param User $user
-     */
     private function setToken(User $user): void
     {
         $token = new UsernamePasswordOrganizationToken(

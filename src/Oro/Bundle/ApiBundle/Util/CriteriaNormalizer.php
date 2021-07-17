@@ -28,11 +28,6 @@ class CriteriaNormalizer
     /** @var OptimizeJoinsFieldVisitorFactory */
     private $optimizeJoinsFieldVisitorFactory;
 
-    /**
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param RequireJoinsFieldVisitorFactory  $requireJoinsFieldVisitorFactory
-     * @param OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory,
@@ -43,10 +38,6 @@ class CriteriaNormalizer
         $this->optimizeJoinsFieldVisitorFactory = $optimizeJoinsFieldVisitorFactory;
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param string   $rootEntityClass
-     */
     public function normalizeCriteria(Criteria $criteria, string $rootEntityClass): void
     {
         $this->ensureJoinAliasesSet($criteria);
@@ -56,8 +47,6 @@ class CriteriaNormalizer
 
     /**
      * Sets missing join aliases.
-     *
-     * @param Criteria $criteria
      */
     private function ensureJoinAliasesSet(Criteria $criteria): void
     {
@@ -73,9 +62,6 @@ class CriteriaNormalizer
 
     /**
      * Makes sure that this criteria object contains all required joins.
-     *
-     * @param Criteria $criteria
-     * @param string   $rootEntityClass
      */
     private function completeJoins(Criteria $criteria, string $rootEntityClass): void
     {
@@ -112,8 +98,6 @@ class CriteriaNormalizer
 
     /**
      * Replaces LEFT JOIN with INNER JOIN where it is possible.
-     *
-     * @param Criteria $criteria
      */
     private function optimizeJoins(Criteria $criteria): void
     {
@@ -185,12 +169,6 @@ class CriteriaNormalizer
         return $pathMap;
     }
 
-    /**
-     * @param string $field
-     * @param string $rootPath
-     *
-     * @return string|null
-     */
     private function getPath(string $field, string $rootPath): ?string
     {
         $path = null;
@@ -219,11 +197,6 @@ class CriteriaNormalizer
         return $path;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return array
-     */
     private function buildJoinPathMapValue(string $path): array
     {
         $lastDelimiter = \strrpos($path, '.');
@@ -288,9 +261,6 @@ class CriteriaNormalizer
         return $visitor->getFields();
     }
 
-    /**
-     * @param array $pathMap
-     */
     private function sortJoinPathMap(array &$pathMap): void
     {
         \uasort(

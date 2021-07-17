@@ -41,9 +41,6 @@ class ParameterBagNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parameters, $this->normalizer->denormalize($data, ParameterBag::class));
     }
 
-    /**
-     * @return array
-     */
     public function supportsDataProvider(): array
     {
         return [

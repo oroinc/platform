@@ -51,33 +51,21 @@ class ActivityListController extends AbstractController
         ];
     }
 
-    /**
-     * @return EntityRoutingHelper
-     */
     private function getEntityRoutingHelper(): EntityRoutingHelper
     {
         return $this->get(EntityRoutingHelper::class);
     }
 
-    /**
-     * @return ConfigManager
-     */
     private function getConfigManager(): ConfigManager
     {
         return $this->get('oro_config.user');
     }
 
-    /**
-     * @return FilterBagInterface
-     */
     private function getFilterBag(): FilterBagInterface
     {
         return $this->get('oro_filter.extension.orm_filter_bag');
     }
 
-    /**
-     * @return ActivityListChainProvider
-     */
     private function getActivityListProvider(): ActivityListChainProvider
     {
         return $this->get('oro_activity_list.provider.chain');

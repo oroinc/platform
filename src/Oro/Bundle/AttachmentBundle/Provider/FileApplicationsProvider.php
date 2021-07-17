@@ -16,9 +16,6 @@ class FileApplicationsProvider
     /** @var AttachmentEntityConfigProviderInterface */
     private $attachmentEntityConfigProvider;
 
-    /**
-     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
-     */
     public function __construct(AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider)
     {
         $this->attachmentEntityConfigProvider = $attachmentEntityConfigProvider;
@@ -41,12 +38,6 @@ class FileApplicationsProvider
         return $this->getFileApplicationsForField($parentEntityClass, $parentEntityFieldName);
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return array
-     */
     public function getFileApplicationsForField(string $className, string $fieldName): array
     {
         $config = $this->attachmentEntityConfigProvider->getFieldConfig($className, $fieldName);
@@ -57,11 +48,6 @@ class FileApplicationsProvider
         return $this->getAllowedApplications($config);
     }
 
-    /**
-     * @param ConfigInterface $config
-     *
-     * @return array
-     */
     private function getAllowedApplications(ConfigInterface $config): array
     {
         return (array)$config->get('file_applications', false, self::DEFAULT_ALLOWED_APPLICATIONS);

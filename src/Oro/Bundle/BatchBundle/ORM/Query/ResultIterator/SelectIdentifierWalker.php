@@ -13,7 +13,6 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
  */
 class SelectIdentifierWalker extends TreeWalkerAdapter
 {
-
     /**
      * {@inheritdoc}
      *
@@ -76,12 +75,10 @@ class SelectIdentifierWalker extends TreeWalkerAdapter
         }
     }
 
-
     /**
      * Validates that walker could be used on a Query
      * Queries that include Order By on a joined to-many field are not supported on PostgreSQL
      *
-     * @param AST\SelectStatement $AST
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validate(AST\SelectStatement $AST)

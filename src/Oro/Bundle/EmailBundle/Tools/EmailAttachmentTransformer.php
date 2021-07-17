@@ -33,12 +33,6 @@ class EmailAttachmentTransformer
     /** @var EmailAttachmentManager */
     private $emailAttachmentManager;
 
-    /**
-     * @param Factory                $factory
-     * @param FileManager            $fileManager
-     * @param AttachmentManager      $manager
-     * @param EmailAttachmentManager $emailAttachmentManager
-     */
     public function __construct(
         Factory $factory,
         FileManager $fileManager,
@@ -51,11 +45,6 @@ class EmailAttachmentTransformer
         $this->emailAttachmentManager = $emailAttachmentManager;
     }
 
-    /**
-     * @param EmailAttachment $emailAttachment
-     *
-     * @return EmailAttachmentModel
-     */
     public function entityToModel(EmailAttachment $emailAttachment): EmailAttachmentModel
     {
         $attachmentModel = $this->factory->getEmailAttachment();
@@ -82,11 +71,6 @@ class EmailAttachmentTransformer
         return $attachmentModel;
     }
 
-    /**
-     * @param Attachment $attachment
-     *
-     * @return EmailAttachmentModel
-     */
     public function attachmentEntityToModel(Attachment $attachment): EmailAttachmentModel
     {
         $attachmentModel = $this->factory->getEmailAttachment();
@@ -109,15 +93,10 @@ class EmailAttachmentTransformer
                 )
             );
         }
-        
+
         return $attachmentModel;
     }
 
-    /**
-     * @param Attachment $attachment
-     *
-     * @return EmailAttachment
-     */
     public function attachmentEntityToEntity(Attachment $attachment): EmailAttachment
     {
         $emailAttachment = new EmailAttachment();
@@ -140,11 +119,6 @@ class EmailAttachmentTransformer
         return $emailAttachment;
     }
 
-    /**
-     * @param UploadedFile $uploadedFile
-     *
-     * @return EmailAttachment
-     */
     public function entityFromUploadedFile(UploadedFile $uploadedFile): EmailAttachment
     {
         $emailAttachment = new EmailAttachment();

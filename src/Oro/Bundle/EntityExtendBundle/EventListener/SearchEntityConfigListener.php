@@ -23,10 +23,6 @@ class SearchEntityConfigListener
     /** @var string[] */
     protected $classNames = [];
 
-    /**
-     * @param SearchMappingProvider $searchMappingProvider
-     * @param IndexerInterface      $searchIndexer
-     */
     public function __construct(
         SearchMappingProvider $searchMappingProvider,
         IndexerInterface $searchIndexer
@@ -35,9 +31,6 @@ class SearchEntityConfigListener
         $this->searchIndexer = $searchIndexer;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         if ($this->isReindexRequired($event)) {
@@ -48,9 +41,6 @@ class SearchEntityConfigListener
         }
     }
 
-    /**
-     * @param PostFlushConfigEvent $event
-     */
     public function postFlush(PostFlushConfigEvent $event)
     {
         if ($this->classNames) {

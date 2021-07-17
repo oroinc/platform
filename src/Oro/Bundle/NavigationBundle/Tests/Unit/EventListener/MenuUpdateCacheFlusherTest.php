@@ -70,7 +70,6 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
             ->method('findMenuUpdatesByScope')
             ->with('application_menu', $scope);
 
-
         $this->flusher->onMenuUpdateWithScopeChange($event);
     }
 }

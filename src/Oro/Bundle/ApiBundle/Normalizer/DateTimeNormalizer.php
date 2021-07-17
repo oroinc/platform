@@ -15,9 +15,6 @@ class DateTimeNormalizer implements ObjectNormalizerInterface
     /** @var DataTransformerRegistry */
     private $dataTransformerRegistry;
 
-    /**
-     * @param DataTransformerRegistry $dataTransformerRegistry
-     */
     public function __construct(DataTransformerRegistry $dataTransformerRegistry)
     {
         $this->dataTransformerRegistry = $dataTransformerRegistry;

@@ -37,11 +37,6 @@ class DraftRedirectAction extends AbstractAction
      */
     private $options;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ConfigManager $configManager
-     * @param RouterInterface $router
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         ConfigManager $configManager,
@@ -52,11 +47,6 @@ class DraftRedirectAction extends AbstractAction
         $this->router = $router;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return DraftRedirectAction
-     */
     public function initialize(array $options): DraftRedirectAction
     {
         $this->options = $this->getOptionResolver()->resolve($options);
@@ -85,11 +75,6 @@ class DraftRedirectAction extends AbstractAction
         return $this->contextAccessor->getValue($metadata, $this->options[self::OPTION_KEY_ROUTE]);
     }
 
-    /**
-     * @param $context
-     *
-     * @return array
-     */
     private function getRouteParameters($context): array
     {
         $object = $this->getSource($context);
@@ -97,11 +82,6 @@ class DraftRedirectAction extends AbstractAction
         return ['id' => $object->getId()];
     }
 
-    /**
-     * @param $context
-     *
-     * @return string
-     */
     private function getUrl($context): string
     {
         $route = $this->getRoute($context);
@@ -110,11 +90,6 @@ class DraftRedirectAction extends AbstractAction
         return $this->router->generate($route, $routeParameters);
     }
 
-    /**
-     * @param $context
-     *
-     * @return DraftableInterface
-     */
     private function getSource($context): DraftableInterface
     {
         $source = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_SOURCE]);
@@ -125,9 +100,6 @@ class DraftRedirectAction extends AbstractAction
         throw new \LogicException('Parameter \'source\' must implement DraftableInterface');
     }
 
-    /**
-     * @return OptionsResolver
-     */
     private function getOptionResolver(): OptionsResolver
     {
         $optionResolver = new OptionsResolver();

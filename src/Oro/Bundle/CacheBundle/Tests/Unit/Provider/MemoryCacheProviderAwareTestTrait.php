@@ -40,9 +40,6 @@ trait MemoryCacheProviderAwareTestTrait
             );
     }
 
-    /**
-     * @param object $object
-     */
     protected function setMemoryCacheProvider(object $object): void
     {
         $object->setMemoryCacheProvider($this->getMemoryCacheProvider());

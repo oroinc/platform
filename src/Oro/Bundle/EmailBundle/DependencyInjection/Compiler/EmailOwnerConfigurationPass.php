@@ -28,10 +28,6 @@ class EmailOwnerConfigurationPass implements CompilerPassInterface
 
     /**
      * Loads services that implement an email owner providers.
-     *
-     * @param ContainerBuilder $container
-     *
-     * @return array
      */
     private function loadProviders(ContainerBuilder $container): array
     {

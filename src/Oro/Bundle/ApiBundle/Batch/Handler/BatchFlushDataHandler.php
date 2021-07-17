@@ -20,10 +20,6 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
     /** @var EntityManagerInterface|null */
     private $entityManager;
 
-    /**
-     * @param string         $entityClass
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(string $entityClass, DoctrineHelper $doctrineHelper)
     {
         $this->entityClass = $entityClass;

@@ -26,10 +26,6 @@ class DependentMessageProcessor implements MessageProcessorInterface, TopicSubsc
     /** @var DependentJobService */
     private $dependentJobService;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param DependentJobService $dependentJobService
-     */
     public function __construct(JobRunner $jobRunner, DependentJobService $dependentJobService)
     {
         $this->jobRunner = $jobRunner;

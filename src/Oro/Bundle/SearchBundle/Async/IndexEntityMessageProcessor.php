@@ -29,11 +29,6 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
      */
     protected $logger;
 
-    /**
-     * @param IndexerInterface $indexer
-     * @param ManagerRegistry $doctrine
-     * @param LoggerInterface $logger
-     */
     public function __construct(IndexerInterface $indexer, ManagerRegistry $doctrine, LoggerInterface $logger)
     {
         $this->indexer = $indexer;

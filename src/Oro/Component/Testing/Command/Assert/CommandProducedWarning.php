@@ -17,9 +17,6 @@ class CommandProducedWarning extends Constraint
     /** @var array */
     private $errors = [];
 
-    /**
-     * @param string|null $expectedWarningMessage
-     */
     public function __construct(?string $expectedWarningMessage)
     {
         $this->expectedWarningMessage = $expectedWarningMessage;

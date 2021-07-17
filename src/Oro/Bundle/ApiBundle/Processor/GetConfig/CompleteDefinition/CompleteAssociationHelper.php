@@ -23,9 +23,6 @@ class CompleteAssociationHelper
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
@@ -173,10 +170,6 @@ class CompleteAssociationHelper
         return null;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param EntityDefinitionConfig $configToMerge
-     */
     private function mergeTargetEntityConfig(
         EntityDefinitionConfig $config,
         EntityDefinitionConfig $configToMerge
@@ -193,10 +186,6 @@ class CompleteAssociationHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param EntityDefinitionFieldConfig $fieldToMerge
-     */
     private function mergeTargetEntityFieldConfig(
         EntityDefinitionFieldConfig $field,
         EntityDefinitionFieldConfig $fieldToMerge
@@ -219,10 +208,6 @@ class CompleteAssociationHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param EntityDefinitionConfig $configToMerge
-     */
     private function mergeTargetEntityConfigAttributes(
         EntityDefinitionConfig $config,
         EntityDefinitionConfig $configToMerge
@@ -238,10 +223,6 @@ class CompleteAssociationHelper
         $this->mergeAttribute($config, $configToMerge, ConfigUtil::HINTS);
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param EntityDefinitionFieldConfig $fieldToMerge
-     */
     private function mergeTargetEntityFieldConfigAttributes(
         EntityDefinitionFieldConfig $field,
         EntityDefinitionFieldConfig $fieldToMerge
@@ -266,11 +247,6 @@ class CompleteAssociationHelper
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::FORM_OPTIONS);
     }
 
-    /**
-     * @param ConfigBagInterface $config
-     * @param ConfigBagInterface $configToMerge
-     * @param string             $attributeName
-     */
     private function mergeAttribute(
         ConfigBagInterface $config,
         ConfigBagInterface $configToMerge,
@@ -281,9 +257,6 @@ class CompleteAssociationHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     */
     private function completeDependsOn(EntityDefinitionFieldConfig $field)
     {
         $targetFields = $field->getTargetEntity()->getFields();

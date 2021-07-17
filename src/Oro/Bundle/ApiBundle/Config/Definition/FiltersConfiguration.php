@@ -15,9 +15,6 @@ class FiltersConfiguration extends AbstractConfigurationSection
     /** @var FilterOperatorRegistry */
     private $filterOperatorRegistry;
 
-    /**
-     * @param FilterOperatorRegistry $filterOperatorRegistry
-     */
     public function __construct(FilterOperatorRegistry $filterOperatorRegistry)
     {
         $this->filterOperatorRegistry = $filterOperatorRegistry;
@@ -58,9 +55,6 @@ class FiltersConfiguration extends AbstractConfigurationSection
         $this->configureFieldNode($fieldNode);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = 'filters.field';
@@ -111,11 +105,6 @@ class FiltersConfiguration extends AbstractConfigurationSection
         $filterOptionsNode->prototype('variable_or_array');
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ConfigUtil::FILTER_OPTIONS])) {

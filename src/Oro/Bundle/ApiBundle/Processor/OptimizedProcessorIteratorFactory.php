@@ -82,9 +82,6 @@ class OptimizedProcessorIteratorFactory implements
         return $result;
     }
 
-    /**
-     * @param string $action
-     */
     private function initializeProcessors(string $action): void
     {
         $processors = $this->processors[$action];

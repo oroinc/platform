@@ -60,7 +60,6 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->getEntityManager()->persist($audit);
         $this->getEntityManager()->flush();
 
-
         $message = $this->createDummyMessage([
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',

@@ -224,7 +224,6 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
      * @param string $variableName
      * @param mixed $expected
      * @param array $options
-     *
      */
     public function testDenormalizeExceptions(
         $exception,

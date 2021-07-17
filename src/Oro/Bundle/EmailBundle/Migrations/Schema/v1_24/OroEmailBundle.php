@@ -16,9 +16,6 @@ class OroEmailBundle implements Migration
         static::removeIndex($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function removeIndex(Schema $schema)
     {
         $emailRecipientTable = $schema->getTable('oro_email_recipient');

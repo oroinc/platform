@@ -29,10 +29,6 @@ class HandleFieldsFilter implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     * @param ValueNormalizer     $valueNormalizer
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;

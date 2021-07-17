@@ -41,8 +41,6 @@ class LoginListener
 
     /**
      * Checks that consumers are alive upon a user login and adds the flash message if there are no alive consumers.
-     *
-     * @param InteractiveLoginEvent $event
      */
     public function onLogin(InteractiveLoginEvent $event)
     {

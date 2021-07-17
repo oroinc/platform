@@ -18,9 +18,6 @@ abstract class AbstractConfigurationProvider
      */
     protected $kernelBundles = [];
 
-    /**
-     * @param array $kernelBundles
-     */
     public function __construct(array $kernelBundles)
     {
         $this->kernelBundles = $kernelBundles;

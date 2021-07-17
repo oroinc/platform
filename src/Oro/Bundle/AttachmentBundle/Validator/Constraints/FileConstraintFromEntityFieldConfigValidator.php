@@ -21,10 +21,6 @@ class FileConstraintFromEntityFieldConfigValidator extends ConstraintValidator
     /** @var FileConstraintsProvider */
     private $fileConstraintsProvider;
 
-    /**
-     * @param FileValidator $fileValidator
-     * @param FileConstraintsProvider $mimeTypesProvider
-     */
     public function __construct(
         FileValidator $fileValidator,
         FileConstraintsProvider $mimeTypesProvider

@@ -40,8 +40,6 @@ class OroReportBundleInstaller implements Installation
 
     /**
      * Create oro_report_type table
-     *
-     * @param Schema $schema
      */
     protected function createOroReportTypeTable(Schema $schema)
     {
@@ -54,8 +52,6 @@ class OroReportBundleInstaller implements Installation
 
     /**
      * Create oro_report table
-     *
-     * @param Schema $schema
      */
     protected function createOroReportTable(Schema $schema)
     {
@@ -79,8 +75,6 @@ class OroReportBundleInstaller implements Installation
 
     /**
      * Add oro_report foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroReportForeignKeys(Schema $schema)
     {
@@ -107,8 +101,6 @@ class OroReportBundleInstaller implements Installation
 
     /**
      * Create oro_order_shipping_tracking table
-     *
-     * @param Schema $schema
      */
     protected function createOroCalendarDateTable(Schema $schema)
     {

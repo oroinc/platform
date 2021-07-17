@@ -9,10 +9,5 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 interface PreviewMetadataProviderInterface
 {
-    /**
-     * @param File $file
-     *
-     * @return array
-     */
     public function getMetadata(File $file): array;
 }

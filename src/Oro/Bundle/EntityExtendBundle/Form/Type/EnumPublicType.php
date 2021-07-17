@@ -15,9 +15,6 @@ class EnumPublicType extends AbstractType
     /** @var EnumTypeHelper */
     protected $typeHelper;
 
-    /**
-     * @param EnumTypeHelper $typeHelper
-     */
     public function __construct(EnumTypeHelper $typeHelper)
     {
         $this->typeHelper = $typeHelper;

@@ -318,9 +318,6 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         return $this->children;
     }
 
-    /**
-     * @param TestEntityForNestedObjects $item
-     */
     public function addChild(TestEntityForNestedObjects $item)
     {
         if (!$this->children->contains($item)) {
@@ -328,9 +325,6 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestEntityForNestedObjects $item
-     */
     public function removeChild(TestEntityForNestedObjects $item)
     {
         if ($this->children->contains($item)) {
@@ -346,17 +340,11 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         return $this->links;
     }
 
-    /**
-     * @param TestCustomIdentifier $link
-     */
     public function addLink(TestCustomIdentifier $link)
     {
         $this->links->add($link);
     }
 
-    /**
-     * @param TestCustomIdentifier $link
-     */
     public function removeLink(TestCustomIdentifier $link)
     {
         $this->links->removeElement($link);

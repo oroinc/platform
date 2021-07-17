@@ -13,9 +13,6 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider assembleDataProvider
      */
     public function testAssemble(array $source, array $expected)

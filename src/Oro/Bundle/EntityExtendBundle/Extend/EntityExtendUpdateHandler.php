@@ -10,9 +10,6 @@ class EntityExtendUpdateHandler implements EntityExtendUpdateHandlerInterface
     /** @var EntityExtendUpdateProcessor */
     private $entityExtendUpdateProcessor;
 
-    /**
-     * @param EntityExtendUpdateProcessor $entityExtendUpdateProcessor
-     */
     public function __construct(EntityExtendUpdateProcessor $entityExtendUpdateProcessor)
     {
         $this->entityExtendUpdateProcessor = $entityExtendUpdateProcessor;

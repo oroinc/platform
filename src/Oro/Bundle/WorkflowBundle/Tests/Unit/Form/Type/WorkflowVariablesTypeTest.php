@@ -98,12 +98,6 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array             $submitData
-     * @param WorkflowData      $formData
-     * @param array             $formOptions
-     * @param array             $childrenOptions
-     * @param array             $guessedData
      */
     public function testSubmit(
         array $submitData,

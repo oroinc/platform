@@ -174,7 +174,7 @@ class ConfigController extends AbstractController
     {
         $formAction = $this->generateUrl('oro_entityconfig_field_update', ['id' => $fieldConfigModel->getId()]);
         $successMessage = $this->getTranslator()->trans('oro.entity_config.controller.config_field.message.saved');
-        
+
         return $this->getConfigFieldHandler()
             ->handleUpdate($fieldConfigModel, $formAction, $successMessage);
     }

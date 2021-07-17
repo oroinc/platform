@@ -353,9 +353,6 @@ class AjaxControllerTest extends WebTestCase
         return $tokenData;
     }
 
-    /**
-     * @param array $operations
-     */
     private function setOperationsConfig(array $operations)
     {
         $config = $this->configProvider->getConfiguration();

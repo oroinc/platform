@@ -14,9 +14,6 @@ class DataTransformer implements DataTransformerInterface
     /** @var DataTransformerInterface */
     private $innerDataTransformer;
 
-    /**
-     * @param DataTransformerInterface $innerDataTransformer
-     */
     public function __construct(DataTransformerInterface $innerDataTransformer)
     {
         $this->innerDataTransformer = $innerDataTransformer;

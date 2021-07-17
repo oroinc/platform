@@ -16,9 +16,6 @@ class RouteRecipientListProcessor implements MessageProcessorInterface
      */
     private $router;
 
-    /**
-     * @param RecipientListRouterInterface $router
-     */
     public function __construct(RecipientListRouterInterface $router)
     {
         $this->router = $router;

@@ -140,8 +140,6 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
 
     /**
      * BigNumber constructor.
-     *
-     * @param BrickBigNumber $brickBigNumber
      */
     protected function __construct(BrickBigNumber $brickBigNumber)
     {

@@ -16,9 +16,6 @@ class EmailAddressWithContextPreferredLocalizationProvider extends AbstractPrefe
     /** @var PreferredLocalizationProviderInterface */
     private $innerLocalizationProvider;
 
-    /**
-     * @param PreferredLocalizationProviderInterface $innerLocalizationProvider
-     */
     public function __construct(PreferredLocalizationProviderInterface $innerLocalizationProvider)
     {
         $this->innerLocalizationProvider = $innerLocalizationProvider;

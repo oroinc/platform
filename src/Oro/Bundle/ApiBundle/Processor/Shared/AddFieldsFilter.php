@@ -31,10 +31,6 @@ class AddFieldsFilter implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     * @param ValueNormalizer     $valueNormalizer
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
@@ -81,10 +77,6 @@ class AddFieldsFilter implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Context $context
-     * @param string  $filterTemplate
-     */
     private function addFiltersForDocumentation(Context $context, string $filterTemplate): void
     {
         $metadata = $context->getMetadata();
@@ -114,12 +106,6 @@ class AddFieldsFilter implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string           $filterTemplate
-     * @param FilterCollection $filters
-     * @param string           $entityClass
-     * @param RequestType      $requestType
-     */
     private function addFilterForEntityClass(
         string $filterTemplate,
         FilterCollection $filters,
@@ -132,11 +118,6 @@ class AddFieldsFilter implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string           $filterTemplate
-     * @param FilterCollection $filters
-     * @param string           $entityType
-     */
     private function addFilter(string $filterTemplate, FilterCollection $filters, string $entityType): void
     {
         $filter = new FieldsFilter(
@@ -147,12 +128,6 @@ class AddFieldsFilter implements ProcessorInterface
         $filters->add(sprintf($filterTemplate, $entityType), $filter, false);
     }
 
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
     private function convertToEntityType(string $entityClass, RequestType $requestType): ?string
     {
         return ValueNormalizerUtil::convertToEntityType(

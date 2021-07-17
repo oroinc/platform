@@ -27,11 +27,6 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
      */
     protected $configProvider;
 
-    /**
-     * @param EntityManager  $em
-     * @param SearchRegistry $searchRegistry
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(
         EntityManager $em,
         SearchRegistry $searchRegistry,

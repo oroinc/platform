@@ -9,11 +9,6 @@ class ItemKeyBuilder
 {
     /**
      * Builds an unique key of an included entity or a relationship.
-     *
-     * @param string $type
-     * @param string $id
-     *
-     * @return string
      */
     public function buildItemKey(string $type, string $id): string
     {

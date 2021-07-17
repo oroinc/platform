@@ -13,9 +13,6 @@ class ConfigProvider
     /** @var Provider */
     protected $configProvider;
 
-    /**
-     * @param Provider $configProvider
-     */
     public function __construct(Provider $configProvider)
     {
         $this->configProvider = $configProvider;

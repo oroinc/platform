@@ -70,10 +70,6 @@ class OroActivityListBundle implements
         ));
     }
 
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     */
     private function renameActivityTables(Schema $schema, QueryBag $queries)
     {
         $helper = new RenameExtendedManyToManyAssociation20(

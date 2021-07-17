@@ -42,10 +42,6 @@ class ExclusionProviderRegistry
     /**
      * Returns the exclusion provider that contains exclusion rules for the given request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return ExclusionProviderInterface
-     *
      * @throws \LogicException if a exclusion provider does not exist for the given request type
      */
     public function getExclusionProvider(RequestType $requestType): ExclusionProviderInterface

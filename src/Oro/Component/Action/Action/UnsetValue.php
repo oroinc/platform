@@ -11,9 +11,6 @@ class UnsetValue extends AbstractAction
      */
     protected $assignValueAction;
 
-    /**
-     * @param AssignValue $assignValueAction
-     */
     public function __construct(AssignValue $assignValueAction)
     {
         $this->assignValueAction = $assignValueAction;

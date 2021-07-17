@@ -23,11 +23,6 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param BaseUserManager $userManager
-     * @param UserLoggingInfoProvider $infoProvider
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         BaseUserManager $userManager,
         UserLoggingInfoProvider $infoProvider,

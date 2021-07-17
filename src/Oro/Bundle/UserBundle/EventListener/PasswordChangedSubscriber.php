@@ -18,9 +18,6 @@ class PasswordChangedSubscriber implements EventSubscriber
     /** @var EnumValueProvider */
     private $enumValueProvider;
 
-    /**
-     * @param EnumValueProvider $enumValueProvider
-     */
     public function __construct(EnumValueProvider $enumValueProvider)
     {
         $this->enumValueProvider = $enumValueProvider;
@@ -37,17 +34,11 @@ class PasswordChangedSubscriber implements EventSubscriber
         ];
     }
 
-    /**
-     * @param  LifecycleEventArgs $args
-     */
     public function prePersist(LifecycleEventArgs $args)
     {
         $this->updateAuthStatus($args);
     }
 
-    /**
-     * @param  PreUpdateEventArgs $args
-     */
     public function preUpdate(PreUpdateEventArgs $args)
     {
         if ($args->hasChangedField('password')) {
@@ -57,8 +48,6 @@ class PasswordChangedSubscriber implements EventSubscriber
 
     /**
      * Change 'expired' status to 'active'
-     *
-     * @param  LifecycleEventArgs $args
      */
     private function updateAuthStatus(LifecycleEventArgs $args)
     {

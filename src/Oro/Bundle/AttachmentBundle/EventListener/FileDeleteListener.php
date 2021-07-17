@@ -19,28 +19,17 @@ class FileDeleteListener implements LoggerAwareInterface
     /** @var FileManager */
     private $fileManager;
 
-    /**
-     * @param FileManager $fileManager
-     */
     public function __construct(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function postRemove(File $file, LifecycleEventArgs $args): void
     {
         $this->deleteFromFilesystem((string)$file->getFilename());
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function postUpdate(File $file, LifecycleEventArgs $args): void
     {
         $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($file);
@@ -49,9 +38,6 @@ class FileDeleteListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param string $filename
-     */
     private function deleteFromFilesystem(string $filename): void
     {
         try {

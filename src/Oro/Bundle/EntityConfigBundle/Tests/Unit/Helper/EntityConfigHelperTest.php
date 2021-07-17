@@ -43,9 +43,6 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider getRoutesProvider
      */
     public function testGetRoutes(array $inputData, array $expectedData)

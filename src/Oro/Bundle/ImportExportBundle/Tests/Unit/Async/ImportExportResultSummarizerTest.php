@@ -267,9 +267,6 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @param int $jobId
-     */
     private function assertUrlCalls(int $jobId = 1)
     {
         $this->router

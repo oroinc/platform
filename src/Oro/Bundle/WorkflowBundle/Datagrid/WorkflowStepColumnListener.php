@@ -53,13 +53,6 @@ class WorkflowStepColumnListener
     /** @var DatagridStateProviderInterface */
     private $filtersStateProvider;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param ConfigProvider $configProvider
-     * @param WorkflowManagerRegistry $workflowManagerRegistry
-     * @param DatagridStateProviderInterface $filtersStateProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
@@ -84,9 +77,6 @@ class WorkflowStepColumnListener
         }
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
@@ -140,9 +130,6 @@ class WorkflowStepColumnListener
         return $rootEntity ?: null;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
@@ -158,9 +145,6 @@ class WorkflowStepColumnListener
         $this->applyFilter($datagrid, self::WORKFLOW_STEP_FILTER, 'getEntityIdsByEntityClassAndWorkflowStepIds');
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         $config = $event->getDatagrid()->getConfig();
@@ -273,10 +257,6 @@ class WorkflowStepColumnListener
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param array $workflowStepColumns
-     */
     protected function removeWorkflowStep(DatagridConfiguration $config, array $workflowStepColumns)
     {
         $paths = [
@@ -382,11 +362,6 @@ class WorkflowStepColumnListener
         return $this->workflowManagerRegistry->getManager();
     }
 
-
-    /**
-     * @param DatagridInterface $grid
-     * @return bool
-     */
     private function isReportDatagrid(DatagridInterface $grid): bool
     {
         return (bool) preg_match(

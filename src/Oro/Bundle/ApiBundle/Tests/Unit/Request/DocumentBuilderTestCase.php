@@ -145,9 +145,6 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
         return $associationMetadata;
     }
 
-    /**
-     * @param EntityMetadata $metadata
-     */
     protected function addEntityPredefinedMetaProperties(EntityMetadata $metadata): EntityMetadata
     {
         $metadata->addMetaProperty(new MetaPropertyMetadata('__path__'));
@@ -158,9 +155,6 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
         return $metadata;
     }
 
-    /**
-     * @param AssociationMetadata $association
-     */
     protected function addAssociationPredefinedMetaProperties(AssociationMetadata $association): AssociationMetadata
     {
         $association->addRelationshipMetaProperty(new MetaAttributeMetadata('__path__'));

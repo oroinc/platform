@@ -23,17 +23,11 @@ class OrganizationRememberMeAuthenticationProvider extends RememberMeAuthenticat
     /** @var OrganizationGuesserInterface */
     private $organizationGuesser;
 
-    /**
-     * @param OrganizationRememberMeTokenFactoryInterface $tokenFactory
-     */
     public function setTokenFactory(OrganizationRememberMeTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
     }
 
-    /**
-     * @param OrganizationGuesserInterface $organizationGuesser
-     */
     public function setOrganizationGuesser(OrganizationGuesserInterface $organizationGuesser)
     {
         $this->organizationGuesser = $organizationGuesser;
@@ -70,12 +64,6 @@ class OrganizationRememberMeAuthenticationProvider extends RememberMeAuthenticat
         );
     }
 
-    /**
-     * @param AbstractUser   $user
-     * @param TokenInterface $token
-     *
-     * @return Organization
-     */
     private function guessOrganization(AbstractUser $user, TokenInterface $token): Organization
     {
         $organization = $this->organizationGuesser->guess($user, $token);

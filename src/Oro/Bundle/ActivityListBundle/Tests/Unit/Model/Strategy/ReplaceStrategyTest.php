@@ -122,10 +122,6 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('activity_replace', $this->strategy->getName());
     }
 
-    /**
-     * @param $object
-     * @param $value
-     */
     protected function setId($object, $value)
     {
         $class = new \ReflectionClass($object);

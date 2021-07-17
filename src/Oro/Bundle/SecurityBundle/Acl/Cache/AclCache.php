@@ -43,13 +43,6 @@ class AclCache implements AclCacheInterface
     /** @var SecurityIdentityToStringConverterInterface */
     private $sidConverter;
 
-    /**
-     * @param Cache                                      $cache
-     * @param PermissionGrantingStrategyInterface        $permissionGrantingStrategy
-     * @param UnderlyingAclCache                         $underlyingCache
-     * @param EventDispatcherInterface                   $eventDispatcher
-     * @param SecurityIdentityToStringConverterInterface $sidConverter
-     */
     public function __construct(
         Cache $cache,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,
@@ -109,8 +102,6 @@ class AclCache implements AclCacheInterface
 
     /**
      * Removes an ACL from the cache by the reference OID.
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
     {

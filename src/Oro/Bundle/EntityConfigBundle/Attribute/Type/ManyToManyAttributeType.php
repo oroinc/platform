@@ -23,10 +23,6 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EntityNameResolver $entityNameResolver, DoctrineHelper $doctrineHelper)
     {
         $this->entityNameResolver = $entityNameResolver;

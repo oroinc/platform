@@ -16,9 +16,6 @@ class SetResultDocumentBuilder implements ProcessorInterface
     /** @var DocumentBuilderFactory */
     private $documentBuilderFactory;
 
-    /**
-     * @param DocumentBuilderFactory $documentBuilderFactory
-     */
     public function __construct(DocumentBuilderFactory $documentBuilderFactory)
     {
         $this->documentBuilderFactory = $documentBuilderFactory;

@@ -24,11 +24,6 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
     /** @var AssociationMetadata */
     protected $metadata;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityLoader        $entityLoader
-     * @param AssociationMetadata $metadata
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,

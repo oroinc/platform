@@ -32,9 +32,6 @@ abstract class AbstractDraftAction extends AbstractAction
         return $this;
     }
 
-    /**
-     * @return OptionsResolver
-     */
     private function getOptionResolver(): OptionsResolver
     {
         $optionResolver = new OptionsResolver();

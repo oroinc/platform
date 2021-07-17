@@ -68,10 +68,6 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param ApiDoc $annotation
-     * @param Route  $route
-     */
     private function doHandle(ApiDoc $annotation, Route $route): void
     {
         $this->handler->handle(
@@ -82,11 +78,6 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param ApiDoc $annotation
-     *
-     * @return array
-     */
     private function convertAnnotationToArray(ApiDoc $annotation): array
     {
         $result = $annotation->toArray();

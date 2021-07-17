@@ -22,8 +22,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Create oro_workflow_scopes table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowScopesTable(Schema $schema)
     {
@@ -35,8 +33,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Add oro_workflow_scopes foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowScopesForeignKeys(Schema $schema)
     {

@@ -264,8 +264,6 @@ class SubresourceContext extends Context
     /**
      * Adds a request for some configuration data of the parent entity.
      *
-     * @param ConfigExtraInterface $extra
-     *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
     public function addParentConfigExtra(ConfigExtraInterface $extra)
@@ -333,8 +331,6 @@ class SubresourceContext extends Context
 
     /**
      * Sets a configuration of the parent entity.
-     *
-     * @param EntityDefinitionConfig|null $definition
      */
     public function setParentConfig(EntityDefinitionConfig $definition = null)
     {
@@ -465,8 +461,6 @@ class SubresourceContext extends Context
 
     /**
      * Sets metadata of the parent entity.
-     *
-     * @param EntityMetadata|null $metadata
      */
     public function setParentMetadata(?EntityMetadata $metadata)
     {

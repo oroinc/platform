@@ -59,16 +59,6 @@ class ImportStrategyHelper
     /** @var array */
     protected $isGrantedCache = [];
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ValidatorInterface $validator
-     * @param TranslatorInterface $translator
-     * @param FieldHelper $fieldHelper
-     * @param ConfigurableTableDataConverter $configurableDataConverter
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param OwnerChecker $ownerChecker
-     */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ValidatorInterface $validator,
@@ -89,9 +79,6 @@ class ImportStrategyHelper
         $this->ownerChecker = $ownerChecker;
     }
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
     public function setConfigProvider(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
@@ -394,11 +381,6 @@ class ImportStrategyHelper
         );
     }
 
-    /**
-     * @param ContextInterface $context
-     *
-     * @return int
-     */
     public function getCurrentRowNumber(ContextInterface $context): int
     {
         $batchSize = null;

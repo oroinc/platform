@@ -23,11 +23,6 @@ class AllEntityHierarchyProvider extends AbstractEntityHierarchyProvider
     /** @var ManagerBagInterface */
     protected $managerBag;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ConfigProvider      $extendConfigProvider
-     * @param ManagerBagInterface $managerBag
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigProvider $extendConfigProvider,

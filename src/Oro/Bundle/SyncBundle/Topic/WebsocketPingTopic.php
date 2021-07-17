@@ -24,10 +24,6 @@ class WebsocketPingTopic extends AbstractTopic implements TopicPeriodicTimerInte
     /** @var int */
     private $timeout;
 
-    /**
-     * @param string $topicName
-     * @param int $timeout
-     */
     public function __construct(string $topicName, int $timeout = 50)
     {
         parent::__construct($topicName);

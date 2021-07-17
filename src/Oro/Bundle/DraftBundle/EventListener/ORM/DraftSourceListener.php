@@ -35,9 +35,6 @@ class DraftSourceListener
         $this->databaseDriver = $databaseDriver;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
         if (!$this->isPlatformSupport()) {
@@ -57,11 +54,6 @@ class DraftSourceListener
         $metadata->mapManyToOne($draftSourceMetadata);
     }
 
-    /**
-     * @param ClassMetadataInfo $metadata
-     *
-     * @return array
-     */
     private function getPropertyMetadata(ClassMetadataInfo $metadata): array
     {
         $className = $metadata->getName();
@@ -87,11 +79,6 @@ class DraftSourceListener
         ];
     }
 
-    /**
-     * @param ClassMetadataInfo $metadata
-     *
-     * @return string
-     */
     private function getEntityIdentifier(ClassMetadataInfo $metadata): string
     {
         $identifier = $metadata->getIdentifier();
@@ -99,9 +86,6 @@ class DraftSourceListener
         return reset($identifier);
     }
 
-    /**
-     * @return bool
-     */
     private function isPlatformSupport(): bool
     {
         $drivers = [DatabaseDriverInterface::DRIVER_MYSQL, DatabaseDriverInterface::DRIVER_POSTGRESQL];
@@ -109,11 +93,6 @@ class DraftSourceListener
         return in_array($this->databaseDriver, $drivers);
     }
 
-    /**
-     * @param \ReflectionClass $class
-     *
-     * @return bool
-     */
     private function isDraft(\ReflectionClass $class): bool
     {
         return in_array(DraftableInterface::class, $class->getInterfaceNames());

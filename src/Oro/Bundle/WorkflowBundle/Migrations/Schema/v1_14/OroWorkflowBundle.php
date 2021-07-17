@@ -61,9 +61,6 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $this->removeScheduledTransitions($queries);
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     protected function updateReportsDefinitions(QueryBag $queries)
     {
         $queries->addPostQuery(
@@ -94,9 +91,6 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         return $comparator->compare($schema, $toSchema)->toSql($this->platform);
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     protected function removeScheduledTransitions(QueryBag $queries)
     {
         $params = ['stpn_name' => 'stpn__%'];

@@ -168,7 +168,6 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root[0].prop: test'], $event->getErrors());
     }
 
-
     public function testInvalidValueLocalizedFallbackValueToMany()
     {
         $fallback = new LocalizedFallbackValue();

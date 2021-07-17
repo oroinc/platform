@@ -90,11 +90,6 @@ class FilterOrmQueryUtil
         ];
     }
 
-    /**
-     * @param QueryBuilder $qb
-     *
-     * @return string
-     */
     public static function getSingleIdentifierFieldExpr(QueryBuilder $qb): string
     {
         $entities = $qb->getRootEntities();
@@ -107,12 +102,6 @@ class FilterOrmQueryUtil
         return sprintf('%s.%s', reset($rootAliases), $idField);
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     * @param string                     $column
-     *
-     * @return Expr\Join|null
-     */
     public static function findRelatedJoinByColumn(
         OrmFilterDatasourceAdapter $ds,
         string $column
@@ -126,12 +115,6 @@ class FilterOrmQueryUtil
         return QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $alias);
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     * @param string                     $column
-     *
-     * @return bool
-     */
     public static function isToOneColumn(OrmFilterDatasourceAdapter $ds, string $column): bool
     {
         [$joinAlias] = explode('.', $column);
@@ -186,11 +169,6 @@ class FilterOrmQueryUtil
         return $expressions;
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     * @param QueryBuilder $subQuery
-     * @param string $fieldExpr
-     */
     private static function processSubQueryExpressionGroupBy(
         OrmFilterDatasourceAdapter $ds,
         QueryBuilder $subQuery,

@@ -19,10 +19,6 @@ class EnumFilter extends BaseMultiChoiceFilter
     /** @var DictionaryApiEntityManager */
     protected $dictionaryApiEntityManager;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

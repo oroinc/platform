@@ -66,10 +66,6 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         unset($this->builder, $this->validator);
     }
 
-    /**
-     * @param array $expected
-     * @param Permission $definition
-     */
     protected function assertDefinitionConfiguration(array $expected, Permission $definition): void
     {
         $this->assertSame($expected['label'], $definition->getLabel());
@@ -81,8 +77,6 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expected
      * @dataProvider buildPermissionsDataProvider
      */
     public function testBuildPermissions(array $configuration, array $expected): void
@@ -134,9 +128,6 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function buildPermissionsDataProvider(): array
     {
         $permissionEntity1 = (new PermissionEntity())->setName('Entity1');

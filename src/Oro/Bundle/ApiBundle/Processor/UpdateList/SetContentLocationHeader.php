@@ -27,11 +27,6 @@ class SetContentLocationHeader implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param RestRoutesRegistry $routesRegistry
-     * @param RouterInterface    $router
-     * @param ValueNormalizer    $valueNormalizer
-     */
     public function __construct(
         RestRoutesRegistry $routesRegistry,
         RouterInterface $router,

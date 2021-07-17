@@ -32,13 +32,6 @@ class UpdateHandlerFacade
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     * @param UpdateFactory $updateFactory
-     */
     public function __construct(
         RequestStack $requestStack,
         Session $session,

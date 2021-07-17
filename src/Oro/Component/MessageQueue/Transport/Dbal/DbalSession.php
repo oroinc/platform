@@ -19,9 +19,6 @@ class DbalSession implements DbalSessionInterface
      */
     private $connection;
 
-    /**
-     * @param DbalConnection $connection
-     */
     public function __construct(DbalConnection $connection)
     {
         $this->connection = $connection;
@@ -78,9 +75,6 @@ class DbalSession implements DbalSessionInterface
     {
     }
 
-    /**
-     * @return ConnectionInterface
-     */
     public function getConnection(): ConnectionInterface
     {
         return $this->connection;

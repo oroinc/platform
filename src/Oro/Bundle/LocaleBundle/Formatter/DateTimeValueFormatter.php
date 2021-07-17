@@ -16,10 +16,6 @@ class DateTimeValueFormatter implements FormatterInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param DateTimeFormatterInterface $dateTimeFormatter
-     * @param TranslatorInterface $translator
-     */
     public function __construct(DateTimeFormatterInterface $dateTimeFormatter, TranslatorInterface $translator)
     {
         $this->formatter = $dateTimeFormatter;

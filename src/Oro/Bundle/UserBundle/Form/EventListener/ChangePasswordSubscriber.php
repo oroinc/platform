@@ -22,8 +22,6 @@ class ChangePasswordSubscriber extends UserSubscriber
 
     /**
      * Re-create current password field in case of user don't filled any password field
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -50,9 +48,6 @@ class ChangePasswordSubscriber extends UserSubscriber
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();

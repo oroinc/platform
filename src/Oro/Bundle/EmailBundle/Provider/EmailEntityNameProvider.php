@@ -17,9 +17,6 @@ class EmailEntityNameProvider implements EntityNameProviderInterface
      */
     private $propertyAccessor;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
@@ -71,10 +68,6 @@ class EmailEntityNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * @param string $format
-     * @return bool
-     */
     private function isSupported(string $format): bool
     {
         return $format === 'email';

@@ -25,11 +25,6 @@ class EntityDataFactory
      */
     protected $eventDispatcher;
 
-    /**
-     * @param MetadataRegistry $metadataRegistry
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         MetadataRegistry $metadataRegistry,
         DoctrineHelper $doctrineHelper,

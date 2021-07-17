@@ -93,9 +93,6 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Changes a connection object for the given entity manager
-     *
-     * @param Connection        $connection
-     * @param EntityManagerMock $em
      */
     protected function setDriverConnection(Connection $connection, EntityManagerMock $em)
     {

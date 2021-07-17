@@ -91,8 +91,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-
-
     /**
      * @return array|\Symfony\Component\Form\FormExtensionInterface[]
      */

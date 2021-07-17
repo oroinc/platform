@@ -33,12 +33,6 @@ class IntegrationSelectType extends AbstractType
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param EntityManager $em
-     * @param TypesRegistry $typesRegistry
-     * @param AssetHelper   $assetHelper
-     * @param AclHelper     $aclHelper
-     */
     public function __construct(
         EntityManager $em,
         TypesRegistry $typesRegistry,

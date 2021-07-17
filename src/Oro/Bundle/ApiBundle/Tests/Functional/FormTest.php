@@ -285,9 +285,6 @@ class FormTest extends WebTestCase
         $formExtensionSwitcher->switchToApiFormExtension();
     }
 
-    /**
-     * @param MetadataAccessorInterface|null $metadataAccessor
-     */
     protected function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null)
     {
         /** @var MetadataTypeGuesser $metadataTypeGuesser */

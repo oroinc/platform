@@ -13,9 +13,6 @@ trait IntegrationTokenAwareTrait
      */
     private $tokenStorage;
 
-    /**
-     * @param Integration $integration
-     */
     private function setTemporaryIntegrationToken(Integration $integration)
     {
         $integrationToken = new OrganizationToken($integration->getOrganization());

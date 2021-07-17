@@ -18,9 +18,6 @@ class MergeParentResourceHelper
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
@@ -59,10 +56,6 @@ class MergeParentResourceHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param EntityDefinitionConfig $configToMerge
-     */
     protected function mergeDefinition(EntityDefinitionConfig $config, EntityDefinitionConfig $configToMerge)
     {
         $config->setKey($configToMerge->getKey());
@@ -88,10 +81,6 @@ class MergeParentResourceHelper
         }
     }
 
-    /**
-     * @param EntityConfigInterface $config
-     * @param EntityConfigInterface $configToMerge
-     */
     protected function mergeConfigSection(EntityConfigInterface $config, EntityConfigInterface $configToMerge)
     {
         $this->mergeEntityConfigAttributes($config, $configToMerge);
@@ -105,10 +94,6 @@ class MergeParentResourceHelper
         }
     }
 
-    /**
-     * @param EntityConfigInterface $config
-     * @param EntityConfigInterface $configToMerge
-     */
     protected function mergeEntityConfigAttributes(EntityConfigInterface $config, EntityConfigInterface $configToMerge)
     {
         $this->mergeConfigAttributes($config, $configToMerge);
@@ -117,10 +102,6 @@ class MergeParentResourceHelper
         }
     }
 
-    /**
-     * @param FieldConfigInterface $config
-     * @param FieldConfigInterface $configToMerge
-     */
     protected function mergeFieldConfigAttributes(FieldConfigInterface $config, FieldConfigInterface $configToMerge)
     {
         $this->mergeConfigAttributes($config, $configToMerge);
@@ -129,10 +110,6 @@ class MergeParentResourceHelper
         }
     }
 
-    /**
-     * @param ConfigBagInterface $config
-     * @param ConfigBagInterface $configToMerge
-     */
     protected function mergeConfigAttributes(ConfigBagInterface $config, ConfigBagInterface $configToMerge)
     {
         $keysToMerge = $configToMerge->keys();

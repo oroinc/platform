@@ -22,10 +22,6 @@ class WidgetProviderPass implements CompilerPassInterface
     /** @var string */
     private $tagName;
 
-    /**
-     * @param string $serviceId
-     * @param string $tagName
-     */
     public function __construct(string $serviceId, string $tagName)
     {
         $this->serviceId = $serviceId;

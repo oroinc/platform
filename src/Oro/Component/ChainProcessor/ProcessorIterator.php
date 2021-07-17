@@ -25,12 +25,6 @@ class ProcessorIterator implements \Iterator
     /** @var int */
     protected $maxIndex;
 
-    /**
-     * @param array                      $processors
-     * @param ContextInterface           $context
-     * @param ApplicableCheckerInterface $applicableChecker
-     * @param ProcessorRegistryInterface $processorRegistry
-     */
     public function __construct(
         array $processors,
         ContextInterface $context,
@@ -55,8 +49,6 @@ class ProcessorIterator implements \Iterator
 
     /**
      * Replaces existing applicable checker.
-     *
-     * @param ApplicableCheckerInterface $applicableChecker
      */
     public function setApplicableChecker(ApplicableCheckerInterface $applicableChecker)
     {

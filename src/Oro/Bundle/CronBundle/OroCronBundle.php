@@ -9,7 +9,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroCronBundle extends Bundle
 {
-
     /**
      * {@inheritdoc}
      */

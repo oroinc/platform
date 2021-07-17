@@ -17,9 +17,6 @@ class EntityAliasConfigBag
     /** @var array */
     private $exclusions;
 
-    /**
-     * @param EntityConfigurationProvider $configProvider
-     */
     public function __construct(EntityConfigurationProvider $configProvider)
     {
         $this->configProvider = $configProvider;

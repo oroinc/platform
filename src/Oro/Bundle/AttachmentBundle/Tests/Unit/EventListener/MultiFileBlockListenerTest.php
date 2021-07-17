@@ -334,9 +334,6 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onBeforeFormRenderProvider
-     *
-     * @param array $inputData
-     * @param array $expectedResult
      */
     public function testOnBeforeFormRender(array $inputData, array $expectedResult)
     {
@@ -388,8 +385,6 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function onBeforeFormRenderProvider(): array
     {

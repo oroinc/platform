@@ -17,7 +17,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 class AutocompleteController extends FOSRestController
 {
     /**
-     * @param Request $request
      * @ApiDoc(
      *  description="Get autocomplete search result",
      *  resource=true,

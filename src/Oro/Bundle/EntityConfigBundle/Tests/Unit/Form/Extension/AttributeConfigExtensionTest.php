@@ -108,9 +108,6 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertFalse($this->builder->has('attribute'));
     }
 
-    /**
-     * @param FieldConfigModel $fieldConfigModel
-     */
     protected function assertConfigProviderCalled(FieldConfigModel $fieldConfigModel)
     {
         $classConfig = $this->createMock(ConfigInterface::class);
@@ -316,11 +313,6 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertEmpty($event->getData());
     }
 
-    /**
-     * @param int|null $id
-     *
-     * @return FieldConfigModel
-     */
     protected function getFieldConfigModel(int $id = null): FieldConfigModel
     {
         $entityConfigModel = new EntityConfigModel('class');

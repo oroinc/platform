@@ -15,9 +15,6 @@ class UseMyIsamEngineQuery implements MigrationQuery, ConnectionAwareInterface
     /** @var string */
     protected $tableName;
 
-    /**
-     * @param $tableName
-     */
     public function __construct($tableName)
     {
         $this->tableName = $tableName;

@@ -15,10 +15,6 @@ class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     /** @var Cache */
     private $cache;
 
-    /**
-     * @param ImagePlaceholderProviderInterface $imagePlaceholderProvider
-     * @param Cache $cache
-     */
     public function __construct(ImagePlaceholderProviderInterface $imagePlaceholderProvider, Cache $cache)
     {
         $this->imagePlaceholderProvider = $imagePlaceholderProvider;

@@ -53,11 +53,6 @@ class ValidateParentEntityObjectAccess implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ChangeRelationshipContext $context
-     *
-     * @return bool
-     */
     private function isParentEntityShouldBeChecked(ChangeRelationshipContext $context): bool
     {
         $parentConfig = $context->getParentConfig();

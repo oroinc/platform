@@ -40,8 +40,6 @@ class IdToEntityTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param \stdClass|null $expected
      */
     public function testTransform(?\stdClass $expected): void
     {
@@ -60,9 +58,6 @@ class IdToEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transformer->transform($id));
     }
 
-    /**
-     * @return array
-     */
     public function transformDataProvider(): array
     {
         return [
@@ -83,9 +78,6 @@ class IdToEntityTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformDataProvider
-     *
-     * @param array $ids
-     * @param int|null $expected
      */
     public function testReverseTransform(array $ids, ?int $expected): void
     {
@@ -110,9 +102,6 @@ class IdToEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
-    /**
-     * @return array
-     */
     public function reverseTransformDataProvider(): array
     {
         return [

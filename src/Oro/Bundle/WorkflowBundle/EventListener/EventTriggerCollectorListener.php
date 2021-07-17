@@ -36,9 +36,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         $this->extensions = $extensions;
     }
 
-    /**
-     * @param bool $forceQueued
-     */
     public function setForceQueued(bool $forceQueued = false)
     {
         $this->forceQueued = $forceQueued;
@@ -53,9 +50,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         $this->initializedExtensions = null;
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function prePersist(LifecycleEventArgs $args)
     {
         if (!$this->enabled) {
@@ -65,9 +59,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         $this->schedule($args->getEntity(), EventTriggerInterface::EVENT_CREATE);
     }
 
-    /**
-     * @param PreUpdateEventArgs $args
-     */
     public function preUpdate(PreUpdateEventArgs $args)
     {
         if (!$this->enabled) {
@@ -83,9 +74,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         $this->schedule($args->getEntity(), EventTriggerInterface::EVENT_UPDATE, $changeSet);
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
     public function preRemove(LifecycleEventArgs $args)
     {
         if (!$this->enabled) {
@@ -95,9 +83,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         $this->schedule($args->getEntity(), EventTriggerInterface::EVENT_DELETE);
     }
 
-    /**
-     * @param OnClearEventArgs $args
-     */
     public function onClear(OnClearEventArgs $args)
     {
         $entityClass = $args->clearsAllEntities() ? null : $args->getEntityClass();
@@ -107,9 +92,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
         if (!$this->enabled) {

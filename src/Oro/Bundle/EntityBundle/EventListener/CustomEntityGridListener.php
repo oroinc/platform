@@ -15,17 +15,11 @@ class CustomEntityGridListener
     /** @var DatagridInterface[] */
     protected $visitedDatagrids = array();
 
-    /**
-     * @param Router $router
-     */
     public function __construct(Router $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $datagrid = $event->getDatagrid();
@@ -67,9 +61,6 @@ class CustomEntityGridListener
         };
     }
 
-    /**
-     * @param DatagridInterface $datagrid
-     */
     protected function addVisitedDatagrid(DatagridInterface $datagrid)
     {
         $this->visitedDatagrids[$datagrid->getName()] = $datagrid;

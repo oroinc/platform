@@ -77,10 +77,6 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
      */
     private $debug = false;
 
-    /**
-     * @param ExpressionProcessor $expressionProcessor
-     * @param BlockViewCache|null $blockViewCache
-     */
     public function __construct(ExpressionProcessor $expressionProcessor, BlockViewCache $blockViewCache = null)
     {
         $this->expressionProcessor = $expressionProcessor;

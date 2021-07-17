@@ -15,19 +15,11 @@ abstract class AbstractChoiceType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!empty($view->children['value'])) {
@@ -43,10 +35,6 @@ abstract class AbstractChoiceType extends AbstractType
 
     /**
      * Translates choices
-     *
-     * @param FormView $view
-     * @param FormView $valueFormView
-     * @param array    $options
      */
     protected function translateChoices(FormView $view, FormView $valueFormView, array $options)
     {

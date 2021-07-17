@@ -18,9 +18,6 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
     /** @var EntitySerializer */
     private $entitySerializer;
 
-    /**
-     * @param EntitySerializer $entitySerializer
-     */
     public function __construct(EntitySerializer $entitySerializer)
     {
         $this->entitySerializer = $entitySerializer;

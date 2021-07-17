@@ -19,14 +19,6 @@ class EmailNotificationEntityProvider extends EntityProvider
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param TranslatorInterface $translator
-     * @param FeatureChecker      $featureChecker
-     * @param ManagerRegistry     $doctrine
-     */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,

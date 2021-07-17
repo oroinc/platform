@@ -50,11 +50,6 @@ class DatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider appendGridParamsDataProvider
-     *
-     * @param string $url
-     * @param string $gridName
-     * @param array $gridParams
-     * @param string $expectedUrl
      */
     public function testAppendGridParams(string $url, string $gridName, array $gridParams, string $expectedUrl): void
     {

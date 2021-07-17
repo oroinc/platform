@@ -16,11 +16,6 @@ class RequestDependedTextProcessor extends AbstractTextProcessor
      * Checks whether the given text contains "{@request:...}" placeholders and, if so, do the following:
      * * replaces placeholders related to the specific request type with their content
      * * removes placeholders that are not related to the specific request type
-     *
-     * @param string      $text
-     * @param RequestType $requestType
-     *
-     * @return string
      */
     public function process(string $text, RequestType $requestType): string
     {

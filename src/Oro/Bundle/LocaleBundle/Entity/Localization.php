@@ -205,9 +205,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
         return $this->formattingCode;
     }
 
-    /**
-     * @return bool
-     */
     public function isRtlMode(): bool
     {
         return $this->rtlMode;

@@ -24,9 +24,6 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         UserManager::STATUS_EXPIRED,
     ];
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -42,9 +39,6 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (null === $token = $this->tokenStorage->getToken()) {

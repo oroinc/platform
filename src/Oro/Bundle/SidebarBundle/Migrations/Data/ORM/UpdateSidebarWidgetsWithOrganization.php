@@ -18,8 +18,6 @@ class UpdateSidebarWidgetsWithOrganization extends UpdateWithOrganization implem
 
     /**
      * Assign exists sidebar widgets to the default organization
-     *
-     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

@@ -34,12 +34,6 @@ abstract class AbstractIndexer implements IndexerInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ManagerRegistry              $registry
-     * @param DoctrineHelper               $doctrineHelper
-     * @param ObjectMapper                 $mapper
-     * @param EntityNameResolver           $entityNameResolver
-     */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,

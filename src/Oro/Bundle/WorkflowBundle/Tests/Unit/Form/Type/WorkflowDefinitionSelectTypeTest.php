@@ -131,8 +131,6 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider incorrectOptionsDataProvider
-     *
-     * @param $options
      */
     public function testNormalizersException(array $options)
     {

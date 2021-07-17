@@ -78,13 +78,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         return 'wsse';
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $id
-     * @param array $config
-     *
-     * @return string
-     */
     private function createEncoder(ContainerBuilder $container, string $id, array $config): string
     {
         $encoderId = self::ENCODER . '.' . $id;
@@ -108,13 +101,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         return $encoderId;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $id
-     * @param array $config
-     *
-     * @return string
-     */
     private function createNonceCache(ContainerBuilder $container, string $id, array $config): string
     {
         if (isset($config['nonce_cache_service_id'])) {
@@ -129,10 +115,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         return $nonceCacheId;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $nonceCacheServiceId
-     */
     private function addNonceCacheToServiceLocator(ContainerBuilder $container, string $nonceCacheServiceId): void
     {
         $nonceCacheServiceLocatorId = 'oro_wsse_authentication.service_locator.nonce_cache';
@@ -149,14 +131,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         $nonceCacheServiceLocator->setArgument(0, $encoders);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $id
-     * @param array $config
-     * @param string $userProviderId
-     *
-     * @return string
-     */
     private function createAuthenticationProvider(
         ContainerBuilder $container,
         string $id,
@@ -180,10 +154,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         return $providerId;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $encoderServiceId
-     */
     private function addEncoderToServiceLocator(ContainerBuilder $container, string $encoderServiceId): void
     {
         $encoderServiceLocatorId = 'oro_wsse_authentication.service_locator.encoder';
@@ -200,13 +170,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         $encoderServiceLocator->setArgument(0, $encoders);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $id
-     * @param array $config
-     *
-     * @return string
-     */
     private function createEntryPoint(ContainerBuilder $container, string $id, array $config): string
     {
         $entryPointId = self::ENTRY_POINT . '.' . $id;
@@ -219,13 +182,6 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
         return $entryPointId;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string $id
-     * @param string $entryPointId
-     *
-     * @return string
-     */
     private function createAuthenticationListener(ContainerBuilder $container, string $id, string $entryPointId): string
     {
         $listenerId = self::AUTHENTICATION_LISTENER . '.' . $id;

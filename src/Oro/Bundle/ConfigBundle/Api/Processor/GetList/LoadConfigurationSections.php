@@ -20,10 +20,6 @@ class LoadConfigurationSections implements ProcessorInterface
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param ConfigurationRepository       $configRepository
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         ConfigurationRepository $configRepository,
         AuthorizationCheckerInterface $authorizationChecker

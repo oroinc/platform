@@ -852,7 +852,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             $isser = 'is'.$camelProp;
             $hasser = 'has'.$camelProp;
 
-
             if ($this->hasPublicMethod($reflClass, $getter)) {
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
                 $access[self::ACCESS_NAME] = $getter;

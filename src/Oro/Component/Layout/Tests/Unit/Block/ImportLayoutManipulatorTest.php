@@ -134,7 +134,6 @@ class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
         $this->importLayoutManipulator->remove('__id');
     }
 
-
     /**
      * Replace in id, parentId and siblingId
      */

@@ -40,17 +40,11 @@ abstract class AbstractStatusCalculator
         Job::STATUS_SUCCESS => 'success'
     ];
 
-    /**
-     * @param JobStatusChecker $jobStatusChecker
-     */
     public function setJobStatusChecker(JobStatusChecker $jobStatusChecker)
     {
         $this->jobStatusChecker = $jobStatusChecker;
     }
 
-    /**
-     * @param Job $rootJob
-     */
     abstract public function init(Job $rootJob);
 
     /**

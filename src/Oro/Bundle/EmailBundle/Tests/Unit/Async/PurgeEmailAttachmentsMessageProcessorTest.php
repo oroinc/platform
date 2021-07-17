@@ -32,9 +32,6 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
 
     /**
      * @dataProvider getSizeDataProvider
-     * @param $payload
-     * @param $parameterSize
-     * @param $expectedResult
      */
     public function testShouldReturnCorrectAttachmentSizeByPayload($payload, $parameterSize, $expectedResult)
     {
@@ -97,7 +94,6 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
         return $this->createMock(ManagerRegistry::class);
     }
 
-
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
@@ -105,7 +101,6 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
     {
         return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
-
 
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface

@@ -22,10 +22,6 @@ class PasswordComplexityExtension extends AbstractTypeExtension
     /** @var PasswordComplexityConfigProvider */
     protected $configProvider;
 
-    /**
-     * @param ConstraintsProviderInterface $constraintsProvider
-     * @param PasswordComplexityConfigProvider $configProvider
-     */
     public function __construct(
         ConstraintsProviderInterface $constraintsProvider,
         PasswordComplexityConfigProvider $configProvider
@@ -50,8 +46,6 @@ class PasswordComplexityExtension extends AbstractTypeExtension
 
     /**
      * Sets the properties of the constraint to the system configured Password Complexity Rules
-     *
-     * @param PasswordComplexity $constraint
      */
     protected function configureConstraint(PasswordComplexity $constraint)
     {

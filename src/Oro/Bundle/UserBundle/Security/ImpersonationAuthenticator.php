@@ -44,13 +44,6 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     /** @var UrlGeneratorInterface */
     protected $router;
 
-    /**
-     * @param ManagerRegistry                                   $doctrine
-     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     * @param OrganizationGuesserInterface                      $organizationGuesser
-     * @param EventDispatcherInterface                          $eventDispatcher
-     * @param UrlGeneratorInterface                             $router
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory,

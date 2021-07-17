@@ -50,10 +50,6 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
         $this->doExecute($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
-     */
     protected function doExecute(LoggerInterface $logger, bool $dryRun = false)
     {
         $fieldRow = $this->getFieldRow($this->entityClass, $this->entityField);
@@ -110,12 +106,6 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
         );
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param string $sql
-     * @param array $parameters
-     * @param bool $dryRun
-     */
     protected function executeQuery(LoggerInterface $logger, string $sql, array $parameters = [], bool $dryRun = false)
     {
         $this->logQuery($logger, $sql, $parameters);
@@ -125,10 +115,6 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
-     */
     protected function updateClassConfig(LoggerInterface $logger, bool $dryRun = false)
     {
         $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';

@@ -10,27 +10,16 @@ class DependentJobService
     /** @var JobManagerInterface */
     private $jobManager;
 
-    /**
-     * @param JobManagerInterface $jobManager
-     */
     public function __construct(JobManagerInterface $jobManager)
     {
         $this->jobManager = $jobManager;
     }
 
-    /**
-     * @param Job $job
-     *
-     * @return DependentJobContext
-     */
     public function createDependentJobContext(Job $job): DependentJobContext
     {
         return new DependentJobContext($job);
     }
 
-    /**
-     * @param DependentJobContext $context
-     */
     public function saveDependentJob(DependentJobContext $context): void
     {
         if (! $context->getJob()->isRoot()) {

@@ -11,9 +11,6 @@ abstract class AbstractAclManager implements AclSidInterface
      */
     protected $baseAclManager;
 
-    /**
-     * @param AclSidInterface $baseAclManager
-     */
     public function setBaseAclManager(AclSidInterface $baseAclManager)
     {
         $this->baseAclManager = $baseAclManager;

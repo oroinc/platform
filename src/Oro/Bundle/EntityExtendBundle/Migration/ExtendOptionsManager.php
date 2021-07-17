@@ -109,11 +109,6 @@ class ExtendOptionsManager
         $this->options[$objectKey] = ArrayUtil::arrayMergeRecursiveDistinct($this->options[$objectKey], $options);
     }
 
-    /**
-     * @param string $tableName
-     * @param string $columnName
-     * @return bool
-     */
     public function hasColumnOptions(string $tableName, string $columnName): bool
     {
         $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
@@ -121,11 +116,6 @@ class ExtendOptionsManager
         return isset($this->getExtendOptions()[$objectKey]);
     }
 
-    /**
-     * @param string $tableName
-     * @param string $columnName
-     * @return array
-     */
     public function getColumnOptions(string $tableName, string $columnName): array
     {
         $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
@@ -264,9 +254,6 @@ class ExtendOptionsManager
     }
 
     /**
-     * @param $objectKey
-     * @param $scope
-     * @param $values
      * @throws \InvalidArgumentException
      */
     private function validateOption($objectKey, $scope, $values)

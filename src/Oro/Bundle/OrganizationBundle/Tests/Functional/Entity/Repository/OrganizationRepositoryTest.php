@@ -57,8 +57,6 @@ class OrganizationRepositoryTest extends WebTestCase
     }
 
     /**
-     * @param Organization $organization
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */

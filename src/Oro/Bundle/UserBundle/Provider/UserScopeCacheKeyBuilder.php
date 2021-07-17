@@ -20,10 +20,6 @@ class UserScopeCacheKeyBuilder implements ScopeCacheKeyBuilderInterface
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
-    /**
-     * @param ScopeCacheKeyBuilderInterface $innerBuilder
-     * @param TokenStorageInterface         $tokenStorage
-     */
     public function __construct(ScopeCacheKeyBuilderInterface $innerBuilder, TokenStorageInterface $tokenStorage)
     {
         $this->innerBuilder = $innerBuilder;
@@ -53,11 +49,6 @@ class UserScopeCacheKeyBuilder implements ScopeCacheKeyBuilderInterface
         return $cacheKey;
     }
 
-    /**
-     * @param TokenInterface $token
-     *
-     * @return string|null
-     */
     private function getUserId(TokenInterface $token): ?string
     {
         $user = $token->getUser();

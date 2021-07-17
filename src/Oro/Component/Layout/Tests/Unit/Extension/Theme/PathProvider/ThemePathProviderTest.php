@@ -141,9 +141,6 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $themes
-     */
     protected function setUpThemeManager(array $themes)
     {
         $map = [];

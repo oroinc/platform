@@ -120,7 +120,6 @@ class CommentController extends RestController
      * )
      *
      * @AclAncestor("oro_comment_create")
-     *
      */
     public function postAction($relationClass, int $relationId)
     {

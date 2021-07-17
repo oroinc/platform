@@ -27,10 +27,6 @@ class FormSubmitLayoutAjaxResponseProcessor implements ProcessorInterface
         $context->setProcessed(true);
     }
 
-    /**
-     * @param TransitionContext $context
-     * @return bool
-     */
     protected function isApplicable(TransitionContext $context): bool
     {
         if (!$context->isSaved()) {

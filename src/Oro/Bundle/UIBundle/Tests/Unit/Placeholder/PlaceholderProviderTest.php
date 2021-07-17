@@ -97,7 +97,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with($items['placeholder_item'], $variables)
             ->will($this->returnValue($items['placeholder_item']));
 
-
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
         $this->assertSame(
@@ -130,7 +129,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with($items['placeholder_item'], $variables)
             ->will($this->returnValue($items['placeholder_item']));
 
-
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
         $this->assertSame(
@@ -154,7 +152,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with(['applicable' => $items['placeholder_item']['applicable'][0]], $variables)
             ->will($this->returnValue(['applicable' => false]));
 
-
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
         $this->assertSame([], $actual);
@@ -175,7 +172,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with('acl_ancestor')
             ->will($this->returnValue(true));
 
-
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
         $this->assertSame([], $actual);
@@ -195,7 +191,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isGranted')
             ->with('acl_ancestor')
             ->will($this->returnValue(false));
-
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
@@ -227,7 +222,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with($items['placeholder_item'], $variables)
             ->will($this->returnValue($items['placeholder_item']));
 
-
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);
         $this->assertSame([$items['placeholder_item']], $actual);
@@ -247,7 +241,6 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isGranted')
             ->with('acl_ancestor1')
             ->will($this->returnValue(false));
-
 
         $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
         unset($items['placeholder_item']['acl']);

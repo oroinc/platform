@@ -18,8 +18,6 @@ interface ConfigExtraInterface
 
     /**
      * Makes modifications of the ConfigContext necessary to get required configuration data.
-     *
-     * @param ConfigContext $context
      */
     public function configureContext(ConfigContext $context);
 

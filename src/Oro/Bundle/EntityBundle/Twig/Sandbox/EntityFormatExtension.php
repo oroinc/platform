@@ -24,9 +24,6 @@ class EntityFormatExtension extends AbstractExtension
     /** @var array [class name => [field name => formatter name or [formatter name, formatter arguments], ...], ...] */
     private $formatters = [];
 
-    /**
-     * @param array $formatters
-     */
     public function setFormatters(array $formatters): void
     {
         $this->formatters = $formatters;
@@ -46,14 +43,6 @@ class EntityFormatExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param string      $name
-     * @param string      $path
-     * @param string      $parentPath
-     * @param string|null $notDefinedMessage
-     *
-     * @return string
-     */
     public function getSafeFormatExpression(
         string $name,
         string $path,

@@ -39,11 +39,6 @@ abstract class AbstractButtonProviderExtension implements
     /** @var ButtonContext */
     private $baseButtonContext;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param RouteProviderInterface $routeProvider
-     * @param OriginalUrlProvider $originalUrlProvider
-     */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         RouteProviderInterface $routeProvider,

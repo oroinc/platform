@@ -59,9 +59,6 @@ class TestTarget implements TestFrameworkEntityInterface
         return $this->owners;
     }
 
-    /**
-     * @param TestOwner $owner
-     */
     public function addOwner(TestOwner $owner)
     {
         if (!$this->owners->contains($owner)) {
@@ -70,9 +67,6 @@ class TestTarget implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestOwner $owner
-     */
     public function removeOwner(TestOwner $owner)
     {
         if ($this->owners->contains($owner)) {

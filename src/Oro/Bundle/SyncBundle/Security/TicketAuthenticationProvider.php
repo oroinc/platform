@@ -33,13 +33,6 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
     /** @var int */
     private $ticketTtl;
 
-    /**
-     * @param TicketDigestGeneratorInterface $ticketDigestGenerator
-     * @param UserProviderInterface          $userProvider
-     * @param string                         $providerKey
-     * @param string                         $secret
-     * @param int                            $ticketTtl
-     */
     public function __construct(
         TicketDigestGeneratorInterface $ticketDigestGenerator,
         UserProviderInterface $userProvider,
@@ -96,9 +89,6 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
             && $this->providerKey === $token->getProviderKey();
     }
 
-    /**
-     * @param TokenInterface $token
-     */
     private function validateTokenCreatedDate(TokenInterface $token): void
     {
         $created = $token->getAttribute('created');
@@ -123,11 +113,6 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
         }
     }
 
-    /**
-     * @param TokenInterface $token
-     *
-     * @return UserInterface|null
-     */
     private function fetchUser(TokenInterface $token): ?UserInterface
     {
         $user = null;

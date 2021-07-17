@@ -12,14 +12,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 interface EmailSynchronizerInterface
 {
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function setMessageProducer(MessageProducerInterface $producer);
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function setTokenStorage(TokenStorageInterface $tokenStorage);
 
     /**

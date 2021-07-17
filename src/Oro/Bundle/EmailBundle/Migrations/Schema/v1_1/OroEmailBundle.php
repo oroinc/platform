@@ -43,8 +43,6 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
 
     /**
      * Create many-to-many relation table
-     *
-     * @param Schema $schema
      */
     public static function oroEmailToFolderRelationTable(Schema $schema)
     {
@@ -72,8 +70,6 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
 
     /**
      * Sets the database platform
-     *
-     * @param AbstractPlatform $platform
      */
     public function setDatabasePlatform(AbstractPlatform $platform)
     {

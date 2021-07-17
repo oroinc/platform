@@ -46,9 +46,6 @@ class OrmQueryConfiguration
     /** @var array */
     private $generatedJoinAliases = [];
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     public function __construct(DatagridConfiguration $config)
     {
         $this->config = $config;

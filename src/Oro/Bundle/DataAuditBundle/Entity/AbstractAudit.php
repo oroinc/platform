@@ -206,7 +206,7 @@ abstract class AbstractAudit
         if ($existingField) {
             $this->getFields()->removeElement($existingField);
         }
-        
+
         $this->getFields()->add($field);
         $field->setAudit($this);
 
@@ -328,9 +328,6 @@ abstract class AbstractAudit
         return $this->loggedAt;
     }
 
-    /**
-     * @param \DateTime|null $loggedAt
-     */
     public function setLoggedAt(\DateTime $loggedAt = null)
     {
         $this->loggedAt = $loggedAt ?: new \DateTime();
@@ -440,9 +437,6 @@ abstract class AbstractAudit
         return $this->additionalFields;
     }
 
-    /**
-     * @param array $additionalFields
-     */
     public function setAdditionalFields(array $additionalFields)
     {
         $this->additionalFields = $additionalFields;

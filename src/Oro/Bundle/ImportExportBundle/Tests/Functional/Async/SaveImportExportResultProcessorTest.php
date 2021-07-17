@@ -75,9 +75,6 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         self::assertEquals(ExportMessageProcessor::REJECT, $processorResult);
     }
 
-    /**
-     * @return ManagerRegistry
-     */
     private function getManager(): ManagerRegistry
     {
         return $this->getContainer()->get('doctrine');

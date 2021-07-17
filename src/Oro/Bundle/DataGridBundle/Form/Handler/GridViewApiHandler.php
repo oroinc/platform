@@ -26,13 +26,6 @@ class GridViewApiHandler
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param FormInterface         $form
-     * @param RequestStack          $requestStack
-     * @param Registry              $registry
-     * @param GridViewManager       $gridViewManager
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -78,9 +71,6 @@ class GridViewApiHandler
         return false;
     }
 
-    /**
-     * @param AbstractGridView $entity
-     */
     protected function onSuccess(AbstractGridView $entity)
     {
         $default = $this->form->get('is_default')->getData();
@@ -107,8 +97,6 @@ class GridViewApiHandler
      *       After removing this method PLEASE CHECK saving filters in grid view
      *       look in CollectionFiltersManager._onChangeFilterSelect()
      *       Added fix for dictionary filters also.
-     *
-     * @param AbstractGridView $gridView
      */
     protected function fixFilters(AbstractGridView $gridView)
     {

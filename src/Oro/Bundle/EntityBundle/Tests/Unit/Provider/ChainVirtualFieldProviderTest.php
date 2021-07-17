@@ -190,7 +190,6 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Mocks for getVirtualFieldQuery method
-     * @param $fieldsConfig
      */
     protected function addQueryMock($fieldsConfig)
     {

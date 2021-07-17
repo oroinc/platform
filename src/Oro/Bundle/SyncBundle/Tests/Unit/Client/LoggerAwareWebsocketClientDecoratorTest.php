@@ -115,8 +115,6 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider exceptionDataProvider
-     *
-     * @param \Exception $exception
      */
     public function testPublishWithException(\Exception $exception)
     {
@@ -234,8 +232,6 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider exceptionDataProvider
-     *
-     * @param \Exception $exception
      */
     public function testEventWithException(\Exception $exception)
     {
@@ -253,9 +249,6 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertFalse($this->loggerAwareClientDecorator->event($topicUri, $payload));
     }
 
-    /**
-     * @return array
-     */
     public function exceptionDataProvider(): array
     {
         return [

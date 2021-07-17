@@ -11,17 +11,11 @@ class WidgetSortByListener
     /** @var WidgetConfigs */
     protected $widgetconfigs;
 
-    /**
-     * @param WidgetConfigs $widgetconfigs
-     */
     public function __construct(WidgetConfigs $widgetconfigs)
     {
         $this->widgetconfigs = $widgetconfigs;
     }
 
-    /**
-     * @param OrmResultBeforeQuery $event
-     */
     public function onResultBeforeQuery(OrmResultBeforeQuery $event)
     {
         $widgetOptions = $this->widgetconfigs->getWidgetOptions();

@@ -23,9 +23,6 @@ class AutocompletePasswordTypeExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configureOptionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testConfigureOptions(array $options, array $expected): void
     {
@@ -38,9 +35,6 @@ class AutocompletePasswordTypeExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $resolver->resolve($options));
     }
 
-    /**
-     * @return array
-     */
     public function configureOptionsDataProvider(): array
     {
         return [

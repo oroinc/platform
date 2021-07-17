@@ -32,11 +32,6 @@ class ValidateParentEntityAccess implements ProcessorInterface
     /** @var QueryAclHelper */
     private $queryAclHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityIdHelper $entityIdHelper
-     * @param QueryAclHelper $queryAclHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityIdHelper $entityIdHelper,

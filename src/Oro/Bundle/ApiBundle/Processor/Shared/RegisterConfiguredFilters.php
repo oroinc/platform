@@ -39,10 +39,6 @@ class RegisterConfiguredFilters extends RegisterFilters
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param FilterFactoryInterface $filterFactory
-     * @param DoctrineHelper         $doctrineHelper
-     */
     public function __construct(
         FilterFactoryInterface $filterFactory,
         DoctrineHelper $doctrineHelper
@@ -128,9 +124,6 @@ class RegisterConfiguredFilters extends RegisterFilters
             : [];
     }
 
-    /**
-     * @param StandaloneFilter $filter
-     */
     private function updateSingleIdentifierOperators(StandaloneFilter $filter)
     {
         $filter->setSupportedOperators(
@@ -138,10 +131,6 @@ class RegisterConfiguredFilters extends RegisterFilters
         );
     }
 
-    /**
-     * @param StandaloneFilter $filter
-     * @param bool             $isCollection
-     */
     private function updateAssociationOperators(StandaloneFilter $filter, bool $isCollection)
     {
         $allowedOperators = $isCollection

@@ -22,11 +22,6 @@ class TagSelectType extends AbstractType
     /** @var TagTransformer */
     protected $tagTransformer;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TagTransformer                $tagTransformer
-     * @param TagSubscriber                 $subscriber
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TagTransformer $tagTransformer,

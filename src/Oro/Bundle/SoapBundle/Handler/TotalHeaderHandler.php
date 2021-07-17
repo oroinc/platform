@@ -21,9 +21,6 @@ class TotalHeaderHandler implements IncludeHandlerInterface
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
 
-    /**
-     * @param CountQueryBuilderOptimizer $countQueryOptimizer
-     */
     public function __construct(CountQueryBuilderOptimizer $countQueryOptimizer)
     {
         $this->countQueryBuilderOptimizer = $countQueryOptimizer;

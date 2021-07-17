@@ -15,9 +15,6 @@ class DeleteHandler
     /** @var EntityDeleteHandlerRegistry */
     private $deleteHandlerRegistry;
 
-    /**
-     * @param EntityDeleteHandlerRegistry $deleteHandlerRegistry
-     */
     public function __construct(EntityDeleteHandlerRegistry $deleteHandlerRegistry)
     {
         $this->deleteHandlerRegistry = $deleteHandlerRegistry;

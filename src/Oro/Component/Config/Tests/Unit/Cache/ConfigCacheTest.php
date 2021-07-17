@@ -24,11 +24,6 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFileDoesNotExist($this->cacheFile);
     }
 
-    /**
-     * @param bool $debug
-     *
-     * @return ConfigCacheStub
-     */
     private function getConfigCache(bool $debug): ConfigCacheStub
     {
         return new ConfigCacheStub($this->cacheFile, $debug);

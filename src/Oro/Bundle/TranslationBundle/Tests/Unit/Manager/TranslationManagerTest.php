@@ -259,8 +259,6 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidateCacheDataProvider
-     *
-     * @param $with
      */
     public function testInvalidateCache($with)
     {

@@ -31,11 +31,6 @@ class ValidateCacheConfigurationPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param Definition $cacheProviderDef
-     *
-     * @return string|null
-     */
     private function getNamespace(Definition $cacheProviderDef): ?string
     {
         $namespace = null;

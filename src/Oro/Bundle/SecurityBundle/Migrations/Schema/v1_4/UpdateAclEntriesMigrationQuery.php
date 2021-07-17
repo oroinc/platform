@@ -40,13 +40,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
     /** @var string */
     private $aclClassesTableName;
 
-    /**
-     * @param PermissionConfigurationProvider $permissionConfigurationProvider
-     * @param AclCacheInterface               $aclCache
-     * @param string                          $entriesTableName
-     * @param string                          $objectIdentitiesTableName
-     * @param string                          $aclClassesTableName
-     */
     public function __construct(
         PermissionConfigurationProvider $permissionConfigurationProvider,
         AclCacheInterface $aclCache,
@@ -93,10 +86,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param int             $rootClassId
-     */
     private function prepareQueriesForUpdateAceMask(LoggerInterface $logger, int $rootClassId)
     {
         $aces = $this->loadAces($logger);
@@ -165,9 +154,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         return true;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     private function prepareQueriesForUpdateAceOrder(LoggerInterface $logger)
     {
         $aces = $this->loadAces($logger, 'e.id, e.class_id, e.object_identity_id, e.ace_order', 'e.ace_order');
@@ -202,14 +188,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         return sprintf('%s-%s', $ace['class_id'], $ace['object_identity_id']);
     }
 
-    /**
-     * @param array $aces
-     * @param array $newMasks
-     * @param array $forUpdate
-     * @param array $forDelete
-     * @param array $forInsert
-     * @param array $maxAceOrders
-     */
     private function addQueries(
         array $aces,
         array $newMasks,
@@ -431,9 +409,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         return $result;
     }
 
-    /**
-     * @param array $aces
-     */
     private function updateAces(array $aces)
     {
         if (!$aces) {
@@ -478,9 +453,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         }
     }
 
-    /**
-     * @param array $aces
-     */
     private function insertAces(array $aces)
     {
         if (!$aces) {

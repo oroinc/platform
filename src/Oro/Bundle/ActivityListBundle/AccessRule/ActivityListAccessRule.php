@@ -29,10 +29,6 @@ class ActivityListAccessRule implements AccessRuleInterface
     /** @var ActivityListChainProvider */
     private $activityListProvider;
 
-    /**
-     * @param AclConditionDataBuilderInterface $builder
-     * @param ActivityListChainProvider $activityListProvider
-     */
     public function __construct(
         AclConditionDataBuilderInterface $builder,
         ActivityListChainProvider $activityListProvider

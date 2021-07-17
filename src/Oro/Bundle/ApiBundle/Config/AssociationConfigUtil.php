@@ -9,11 +9,6 @@ class AssociationConfigUtil
 {
     /**
      * Gets the class name of a target entity for the given association.
-     *
-     * @param EntityDefinitionFieldConfig $association
-     * @param EntityDefinitionConfig      $config
-     *
-     * @return string|null
      */
     public static function getAssociationTargetClass(
         EntityDefinitionFieldConfig $association,
@@ -35,11 +30,6 @@ class AssociationConfigUtil
 
     /**
      * Gets a configuration for the given association.
-     *
-     * @param EntityDefinitionFieldConfig $association
-     * @param EntityDefinitionConfig      $config
-     *
-     * @return EntityDefinitionFieldConfig|null
      */
     public static function getAssociationConfig(
         EntityDefinitionFieldConfig $association,

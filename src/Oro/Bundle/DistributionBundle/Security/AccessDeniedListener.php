@@ -21,11 +21,6 @@ class AccessDeniedListener
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param Session               $session
-     * @param Router                $router
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(Session $session, Router $router, TokenStorageInterface $tokenStorage)
     {
         $this->session = $session;
@@ -33,9 +28,6 @@ class AccessDeniedListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
     public function onAccessDeniedException(GetResponseForExceptionEvent $event)
     {
         if ($event->getThrowable() instanceof AccessDeniedHttpException) {

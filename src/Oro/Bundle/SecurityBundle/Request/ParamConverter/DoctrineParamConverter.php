@@ -24,12 +24,6 @@ class DoctrineParamConverter extends BaseParamConverter
     /** @var array */
     private $defaultOptions;
 
-    /**
-     * @param ManagerRegistry|null $registry
-     * @param ExpressionLanguage|null $expressionLanguage
-     * @param RequestAuthorizationChecker|null $requestAuthorizationChecker
-     * @param array $options
-     */
     public function __construct(
         ManagerRegistry $registry = null,
         ExpressionLanguage $expressionLanguage = null,

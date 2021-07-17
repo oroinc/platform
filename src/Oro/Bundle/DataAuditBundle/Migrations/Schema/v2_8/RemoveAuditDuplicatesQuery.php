@@ -23,9 +23,6 @@ class RemoveAuditDuplicatesQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

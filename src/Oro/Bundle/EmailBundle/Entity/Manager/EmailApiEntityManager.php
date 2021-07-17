@@ -125,11 +125,6 @@ class EmailApiEntityManager extends ApiEntityManager
         return $config;
     }
 
-    /**
-     * @param array $result
-     *
-     * @return array
-     */
     protected function postSerializeEmail(array $result): array
     {
         $result['to']  = [];

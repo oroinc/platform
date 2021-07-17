@@ -14,10 +14,6 @@ class EntityTypeProvider
     /** @var AuditConfigProvider */
     protected $configProvider;
 
-    /**
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param AuditConfigProvider              $configProvider
-     */
     public function __construct(
         EntityClassNameProviderInterface $entityClassNameProvider,
         AuditConfigProvider $configProvider

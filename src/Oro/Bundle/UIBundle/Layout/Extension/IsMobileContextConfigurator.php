@@ -13,9 +13,6 @@ class IsMobileContextConfigurator implements ContextConfiguratorInterface
      */
     protected $userAgentProvider;
 
-    /**
-     * @param UserAgentProvider $userAgentProvider
-     */
     public function __construct(UserAgentProvider $userAgentProvider)
     {
         $this->userAgentProvider = $userAgentProvider;

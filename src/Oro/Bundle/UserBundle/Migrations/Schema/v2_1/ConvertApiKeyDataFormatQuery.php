@@ -15,9 +15,6 @@ class ConvertApiKeyDataFormatQuery extends ParametrizedSqlMigrationQuery
     /** @var SymmetricCrypterInterface */
     protected $crypter;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     */
     public function __construct(SymmetricCrypterInterface $crypter)
     {
         $this->crypter = $crypter;

@@ -77,9 +77,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAllowedDataProvider
-     *
-     * @param bool|null $isAllowed
-     * @param bool $expected
      */
     public function testIsAllowed(?bool $isAllowed, bool $expected): void
     {
@@ -108,9 +105,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isAllowed === false ? [$expectedError] : [], $errors->toArray());
     }
 
-    /**
-     * @return array
-     */
     public function isAllowedDataProvider(): array
     {
         return [
@@ -148,9 +142,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAllowedDataProvider
-     *
-     * @param bool|null $isAllowed
-     * @param bool $expected
      */
     public function testIsAvailableWithForm(?bool $isAllowed, bool $expected): void
     {
@@ -241,9 +232,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function isAvailableDataProvider(): array
     {
         return [
@@ -277,9 +265,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transitDisallowedDataProvider
-     *
-     * @param bool $preConditionAllowed
-     * @param bool $conditionAllowed
      */
     public function testTransitNotAllowed(bool $preConditionAllowed, bool $conditionAllowed)
     {
@@ -315,9 +300,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             ->transit($workflowItem, $errors);
     }
 
-    /**
-     * @return array
-     */
     public function transitDisallowedDataProvider(): array
     {
         return [
@@ -329,9 +311,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transitDataProvider
-     *
-     * @param bool $isFinal
-     * @param bool $hasAllowedTransition
      */
     public function testTransit(bool $isFinal, bool $hasAllowedTransition): void
     {
@@ -378,9 +357,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
             ->transit($workflowItem);
     }
 
-    /**
-     * @return array
-     */
     public function transitDataProvider(): array
     {
         return [
@@ -445,11 +421,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider initContextProvider
-     *
-     * @param array $entities
-     * @param array $routes
-     * @param array $datagrids
-     * @param bool $result
      */
     public function testIsNotEmptyInitContext(array $entities, array $routes, array $datagrids, bool $result): void
     {
@@ -459,9 +430,6 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($result, $this->transition->isEmptyInitOptions());
     }
 
-    /**
-     * @return array
-     */
     public function initContextProvider(): array
     {
         return [

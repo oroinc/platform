@@ -24,10 +24,6 @@ class AssignUrl extends AbstractAction
      */
     protected $urlAttribute;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param RouterInterface $router
-     */
     public function __construct(ContextAccessor $contextAccessor, RouterInterface $router)
     {
         parent::__construct($contextAccessor);

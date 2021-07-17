@@ -22,8 +22,6 @@ class OroTranslationBundle implements Migration
 
     /**
      * Create oro_language table
-     *
-     * @param Schema $schema
      */
     protected function createOroLanguageTable(Schema $schema)
     {
@@ -42,8 +40,6 @@ class OroTranslationBundle implements Migration
 
     /**
      * Add oro_language foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroLanguageForeignKeys(Schema $schema)
     {

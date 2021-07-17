@@ -28,8 +28,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      * The format of the data for a collection: [[field name => field value, ...], ...]
      *
      * This method is a alias for getResult, but with strict return data type.
-     *
-     * @return array
      */
     public function getData(): array
     {
@@ -40,8 +38,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      * Sets the response data.
      *
      * This method is a alias for setResult, but with strict data type of the parameter.
-     *
-     * @param array $data
      */
     public function setData(array $data): void
     {
@@ -51,8 +47,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Indicates whether "customize_loaded_data" action is executed for a relationship,
      * it means that only identifier field should be returned in response data.
-     *
-     * @return bool
      */
     public function isIdentifierOnly(): bool
     {
@@ -62,8 +56,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Sets a flag indicates whether "customize_loaded_data" action is executed for a relationship.
      * In this case only identifier field should be returned in response data.
-     *
-     * @param bool $identifierOnly
      */
     public function setIdentifierOnly(bool $identifierOnly): void
     {
@@ -279,10 +271,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Checks whether some configuration data for a customizing entity is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
     public function hasConfigExtra(string $extraName): bool
     {
@@ -297,10 +285,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Gets a request for configuration data of a customizing entity by its name.
-     *
-     * @param string $extraName
-     *
-     * @return ConfigExtraInterface|null
      */
     public function getConfigExtra(string $extraName): ?ConfigExtraInterface
     {
@@ -336,8 +320,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Indicates whether HATEOAS is enabled.
-     *
-     * @return bool
      */
     public function isHateoasEnabled(): bool
     {

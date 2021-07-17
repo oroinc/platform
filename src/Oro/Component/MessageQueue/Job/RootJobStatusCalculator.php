@@ -30,12 +30,6 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
     /** @var Registry  */
     private $registry;
 
-    /**
-     * @param JobManagerInterface $jobManager
-     * @param JobStatusChecker $jobStatusChecker
-     * @param StatusCalculatorResolver $statusCalculatorResolver
-     * @param MessageProducerInterface $messageProducer
-     */
     public function __construct(
         JobManagerInterface $jobManager,
         JobStatusChecker $jobStatusChecker,
@@ -53,11 +47,6 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         $this->registry = $registry;
     }
 
-    /**
-     * @param Job $job
-     *
-     * @return void
-     */
     public function calculate(Job $job): void
     {
         $rootJob = $this->getRootJob($job);
@@ -69,10 +58,6 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         });
     }
 
-    /**
-     * @param Job $rootJob
-     * @return void
-     */
     private function updateRootJob(Job $rootJob): void
     {
         $rootJob->setLastActiveAt(new \DateTime());
@@ -98,10 +83,6 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         }
     }
 
-    /**
-     * @param Job $job
-     * @return Job
-     */
     private function getRootJob(Job $job): Job
     {
         return $job->isRoot() ? $job : $job->getRootJob();

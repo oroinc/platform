@@ -26,11 +26,6 @@ class AddOwnerValidator implements ProcessorInterface
     /** @var ValidationHelper */
     protected $validationHelper;
 
-    /**
-     * @param DoctrineHelper                     $doctrineHelper
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param ValidationHelper                   $validationHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,

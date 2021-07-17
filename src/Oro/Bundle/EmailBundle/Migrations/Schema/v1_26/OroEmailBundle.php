@@ -17,18 +17,12 @@ class OroEmailBundle implements Migration
         static::addEmailUserMailboxOwnerSeenIndex($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function dropEmailUserMailboxOwnerSeenIndex(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');
         $table->dropIndex('mailbox_seen_idx');
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addEmailUserMailboxOwnerSeenIndex(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

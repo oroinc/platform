@@ -24,9 +24,6 @@ class DecorateAuthorizationCheckerPass implements CompilerPassInterface
         $this->configureAuthorizationChecker($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     protected function configureAuthorizationChecker(ContainerBuilder $container)
     {
         $container->register(self::AUTHORIZATION_CHECKER, AuthorizationChecker::class)

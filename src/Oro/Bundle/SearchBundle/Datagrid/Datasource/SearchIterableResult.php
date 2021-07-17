@@ -55,9 +55,6 @@ class SearchIterableResult implements IterableResultInterface
      */
     private $rows;
 
-    /**
-     * @param SearchQueryInterface $query
-     */
     public function __construct(SearchQueryInterface $query)
     {
         $this->query = $query;

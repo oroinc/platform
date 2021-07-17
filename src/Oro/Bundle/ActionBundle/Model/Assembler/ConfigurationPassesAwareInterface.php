@@ -6,8 +6,5 @@ use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 interface ConfigurationPassesAwareInterface
 {
-    /**
-     * @param ConfigurationPassInterface $configurationPass
-     */
     public function addConfigurationPass(ConfigurationPassInterface $configurationPass);
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\ImapBundle\Connector;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;

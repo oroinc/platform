@@ -21,10 +21,6 @@ class InputOutputController implements Controller
     /** @var MessageQueueIsolationSubscriber */
     private $messageQueueIsolationSubscriber;
 
-    /**
-     * @param TestIsolationSubscriber $testIsolationSubscriber
-     * @param MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber
-     */
     public function __construct(
         TestIsolationSubscriber $testIsolationSubscriber,
         MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber

@@ -30,8 +30,6 @@ class EmailUserListener
 
     /**
      * Collecting added EmailUser entities for processing in postFlush
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
@@ -42,8 +40,6 @@ class EmailUserListener
 
     /**
      * Send notification to websocket that user have new emails
-     *
-     * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
@@ -138,9 +134,6 @@ class EmailUserListener
 
     /**
      * Collect updated EmailUser entities
-     *
-     * @param $entities
-     * @param $uow - UnitOfWork
      */
     protected function collectUpdatedEmailUserEntities($entities, $uow)
     {

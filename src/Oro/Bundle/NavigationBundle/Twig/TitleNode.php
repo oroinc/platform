@@ -25,7 +25,6 @@ class TitleNode extends Node
     /**
      * Compile title node to template
      *
-     * @param  Compiler $compiler
      * @throws SyntaxError
      */
     public function compile(Compiler $compiler)

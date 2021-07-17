@@ -37,9 +37,6 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
         $this->datagridParameters = $this->createMock(ParameterBag::class);
     }
 
-    /**
-     * @param string $gridName
-     */
     protected function mockGridName(string $gridName): void
     {
         $this->datagridConfiguration
@@ -62,12 +59,6 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
-    /**
-     * @param string $method
-     * @param array $state
-     *
-     * @return ViewInterface
-     */
     protected function mockGridView(string $method, array $state): ViewInterface
     {
         $gridView = $this->createMock(ViewInterface::class);

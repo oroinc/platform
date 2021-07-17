@@ -23,10 +23,6 @@ class GuessMimeTypeByFileContentFactory implements ImagineBinaryByFileContentFac
      */
     private $extensionGuesser;
 
-    /**
-     * @param MimeTypeGuesserInterface  $mimeTypeGuesser
-     * @param ExtensionGuesserInterface $extensionGuesser
-     */
     public function __construct(
         MimeTypeGuesserInterface $mimeTypeGuesser,
         ExtensionGuesserInterface $extensionGuesser

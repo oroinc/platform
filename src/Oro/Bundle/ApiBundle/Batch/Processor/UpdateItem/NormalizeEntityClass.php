@@ -25,10 +25,6 @@ class NormalizeEntityClass implements ProcessorInterface
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
-    /**
-     * @param ValueNormalizer   $valueNormalizer
-     * @param ResourcesProvider $resourcesProvider
-     */
     public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
     {
         $this->valueNormalizer = $valueNormalizer;
@@ -71,13 +67,6 @@ class NormalizeEntityClass implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string      $entityType
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
     private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
     {
         $entityClass = ValueNormalizerUtil::convertToEntityClass(

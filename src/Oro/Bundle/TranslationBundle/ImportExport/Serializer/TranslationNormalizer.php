@@ -12,9 +12,6 @@ class TranslationNormalizer implements DenormalizerInterface
     /** @var TranslationManager */
     protected $translationManager;
 
-    /**
-     * @param TranslationManager $translationManager
-     */
     public function __construct(TranslationManager $translationManager)
     {
         $this->translationManager = $translationManager;

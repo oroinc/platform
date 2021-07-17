@@ -58,9 +58,6 @@ class GridViewsLoadEvent extends Event
         $this->gridViews = $gridViews;
     }
 
-    /**
-     * @return DatagridConfiguration
-     */
     public function getGridConfiguration(): DatagridConfiguration
     {
         return $this->gridConfiguration;

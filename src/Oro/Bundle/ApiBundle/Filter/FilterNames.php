@@ -28,15 +28,6 @@ class FilterNames
     /** @var string|null */
     private $includeFilterName;
 
-    /**
-     * @param string      $sortFilterName
-     * @param string      $pageNumberFilterName
-     * @param string      $pageSizeFilterName
-     * @param string      $metaPropertyFilterName
-     * @param string|null $dataFilterGroupName
-     * @param string|null $fieldsFilterGroupName
-     * @param string|null $includeFilterName
-     */
     public function __construct(
         string $sortFilterName,
         string $pageNumberFilterName,
@@ -58,8 +49,6 @@ class FilterNames
     /**
      * Gets the name of a filter that can be used to specify how a result collection should be sorted.
      * @see \Oro\Bundle\ApiBundle\Filter\SortFilter
-     *
-     * @return string
      */
     public function getSortFilterName(): string
     {
@@ -69,8 +58,6 @@ class FilterNames
     /**
      * Gets the name of a filter that can be used to specify the page number.
      * @see \Oro\Bundle\ApiBundle\Filter\PageNumberFilter
-     *
-     * @return string
      */
     public function getPageNumberFilterName(): string
     {
@@ -80,8 +67,6 @@ class FilterNames
     /**
      * Gets the name of a filter that can be used to specify the maximum number of records on one page.
      * @see \Oro\Bundle\ApiBundle\Filter\PageSizeFilter
-     *
-     * @return string
      */
     public function getPageSizeFilterName(): string
     {
@@ -95,8 +80,6 @@ class FilterNames
      * @see \Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
-     *
-     * @return string
      */
     public function getMetaPropertyFilterName(): string
     {
@@ -108,8 +91,6 @@ class FilterNames
      * E.g. if the group is "filter" then the full name of data filters will be "filter[fieldName]".
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\RegisterConfiguredFilters
-     *
-     * @return string|null
      */
     public function getDataFilterGroupName(): ?string
     {
@@ -122,8 +103,6 @@ class FilterNames
      * @see \Oro\Bundle\ApiBundle\Filter\FieldsFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\AddFieldsFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleFieldsFilter
-     *
-     * @return string|null
      */
     public function getFieldsFilterGroupName(): ?string
     {
@@ -133,8 +112,6 @@ class FilterNames
     /**
      * Gets the template to build filters that can be used to filter entity fields that should be returned.
      * E.g. if the group of the fields filters is "fields" then the template will be "fields[%s]".
-     *
-     * @return string|null
      */
     public function getFieldsFilterTemplate(): ?string
     {
@@ -150,8 +127,6 @@ class FilterNames
      * @see \Oro\Bundle\ApiBundle\Filter\IncludeFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\AddIncludeFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleIncludeFilter
-     *
-     * @return string|null
      */
     public function getIncludeFilterName(): ?string
     {

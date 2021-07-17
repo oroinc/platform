@@ -161,11 +161,6 @@ class MultiInsertQueryExecutorTest extends WebTestCase
         $this->assertCount(count($multiInsertRole->getUsers()), $items);
     }
 
-    /**
-     * @param Role         $userRole
-     * @param Organization $organization
-     * @param int          $userCount
-     */
     private function createUsers(Role $userRole, Organization $organization, int $userCount): void
     {
         $userManager = $this->getContainer()->get('oro_user.manager');

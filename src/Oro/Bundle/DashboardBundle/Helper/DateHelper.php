@@ -34,11 +34,6 @@ class DateHelper
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param ManagerRegistry $doctrine
-     * @param AclHelper $aclHelper
-     */
     public function __construct(LocaleSettings $localeSettings, ManagerRegistry $doctrine, AclHelper $aclHelper)
     {
         $this->doctrine       = $doctrine;

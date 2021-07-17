@@ -48,11 +48,6 @@ class PostProcessorRegistry
 
     /**
      * Gets a post processor by its name and suitable for the given request type.
-     *
-     * @param string      $name
-     * @param RequestType $requestType
-     *
-     * @return PostProcessorInterface|null
      */
     public function getPostProcessor(string $name, RequestType $requestType): ?PostProcessorInterface
     {

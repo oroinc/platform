@@ -20,8 +20,6 @@ class ByStepNormalizeResultContext extends NormalizeResultContext
     /**
      * Gets the name of the group after that processors from "normalize_result" group are executed
      * if no errors are occurred.
-     *
-     * @return string|null
      */
     public function getSourceGroup(): ?string
     {
@@ -31,8 +29,6 @@ class ByStepNormalizeResultContext extends NormalizeResultContext
     /**
      * Sets the name of the group after that processors from "normalize_result" group are executed
      * if no errors are occurred.
-     *
-     * @param string|null $groupName
      */
     public function setSourceGroup(?string $groupName): void
     {
@@ -45,8 +41,6 @@ class ByStepNormalizeResultContext extends NormalizeResultContext
 
     /**
      * Gets the name of the last group that execution was finished with an error or an exception.
-     *
-     * @return string|null
      */
     public function getFailedGroup(): ?string
     {
@@ -55,8 +49,6 @@ class ByStepNormalizeResultContext extends NormalizeResultContext
 
     /**
      * Sets the name of the last group that execution was finished with an error or an exception.
-     *
-     * @param string|null $groupName
      */
     public function setFailedGroup(?string $groupName): void
     {

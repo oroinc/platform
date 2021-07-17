@@ -34,15 +34,6 @@ class SegmentFilter extends EntityFilter
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManagerRegistry      $doctrine
-     * @param SegmentManager       $segmentManager
-     * @param EntityNameProvider   $entityNameProvider
-     * @param ConfigProvider       $entityConfigProvider
-     * @param ConfigProvider       $extendConfigProvider
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

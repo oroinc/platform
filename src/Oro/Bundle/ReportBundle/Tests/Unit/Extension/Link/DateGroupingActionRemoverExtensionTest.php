@@ -50,7 +50,6 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($extension->isApplicable($this->config));
     }
 
-
     public function testIsApplicableTrue()
     {
         $this->config->expects($this->once())
@@ -70,8 +69,6 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param        [] $inputRows
-     * @param        [] $expectedRows
      * @dataProvider visitResultProvider
      */
     public function testVisitResult($inputRows, $expectedRows)

@@ -15,8 +15,6 @@ class FetchIterator implements \Iterator
 
     /**
      * FetchIterator constructor.
-     *
-     * @param StatementMock $statement
      */
     public function __construct(StatementMock $statement)
     {

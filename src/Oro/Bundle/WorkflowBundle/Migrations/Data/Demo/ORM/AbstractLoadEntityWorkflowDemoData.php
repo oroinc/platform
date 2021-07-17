@@ -88,10 +88,6 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
         return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
     }
 
-    /**
-     * @param WorkflowItem $workflowItem
-     * @param Transition $transition
-     */
     protected function transitWorkflow(WorkflowItem $workflowItem, Transition $transition)
     {
         $this->getWorkflowManager()->transit($workflowItem, $transition);
@@ -149,9 +145,6 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
         }
     }
 
-    /**
-     * @param AbstractUser $user
-     */
     private function setUserToken(AbstractUser $user)
     {
         /** @var Organization $organization */

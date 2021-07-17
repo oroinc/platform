@@ -72,9 +72,6 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return BundleInterface
-     */
     private function getBundle(): BundleInterface
     {
         /** @var BundleInterface|\PHPUnit\Framework\MockObject\MockObject $bundle */

@@ -28,12 +28,6 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     /** @var string */
     private $prefixCacheKey;
 
-    /**
-     * @param ReportDatagridConfigurationBuilder $builder
-     * @param ManagerRegistry                    $doctrine
-     * @param Cache                              $cache
-     * @param string                             $prefixCacheKey
-     */
     public function __construct(
         ReportDatagridConfigurationBuilder $builder,
         ManagerRegistry $doctrine,
@@ -72,10 +66,6 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
 
     /**
      * Check whether a report is valid or not
-     *
-     * @param string $gridName
-     *
-     * @return bool
      */
     public function isReportValid(string $gridName): bool
     {
@@ -96,11 +86,6 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         return $this->builder;
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return DatagridConfiguration
-     */
     private function buildConfiguration(string $gridName): DatagridConfiguration
     {
         $id = (int)(substr($gridName, \strlen(Report::GRID_PREFIX)));

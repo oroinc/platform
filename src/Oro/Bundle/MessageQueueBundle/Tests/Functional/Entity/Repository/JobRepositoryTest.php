@@ -104,9 +104,6 @@ class JobRepositoryTest extends WebTestCase
         return $this->getJobEntityManager();
     }
 
-    /**
-     * @return EntityManager
-     */
     private function getJobEntityManager(): EntityManager
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
