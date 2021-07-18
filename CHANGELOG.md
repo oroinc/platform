@@ -21,6 +21,9 @@ The current file describes significant changes in the code that may affect the u
 * The DIC compiler pass `Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ListenerExcludeConfigConnectionPass`
   was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.
 
+#### EntityBundle
+* The service `oro_entity.abstract_entity_manager` was removed.
+
 #### EntityMergeBundle
 * The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.
 * The service `oro_entity_merge.strategy.delegate` was removed. Use `oro_entity_merge.strategy` instead.

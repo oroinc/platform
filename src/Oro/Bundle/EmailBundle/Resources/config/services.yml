@@ -46,22 +46,12 @@ services:
         arguments:
             - !tagged_iterator oro_email.email_flag_manager_loader
 
-    oro_email.email_address.entity_manager:
-        parent: oro_entity.abstract_entity_manager
-        arguments:
-            - 'OroEmailBundle:EmailAddress'
-
-    oro_email.link.email_address.entity_manager:
-        tags:
-            - { name: oro_service_link,  service: oro_email.email_address.entity_manager }
-
     oro_email.email.address.manager:
         class: Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
         arguments:
             - '%oro_email.entity.cache_namespace%'
             - '%oro_email.entity.proxy_name_template%'
-        calls:
-            - [setEntityManagerLink, ['@oro_email.link.email_address.entity_manager']]
+            - '@doctrine'
 
     oro_email.email.owner.provider.storage:
         class: Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage
