@@ -3,10 +3,10 @@
 namespace Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -20,36 +20,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Listens to onProcessAfter event of import strategy to handle digital assets during file importing.
  * This listener must work in pair with and be called after the
- * Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener
+ * {@see \Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener}.
+ * The collected File entities are persisted by {@see DigitalAssetAwareFileStrategyPersistEventListener}.
+ * This was done to avoid loading this listener and all services used by it when it is not required.
  */
 class DigitalAssetAwareFileStrategyEventListener
 {
-    /** @var AttachmentEntityConfigProviderInterface */
-    private $attachmentEntityConfigProvider;
-
-    /** @var FieldHelper */
-    private $fieldHelper;
-
-    /** @var DatabaseHelper */
-    private $databaseHelper;
-
-    /** @var ImportStrategyHelper */
-    private $importStrategyHelper;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
+    private AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider;
+    private FieldHelper $fieldHelper;
+    private DatabaseHelper $databaseHelper;
+    private ImportStrategyHelper $importStrategyHelper;
+    private DoctrineHelper $doctrineHelper;
+    private TranslatorInterface $translator;
+    private MemoryCache $memoryCache;
     /** @var DigitalAsset[] */
-    private $newDigitalAssets = [];
-
+    private array $newDigitalAssets = [];
     /** @var File[] */
-    private $filesWithDigitalAssetsToPersist = [];
-
-    /** @var File[] */
-    private $newFiles;
+    private array $newFiles = [];
 
     public function __construct(
         AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider,
@@ -57,7 +44,8 @@ class DigitalAssetAwareFileStrategyEventListener
         DatabaseHelper $databaseHelper,
         ImportStrategyHelper $importStrategyHelper,
         DoctrineHelper $doctrineHelper,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        MemoryCache $memoryCache
     ) {
         $this->databaseHelper = $databaseHelper;
         $this->fieldHelper = $fieldHelper;
@@ -65,6 +53,7 @@ class DigitalAssetAwareFileStrategyEventListener
         $this->importStrategyHelper = $importStrategyHelper;
         $this->doctrineHelper = $doctrineHelper;
         $this->translator = $translator;
+        $this->memoryCache = $memoryCache;
     }
 
     public function onProcessAfter(StrategyEvent $event): void
@@ -91,7 +80,8 @@ class DigitalAssetAwareFileStrategyEventListener
             }
         }
 
-        if ($errors = array_merge(...$errors)) {
+        $errors = array_merge(...$errors);
+        if ($errors) {
             // Digital asset importing has failed, entity will be skipped from import.
             $event->setEntity(null);
             $event->stopPropagation();
@@ -123,7 +113,7 @@ class DigitalAssetAwareFileStrategyEventListener
     /**
      * @param object $entity
      * @param string $fieldName
-     * @param array $itemData
+     * @param array  $itemData
      *
      * @return string[]
      */
@@ -150,7 +140,7 @@ class DigitalAssetAwareFileStrategyEventListener
     }
 
     /**
-     * @param File $file
+     * @param File   $file
      * @param string $originUuid
      *
      * @return string[]
@@ -187,7 +177,7 @@ class DigitalAssetAwareFileStrategyEventListener
             $file->setDigitalAsset($digitalAsset);
 
             // Schedule to persist a new digital asset.
-            $this->filesWithDigitalAssetsToPersist[] = $file;
+            $this->addFileWithDigitalAssetsToPersistList($file);
 
             if (!$foundByUuid && $originUuid) {
                 // Sets origin UUID to the source file of new digital asset to prevent duplicating digital assets after
@@ -238,7 +228,7 @@ class DigitalAssetAwareFileStrategyEventListener
     /**
      * @param object $entity
      * @param string $fieldName
-     * @param array $itemData
+     * @param array  $itemData
      *
      * @return string[]
      */
@@ -270,25 +260,11 @@ class DigitalAssetAwareFileStrategyEventListener
         return array_merge(...$errors);
     }
 
-    public function preFlush(PreFlushEventArgs $args): void
+    private function addFileWithDigitalAssetsToPersistList(File $file): void
     {
-        $entityManager = $args->getEntityManager();
-
-        foreach ($this->filesWithDigitalAssetsToPersist as $file) {
-            if (!$entityManager->contains($file)) {
-                // Skips files that are not going to be persisted.
-                continue;
-            }
-
-            // Prevents uploading as the file will be reflected from digital asset.
-            $file->setFile(null);
-
-            $digitalAsset = $file->getDigitalAsset();
-            if ($digitalAsset) {
-                $entityManager->persist($digitalAsset);
-            }
-        }
-
-        $this->filesWithDigitalAssetsToPersist = [];
+        $key = DigitalAssetAwareFileStrategyPersistEventListener::FILES_WITH_DIGITAL_ASSETS_TO_PERSIST;
+        $files = $this->memoryCache->get($key, []);
+        $files[] = $file;
+        $this->memoryCache->set($key, $files);
     }
 }

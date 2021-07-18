@@ -97,10 +97,20 @@ services:
             - '@oro_importexport.strategy.import.helper'
             - '@oro_entity.doctrine_helper'
             - '@translator'
+            - '@oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache'
         tags:
             # Listener priority should be lower than onProcessAfter in oro_attachment.import_export.file_strategy_event_listener
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 40 }
+
+    oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_persist_event_listener:
+        class: Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyPersistEventListener
+        arguments:
+            - '@oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache'
+        tags:
             - { name: doctrine.event_listener, event: preFlush }
+
+    oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache:
+        class: Oro\Bundle\CacheBundle\Provider\MemoryCache
 
     oro_digital_asset.event_listener.digital_asset_preloading:
         parent: oro_entity.event_listener.default_preloading
