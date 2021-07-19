@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormEvent;
@@ -21,10 +21,10 @@ class OAuthSubscriber implements EventSubscriberInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    public function __construct(TranslatorInterface $translator, OAuth2ManagerRegistry $oauthManagerRegistry)
+    public function __construct(TranslatorInterface $translator, OAuthManagerRegistry $oauthManagerRegistry)
     {
         $this->translator = $translator;
         $this->oauthManagerRegistry = $oauthManagerRegistry;

@@ -9,13 +9,12 @@ use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,84 +22,57 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ConfigurationGmailTypeTest extends FormIntegrationTestCase
 {
-    /** @var TokenAccessorInterface|MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var Translator|MockObject */
-    protected $translator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var MockObject */
-    protected $configProvider;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $userConfigManager;
 
-    /** @var ConfigManager|MockObject */
-    protected $userConfigManager;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    /** @var MockObject|RequestStack */
-    protected $requestStack;
+    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $oauthManagerRegistry;
 
-    /** @var OAuth2ManagerRegistry */
-    protected $oauthManagerRegistry;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
     protected function setUp(): void
     {
-        $user = $this->getMockBuilder(User::class)
-            ->onlyMethods(['getOrganization'])
-            ->getMock();
-        $organization = $this->createMock(Organization::class);
-        $user->method('getOrganization')->willReturn($organization);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->tokenAccessor->method('getUser')->willReturn($user);
-        $this->tokenAccessor->method('getOrganization')->willReturn($organization);
+        $this->translator = $this->createMock(Translator::class);
+        $this->userConfigManager = $this->createMock(ConfigManager::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
-        $this->translator = $this
-            ->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->userConfigManager = $this
-            ->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $user = $this->createMock(User::class);
+        $organization = $this->createMock(Organization::class);
+        $user->expects(self::any())
+            ->method('getOrganization')
+            ->willReturn($organization);
+        $this->tokenAccessor->expects(self::any())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenAccessor->expects(self::any())
+            ->method('getOrganization')
+            ->willReturn($organization);
 
-        $this->requestStack = $this->createRequestStack();
-
-        $this->oauthManagerRegistry = $this->getMockBuilder(OAuth2ManagerRegistry::class)
-            ->getMock();
-
-        $this->configProvider = $this
-            ->getMockBuilder(ConfigProvider::class)
-            ->onlyMethods(['hasConfig', 'getConfig'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        parent::setUp();
-    }
-
-    /**
-     * @return MockObject|RequestStack
-     */
-    protected function createRequestStack(): MockObject
-    {
-        $requestStack = $this
-            ->getMockBuilder(RequestStack::class)
-            ->getMock();
-
-        $requestMock = $this
-            ->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requestMock->expects($this->any())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::any())
             ->method('isXmlHttpRequest')
             ->willReturn(false);
-        $requestMock->expects($this->any())
+        $request->expects(self::any())
             ->method('get')
             ->willReturn('sample');
-
-        $requestStack
-            ->expects($this->any())
+        $this->requestStack->expects(self::any())
             ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+            ->willReturn($request);
 
-        return $requestStack;
+        parent::setUp();
     }
 
     protected function getExtensions(): array
@@ -130,19 +102,16 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * Test default values for form ConfigurationGmailType
-     */
     public function testDefaultData()
     {
         $form = $this->factory->create(ConfigurationGmailType::class);
 
-        static::assertEquals(GmailImap::DEFAULT_GMAIL_HOST, $form->get('imapHost')->getData());
-        static::assertEquals(GmailImap::DEFAULT_GMAIL_PORT, $form->get('imapPort')->getData());
-        static::assertEquals(GmailImap::DEFAULT_GMAIL_SSL, $form->get('imapEncryption')->getData());
-        static::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_HOST, $form->get('smtpHost')->getData());
-        static::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_PORT, $form->get('smtpPort')->getData());
-        static::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_SSL, $form->get('smtpEncryption')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_HOST, $form->get('imapHost')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_PORT, $form->get('imapPort')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SSL, $form->get('imapEncryption')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_HOST, $form->get('smtpHost')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_PORT, $form->get('smtpPort')->getData());
+        self::assertEquals(GmailImap::DEFAULT_GMAIL_SMTP_SSL, $form->get('smtpEncryption')->getData());
     }
 
     public function testShouldBindValidData()
@@ -163,28 +132,28 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
             'refreshToken' => '111'
         ]);
 
-        static::assertEquals('test', $form->get('user')->getData());
-        static::assertEquals('imap.gmail.com', $form->get('imapHost')->getData());
-        static::assertEquals('993', $form->get('imapPort')->getData());
-        static::assertEquals('ssl', $form->get('imapEncryption')->getData());
-        static::assertEquals('smtp.gmail.com', $form->get('smtpHost')->getData());
-        static::assertEquals('993', $form->get('smtpPort')->getData());
-        static::assertEquals('ssl', $form->get('smtpEncryption')->getData());
-        static::assertEquals($accessTokenExpiresAt, $form->get('accessTokenExpiresAt')->getData());
-        static::assertEquals('1', $form->get('accessToken')->getData());
-        static::assertEquals('111', $form->get('refreshToken')->getData());
+        self::assertEquals('test', $form->get('user')->getData());
+        self::assertEquals('imap.gmail.com', $form->get('imapHost')->getData());
+        self::assertEquals('993', $form->get('imapPort')->getData());
+        self::assertEquals('ssl', $form->get('imapEncryption')->getData());
+        self::assertEquals('smtp.gmail.com', $form->get('smtpHost')->getData());
+        self::assertEquals('993', $form->get('smtpPort')->getData());
+        self::assertEquals('ssl', $form->get('smtpEncryption')->getData());
+        self::assertEquals($accessTokenExpiresAt, $form->get('accessTokenExpiresAt')->getData());
+        self::assertEquals('1', $form->get('accessToken')->getData());
+        self::assertEquals('111', $form->get('refreshToken')->getData());
 
         $entity = $form->getData();
 
-        static::assertEquals('test', $entity->getUser());
-        static::assertEquals('imap.gmail.com', $entity->getImapHost());
-        static::assertEquals('993', $entity->getImapPort());
-        static::assertEquals('ssl', $entity->getImapEncryption());
-        static::assertEquals('smtp.gmail.com', $entity->getSmtpHost());
-        static::assertEquals('993', $entity->getSmtpPort());
-        static::assertEquals('ssl', $entity->getSmtpEncryption());
-        static::assertEquals($accessTokenExpiresAt, $entity->getAccessTokenExpiresAt());
-        static::assertEquals('1', $entity->getAccessToken());
-        static::assertEquals('111', $entity->getRefreshToken());
+        self::assertEquals('test', $entity->getUser());
+        self::assertEquals('imap.gmail.com', $entity->getImapHost());
+        self::assertEquals('993', $entity->getImapPort());
+        self::assertEquals('ssl', $entity->getImapEncryption());
+        self::assertEquals('smtp.gmail.com', $entity->getSmtpHost());
+        self::assertEquals('993', $entity->getSmtpPort());
+        self::assertEquals('ssl', $entity->getSmtpEncryption());
+        self::assertEquals($accessTokenExpiresAt, $entity->getAccessTokenExpiresAt());
+        self::assertEquals('1', $entity->getAccessToken());
+        self::assertEquals('111', $entity->getRefreshToken());
     }
 }

@@ -4,7 +4,8 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,15 +17,15 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class EmailSettingsType extends AbstractType
 {
-    /** UserImapConfigSubscriber */
+    /** @var UserImapConfigSubscriber */
     protected $subscriber;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     public function __construct(
         UserImapConfigSubscriber $subscriber,
-        OAuth2ManagerRegistry    $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->subscriber = $subscriber;
         $this->oauthManagerRegistry = $oauthManagerRegistry;
@@ -36,7 +37,7 @@ class EmailSettingsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'         => 'Oro\Bundle\UserBundle\Entity\User',
+            'data_class' => User::class,
             'ownership_disabled' => true,
             'dynamic_fields_disabled' => true,
             'label' => false,

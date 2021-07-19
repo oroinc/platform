@@ -9,7 +9,7 @@ use Oro\Bundle\ImapBundle\Form\EventListener\CleanupSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OAuthSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -30,7 +30,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-abstract class AbstractOauthAwareConfigurationType extends AbstractType
+abstract class AbstractOAuthAwareConfigurationType extends AbstractType
 {
     /** @var TranslatorInterface */
     protected $translator;
@@ -44,7 +44,7 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     public function __construct(
@@ -52,7 +52,7 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
         ConfigManager $userConfigManager,
         TokenAccessorInterface $tokenAccessor,
         RequestStack $requestStack,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->translator = $translator;
         $this->userConfigManager = $userConfigManager;
@@ -144,8 +144,7 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
                     }
                     if ($data->getOrganization() === null) {
                         $organization = $this->tokenAccessor->getOrganization()
-                            ? $this->tokenAccessor->getOrganization()
-                            : $this->tokenAccessor->getUser()->getOrganization();
+                            ?? $this->tokenAccessor->getUser()->getOrganization();
                         $data->setOrganization($organization);
                     }
 

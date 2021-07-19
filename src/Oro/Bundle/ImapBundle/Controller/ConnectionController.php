@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager;
@@ -30,21 +32,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConnectionController extends AbstractController
 {
     /**
-     * @var ImapEmailFolderManager
-     */
-    protected $manager;
-
-    /**
      * @Route("/connection/check", name="oro_imap_connection_check", methods={"POST"})
-     * @param Request $request
-     * @return JsonResponse
      */
-    public function checkAction(Request $request)
+    public function checkAction(Request $request): JsonResponse
     {
         $data = null;
         $id = $request->get('id', false);
         if (false !== $id) {
-            $data = $this->getDoctrine()->getRepository(UserEmailOrigin::class)->find($id);
+            $data = $this->getEntityManager(UserEmailOrigin::class)->find(UserEmailOrigin::class, $id);
         }
 
         $form = $this->createForm(
@@ -76,9 +71,8 @@ class ConnectionController extends AbstractController
     /**
      * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"POST"})
      */
-    public function getFormAction()
+    public function getFormAction(Request $request): JsonResponse
     {
-        $request = $this->get('request_stack')->getCurrentRequest();
         $type = $request->get('type');
         $token = $request->get('accessToken');
         $formParentName = $request->get('formParentName');
@@ -101,27 +95,16 @@ class ConnectionController extends AbstractController
         return new JsonResponse($response);
     }
 
-    /**
-     * @param int|null $id
-     *
-     * @return Organization|null
-     */
-    protected function getOrganization($id)
+    private function getOrganization(?int $id): ?Organization
     {
         if (!$id) {
             return null;
         }
 
-        return $this->getDoctrine()->getRepository('OroOrganizationBundle:Organization')->find($id);
+        return $this->getEntityManager(Organization::class)->find(Organization::class, $id);
     }
 
-    /**
-     * @param $origin
-     * @param $organization
-     *
-     * @return mixed
-     */
-    protected function getFoldersViewForUserMailBox($origin, $organization)
+    private function getFoldersViewForUserMailBox(UserEmailOrigin $origin, ?Organization $organization): string
     {
         $user = new User();
         $user->setImapConfiguration($origin);
@@ -129,18 +112,13 @@ class ConnectionController extends AbstractController
         $userForm = $this->createForm(EmailSettingsType::class);
         $userForm->setData($user);
 
-        return $this->renderView('@OroImap/Connection/check.html.twig', [
-            'form' => $userForm->createView(),
-        ]);
+        return $this->renderView(
+            '@OroImap/Connection/check.html.twig',
+            ['form' => $userForm->createView()]
+        );
     }
 
-    /**
-     * @param $origin
-     * @param $organization
-     *
-     * @return mixed
-     */
-    protected function getFoldersViewForSystemMailBox($origin, $organization)
+    private function getFoldersViewForSystemMailBox(UserEmailOrigin $origin, ?Organization $organization): string
     {
         $mailbox = new Mailbox();
         $mailbox->setOrigin($origin);
@@ -152,18 +130,11 @@ class ConnectionController extends AbstractController
 
         return $this->renderView(
             '@OroImap/Connection/checkMailbox.html.twig',
-            [
-                'form' => $mailboxForm->createView(),
-            ]
+            ['form' => $mailboxForm->createView()]
         );
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return array
-     */
-    private function handleFormErrors(FormInterface $form)
+    private function handleFormErrors(FormInterface $form): array
     {
         $nestedErrors = new \SplObjectStorage();
         foreach ($form->getErrors(true) as $error) {
@@ -201,7 +172,7 @@ class ConnectionController extends AbstractController
      *
      * @return array
      */
-    private function handleUserEmailOrigin(UserEmailOrigin $origin, string $entity, $organizationId)
+    private function handleUserEmailOrigin(UserEmailOrigin $origin, string $entity, $organizationId): array
     {
         $response = [];
 
@@ -219,13 +190,13 @@ class ConnectionController extends AbstractController
 
             try {
                 $connector = $this->get(ImapConnectorFactory::class)->createImapConnector($config);
-                $this->manager = new ImapEmailFolderManager(
+                $manager = new ImapEmailFolderManager(
                     $connector,
-                    $this->getDoctrine()->getManager(),
+                    $this->getEntityManager(ImapEmailFolder::class),
                     $origin
                 );
 
-                $emailFolders = $this->manager->getFolders();
+                $emailFolders = $manager->getFolders();
                 $origin->setFolders($emailFolders);
 
                 $organization = $this->getOrganization($organizationId);
@@ -255,6 +226,11 @@ class ConnectionController extends AbstractController
         }
 
         return $response;
+    }
+
+    private function getEntityManager(string $entityClass): EntityManagerInterface
+    {
+        return $this->getDoctrine()->getManagerForClass($entityClass);
     }
 
     /**

@@ -12,7 +12,7 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -21,57 +21,26 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConnectionControllerManager
 {
-    /** @var FormFactory */
-    protected $formFactory;
+    private FormFactoryInterface $formFactory;
+    private SymmetricCrypterInterface $crypter;
+    private ManagerRegistry $doctrine;
+    private ImapConnectorFactory $imapConnectorFactory;
+    private OAuthManagerRegistry $oauthManagerRegistry;
+    private string $userFormName;
+    private string $userFormType;
+    private string $emailMailboxFormName;
+    private string $emailMailboxFormType;
 
-    /** @var SymmetricCrypterInterface */
-    protected $crypter;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var ImapConnectorFactory */
-    protected $imapConnectorFactory;
-
-    /** @var string */
-    protected $userFormName;
-
-    /** @var string */
-    protected $userFormType;
-
-    /** @var string */
-    protected $emailMailboxFormName;
-
-    /** @var string */
-    protected $emailMailboxFormType;
-
-    /** @var OAuth2ManagerRegistry */
-    protected $oauthManagerRegistry;
-
-    /** @var string */
-    protected $type;
-
-    /**
-     * @param FormFactory $formFactory
-     * @param SymmetricCrypterInterface $crypter
-     * @param ManagerRegistry $doctrineHelper
-     * @param ImapConnectorFactory $imapConnectorFactory
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
-     * @param string $userFormName
-     * @param $userFormType
-     * @param string $emailMailboxFormName
-     * @param string $emailMailboxFormType
-     */
     public function __construct(
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         SymmetricCrypterInterface $crypter,
         ManagerRegistry $doctrineHelper,
         ImapConnectorFactory $imapConnectorFactory,
-        OAuth2ManagerRegistry $oauthManagerRegistry,
-        $userFormName,
-        $userFormType,
-        $emailMailboxFormName,
-        $emailMailboxFormType
+        OAuthManagerRegistry $oauthManagerRegistry,
+        string $userFormName,
+        string $userFormType,
+        string $emailMailboxFormName,
+        string $emailMailboxFormType
     ) {
         $this->formFactory = $formFactory;
         $this->crypter = $crypter;
@@ -85,14 +54,11 @@ class ConnectionControllerManager
     }
 
     /**
-     * Returns check connection form instance
+     * Gets a form to check connection.
      */
     public function getCheckConnectionForm(Request $request, string $formParentName): FormInterface
     {
-        $id = $request->get('id', null);
-        /** @var UserEmailOrigin $data */
-        $data = $id ? $this->doctrine->getRepository(UserEmailOrigin::class)->find($id) : null;
-
+        $data = $this->getUserEmailOrigin($request->get('id'));
         $type = $data ? $data->getAccountType() : $request->get('type');
         $oauthManager = $this->oauthManagerRegistry->getManager($type);
 
@@ -102,7 +68,7 @@ class ConnectionControllerManager
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !$form->isValid()) {
-            throw new Exception("Incorrect setting for IMAP authentication");
+            throw new Exception('Incorrect setting for IMAP authentication');
         }
 
         /** @var UserEmailOrigin $origin */
@@ -133,19 +99,6 @@ class ConnectionControllerManager
     }
 
     /**
-     * @param Request $request
-     * @param string  $formParentName
-     *
-     * @return FormInterface
-     * @deprecated Pleas use \Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager::getCheckConnectionForm()
-     *              with certain type taken from request
-     */
-    public function getCheckGmailConnectionForm($request, $formParentName)
-    {
-        return $this->getCheckConnectionForm($request, $formParentName);
-    }
-
-    /**
      * @param string $type
      * @param string|null $accessToken
      * @param string $formParentName
@@ -168,41 +121,15 @@ class ConnectionControllerManager
     }
 
     /**
-     * Get oauth2 access token by security code
-     *
-     * @param string $code
-     * @param string $type
-     * @return array
-     */
-    public function getAccessToken($code, $type)
-    {
-        $manager = $this->oauthManagerRegistry->getManager($type);
-        $accessTokenData = $manager->getAccessTokenDataByAuthCode($code);
-        try {
-            $userInfo = $manager->getUserInfo($accessTokenData);
-            $response = [
-                'access_token' => $accessTokenData->getAccessToken(),
-                'refresh_token' => $accessTokenData->getRefreshToken(),
-                'expires_in' => $accessTokenData->getExpiresIn(),
-                'email_address' => $userInfo->getEmail()
-            ];
-        } catch (\HWI\Bundle\OAuthBundle\OAuth\Exception\HttpTransportException $exc) {
-            $response = [ 'error' => $exc->getMessage() ];
-        }
-
-        return $response;
-    }
-
-    /**
      * @param $formParentName
      * @param $accountTypeModel
-     * @return null|\Symfony\Component\Form\Form|FormInterface
+     * @return FormInterface|null
      */
-    protected function prepareForm($formParentName, $accountTypeModel)
+    private function prepareForm($formParentName, $accountTypeModel)
     {
         $form = null;
         if ($formParentName === $this->userFormName || $formParentName === 'value') {
-            $data = $user = new User();
+            $data = new User();
             $data->setImapAccountType($accountTypeModel);
             $form = $this->formFactory->createNamed(
                 $this->userFormName,
@@ -212,7 +139,7 @@ class ConnectionControllerManager
             );
             $form->setData($data);
         } elseif ($formParentName === $this->emailMailboxFormName) {
-            $data = $user = new Mailbox();
+            $data = new Mailbox();
             $data->setImapAccountType($accountTypeModel);
             $form = $this->formFactory->createNamed(
                 $this->emailMailboxFormName,
@@ -231,12 +158,21 @@ class ConnectionControllerManager
      * @param $oauthEmailOrigin
      * @return AccountTypeModel
      */
-    protected function createAccountModel($type, $oauthEmailOrigin)
+    private function createAccountModel($type, $oauthEmailOrigin)
     {
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType($type);
         $accountTypeModel->setUserEmailOrigin($oauthEmailOrigin);
 
         return $accountTypeModel;
+    }
+
+    private function getUserEmailOrigin(?string $id): ?UserEmailOrigin
+    {
+        if (!$id) {
+            return null;
+        }
+
+        return $this->doctrine->getRepository(UserEmailOrigin::class)->find((int)$id);
     }
 }

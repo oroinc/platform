@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\ImapBundle\Exception;
 
+/**
+ * This exception is thrown when receiving the access token by the refresh token failed.
+ */
 class RefreshOAuthAccessTokenFailureException extends \RuntimeException
 {
-    /** @var string */
-    private $reason;
+    private string $reason;
+    private string $refreshToken;
 
-    /** @var string */
-    private $refreshToken;
-
-    /**
-     * @param string $reason
-     * @param string $refreshToken
-     */
-    public function __construct($reason, $refreshToken)
+    public function __construct(string $reason, string $refreshToken)
     {
-        $message = 'Cannot refresh OAuth2 access token.';
+        $message = 'Cannot refresh OAuth access token.';
         if ($reason) {
             $message .= sprintf(' Reason: %s.', $reason);
         }
@@ -29,20 +25,16 @@ class RefreshOAuthAccessTokenFailureException extends \RuntimeException
 
     /**
      * Gets the failure reason.
-     *
-     * @return string
      */
-    public function getReason()
+    public function getReason(): string
     {
         return $this->reason;
     }
 
     /**
      * Gets the refresh token.
-     *
-     * @return string
      */
-    public function getRefreshToken()
+    public function getRefreshToken(): string
     {
         return $this->refreshToken;
     }

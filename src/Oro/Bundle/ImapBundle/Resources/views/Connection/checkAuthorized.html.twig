@@ -3,11 +3,13 @@
         <div class="control-label wrap">
             {{ 'oro.imap.configuration.reset_email.label'|trans }}
         </div>
-        <div class="controls oro-item-collection">
-            <div style="margin-top: 6px">
-                <strong>{{ form.imapAccountType.userEmailOrigin.user.vars.value }}</strong>
-                <button title="{{ 'oro.imap.configuration.disconnect.label'|trans }}" class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
-            </div>
+        <div class="controls html-content oro-item-collection">
+            <strong>{{ form.imapAccountType.userEmailOrigin.user.vars.value }}</strong>
+            <button data-role="remove" class="btn btn-icon btn-square-lighter delete" type="button"
+                    title="{{ 'oro.imap.configuration.disconnect.label'|trans }}"
+            >
+                <span class="fa-close" aria-hidden="true"></span>
+            </button>
         </div>
     </div>
 {% endif %}
