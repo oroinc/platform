@@ -1,9 +1,7 @@
 services:
     Oro\Bundle\BatchBundle\Command\CleanupCommand:
-        public: false
-        class: Oro\Bundle\BatchBundle\Command\CleanupCommand
         arguments:
-            - '@akeneo_batch.job_repository'
+            - '@oro_batch.job.repository'
             - '%oro_batch.cleanup_interval%'
         tags:
             - { name: console.command }

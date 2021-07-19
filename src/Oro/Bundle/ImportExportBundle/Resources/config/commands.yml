@@ -4,7 +4,7 @@ services:
         class: Oro\Bundle\ImportExportBundle\Command\ImportCommand
         arguments:
             - '@oro_importexport.processor.registry'
-            - '@akeneo_batch.connectors'
+            - '@oro_batch.connector.registry'
             - '@oro_message_queue.client.message_producer'
             - '@oro_importexport.file.file_manager'
             - '@oro_user.manager'

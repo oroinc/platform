@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 
+/**
+ * Registry of import/export contexts.
+ */
 class ContextRegistry
 {
     const DEFAULT_ALIAS = 'default';

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\EventListener;
 
-use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 use Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener;
 
@@ -12,7 +13,7 @@ class KeepAliveListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnWriterAfterFlush()
     {
-        $expectedDql = 'SELECT e.id FROM AkeneoBatchBundle:JobExecution e WHERE e.id = 1';
+        $expectedDql = 'SELECT e.id FROM ' . JobExecution::class . ' e WHERE e.id = 1';
 
         $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())

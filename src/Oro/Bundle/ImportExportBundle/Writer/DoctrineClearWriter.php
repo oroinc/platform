@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 
+/**
+ * Batch job writer that clears entity manager.
+ */
 class DoctrineClearWriter implements ItemWriterInterface
 {
     /**

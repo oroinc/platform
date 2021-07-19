@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Migrations\Schema\v1_3;
 
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;

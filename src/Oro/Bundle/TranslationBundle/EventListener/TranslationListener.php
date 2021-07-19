@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\EventListener;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
+/**
+ * Updates the timestamp of the last update of database translations.
+ */
 class TranslationListener
 {
     /** @var DynamicTranslationMetadataCache */

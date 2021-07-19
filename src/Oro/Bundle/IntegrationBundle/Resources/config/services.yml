@@ -84,8 +84,8 @@ services:
     oro_integration.job_executor:
         class: Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
         arguments:
-            - '@akeneo_batch.connectors'
-            - '@akeneo_batch.job_repository'
+            - '@oro_batch.connector.registry'
+            - '@oro_batch.job.repository'
             - '@oro_importexport.context_registry'
             - '@doctrine'
             - '@oro_importexport.job.context.aggregator_registry'
@@ -223,7 +223,7 @@ services:
     oro_integration.event_listener.keep_avile:
         class: Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
         arguments:
-            - '@akeneo_batch.job_repository'
+            - '@oro_batch.job.repository'
         tags:
             - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 

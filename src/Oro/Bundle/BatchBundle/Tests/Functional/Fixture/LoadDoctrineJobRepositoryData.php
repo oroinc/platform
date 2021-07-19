@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Fixture;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -20,7 +20,7 @@ class LoadDoctrineJobRepositoryData extends AbstractFixture implements Container
      */
     public function load(ObjectManager $manager)
     {
-        $manager = $this->container->get('akeneo_batch.job_repository')->getJobManager();
+        $manager = $this->container->get('oro_batch.job.repository')->getJobManager();
 
         $jobInstance = new JobInstance();
         $jobInstance->setCode('test_job_instance_1');

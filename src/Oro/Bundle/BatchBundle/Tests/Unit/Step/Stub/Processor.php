@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
+use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class Processor implements ItemProcessorInterface, ClosableInterface
@@ -13,11 +13,9 @@ class Processor implements ItemProcessorInterface, ClosableInterface
     public const LOGIC_EXCEPTION_MESSAGE = 'Processor logic exception message';
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      *
      * @throws InvalidItemException
-     *
-     * @return mixed
      */
     public function process($item)
     {
@@ -33,7 +31,7 @@ class Processor implements ItemProcessorInterface, ClosableInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function close(): void
     {

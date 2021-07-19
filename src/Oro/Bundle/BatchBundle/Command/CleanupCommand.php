@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\BatchBundle\Command;
 
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
-use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Component\Console\Command\Command;
@@ -26,13 +27,13 @@ class CleanupCommand extends Command implements CronCommandInterface
     /** @var string */
     protected static $defaultName = 'oro:cron:batch:cleanup';
 
-    private DoctrineJobRepository $akeneoJobRepository;
+    private DoctrineJobRepository $doctrineJobRepository;
 
     private string $batchCleanupInterval;
 
-    public function __construct(DoctrineJobRepository $akeneoJobRepository, string $batchCleanupInterval)
+    public function __construct(DoctrineJobRepository $doctrineJobRepository, string $batchCleanupInterval)
     {
-        $this->akeneoJobRepository = $akeneoJobRepository;
+        $this->doctrineJobRepository = $doctrineJobRepository;
         $this->batchCleanupInterval = $batchCleanupInterval;
         parent::__construct();
     }
@@ -101,13 +102,15 @@ HELP
         if (!count($jobInstanceIterator)) {
             $output->writeln('<info>There are no jobs eligible for clean up</info>');
 
-            return;
+            return 1;
         }
         $output->writeln(sprintf('<comment>Batch jobs will be deleted:</comment> %d', count($jobInstanceIterator)));
 
-        $this->deleteRecords($jobInstanceIterator, 'AkeneoBatchBundle:JobInstance');
+        $this->deleteRecords($jobInstanceIterator, JobInstance::class);
 
         $output->writeln('<info>Batch job history cleanup complete</info>');
+
+        return 0;
     }
 
     /**
@@ -166,7 +169,7 @@ HELP
      */
     protected function getObsoleteJobInstancesQueryBuilder($endTime)
     {
-        $repository = $this->getEntityManager()->getRepository('AkeneoBatchBundle:JobInstance');
+        $repository = $this->getEntityManager()->getRepository(JobInstance::class);
 
         return $repository->createQueryBuilder('ji')
             ->resetDQLPart('select')
@@ -186,6 +189,6 @@ HELP
      */
     protected function getEntityManager()
     {
-        return $this->akeneoJobRepository->getJobManager();
+        return $this->doctrineJobRepository->getJobManager();
     }
 }

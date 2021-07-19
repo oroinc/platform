@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Fixture;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -14,15 +14,14 @@ class LoadJobExecutionData extends AbstractFixture implements ContainerAwareInte
 {
     use ContainerAwareTrait;
 
-    /** @var array */
-    protected $jobInstances = [];
+    private array $jobInstances = [];
 
     /**
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
-        $manager = $this->container->get('akeneo_batch.job_repository')->getJobManager();
+        $manager = $this->container->get('oro_batch.job.repository')->getJobManager();
 
         $this->clearJobTables($manager);
         $this->loadJobInstances($manager);
@@ -35,7 +34,7 @@ class LoadJobExecutionData extends AbstractFixture implements ContainerAwareInte
     {
         $manager
             ->createQueryBuilder()
-            ->delete('AkeneoBatchBundle:JobExecution', 'je')
+            ->delete(JobExecution::class, 'je')
             ->where('je.id > :id')
             ->setParameter('id', 0)
             ->getQuery()
@@ -43,7 +42,7 @@ class LoadJobExecutionData extends AbstractFixture implements ContainerAwareInte
 
         $manager
             ->createQueryBuilder()
-            ->delete('AkeneoBatchBundle:JobInstance', 'ji')
+            ->delete(JobInstance::class, 'ji')
             ->where('ji.id > :id')
             ->setParameter('id', 0)
             ->getQuery()

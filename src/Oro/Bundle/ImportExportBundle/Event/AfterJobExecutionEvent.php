@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Represents the event after a job execution is finished.
+ */
 class AfterJobExecutionEvent extends Event
 {
     /** @var JobExecution */

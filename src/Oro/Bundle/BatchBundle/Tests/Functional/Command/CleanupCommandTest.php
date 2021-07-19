@@ -3,6 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Tests\Functional\Fixture\LoadJobExecutionData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -11,37 +14,31 @@ class CleanupCommandTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\BatchBundle\Tests\Functional\Fixture\LoadJobExecutionData']);
+        $this->loadFixtures([LoadJobExecutionData::class]);
     }
 
     /**
      * @dataProvider paramProvider
-     *
-     * @param string $expectedContent
-     * @param array  $params
      */
-    public function testCommandOutput($expectedContent, $params)
+    public function testCommandOutput(string $expectedContent, array $params): void
     {
-        $result = $this->runCommand('oro:cron:batch:cleanup', $params);
+        $result = self::runCommand('oro:cron:batch:cleanup', $params);
         static::assertStringContainsString($expectedContent, $result);
 
         $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixture'
             . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'expected_results.yml';
 
         $expectedResults = Yaml::parse(file_get_contents($fileName));
-        if (isset($params['-i']) && isset($expectedResults['data'][$params['-i']])) {
+        if (isset($params['-i'], $expectedResults['data'][$params['-i']])) {
             $expectedJobData  = $expectedResults['data'][$params['-i']];
-            $jobInstanceCodes = $this->getEntityFieldAsArray('AkeneoBatchBundle:JobInstance', 'code');
-            $jobExecutionPids = $this->getEntityFieldAsArray('AkeneoBatchBundle:JobExecution', 'pid');
-            $this->assertEquals($expectedJobData['job_instance_codes'], $jobInstanceCodes);
-            $this->assertEquals(explode(',', $expectedJobData['job_execution_pids']), $jobExecutionPids);
+            $jobInstanceCodes = $this->getEntityFieldAsArray(JobInstance::class, 'code');
+            $jobExecutionPids = $this->getEntityFieldAsArray(JobExecution::class, 'pid');
+            self::assertEquals($expectedJobData['job_instance_codes'], $jobInstanceCodes);
+            self::assertEquals(explode(',', $expectedJobData['job_execution_pids']), $jobExecutionPids);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function paramProvider()
+    public function paramProvider(): array
     {
         return [
             'should show help'                             => [
@@ -59,16 +56,10 @@ class CleanupCommandTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param string $repositoryName
-     * @param string $field
-     *
-     * @return array
-     */
-    protected function getEntityFieldAsArray($repositoryName, $field)
+    private function getEntityFieldAsArray(string $repositoryName, string $field): array
     {
         /** @var QueryBuilder $qb */
-        $qb = $this->getContainer()->get('akeneo_batch.job_repository')
+        $qb = self::getContainer()->get('oro_batch.job.repository')
             ->getJobManager()
             ->getRepository($repositoryName)
             ->createQueryBuilder('i');
@@ -78,11 +69,6 @@ class CleanupCommandTest extends WebTestCase
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(
-            function ($item) use ($field) {
-                return $item[$field];
-            },
-            $items
-        );
+        return array_map(static fn ($item) => $item[$field], $items);
     }
 }

@@ -4,7 +4,7 @@ doctrine:
             batch:
                 connection: message_queue
                 mappings:
-                    AkeneoBatchBundle:
+                    OroBatchBundle:
                         mapping: true
                         is_bundle: true
                 metadata_cache_driver:

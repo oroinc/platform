@@ -3,19 +3,18 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\BatchBundle\DependencyInjection\Configuration;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Processor;
 
-/**
- * Test related class
- */
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * Test related method
-     */
-    public function testGetConfigTreeBuilder()
+    public function testProcessConfiguration(): void
     {
         $configuration = new Configuration();
-        $this->assertTrue($configuration->getConfigTreeBuilder() instanceof TreeBuilder);
+        $expected = [
+            'log_batch' => false,
+            'cleanup_interval' => '1 week',
+        ];
+
+        self::assertEquals($expected, (new Processor())->processConfiguration($configuration, []));
     }
 }

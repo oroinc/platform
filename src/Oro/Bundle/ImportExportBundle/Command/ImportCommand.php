@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Command;
 
-use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
+use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
