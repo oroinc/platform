@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Akeneo\Bundle\BatchBundle\Job\Job;
+use Oro\Bundle\BatchBundle\Job\Job;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -85,7 +85,7 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
         $step->setBatchSize($batchSize);
 
         $job = new Job($jobName);
-        $job->addStep($processorType, $step);
+        $job->addStep($step);
 
         $this->jobExecutor->expects($this->once())
             ->method('getJob')

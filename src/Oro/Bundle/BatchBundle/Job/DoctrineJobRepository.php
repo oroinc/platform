@@ -2,35 +2,52 @@
 
 namespace Oro\Bundle\BatchBundle\Job;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BaseRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 
 /**
  * Handle case when job executed inside another job and performs EntityManger::clear
  * Cascade persist is not possible for JobInstance because of duplicates in database
  */
-class DoctrineJobRepository extends BaseRepository
+class DoctrineJobRepository implements JobRepositoryInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    private ManagerRegistry $managerRegistry;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param string          $jobExecutionClass
-     */
-    public function __construct(ManagerRegistry $doctrine, $jobExecutionClass = JobExecution::class)
+    private ?EntityManagerInterface $jobEntityManager = null;
+
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->doctrine = $doctrine;
-        $this->jobExecutionClass = $jobExecutionClass;
+        $this->managerRegistry = $doctrine;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateJobExecution(JobExecution $jobExecution)
+    public function createJobExecution(JobInstance $jobInstance): JobExecution
+    {
+        if (null !== $jobInstance->getId()) {
+            $jobInstance = $this->getJobManager()->merge($jobInstance);
+        } else {
+            $this->getJobManager()->persist($jobInstance);
+        }
+
+        $jobExecution = new JobExecution();
+        $jobExecution->setJobInstance($jobInstance);
+
+        $this->updateJobExecution($jobExecution);
+
+        return $jobExecution;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateJobExecution(JobExecution $jobExecution): JobExecution
     {
         $jobManager = $this->getJobManager();
 
@@ -42,13 +59,16 @@ class DoctrineJobRepository extends BaseRepository
             $jobExecution->setJobInstance($jobInstance);
         }
 
-        parent::updateJobExecution($jobExecution);
+        $jobManager->persist($jobExecution);
+        $jobManager->flush($jobExecution);
+
+        return $jobExecution;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateStepExecution(StepExecution $stepExecution)
+    public function updateStepExecution(StepExecution $stepExecution): StepExecution
     {
         $jobManager = $this->getJobManager();
         if ($stepExecution->getId()
@@ -58,10 +78,10 @@ class DoctrineJobRepository extends BaseRepository
         }
 
         /**
-         * @see \Akeneo\Bundle\BatchBundle\Step\AbstractStep::execute
+         * @see \Oro\Bundle\BatchBundle\Step\AbstractStep::execute
          * because of StepExecution is not configured to cascade persist JobExecution
          * to avoid an error "A new entity was found through the relationship
-         * 'Akeneo\Bundle\BatchBundle\Entity\StepExecution#jobExecution' that was not configured to cascade
+         * 'Oro\Bundle\BatchBundle\Entity\StepExecution#jobExecution' that was not configured to cascade
          * persist operations".
          */
         $jobExecution = $stepExecution->getJobExecution();
@@ -71,31 +91,32 @@ class DoctrineJobRepository extends BaseRepository
             $this->updateJobExecution($jobExecution);
         }
 
-        parent::updateStepExecution($stepExecution);
+        $jobManager->persist($stepExecution);
+        $jobManager->flush($stepExecution);
+
+        return $stepExecution;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getJobManager()
+    public function getJobManager(): EntityManager
     {
-        if (null !== $this->jobManager && !$this->jobManager->isOpen()) {
+        if (null !== $this->jobEntityManager && !$this->jobEntityManager->isOpen()) {
             $this->resetEntityManager();
-            $this->jobManager = null;
+            $this->jobEntityManager = null;
         }
 
-        if (null === $this->jobManager) {
-            $this->jobManager = $this->doctrine->getManagerForClass($this->jobExecutionClass);
-            $this->jobManager->getConfiguration()->setSQLLogger(null);
+        if (null === $this->jobEntityManager) {
+            $this->jobEntityManager = $this->managerRegistry->getManagerForClass(JobExecution::class);
+            $this->jobEntityManager->getConfiguration()->setSQLLogger(null);
         } else {
             /**
              * ensure that the transaction is fully rolled back
              * in case if a nested transaction is rolled back but the entity manager is not closed
              * this may happen if the EntityManager::rollback() method is called
              * without the call of EntityManager::close() method
-             * @link http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/transactions-and-concurrency.html#exception-handling
+             * @link http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference
+             * /transactions-and-concurrency.html#exception-handling
              */
-            $connection = $this->jobManager->getConnection();
+            $connection = $this->jobEntityManager->getConnection();
             if ($connection->getTransactionNestingLevel() > 0 && $connection->isRollbackOnly()) {
                 while ($connection->getTransactionNestingLevel() > 0) {
                     $connection->rollBack();
@@ -103,18 +124,18 @@ class DoctrineJobRepository extends BaseRepository
             }
         }
 
-        return parent::getJobManager();
+        return $this->jobEntityManager;
     }
 
     /**
      * Replaces the closed entity manager with new instance of entity manager.
      */
-    private function resetEntityManager()
+    private function resetEntityManager(): void
     {
-        $managers = $this->doctrine->getManagers();
+        $managers = $this->managerRegistry->getManagers();
         foreach ($managers as $name => $manager) {
-            if (!$manager->getMetadataFactory()->isTransient($this->jobExecutionClass)) {
-                $this->doctrine->resetManager($name);
+            if (!$manager->getMetadataFactory()->isTransient(JobExecution::class)) {
+                $this->managerRegistry->resetManager($name);
                 break;
             }
         }

@@ -2,54 +2,77 @@
 
 namespace Oro\Bundle\BatchBundle\Monolog\Handler;
 
-use Akeneo\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler as AkeneoBatchLogHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
 /**
- * Write the log into a separate log file
+ * Writes the log into a separate log file
  */
-class BatchLogHandler extends AkeneoBatchLogHandler
+class BatchLogHandler extends StreamHandler
 {
-    /** @var bool */
-    protected $isActive = false;
+    private string $logDir;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($logDir)
+    private bool $isActive;
+
+    public function __construct(string $logDir, $isActive)
     {
         $this->logDir = $logDir;
+        $this->isActive = (bool) $isActive;
 
         $this->filePermission = null;
         $this->useLocking = false;
+        $this->bubble = true;
 
         $this->setLevel(Logger::DEBUG);
-        $this->bubble = true;
     }
 
     /**
-     * @param boolean $isActive
+     * Get the filename of the log file
      */
-    public function setIsActive($isActive)
+    public function getFilename(): string
     {
-        $this->isActive = $isActive;
+        return (string) $this->url;
+    }
+
+    public function setSubDirectory(string $subDirectory): void
+    {
+        $this->url = $this->getRealPath($this->generateLogFilename(), $subDirectory);
     }
 
     /**
-     * @return boolean
+     * Get the real path of the log file
      */
-    public function isActive()
+    public function getRealPath(string $filename, ?string $subDirectory = null): string
     {
-        return $this->isActive;
+        if ($subDirectory) {
+            return sprintf('%s/%s/%s', $this->logDir, $subDirectory, $filename);
+        }
+
+        return sprintf('%s/%s', $this->logDir, $filename);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write(array $record)
+    public function write(array $record): void
     {
-        if ($this->isActive()) {
-            parent::write($record);
+        if (!$this->isActive) {
+            return;
         }
+
+        if (!$this->url) {
+            $this->url = $this->getRealPath($this->generateLogFilename());
+        }
+
+        if (!is_dir(dirname($this->url))) {
+            mkdir(dirname($this->url), 0755, true);
+        }
+
+        parent::write($record);
+    }
+
+    private function generateLogFilename(): string
+    {
+        return sprintf('batch_%s.log', sha1(uniqid(mt_rand(), true)));
     }
 }

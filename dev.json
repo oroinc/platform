@@ -102,7 +102,6 @@
         "gos/web-socket-bundle": "3.6.*",
         "guzzlehttp/guzzle": "7.2.*",
         "composer/composer": "1.* || 2.*",
-        "akeneo/batch-bundle": "0.4.14",
         "nesbot/carbon": "~2.43.0",
         "monolog/monolog": "^1.25.1",
         "ocramius/proxy-manager": "~2.11.1",

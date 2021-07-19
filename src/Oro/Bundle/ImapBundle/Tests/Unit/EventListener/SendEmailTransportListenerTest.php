@@ -5,8 +5,8 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener;
-use Oro\Bundle\ImapBundle\Manager\Oauth2ManagerInterface;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
@@ -14,7 +14,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $crypter;
 
-    /** @var OAuth2ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $oauthManagerRegistry;
 
     /** @var SendEmailTransportListener */
@@ -23,7 +23,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
-        $this->oauthManagerRegistry = $this->createMock(OAuth2ManagerRegistry::class);
+        $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
 
         $this->listener = new SendEmailTransportListener($this->crypter, $this->oauthManagerRegistry);
     }
@@ -168,7 +168,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
             ->with($userEmailOrigin->getUser())
             ->willReturnSelf();
 
-        $manager = $this->createMock(Oauth2ManagerInterface::class);
+        $manager = $this->createMock(OAuthManagerInterface::class);
         $this->oauthManagerRegistry->expects($this->once())
             ->method('hasManager')
             ->with($userEmailOrigin->getAccountType())
@@ -242,7 +242,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
             ->with($userEmailOrigin->getUser())
             ->willReturnSelf();
 
-        $manager = $this->createMock(Oauth2ManagerInterface::class);
+        $manager = $this->createMock(OAuthManagerInterface::class);
         $this->oauthManagerRegistry->expects($this->once())
             ->method('hasManager')
             ->with($userEmailOrigin->getAccountType())

@@ -9,9 +9,12 @@ use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
  */
 class BufferedWarningHandler implements StepExecutionWarningHandlerInterface
 {
-    private $warnings = [];
+    private array $warnings = [];
 
-    public function handleWarning($element, $name, $reason, array $reasonParameters, $item)
+    /**
+     * {@inheritdoc}
+     */
+    public function handleWarning($element, $name, $reason, array $reasonParameters, $item): void
     {
         $this->warnings[] = [$element, $name, $reason, $reasonParameters, $item];
     }

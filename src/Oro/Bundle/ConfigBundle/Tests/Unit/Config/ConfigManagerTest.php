@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
@@ -19,30 +19,25 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager */
-    protected $manager;
-
-    /** @var ConfigDefinitionImmutableBag */
-    protected $bag;
+    private $manager;
 
     /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
+    private $dispatcher;
+
+    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $memoryCache;
 
     /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $globalScopeManager;
+    private $globalScopeManager;
 
     /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $userScopeManager;
+    private $userScopeManager;
 
     /** @var ValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultValueProvider;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $arrayCache;
-
-    /**
-     * @var array
-     */
-    protected $settings = [
+    /** @var array */
+    private $settings = [
         'oro_user' => [
             'greeting' => [
                 'value' => true,
@@ -71,22 +66,22 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->defaultValueProvider = $this->createMock(ValueProviderInterface::class);
-
-        $this->settings['oro_test']['servicestring']['value'] = $this->defaultValueProvider;
-
-        $this->bag        = new ConfigDefinitionImmutableBag($this->settings);
         $this->dispatcher = $this->createMock(EventDispatcher::class);
-        $this->arrayCache = $this->createMock(CacheProvider::class);
-
-        $this->manager = new ConfigManager(
-            'user',
-            $this->bag,
-            $this->dispatcher
-        );
+        $this->memoryCache = $this->getMockBuilder(MemoryCache::class)
+            ->onlyMethods(['deleteAll'])
+            ->getMock();
 
         $this->globalScopeManager = $this->createMock(GlobalScopeManager::class);
         $this->userScopeManager = $this->createMock(GlobalScopeManager::class);
 
+        $this->settings['oro_test']['servicestring']['value'] = $this->defaultValueProvider;
+
+        $this->manager = new ConfigManager(
+            'user',
+            new ConfigDefinitionImmutableBag($this->settings),
+            $this->dispatcher,
+            $this->memoryCache
+        );
         $this->manager->addManager('user', $this->userScopeManager);
         $this->manager->addManager('global', $this->globalScopeManager);
     }
@@ -119,21 +114,10 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('reset')
             ->with($name, $scopeIdentifier);
 
+        $this->memoryCache->expects($this->once())
+            ->method('deleteAll');
+
         $this->manager->reset($name, $scopeIdentifier);
-    }
-
-    /**
-     * @dataProvider scopeIdentifierDataProvider
-     *
-     * @param int|null|object $scopeIdentifier
-     */
-    public function testResetWhenArrayCache($scopeIdentifier): void
-    {
-        $this->arrayCache->expects($this->once())
-            ->method('flushAll');
-
-        $this->manager->setArrayCache($this->arrayCache);
-        $this->testReset($scopeIdentifier);
     }
 
     /**
@@ -290,23 +274,10 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
                 [$afterEvent, ConfigUpdateEvent::EVENT_NAME]
             );
 
+        $this->memoryCache->expects($this->once())
+            ->method('deleteAll');
+
         $this->manager->save($data, $scopeIdentifier);
-    }
-
-    /**
-     * @dataProvider scopeIdentifierDataProvider
-     *
-     * @param int|null|object $scopeIdentifier
-     * @param int $idValue
-     */
-    public function testSaveWhenArrayCache($scopeIdentifier, $idValue): void
-    {
-        $this->arrayCache->expects($this->once())
-            ->method('flushAll');
-
-        $this->manager->setArrayCache($this->arrayCache);
-
-        $this->testSave($scopeIdentifier, $idValue);
     }
 
     /**
@@ -329,17 +300,10 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects($this->once())
             ->method('reload');
 
+        $this->memoryCache->expects($this->once())
+            ->method('deleteAll');
+
         $this->manager->reload();
-    }
-
-    public function testReloadWhenArrayCache(): void
-    {
-        $this->arrayCache->expects($this->once())
-            ->method('flushAll');
-
-        $this->manager->setArrayCache($this->arrayCache);
-
-        $this->testReload();
     }
 
     /**
@@ -428,38 +392,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
 
-        $this->assertEquals(2, $this->manager->get($parameterName, false, false, $scopeIdentifier));
-    }
-
-    /**
-     * @dataProvider scopeIdentifierDataProvider
-     *
-     * @param int|null|object $scopeIdentifier
-     */
-    public function testGetWhenArrayCache($scopeIdentifier): void
-    {
-        $this->arrayCache->expects($this->exactly(2))
-            ->method('contains')
-            ->willReturnOnConsecutiveCalls(false, true);
-
-        $this->arrayCache->expects($this->once())
-            ->method('fetch')
-            ->willReturn(2);
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('app');
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('user');
-
-        $this->manager->setArrayCache($this->arrayCache);
-
-        $this->testGet($scopeIdentifier);
-
-        // Checks cache.
-        $this->assertEquals(2, $this->manager->get('oro_test.someValue', false, false, $scopeIdentifier));
+        $this->assertSame(2, $this->manager->get($parameterName, false, false, $scopeIdentifier));
+        // check cache
+        $this->assertSame(2, $this->manager->get($parameterName, false, false, $scopeIdentifier));
     }
 
     /**
@@ -481,44 +416,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->with($parameterName, true, $scopeIdentifier)
             ->willReturn(null);
 
-        $this->assertEquals(
-            'anyvalue',
-            $this->manager->get($parameterName, false, false, $scopeIdentifier)
-        );
-    }
-
-    /**
-     * @dataProvider scopeIdentifierDataProvider
-     *
-     * @param int|null|object $scopeIdentifier
-     */
-    public function testGetDefaultSettingsWhenArrayCache($scopeIdentifier): void
-    {
-        $this->arrayCache->expects($this->exactly(2))
-            ->method('contains')
-            ->willReturnOnConsecutiveCalls(false, true);
-
-        $this->arrayCache->expects($this->once())
-            ->method('fetch')
-            ->willReturn('anyvalue');
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('app');
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('user');
-
-        $this->manager->setArrayCache($this->arrayCache);
-
-        $this->testGetDefaultSettings($scopeIdentifier);
-
-        // Checks cache.
-        $this->assertEquals(
-            'anyvalue',
-            $this->manager->get('oro_test.anysetting', false, false, $scopeIdentifier)
-        );
+        $this->assertEquals('anyvalue', $this->manager->get($parameterName, false, false, $scopeIdentifier));
+        // check cache
+        $this->assertEquals('anyvalue', $this->manager->get($parameterName, false, false, $scopeIdentifier));
     }
 
     public function testGetEmptyValueSettings()
@@ -533,33 +433,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
 
-        $this->assertEquals('', $this->manager->get($parameterName));
-    }
-
-    public function testGetEmptyValueSettingsWhenArrayCache(): void
-    {
-        $this->arrayCache->expects($this->exactly(2))
-            ->method('contains')
-            ->willReturnOnConsecutiveCalls(false, true);
-
-        $this->arrayCache->expects($this->once())
-            ->method('fetch')
-            ->willReturn('');
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('app');
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('user');
-
-        $this->manager->setArrayCache($this->arrayCache);
-
-        $this->testGetEmptyValueSettings();
-
-        // Checks cache.
-        $this->assertEquals('', $this->manager->get('oro_test.emptystring'));
+        $this->assertSame('', $this->manager->get($parameterName));
+        // check cache
+        $this->assertSame('', $this->manager->get($parameterName));
     }
 
     public function testGetSettingsDefaultsMethodReturnNullForMissing()
@@ -633,16 +509,25 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
                 [$entity1, 33],
             ]);
 
+        $this->userScopeManager->expects($this->any())
+            ->method('getScopeIdFromEntity')
+            ->willReturnCallback(function (\stdClass $scope) {
+                return $scope->id;
+            });
+        $this->globalScopeManager->expects($this->never())
+            ->method('getScopeIdFromEntity');
+
         $this->userScopeManager->expects($this->exactly(2))
             ->method('getSettingValue')
             ->willReturnMap([
                 [$parameterName, true, $entity1, false, ['value' => 'val1']],
                 [$parameterName, true, $entity2, false, ['value' => 'val2']]
             ]);
-
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
 
+        $this->assertEquals([33 => 'val1', 55 => 'val2'], $this->manager->getValues($parameterName, $entities));
+        // check cache
         $this->assertEquals([33 => 'val1', 55 => 'val2'], $this->manager->getValues($parameterName, $entities));
     }
 
@@ -683,44 +568,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getValue')
             ->willReturn($value);
 
-        $this->assertEquals(
-            $value,
-            $this->manager->get($parameterName, false, false, $scopeIdentifier)
-        );
-    }
-
-    /**
-     * @dataProvider scopeIdentifierDataProvider
-     *
-     * @param int|null|object $scopeIdentifier
-     */
-    public function testGetDefaultSettingsFromProviderWhenArrayCache($scopeIdentifier): void
-    {
-        $this->arrayCache->expects($this->exactly(2))
-            ->method('contains')
-            ->willReturnOnConsecutiveCalls(false, true);
-
-        $this->arrayCache->expects($this->once())
-            ->method('fetch')
-            ->willReturn(1);
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('app');
-
-        $this->userScopeManager->expects($this->atLeastOnce())
-            ->method('getScopedEntityName')
-            ->willReturn('user');
-
-        $this->manager->setArrayCache($this->arrayCache);
-
-        $this->testGetDefaultSettingsFromProvider($scopeIdentifier);
-
-        // Checks cache.
-        $this->assertEquals(
-            1,
-            $this->manager->get('oro_test.servicestring', false, false, $scopeIdentifier)
-        );
+        $this->assertEquals($value, $this->manager->get($parameterName, false, false, $scopeIdentifier));
+        // check cache
+        $this->assertEquals($value, $this->manager->get($parameterName, false, false, $scopeIdentifier));
     }
 
     public function testDeleteScope()

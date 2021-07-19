@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
@@ -68,7 +69,8 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
         $this->manager = new ConfigManager(
             'global',
             $bag,
-            $dispatcher
+            $dispatcher,
+            new MemoryCache()
         );
 
         $this->globalScopeManager = $this->getMockBuilder(GlobalScopeManager::class)

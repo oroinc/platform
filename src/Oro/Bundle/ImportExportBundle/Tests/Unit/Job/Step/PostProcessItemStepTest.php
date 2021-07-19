@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job\Step;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Item\ExecutionContext;
+use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessItemStep;
 
@@ -21,21 +24,21 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
         $this->itemStep = new PostProcessItemStep('step_name');
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor $jobExecutor */
-        $jobExecutor = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobExecutor')
+        $jobExecutor = $this->getMockBuilder(JobExecutor::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->itemStep->setJobExecutor($jobExecutor);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|ItemReaderInterface $reader */
-        $reader = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
+        $reader = $this->createMock(ItemReaderInterface::class);
         $this->itemStep->setReader($reader);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|ItemProcessorInterface $processor */
-        $processor = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
+        $processor = $this->createMock(ItemProcessorInterface::class);
         $this->itemStep->setProcessor($processor);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|ItemWriterInterface $writer */
-        $writer = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
+        $writer = $this->createMock(ItemWriterInterface::class);
         $this->itemStep->setWriter($writer);
 
         $this->itemStep->setBatchSize(1);
@@ -50,13 +53,13 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
     public function testDoExecute($jobName, $contextKeys)
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
-        $jobExecution = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-        $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $executionContext = $this->createMock(ExecutionContext::class);
+        $jobExecution = $this->createMock(JobExecution::class);
+        $jobInstance = $this->createMock(JobInstance::class);
         $jobExecution->expects($this->any())
             ->method('getJobInstance')
             ->will($this->returnValue($jobInstance));

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity\Repository;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -17,17 +18,11 @@ class ImapEmailRepositoryTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            [
-                'Oro\Bundle\ImapBundle\Entity',
-                'Oro\Bundle\EmailBundle\Entity',
-            ]
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            ['Oro\Bundle\ImapBundle\Entity', 'Oro\Bundle\EmailBundle\Entity']
+        ));
         $this->em->getConfiguration()->setEntityNamespaces(
             [
                 'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
@@ -38,13 +33,11 @@ class ImapEmailRepositoryTest extends OrmTestCase
     public function testGetEmailsByUidsQueryBuilder()
     {
         $folder = new EmailFolder();
-        $uids   = [1, 2];
+        $uids = [1, 2];
 
         /** @var ImapEmailRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
-
-        $qb    = $repo->getEmailsByUidsQueryBuilder($folder, $uids);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmail::class);
+        $query = $repo->getEmailsByUidsQueryBuilder($folder, $uids)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_email '
@@ -61,14 +54,12 @@ class ImapEmailRepositoryTest extends OrmTestCase
 
     public function testGetEmailsByMessageIdsQueryBuilder()
     {
-        $origin     = new UserEmailOrigin();
+        $origin = new UserEmailOrigin();
         $messageIds = ['msg1', 'msg2'];
 
         /** @var ImapEmailRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
-
-        $qb    = $repo->getEmailsByMessageIdsQueryBuilder($origin, $messageIds);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmail::class);
+        $query = $repo->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_email '

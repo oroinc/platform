@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 
 /**
  * Provides the ability to save and manage parameters

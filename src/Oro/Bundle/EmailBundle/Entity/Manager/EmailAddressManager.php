@@ -2,40 +2,36 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Provides a set of methods to work with EmailAddress entity.
+ */
 class EmailAddressManager
 {
-    /** @var string */
-    private $entityCacheNamespace;
+    private string $entityCacheNamespace;
+    private string $entityProxyNameTemplate;
+    private ManagerRegistry $doctrine;
+    private ?string $emailAddressProxyClass = null;
 
-    /** @var string */
-    private $entityProxyNameTemplate;
-
-    /** @var ServiceLink|null */
-    private $emLink;
-
-    /**
-     * Constructor
-     *
-     * @param string $entityCacheNamespace
-     * @param string $entityProxyNameTemplate
-     */
-    public function __construct($entityCacheNamespace, $entityProxyNameTemplate)
-    {
+    public function __construct(
+        string $entityCacheNamespace,
+        string $entityProxyNameTemplate,
+        ManagerRegistry $doctrine
+    ) {
         $this->entityCacheNamespace = $entityCacheNamespace;
         $this->entityProxyNameTemplate = $entityProxyNameTemplate;
+        $this->doctrine = $doctrine;
     }
 
     /**
-     * Create EmailAddress entity object. Actually a proxy class is created
-     *
-     * @return EmailAddress
+     * Creates EmailAddress entity object.
+     * Actually a proxy class for this entity is created.
      */
-    public function newEmailAddress()
+    public function newEmailAddress(): EmailAddress
     {
         $emailAddressClass = $this->getEmailAddressProxyClass();
 
@@ -43,45 +39,38 @@ class EmailAddressManager
     }
 
     /**
-     * Get a repository for EmailAddress entity
-     *
-     * @param EntityManager|null $em Manager have to be provided via "setEntityManager" method if null
-     * @return EntityRepository
+     * Gets an entity manager for EmailAddress entity.
      */
-    public function getEmailAddressRepository(EntityManager $em = null)
+    public function getEntityManager(): EntityManagerInterface
     {
-        $manager = $em ?: $this->getEntityManager();
-
-        return $manager->getRepository($this->getEmailAddressProxyClass());
+        return $this->doctrine->getManagerForClass($this->getEmailAddressProxyClass());
     }
 
     /**
-     * Get full class name of a proxy of EmailAddress entity
-     *
-     * @return string
+     * Gets an entity repository for EmailAddress entity.
      */
-    public function getEmailAddressProxyClass()
+    public function getEmailAddressRepository(EntityManagerInterface $em = null): EntityRepository
     {
-        return sprintf('%s\%s', $this->entityCacheNamespace, sprintf($this->entityProxyNameTemplate, 'EmailAddress'));
+        if (null === $em) {
+            $em = $this->getEntityManager();
+        }
+
+        return $em->getRepository($this->getEmailAddressProxyClass());
     }
 
     /**
-     * @param ServiceLink $emLink
-     *
-     * @return $this
+     * Gets the full class name of a proxy for EmailAddress entity.
      */
-    public function setEntityManagerLink(ServiceLink $emLink)
+    public function getEmailAddressProxyClass(): string
     {
-        $this->emLink = $emLink;
+        if (null === $this->emailAddressProxyClass) {
+            $this->emailAddressProxyClass = sprintf(
+                '%s\%s',
+                $this->entityCacheNamespace,
+                sprintf($this->entityProxyNameTemplate, 'EmailAddress')
+            );
+        }
 
-        return $this;
-    }
-
-    /**
-     * @return EntityManager|null
-     */
-    public function getEntityManager()
-    {
-        return $this->emLink ? $this->emLink->getService() : null;
+        return $this->emailAddressProxyClass;
     }
 }

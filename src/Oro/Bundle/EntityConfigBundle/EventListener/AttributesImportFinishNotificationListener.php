@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;

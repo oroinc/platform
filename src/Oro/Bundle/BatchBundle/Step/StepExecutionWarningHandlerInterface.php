@@ -11,11 +11,11 @@ interface StepExecutionWarningHandlerInterface
     /**
      * Handle step execution warning
      *
-     * @param object $element A step element (for example a reader or a processor) causes a warning
-     * @param string $name    A warning name
-     * @param string $reason  A warning reason
-     * @param array $reasonParameters  A warning reason parameters
-     * @param mixed  $item    An item processing of which caused a warning
+     * @param object $element A step element (for example a reader or a processor) which causes a warning
+     * @param string $name A warning name
+     * @param string $reason A warning reason
+     * @param array $reasonParameters A warning reason parameters
+     * @param mixed $item An item processing of which caused a warning
      */
-    public function handleWarning($element, $name, $reason, array $reasonParameters, $item);
+    public function handleWarning(object $element, string $name, string $reason, array $reasonParameters, $item);
 }

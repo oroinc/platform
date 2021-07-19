@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
@@ -41,34 +41,22 @@ class ConfigManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var CacheProvider|null */
-    private $arrayCache;
+    /** @var MemoryCache */
+    private $memoryCache;
 
-    /**
-     * @param string                       $scope
-     * @param ConfigDefinitionImmutableBag $configDefinition
-     * @param EventDispatcherInterface     $eventDispatcher
-     */
     public function __construct(
-        $scope,
+        string $scope,
         ConfigDefinitionImmutableBag $configDefinition,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        MemoryCache $memoryCache
     ) {
-        $this->scope           = $scope;
-        $this->settings        = $configDefinition->all();
+        $this->scope = $scope;
+        $this->settings = $configDefinition->all();
         $this->eventDispatcher = $eventDispatcher;
+        $this->memoryCache = $memoryCache;
     }
 
-    public function setArrayCache(?CacheProvider $arrayCache): void
-    {
-        $this->arrayCache = $arrayCache;
-    }
-
-    /**
-     * @param string               $scope
-     * @param AbstractScopeManager $manager
-     */
-    public function addManager($scope, $manager)
+    public function addManager(string $scope, AbstractScopeManager $manager): void
     {
         $this->managers[$scope] = $manager;
     }
@@ -125,18 +113,13 @@ class ConfigManager
      */
     public function get($name, $default = false, $full = false, $scopeIdentifier = null)
     {
-        if ($this->arrayCache) {
-            $cacheKey = $this->getCacheKey($name, $default, $full, $scopeIdentifier);
-            if ($this->arrayCache->contains($cacheKey)) {
-                return $this->arrayCache->fetch($cacheKey);
-            }
+        $cacheKey = $this->getCacheKey($name, $default, $full, $scopeIdentifier);
+        if ($this->memoryCache->has($cacheKey)) {
+            return $this->memoryCache->get($cacheKey);
         }
 
         $value = $this->getValue($name, $default, $full, $scopeIdentifier);
-
-        if ($this->arrayCache) {
-            $this->arrayCache->save($cacheKey, $value);
-        }
+        $this->memoryCache->set($cacheKey, $value);
 
         return $value;
     }
@@ -215,7 +198,7 @@ class ConfigManager
     {
         $this->getScopeManager()->set($name, $value, $scopeIdentifier);
 
-        $this->resetArrayCache();
+        $this->resetMemoryCache();
     }
 
     /**
@@ -228,7 +211,7 @@ class ConfigManager
     {
         $this->getScopeManager()->reset($name, $scopeIdentifier);
 
-        $this->resetArrayCache();
+        $this->resetMemoryCache();
     }
 
     /**
@@ -240,7 +223,7 @@ class ConfigManager
     {
         $this->getScopeManager()->deleteScope($scopeIdentifier);
 
-        $this->resetArrayCache();
+        $this->resetMemoryCache();
     }
 
     /**
@@ -285,7 +268,7 @@ class ConfigManager
 
         [$updated, $removed] = $this->getScopeManager()->save($settings, $scopeIdentifier);
 
-        $this->resetArrayCache();
+        $this->resetMemoryCache();
 
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
         $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
@@ -331,7 +314,7 @@ class ConfigManager
     {
         $this->getScopeManager()->reload($scopeIdentifier);
 
-        $this->resetArrayCache();
+        $this->resetMemoryCache();
     }
 
     /**
@@ -443,7 +426,6 @@ class ConfigManager
      */
     protected function getValue($name, $default = false, $full = false, $scopeIdentifier = null, $skipChanges = false)
     {
-        $value = null;
         $scopeId = $this->resolveIdentifier($scopeIdentifier);
         $managers = $this->getScopeManagersToGetValue($default);
         $settingValue = null;
@@ -520,11 +502,9 @@ class ConfigManager
         );
     }
 
-    private function resetArrayCache(): void
+    private function resetMemoryCache(): void
     {
-        if ($this->arrayCache) {
-            $this->arrayCache->flushAll();
-        }
+        $this->memoryCache->deleteAll();
     }
 
     /**

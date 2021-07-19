@@ -2,73 +2,65 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
-use Akeneo\Bundle\BatchBundle\Job\ExitStatus;
-use Akeneo\Bundle\BatchBundle\Job\JobRepositoryInterface;
-use Akeneo\Bundle\BatchBundle\Tests\Unit\Step\Stub\ProcessorStub;
-use Akeneo\Bundle\BatchBundle\Tests\Unit\Step\Stub\ReaderStub;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Job\ExitStatus;
+use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
 use Oro\Bundle\BatchBundle\Step\CumulativeItemStep;
-use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ClosableWriterStub;
+use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ProcessorStub;
+use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ReaderStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CumulativeItemStepTest extends \PHPUnit\Framework\TestCase
 {
     private const STEP_NAME = 'test_step_name';
 
-    /** @var ItemStep */
-    private $itemStep;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
+    private CumulativeItemStep $itemStep;
 
     protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $jobRepository = $this->createMock(JobRepositoryInterface::class);
 
         $this->itemStep = new CumulativeItemStep(self::STEP_NAME);
-        $this->itemStep->setEventDispatcher($this->eventDispatcher);
-        $this->itemStep->setJobRepository($this->jobRepository);
+        $this->itemStep->setEventDispatcher($eventDispatcher);
+        $this->itemStep->setJobRepository($jobRepository);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $stepExecution = $this->createMock(StepExecution::class);
-        $stepExecution->expects($this->any())
+        $stepExecution->expects(self::any())
             ->method('getStatus')
             ->willReturn(new BatchStatus(BatchStatus::STARTING));
-        $stepExecution->expects($this->any())
+        $stepExecution->expects(self::any())
             ->method('getExitStatus')
             ->willReturn(new ExitStatus());
 
         $reader = $this->createMock(ReaderStub::class);
-        $reader->expects($this->once())
+        $reader->expects(self::once())
             ->method('setStepExecution')
             ->with($stepExecution);
-        $reader->expects($this->exactly(8))
+        $reader->expects(self::exactly(8))
             ->method('read')
-            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6, 7, null));
+            ->willReturnOnConsecutiveCalls(1, 2, 3, 4, 5, 6, 7, null);
 
         $processor = $this->createMock(ProcessorStub::class);
-        $processor->expects($this->once())
+        $processor->expects(self::once())
             ->method('setStepExecution')
             ->with($stepExecution);
-        $processor->expects($this->exactly(7))
+        $processor->expects(self::exactly(7))
             ->method('process')
-            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6, 7));
+            ->willReturnOnConsecutiveCalls(1, 2, 3, 4, 5, 6, 7);
 
         $writer = $this->createMock(ClosableWriterStub::class);
-        $writer->expects($this->once())
+        $writer->expects(self::once())
             ->method('setStepExecution')
             ->with($stepExecution);
-        $writer->expects($this->exactly(7))
+        $writer->expects(self::exactly(7))
             ->method('write');
-        $writer->expects($this->once())
+        $writer->expects(self::once())
             ->method('close');
 
         $this->itemStep->setReader($reader);
@@ -80,11 +72,11 @@ class CumulativeItemStepTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBatchSize(): void
     {
-        $this->assertNull($this->itemStep->getBatchSize());
+        self::assertNull($this->itemStep->getBatchSize());
 
         $batchSize = 100;
         $this->itemStep->setBatchSize($batchSize);
 
-        $this->assertSame($batchSize, $this->itemStep->getBatchSize());
+        self::assertSame($batchSize, $this->itemStep->getBatchSize());
     }
 }

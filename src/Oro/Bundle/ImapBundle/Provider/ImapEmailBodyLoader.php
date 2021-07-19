@@ -12,9 +12,10 @@ use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -22,15 +23,13 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 class ImapEmailBodyLoader implements EmailBodyLoaderInterface
 {
-    /**
-     * @var ImapConnectorFactory
-     */
+    /** @var ImapConnectorFactory */
     protected $connectorFactory;
 
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     /** @var ConfigManager */
@@ -39,7 +38,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        OAuth2ManagerRegistry $oauthManagerRegistry,
+        OAuthManagerRegistry $oauthManagerRegistry,
         ConfigManager $configManager
     ) {
         $this->connectorFactory = $connectorFactory;
@@ -79,7 +78,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
         $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
         $manager->selectFolder($folder->getFullName());
 
-        $repo = $em->getRepository('OroImapBundle:ImapEmail');
+        $repo = $em->getRepository(ImapEmail::class);
         $query = $repo->createQueryBuilder('e')
             ->select('e.uid')
             ->innerJoin('e.imapFolder', 'if')

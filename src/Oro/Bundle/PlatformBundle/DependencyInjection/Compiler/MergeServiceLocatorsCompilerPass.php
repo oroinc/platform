@@ -16,17 +16,10 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
 {
-    /** @var string */
-    private $tagName;
+    private string $tagName;
+    private string $serviceLocatorServiceId;
 
-    /** @var string */
-    private $serviceLocatorServiceId;
-
-    /**
-     * @param string $tagName
-     * @param string $serviceLocatorServiceId
-     */
-    public function __construct(string $tagName, ?string $serviceLocatorServiceId)
+    public function __construct(string $tagName, string $serviceLocatorServiceId)
     {
         $this->tagName = $tagName;
         $this->serviceLocatorServiceId = $serviceLocatorServiceId;
@@ -126,7 +119,7 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
         }
 
         $referenceId = (string)$argument;
-        if (strpos($referenceId, '.') !== 0 || !$container->hasDefinition($referenceId)) {
+        if (!str_starts_with($referenceId, '.') || !$container->hasDefinition($referenceId)) {
             return null;
         }
 
