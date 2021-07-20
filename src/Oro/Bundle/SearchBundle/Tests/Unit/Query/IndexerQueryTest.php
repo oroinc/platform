@@ -190,8 +190,6 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $arguments
-     * @param array $ordering
      * @dataProvider orderByDataProvider
      */
     public function testSetOrderBy(array $arguments, array $ordering)

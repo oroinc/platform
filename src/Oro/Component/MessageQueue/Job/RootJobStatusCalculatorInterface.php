@@ -7,10 +7,5 @@ namespace Oro\Component\MessageQueue\Job;
  */
 interface RootJobStatusCalculatorInterface
 {
-    /**
-     * @param Job $job
-     *
-     * @return void
-     */
     public function calculate(Job $job): void;
 }

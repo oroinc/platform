@@ -20,10 +20,6 @@ class FilterHelper
     /** @var array [field name => [FilterValue|null, filterKey, filter], ...] */
     private $filterMap;
 
-    /**
-     * @param FilterCollection             $filters
-     * @param FilterValueAccessorInterface $filterValues
-     */
     public function __construct(FilterCollection $filters, FilterValueAccessorInterface $filterValues)
     {
         $this->filters = $filters;
@@ -32,8 +28,6 @@ class FilterHelper
 
     /**
      * Return a value of "page number" filter.
-     *
-     * @return int|null
      */
     public function getPageNumber(): ?int
     {
@@ -48,8 +42,6 @@ class FilterHelper
 
     /**
      * Return a value of "page size" filter.
-     *
-     * @return int|null
      */
     public function getPageSize(): ?int
     {
@@ -80,10 +72,6 @@ class FilterHelper
 
     /**
      * Returns a value of a given boolean filter.
-     *
-     * @param string $fieldName
-     *
-     * @return bool|null
      */
     public function getBooleanFilterValue(string $fieldName): ?bool
     {
@@ -101,10 +89,6 @@ class FilterHelper
 
     /**
      * Returns a value of a given filter.
-     *
-     * @param string $fieldName
-     *
-     * @return FilterValue|null
      */
     public function getFilterValue(string $fieldName): ?FilterValue
     {

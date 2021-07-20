@@ -13,10 +13,6 @@ class ApiSubRequestListener
     /** @var array [[request matcher, options], ...] */
     private $rules;
 
-    /**
-     * @param RequestMatcherInterface $requestMatcher
-     * @param array                   $options
-     */
     public function addRule(RequestMatcherInterface $requestMatcher, array $options = []): void
     {
         $this->rules[] = [$requestMatcher, $options];

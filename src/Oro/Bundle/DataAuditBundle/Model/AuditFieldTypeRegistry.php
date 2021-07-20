@@ -119,8 +119,6 @@ class AuditFieldTypeRegistry
     }
 
     /**
-     * @param string $auditType
-     *
      * @throws \LogicException
      */
     public static function addAuditType(string $auditType)
@@ -132,8 +130,6 @@ class AuditFieldTypeRegistry
 
     /**
      * Removing type will cause application to crash if type is in use and the field is auditable
-     *
-     * @param string $auditType
      */
     public static function removeAuditType(string $auditType)
     {
@@ -191,7 +187,6 @@ class AuditFieldTypeRegistry
         return isset(static::$typeMap[$doctrineType]);
     }
 
-
     /**
      * @param string $auditType
      *
@@ -202,10 +197,6 @@ class AuditFieldTypeRegistry
         return isset(static::$auditTypes[$auditType]);
     }
 
-
-    /**
-     * @param string $doctrineType
-     */
     protected static function validateType(string $doctrineType)
     {
         if (!empty(static::$typeMap[$doctrineType])) {
@@ -213,9 +204,6 @@ class AuditFieldTypeRegistry
         }
     }
 
-    /**
-     * @param string $auditType
-     */
     protected static function validateAuditType(string $auditType)
     {
         if (!empty(static::$auditTypes[$auditType])) {

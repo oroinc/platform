@@ -26,10 +26,6 @@ class WorkflowAwareCache implements EventSubscriberInterface
     /** @var WorkflowDefinitionRepository */
     private $definitionRepository;
 
-    /**
-     * @param Cache $cache
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(Cache $cache, DoctrineHelper $doctrineHelper)
     {
         $this->cache = $cache;

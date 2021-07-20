@@ -81,9 +81,6 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
     public function wrongOptionsDataProvider(): array
     {
         return [

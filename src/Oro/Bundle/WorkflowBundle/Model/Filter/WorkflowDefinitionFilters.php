@@ -22,9 +22,6 @@ class WorkflowDefinitionFilters
     /** @var bool */
     protected static $enabled = true;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -32,9 +29,6 @@ class WorkflowDefinitionFilters
         $this->filters = new ArrayCollection();
     }
 
-    /**
-     * @param WorkflowDefinitionFilterInterface $filter
-     */
     public function addFilter(WorkflowDefinitionFilterInterface $filter)
     {
         if (!$this->filters->contains($filter)) {

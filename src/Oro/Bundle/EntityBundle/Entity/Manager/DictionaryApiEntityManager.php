@@ -40,12 +40,6 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param ObjectManager                    $om
-     * @param ChainDictionaryValueListProvider $dictionaryProvider
-     * @param ConfigManager                    $entityConfigManager
-     * @param EntityNameResolver               $entityNameResolver
-     */
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
@@ -60,7 +54,6 @@ class DictionaryApiEntityManager extends ApiEntityManager
 
     /**
      * @deprecated
-     * @param AclHelper $aclHelper
      */
     public function setAclHelper(AclHelper $aclHelper): void
     {

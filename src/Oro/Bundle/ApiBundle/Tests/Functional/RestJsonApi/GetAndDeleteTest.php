@@ -12,11 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class GetAndDeleteTest extends RestJsonApiTestCase
 {
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
     private function isSkippedEntity(string $entityClass, string $action): bool
     {
         /** @var SkippedEntityProviderInterface $provider */

@@ -66,11 +66,6 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $data
-     *
-     * @return WindowsState
-     */
     private function createWindowState(array $data = [], ?int $id = 123): WindowsState
     {
         /** @var WindowsState $state */

@@ -41,9 +41,6 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getTitlesDataProvider
-     *
-     * @param int $duplicatedCount
-     * @param array $expectedTitles
      */
     public function testGetTitles(int $duplicatedCount, array $expectedTitles): void
     {
@@ -78,9 +75,6 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedTitles, $titles);
     }
 
-    /**
-     * @return array
-     */
     public function getTitlesDataProvider(): array
     {
         return [

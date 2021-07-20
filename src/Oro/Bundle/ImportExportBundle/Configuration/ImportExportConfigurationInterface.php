@@ -4,14 +4,8 @@ namespace Oro\Bundle\ImportExportBundle\Configuration;
 
 interface ImportExportConfigurationInterface
 {
-    /**
-     * @return array
-     */
     public function getRouteOptions(): array;
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string;
 
     /**

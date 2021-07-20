@@ -84,18 +84,6 @@ class EmailActivityListProvider implements
     protected $commentAssociationHelper;
 
     /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param EntityNameResolver            $entityNameResolver
-     * @param Router                        $router
-     * @param ConfigManager                 $configManager
-     * @param EmailThreadProvider           $emailThreadProvider
-     * @param HtmlTagHelper                 $htmlTagHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param MailboxProcessStorage         $mailboxProcessStorage
-     * @param ActivityAssociationHelper     $activityAssociationHelper
-     * @param CommentAssociationHelper      $commentAssociationHelper
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(

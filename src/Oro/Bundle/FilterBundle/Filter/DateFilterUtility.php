@@ -33,10 +33,6 @@ class DateFilterUtility
         DateModifierInterface::PART_YEAR  => 'YEAR',
     ];
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param Compiler       $compiler
-     */
     public function __construct(LocaleSettings $localeSettings, Compiler $compiler)
     {
         $this->localeSettings     = $localeSettings;

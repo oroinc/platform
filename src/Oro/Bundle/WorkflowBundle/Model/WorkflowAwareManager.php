@@ -10,9 +10,6 @@ class WorkflowAwareManager implements WorkflowAwareInterface
     /** @var WorkflowManager */
     private $workflowManager;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     */
     public function __construct(WorkflowManager $workflowManager)
     {
         $this->workflowManager = $workflowManager;

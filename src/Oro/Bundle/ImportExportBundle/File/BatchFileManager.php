@@ -48,25 +48,16 @@ class BatchFileManager
         $this->sizeOfBatch = $sizeOfBatch;
     }
 
-    /**
-     * @param AbstractFileReader $reader
-     */
     public function setReader(AbstractFileReader $reader)
     {
         $this->reader = $reader;
     }
 
-    /**
-     * @param FileStreamWriter $writer
-     */
     public function setWriter(FileStreamWriter $writer)
     {
         $this->writer = $writer;
     }
 
-    /**
-     * @param array $options
-     */
     public function setConfigurationOptions(array $options)
     {
         $this->configurationOptions = $options;

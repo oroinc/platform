@@ -30,13 +30,6 @@ class ClientAttributes
      */
     private $contextOptions;
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param string $path
-     * @param string $transport
-     * @param array $contextOptions
-     */
     public function __construct(
         string $host,
         int $port,
@@ -55,42 +48,26 @@ class ClientAttributes
         $this->contextOptions = $contextOptions;
     }
 
-    /**
-     * @return string
-     */
     public function getHost(): string
     {
         return $this->host;
     }
 
-    /**
-     * @return int
-     */
     public function getPort(): int
     {
         return $this->port;
     }
 
-    /**
-     * @return string
-     */
     public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * @return string
-     */
     public function getTransport(): string
     {
         return $this->transport;
     }
 
-
-    /**
-     * @return array
-     */
     public function getContextOptions(): array
     {
         return $this->contextOptions;

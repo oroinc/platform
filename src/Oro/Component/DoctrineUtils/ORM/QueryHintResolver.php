@@ -19,11 +19,6 @@ class QueryHintResolver implements QueryHintResolverInterface
     /** @var array [hint alias => hint, ...] */
     private $aliases;
 
-    /**
-     * @param array              $walkers
-     * @param ContainerInterface $walkerHintProviders
-     * @param array              $aliases
-     */
     public function __construct(array $walkers, ContainerInterface $walkerHintProviders, array $aliases)
     {
         $this->walkers = $walkers;
@@ -33,9 +28,6 @@ class QueryHintResolver implements QueryHintResolverInterface
 
     /**
      * Resolves query hints
-     *
-     * @param Query $query
-     * @param array $hints
      */
     public function resolveHints(Query $query, array $hints = [])
     {
@@ -93,9 +85,6 @@ class QueryHintResolver implements QueryHintResolverInterface
 
     /**
      * Adds hints to a query object
-     *
-     * @param Query $query
-     * @param array $hints
      */
     public function addHints(Query $query, array $hints)
     {
@@ -153,10 +142,6 @@ class QueryHintResolver implements QueryHintResolverInterface
         return $value;
     }
 
-    /**
-     * @param array $walker
-     * @return string
-     */
     private function getHintName(array $walker): string
     {
         return $walker['output'] ? Query::HINT_CUSTOM_OUTPUT_WALKER : Query::HINT_CUSTOM_TREE_WALKERS;

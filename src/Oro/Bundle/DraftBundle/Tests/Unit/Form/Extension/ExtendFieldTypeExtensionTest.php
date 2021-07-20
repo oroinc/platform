@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\DraftBundle\Form\Extension\ExtendFieldTypeExtension;
@@ -22,9 +21,6 @@ class ExtendFieldTypeExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $exceptionMessage
-     * @param array $options
-     *
      * @dataProvider configureOptionsExceptionDataProvider
      */
     public function testConfigureOptionsExceptions(string $exceptionMessage, array $options): void
@@ -36,9 +32,6 @@ class ExtendFieldTypeExtensionTest extends \PHPUnit\Framework\TestCase
         $resolver->resolve($options);
     }
 
-    /**
-     * @return array
-     */
     public function configureOptionsExceptionDataProvider(): array
     {
         return [

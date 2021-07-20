@@ -17,8 +17,6 @@ final class BatchError extends Error
 
     /**
      * Gets an unique identifier of this error.
-     *
-     * @return string|null
      */
     public function getId(): ?string
     {
@@ -41,8 +39,6 @@ final class BatchError extends Error
 
     /**
      * Gets the index of the source record caused this error.
-     *
-     * @return int|null
      */
     public function getItemIndex(): ?int
     {

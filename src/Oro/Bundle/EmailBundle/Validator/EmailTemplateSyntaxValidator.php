@@ -30,12 +30,6 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param EmailRenderer $emailRenderer
-     * @param LocalizationManager $localizationManager
-     * @param ConfigProvider $entityConfigProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EmailRenderer $emailRenderer,
         LocalizationManager $localizationManager,

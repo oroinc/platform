@@ -24,8 +24,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Create test_security_department table
-     *
-     * @param Schema $schema
      */
     protected function createTestSecurityDepartmentTable(Schema $schema)
     {
@@ -46,8 +44,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Create test_security_person table
-     *
-     * @param Schema $schema
      */
     protected function createTestSecurityPersonTable(Schema $schema)
     {
@@ -70,8 +66,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Create test_security_order table
-     *
-     * @param Schema $schema
      */
     protected function createTestSecurityOrderTable(Schema $schema)
     {
@@ -90,8 +84,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Create test_security_company table
-     *
-     * @param Schema $schema
      */
     protected function createTestSecurityCompanyTable(Schema $schema)
     {
@@ -110,8 +102,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Create test_security_product table
-     *
-     * @param Schema $schema
      */
     protected function createTestSecurityProductTable(Schema $schema)
     {
@@ -130,8 +120,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Create test_security_order_product table
-     *
-     * @param Schema $schema
      */
     protected function createTestSecurityOrderProductTable(Schema $schema)
     {
@@ -150,8 +138,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Add test_security_department foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSecurityDepartmentForeignKeys(Schema $schema)
     {
@@ -166,8 +152,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Add test_security_person foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSecurityPersonForeignKeys(Schema $schema)
     {
@@ -194,8 +178,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Add test_security_order foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSecurityOrderForeignKeys(Schema $schema)
     {
@@ -210,8 +192,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Add test_security_company foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSecurityCompanyForeignKeys(Schema $schema)
     {
@@ -226,8 +206,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Add test_security_product foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSecurityProductForeignKeys(Schema $schema)
     {
@@ -242,8 +220,6 @@ class TestEntitiesMigration implements Migration
 
     /**
      * Add test_security_order_product foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestSecurityOrderProductForeignKeys(Schema $schema)
     {

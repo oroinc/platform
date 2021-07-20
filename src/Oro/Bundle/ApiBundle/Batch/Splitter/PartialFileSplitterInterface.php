@@ -13,8 +13,6 @@ interface PartialFileSplitterInterface extends FileSplitterInterface
 {
     /**
      * Indicates whether the source file was split completely or partially.
-     *
-     * @return bool
      */
     public function isCompleted(): bool;
 
@@ -34,15 +32,11 @@ interface PartialFileSplitterInterface extends FileSplitterInterface
 
     /**
      * Gets the state of the splitter.
-     *
-     * @return array
      */
     public function getState(): array;
 
     /**
      * Restores the state of the splitter.
-     *
-     * @param array $data
      */
     public function setState(array $data): void;
 }

@@ -206,11 +206,6 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
         return count($this->rows) > 0;
     }
 
-    /**
-     * @param Query $query
-     *
-     * @return bool
-     */
     protected function calculateNextPage(Query $query): bool
     {
         $totalPages = ceil($this->count() / $query->getMaxResults());
@@ -240,8 +235,6 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
 
     /**
      * Makes final preparation of a query object before its execute method will be called.
-     *
-     * @param Query $query
      */
     protected function prepareQueryToExecute(Query $query)
     {

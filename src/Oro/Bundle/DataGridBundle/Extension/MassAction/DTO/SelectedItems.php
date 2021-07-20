@@ -17,35 +17,22 @@ class SelectedItems
      */
     private $inset;
 
-    /**
-     * @param array $values
-     * @param bool $inset
-     */
     public function __construct(array $values, bool $inset)
     {
         $this->values = $values;
         $this->inset = $inset;
     }
 
-    /**
-     * @return bool
-     */
     public function isEmpty(): bool
     {
         return $this->inset && empty($this->values);
     }
 
-    /**
-     * @return array
-     */
     public function getValues(): array
     {
         return $this->values;
     }
 
-    /**
-     * @return bool
-     */
     public function isInset(): bool
     {
         return $this->inset;

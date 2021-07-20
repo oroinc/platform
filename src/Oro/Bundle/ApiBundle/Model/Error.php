@@ -95,8 +95,6 @@ class Error
 
     /**
      * Gets the HTTP status code applicable to this problem.
-     *
-     * @return int|null
      */
     public function getStatusCode(): ?int
     {
@@ -119,8 +117,6 @@ class Error
 
     /**
      * Gets an application-specific error code.
-     *
-     * @return string|null
      */
     public function getCode(): ?string
     {
@@ -193,8 +189,6 @@ class Error
 
     /**
      * Gets a source of this occurrence of the problem.
-     *
-     * @return ErrorSource|null
      */
     public function getSource(): ?ErrorSource
     {
@@ -217,8 +211,6 @@ class Error
 
     /**
      * Gets an exception object that caused this occurrence of the problem.
-     *
-     * @return \Exception|null
      */
     public function getInnerException(): ?\Exception
     {
@@ -241,8 +233,6 @@ class Error
 
     /**
      * Translates all attributes that are represented by the Label object.
-     *
-     * @param TranslatorInterface $translator
      */
     public function trans(TranslatorInterface $translator): void
     {

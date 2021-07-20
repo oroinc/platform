@@ -131,11 +131,6 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($dimensions, array_keys($imageType->getDimensions()));
     }
 
-    /**
-     * @param array $theme1MainDimensions
-     * @param array $theme1ListingDimensions
-     * @param array $theme2ListingDimensions
-     */
     private function prepareThemeManager(
         array $theme1MainDimensions,
         array $theme1ListingDimensions,

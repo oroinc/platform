@@ -547,10 +547,6 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
         return $user;
     }
 
-    /**
-     * @param OwnerTree $tree
-     * @param User $user
-     */
     protected function addUserInfoToTree(OwnerTree $tree, User $user)
     {
         $owner = $user->getOwner();
@@ -567,10 +563,6 @@ class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param OwnerTree $tree
-     * @param BusinessUnit $businessUnit
-     */
     protected function addBusinessUnitInfoToTree(OwnerTree $tree, BusinessUnit $businessUnit)
     {
         $owner = $businessUnit->getOwner();

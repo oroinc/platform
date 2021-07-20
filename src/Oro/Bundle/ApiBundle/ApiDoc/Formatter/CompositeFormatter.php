@@ -17,9 +17,6 @@ class CompositeFormatter implements FormatterInterface
     /** @var FormatterInterface[] [view => formatter, ...] */
     private $formatters = [];
 
-    /**
-     * @param RestDocViewDetector $docViewDetector
-     */
     public function __construct(RestDocViewDetector $docViewDetector)
     {
         $this->docViewDetector = $docViewDetector;

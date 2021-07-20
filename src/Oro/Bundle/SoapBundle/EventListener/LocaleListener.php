@@ -18,17 +18,11 @@ class LocaleListener implements EventSubscriberInterface
     /** @var TranslatableListener */
     private $translatableListener;
 
-    /**
-     * @param TranslatableListener $translatableListener
-     */
     public function __construct(TranslatableListener $translatableListener)
     {
         $this->translatableListener = $translatableListener;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();

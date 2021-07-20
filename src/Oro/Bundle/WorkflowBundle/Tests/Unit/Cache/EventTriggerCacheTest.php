@@ -197,9 +197,6 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         return $cacheProvider;
     }
 
-    /**
-     * @param array $data
-     */
     protected function prepareRegistryForBuild(array $data)
     {
         // generate triggers

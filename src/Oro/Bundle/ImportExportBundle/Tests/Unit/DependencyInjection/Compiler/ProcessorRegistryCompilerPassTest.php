@@ -19,9 +19,6 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processDataProvider
-     *
-     * @param array $taggedProcessorIds
-     * @param array $definitionsExpectations
      */
     public function testProcess(array $taggedProcessorIds, array $definitionsExpectations)
     {

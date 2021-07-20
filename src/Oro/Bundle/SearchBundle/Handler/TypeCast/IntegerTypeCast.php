@@ -24,19 +24,11 @@ class IntegerTypeCast extends AbstractTypeCastingHandler
         return parent::castValue($value);
     }
 
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
     public function isSupported($value): bool
     {
         return is_int($value) || is_bool($value);
     }
 
-    /**
-     * @return string
-     */
     public static function getType(): string
     {
         return Query::TYPE_INTEGER;

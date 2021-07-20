@@ -74,10 +74,6 @@ class DraftableFilterManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->enable($className);
     }
 
-    /**
-     * @param FilterCollection $filters
-     * @param string $className
-     */
     private function mockManagerRegistry(FilterCollection $filters, string $className): void
     {
         $entityManager = $this->createMock(EntityManager::class);

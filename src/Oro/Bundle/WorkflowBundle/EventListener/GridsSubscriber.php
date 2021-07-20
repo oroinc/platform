@@ -11,9 +11,6 @@ class GridsSubscriber implements EventSubscriberInterface
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
@@ -30,9 +27,6 @@ class GridsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param OrmResultBeforeQuery $event
-     */
     public function onProcessesResultBeforeQuery(OrmResultBeforeQuery $event)
     {
         $disabledProcesses = $this->featureChecker->getDisabledResourcesByType('processes');
@@ -46,9 +40,6 @@ class GridsSubscriber implements EventSubscriberInterface
             ->setParameter('processes', $disabledProcesses);
     }
 
-    /**
-     * @param OrmResultBeforeQuery $event
-     */
     public function onWorkflowsResultBeforeQuery(OrmResultBeforeQuery $event)
     {
         $disabledWorkflowEntities = $this->featureChecker->getDisabledResourcesByType('entities');

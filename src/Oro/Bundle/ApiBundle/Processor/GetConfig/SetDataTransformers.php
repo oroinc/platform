@@ -27,11 +27,6 @@ class SetDataTransformers implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DataTransformerRegistry $dataTransformerRegistry
-     * @param PostProcessorRegistry   $postProcessorRegistry
-     * @param DoctrineHelper          $doctrineHelper
-     */
     public function __construct(
         DataTransformerRegistry $dataTransformerRegistry,
         PostProcessorRegistry $postProcessorRegistry,
@@ -63,9 +58,6 @@ class SetDataTransformers implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     * @param ClassMetadata|null     $metadata
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function setDataTransformers(

@@ -119,7 +119,6 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $this->createMock(LoggerInterface::class);
     }
 
-
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */

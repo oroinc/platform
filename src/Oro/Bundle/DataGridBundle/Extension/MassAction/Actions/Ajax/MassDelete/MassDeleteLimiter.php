@@ -25,8 +25,6 @@ class MassDeleteLimiter
 
     /**
      * MassDeleteLimiter constructor.
-     *
-     * @param AclHelper $helper
      */
     public function __construct(AclHelper $helper)
     {
@@ -59,9 +57,6 @@ class MassDeleteLimiter
 
     /**
      * Limits query for deletion with access and/or performance restrictions.
-     *
-     * @param MassDeleteLimitResult $result
-     * @param MassActionHandlerArgs $args
      */
     public function limitQuery(MassDeleteLimitResult $result, MassActionHandlerArgs $args)
     {

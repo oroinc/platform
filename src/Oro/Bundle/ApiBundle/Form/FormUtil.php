@@ -19,10 +19,6 @@ class FormUtil
 {
     /**
      * Gets API context within the given form is processed.
-     *
-     * @param FormInterface $form
-     *
-     * @return FormContext|null
      */
     public static function getApiContext(FormInterface $form): ?FormContext
     {
@@ -35,10 +31,6 @@ class FormUtil
 
     /**
      * Checks whether the form is submitted and does not have errors.
-     *
-     * @param FormInterface $form
-     *
-     * @return bool
      */
     public static function isSubmittedAndValid(FormInterface $form): bool
     {
@@ -47,10 +39,6 @@ class FormUtil
 
     /**
      * Checks whether the form is not submitted or submitted and does not have errors.
-     *
-     * @param FormInterface $form
-     *
-     * @return bool
      */
     public static function isNotSubmittedOrSubmittedAndValid(FormInterface $form): bool
     {
@@ -59,10 +47,6 @@ class FormUtil
 
     /**
      * Makes sure that a form associated with the given property is submitted.
-     *
-     * @param FormInterface               $form
-     * @param string                      $propertyName
-     * @param EntityDefinitionConfig|null $config
      */
     public static function ensureFieldSubmitted(
         FormInterface $form,
@@ -87,8 +71,6 @@ class FormUtil
     /**
      * Marks the given form as submitted.
      *
-     * @param FormInterface $form
-     *
      * @throws \LogicException the the form was already submitted
      */
     public static function markAsSubmitted(FormInterface $form): void
@@ -108,12 +90,6 @@ class FormUtil
 
     /**
      * Creates an instance of TransformationFailedException.
-     *
-     * @param string      $message
-     * @param string|null $invalidMessage
-     * @param array|null  $invalidMessageParameters
-     *
-     * @return TransformationFailedException
      */
     public static function createTransformationFailedException(
         string $message,
@@ -130,10 +106,6 @@ class FormUtil
 
     /**
      * Adds a general error to a form.
-     *
-     * @param FormInterface $form
-     * @param string        $errorMessage
-     * @param string|null   $propertyPath
      */
     public static function addFormError(
         FormInterface $form,
@@ -151,12 +123,6 @@ class FormUtil
 
     /**
      * Adds an error to a form.
-     *
-     * @param FormInterface $form
-     * @param string        $errorType
-     * @param string        $errorMessage
-     * @param string|null   $propertyPath
-     * @param int|null      $statusCode
      */
     public static function addNamedFormError(
         FormInterface $form,
@@ -175,11 +141,6 @@ class FormUtil
 
     /**
      * Adds constraint violation to a form.
-     *
-     * @param FormInterface $form
-     * @param Constraint    $constraint
-     * @param string|null   $errorMessage
-     * @param string|null   $propertyPath
      */
     public static function addFormConstraintViolation(
         FormInterface $form,
@@ -201,22 +162,12 @@ class FormUtil
 
     /**
      * Finds a form field by its property path.
-     *
-     * @param FormInterface $form
-     * @param string        $propertyPath
-     *
-     * @return FormInterface|null
      */
     public static function findFormFieldByPropertyPath(FormInterface $form, string $propertyPath): ?FormInterface
     {
         return FormUtils::findFormField($form, $propertyPath);
     }
 
-    /**
-     * @param ConstraintViolation $violation
-     *
-     * @return FormError
-     */
     private static function createFormError(ConstraintViolation $violation): FormError
     {
         return new FormError(
@@ -228,12 +179,6 @@ class FormUtil
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string        $propertyPath
-     *
-     * @return string
-     */
     private static function resolvePropertyPath(FormInterface $form, string $propertyPath): string
     {
         $path = [];
@@ -252,11 +197,6 @@ class FormUtil
         return \implode('.', $path);
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
     private static function getFormPath(FormInterface $form): string
     {
         $path = [];

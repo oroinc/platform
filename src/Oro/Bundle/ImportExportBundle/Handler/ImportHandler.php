@@ -28,11 +28,6 @@ class ImportHandler extends AbstractHandler
     protected $importingFileName;
 
     /**
-     * @param string $process
-     * @param string $jobName
-     * @param string $processorAlias
-     * @param array $options
-     * @return array
      * @throws InvalidArgumentException
      * @throws JobRedeliveryException
      */
@@ -52,12 +47,6 @@ class ImportHandler extends AbstractHandler
         }
     }
 
-    /**
-     * @param string $jobName
-     * @param string $processorType
-     * @param FileStreamWriter $writer
-     * @return array
-     */
     public function splitImportFile(string $jobName, string $processorType, FileStreamWriter $writer): array
     {
         $step = $this->getJobStep($jobName, $processorType);
@@ -125,11 +114,6 @@ class ImportHandler extends AbstractHandler
     /**
      * Handles import action
      *
-     * @param string $jobName
-     * @param string $processorAlias
-     * @param array $options
-     *
-     * @return array
      * @throws JobRedeliveryException
      */
     public function handleImport(string $jobName, string $processorAlias, array $options = []): array
@@ -187,9 +171,6 @@ class ImportHandler extends AbstractHandler
         $this->importingFileName = $fileName;
     }
 
-    /**
-     * @param array $options
-     */
     public function setConfigurationOptions(array $options)
     {
         $this->configurationOptions = $options;
@@ -342,11 +323,6 @@ class ImportHandler extends AbstractHandler
         );
     }
 
-    /**
-     * @param array $counts
-     * @param JobResult $jobResult
-     * @return bool
-     */
     private function isSuccessful(array $counts, JobResult $jobResult): bool
     {
         $processedCount = $counts['process'] ?? 0;

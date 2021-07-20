@@ -78,10 +78,6 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
 
     /**
      * Initializes the state of this builder.
-     *
-     * @param FormAccessorInterface $formAccessor
-     * @param BlockBuilderInterface $builder
-     * @param Options               $options
      */
     protected function initializeState(
         FormAccessorInterface $formAccessor,

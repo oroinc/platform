@@ -59,8 +59,6 @@ class MaintenancePropagationListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onKernelRequestDataProvider
-     *
-     * @param Request $request
      */
     public function testOnKernelRequest(Request $request): void
     {
@@ -77,9 +75,6 @@ class MaintenancePropagationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelRequest($requestEvent);
     }
 
-    /**
-     * @return array
-     */
     public function onKernelRequestDataProvider(): array
     {
         $requestWithFlattenException = new Request();

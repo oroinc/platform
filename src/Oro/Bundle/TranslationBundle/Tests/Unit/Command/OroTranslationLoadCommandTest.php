@@ -142,7 +142,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguageCodes')
             ->willReturn(['locale1', 'currentLocale']);

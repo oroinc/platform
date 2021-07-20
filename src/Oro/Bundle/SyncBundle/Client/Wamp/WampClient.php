@@ -88,13 +88,6 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      */
     private $gosClient;
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param string $transport
-     * @param array $contextOptions
-     * @param string|null $origin
-     */
     public function __construct(
         string $host,
         int $port,
@@ -194,9 +187,6 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isConnected(): bool
     {
         return $this->connected;
@@ -329,10 +319,6 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     }
 
     /**
-     * @param string $transport
-     *
-     * @return bool
-     *
      * @extensionPoint to change the logic of websocket protocol detection.
      */
     protected function isSecured(string $transport): bool
@@ -445,8 +431,6 @@ class WampClient implements ClientInterface, LoggerAwareInterface
 
     /**
      * Copy of Client::generateKey
-     * @param int $length
-     * @return string
      */
     private function generateKey(int $length = 16): string
     {

@@ -80,8 +80,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_item table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowItemTable(Schema $schema)
     {
@@ -103,8 +101,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_entity_acl table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowEntityAclTable(Schema $schema)
     {
@@ -124,8 +120,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_transition_log table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowTransitionLogTable(Schema $schema)
     {
@@ -144,8 +138,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_process_job table
-     *
-     * @param Schema $schema
      */
     protected function createOroProcessJobTable(Schema $schema)
     {
@@ -162,8 +154,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_process_trigger table
-     *
-     * @param Schema $schema
      */
     protected function createOroProcessTriggerTable(Schema $schema)
     {
@@ -185,8 +175,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_entity_acl_ident table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowEntityAclIdentTable(Schema $schema)
     {
@@ -208,8 +196,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_definition table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowDefinitionTable(Schema $schema)
     {
@@ -241,8 +227,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_process_definition table
-     *
-     * @param Schema $schema
      */
     protected function createOroProcessDefinitionTable(Schema $schema)
     {
@@ -270,8 +254,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_restriction table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowRestrictionTable(Schema $schema)
     {
@@ -293,8 +275,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_restriction_ident table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowRestrictionIdentityTable(Schema $schema)
     {
@@ -313,8 +293,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_step table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowStepTable(Schema $schema)
     {
@@ -333,8 +311,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_trans_trigger table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowTransTriggerTable(Schema $schema)
     {
@@ -358,8 +334,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Create oro_workflow_scopes table
-     *
-     * @param Schema $schema
      */
     protected function createOroWorkflowScopesTable(Schema $schema)
     {
@@ -371,8 +345,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_item foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowItemForeignKeys(Schema $schema)
     {
@@ -393,8 +365,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_entity_acl foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowEntityAclForeignKeys(Schema $schema)
     {
@@ -415,8 +385,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_transition_log foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowTransitionLogForeignKeys(Schema $schema)
     {
@@ -443,8 +411,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_process_job foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroProcessJobForeignKeys(Schema $schema)
     {
@@ -459,8 +425,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_process_trigger foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroProcessTriggerForeignKeys(Schema $schema)
     {
@@ -475,8 +439,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_entity_acl_ident foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowEntityAclIdentForeignKeys(Schema $schema)
     {
@@ -497,8 +459,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_definition foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowDefinitionForeignKeys(Schema $schema)
     {
@@ -513,8 +473,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_restriction foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowRestrictionForeignKeys(Schema $schema)
     {
@@ -535,8 +493,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_restriction_ident foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowRestrictionIdentityForeignKeys(Schema $schema)
     {
@@ -557,8 +513,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_step foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowStepForeignKeys(Schema $schema)
     {
@@ -573,8 +527,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_trans_trigger foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowTransTriggerForeignKeys(Schema $schema)
     {
@@ -589,8 +541,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
 
     /**
      * Add oro_workflow_scopes foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroWorkflowScopesForeignKeys(Schema $schema)
     {
@@ -609,9 +559,6 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addWorkflowFieldsToEmailNotificationTable(Schema $schema)
     {
         $this->extendExtension->addManyToOneRelation(

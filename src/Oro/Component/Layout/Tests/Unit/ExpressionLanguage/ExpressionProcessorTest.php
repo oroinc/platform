@@ -132,7 +132,6 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-
     public function testProcessExpressionsWithCircularReference()
     {
         $this->expectException(CircularReferenceException::class);
@@ -150,7 +149,6 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
-
 
     public function testProcessExpressionsWithDataKey()
     {

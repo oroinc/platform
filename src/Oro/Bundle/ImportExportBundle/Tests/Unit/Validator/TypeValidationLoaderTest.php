@@ -240,13 +240,6 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $classMetaData->getConstrainedProperties());
     }
 
-    /**
-     * @param string $className
-     * @param array $fieldConfigArray
-     * @param array $config
-     *
-     * @return array
-     */
     private function getFieldConfigs(string $className, array $fieldConfigArray, array $config = []): array
     {
         $fieldConfigs = [];

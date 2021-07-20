@@ -17,9 +17,6 @@ class AliceYamlParser implements ChainableParserInterface
      */
     protected $yamlParser;
 
-    /**
-     * @param ChainableParserInterface $yamlParser
-     */
     public function __construct(ChainableParserInterface $yamlParser)
     {
         $this->yamlParser = $yamlParser;

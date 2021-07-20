@@ -79,9 +79,6 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
         return $user;
     }
 
-    /**
-     * @param AbstractUser $user
-     */
     protected function setUpTokenStorage(AbstractUser $user)
     {
         $token = new UsernamePasswordOrganizationToken(

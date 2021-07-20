@@ -20,25 +20,16 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /** @var ErrorTitleOverrideProvider */
     private $errorTitleOverrideProvider;
 
-    /**
-     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
-     */
     public function __construct(ExceptionTextExtractorInterface $exceptionTextExtractor)
     {
         $this->exceptionTextExtractor = $exceptionTextExtractor;
     }
 
-    /**
-     * @param ErrorTitleOverrideProvider $errorTitleOverrideProvider
-     */
     public function setErrorTitleOverrideProvider(ErrorTitleOverrideProvider $errorTitleOverrideProvider): void
     {
         $this->errorTitleOverrideProvider = $errorTitleOverrideProvider;
     }
 
-    /**
-     * @param Error $error
-     */
     protected function completeStatusCode(Error $error): void
     {
         if (null === $error->getStatusCode() && null !== $error->getInnerException()) {
@@ -49,9 +40,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     */
     protected function completeCode(Error $error): void
     {
         if (null === $error->getCode() && null !== $error->getInnerException()) {
@@ -63,7 +51,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     }
 
     /**
-     * @param Error $error
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completeTitle(Error $error): void
@@ -92,9 +79,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     */
     protected function completeDetail(Error $error): void
     {
         if (null === $error->getDetail()) {
@@ -109,11 +93,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     *
-     * @return bool
-     */
     protected function isConfigFilterConstraintViolation(Error $error): bool
     {
         if (null === $error->getInnerException()) {

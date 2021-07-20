@@ -12,9 +12,6 @@ class BasicExpressionLanguageValidator
      */
     private $expressionParser;
 
-    /**
-     * @param ExpressionLanguage $expressionParser
-     */
     public function __construct(ExpressionLanguage $expressionParser)
     {
         $this->expressionParser = $expressionParser;

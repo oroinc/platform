@@ -24,9 +24,6 @@ class PinbarTabUrlNormalizer implements PinbarTabUrlNormalizerInterface
         return str_replace($urlQuery, http_build_query($urlQueryArray), $url);
     }
 
-    /**
-     * @param array $urlQueryArray
-     */
     private function normalizeDatagridParameters(array &$urlQueryArray): void
     {
         if (isset($urlQueryArray[RequestParameterBagFactory::DEFAULT_ROOT_PARAM])) {

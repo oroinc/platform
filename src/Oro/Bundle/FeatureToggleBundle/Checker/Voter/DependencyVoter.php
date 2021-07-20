@@ -20,10 +20,6 @@ class DependencyVoter implements VoterInterface
      */
     private $featureConfigManager;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     * @param ConfigurationManager $featureConfigManager
-     */
     public function __construct(FeatureChecker $featureChecker, ConfigurationManager $featureConfigManager)
     {
         $this->featureChecker = $featureChecker;

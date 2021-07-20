@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
@@ -20,9 +19,6 @@ class WarningHandler implements StepExecutionWarningHandlerInterface
         $this->warnings[] = [$element, $name, $reason, $reasonParameters, $item];
     }
 
-    /**
-     * @return array
-     */
     public function getWarnings(): array
     {
         return $this->warnings;

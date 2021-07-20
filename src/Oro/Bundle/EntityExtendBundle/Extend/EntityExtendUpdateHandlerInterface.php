@@ -10,8 +10,6 @@ interface EntityExtendUpdateHandlerInterface
 {
     /**
      * Updates the database schema and all related caches to reflect changes made in extended entities.
-     *
-     * @return EntityExtendUpdateResult
      */
     public function update(): EntityExtendUpdateResult;
 }

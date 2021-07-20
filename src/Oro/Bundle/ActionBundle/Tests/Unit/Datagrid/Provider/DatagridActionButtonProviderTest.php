@@ -480,7 +480,6 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->applyActions($config1);
         $this->provider->applyActions($config2);
 
-
         $callback1 = $config1->offsetGet('action_configuration');
         $this->assertEquals(
             [

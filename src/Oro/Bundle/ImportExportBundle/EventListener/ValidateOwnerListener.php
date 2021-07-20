@@ -26,12 +26,6 @@ class ValidateOwnerListener
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param PropertyAccessorInterface          $propertyAccessor
-     * @param ConfigurableTableDataConverter     $configurableDataConverter
-     * @param TranslatorInterface                $translator
-     */
     public function __construct(
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         PropertyAccessorInterface $propertyAccessor,
@@ -44,9 +38,6 @@ class ValidateOwnerListener
         $this->translator = $translator;
     }
 
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessAfter(StrategyEvent $event): void
     {
         $entity = $event->getEntity();
@@ -74,12 +65,6 @@ class ValidateOwnerListener
         }
     }
 
-    /**
-     * @param object $entity
-     * @param string $propertyPath
-     *
-     * @return string
-     */
     private function getErrorString(object $entity, string $propertyPath): string
     {
         if ($propertyPath && is_object($entity)) {

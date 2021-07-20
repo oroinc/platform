@@ -53,27 +53,17 @@ class MenuUpdateCacheFlusher
         $this->scopeType = $scopeType;
     }
 
-    /**
-     * @param MenuUpdateChangeEvent $event
-     */
     public function onMenuUpdateScopeChange(MenuUpdateChangeEvent $event)
     {
         $scope = $this->scopeManager->find($this->scopeType, $event->getContext());
         $this->flushCaches($event->getMenuName(), $scope);
     }
 
-    /**
-     * @param MenuUpdateWithScopeChangeEvent $event
-     */
     public function onMenuUpdateWithScopeChange(MenuUpdateWithScopeChangeEvent $event)
     {
         $this->flushCaches($event->getMenuName(), $event->getScope());
     }
 
-    /**
-     * @param string $menuName
-     * @param Scope|null $scope
-     */
     protected function flushCaches(string $menuName, ?Scope $scope): void
     {
         if (null !== $scope) {

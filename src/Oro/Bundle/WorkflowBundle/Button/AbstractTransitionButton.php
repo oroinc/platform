@@ -24,11 +24,6 @@ abstract class AbstractTransitionButton implements ButtonInterface
     /*** @var ButtonContext */
     protected $buttonContext;
 
-    /**
-     * @param Transition $transition
-     * @param Workflow $workflow
-     * @param ButtonContext $buttonContext
-     */
     public function __construct(Transition $transition, Workflow $workflow, ButtonContext $buttonContext)
     {
         $this->transition = $transition;

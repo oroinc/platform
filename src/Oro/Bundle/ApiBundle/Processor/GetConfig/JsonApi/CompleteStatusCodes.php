@@ -19,9 +19,6 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -78,8 +75,6 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
 
     /**
      * Adds status codes for "update" action.
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     private function addStatusCodesForUpdate(StatusCodesConfig $statusCodes)
     {

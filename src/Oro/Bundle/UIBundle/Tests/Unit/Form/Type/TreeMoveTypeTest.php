@@ -14,10 +14,6 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
 {
     /**
      * @dataProvider submitProvider
-     *
-     * @param TreeCollection $defaultData
-     * @param array          $submittedData
-     * @param TreeCollection $expectedData
      */
     public function testSubmit(TreeCollection $defaultData, array $submittedData, TreeCollection $expectedData)
     {

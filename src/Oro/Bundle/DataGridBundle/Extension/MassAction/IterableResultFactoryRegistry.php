@@ -26,11 +26,6 @@ class IterableResultFactoryRegistry
     }
 
     /**
-     * @param DatasourceInterface $dataSource
-     * @param ActionConfiguration $actionConfiguration
-     * @param DatagridConfiguration $gridConfiguration
-     * @param SelectedItems $selectedItems
-     * @return IterableResultInterface
      * @throws LogicException
      */
     public function createIterableResult(

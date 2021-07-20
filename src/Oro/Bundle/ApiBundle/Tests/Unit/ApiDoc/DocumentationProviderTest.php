@@ -8,9 +8,6 @@ use Symfony\Component\Config\FileLocator;
 
 class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return FileLocator
-     */
     private function getFileLocator(): FileLocator
     {
         return new FileLocator(__DIR__ . '/../Fixtures/Resources/doc');

@@ -80,7 +80,6 @@ class AttachmentController extends AbstractController
     }
 
     /**
-     *
      * @Route("attachment/update/{id}", name="oro_attachment_update")
      *
      * @Template("OroAttachmentBundle:Attachment:update.html.twig")

@@ -39,13 +39,6 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
     /** @var int */
     private $batchSize = 2000;
 
-    /**
-     * @param JobRunner                  $jobRunner
-     * @param DoctrineHelper             $doctrineHelper
-     * @param AsyncOperationManager      $operationManager
-     * @param UpdateListProcessingHelper $processingHelper
-     * @param LoggerInterface            $logger
-     */
     public function __construct(
         JobRunner $jobRunner,
         DoctrineHelper $doctrineHelper,
@@ -70,8 +63,6 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
 
     /**
      * Sets the maximum number of jobs that this processor can create at the one iteration.
-     *
-     * @param int $batchSize
      */
     public function setBatchSize(int $batchSize): void
     {

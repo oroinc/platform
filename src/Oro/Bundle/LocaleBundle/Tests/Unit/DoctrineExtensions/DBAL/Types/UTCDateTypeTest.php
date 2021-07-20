@@ -35,10 +35,6 @@ class UTCDateTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $sourceDate
-     * @param string $sourceTimeZone
-     * @param string $expected
-     *
      * @dataProvider convertToDatabaseValueWhenNoDstDataProvider
      */
     public function testConvertToDatabaseValueWhenNoDst(string $sourceDate, string $sourceTimeZone, string $expected)
@@ -73,10 +69,6 @@ class UTCDateTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $sourceDate
-     * @param string $sourceTimeZone
-     * @param string $expected
-     *
      * @dataProvider convertToDatabaseValueWhenDstDataProvider
      */
     public function testConvertToDatabaseValueWhenDst(string $sourceDate, string $sourceTimeZone, string $expected)

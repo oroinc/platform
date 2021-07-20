@@ -21,10 +21,6 @@ class ConfigLoader
      */
     protected $logger;
 
-    /**
-     * @param ConfigManager    $configManager
-     * @param EntityManagerBag $entityManagerBag
-     */
     public function __construct(ConfigManager $configManager, EntityManagerBag $entityManagerBag)
     {
         $this->configManager    = $configManager;

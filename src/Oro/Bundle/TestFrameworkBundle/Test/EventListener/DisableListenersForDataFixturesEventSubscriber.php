@@ -31,9 +31,6 @@ class DisableListenersForDataFixturesEventSubscriber implements EventSubscriberI
         return [DisableListenersForDataFixturesEvent::NAME => 'collectListeners'];
     }
 
-    /**
-     * @param DisableListenersForDataFixturesEvent $event
-     */
     public function collectListeners(DisableListenersForDataFixturesEvent $event)
     {
         foreach ($this->listeners as $listener) {

@@ -102,17 +102,11 @@ class Department
         return $this->staff;
     }
 
-    /**
-     * @param Collection $staff
-     */
     public function setStaff(Collection $staff)
     {
         $this->staff = $staff;
     }
 
-    /**
-     * @param Person $person
-     */
     public function addStaff(Person $person)
     {
         if (!$this->staff->contains($person)) {
@@ -121,9 +115,6 @@ class Department
         }
     }
 
-    /**
-     * @param Person $person
-     */
     public function removeStaff(Person $person)
     {
         if ($this->staff->contains($person)) {

@@ -125,10 +125,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     protected $links = [];
 
-    /**
-     * @param LayoutRegistryInterface   $registry
-     * @param RawLayoutBuilderInterface $rawLayoutBuilder
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         RawLayoutBuilderInterface $rawLayoutBuilder

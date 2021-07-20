@@ -16,10 +16,6 @@ class BigNumberDateHelperTest extends TestCase
 
     /**
      * @dataProvider localeDataProvider
-     *
-     * @param string $locale
-     * @param string $timezone
-     * @param string $expectedWeekStart
      */
     public function testGetLastWeekPeriodForLocale(string $locale, string $timezone, string $expectedWeekStart)
     {

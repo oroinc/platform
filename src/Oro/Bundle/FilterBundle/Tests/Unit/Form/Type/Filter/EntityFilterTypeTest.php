@@ -66,10 +66,6 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
 
     /**
      * @dataProvider bindDataProvider
-     * @param array $bindData
-     * @param array $formData
-     * @param array $viewData
-     * @param array $customOptions
      */
     public function testBindData(
         array $bindData,

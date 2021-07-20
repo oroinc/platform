@@ -22,10 +22,6 @@ class RequestParameterBagFactory
      */
     protected $parametersClass;
 
-    /**
-     * @param string $parametersClass
-     * @param RequestStack $requestStack
-     */
     public function __construct(string $parametersClass, RequestStack $requestStack)
     {
         $this->parametersClass = $parametersClass;
@@ -44,11 +40,6 @@ class RequestParameterBagFactory
         return $request ? $this->fetchParametersFromRequest($request, $gridParameterName) : [];
     }
 
-    /**
-     * @param Request $request
-     * @param string $gridParameterName
-     * @return array
-     */
     public function fetchParametersFromRequest(
         Request $request,
         string $gridParameterName = self::DEFAULT_ROOT_PARAM
@@ -77,11 +68,6 @@ class RequestParameterBagFactory
         return new $this->parametersClass($parameters);
     }
 
-    /**
-     * @param Request $request
-     * @param string $gridParameterName
-     * @return ParameterBag
-     */
     public function createParametersFromRequest(
         Request $request,
         string $gridParameterName = self::DEFAULT_ROOT_PARAM
@@ -91,11 +77,6 @@ class RequestParameterBagFactory
         return new $this->parametersClass($parameters);
     }
 
-    /**
-     * @param Request $request
-     * @param string $gridParameterName
-     * @return array
-     */
     private function getMinifiedParametersFromRequest(Request $request, string $gridParameterName): array
     {
         $gridData = $request->get(self::DEFAULT_ROOT_PARAM, []);

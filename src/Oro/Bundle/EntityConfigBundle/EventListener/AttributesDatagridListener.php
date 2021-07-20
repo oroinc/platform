@@ -37,13 +37,6 @@ class AttributesDatagridListener
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param LocalizationHelper $localizationHelper
-     * @param AclHelper $aclHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizationHelper $localizationHelper,
@@ -58,9 +51,6 @@ class AttributesDatagridListener
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         $attributeIds = [];

@@ -23,11 +23,6 @@ class FileController extends AbstractController
      *   name="oro_attachment_get_file",
      *   requirements={"id"="\d+", "action"="(get|download)"}
      * )
-     * @param int    $id
-     * @param string $filename
-     * @param string $action
-     *
-     * @return Response
      */
     public function getFileAction(int $id, string $filename, string $action): Response
     {
@@ -60,12 +55,6 @@ class FileController extends AbstractController
      *   name="oro_resize_attachment",
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
-     * @param int    $id
-     * @param int    $width
-     * @param int    $height
-     * @param string $filename
-     *
-     * @return Response
      */
     public function getResizedAttachmentImageAction(int $id, int $width, int $height, string $filename): Response
     {
@@ -85,11 +74,6 @@ class FileController extends AbstractController
      *   name="oro_filtered_attachment",
      *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
      * )
-     * @param int    $id
-     * @param string $filter
-     * @param string $filename
-     *
-     * @return Response
      */
     public function getFilteredImageAction(int $id, string $filter, string $filename): Response
     {
@@ -104,12 +88,6 @@ class FileController extends AbstractController
         return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
     }
 
-    /**
-     * @param int    $id
-     * @param string $fileName
-     *
-     * @return File
-     */
     private function getFileByIdAndFileName(int $id, string $fileName): File
     {
         /** @var File|null $file */
@@ -153,9 +131,6 @@ class FileController extends AbstractController
         return $this->get('oro_attachment.provider.file_name');
     }
 
-    /**
-     * @return SessionInterface|null
-     */
     private function getSession(): ?SessionInterface
     {
         return $this->get('session');

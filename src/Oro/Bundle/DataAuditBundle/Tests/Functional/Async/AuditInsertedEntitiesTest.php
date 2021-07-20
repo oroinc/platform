@@ -26,9 +26,6 @@ class AuditInsertedEntitiesTest extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @return array
-     */
     public function provideScalarProperties(): array
     {
         return [
@@ -57,7 +54,6 @@ class AuditInsertedEntitiesTest extends WebTestCase
 
         $this->assertStoredAuditCount(0);
     }
-
 
     public function testShouldCreateAuditForInsertedEntity()
     {

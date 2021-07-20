@@ -29,12 +29,6 @@ class EmailNotificationManager
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param HtmlTagHelper $htmlTagHelper
-     * @param Router $router
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         EntityManager $entityManager,
         HtmlTagHelper $htmlTagHelper,

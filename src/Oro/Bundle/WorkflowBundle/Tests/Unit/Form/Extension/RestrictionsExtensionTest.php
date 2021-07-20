@@ -56,10 +56,6 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildFormDataProvider
-     *
-     * @param array $options
-     * @param array $fields
-     * @param array $restrictions
      */
     public function testBuildForm(array $options, array $fields = [], array $restrictions = [])
     {

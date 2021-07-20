@@ -24,10 +24,6 @@ class FormProvider
     /** @var string */
     protected $formTypeClass;
 
-    /**
-     * @param FormFactoryInterface   $formFactory
-     * @param string $formTypeClass
-     */
     public function __construct(FormFactoryInterface $formFactory, string $formTypeClass)
     {
         $this->formFactory = $formFactory;
@@ -37,10 +33,6 @@ class FormProvider
     /**
      * Returns csrf protected form for operation execution.
      *
-     * @param Operation  $operation
-     * @param ActionData $actionData
-     *
-     * @return FormInterface
      * @throws InvalidConfigurationException
      */
     public function getOperationExecutionForm(Operation $operation, ActionData $actionData): FormInterface
@@ -58,10 +50,6 @@ class FormProvider
      * Creates data of operation execution csrf protection parameters
      * generated using form functionality.
      *
-     * @param Operation  $operation
-     * @param ActionData $actionData
-     *
-     * @return array
      * @throws InvalidOptionsException
      */
     public function createTokenData(Operation $operation, ActionData $actionData): array

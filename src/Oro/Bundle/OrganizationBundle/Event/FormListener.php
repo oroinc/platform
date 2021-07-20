@@ -10,9 +10,6 @@ class FormListener
 {
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -20,8 +17,6 @@ class FormListener
 
     /**
      * Add owner field to forms
-     *
-     * @param BeforeFormRenderEvent $event
      */
     public function addOwnerField(BeforeFormRenderEvent $event)
     {

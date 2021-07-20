@@ -34,12 +34,6 @@ class EmailGridResultHelper
     /** @var EmailAddressManager */
     private $emailAddressManager;
 
-    /**
-     * @param ManagerRegistry           $doctrine
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param MailboxNameHelper         $mailboxNameHelper
-     * @param EmailAddressManager       $emailAddressManager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailOwnerProviderStorage $emailOwnerProviderStorage,

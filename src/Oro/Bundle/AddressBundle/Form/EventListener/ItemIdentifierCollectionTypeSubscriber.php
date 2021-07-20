@@ -42,7 +42,6 @@ class ItemIdentifierCollectionTypeSubscriber implements EventSubscriberInterface
     /**
      * Remove empty items to prevent validation.
      *
-     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event)

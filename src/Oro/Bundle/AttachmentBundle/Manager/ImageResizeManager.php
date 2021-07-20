@@ -25,12 +25,6 @@ class ImageResizeManager implements ImageResizeManagerInterface
     /** @var ImagineBinaryByFileContentFactoryInterface */
     private $imagineBinaryByFileContentFactory;
 
-    /**
-     * @param ResizedImageProviderInterface $resizedImageProvider
-     * @param ResizedImagePathProviderInterface $resizedImagePathProvider
-     * @param MediaCacheManagerRegistryInterface $mediaCacheManagerRegistry
-     * @param ImagineBinaryByFileContentFactoryInterface $imagineBinaryByFileContentFactory
-     */
     public function __construct(
         ResizedImageProviderInterface $resizedImageProvider,
         ResizedImagePathProviderInterface $resizedImagePathProvider,

@@ -49,7 +49,6 @@ class IntegrationControllerTest extends WebTestCase
         static::assertStringContainsString('Integrations - System', $crawler->html());
     }
 
-
     public function testShouldScheduleSyncJobForActiveIntegration()
     {
         $channel = $this->createChannel();
@@ -166,7 +165,6 @@ class IntegrationControllerTest extends WebTestCase
         return $integration;
     }
 
-
     public function testShouldNotScheduleSyncJobIfIntegrationNotActive()
     {
         $channel = $this->createChannel();
@@ -185,8 +183,6 @@ class IntegrationControllerTest extends WebTestCase
     }
 
     /**
-     * @param $integration
-     *
      * @depends testUpdate
      */
     public function testDelete($integration)

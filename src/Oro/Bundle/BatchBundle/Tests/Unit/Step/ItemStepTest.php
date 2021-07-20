@@ -8,7 +8,6 @@ use Oro\Bundle\BatchBundle\Step\ItemStep;
 
 /**
  * Tests related to the ItemStep class
- *
  */
 class ItemStepTest extends \PHPUnit\Framework\TestCase
 {

@@ -48,15 +48,6 @@ abstract class AbstractOwnerValidator extends ConstraintValidator
     /** @var AclGroupProviderInterface */
     protected $aclGroupProvider;
 
-    /**
-     * @param ManagerRegistry                    $doctrine
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param AuthorizationCheckerInterface      $authorizationChecker
-     * @param TokenAccessorInterface             $tokenAccessor
-     * @param OwnerTreeProviderInterface         $ownerTreeProvider
-     * @param AclVoterInterface                  $aclVoter
-     * @param AclGroupProviderInterface          $aclGroupProvider
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,

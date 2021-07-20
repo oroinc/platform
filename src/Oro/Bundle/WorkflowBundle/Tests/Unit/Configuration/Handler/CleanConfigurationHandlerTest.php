@@ -54,9 +54,6 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider handleDataProvider
-     *
-     * @param array $configuration
-     * @param array $expected
      */
     public function testHandle(array $configuration, array $expected)
     {

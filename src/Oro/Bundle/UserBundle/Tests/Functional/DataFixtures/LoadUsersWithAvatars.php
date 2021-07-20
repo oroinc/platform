@@ -52,12 +52,6 @@ class LoadUsersWithAvatars extends AbstractFixture implements DependentFixtureIn
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param int $userNumber
-     *
-     * @return File
-     */
     private function createFile(ObjectManager $manager, int $userNumber): File
     {
         $file = new File();
@@ -71,13 +65,6 @@ class LoadUsersWithAvatars extends AbstractFixture implements DependentFixtureIn
         return $file;
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param int $number
-     * @param string $role
-     *
-     * @return User
-     */
     private function createUser(ObjectManager $manager, int $number, string $role): User
     {
         $userManager = $this->container->get('oro_user.manager');

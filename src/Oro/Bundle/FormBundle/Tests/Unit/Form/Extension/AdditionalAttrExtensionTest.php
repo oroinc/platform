@@ -29,9 +29,6 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider finishViewData
-     * @param FormView $view
-     * @param array $options
-     * @param array $expectedVars
      */
     public function testFinishView(FormView $view, array $options, array  $expectedVars)
     {

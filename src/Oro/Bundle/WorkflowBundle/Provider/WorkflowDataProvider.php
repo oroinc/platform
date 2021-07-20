@@ -17,10 +17,6 @@ class WorkflowDataProvider
     /** @var WorkflowManagerRegistry */
     private $workflowManagerRegistry;
 
-    /**
-     * @param WorkflowManagerRegistry $workflowManagerRegistry
-     * @param TransitionDataProvider $transitionDataProvider
-     */
     public function __construct(
         WorkflowManagerRegistry $workflowManagerRegistry,
         TransitionDataProvider $transitionDataProvider

@@ -139,8 +139,6 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider initializeDataProvider
      */
     public function testInitialize(array $source, array $expected)
@@ -190,8 +188,6 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param array $data
      * @dataProvider executeDataProvider
      */
     public function testExecute(array $options, array $data = array())

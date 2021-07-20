@@ -44,12 +44,6 @@ class FlashMessage extends AbstractAction
     /** @var array|PropertyPathInterface|null */
     protected $messageParameters;
 
-    /**
-     * @param ContextAccessor     $contextAccessor
-     * @param TranslatorInterface $translator
-     * @param HtmlTagHelper       $htmlTagHelper
-     * @param RequestStack        $requestStack
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         TranslatorInterface $translator,

@@ -186,11 +186,6 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         );
     }
 
-    /**
-     * @param array $resultOfImportJob1
-     * @param array $resultOfImportJob2
-     * @param array $notificationExpectedMessage
-     */
     protected function shouldProcessImportSendNotificationProcess(
         array $resultOfImportJob1,
         array $resultOfImportJob2,

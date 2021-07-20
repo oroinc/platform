@@ -35,10 +35,6 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $sourceDateTime
-     * @param string $sourceTimeZone
-     * @param string $expected
-     *
      * @dataProvider convertToDatabaseValueWhenDataProvider
      */
     public function testConvertToDatabaseValue(string $sourceDateTime, string $sourceTimeZone, string $expected)

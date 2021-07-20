@@ -30,8 +30,6 @@ class OroImapBundle implements Migration
 
     /**
      * Add Smtp fields to the oro_email_origin table
-     *
-     * @param Schema $schema
      */
     public static function addSmtpFieldsToOroEmailOriginTable(Schema $schema)
     {

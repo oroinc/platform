@@ -32,7 +32,7 @@ class ReversSyncIntegrationProcessor implements
      * @var DoctrineHelper
      */
     private $doctrineHelper;
-    
+
     /**
      * @var ReverseSyncProcessor
      */
@@ -53,14 +53,6 @@ class ReversSyncIntegrationProcessor implements
      */
     private $logger;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ReverseSyncProcessor $reverseSyncProcessor
-     * @param TypesRegistry $typesRegistry
-     * @param JobRunner $jobRunner,
-     * @param TokenStorageInterface $tokenStorage
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ReverseSyncProcessor $reverseSyncProcessor,

@@ -37,7 +37,6 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
      * @dataProvider initializeDataProvider
      */
     public function testInitialize(array $options)
@@ -71,8 +70,6 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param $message
      * @dataProvider initializeExceptionDataProvider
      */
     public function testInitializeException(array $options, $message)

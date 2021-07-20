@@ -16,11 +16,6 @@ class EntityFilter extends ChoiceFilter
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManagerRegistry      $doctrine
-     */
     public function __construct(FormFactoryInterface $factory, FilterUtility $util, ManagerRegistry $doctrine)
     {
         parent::__construct($factory, $util);
@@ -77,9 +72,6 @@ class EntityFilter extends ChoiceFilter
         return EntityFilterType::class;
     }
 
-    /**
-     * @return string|null
-     */
     protected function getEntityClass(): ?string
     {
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY);

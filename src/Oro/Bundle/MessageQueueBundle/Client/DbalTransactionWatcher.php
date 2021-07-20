@@ -14,9 +14,6 @@ class DbalTransactionWatcher implements TransactionWatcherInterface
     /** @var BufferedMessageProducer */
     private $producer;
 
-    /**
-     * @param BufferedMessageProducer $producer
-     */
     public function __construct(BufferedMessageProducer $producer)
     {
         $this->producer = $producer;

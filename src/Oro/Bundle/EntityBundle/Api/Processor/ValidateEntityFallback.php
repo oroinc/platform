@@ -25,10 +25,6 @@ class ValidateEntityFallback implements ProcessorInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param EntityFallbackResolver    $fallbackResolver
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         EntityFallbackResolver $fallbackResolver,
         PropertyAccessorInterface $propertyAccessor
@@ -222,12 +218,6 @@ class ValidateEntityFallback implements ProcessorInterface
         return $associationName;
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string        $propertyPath
-     *
-     * @return string
-     */
     private function getFormFieldName(FormInterface $form, string $propertyPath): string
     {
         $field = FormUtil::findFormFieldByPropertyPath($form, $propertyPath);

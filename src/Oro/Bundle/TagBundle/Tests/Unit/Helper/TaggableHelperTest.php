@@ -73,7 +73,6 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     /**
      * @dataProvider isTaggableDataProvider
      *

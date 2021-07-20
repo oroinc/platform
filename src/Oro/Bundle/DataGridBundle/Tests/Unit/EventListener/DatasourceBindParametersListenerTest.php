@@ -112,7 +112,6 @@ class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
 
         $datasource = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datasource\\DatasourceInterface');
 
-
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
             ->will($this->returnValue($datasource));

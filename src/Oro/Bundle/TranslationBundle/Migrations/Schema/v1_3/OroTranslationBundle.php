@@ -30,8 +30,6 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
 
     /**
      * Create oro_translation_key table
-     *
-     * @param Schema $schema
      */
     protected function createOroTranslationKeyTable(Schema $schema)
     {
@@ -48,10 +46,6 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
         $table->addOption('collate', 'utf8_bin');
     }
 
-    /**
-     * @param Schema $schema
-     * @param QueryBag $queries
-     */
     protected function updateOroTranslationTable(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_translation');

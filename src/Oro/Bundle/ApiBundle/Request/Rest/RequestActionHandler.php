@@ -106,11 +106,6 @@ class RequestActionHandler extends BaseRequestActionHandler
         return $this->viewHandler->handle($view);
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     private function isCorsRequest(Request $request): bool
     {
         return

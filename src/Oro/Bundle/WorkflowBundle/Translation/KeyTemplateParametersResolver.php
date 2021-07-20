@@ -14,9 +14,6 @@ class KeyTemplateParametersResolver
     /** @var TranslationKeyTemplateInterface[] */
     protected $templates;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -45,11 +42,6 @@ class KeyTemplateParametersResolver
         return $resolved;
     }
 
-    /**
-     * @param TranslationKeyTemplateInterface $template
-     * @param array $resolved
-     * @param array $parameters
-     */
     protected function resolveParameter(TranslationKeyTemplateInterface $template, array &$resolved, array $parameters)
     {
         if (!empty(array_diff($template->getRequiredKeys(), array_keys($parameters)))) {

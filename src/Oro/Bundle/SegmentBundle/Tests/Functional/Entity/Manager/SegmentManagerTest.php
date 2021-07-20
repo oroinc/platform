@@ -231,8 +231,6 @@ class SegmentManagerTest extends WebTestCase
 
     /**
      * @dataProvider caseSensitiveTermDataProvider
-     *
-     * @param string $segmentName
      */
     public function testGetSegmentByEntityNameWithCaseSensitiveTerm(string $segmentName): void
     {
@@ -252,9 +250,6 @@ class SegmentManagerTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function caseSensitiveTermDataProvider(): array
     {
         return [

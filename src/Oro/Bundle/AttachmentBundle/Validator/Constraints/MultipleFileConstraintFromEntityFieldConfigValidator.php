@@ -15,9 +15,6 @@ class MultipleFileConstraintFromEntityFieldConfigValidator extends ConstraintVal
     /** @var MultipleFileConstraintsProvider */
     private $constraintsProvider;
 
-    /**
-     * @param MultipleFileConstraintsProvider $multipleFileConstraintsProvider
-     */
     public function __construct(MultipleFileConstraintsProvider $multipleFileConstraintsProvider)
     {
         $this->constraintsProvider = $multipleFileConstraintsProvider;

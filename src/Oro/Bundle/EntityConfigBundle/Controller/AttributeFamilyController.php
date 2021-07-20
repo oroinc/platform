@@ -175,7 +175,6 @@ class AttributeFamilyController extends AbstractController
     }
 
     /**
-     * @param EntityConfigModel $entityConfigModel
      * @throws BadRequestHttpException
      */
     private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel)

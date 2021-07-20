@@ -21,10 +21,6 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
     /** @var LocaleSettings */
     private $localeSettings;
 
-    /**
-     * @param EntityFallbackResolver $fallbackResolver
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(EntityFallbackResolver $fallbackResolver, LocaleSettings $localeSettings)
     {
         $this->fallbackResolver = $fallbackResolver;

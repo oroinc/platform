@@ -27,11 +27,6 @@ class EntityPaginationNavigation
     /** @var EntityPaginationManager */
     protected $paginationManager;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityPaginationStorage       $storage
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker,

@@ -6,7 +6,6 @@ use Oro\Bundle\TagBundle\Form\Type\TagApiType;
 
 class TagApiTypeTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @var TagApiType
      */

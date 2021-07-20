@@ -28,11 +28,6 @@ class AttributeConfigExtension extends AbstractTypeExtension
     /** @var AttributeTypeRegistry */
     protected $attributeTypeRegistry;
 
-    /**
-     * @param ConfigProvider $attributeConfigProvider
-     * @param SerializedFieldProvider $serializedFieldProvider
-     * @param AttributeTypeRegistry $attributeTypeRegistry
-     */
     public function __construct(
         ConfigProvider $attributeConfigProvider,
         SerializedFieldProvider $serializedFieldProvider,
@@ -62,10 +57,6 @@ class AttributeConfigExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param FieldConfigModel $configModel
-     */
     protected function ensureAttributeFields(FormBuilderInterface $builder, FieldConfigModel $configModel)
     {
         if (!$builder->has('attribute')) {
@@ -95,17 +86,11 @@ class AttributeConfigExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSetData(FormEvent $event)
     {
         $event->getForm()->remove('is_serialized');
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSubmit(FormEvent $event)
     {
         if ($event->getForm()->isValid()) {

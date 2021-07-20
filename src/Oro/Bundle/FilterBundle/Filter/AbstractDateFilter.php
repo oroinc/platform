@@ -48,13 +48,6 @@ abstract class AbstractDateFilter extends AbstractFilter
     /** @var DateTimeToLocalizedStringTransformer */
     private $valueTransformer;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param DateFilterUtility    $dateFilterUtility
-     * @param LocaleSettings       $localeSettings
-     * @param DateFilterModifier   $dateFilterModifier
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -416,11 +409,6 @@ abstract class AbstractDateFilter extends AbstractFilter
         QueryBuilderUtil::checkField($this->get(FilterUtility::DATA_NAME_KEY));
     }
 
-    /**
-     * @param string|null $valuePart
-     *
-     * @return bool
-     */
     protected function isValueNormalizationRequired(?string $valuePart): bool
     {
         return

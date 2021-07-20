@@ -20,16 +20,6 @@ class OwnerValidator extends AbstractOwnerValidator
     /** @var BusinessUnitManager */
     private $businessUnitManager;
 
-    /**
-     * @param ManagerRegistry                    $doctrine
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param AuthorizationCheckerInterface      $authorizationChecker
-     * @param TokenAccessorInterface             $tokenAccessor
-     * @param OwnerTreeProviderInterface         $ownerTreeProvider
-     * @param AclVoterInterface                  $aclVoter
-     * @param AclGroupProviderInterface          $aclGroupProvider
-     * @param BusinessUnitManager                $businessUnitManager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,

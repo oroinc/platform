@@ -19,11 +19,6 @@ class BigNumberProcessor
     /** @var BigNumberDateHelper */
     private $dateHelper;
 
-    /**
-     * @param ContainerInterface  $valueProviders
-     * @param BigNumberFormatter  $bigNumberFormatter
-     * @param BigNumberDateHelper $dateHelper
-     */
     public function __construct(
         ContainerInterface $valueProviders,
         BigNumberFormatter $bigNumberFormatter,

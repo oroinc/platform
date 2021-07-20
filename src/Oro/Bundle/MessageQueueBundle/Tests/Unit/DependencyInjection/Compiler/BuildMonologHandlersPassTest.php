@@ -51,7 +51,6 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
                 ['handlers' => [$handler]]
             ]);
 
-
         $consoleErrorHandler = $this->createMock(Definition::class);
         $container->expects($this->once())
             ->method('getDefinition')
@@ -70,9 +69,6 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processVerbosityFilterProvider
-     *
-     * @param array $handler
-     * @param array $verbosityLevels
      */
     public function testProcessVerbosityFilter(array $handler, array $verbosityLevels)
     {
@@ -94,7 +90,6 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ->willReturn([
                 ['handlers' => [$handler]]
             ]);
-
 
         $consoleErrorHandler = $this->createMock(Definition::class);
         $container->expects($this->once())

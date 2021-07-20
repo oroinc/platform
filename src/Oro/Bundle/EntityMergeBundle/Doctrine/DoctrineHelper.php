@@ -21,10 +21,6 @@ class DoctrineHelper
     /** @var AdditionalMetadataProvider */
     protected $additionalMetadataProvider;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param AdditionalMetadataProvider $additionalMetadataProvider
-     */
     public function __construct(EntityManager $entityManager, AdditionalMetadataProvider $additionalMetadataProvider)
     {
         $this->entityManager = $entityManager;

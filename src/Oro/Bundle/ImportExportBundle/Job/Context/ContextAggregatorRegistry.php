@@ -27,10 +27,6 @@ class ContextAggregatorRegistry implements ResetInterface
     /**
      * Returns the context aggregator by its type.
      *
-     * @param string $type
-     *
-     * @return ContextAggregatorInterface
-     *
      * @throws RuntimeException if the aggregator for the given type does not exist
      */
     public function getAggregator(string $type): ContextAggregatorInterface

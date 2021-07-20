@@ -27,11 +27,6 @@ class CorrectSortValue implements ProcessorInterface
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ValueNormalizer $valueNormalizer
-     * @param FilterNamesRegistry $filterNamesRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer,

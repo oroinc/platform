@@ -196,9 +196,6 @@ class StringFilter extends AbstractFilter
         return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     */
     protected function setCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $platform = $ds->getDatabasePlatform();
@@ -207,9 +204,6 @@ class StringFilter extends AbstractFilter
         }
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     */
     protected function resetCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $ds->expr()->setCaseInsensitive(false);

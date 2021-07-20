@@ -23,10 +23,6 @@ class AssetConfigCache implements WarmableInterface
 
     private ThemeManager $themeManager;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param array           $webpackDevServerOptions
-     */
     public function __construct(
         KernelInterface $kernel,
         array $webpackDevServerOptions
@@ -54,27 +50,16 @@ class AssetConfigCache implements WarmableInterface
         @file_put_contents($this->getFilePath($cacheDir), \json_encode($config, JSON_UNESCAPED_SLASHES));
     }
 
-    /**
-     * @param string $cacheDir
-     * @return bool
-     */
     public function exists(string $cacheDir): bool
     {
         return file_exists($this->getFilePath($cacheDir));
     }
 
-    /**
-     * @param string $cacheDir
-     * @return string
-     */
     private function getFilePath(string $cacheDir): string
     {
         return $cacheDir.'/asset-config.json';
     }
 
-    /**
-     * @return array
-     */
     private function getBundlesPath(): array
     {
         $paths = [];

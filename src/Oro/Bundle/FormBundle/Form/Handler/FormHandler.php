@@ -20,10 +20,6 @@ class FormHandler implements FormHandlerInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher, DoctrineHelper $doctrineHelper)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -73,10 +69,6 @@ class FormHandler implements FormHandlerInterface
         return false;
     }
 
-    /**
-     * @param $data
-     * @param FormInterface $form
-     */
     protected function saveData($data, FormInterface $form)
     {
         $manager = $this->doctrineHelper->getEntityManager($data);

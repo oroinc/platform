@@ -299,9 +299,6 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider dataProviderForTestProcessImport
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @param $body
-     * @param $writeLog
      */
     public function testShouldProcessedDataMessage($body, $writeLog)
     {

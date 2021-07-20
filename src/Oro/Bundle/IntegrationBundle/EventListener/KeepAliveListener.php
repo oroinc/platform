@@ -12,17 +12,11 @@ class KeepAliveListener
      */
     protected $batchJobRepository;
 
-    /**
-     * @param DoctrineJobRepository $batchJobRepository
-     */
     public function __construct(DoctrineJobRepository $batchJobRepository)
     {
         $this->batchJobRepository = $batchJobRepository;
     }
 
-    /**
-     * @param WriterAfterFlushEvent $event
-     */
     public function onWriterAfterFlush(WriterAfterFlushEvent $event)
     {
         // keep alive connection for really long integration processes

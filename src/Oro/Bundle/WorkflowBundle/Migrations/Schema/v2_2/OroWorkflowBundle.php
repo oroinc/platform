@@ -53,9 +53,6 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         return $comparator->compare($schema, $toSchema)->toSql($this->platform);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addIndex(Schema $schema)
     {
         $table = $schema->getTable('oro_workflow_item');

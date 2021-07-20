@@ -35,11 +35,6 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var array */
     private $config;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityDetachFixer $detachFixer
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityDetachFixer $detachFixer,
@@ -74,9 +69,6 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
         }
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

@@ -40,11 +40,6 @@ class EmailSendProcessor implements SendProcessorInterface
      */
     protected $eventDispatcher;
 
-    /**
-     * @param EmailNotificationManager $emailNotificationManager
-     * @param TemplateEmailNotification $emailNotification
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
         TemplateEmailNotification $emailNotification,
@@ -76,8 +71,6 @@ class EmailSendProcessor implements SendProcessorInterface
 
     /**
      * Send reminder using email
-     *
-     * @param Reminder $reminder
      */
     public function sendReminderEmail(Reminder $reminder)
     {

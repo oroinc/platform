@@ -31,12 +31,6 @@ class NavigationHistoryLogger
     /** @var TitleServiceInterface */
     private $titleService;
 
-    /**
-     * @param ManagerRegistry        $doctrine
-     * @param string                 $navigationHistoryItemClassName
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param TitleServiceInterface  $titleService
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         string $navigationHistoryItemClassName,
@@ -49,9 +43,6 @@ class NavigationHistoryLogger
         $this->titleService = $titleService;
     }
 
-    /**
-     * @param Request $request
-     */
     public function logRequest(Request $request): void
     {
         $visitedAt = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -111,12 +102,6 @@ class NavigationHistoryLogger
         $qb->getQuery()->execute();
     }
 
-    /**
-     * @param SqlQueryBuilder        $qb
-     * @param array                  $data
-     * @param ClassMetadata          $metadata
-     * @param EntityManagerInterface $em
-     */
     private function fillData(
         SqlQueryBuilder $qb,
         array $data,
@@ -203,11 +188,6 @@ class NavigationHistoryLogger
         return [$row[$idColumnName], $row[$visitCountColumnName] ?? 0, $row[$titleColumnName]];
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     *
-     * @return int
-     */
     private function getUrlLength(ClassMetadata $metadata): int
     {
         $urlMapping = $metadata->getFieldMapping('url');
@@ -215,12 +195,6 @@ class NavigationHistoryLogger
         return $urlMapping['length'];
     }
 
-    /**
-     * @param string        $fieldName
-     * @param ClassMetadata $metadata
-     *
-     * @return string
-     */
     private function getColumnName(string $fieldName, ClassMetadata $metadata): string
     {
         if ($metadata->hasAssociation($fieldName)) {

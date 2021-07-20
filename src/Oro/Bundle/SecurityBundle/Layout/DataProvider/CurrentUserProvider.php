@@ -9,9 +9,6 @@ class CurrentUserProvider
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;

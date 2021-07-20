@@ -19,10 +19,6 @@ class MultipleEntityType extends AbstractType
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker

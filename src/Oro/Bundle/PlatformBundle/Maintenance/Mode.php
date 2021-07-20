@@ -17,10 +17,6 @@ class Mode
      */
     protected $dispatcher;
 
-    /**
-     * @param DriverFactory            $factory
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(DriverFactory $factory, EventDispatcherInterface $dispatcher)
     {
         $this->factory    = $factory;

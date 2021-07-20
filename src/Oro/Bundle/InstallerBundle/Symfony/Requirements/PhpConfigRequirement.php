@@ -50,7 +50,8 @@ class PhpConfigRequirement extends Requirement
             $fulfilled = call_user_func($evaluation, $cfgValue);
         } else {
             if (null === $testMessage) {
-                $testMessage = sprintf('%s %s be %s in php.ini',
+                $testMessage = sprintf(
+                    '%s %s be %s in php.ini',
                     $cfgName,
                     $optional ? 'should' : 'must',
                     $evaluation ? 'enabled' : 'disabled'
@@ -58,7 +59,8 @@ class PhpConfigRequirement extends Requirement
             }
 
             if (null === $helpHtml) {
-                $helpHtml = sprintf('Set <strong>%s</strong> to <strong>%s</strong> in php.ini<a href="#phpini">*</a>.',
+                $helpHtml = sprintf(
+                    'Set <strong>%s</strong> to <strong>%s</strong> in php.ini<a href="#phpini">*</a>.',
                     $cfgName,
                     $evaluation ? 'on' : 'off'
                 );

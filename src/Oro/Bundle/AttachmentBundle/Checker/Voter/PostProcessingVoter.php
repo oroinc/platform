@@ -18,9 +18,6 @@ class PostProcessingVoter implements VoterInterface
      */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -38,9 +35,6 @@ class PostProcessingVoter implements VoterInterface
         return self::FEATURE_ABSTAIN;
     }
 
-    /**
-     * @return bool
-     */
     private function isDefaultQualityUsed(): bool
     {
         $pngQuality = $this->configManager->get('oro_attachment.png_quality');

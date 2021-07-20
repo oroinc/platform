@@ -23,11 +23,6 @@ class DataChangesetTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitProvider
-     *
-     * @param $defaultData
-     * @param $viewData
-     * @param $submittedData
-     * @param ArrayCollection $expected
      */
     public function testSubmit($defaultData, $viewData, $submittedData, ArrayCollection $expected)
     {

@@ -9,9 +9,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return MarkdownApiDocParser
-     */
     private function loadDocument(): MarkdownApiDocParser
     {
         $fixturesDir = __DIR__ . '/Fixtures';
@@ -42,8 +39,6 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
      * Now DOMDocument::saveHTML return html in different formatting than PHP < 7.3.
      * We removing new lines in actual parsed data so that check to work on all supported PHP versions.
      *
-     * @param array $expected
-     * @param MarkdownApiDocParser $apiDocParser
      * @throws \ReflectionException
      */
     private function assertLoadedData(array $expected, MarkdownApiDocParser $apiDocParser): void

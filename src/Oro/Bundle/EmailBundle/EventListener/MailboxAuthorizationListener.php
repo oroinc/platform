@@ -22,11 +22,6 @@ class MailboxAuthorizationListener
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param ManagerRegistry               $registry
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     */
     public function __construct(
         ManagerRegistry $registry,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -39,8 +34,6 @@ class MailboxAuthorizationListener
 
     /**
      * Filters requests to MailboxController.
-     *
-     * @param FilterControllerEvent $event
      */
     public function onKernelController(FilterControllerEvent $event)
     {

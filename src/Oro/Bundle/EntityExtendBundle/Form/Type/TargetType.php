@@ -21,9 +21,6 @@ class TargetType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -41,8 +38,6 @@ class TargetType extends AbstractType
 
     /**
      * Sets selected target entity class
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event, FieldConfigId $fieldConfigId)
     {

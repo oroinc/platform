@@ -31,8 +31,6 @@ class FilterExecutionContext
 
     /**
      * Indicates whether using of forms to validate data of filters is enabled.
-     *
-     * @return bool
      */
     public function isValidationEnabled(): bool
     {

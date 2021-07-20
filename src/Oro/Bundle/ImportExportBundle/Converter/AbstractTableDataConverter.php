@@ -41,9 +41,6 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     /** @var bool */
     protected $translateUsingLocale = true;
 
-    /**
-     * @param AttributeConfigHelper|null $attributeConfigHelper
-     */
     public function setAttributeConfigHelper(?AttributeConfigHelper $attributeConfigHelper): void
     {
         $this->attributeConfigHelper = $attributeConfigHelper;
@@ -103,9 +100,6 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
             ->getResult();
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -155,8 +149,6 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     }
 
     /**
-     * @param array $header
-     * @param array $data
      * @throws LogicException
      */
     protected function validateColumns(array $header, array $data)

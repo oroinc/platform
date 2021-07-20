@@ -26,9 +26,6 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([], $container);
     }
 
-    /**
-     * @return array
-     */
     public function loadExceptionProvider(): array
     {
         return [
@@ -54,9 +51,6 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider loadDataProvider
-     *
-     * @param array $params
-     * @param array $expected
      */
     public function testLoad(array $params, array $expected)
     {
@@ -92,9 +86,6 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $configurationParams);
     }
 
-    /**
-     * @return array
-     */
     public function loadDataProvider(): array
     {
         return [

@@ -14,10 +14,6 @@ class SettingsBuilder
 
     private const ALLOWED_TYPES = ['scalar', 'boolean', 'array'];
 
-    /**
-     * @param ArrayNodeDefinition $root
-     * @param array               $settings
-     */
     public static function append(ArrayNodeDefinition $root, array $settings): void
     {
         $builder = new TreeBuilder('settings');

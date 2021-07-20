@@ -40,9 +40,6 @@ class RestDocViewDetector implements ResetInterface
         $this->requestTypeProviders = $requestTypeProviders;
     }
 
-    /**
-     * @return string
-     */
     public function getView(): string
     {
         $view = $this->view;
@@ -60,9 +57,6 @@ class RestDocViewDetector implements ResetInterface
         return $view;
     }
 
-    /**
-     * @param string|null $view
-     */
     public function setView(string $view = null): void
     {
         $this->view = $view;
@@ -70,9 +64,6 @@ class RestDocViewDetector implements ResetInterface
         $this->version = null;
     }
 
-    /**
-     * @return string
-     */
     public function getVersion(): string
     {
         if (null === $this->version) {
@@ -82,17 +73,11 @@ class RestDocViewDetector implements ResetInterface
         return $this->version;
     }
 
-    /**
-     * @param string|null $version
-     */
     public function setVersion(string $version = null): void
     {
         $this->version = $version;
     }
 
-    /**
-     * @return RequestType
-     */
     public function getRequestType(): RequestType
     {
         if (null === $this->requestType) {

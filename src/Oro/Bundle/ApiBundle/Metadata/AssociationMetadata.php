@@ -126,8 +126,6 @@ class AssociationMetadata extends PropertyMetadata
      * Sets an accessor to target metadata by a specified target class name and association path.
      * It is used for multi-target associations.
      * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
-     *
-     * @param TargetMetadataAccessorInterface|null $targetMetadataAccessor
      */
     public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor)
     {
@@ -136,8 +134,6 @@ class AssociationMetadata extends PropertyMetadata
 
     /**
      * Sets the path from a root entity to the association.
-     *
-     * @param string|null $associationPath
      */
     public function setAssociationPath(?string $associationPath)
     {
@@ -171,8 +167,6 @@ class AssociationMetadata extends PropertyMetadata
 
     /**
      * Sets metadata of the association target.
-     *
-     * @param EntityMetadata $targetMetadata
      */
     public function setTargetMetadata(EntityMetadata $targetMetadata)
     {

@@ -15,10 +15,6 @@ class MergeFieldsStep implements DependentMergeStepInterface
      */
     protected $eventDispatcher;
 
-    /**
-     * @param StrategyInterface $strategy
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(StrategyInterface $strategy, EventDispatcherInterface $eventDispatcher)
     {
         $this->strategy = $strategy;
@@ -27,8 +23,6 @@ class MergeFieldsStep implements DependentMergeStepInterface
 
     /**
      * Merge fields
-     *
-     * @param EntityData $data
      */
     public function run(EntityData $data)
     {

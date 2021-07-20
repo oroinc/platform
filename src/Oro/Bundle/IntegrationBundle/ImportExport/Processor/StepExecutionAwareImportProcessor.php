@@ -20,9 +20,6 @@ class StepExecutionAwareImportProcessor extends ImportProcessor implements StepE
      */
     protected $stepExecution;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function setContextRegistry(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;

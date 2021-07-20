@@ -21,21 +21,12 @@ class VersionHelper
     /** @var array */
     private $packageVersions = [];
 
-    /**
-     * @param LocalRepositoryFactory $factory
-     * @param Cache|null             $cache
-     */
     public function __construct(LocalRepositoryFactory $factory, Cache $cache = null)
     {
         $this->factory = $factory;
         $this->cache = $cache;
     }
 
-    /**
-     * @param string $packageName
-     *
-     * @return string
-     */
     public function getVersion(string $packageName = OroPlatformBundle::PACKAGE_NAME): string
     {
         if (isset($this->packageVersions[$packageName])) {
@@ -57,11 +48,6 @@ class VersionHelper
         return $version;
     }
 
-    /**
-     * @param string $packageName
-     *
-     * @return string
-     */
     private function getPackageVersion(string $packageName): string
     {
         $packages = $this->factory->getLocalRepository()->findPackages($packageName);

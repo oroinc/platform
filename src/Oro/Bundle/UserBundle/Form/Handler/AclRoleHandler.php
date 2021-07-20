@@ -85,11 +85,6 @@ class AclRoleHandler
     /** @var AclPrivilegeConfigurableFilter */
     protected $configurableFilter;
 
-    /**
-     * @param FormFactory $formFactory
-     * @param AclCacheInterface $aclCache
-     * @param array $privilegeConfig
-     */
     public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
         $this->formFactory = $formFactory;
@@ -98,33 +93,21 @@ class AclRoleHandler
         $this->configurableName = ConfigurablePermissionProvider::DEFAULT_CONFIGURABLE_NAME;
     }
 
-    /**
-     * @param AclManager $aclManager
-     */
     public function setAclManager(AclManager $aclManager)
     {
         $this->aclManager = $aclManager;
     }
 
-    /**
-     * @param AclPrivilegeRepository $privilegeRepository
-     */
     public function setAclPrivilegeRepository(AclPrivilegeRepository $privilegeRepository)
     {
         $this->privilegeRepository = $privilegeRepository;
     }
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function setManagerRegistry(ManagerRegistry $registry)
     {
         $this->managerRegistry = $registry;
     }
 
-    /**
-     * @param Request $request
-     */
     public function setRequest(Request $request)
     {
         $this->request = $request;
@@ -138,9 +121,6 @@ class AclRoleHandler
         $this->configurableName = $configurableName;
     }
 
-    /**
-     * @param AclPrivilegeConfigurableFilter $configurableFilter
-     */
     public function setConfigurableFilter(AclPrivilegeConfigurableFilter $configurableFilter)
     {
         $this->configurableFilter = $configurableFilter;
@@ -316,9 +296,6 @@ class AclRoleHandler
         return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role), $this->getAclGroup());
     }
 
-    /**
-     * @param AbstractRole $role
-     */
     protected function processPrivileges(AbstractRole $role)
     {
         $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);

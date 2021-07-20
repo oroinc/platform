@@ -31,9 +31,6 @@ class OroDraftBundleInstaller implements Installation
         $this->addOroDraftProjectForeignKeys($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createOroDraftProjectTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_draft_project');
@@ -50,8 +47,6 @@ class OroDraftBundleInstaller implements Installation
 
     /**
      * Add oro_draft_project foreign keys.
-     *
-     * @param Schema $schema
      */
     private function addOroDraftProjectForeignKeys(Schema $schema): void
     {

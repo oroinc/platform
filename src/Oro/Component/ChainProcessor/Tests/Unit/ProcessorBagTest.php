@@ -128,7 +128,6 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->builder->addGroup('group3', 'action1', 1);
     }
 
-
     public function testBagWithoutGroups()
     {
         $context = new Context();

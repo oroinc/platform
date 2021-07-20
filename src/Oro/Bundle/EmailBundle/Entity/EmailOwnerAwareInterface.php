@@ -7,8 +7,5 @@ namespace Oro\Bundle\EmailBundle\Entity;
  */
 interface EmailOwnerAwareInterface
 {
-    /**
-     * @return EmailOwnerInterface
-     */
     public function getEmailOwner(): EmailOwnerInterface;
 }

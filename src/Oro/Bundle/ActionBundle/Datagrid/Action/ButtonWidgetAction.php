@@ -30,9 +30,6 @@ class ButtonWidgetAction extends AbstractAction
         ]
     ];
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         parent::__construct();

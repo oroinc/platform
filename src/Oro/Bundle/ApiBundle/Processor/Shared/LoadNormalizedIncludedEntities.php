@@ -25,9 +25,6 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
-    /**
-     * @param ActionProcessorBagInterface $processorBag
-     */
     public function __construct(ActionProcessorBagInterface $processorBag)
     {
         $this->processorBag = $processorBag;

@@ -14,10 +14,6 @@ trait ApiTaggedServiceTrait
 
     /**
      * Gets a value of the "requestType" attribute.
-     *
-     * @param array $attributes
-     *
-     * @return string|null
      */
     private function getRequestTypeAttribute(array $attributes): ?string
     {

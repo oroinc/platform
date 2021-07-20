@@ -35,10 +35,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     /** @var FormContext */
     protected $context;
 
-    /**
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
@@ -47,14 +43,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
-    /**
-     * @param string              $path
-     * @param string              $pointer
-     * @param array               $data
-     * @param EntityMetadata|null $metadata
-     *
-     * @return array
-     */
     protected function normalizeData(string $path, string $pointer, array $data, ?EntityMetadata $metadata): array
     {
         $relations = \array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
@@ -76,14 +64,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param string              $path
-     * @param string              $pointer
-     * @param array               $relationships
-     * @param EntityMetadata|null $metadata
-     *
-     * @return array
-     */
     protected function normalizeRelationships(
         string $path,
         string $pointer,
@@ -176,12 +156,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         ];
     }
 
-    /**
-     * @param string                   $entityClass
-     * @param AssociationMetadata|null $associationMetadata
-     *
-     * @return bool
-     */
     protected function isAcceptableTargetClass(string $entityClass, ?AssociationMetadata $associationMetadata): bool
     {
         if (null === $associationMetadata) {
@@ -196,12 +170,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return \in_array($entityClass, $acceptableClassNames, true);
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityType
-     *
-     * @return string
-     */
     protected function normalizeEntityClass(string $pointer, string $entityType): string
     {
         $entityClass = ValueNormalizerUtil::convertToEntityClass(
@@ -270,22 +238,11 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return $entityId;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @param string      $title
-     * @param string|null $pointer
-     *
-     * @return Error
-     */
     protected function addValidationError(string $title, string $pointer = null): Error
     {
         $error = Error::createValidationError($title);
@@ -297,12 +254,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return $error;
     }
 
-    /**
-     * @param string $parentPath
-     * @param string $property
-     *
-     * @return string
-     */
     protected function buildPath(string $parentPath, string $property): string
     {
         return '' !== $parentPath
@@ -310,12 +261,6 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             : $property;
     }
 
-    /**
-     * @param string $parentPointer
-     * @param string $property
-     *
-     * @return string
-     */
     protected function buildPointer(string $parentPointer, string $property): string
     {
         return $parentPointer . '/' . $property;

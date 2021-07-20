@@ -29,8 +29,6 @@ class OroLoggerBundleInstaller implements Installation
 
     /**
      * Create oro_logger_log_entry table
-     *
-     * @param Schema $schema
      */
     protected function createOroLoggerLogEntryTable(Schema $schema)
     {

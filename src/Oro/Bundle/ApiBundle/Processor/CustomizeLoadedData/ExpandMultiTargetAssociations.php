@@ -43,13 +43,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
-    /**
-     * @param ConfigProvider      $configProvider
-     * @param EntitySerializer    $entitySerializer
-     * @param SerializationHelper $serializationHelper
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ResourcesProvider   $resourcesProvider
-     */
     public function __construct(
         ConfigProvider $configProvider,
         EntitySerializer $entitySerializer,
@@ -77,11 +70,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         }
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $context
-     *
-     * @return array|null
-     */
     private function expandMultiTargetAssociations(CustomizeLoadedDataContext $context): ?array
     {
         $config = $context->getConfig();
@@ -105,11 +93,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         );
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $context
-     *
-     * @return bool
-     */
     private function isExpandRequested(CustomizeLoadedDataContext $context): bool
     {
         $associationPath = $context->getPropertyPath();
@@ -126,11 +109,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $expandConfigExtra->isExpandRequested($this->getAssociationName($associationPath));
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $context
-     *
-     * @return string|null
-     */
     private function getPathPrefix(CustomizeLoadedDataContext $context): ?string
     {
         $propertyPath = $context->getPropertyPath();
@@ -141,11 +119,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $propertyPath . ConfigUtil::PATH_DELIMITER;
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $context
-     *
-     * @return string|null
-     */
     private function getSubresourceAssociationName(CustomizeLoadedDataContext $context): ?string
     {
         /** @var EntityDefinitionConfigExtra|null $entityConfigExtra */
@@ -157,11 +130,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $entityConfigExtra->getAssociationName();
     }
 
-    /**
-     * @param string $associationPath
-     *
-     * @return string
-     */
     private function getAssociationName(string $associationPath): string
     {
         $lastDelimiter = strrpos($associationPath, ConfigUtil::PATH_DELIMITER);

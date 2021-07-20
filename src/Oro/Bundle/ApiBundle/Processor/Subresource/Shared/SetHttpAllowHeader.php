@@ -17,10 +17,6 @@ abstract class SetHttpAllowHeader extends BaseSetHttpAllowHeader
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
-    /**
-     * @param ResourcesProvider    $resourcesProvider
-     * @param SubresourcesProvider $subresourcesProvider
-     */
     public function __construct(ResourcesProvider $resourcesProvider, SubresourcesProvider $subresourcesProvider)
     {
         parent::__construct($resourcesProvider);

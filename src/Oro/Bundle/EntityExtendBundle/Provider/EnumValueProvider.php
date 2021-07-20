@@ -19,10 +19,6 @@ class EnumValueProvider
     /** @var EnumTranslationCache */
     private $enumTranslationCache;
 
-    /**
-     * @param DoctrineHelper       $doctrineHelper
-     * @param EnumTranslationCache $enumTranslationCache
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EnumTranslationCache $enumTranslationCache)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -74,12 +70,6 @@ class EnumValueProvider
         return $this->getEnumChoices(ExtendHelper::buildEnumValueClassName($enumCode));
     }
 
-    /**
-     * @param string $enumCode
-     * @param string $id
-     *
-     * @return AbstractEnumValue
-     */
     public function getEnumValueByCode(string $enumCode, string $id): AbstractEnumValue
     {
         return $this->doctrineHelper->getEntityReference(ExtendHelper::buildEnumValueClassName($enumCode), $id);
@@ -97,11 +87,6 @@ class EnumValueProvider
         return $defaultStatuses ? reset($defaultStatuses) : null;
     }
 
-    /**
-     * @param string $enumCode
-     *
-     * @return AbstractEnumValue|null
-     */
     public function getDefaultEnumValueByCode(string $enumCode): ?AbstractEnumValue
     {
         $defaultStatuses = $this->getDefaultEnumValuesByCode($enumCode);
@@ -129,11 +114,6 @@ class EnumValueProvider
         return $this->getDefaultEnumValues(ExtendHelper::buildEnumValueClassName($enumCode));
     }
 
-    /**
-     * @param string $enumClass
-     *
-     * @return EnumValueRepository
-     */
     private function getEnumValueRepository(string $enumClass): EnumValueRepository
     {
         return $this->doctrineHelper->getEntityRepository($enumClass);

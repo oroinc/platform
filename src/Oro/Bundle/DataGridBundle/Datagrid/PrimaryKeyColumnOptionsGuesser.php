@@ -13,9 +13,6 @@ class PrimaryKeyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
     /** @var Registry */
     private $registry;
 
-    /**
-     * @param Registry $registry
-     */
     public function __construct(Registry $registry)
     {
         $this->registry = $registry;

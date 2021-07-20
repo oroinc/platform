@@ -54,9 +54,6 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedColumns, $columns);
     }
 
-    /**
-     * @param array $expectedColumns
-     */
     private function mockColumnsInContext(array $expectedColumns): void
     {
         $this->context
@@ -110,9 +107,6 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->datagridColumnsFromContextProvider->getColumnsFromContext($this->context);
     }
 
-    /**
-     * @param string $gridName
-     */
     private function mockGridName(string $gridName): void
     {
         $this->context
@@ -167,10 +161,6 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getColumnsFromContextWhenColumnsWhenParamsDataProvider
-     *
-     * @param array $gridColumns
-     * @param array $columnsState
-     * @param array $expectedColumns
      */
     public function testGetColumnsFromContextWhenColumnsWhenParams(
         array $gridColumns,
@@ -220,9 +210,6 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedColumns, $columns);
     }
 
-    /**
-     * @return array
-     */
     public function getColumnsFromContextWhenColumnsWhenParamsDataProvider(): array
     {
         return [

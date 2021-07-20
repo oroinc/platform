@@ -19,9 +19,6 @@ class AttributeAssembler extends AbstractAssembler
      */
     protected $attributeGuesser;
 
-    /**
-     * @param AttributeGuesser $attributeGuesser
-     */
     public function __construct(AttributeGuesser $attributeGuesser)
     {
         $this->attributeGuesser = $attributeGuesser;
@@ -121,7 +118,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param array $options
      * @throws AssemblerException
      */
     protected function assertAttributeEntityAcl(array $options)
@@ -138,7 +134,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function validateAttribute(Attribute $attribute)
@@ -153,7 +148,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function assertAttributeHasValidType(Attribute $attribute)
@@ -209,7 +203,6 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function assertAttributeHasClassOption(Attribute $attribute)

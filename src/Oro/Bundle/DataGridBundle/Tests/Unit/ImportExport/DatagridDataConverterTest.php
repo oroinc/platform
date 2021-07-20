@@ -41,10 +41,6 @@ class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider convertDataProvider
-     *
-     * @param array $columns
-     * @param array $exportedRecord
-     * @param array $expected
      */
     public function testConvertToExportFormat(array $columns, array $exportedRecord, array $expected): void
     {
@@ -68,9 +64,6 @@ class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
     public function convertDataProvider(): array
     {
         return [

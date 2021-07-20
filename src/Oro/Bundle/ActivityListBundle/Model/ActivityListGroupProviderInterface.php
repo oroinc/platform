@@ -25,17 +25,11 @@ interface ActivityListGroupProviderInterface
      * Collapses the given activity list items to keep only one item from each group.
      * It is supposed that each element in $items array is an array contains at least two keys,
      * "relatedActivityClass" and "relatedActivityId".
-     *
-     * @param array $items
-     *
-     * @return array
      */
     public function collapseGroupedItems(array $items): array;
 
     /**
      * Gets TWIG template that should be used to render a grouped activity entities in the activity list.
-     *
-     * @return string
      */
     public function getGroupedTemplate(): string;
 }

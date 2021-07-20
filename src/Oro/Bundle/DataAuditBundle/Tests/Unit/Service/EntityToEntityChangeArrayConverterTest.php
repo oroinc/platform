@@ -30,8 +30,6 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider entityConversionDataProvider
-     * @param array $changeSet
-     * @param array $expectedChangeSet
      */
     public function testEntityConversionToArray(array $changeSet, array $expectedChangeSet)
     {
@@ -68,8 +66,6 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider additionalFieldsDataProvider
-     * @param array $fields
-     * @param array $expectedFields
      */
     public function testAdditionalFieldsAddedIfEntityHasThem(array $fields, array $expectedFields)
     {

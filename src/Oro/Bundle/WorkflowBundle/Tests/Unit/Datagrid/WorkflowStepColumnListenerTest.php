@@ -565,8 +565,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputConfig
-     * @param array $expectedConfig
      * @dataProvider buildBeforeRemoveColumnDataProvider
      */
     public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig)

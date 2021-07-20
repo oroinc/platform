@@ -33,12 +33,6 @@ abstract class LoadCustomAssociation implements ProcessorInterface
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @param EntitySerializer $entitySerializer
-     * @param DoctrineHelper   $doctrineHelper
-     * @param EntityIdHelper   $entityIdHelper
-     * @param ConfigProvider   $configProvider
-     */
     public function __construct(
         EntitySerializer $entitySerializer,
         DoctrineHelper $doctrineHelper,

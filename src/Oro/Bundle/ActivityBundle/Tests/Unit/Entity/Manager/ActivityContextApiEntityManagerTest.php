@@ -104,9 +104,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $result);
     }
 
-    /**
-     * @return array
-     */
     public function getActivityContextWhenNotActivityDataProvider(): array
     {
         return [
@@ -139,11 +136,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $result);
     }
 
-    /**
-     * @param array $targets
-     *
-     * @return ActivityInterface
-     */
     private function getActivity(array $targets): ActivityInterface
     {
         $activity = $this->createMock(TestActivity::class);
@@ -208,9 +200,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getActivityContextDataProvider
-     *
-     * @param array $targets
-     * @param array $expectedResult
      */
     public function testGetActivityContext(array $targets, array $expectedResult): void
     {
@@ -231,9 +220,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @param array $targets
-     */
     private function mockCheckers(array $targets): void
     {
         $this->doctrineHelper
@@ -314,9 +300,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($link = 'sample-url');
     }
 
-    /**
-     * @return array
-     */
     public function getActivityContextDataProvider(): array
     {
         return [
@@ -348,9 +331,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getActivityContextDataProvider
-     *
-     * @param array $targets
-     * @param array $expectedResult
      */
     public function testGetActivityContextWhenNoEventDispatcher(array $targets, array $expectedResult): void
     {

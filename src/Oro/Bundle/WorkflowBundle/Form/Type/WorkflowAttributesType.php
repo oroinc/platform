@@ -126,9 +126,6 @@ class WorkflowAttributesType extends AbstractType
 
     /**
      * Adds required event listeners
-     *
-     * @param FormBuilderInterface $builder
-     * @param array $options
      */
     protected function addEventListeners(FormBuilderInterface $builder, array $options)
     {
@@ -157,8 +154,6 @@ class WorkflowAttributesType extends AbstractType
     /**
      * Add attributes to form
      *
-     * @param FormBuilderInterface $builder
-     * @param array $options
      * @throws InvalidConfigurationException When attribute is not found in given Workflow
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -236,11 +231,6 @@ class WorkflowAttributesType extends AbstractType
 
     /**
      * Adds form type of attribute to form builder
-     *
-     * @param FormBuilderInterface $builder
-     * @param Attribute $attribute
-     * @param array $attributeOptions
-     * @param array $options
      */
     protected function addAttributeField(
         FormBuilderInterface $builder,
@@ -325,7 +315,6 @@ class WorkflowAttributesType extends AbstractType
             if (is_array($attributeOptions['options']['label'])) {
                 $attributeOptions['options']['label'] = array_shift($attributeOptions['options']['label']);
             }
-
 
             $label = $attributeOptions['options']['label'];
             if ($this->translator->trans($label, [], $domain) === $label) {

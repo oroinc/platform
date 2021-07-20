@@ -34,26 +34,17 @@ class GroupingOrmQueryConverterContext extends QueryConverterContext
         $this->currentFilterPath = '';
     }
 
-    /**
-     * @return array
-     */
     public function getFilters(): array
     {
         return $this->filters;
     }
 
-    /**
-     * @param array $filter
-     */
     public function addFilter(array $filter): void
     {
         $this->propertyAccessor->setValue($this->filters, $this->currentFilterPath, $filter);
         $this->incrementCurrentFilterPath();
     }
 
-    /**
-     * @param string $operator
-     */
     public function addFilterOperator(string $operator): void
     {
         $this->propertyAccessor->setValue($this->filters, $this->currentFilterPath, $operator);

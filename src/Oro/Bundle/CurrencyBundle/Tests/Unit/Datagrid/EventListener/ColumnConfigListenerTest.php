@@ -32,9 +32,6 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildBeforeEventDataProvider
-     *
-     * @param array $inputConfig
-     * @param array $expectedConfig
      */
     public function testBuildBeforeEvent(array $inputConfig, array $expectedConfig)
     {

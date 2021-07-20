@@ -2,18 +2,13 @@
 
 namespace Oro\Component\DoctrineUtils\DBAL;
 
-use \PDO;
+use PDO;
 
 /**
  * Provide DB privileges for a connected user.
  */
 class DbPrivilegesProvider
 {
-    /**
-     * @param PDO $pdo
-     * @param string $dbName
-     * @return array
-     */
     public static function getPostgresGrantedPrivileges(PDO $pdo, string $dbName): array
     {
         try {
@@ -62,11 +57,6 @@ class DbPrivilegesProvider
         return $granted;
     }
 
-    /**
-     * @param PDO $pdo
-     * @param string $dbName
-     * @return array
-     */
     public static function getMySqlGrantedPrivileges(PDO $pdo, string $dbName): array
     {
         $grantRows = $pdo->query('SHOW GRANTS')->fetchAll(PDO::FETCH_COLUMN);

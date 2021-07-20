@@ -12,29 +12,14 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 abstract class AbstractCollectionTestCase extends RestJsonApiTestCase
 {
-    /**
-     * @return string
-     */
     abstract protected function getCollectionEntityClass(): string;
 
-    /**
-     * @return string
-     */
     abstract protected function getCollectionItemEntityClass(): string;
 
-    /**
-     * @return bool
-     */
     abstract protected function isManyToMany(): bool;
 
-    /**
-     * @return bool
-     */
     abstract protected function isOrphanRemoval(): bool;
 
-    /**
-     * @return string
-     */
     abstract protected function getAssociationName(): string;
 
     /**

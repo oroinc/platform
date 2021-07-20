@@ -13,9 +13,6 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
     /** @var array [section path => callback[], ...] */
     private $additionalConfigureCallbacks = [];
 
-    /**
-     * @param ConfigurationSettingsInterface $settings
-     */
     public function __construct(ConfigurationSettingsInterface $settings)
     {
         $this->settings = $settings;

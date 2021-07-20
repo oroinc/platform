@@ -264,8 +264,6 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
 
     /**
      * Handles Exception
-     *
-     * @param \Exception $e
      */
     private function handleException(\Exception $e)
     {

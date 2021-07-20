@@ -62,13 +62,6 @@ class ConfigManager
     /** @var array */
     protected $configChangeSets = [];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param MetadataFactory          $metadataFactory
-     * @param ConfigModelManager       $modelManager
-     * @param AuditManager             $auditManager
-     * @param ConfigCache              $cache
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         MetadataFactory $metadataFactory,
@@ -112,9 +105,6 @@ class ConfigManager
         return $this->providerBag->getProvider($scope);
     }
 
-    /**
-     * @param ConfigProviderBag $providerBag
-     */
     public function setProviderBag(ConfigProviderBag $providerBag)
     {
         $this->providerBag = $providerBag;
@@ -452,8 +442,6 @@ class ConfigManager
 
     /**
      * Removes all configuration data or for the given object (if $configId is specified) from a cache.
-     *
-     * @param ConfigIdInterface|null $configId
      */
     public function clearCache(ConfigIdInterface $configId = null)
     {
@@ -507,8 +495,6 @@ class ConfigManager
 
     /**
      * Makes the given configuration object managed and persistent.
-     *
-     * @param ConfigInterface $config
      */
     public function persist(ConfigInterface $config)
     {
@@ -520,8 +506,6 @@ class ConfigManager
     /**
      * Merges configuration data from the given configuration object with existing
      * managed configuration object.
-     *
-     * @param ConfigInterface $config
      */
     public function merge(ConfigInterface $config)
     {
@@ -652,9 +636,6 @@ class ConfigManager
         }
     }
 
-    /**
-     * @param ConfigInterface $config
-     */
     public function calculateConfigChangeSet(ConfigInterface $config)
     {
         $configKey = $this->buildConfigKey($config->getId());

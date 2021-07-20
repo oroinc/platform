@@ -21,10 +21,6 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
     /** @var callable|null */
     private $logger;
 
-    /**
-     * @param EntityManager            $em
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EntityManager $em, EventDispatcherInterface $eventDispatcher)
     {
         $this->em = $em;

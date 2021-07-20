@@ -110,9 +110,6 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
         $this->websocketAuthenticationByTicketProvider->authenticate($connection);
     }
 
-    /**
-     * @return array
-     */
     public function authenticateWithInvalidTicketDataProvider(): array
     {
         return [

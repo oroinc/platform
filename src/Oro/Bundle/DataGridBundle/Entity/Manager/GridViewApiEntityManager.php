@@ -24,10 +24,6 @@ class GridViewApiEntityManager extends ApiEntityManager
         $this->gridViewManager = $gridViewManager;
     }
 
-    /**
-     * @param AbstractUser $user
-     * @param ViewInterface $gridView
-     */
     public function setDefaultGridView(AbstractUser $user, ViewInterface $gridView)
     {
         $this->gridViewManager->setDefaultGridView($user, $gridView);

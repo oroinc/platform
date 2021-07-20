@@ -19,9 +19,6 @@ class NormalizeEntityType extends AbstractProcessor
     /** @var EntityAliasResolver|null */
     private $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
-     */
     public function __construct(EntityAliasResolverRegistry $entityAliasResolverRegistry)
     {
         $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;

@@ -22,9 +22,6 @@ class RequestListener
         $this->debug = $debug;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {

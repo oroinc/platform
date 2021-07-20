@@ -31,9 +31,6 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
     /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject $blockTypeMapper */
     protected $blockTypeMapper;
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->attributeRenderRegistry = new AttributeRenderRegistry();

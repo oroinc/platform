@@ -14,18 +14,12 @@ class ExpressionCompilerPass implements CompilerPassInterface
     const EXPRESSION_LANGUAGE_PROVIDER_TAG = 'layout.expression_language_provider';
     const EXPRESSION_LANGUAGE_SERVICE = 'oro_layout.expression_language';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $this->loadExpressionEncoders($container);
         $this->loadExpressionLanguageProviders($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     protected function loadExpressionEncoders(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::EXPRESSION_ENCODING_SERVICE)) {
@@ -44,9 +38,6 @@ class ExpressionCompilerPass implements CompilerPassInterface
         $encodingServiceDef->replaceArgument(0, $serviceIds);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     protected function loadExpressionLanguageProviders(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::EXPRESSION_LANGUAGE_SERVICE)) {

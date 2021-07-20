@@ -47,8 +47,6 @@ class BatchUpdateResponse
 
     /**
      * Gets data items that are processed by this batch operation.
-     *
-     * @return array
      */
     public function getData(): array
     {
@@ -68,8 +66,6 @@ class BatchUpdateResponse
 
     /**
      * Gets the summary statistics of this batch operation.
-     *
-     * @return BatchSummary
      */
     public function getSummary(): BatchSummary
     {
@@ -78,8 +74,6 @@ class BatchUpdateResponse
 
     /**
      * Indicates whether some unexpected errors occurred when processing this batch operation.
-     *
-     * @return bool
      */
     public function hasUnexpectedErrors(): bool
     {
@@ -88,8 +82,6 @@ class BatchUpdateResponse
 
     /**
      * Indicates whether this batch operation cannot be processed now and it is required to retry it.
-     *
-     * @return bool
      */
     public function isRetryAgain(): bool
     {
@@ -98,8 +90,6 @@ class BatchUpdateResponse
 
     /**
      * Gets a reason why this batch operation cannot be processed now and should be processed again.
-     *
-     * @return string|null
      */
     public function getRetryReason(): ?string
     {

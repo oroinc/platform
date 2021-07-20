@@ -20,9 +20,6 @@ class MenuUpdateRepository extends EntityRepository
      */
     private $queryResultCache;
 
-    /**
-     * @param CacheProvider $queryResultCache
-     */
     public function setQueryResultCache(CacheProvider $queryResultCache)
     {
         $this->queryResultCache = $queryResultCache;
@@ -79,9 +76,6 @@ class MenuUpdateRepository extends EntityRepository
             ->getResult();
     }
 
-    /**
-     * @param MenuUpdateInterface $menuUpdate
-     */
     public function updateDependentMenuUpdates(MenuUpdateInterface $menuUpdate)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();

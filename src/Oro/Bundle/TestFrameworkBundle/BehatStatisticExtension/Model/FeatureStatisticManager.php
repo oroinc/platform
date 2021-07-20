@@ -21,11 +21,6 @@ class FeatureStatisticManager
     /** @var CriteriaArrayCollection */
     private $criteria;
 
-    /**
-     * @param StatisticRepository $featureRepository
-     * @param FeaturePathLocator $featurePathLocator
-     * @param CriteriaArrayCollection $criteria
-     */
     public function __construct(
         StatisticRepository $featureRepository,
         FeaturePathLocator $featurePathLocator,
@@ -36,10 +31,6 @@ class FeatureStatisticManager
         $this->criteria = clone $criteria;
     }
 
-    /**
-     * @param FeatureNode $feature
-     * @param float $time
-     */
     public function addStatistic(FeatureNode $feature, float $time): void
     {
         $featurePath = $this->featurePathLocator->getRelativePath($feature->getFile());
@@ -56,9 +47,6 @@ class FeatureStatisticManager
         $this->featureRepository->add($stat);
     }
 
-    /**
-     * @return array
-     */
     public function getTested(): array
     {
         $buildId = $this->getBuildId();
@@ -98,49 +86,31 @@ class FeatureStatisticManager
         }
     }
 
-    /**
-     * @return null|string
-     */
     private function getBuildId(): ?string
     {
         return $this->criteria->get('build_id');
     }
 
-    /**
-     * @return null|string
-     */
     private function getStageName(): ?string
     {
         return $this->criteria->get('stage_name');
     }
 
-    /**
-     * @return null|string
-     */
     private function getJobName(): ?string
     {
         return $this->criteria->get('job_name');
     }
 
-    /**
-     * @return null|string
-     */
     private function getGitBranch(): ?string
     {
         return $this->criteria->get('branch_name') ?: $this->criteria->get('single_branch_name');
     }
 
-    /**
-     * @return null|string
-     */
     private function getGitTarget(): ?string
     {
         return $this->criteria->get('target_branch');
     }
 
-    /**
-     * @return int
-     */
     private function getStatisticsLifetime(): int
     {
         $lifetime = $this->criteria->get('lifetime') ?: 30;

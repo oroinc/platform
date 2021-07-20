@@ -10,19 +10,11 @@ class FileStub extends File
     /** @var DigitalAsset|null */
     protected $digitalAsset;
 
-    /**
-     * @return DigitalAsset|null
-     */
     public function getDigitalAsset(): ?DigitalAsset
     {
         return $this->digitalAsset;
     }
 
-    /**
-     * @param DigitalAsset|null $digitalAsset
-     *
-     * @return self
-     */
     public function setDigitalAsset(?DigitalAsset $digitalAsset): self
     {
         $this->digitalAsset = $digitalAsset;

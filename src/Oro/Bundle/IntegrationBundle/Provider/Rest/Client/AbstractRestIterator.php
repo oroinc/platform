@@ -49,9 +49,6 @@ abstract class AbstractRestIterator implements \Iterator
      */
     protected $current = null;
 
-    /**
-     * @param RestClientInterface $client
-     */
     public function __construct(RestClientInterface $client)
     {
         $this->client = $client;

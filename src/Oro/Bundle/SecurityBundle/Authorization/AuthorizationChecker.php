@@ -28,12 +28,6 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ServiceLink     $authorizationCheckerLink
-     * @param ServiceLink     $objectIdentityFactoryLink
-     * @param ServiceLink     $annotationProviderLink
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ServiceLink $authorizationCheckerLink,
         ServiceLink $objectIdentityFactoryLink,

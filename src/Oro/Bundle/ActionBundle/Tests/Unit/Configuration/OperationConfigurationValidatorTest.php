@@ -51,9 +51,6 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider validateProvider
      */
     public function testValidate(array $inputData, array $expectedData)

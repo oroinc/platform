@@ -31,11 +31,6 @@ class SegmentHandler
      */
     protected $staticSegmentManager;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param ManagerRegistry $managerRegistry
-     * @param StaticSegmentManager $staticSegmentManager
-     */
     public function __construct(
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
@@ -71,9 +66,6 @@ class SegmentHandler
         return false;
     }
 
-    /**
-     * @param Segment $entity
-     */
     protected function onSuccess(Segment $entity)
     {
         $entityManager = $this->managerRegistry->getManager();

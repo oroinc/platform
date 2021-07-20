@@ -64,10 +64,6 @@ class ChartView
         return $this->twig->render($this->template, $context);
     }
 
-    /**
-     * @param array $data
-     * @return array
-     */
     private function getSafeHtmlData(array $data): array
     {
         foreach ($data as &$item) {

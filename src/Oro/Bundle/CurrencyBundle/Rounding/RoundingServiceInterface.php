@@ -17,7 +17,6 @@ interface RoundingServiceInterface
     const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
     const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
 
-
     /**
      * @param float|int $value
      * @param int $precision

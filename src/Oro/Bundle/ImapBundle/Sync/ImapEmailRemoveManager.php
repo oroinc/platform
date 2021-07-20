@@ -26,9 +26,6 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->em = $doctrine->getManager();
@@ -96,8 +93,6 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
 
     /**
      * Deletes all empty outdated folders
-     *
-     * @param EmailOrigin $origin
      */
     public function cleanupOutdatedFolders(EmailOrigin $origin)
     {
@@ -153,8 +148,6 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
 
     /**
      * Removes an email from a folder linked to the given IMAP email object
-     *
-     * @param ImapEmail $imapEmail
      */
     protected function removeImapEmailReference(ImapEmail $imapEmail)
     {

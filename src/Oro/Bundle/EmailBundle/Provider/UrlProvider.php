@@ -21,10 +21,6 @@ class UrlProvider
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(ConfigManager $configManager, UrlGeneratorInterface $urlGenerator)
     {
         $this->configManager = $configManager;
@@ -33,9 +29,6 @@ class UrlProvider
 
     /**
      * Returns absolute url based on application url setting with generated route
-     * @param $route
-     * @param array $routeParams
-     * @return string
      */
     public function getAbsoluteUrl($route, array $routeParams = []): string
     {

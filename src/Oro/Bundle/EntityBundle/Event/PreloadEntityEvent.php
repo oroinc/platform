@@ -50,9 +50,6 @@ class PreloadEntityEvent extends Event
         $this->context = $context;
     }
 
-    /**
-     * @return array
-     */
     public function getEntities(): array
     {
         return $this->entities;
@@ -66,18 +63,11 @@ class PreloadEntityEvent extends Event
         return $this->fieldsToPreload;
     }
 
-    /**
-     * @param string $field
-     * @return bool
-     */
     public function hasSubFields(string $field): bool
     {
         return !empty($this->allFieldsToPreload[$field]);
     }
 
-    /**
-     * @return array
-     */
     public function getContext(): array
     {
         return $this->context;

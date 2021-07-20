@@ -41,7 +41,6 @@ class VerbosityFilterHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
 
-
         $this->assertFalse($this->handler->isHandling(['level' => Logger::EMERGENCY]));
         $this->consumerState->startConsumption();
         $this->assertFalse($this->handler->isHandling(['level' => Logger::DEBUG]));

@@ -34,10 +34,6 @@ class FileSplitterRegistry
 
     /**
      * Returns the file splitter for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return FileSplitterInterface|null
      */
     public function getSplitter(RequestType $requestType): ?FileSplitterInterface
     {

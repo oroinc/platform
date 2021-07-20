@@ -23,9 +23,6 @@ abstract class NormalizeSection implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -50,8 +47,6 @@ abstract class NormalizeSection implements ProcessorInterface
     }
 
     /**
-     * @param EntityConfigInterface  $section
-     * @param EntityDefinitionConfig $definition
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function removeExcludedFieldsAndUpdatePropertyPath(

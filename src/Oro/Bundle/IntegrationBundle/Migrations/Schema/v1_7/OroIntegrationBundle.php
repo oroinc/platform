@@ -19,8 +19,6 @@ class OroIntegrationBundle implements Migration
 
     /**
      * Change oro_integration_channel table
-     *
-     * @param Schema $schema
      */
     public static function modifyChannelTable(Schema $schema)
     {

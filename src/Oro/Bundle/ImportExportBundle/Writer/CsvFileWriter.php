@@ -22,9 +22,6 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
      */
     protected $clearWriter;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         parent::__construct();
@@ -53,9 +50,6 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
         }
     }
 
-    /**
-     * @param DoctrineClearWriter $clearWriter
-     */
     public function setClearWriter(DoctrineClearWriter $clearWriter)
     {
         $this->clearWriter = $clearWriter;

@@ -25,9 +25,6 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     /** @var int */
     private $commandNestedLevel = 0;
 
-    /**
-     * @param ConsumerState $consumerState
-     */
     public function __construct(ConsumerState $consumerState)
     {
         parent::__construct(new BaseConsoleHandler());
@@ -59,8 +56,6 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     /**
      * Before a command is executed, the handler gets activated and the console output
      * is set in order to know where to write the logs.
-     *
-     * @param ConsoleCommandEvent $event
      */
     public function onCommand(ConsoleCommandEvent $event)
     {
@@ -73,10 +68,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     }
 
     /**
-     *
      * After a command has been executed, it disables the output.
-     *
-     * @param ConsoleTerminateEvent $event
      */
     public function onTerminate(ConsoleTerminateEvent $event)
     {

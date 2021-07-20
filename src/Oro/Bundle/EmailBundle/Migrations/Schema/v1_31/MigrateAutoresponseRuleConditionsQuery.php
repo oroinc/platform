@@ -47,9 +47,6 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
         return 'Migrates data from table "oro_email_response_rule_cond" into "oro_email_auto_response_rule"';
     }
 
-    /**
-     * @param Connection $connection
-     */
     public function setConnection(Connection $connection)
     {
         $this->connection = $connection;

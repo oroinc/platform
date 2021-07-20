@@ -16,7 +16,6 @@ abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAs
     abstract protected function assembleTrigger(array $options, WorkflowDefinition $workflowDefinition);
 
     /**
-     * @param BaseTransitionTrigger $trigger
      * @throws TransitionTriggerVerifierException
      */
     abstract protected function verifyTrigger(BaseTransitionTrigger $trigger);

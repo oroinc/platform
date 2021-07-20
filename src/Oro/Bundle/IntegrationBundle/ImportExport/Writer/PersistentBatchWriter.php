@@ -42,12 +42,6 @@ class PersistentBatchWriter implements
     /** @var StepExecution|null */
     protected $previousStepExecution;
 
-    /**
-     * @param ManagerRegistry          $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ContextRegistry          $contextRegistry
-     * @param LoggerInterface          $logger
-     */
     public function __construct(
         ManagerRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
@@ -113,9 +107,6 @@ class PersistentBatchWriter implements
         $this->eventDispatcher->dispatch(new WriterAfterFlushEvent($em), WriterAfterFlushEvent::NAME);
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->previousStepExecution = $this->stepExecution;
@@ -131,10 +122,6 @@ class PersistentBatchWriter implements
         $this->stepExecution = $this->previousStepExecution;
     }
 
-    /**
-     * @param array $items
-     * @param EntityManager $em
-     */
     protected function saveItems(array $items, EntityManager $em)
     {
         foreach ($items as $item) {

@@ -51,8 +51,6 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->item->getRecordId());
     }
 
-
-
     public function testToArray()
     {
         $result = $this->item->toArray();

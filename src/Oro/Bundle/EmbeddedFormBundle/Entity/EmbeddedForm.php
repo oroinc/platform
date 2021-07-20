@@ -208,9 +208,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
         return $this->allowedDomains;
     }
 
-    /**
-     * @param \DateTime $createdAt
-     */
     public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
@@ -224,9 +221,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
         return $this->createdAt;
     }
 
-    /**
-     * @param \DateTime $updatedAt
-     */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
@@ -266,9 +260,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
         return $this->owner;
     }
 
-    /**
-     * @param Organization $organization
-     */
     public function setOwner(Organization $organization)
     {
         $this->owner = $organization;

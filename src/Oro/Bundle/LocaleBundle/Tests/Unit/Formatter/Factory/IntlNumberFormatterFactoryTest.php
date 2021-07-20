@@ -38,9 +38,6 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->create(self::LOCALE, $style, [], [], []);
     }
 
-    /**
-     * @return array
-     */
     public function invalidStyleDataProvider(): array
     {
         return [
@@ -71,9 +68,6 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new IntlNumberFormatter(self::LOCALE, $expectedStyle), $intlNumberFormatter);
     }
 
-    /**
-     * @return array
-     */
     public function createAllStylesDataProvider(): array
     {
         return [
@@ -134,9 +128,6 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function createDataProvider(): array
     {
         return [
@@ -204,9 +195,6 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider createWhenPercentDataProvider
-     *
-     * @param array $attributes
-     * @param array $expectedAttributes
      */
     public function testCreateWhenPercent(array $attributes, array $expectedAttributes): void
     {
@@ -236,9 +224,6 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function createWhenPercentDataProvider(): array
     {
         $percentIntlNumberFormatter = new IntlNumberFormatter(self::LOCALE, IntlNumberFormatter::PERCENT);

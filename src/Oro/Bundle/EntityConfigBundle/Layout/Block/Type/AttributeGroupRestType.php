@@ -23,9 +23,6 @@ class AttributeGroupRestType extends AbstractContainerType
     /** @var AttributeRenderRegistry */
     protected $attributeRenderRegistry;
 
-    /**
-     * @param AttributeRenderRegistry $attributeRenderRegistry
-     */
     public function __construct(AttributeRenderRegistry $attributeRenderRegistry)
     {
         $this->attributeRenderRegistry = $attributeRenderRegistry;

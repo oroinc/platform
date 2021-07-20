@@ -12,9 +12,6 @@ class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processConfigurationDataProvider
-     *
-     * @param array $configs
-     * @param array $expected
      */
     public function testProcessConfiguration(array $configs, array $expected)
     {

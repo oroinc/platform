@@ -55,9 +55,6 @@ class RemoveInvalidFieldConfigQuery implements MigrationQuery, ConnectionAwareIn
         }
     }
 
-    /**
-     * @param array $row
-     */
     protected function processRow(array $row)
     {
         $convertedData = Type::getType(Types::ARRAY)

@@ -8,7 +8,6 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @var NavigationTitleProvider
      */
@@ -36,7 +35,6 @@ class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider = new NavigationTitleProvider($this->titleService, $this->userConfigManager);
     }
-
 
     /**
      * @dataProvider getDataDataProvider

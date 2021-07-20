@@ -18,9 +18,6 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
     /** @var bool */
     private $notExpression;
 
-    /**
-     * @param bool $notExpression
-     */
     public function __construct(bool $notExpression = false)
     {
         $this->notExpression = $notExpression;

@@ -63,7 +63,6 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test with expected \Doctrine\ORM\EntityNotFoundException for the case, when template does not found
-     *
      */
     public function testExecuteWithoutTemplateEntity(): void
     {
@@ -265,8 +264,6 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function executeOptionsDataProvider(): array
     {

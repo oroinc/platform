@@ -18,10 +18,6 @@ class FileConstraintsProvider
     /** @var AttachmentEntityConfigProviderInterface */
     private $attachmentEntityConfigProvider;
 
-    /**
-     * @param SystemConfigManager $configManager
-     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
-     */
     public function __construct(
         SystemConfigManager $configManager,
         AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
@@ -30,9 +26,6 @@ class FileConstraintsProvider
         $this->attachmentEntityConfigProvider = $attachmentEntityConfigProvider;
     }
 
-    /**
-     * @return array
-     */
     public function getFileMimeTypes(): array
     {
         return MimeTypesConverter::convertToArray(
@@ -40,9 +33,6 @@ class FileConstraintsProvider
         );
     }
 
-    /**
-     * @return array
-     */
     public function getImageMimeTypes(): array
     {
         return MimeTypesConverter::convertToArray(
@@ -52,17 +42,12 @@ class FileConstraintsProvider
 
     /**
      * Gets file and image mime types from system config.
-     *
-     * @return array
      */
     public function getMimeTypes(): array
     {
         return array_unique(array_merge($this->getFileMimeTypes(), $this->getImageMimeTypes()));
     }
 
-    /**
-     * @return array
-     */
     public function getMimeTypesAsChoices(): array
     {
         $mimeTypes = $this->getMimeTypes();
@@ -72,10 +57,6 @@ class FileConstraintsProvider
 
     /**
      * Gets file and image mime types from entity config.
-     *
-     * @param string $entityClass
-     *
-     * @return array
      */
     public function getAllowedMimeTypesForEntity(string $entityClass): array
     {
@@ -93,11 +74,6 @@ class FileConstraintsProvider
 
     /**
      * Gets file and image mime types from entity field config.
-     *
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return array
      */
     public function getAllowedMimeTypesForEntityField(string $entityClass, string $fieldName): array
     {
@@ -119,8 +95,6 @@ class FileConstraintsProvider
 
     /**
      * Gets max allowed file size from system config.
-     *
-     * @return int
      */
     public function getMaxSize(): int
     {
@@ -129,8 +103,6 @@ class FileConstraintsProvider
 
     /**
      * Gets max allowed file size from system config.
-     *
-     * @return int
      */
     public function getMaxSizeByConfigPath(string $maxSizeConfigPath): int
     {
@@ -142,10 +114,6 @@ class FileConstraintsProvider
 
     /**
      * Gets max allowed file size from entity config.
-     *
-     * @param string $entityClass
-     *
-     * @return int
      */
     public function getMaxSizeForEntity(string $entityClass): int
     {
@@ -163,11 +131,6 @@ class FileConstraintsProvider
 
     /**
      * Gets max allowed file size from entity field config.
-     *
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return int
      */
     public function getMaxSizeForEntityField(string $entityClass, string $fieldName): int
     {

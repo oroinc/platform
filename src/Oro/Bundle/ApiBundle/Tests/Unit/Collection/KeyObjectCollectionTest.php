@@ -72,7 +72,6 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider             blankKeyProvider
-     *
      */
     public function testShouldAddThrowExceptionForBlankKey($key)
     {

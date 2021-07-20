@@ -394,9 +394,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
     }
 
-    /**
-     * @return array
-     */
     public function isGrantedWhenUsingCacheDataProvider(): array
     {
         return [
@@ -458,9 +455,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
     }
 
-    /**
-     * @return array
-     */
     public function isGrantedForPropertyWhenUsingCacheDataProvider(): array
     {
         return [

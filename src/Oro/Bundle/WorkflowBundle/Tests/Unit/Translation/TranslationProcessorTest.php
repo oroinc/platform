@@ -210,7 +210,6 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-
         $keyedConfig = [
             'transitions' => [
                 'transition1' => [

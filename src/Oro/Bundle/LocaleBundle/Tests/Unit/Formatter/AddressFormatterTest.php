@@ -169,12 +169,6 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getAddressPartsDataProvider
-     *
-     * @param string $format
-     * @param string|null $regionCode
-     * @param array
-     * @param bool $formatByCountry
-     * @param string $street2
      */
     public function testGetAddressParts(
         string $format,

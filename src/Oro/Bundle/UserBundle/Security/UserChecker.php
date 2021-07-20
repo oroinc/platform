@@ -20,9 +20,6 @@ class UserChecker extends BaseUserChecker
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage
     ) {

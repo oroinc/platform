@@ -121,10 +121,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     * @param array $expectedCacheData
-     *
      * @dataProvider getPermissionsMapProvider
      */
     public function testGetPermissionsMap(array $inputData, array $expectedData, array $expectedCacheData = []): void
@@ -150,9 +146,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider getPermissionsForEntityProvider
      */
     public function testGetPermissionsForEntity(array $inputData, array $expectedData): void
@@ -179,9 +172,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider getPermissionsForGroupProvider
      */
     public function testGetPermissionsForGroup(array $inputData, array $expectedData): void
@@ -227,8 +217,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getPermissionsMapProvider(): array
@@ -346,9 +334,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function getPermissionsForEntityProvider(): array
     {
         $cache = [
@@ -420,9 +405,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function getPermissionsForGroupProvider(): array
     {
         $cache = [
@@ -486,9 +468,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     public function getPermissionByNameProvider(): array
     {
         $cache = ['PERMISSION1' => 1, 'PERMISSION2' => 2, 'PERMISSION3' => 3];

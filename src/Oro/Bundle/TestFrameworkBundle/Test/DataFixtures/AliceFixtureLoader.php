@@ -20,10 +20,6 @@ class AliceFixtureLoader implements LoaderInterface
     /** @var FileLocator */
     protected $fileLocator;
 
-    /**
-     * @param LoaderInterface $loader
-     * @param FileLocator $fileLocator
-     */
     public function __construct(LoaderInterface $loader, FileLocator $fileLocator)
     {
         $this->loader = $loader;
@@ -31,17 +27,11 @@ class AliceFixtureLoader implements LoaderInterface
         $this->referenceRepository = new Collection();
     }
 
-    /**
-     * @return Collection
-     */
     public function getReferenceRepository(): Collection
     {
         return $this->referenceRepository;
     }
 
-    /**
-     * @param array $references
-     */
     protected function setReferences(array $references): void
     {
         $this->referenceRepository->clear();

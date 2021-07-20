@@ -19,10 +19,6 @@ class RoutePatternVoter implements VoterInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @param ItemInterface $item
-     * @return bool|null
-     */
     public function matchItem(ItemInterface $item): ?bool
     {
         // Using master request, as sub-requests routes must not be taken into account when matching the menu items
@@ -83,9 +79,6 @@ class RoutePatternVoter implements VoterInterface
 
     /**
      * Returns TRUE if request matches parameters
-     * @param array   $parameters
-     * @param Request $request
-     * @return bool
      */
     protected function parametersMatch(array $parameters, Request $request): bool
     {

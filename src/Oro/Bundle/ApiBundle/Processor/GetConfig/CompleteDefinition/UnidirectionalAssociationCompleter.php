@@ -30,10 +30,6 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityOverrideProviderRegistry $entityOverrideProviderRegistry
@@ -162,12 +158,6 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         return $targetAssociationName;
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     * @param ClassMetadata $targetMetadata
-     * @param string        $targetAssociationName
-     */
     private function assetTargetAssociationMapping(
         ClassMetadata $metadata,
         string $fieldName,
@@ -219,13 +209,6 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         }
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param ClassMetadata $targetMetadata
-     * @param string        $targetAssociationName
-     *
-     * @return QueryBuilder
-     */
     private function createAssociationQuery(
         ClassMetadata $metadata,
         ClassMetadata $targetMetadata,

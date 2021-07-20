@@ -29,10 +29,6 @@ class CreateRelatedEntity extends ComponentAbstractAction
      */
     protected $options = array();
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         ManagerRegistry $registry

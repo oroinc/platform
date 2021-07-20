@@ -31,9 +31,5 @@ abstract class SetGroups implements ProcessorInterface
         $this->setGroups($targetContext, $targetAction);
     }
 
-    /**
-     * @param Context $targetContext
-     * @param string  $targetAction
-     */
     abstract protected function setGroups(Context $targetContext, string $targetAction): void;
 }

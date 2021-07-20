@@ -65,11 +65,6 @@ class AclAnnotationProvider extends PhpConfigProvider
 
     /**
      * Determines whether the given class/method has ACL annotation.
-     *
-     * @param string      $class
-     * @param string|null $method
-     *
-     * @return bool
      */
     public function hasAnnotation(string $class, string $method = null): bool
     {
@@ -147,9 +142,6 @@ class AclAnnotationProvider extends PhpConfigProvider
         }
     }
 
-    /**
-     * @return AclAnnotationStorage
-     */
     private function getStorage(): AclAnnotationStorage
     {
         return $this->doGetConfig();

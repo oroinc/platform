@@ -16,9 +16,6 @@ class AutoResponseRuleSubscriber implements EventSubscriberInterface
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;
@@ -34,9 +31,6 @@ class AutoResponseRuleSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSet(FormEvent $event)
     {
         if (null === $rule = $event->getData()) {

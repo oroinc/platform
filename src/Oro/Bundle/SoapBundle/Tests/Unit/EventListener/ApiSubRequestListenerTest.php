@@ -67,12 +67,6 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('xml', $request->getRequestFormat(null));
     }
 
-    /**
-     * @param string|null $format
-     * @param string      $uri
-     *
-     * @return Request
-     */
     private function createRequest(?string $format = 'xml', string $uri = '/api/rest/query'): Request
     {
         $request = Request::create($uri);
@@ -83,12 +77,6 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         return $request;
     }
 
-    /**
-     * @param Request $request
-     * @param int     $type
-     *
-     * @return GetResponseEvent
-     */
     private function createEvent(Request $request, int $type = HttpKernelInterface::SUB_REQUEST): GetResponseEvent
     {
         /** @var HttpKernelInterface $httpKernel */

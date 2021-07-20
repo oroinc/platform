@@ -101,8 +101,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      *
      * @Given /^Email should contains the following:/
      * @Given /^An email containing the following was sent:/
-     *
-     * @param TableNode $table
      */
     public function emailShouldContainsTheFollowing(TableNode $table)
     {
@@ -150,11 +148,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         );
     }
 
-    /**
-     * @param array $messages
-     *
-     * @return array
-     */
     private function getSentMessagesData(array $messages): array
     {
         $messagesData = [];
@@ -180,8 +173,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      *
      * @Given /^Email should not contains the following:/
      * @Given /^An email does not containing the following was sent:/
-     *
-     * @param TableNode $table
      */
     public function emailShouldNotContainsTheFollowing(TableNode $table)
     {
@@ -275,8 +266,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      *          | PSKU2 | PSKU5;PSKU4;PSKU3;PSKU1                              |
      *
      * @Given /^the downloaded file from email contains at least the following data:$/
-     *
-     * @param TableNode $expectedEntities
      */
     public function downloadedFileFromEmailMustContains(TableNode $expectedEntities)
     {
@@ -325,10 +314,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      *            | Body    | Test Body         |
      *
      * @Given /^email with (?P<searchField>[\w]+) "(?P<searchText>(?:[^"]|\\")*)" containing the following was sent:/
-     *
-     * @param string $searchField
-     * @param string $searchText
-     * @param TableNode $table
      */
     public function emailWithFieldMustContainsTheFollowing(string $searchField, string $searchText, TableNode $table)
     {
@@ -369,9 +354,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      * Example: Then email with Subject "Your RFQ has been received." was not sent:
      *
      * @Given /^email with (?P<searchField>[\w]+) "(?P<searchText>(?:[^"]|\\")*)" was not sent/
-     *
-     * @param string $searchField
-     * @param string $searchText
      */
     public function emailWithFieldIsNotSent(string $searchField, string $searchText)
     {
@@ -394,9 +376,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      * Example: Then email date less than "+3 days"
      *
      * @Given /^email date (?P<condition>[\w]+) than "(?P<date>[-+\s\w]+)"$/
-     *
-     * @param string $condition
-     * @param string $expectedDate
      */
     public function assertDateInEmail(string $condition, string $expectedDate)
     {
@@ -490,9 +469,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         return $this->mailer;
     }
 
-    /**
-     * @param string $fieldName
-     */
     private static function assertEmailFieldValid(string $fieldName): void
     {
         $allowedFields = ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'];
@@ -508,8 +484,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      *
      * @Given /^(?:|I )follow "(?P<linkCaption>[^"]+)" link from the email$/
      * @Given /^(?:|I )follow link from the email$/
-     *
-     * @param string $linkCaption
      */
     public function followLinkFromEmail(string $linkCaption = '[^\<]+')
     {
@@ -525,11 +499,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         $this->visitPath($url);
     }
 
-    /**
-     * @param string $linkCaption
-     *
-     * @return string|null
-     */
     public function getLinkUrlFromEmail(string $linkCaption): ?string
     {
         $mailer = $this->getMailer();
@@ -559,9 +528,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
 
     /**
      * @Given /^(?:|I )send email template "(?P<templateName>(?:[^"]|\\")*)" to "(?P<username>(?:[^"]|\\")*)"$/
-     *
-     * @param string $templateName
-     * @param string $username
      */
     public function sendEmailTemplateToUser(string $templateName, string $username): void
     {
@@ -605,11 +571,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         return [$expectedHeaders, $metadata];
     }
 
-    /**
-     * @param array $data
-     * @param array $metadata
-     * @return array
-     */
     private function normalizeData(array $data, array $metadata): array
     {
         foreach ($metadata as $header => $metadataRow) {
@@ -630,10 +591,6 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         return $data;
     }
 
-    /**
-     * @param DirectMailerDecorator $mailer
-     * @return array
-     */
     private function getSentMessages(DirectMailerDecorator $mailer): array
     {
         $this->messageQueueProcessor->waitWhileProcessingMessages();

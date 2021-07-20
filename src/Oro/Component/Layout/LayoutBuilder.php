@@ -38,15 +38,6 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     private $blockViewCache;
 
-    /**
-     * @param LayoutRegistryInterface            $registry
-     * @param RawLayoutBuilderInterface          $rawLayoutBuilder
-     * @param DeferredLayoutManipulatorInterface $layoutManipulator
-     * @param BlockFactoryInterface              $blockFactory
-     * @param LayoutRendererRegistryInterface    $rendererRegistry
-     * @param ExpressionProcessor                $expressionProcessor
-     * @param BlockViewCache|null                $blockViewCache
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         RawLayoutBuilderInterface $rawLayoutBuilder,
@@ -262,10 +253,6 @@ class LayoutBuilder implements LayoutBuilderInterface
         return $layout;
     }
 
-    /**
-     * @param ContextInterface $context
-     * @return BlockView
-     */
     protected function buildLayout(ContextInterface $context): BlockView
     {
         $this->layoutManipulator->applyChanges($context);
@@ -327,9 +314,6 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
     }
 
-    /**
-     * @param BlockView $view
-     */
     protected function buildValueBags(BlockView $view)
     {
         array_walk_recursive(

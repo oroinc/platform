@@ -36,11 +36,6 @@ class MigrationExtensionPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function loadExtensions(ContainerBuilder $container): array
     {
         $extensions = [];

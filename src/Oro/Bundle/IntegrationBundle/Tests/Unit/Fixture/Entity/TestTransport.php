@@ -10,9 +10,6 @@ class TestTransport extends Transport
     /** @var ParameterBag */
     protected $parameters;
 
-    /**
-     * @param array $parameters
-     */
     public function __construct(array $parameters = [])
     {
         $this->parameters = new ParameterBag($parameters);

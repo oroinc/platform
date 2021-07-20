@@ -1310,7 +1310,6 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
 
-
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(
             $entityClass,
@@ -1392,7 +1391,6 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->configManager->expects(self::once())->method('getEntityConfig')->willReturn($targetEntityConfig);
-
 
         $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
         $relationKey     = ExtendHelper::buildRelationKey(

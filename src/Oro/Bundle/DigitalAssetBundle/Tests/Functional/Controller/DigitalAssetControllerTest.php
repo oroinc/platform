@@ -26,9 +26,6 @@ class DigitalAssetControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
-    /**
-     * @return DigitalAsset
-     */
     public function testCreate(): DigitalAsset
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_digital_asset_create'));
@@ -61,11 +58,6 @@ class DigitalAssetControllerTest extends WebTestCase
         return $digitalAsset;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return UploadedFile
-     */
     private function getFileForUpload(string $name): UploadedFile
     {
         $fileLocator = $this->getContainer()->get('file_locator');
@@ -76,10 +68,6 @@ class DigitalAssetControllerTest extends WebTestCase
 
     /**
      * @depends testCreate
-     *
-     * @param DigitalAsset $digitalAsset
-     *
-     * @return DigitalAsset
      */
     public function testUpdate(DigitalAsset $digitalAsset): DigitalAsset
     {
@@ -129,8 +117,6 @@ class DigitalAssetControllerTest extends WebTestCase
 
     /**
      * @depends testUpdate
-     *
-     * @param DigitalAsset $digitalAsset
      */
     public function testGrid(DigitalAsset $digitalAsset): void
     {
@@ -146,9 +132,6 @@ class DigitalAssetControllerTest extends WebTestCase
         $this->assertEquals($digitalAsset->getTitle(), $data['title']);
     }
 
-    /**
-     * @return int
-     */
     private function getDigitalAssetCount(): int
     {
         $qb = $this->getContainer()->get('doctrine')
@@ -196,9 +179,6 @@ class DigitalAssetControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
     }
 
-    /**
-     * @return DigitalAsset
-     */
     public function testChooseUpload(): DigitalAsset
     {
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
@@ -242,8 +222,6 @@ class DigitalAssetControllerTest extends WebTestCase
 
     /**
      * @depends testChooseUpload
-     *
-     * @param DigitalAsset $digitalAsset
      */
     public function testChoose(DigitalAsset $digitalAsset): void
     {
@@ -331,11 +309,6 @@ class DigitalAssetControllerTest extends WebTestCase
         $this->assertEquals(self::DIGITAL_ASSET_IMAGE_2, $digitalAsset->getSourceFile()->getOriginalFilename());
     }
 
-    /**
-     * @param int $id
-     *
-     * @return User
-     */
     private function getUserById(int $id): User
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(User::class)->find(User::class, $id);
@@ -352,8 +325,6 @@ class DigitalAssetControllerTest extends WebTestCase
 
     /**
      * Enables/disables DAM for avatar field on user form.
-     *
-     * @param bool $state
      */
     private static function toggleDam(bool $state): void
     {

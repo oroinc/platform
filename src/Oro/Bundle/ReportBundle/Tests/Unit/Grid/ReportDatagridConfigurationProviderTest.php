@@ -435,8 +435,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
 
     /**
      * Initialises repository to return expected report entity
-     *
-     * @param Report $report
      */
     private function prepareRepository(Report $report)
     {

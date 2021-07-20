@@ -34,11 +34,6 @@ class AddressFormatter
      */
     protected $phoneProvider;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param NameFormatter $nameFormatter
-     * @param PropertyAccessor $propertyAccessor
-     */
     public function __construct(
         LocaleSettings $localeSettings,
         NameFormatter $nameFormatter,
@@ -49,9 +44,6 @@ class AddressFormatter
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @param PhoneProvider $phoneProvider
-     */
     public function setPhoneProvider(PhoneProvider $phoneProvider)
     {
         $this->phoneProvider = $phoneProvider;

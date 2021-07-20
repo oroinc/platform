@@ -15,9 +15,6 @@ use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TraversableArrayObject;
  */
 trait SearchMappingTypeCastingHandlersTestTrait
 {
-    /**
-     * @return TypeCastingHandlerRegistry
-     */
     public function getTypeCastingHandlerRegistry(): TypeCastingHandlerRegistry
     {
         $handlers = new TraversableArrayObject([

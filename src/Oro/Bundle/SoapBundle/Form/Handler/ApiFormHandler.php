@@ -27,12 +27,6 @@ class ApiFormHandler implements FormAwareInterface
      */
     protected $entityManager;
 
-    /**
-     *
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $entityManager
-     */
     public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $entityManager)
     {
         $this->form          = $form;

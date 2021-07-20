@@ -22,9 +22,6 @@ class MaintenanceListenerPriorityCompilerPassTest extends \PHPUnit\Framework\Tes
 
     /**
      * @dataProvider processDataProvider
-     *
-     * @param array $tags
-     * @param array $expectedTags
      */
     public function testProcess(array $tags, array $expectedTags): void
     {
@@ -42,9 +39,6 @@ class MaintenanceListenerPriorityCompilerPassTest extends \PHPUnit\Framework\Tes
         $this->assertEquals($expectedTags, $definition->getTags());
     }
 
-    /**
-     * @return array
-     */
     public function processDataProvider(): array
     {
         return [

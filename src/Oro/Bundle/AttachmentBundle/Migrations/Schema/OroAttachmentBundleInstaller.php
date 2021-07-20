@@ -33,8 +33,6 @@ class OroAttachmentBundleInstaller implements Installation
 
     /**
      * Create oro_attachment table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttachmentTable(Schema $schema)
     {
@@ -51,8 +49,6 @@ class OroAttachmentBundleInstaller implements Installation
 
     /**
      * Create oro_attachment_file_item table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttachmentFileItemTable(Schema $schema)
     {
@@ -68,8 +64,6 @@ class OroAttachmentBundleInstaller implements Installation
 
     /**
      * Create oro_attachment_file table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttachmentFileTable(Schema $schema)
     {
@@ -94,8 +88,6 @@ class OroAttachmentBundleInstaller implements Installation
 
     /**
      * Add oro_attachment foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttachmentForeignKeys(Schema $schema)
     {
@@ -116,8 +108,6 @@ class OroAttachmentBundleInstaller implements Installation
 
     /**
      * Add oro_attachment_file_item foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttachmentFileItemForeignKeys(Schema $schema)
     {

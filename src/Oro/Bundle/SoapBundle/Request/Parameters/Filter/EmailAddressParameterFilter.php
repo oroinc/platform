@@ -9,9 +9,6 @@ class EmailAddressParameterFilter implements ParameterFilterInterface
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
-    /**
-     * @param EmailAddressHelper $emailAddressHelper
-     */
     public function __construct(EmailAddressHelper $emailAddressHelper)
     {
         $this->emailAddressHelper = $emailAddressHelper;

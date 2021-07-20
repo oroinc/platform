@@ -23,10 +23,6 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
     /** @var AnnotationReader */
     private $reader;
 
-    /**
-     * @param ControllerClassProvider $controllerClassProvider
-     * @param AnnotationReader        $reader
-     */
     public function __construct(ControllerClassProvider $controllerClassProvider, AnnotationReader $reader)
     {
         $this->controllerClassProvider = $controllerClassProvider;
@@ -94,9 +90,6 @@ class AclAnnotationLoader implements AclAnnotationLoaderInterface
 
     /**
      * Loads annotations from given class.
-     *
-     * @param string               $className
-     * @param AclAnnotationStorage $storage
      */
     private function loadClassAnnotations(string $className, AclAnnotationStorage $storage): void
     {

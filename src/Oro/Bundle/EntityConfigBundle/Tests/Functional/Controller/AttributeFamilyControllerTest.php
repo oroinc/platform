@@ -63,9 +63,6 @@ class AttributeFamilyControllerTest extends WebTestCase
         static::assertStringContainsString('Product Family was successfully saved', $crawler->html());
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     */
     private function assertFamilyIsNotDeleted(AttributeFamily $attributeFamily)
     {
         $this->ajaxRequest(

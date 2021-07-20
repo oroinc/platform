@@ -9,9 +9,6 @@ class EntityClassParameterFilter implements ParameterFilterInterface
     /** @var EntityClassNameHelper */
     protected $helper;
 
-    /**
-     * @param EntityClassNameHelper $helper
-     */
     public function __construct(EntityClassNameHelper $helper)
     {
         $this->helper = $helper;

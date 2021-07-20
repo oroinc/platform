@@ -26,10 +26,6 @@ class RenderTemplate extends AbstractAction
      */
     private $options;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param Environment $twig
-     */
     public function __construct(ContextAccessor $contextAccessor, Environment $twig)
     {
         parent::__construct($contextAccessor);
@@ -64,9 +60,6 @@ class RenderTemplate extends AbstractAction
         );
     }
 
-    /**
-     * @return OptionsResolver
-     */
     private function getOptionResolver(): OptionsResolver
     {
         $optionResolver = new OptionsResolver();

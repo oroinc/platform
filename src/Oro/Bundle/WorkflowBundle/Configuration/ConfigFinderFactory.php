@@ -9,19 +9,11 @@ class ConfigFinderFactory
     /** @var array */
     private $kernelBundles;
 
-    /**
-     * @param array $kernelBundles
-     */
     public function __construct(array $kernelBundles)
     {
         $this->kernelBundles = $kernelBundles;
     }
 
-    /**
-     * @param string $subDir
-     * @param string $filePattern
-     * @return Finder
-     */
     public function create(string $subDir, string $filePattern): Finder
     {
         $finder = new Finder();
@@ -30,10 +22,6 @@ class ConfigFinderFactory
         return $finder;
     }
 
-    /**
-     * @param string $subDirectory
-     * @return array
-     */
     private function getConfigDirectories(string $subDirectory): array
     {
         $configDirectory = str_replace('/', DIRECTORY_SEPARATOR, $subDirectory);

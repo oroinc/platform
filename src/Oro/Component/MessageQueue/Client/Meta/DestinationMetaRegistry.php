@@ -9,12 +9,12 @@ class DestinationMetaRegistry
      * @var array
      */
     private $destinationsMeta;
-    
+
     /**
      * @var Config
      */
     private $config;
-    
+
     /**
      * @var string
      */

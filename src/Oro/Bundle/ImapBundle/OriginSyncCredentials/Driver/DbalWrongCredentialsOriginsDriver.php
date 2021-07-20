@@ -20,10 +20,6 @@ class DbalWrongCredentialsOriginsDriver implements WrongCredentialsOriginsDriver
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param LoggerInterface $logger
-     */
     public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;

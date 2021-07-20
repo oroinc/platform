@@ -43,10 +43,6 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $fields
-     * @param array $submittedData
-     * @param array $expectedData
      */
     public function testSubmit(array $fields, array $submittedData, array $expectedData)
     {

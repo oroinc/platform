@@ -16,9 +16,6 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
     /** @var array [field name => ['converter' => ConfigValueConverterAbstract, 'label' => string], ...] */
     protected $converters = [];
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

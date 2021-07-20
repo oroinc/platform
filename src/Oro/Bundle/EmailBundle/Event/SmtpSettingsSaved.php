@@ -12,9 +12,6 @@ class SmtpSettingsSaved extends Event
     /** @var SmtpSettings */
     protected $smtpSettings;
 
-    /**
-     * @param SmtpSettings $smtpSettings
-     */
     public function __construct(SmtpSettings $smtpSettings)
     {
         $this->smtpSettings = $smtpSettings;

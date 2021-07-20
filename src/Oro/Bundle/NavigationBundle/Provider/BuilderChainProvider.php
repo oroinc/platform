@@ -41,13 +41,6 @@ class BuilderChainProvider implements MenuProviderInterface
     /** @var CacheProvider */
     private $cache;
 
-    /**
-     * @param array $builders
-     * @param ContainerInterface $builderContainer
-     * @param FactoryInterface $factory
-     * @param ArrayLoader $loader
-     * @param MenuManipulator $manipulator
-     */
     public function __construct(
         array $builders,
         ContainerInterface $builderContainer,
@@ -64,8 +57,6 @@ class BuilderChainProvider implements MenuProviderInterface
 
     /**
      * Set cache instance
-     *
-     * @param CacheProvider $cache
      */
     public function setCache(CacheProvider $cache)
     {
@@ -75,10 +66,6 @@ class BuilderChainProvider implements MenuProviderInterface
 
     /**
      * Build menu.
-     *
-     * @param string $alias
-     * @param array $options
-     * @return ItemInterface
      */
     public function get(string $alias, array $options = []): ItemInterface
     {
@@ -105,8 +92,6 @@ class BuilderChainProvider implements MenuProviderInterface
 
     /**
      * Reorder menu based on position attribute
-     *
-     * @param ItemInterface $menu
      */
     private function sort(ItemInterface $menu)
     {

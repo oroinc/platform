@@ -31,11 +31,6 @@ class ValidateSorting implements ProcessorInterface
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ConfigProvider      $configProvider
-     * @param FilterNamesRegistry $filterNamesRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigProvider $configProvider,
@@ -126,11 +121,6 @@ class ValidateSorting implements ProcessorInterface
         return $unsupportedFields;
     }
 
-    /**
-     * @param FilterValue $filterValue
-     * @param string      $oldFieldName
-     * @param string      $newFieldName
-     */
     private function renameSortField(FilterValue $filterValue, string $oldFieldName, string $newFieldName): void
     {
         $updatedOrderBy = [];

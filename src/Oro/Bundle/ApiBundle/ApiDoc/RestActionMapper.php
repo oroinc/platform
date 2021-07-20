@@ -14,9 +14,6 @@ class RestActionMapper
     /** @var RestRoutes */
     private $routes;
 
-    /**
-     * @param RestRoutes $routes
-     */
     public function __construct(RestRoutes $routes)
     {
         $this->routes = $routes;
@@ -81,10 +78,6 @@ class RestActionMapper
     }
 
     /**
-     * @param string $action
-     *
-     * @return string
-     *
      * @throws \LogicException if the given API action cannot be mapped to any HTTP method
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)

@@ -75,15 +75,11 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
 
     /**
      * Gets the name of the resource owner.
-     *
-     * @return string
      */
     abstract protected function getResourceOwnerName(): string;
 
     /**
      * Gets parameters common for all types of requests.
-     *
-     * @return array
      */
     abstract protected function getCommonParameters(): array;
 
@@ -105,11 +101,6 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
 
     /**
      * Gets parameters for a request to renew the access token via the refresh token.
-     *
-     * @param string     $refreshToken
-     * @param array|null $scopes
-     *
-     * @return array
      */
     protected function getRefreshTokenParameters(string $refreshToken, array $scopes = null): array
     {

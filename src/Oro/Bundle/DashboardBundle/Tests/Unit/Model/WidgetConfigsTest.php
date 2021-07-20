@@ -143,7 +143,6 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-
         static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
         static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
     }

@@ -30,10 +30,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         unset($this->builder);
     }
 
-    /**
-     * @param array $expected
-     * @param ProcessDefinition $definition
-     */
     protected function assertDefinitionConfiguration(array $expected, ProcessDefinition $definition)
     {
         $this->assertEquals($expected['label'], $definition->getLabel());
@@ -44,11 +40,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected['actions_configuration'], $definition->getActionsConfiguration());
     }
 
-    /**
-     * @param array $expected
-     * @param ProcessDefinition $definition
-     * @param ProcessTrigger $trigger
-     */
     protected function assertProcessTrigger(
         array $expected,
         ProcessDefinition $definition,
@@ -122,8 +113,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expected
      * @dataProvider buildProcessDefinitionsDataProvider
      */
     public function testBuildProcessDefinitions(array $configuration, array $expected)
@@ -162,8 +151,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expected
      * @dataProvider buildProcessTriggerDataProvider
      */
     public function testBuildProcessTrigger(array $configuration, array $expected)
@@ -303,8 +290,6 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expected
      * @dataProvider buildProcessTriggersDataProvider
      */
     public function testBuildProcessTriggers(array $configuration, array $expected)

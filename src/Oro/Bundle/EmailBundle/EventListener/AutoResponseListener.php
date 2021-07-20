@@ -23,9 +23,6 @@ class AutoResponseListener extends MailboxEmailListener implements
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -42,9 +39,6 @@ class AutoResponseListener extends MailboxEmailListener implements
         ];
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
         if (!$this->isFeaturesEnabled()) {

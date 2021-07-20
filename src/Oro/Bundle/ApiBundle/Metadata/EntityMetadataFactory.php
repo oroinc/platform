@@ -23,19 +23,11 @@ class EntityMetadataFactory
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     *
-     * @return EntityMetadata
-     */
     public function createEntityMetadata(ClassMetadata $classMetadata): EntityMetadata
     {
         $entityMetadata = new EntityMetadata();
@@ -47,13 +39,6 @@ class EntityMetadataFactory
         return $entityMetadata;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $propertyPath
-     * @param string|null   $fieldType
-     *
-     * @return MetaPropertyMetadata
-     */
     public function createMetaPropertyMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
@@ -72,13 +57,6 @@ class EntityMetadataFactory
         return $fieldMetadata;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $propertyPath
-     * @param string|null   $fieldType
-     *
-     * @return FieldMetadata
-     */
     public function createFieldMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
@@ -117,13 +95,6 @@ class EntityMetadataFactory
         return $fieldMetadata;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $propertyPath
-     * @param string|null   $associationDataType
-     *
-     * @return AssociationMetadata
-     */
     public function createAssociationMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
@@ -172,21 +143,11 @@ class EntityMetadataFactory
         return $associationMetadata;
     }
 
-    /**
-     * @param array $fieldMapping
-     *
-     * @return string
-     */
     private function getFieldType(array $fieldMapping): string
     {
         return (string)$fieldMapping[self::TYPE];
     }
 
-    /**
-     * @param array $associationMapping
-     *
-     * @return string|null
-     */
     private function getAssociationType(array $associationMapping): ?string
     {
         switch ($associationMapping[self::TYPE]) {
@@ -203,11 +164,6 @@ class EntityMetadataFactory
         }
     }
 
-    /**
-     * @param array $associationMapping
-     *
-     * @return bool
-     */
     private function isNullableAssociation(array $associationMapping): bool
     {
         $isNullable = true;

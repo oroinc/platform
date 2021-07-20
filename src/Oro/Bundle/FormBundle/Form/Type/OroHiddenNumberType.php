@@ -23,9 +23,6 @@ class OroHiddenNumberType extends AbstractType
      */
     private $numberFormatter;
 
-    /**
-     * @param NumberFormatter $numberFormatter
-     */
     public function __construct(NumberFormatter $numberFormatter)
     {
         $this->numberFormatter = $numberFormatter;

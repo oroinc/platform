@@ -76,7 +76,6 @@ class ConfigFieldGridController extends AbstractController
     }
 
     /**
-     * @param FieldConfigModel $fieldConfigModel
      * @throws AccessDeniedException
      */
     private function ensureFieldConfigModelIsCustom(FieldConfigModel $fieldConfigModel)
@@ -134,33 +133,21 @@ class ConfigFieldGridController extends AbstractController
         );
     }
 
-    /**
-     * @return ConfigProvider
-     */
     private function getExtendConfigProvider(): ConfigProvider
     {
         return $this->get(ConfigManager::class)->getProvider('extend');
     }
 
-    /**
-     * @return TranslatorInterface
-     */
     protected function getTranslator(): TranslatorInterface
     {
         return $this->get(TranslatorInterface::class);
     }
 
-    /**
-     * @return CreateUpdateConfigFieldHandler
-     */
     protected function getCreateUpdateConfigFieldHandler(): CreateUpdateConfigFieldHandler
     {
         return $this->get(CreateUpdateConfigFieldHandler::class);
     }
 
-    /**
-     * @return RemoveRestoreConfigFieldHandler
-     */
     protected function getRemoveRestoreConfigFieldHandler(): RemoveRestoreConfigFieldHandler
     {
         return $this->get(RemoveRestoreConfigFieldHandler::class);

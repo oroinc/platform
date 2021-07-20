@@ -11,9 +11,6 @@ interface RestrictionBuilderInterface
 {
     /**
      * Builds and applies the query designer filters to the given data source.
-     *
-     * @param array                              $filters
-     * @param GroupingOrmFilterDatasourceAdapter $ds
      */
     public function buildRestrictions(array $filters, GroupingOrmFilterDatasourceAdapter $ds): void;
 }

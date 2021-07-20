@@ -44,10 +44,6 @@ abstract class PhpConfigProvider implements
     /** @var mixed|null */
     private $config;
 
-    /**
-     * @param string $cacheFile
-     * @param bool   $debug
-     */
     public function __construct(string $cacheFile, bool $debug)
     {
         $this->cacheFile = $cacheFile;
@@ -146,8 +142,6 @@ abstract class PhpConfigProvider implements
     /**
      * Gets a resource that represents the cache file
      * and can be used by depended configuration caches to track if this cache is changed.
-     *
-     * @return ResourceInterface
      */
     public function getCacheResource(): ResourceInterface
     {
@@ -178,9 +172,6 @@ abstract class PhpConfigProvider implements
      */
     abstract protected function assertLoaderConfig($config): void;
 
-    /**
-     * @return ConfigCacheInterface
-     */
     private function getConfigCache(): ConfigCacheInterface
     {
         if (null === $this->cache) {
@@ -190,9 +181,6 @@ abstract class PhpConfigProvider implements
         return $this->cache;
     }
 
-    /**
-     * @return PhpConfigCacheAccessor
-     */
     private function getCacheAccessor(): PhpConfigCacheAccessor
     {
         if (null === $this->cacheAccessor) {

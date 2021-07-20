@@ -31,9 +31,6 @@ class NotResolvedIdentifier
         return $this->value;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return $this->entityClass;

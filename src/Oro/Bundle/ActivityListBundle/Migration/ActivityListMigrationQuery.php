@@ -35,14 +35,6 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param Schema                          $schema
-     * @param ActivityListChainProvider       $provider
-     * @param ActivityListExtension           $activityListExtension
-     * @param EntityMetadataHelper            $metadataHelper
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param ConfigManager                   $configManager
-     */
     public function __construct(
         Schema $schema,
         ActivityListChainProvider $provider,

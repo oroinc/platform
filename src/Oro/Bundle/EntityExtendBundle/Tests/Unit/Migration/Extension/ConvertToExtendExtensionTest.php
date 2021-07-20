@@ -110,7 +110,6 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         $tableObject = $this->getMockBuilder('Doctrine\DBAL\Schema\Table')->disableOriginalConstructor()->getMock();
 
-
         $this->schema->expects(self::once())->method('getTable')->willReturn($tableObject);
         $this->queries->expects(self::never())->method('addQuery');
 

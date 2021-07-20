@@ -38,13 +38,6 @@ abstract class AbstractSyncProcessor implements
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @param ProcessorRegistry        $processorRegistry
-     * @param Executor                 $jobExecutor
-     * @param TypesRegistry            $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerStrategy|null      $logger
-     */
     public function __construct(
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,

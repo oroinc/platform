@@ -42,11 +42,6 @@ class DatagridExportIdFetcher implements ContextAwareInterface
      */
     protected $queryExecutor;
 
-    /**
-     * @param ServiceLink $gridManagerLink
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param QueryExecutorInterface $queryExecutor
-     */
     public function __construct(
         ServiceLink $gridManagerLink,
         EventDispatcherInterface $eventDispatcher,
@@ -79,9 +74,6 @@ class DatagridExportIdFetcher implements ContextAwareInterface
         }
     }
 
-    /**
-     * @return string
-     */
     public function getGridRootEntity(): string
     {
         /** @var QueryBuilder $queryBuilder */

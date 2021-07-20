@@ -15,12 +15,6 @@ interface FileUrlProviderInterface
 
     /**
      * Get file URL.
-     *
-     * @param File $file
-     * @param string $action
-     * @param int $referenceType
-     *
-     * @return string
      */
     public function getFileUrl(
         File $file,
@@ -30,13 +24,6 @@ interface FileUrlProviderInterface
 
     /**
      * Get resized image URL.
-     *
-     * @param File $file
-     * @param int $width
-     * @param int $height
-     * @param int $referenceType
-     *
-     * @return string
      */
     public function getResizedImageUrl(
         File $file,
@@ -47,12 +34,6 @@ interface FileUrlProviderInterface
 
     /**
      * Get URL to the image with applied liip imagine filter.
-     *
-     * @param File $file
-     * @param string $filterName
-     * @param int $referenceType
-     *
-     * @return string
      */
     public function getFilteredImageUrl(
         File $file,

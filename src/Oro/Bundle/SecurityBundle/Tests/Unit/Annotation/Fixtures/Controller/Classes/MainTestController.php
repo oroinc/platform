@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MainTestController extends AbstractController
 {
-
     /**
      * @Acl(
      *      id = "user_test_main_controller_action1",

@@ -17,9 +17,6 @@ class IncreaseEmailNameLength implements Migration
         static::changeEmailRecipientNameColumnLength($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function changeEmailFromNameColumnLength(Schema $schema)
     {
         $table = $schema->getTable('oro_email');
@@ -28,9 +25,6 @@ class IncreaseEmailNameLength implements Migration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function changeEmailRecipientNameColumnLength(Schema $schema)
     {
         $table = $schema->getTable('oro_email_recipient');

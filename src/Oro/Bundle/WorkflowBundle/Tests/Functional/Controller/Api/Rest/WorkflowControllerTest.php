@@ -117,9 +117,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEmpty($this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP));
     }
 
-    /**
-     * @return WorkflowAwareEntity
-     */
     protected function createNewEntity(): WorkflowAwareEntity
     {
         $testEntity = new WorkflowAwareEntity();
@@ -130,17 +127,11 @@ class WorkflowControllerTest extends WebTestCase
         return $testEntity;
     }
 
-    /**
-     * @return WorkflowManager
-     */
     protected function getWorkflowManager(): WorkflowManager
     {
         return $this->client->getContainer()->get('oro_workflow.manager.system');
     }
 
-    /**
-     * @param array $result
-     */
     protected function assertActivationResult(array $result): void
     {
         $this->assertArrayHasKey('successful', $result);
@@ -149,10 +140,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertNotEmpty($result['message']);
     }
 
-    /**
-     * @param WorkflowAwareEntity $entity
-     * @param string|null $workflowName
-     */
     protected function assertEntityWorkflowItem(WorkflowAwareEntity $entity, ?string $workflowName): void
     {
         $workflowItem = $this->getWorkflowItem($entity, $workflowName);
@@ -160,10 +147,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($workflowName, $workflowItem->getWorkflowName());
     }
 
-    /**
-     * @param object $entity
-     * @param string|null $workflowName
-     */
     protected function assertActiveWorkflow(object $entity, ?string $workflowName): void
     {
         $activeWorkflowNames = $this->getActiveWorkflowNames($entity);
@@ -172,30 +155,16 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertContains($workflowName, $activeWorkflowNames);
     }
 
-    /**
-     * @param object $entity
-     * @param string|null $workflowName
-     */
     protected function assertInactiveWorkflow(object $entity, ?string $workflowName): void
     {
         $this->assertNotContains($workflowName, $this->getActiveWorkflowNames($entity));
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ObjectManager
-     */
     protected function getObjectManager(string $entityClass): ObjectManager
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($entityClass);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ObjectRepository
-     */
     protected function getRepository(string $entityClass): ObjectRepository
     {
         return $this->getObjectManager($entityClass)->getRepository($entityClass);
@@ -396,10 +365,6 @@ class WorkflowControllerTest extends WebTestCase
 
     /**
      * @dataProvider startWorkflowDataProvider
-     *
-     * @param string $routeName
-     * @param string $entityClass
-     * @param string $transitionName
      */
     public function testStartWorkflowFromNonRelatedEntity(
         string $routeName,
@@ -436,9 +401,6 @@ class WorkflowControllerTest extends WebTestCase
         $this->assertEquals($initContext->getRouteName(), $routeName);
     }
 
-    /**
-     * @return array
-     */
     public function startWorkflowDataProvider(): array
     {
         return [
@@ -480,10 +442,6 @@ class WorkflowControllerTest extends WebTestCase
         $manager->flush();
     }
 
-    /**
-     * @param object $entity
-     * @return array
-     */
     protected function getActiveWorkflowNames(object $entity): array
     {
         $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entity);

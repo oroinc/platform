@@ -7,10 +7,5 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
  */
 interface AccessRuleWalkerContextFactoryInterface
 {
-    /**
-     * @param string $permission
-     *
-     * @return AccessRuleWalkerContext
-     */
     public function createContext(string $permission): AccessRuleWalkerContext;
 }

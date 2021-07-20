@@ -23,17 +23,11 @@ class DumpApiDocConsoleCommandListener
     /** @var RestDocViewDetector */
     private $docViewDetector;
 
-    /**
-     * @param RestDocViewDetector $docViewDetector
-     */
     public function __construct(RestDocViewDetector $docViewDetector)
     {
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
@@ -51,12 +45,6 @@ class DumpApiDocConsoleCommandListener
         }
     }
 
-    /**
-     * @param Command        $helpCommand
-     * @param InputInterface $input
-     *
-     * @return Command|null
-     */
     private function getHelpInnerCommand(Command $helpCommand, InputInterface $input): ?Command
     {
         $innerCommand = null;
@@ -75,21 +63,11 @@ class DumpApiDocConsoleCommandListener
         return $innerCommand;
     }
 
-    /**
-     * @param Command $command
-     *
-     * @return bool
-     */
     private function isApiDocDumpCommand(Command $command): bool
     {
         return in_array($command->getName(), $this->getApiDocDumpCommands(), true);
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return string|null
-     */
     private function getApiDocDumpCommandFromParameterOptions(InputInterface $input): ?string
     {
         $commands = $this->getApiDocDumpCommands();
@@ -110,9 +88,6 @@ class DumpApiDocConsoleCommandListener
         return ['api:doc:dump', 'api:swagger:dump'];
     }
 
-    /**
-     * @param Command $command
-     */
     private function ensureViewOptionDefined(Command $command): void
     {
         $viewOption = new InputOption(

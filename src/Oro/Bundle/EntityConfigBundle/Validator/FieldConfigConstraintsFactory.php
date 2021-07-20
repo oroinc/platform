@@ -20,10 +20,6 @@ class FieldConfigConstraintsFactory
 
     /**
      * Creates a validation constraints.
-     *
-     * @param ConfigInterface $config
-     *
-     * @return array
      */
     public function create(ConfigInterface $config): array
     {

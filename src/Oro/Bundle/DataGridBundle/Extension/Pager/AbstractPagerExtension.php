@@ -24,9 +24,6 @@ abstract class AbstractPagerExtension extends AbstractExtension
      */
     protected $pager;
 
-    /**
-     * @param PagerInterface $pager
-     */
     public function __construct(PagerInterface $pager)
     {
         $this->pager = $pager;
@@ -73,7 +70,6 @@ abstract class AbstractPagerExtension extends AbstractExtension
             }
         }
     }
-
 
     /**
      * {@inheritDoc}

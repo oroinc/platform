@@ -178,7 +178,6 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
             )
             ->will($this->returnValue(true));
 
-
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
     }
@@ -274,7 +273,6 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 )
             )
             ->will($this->returnValue(true));
-
 
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);

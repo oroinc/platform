@@ -330,9 +330,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobProcessor->startChildJob($job);
     }
 
-    /**
-     * @return array
-     */
     public function getStatusThatCanRun(): array
     {
         return [
@@ -549,9 +546,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getIsRootJobExistsAndNotStaleProvider(): array
     {
         $rootJob = new Job();

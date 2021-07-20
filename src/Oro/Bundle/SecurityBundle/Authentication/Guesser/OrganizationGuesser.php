@@ -33,11 +33,6 @@ class OrganizationGuesser implements OrganizationGuesserInterface
         return $organization;
     }
 
-    /**
-     * @param Collection $organizations
-     *
-     * @return Organization|null
-     */
     private function getFirstOrganization(Collection $organizations): ?Organization
     {
         $organization = $organizations->first();

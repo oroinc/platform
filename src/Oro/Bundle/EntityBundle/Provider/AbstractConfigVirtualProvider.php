@@ -14,9 +14,6 @@ abstract class AbstractConfigVirtualProvider
     /** @var array */
     private $items;
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     */
     public function __construct(EntityHierarchyProviderInterface $entityHierarchyProvider)
     {
         $this->entityHierarchyProvider = $entityHierarchyProvider;

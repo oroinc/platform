@@ -96,11 +96,6 @@ class OroFeatureContext extends RawMinkContext
         return new CookieJar(false, $cookies);
     }
 
-    /**
-     * @param string $imageUrl
-     *
-     * @return ResponseInterface
-     */
     protected function loadImage(string $imageUrl): ResponseInterface
     {
         $imageUrl = $this->locatePath($imageUrl);
@@ -117,10 +112,6 @@ class OroFeatureContext extends RawMinkContext
         return $client->get($imageUrl);
     }
 
-    /**
-     * @param string $sourcePath
-     * @param string $destinationPath
-     */
     protected function copyFiles(string $sourcePath, string $destinationPath): void
     {
         $fs = new Filesystem();

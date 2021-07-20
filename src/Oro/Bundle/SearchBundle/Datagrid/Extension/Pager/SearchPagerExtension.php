@@ -18,9 +18,6 @@ class SearchPagerExtension extends OrmPagerExtension
     /** @var IndexerPager */
     protected $pager;
 
-    /**
-     * @param IndexerPager $pager
-     */
     public function __construct(IndexerPager $pager)
     {
         $this->pager = $pager;

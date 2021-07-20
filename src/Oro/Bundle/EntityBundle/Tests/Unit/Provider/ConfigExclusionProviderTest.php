@@ -162,12 +162,6 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $className
-     * @param array  $fields
-     *
-     * @return ClassMetadata
-     */
     private function getEntityMetadata(string $className, array $fields = []): ClassMetadata
     {
         $metadata = new ClassMetadata($className);

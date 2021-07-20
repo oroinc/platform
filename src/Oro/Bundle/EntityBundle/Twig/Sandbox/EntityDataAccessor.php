@@ -13,9 +13,6 @@ class EntityDataAccessor
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;

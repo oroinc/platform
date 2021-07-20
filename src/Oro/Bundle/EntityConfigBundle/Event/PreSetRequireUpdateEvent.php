@@ -22,9 +22,6 @@ class PreSetRequireUpdateEvent extends PreFlushConfigEvent
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isUpdateRequired(): bool
     {
         return $this->updateRequired;

@@ -29,11 +29,6 @@ class ResourcesCacheWarmerCompilerPass implements CompilerPassInterface
             ->replaceArgument(2, $requestTypes);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function getApiDocViews(ContainerBuilder $container): array
     {
         $config = DependencyInjectionUtil::getConfig($container);

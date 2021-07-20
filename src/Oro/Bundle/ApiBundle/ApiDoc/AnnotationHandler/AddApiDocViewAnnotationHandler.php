@@ -16,10 +16,6 @@ class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
     /** @var string */
     private $existingView;
 
-    /**
-     * @param string $additionalView
-     * @param string $existingView
-     */
     public function __construct(string $additionalView, string $existingView)
     {
         $this->additionalView = $additionalView;

@@ -22,11 +22,6 @@ class NoteActivityEntityDeleteHandlerExtension implements ActivityEntityDeleteHa
     /** @var EntityDeleteAccessDeniedExceptionFactory */
     private $accessDeniedExceptionFactory;
 
-    /**
-     * @param ActivityEntityDeleteHandlerExtensionInterface $innerExtension
-     * @param DoctrineHelper                                $doctrineHelper
-     * @param EntityDeleteAccessDeniedExceptionFactory      $accessDeniedExceptionFactory
-     */
     public function __construct(
         ActivityEntityDeleteHandlerExtensionInterface $innerExtension,
         DoctrineHelper $doctrineHelper,

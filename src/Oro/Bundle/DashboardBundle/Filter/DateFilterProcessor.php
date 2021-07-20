@@ -25,11 +25,6 @@ class DateFilterProcessor
     /** @var LocaleSettings */
     private $localeSettings;
 
-    /**
-     * @param DateRangeFilter $filter
-     * @param DateFilterModifier $modifier
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(DateRangeFilter $filter, DateFilterModifier $modifier, LocaleSettings $localeSettings)
     {
         $this->dateFilter = $filter;
@@ -78,11 +73,6 @@ class DateFilterProcessor
             : new \DateTime($date, new \DateTimeZone($this->localeSettings->getTimeZone()));
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param $dateRange
-     * @param $fieldAlias
-     */
     public function applyDateRangeFilterToQuery(QueryBuilder $qb, $dateRange, $fieldAlias)
     {
         $dateRange = $this->getModifiedDateData($dateRange);

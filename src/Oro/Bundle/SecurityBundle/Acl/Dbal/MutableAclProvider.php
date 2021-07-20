@@ -57,8 +57,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Clear cache by $oid
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function clearOidCache(ObjectIdentityInterface $oid)
     {
@@ -128,8 +126,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Deletes all ACL including class data for a given object identity.
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function deleteAclClass(ObjectIdentityInterface $oid)
     {
@@ -276,8 +272,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * Deletes the security identity from the database.
      * ACL entries have the CASCADE option on their foreign key so they will also get deleted.
-     *
-     * @param SecurityIdentityInterface $sid
      *
      * @throws \InvalidArgumentException
      */
@@ -996,8 +990,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Creates the ACL for the passed object identity.
-     *
-     * @param ObjectIdentityInterface $oid
      */
     private function createObjectIdentity(ObjectIdentityInterface $oid)
     {
@@ -1088,8 +1080,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * This regenerates the ancestor table which is used for fast read access.
-     *
-     * @param AclInterface $acl
      */
     private function regenerateAncestorRelations(AclInterface $acl)
     {
@@ -1288,8 +1278,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Persists the changes which were made to ACEs to the database.
-     *
-     * @param \SplObjectStorage $aces
      */
     private function updateAces(\SplObjectStorage $aces)
     {

@@ -92,11 +92,6 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
         );
     }
 
-    /**
-     * @param string|null $associationPath
-     *
-     * @return bool
-     */
     private function isExpandRequested(?string $associationPath): bool
     {
         if (!$associationPath) {
@@ -112,11 +107,6 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
         return $expandConfigExtra->isExpandRequested($associationPath);
     }
 
-    /**
-     * @param string $extraName
-     *
-     * @return ConfigExtraInterface|null
-     */
     private function getConfigExtra(string $extraName): ?ConfigExtraInterface
     {
         foreach ($this->configExtras as $extra) {

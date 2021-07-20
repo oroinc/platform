@@ -17,9 +17,6 @@ class PrepareFormData implements ProcessorInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
@@ -73,12 +70,6 @@ class PrepareFormData implements ProcessorInterface
         return true;
     }
 
-    /**
-     * @param string                      $fieldName
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return string
-     */
     private function getEntityFieldName(string $fieldName, ?EntityDefinitionConfig $config): string
     {
         if (null === $config) {

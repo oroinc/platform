@@ -15,9 +15,6 @@ class ApplicableEntitiesType extends AbstractType
     /** @var WorkflowEntityConnector */
     protected $entityConnector;
 
-    /**
-     * @param WorkflowEntityConnector $entityConnector
-     */
     public function __construct(WorkflowEntityConnector $entityConnector)
     {
         $this->entityConnector = $entityConnector;

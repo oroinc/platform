@@ -23,10 +23,6 @@ class TranslationDomainProvider
     /** @var array */
     protected $availableDomains;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param CacheProvider $cache
-     */
     public function __construct(ManagerRegistry $registry, CacheProvider $cache)
     {
         $this->registry = $registry;

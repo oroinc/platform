@@ -18,11 +18,6 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ValidatePagingTest extends GetListProcessorTestCase
 {
-    /**
-     * @param int $maxEntitiesLimit
-     *
-     * @return ValidatePaging
-     */
     private function getProcessor(int $maxEntitiesLimit): ValidatePaging
     {
         $filterNames = $this->createMock(FilterNames::class);

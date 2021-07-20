@@ -169,9 +169,6 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
 
     /**
      * This method is used as configurator option.
-     *
-     * @param FormBuilderInterface $builder
-     * @param $options
      */
     public static function configure(FormBuilderInterface $builder, $options): void
     {
@@ -179,17 +176,11 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $emailConfigurationConfigurator->configure($builder, $options);
     }
 
-    /**
-     * @return string
-     */
     private function getConfiguratorOption(): string
     {
         return sprintf('%s::configure', EmailConfigurationConfiguratorTest::class);
     }
 
-    /**
-     * @return FormBuilderInterface
-     */
     private function createFormBuilder(): FormBuilderInterface
     {
         return $this->factory->createNamedBuilder(
@@ -206,9 +197,6 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @return string
-     */
     private function getSmtpPasswordFieldKey(): string
     {
         return $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);

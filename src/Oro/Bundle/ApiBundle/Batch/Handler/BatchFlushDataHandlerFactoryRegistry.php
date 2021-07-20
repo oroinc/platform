@@ -29,10 +29,6 @@ class BatchFlushDataHandlerFactoryRegistry
     /**
      * Returns a factory that creates a flush data handler for a batch operation for the given entity class.
      *
-     * @param string $entityClass
-     *
-     * @return BatchFlushDataHandlerFactoryInterface
-     *
      * @throws \LogicException if a factory does not exist for the given entity class
      */
     public function getFactory(string $entityClass): BatchFlushDataHandlerFactoryInterface

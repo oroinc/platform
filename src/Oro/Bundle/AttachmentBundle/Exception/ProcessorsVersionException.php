@@ -12,11 +12,6 @@ class ProcessorsVersionException extends \RuntimeException
      */
     private $binary;
 
-    /**
-     * @param string $name
-     * @param string $version
-     * @param string $binary
-     */
     public function __construct(string $name, string $version, string $binary)
     {
         $this->binary = $binary;
@@ -25,9 +20,6 @@ class ProcessorsVersionException extends \RuntimeException
         parent::__construct($message);
     }
 
-    /**
-     * @return string
-     */
     public function getBinary(): string
     {
         return $this->binary;

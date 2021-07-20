@@ -26,10 +26,6 @@ abstract class LoadSubresources implements ProcessorInterface
     /** @var MetadataProvider */
     private $metadataProvider;
 
-    /**
-     * @param ConfigProvider   $configProvider
-     * @param MetadataProvider $metadataProvider
-     */
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         $this->configProvider = $configProvider;
@@ -91,12 +87,6 @@ abstract class LoadSubresources implements ProcessorInterface
         return \array_values(\array_unique($result));
     }
 
-    /**
-     * @param string                 $fieldName
-     * @param EntityDefinitionConfig $config
-     *
-     * @return bool
-     */
     protected function isExcludedAssociation(string $fieldName, EntityDefinitionConfig $config): bool
     {
         $field = $config->getField($fieldName);
@@ -109,13 +99,6 @@ abstract class LoadSubresources implements ProcessorInterface
             || DataType::isAssociationAsField($field->getDataType());
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return EntityDefinitionConfig|null
-     */
     protected function getConfig(
         string $entityClass,
         string $version,
@@ -126,14 +109,6 @@ abstract class LoadSubresources implements ProcessorInterface
             ->getDefinition();
     }
 
-    /**
-     * @param string                 $entityClass
-     * @param string                 $version
-     * @param RequestType            $requestType
-     * @param EntityDefinitionConfig $config
-     *
-     * @return EntityMetadata|null
-     */
     protected function getMetadata(
         string $entityClass,
         string $version,

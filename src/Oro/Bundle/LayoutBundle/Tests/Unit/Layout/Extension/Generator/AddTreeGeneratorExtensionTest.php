@@ -21,9 +21,6 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prepareDataProvider
-     *
-     * @param array $source
-     * @param array $expectedSource
      */
     public function testPrepare(array $source, array $expectedSource)
     {

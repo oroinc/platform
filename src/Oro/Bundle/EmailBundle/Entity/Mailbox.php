@@ -499,9 +499,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         return $this->autoResponseRules;
     }
 
-    /**
-     * @param AccountTypeModel|null $accountTypeModel
-     */
     public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;

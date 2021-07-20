@@ -74,8 +74,6 @@ class FormFieldType extends AbstractType
 
     /**
      * Add listeners that disable fields according to the state of `use_parent_scope_value` checkbox
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function addFieldDisableListeners(FormBuilderInterface $builder)
     {

@@ -23,11 +23,6 @@ class RebuildTranslationCacheAction extends AbstractAction
     /** @var PropertyPathInterface */
     private $attribute;
 
-    /**
-     * @param ContextAccessor                         $contextAccessor
-     * @param RebuildTranslationCacheHandlerInterface $rebuildTranslationCacheHandler
-     * @param TranslatorInterface                     $translator
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         RebuildTranslationCacheHandlerInterface $rebuildTranslationCacheHandler,
@@ -71,9 +66,6 @@ class RebuildTranslationCacheAction extends AbstractAction
         return $this;
     }
 
-    /**
-     * @return string
-     */
     private function getDefaultFailureMessage(): string
     {
         return $this->translator->trans('oro.translation.translation.message.rebuild_cache_failure');

@@ -6,8 +6,5 @@ use Oro\Bundle\SearchBundle\Query\Query;
 
 interface QueryModifierInterface
 {
-    /**
-     * @param Query $query
-     */
     public function modify(Query $query);
 }

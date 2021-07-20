@@ -31,9 +31,6 @@ class UploadedFileExtensionHelper
         return $extension;
     }
 
-    /**
-     * @return array
-     */
     private static function fetchUploadedFiles(): array
     {
         $fileNameMap = [];

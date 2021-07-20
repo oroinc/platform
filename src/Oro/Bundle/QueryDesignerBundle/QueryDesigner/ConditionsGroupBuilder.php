@@ -19,11 +19,6 @@ class ConditionsGroupBuilder
      */
     private $groupLevel = 0;
 
-    /**
-     * @param RestrictionBuilder                 $restrictionBuilder
-     * @param GroupingOrmFilterDatasourceAdapter $ds
-     * @param array                              $filters
-     */
     public function apply(
         RestrictionBuilder $restrictionBuilder,
         GroupingOrmFilterDatasourceAdapter $ds,
@@ -57,13 +52,6 @@ class ConditionsGroupBuilder
         $this->applyParameters($ds, $boundParameters);
     }
 
-    /**
-     * @param RestrictionBuilder                 $restrictionBuilder
-     * @param GroupingOrmFilterDatasourceAdapter $ds
-     * @param array                              $filters
-     *
-     * @return QueryBuilder
-     */
     private function createSubQueryBuilder(
         RestrictionBuilder $restrictionBuilder,
         GroupingOrmFilterDatasourceAdapter $ds,
@@ -78,12 +66,6 @@ class ConditionsGroupBuilder
         return $newDs->getQueryBuilder();
     }
 
-    /**
-     * @param GroupingOrmFilterDatasourceAdapter $ds
-     * @param array                              $filters
-     *
-     * @return bool
-     */
     private function hasRelationsInFilters(GroupingOrmFilterDatasourceAdapter $ds, array $filters): bool
     {
         foreach ($filters as $filter) {

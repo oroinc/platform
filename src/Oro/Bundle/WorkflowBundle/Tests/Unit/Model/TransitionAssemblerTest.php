@@ -230,8 +230,6 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationDataProvider
      *
-     * @param array $configuration
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -400,9 +398,6 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expectedActionConfig
-     *
      * @dataProvider assembleWithDestinationProvider
      */
     public function testAssembleAndDestination(array $configuration, array $expectedActionConfig)
@@ -913,9 +908,6 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider assembleWithFrontendOptions
-     *
-     * @param array $transitionDefinition
-     * @param array $expectedFrontendOptions
      */
     public function testAssembleWithFrontendOptions(array $transitionDefinition, array $expectedFrontendOptions)
     {

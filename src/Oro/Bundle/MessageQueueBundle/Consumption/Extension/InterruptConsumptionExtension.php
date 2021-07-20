@@ -76,10 +76,6 @@ class InterruptConsumptionExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param Context $context
-     * @param string $reason
-     */
     private function interruptExecution(Context $context, string $reason): void
     {
         $context->getLogger()->info(

@@ -13,10 +13,6 @@ class SecurityProvider
     /** @var EntitySecurityMetadataProvider */
     protected $entitySecurityMetadataProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface  $authorizationChecker
-     * @param EntitySecurityMetadataProvider $entitySecurityMetadataProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         EntitySecurityMetadataProvider $entitySecurityMetadataProvider

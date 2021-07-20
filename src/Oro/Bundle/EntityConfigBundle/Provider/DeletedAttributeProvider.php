@@ -18,10 +18,6 @@ class DeletedAttributeProvider implements DeletedAttributeProviderInterface
      */
     protected $attributeValueProvider;
 
-    /**
-     * @param ConfigModelManager $configModelManager
-     * @param AttributeValueProviderInterface $attributeValueProvider
-     */
     public function __construct(
         ConfigModelManager $configModelManager,
         AttributeValueProviderInterface $attributeValueProvider
@@ -41,20 +37,16 @@ class DeletedAttributeProvider implements DeletedAttributeProviderInterface
         }
 
         $repository = $this->configModelManager->getEntityManager()->getRepository(FieldConfigModel::class);
-        
+
         return $repository->getAttributesByIds($ids);
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param array $names
-     */
     public function removeAttributeValues(AttributeFamily $attributeFamily, array $names)
     {
         if (!$names) {
             return;
         }
-        
+
         $this->attributeValueProvider->removeAttributeValues($attributeFamily, $names);
     }
 }

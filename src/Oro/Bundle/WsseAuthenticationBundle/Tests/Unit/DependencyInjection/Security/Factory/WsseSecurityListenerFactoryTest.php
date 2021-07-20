@@ -19,9 +19,6 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('pre_auth', $this->getFactory()->getPosition());
     }
 
-    /**
-     * @return WsseSecurityListenerFactory
-     */
     private function getFactory(): WsseSecurityListenerFactory
     {
         return new WsseSecurityListenerFactory();

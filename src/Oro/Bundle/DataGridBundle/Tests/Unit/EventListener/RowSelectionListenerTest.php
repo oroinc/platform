@@ -56,11 +56,6 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onBuildAfterDataProvider
-     *
-     * @param array $config
-     * @param array $expectedConfig
-     * @param array $classMetadataArray
-     * @param array $expectedBindParameters
      */
     public function testOnBuildAfterWorks(
         array $config,

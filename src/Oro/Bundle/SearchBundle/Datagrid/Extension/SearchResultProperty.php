@@ -16,9 +16,6 @@ class SearchResultProperty extends TwigTemplateProperty
     /**  @var SearchMappingProvider */
     protected $mappingProvider;
 
-    /**
-     * @param SearchMappingProvider $mappingProvider
-     */
     public function setMappingProvider(SearchMappingProvider $mappingProvider)
     {
         $this->mappingProvider = $mappingProvider;

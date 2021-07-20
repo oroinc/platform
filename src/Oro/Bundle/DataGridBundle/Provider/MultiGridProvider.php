@@ -18,11 +18,6 @@ class MultiGridProvider
     /** @var ManagerInterface */
     protected $gridManager;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ConfigManager                 $configManager
-     * @param ManagerInterface              $gridManager
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,

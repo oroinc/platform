@@ -20,10 +20,6 @@ class FormType extends AbstractType
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ConfigSubscriber   $subscriber
-     * @param ContainerInterface $container
-     */
     public function __construct(ConfigSubscriber $subscriber, ContainerInterface $container)
     {
         $this->subscriber = $subscriber;

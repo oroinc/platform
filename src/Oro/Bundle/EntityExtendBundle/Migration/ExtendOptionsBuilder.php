@@ -32,12 +32,6 @@ class ExtendOptionsBuilder
     /** @var array */
     protected $result = [];
 
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param FieldTypeHelper      $fieldTypeHelper
-     * @param ConfigManager        $configManager
-     * @param bool                 $isDryRunMode
-     */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper,

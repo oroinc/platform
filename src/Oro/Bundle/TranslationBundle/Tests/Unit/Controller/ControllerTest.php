@@ -76,9 +76,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderRenderJsTranslationContent
-     *
-     * @param $params
-     * @param $expected
      */
     public function testRenderJsTranslationContent($params, $expected)
     {
@@ -93,7 +90,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
                     }
                 )
             );
-
 
         $this->translator
             ->expects($this->any())

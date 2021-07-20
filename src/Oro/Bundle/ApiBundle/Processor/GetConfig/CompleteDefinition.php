@@ -44,11 +44,6 @@ class CompleteDefinition implements ProcessorInterface
     /** @var CompleteObjectDefinitionHelper */
     protected $objectDefinitionHelper;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param CompleteEntityDefinitionHelper $entityDefinitionHelper
-     * @param CompleteObjectDefinitionHelper $objectDefinitionHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         CompleteEntityDefinitionHelper $entityDefinitionHelper,

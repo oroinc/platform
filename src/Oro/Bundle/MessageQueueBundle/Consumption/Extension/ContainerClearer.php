@@ -21,9 +21,6 @@ class ContainerClearer implements ClearerInterface, ChainExtensionAwareInterface
     /** @var ExtensionInterface|null */
     private $rootChainExtension;
 
-    /**
-     * @param ResettableContainerInterface $container
-     */
     public function __construct(ResettableContainerInterface $container)
     {
         $this->container = $container;

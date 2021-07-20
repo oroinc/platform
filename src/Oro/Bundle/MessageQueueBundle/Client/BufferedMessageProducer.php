@@ -29,11 +29,6 @@ class BufferedMessageProducer implements MessageProducerInterface
     /** @var int */
     private $enableBufferingNestingLevel = 0;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface          $logger
-     * @param MessageFilterInterface   $filter
-     */
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,
@@ -151,8 +146,6 @@ class BufferedMessageProducer implements MessageProducerInterface
     }
 
     /**
-     * @param MessageBuffer $buffer
-     *
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception if the sending a message to the queue
      * fails due to some internal error
      */

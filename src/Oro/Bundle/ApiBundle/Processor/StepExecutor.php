@@ -12,9 +12,6 @@ class StepExecutor
     /** @var ByStepNormalizeResultActionProcessor */
     private $processor;
 
-    /**
-     * @param ByStepNormalizeResultActionProcessor $processor
-     */
     public function __construct(ByStepNormalizeResultActionProcessor $processor)
     {
         $this->processor = $processor;
@@ -22,8 +19,6 @@ class StepExecutor
 
     /**
      * Creates the execution context.
-     *
-     * @return ByStepNormalizeResultContext
      */
     public function createContext(): ByStepNormalizeResultContext
     {

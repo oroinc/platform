@@ -6,9 +6,6 @@ use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 
 interface DBALPersisterInterface
 {
-    /**
-     * @param AbstractItem $item
-     */
     public function writeItem(AbstractItem $item);
 
     /**

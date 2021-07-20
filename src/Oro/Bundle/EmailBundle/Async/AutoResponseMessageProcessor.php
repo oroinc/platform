@@ -35,12 +35,6 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
      */
     private $logger;
 
-    /**
-     * @param Registry            $doctrine
-     * @param AutoResponseManager $autoResponseManager
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface     $logger
-     */
     public function __construct(
         Registry $doctrine,
         AutoResponseManager $autoResponseManager,

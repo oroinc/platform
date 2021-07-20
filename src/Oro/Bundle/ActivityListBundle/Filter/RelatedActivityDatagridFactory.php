@@ -26,11 +26,6 @@ class RelatedActivityDatagridFactory
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @param DatagridConfigurationBuilder $datagridConfigurationBuilder
-     * @param DatagridBuilder              $datagridBuilder
-     * @param EventDispatcherInterface     $eventDispatcher
-     */
     public function __construct(
         DatagridConfigurationBuilder $datagridConfigurationBuilder,
         DatagridBuilder $datagridBuilder,
@@ -41,11 +36,6 @@ class RelatedActivityDatagridFactory
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param AbstractQueryDesigner $source
-     *
-     * @return DatagridInterface
-     */
     public function createGrid(AbstractQueryDesigner $source): DatagridInterface
     {
         $this->datagridConfigurationBuilder->setGridName('related-activity');

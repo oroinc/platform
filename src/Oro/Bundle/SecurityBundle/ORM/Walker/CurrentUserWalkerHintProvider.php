@@ -15,9 +15,6 @@ class CurrentUserWalkerHintProvider implements QueryWalkerHintProviderInterface
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;

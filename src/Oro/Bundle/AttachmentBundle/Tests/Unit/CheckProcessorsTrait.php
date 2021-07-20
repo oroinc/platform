@@ -24,9 +24,6 @@ trait CheckProcessorsTrait
         }
     }
 
-    /**
-     * @return ParameterBag
-     */
     protected function getParameters(): ParameterBag
     {
         return new ParameterBag([

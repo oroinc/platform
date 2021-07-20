@@ -23,10 +23,6 @@ class PostProcessorsVoter implements VoterInterface
      */
     private $pngQuant;
 
-    /**
-     * @param string|null $jpegopim
-     * @param string|null $pngQuant
-     */
     public function __construct(?string $jpegopim, ?string $pngQuant)
     {
         $this->jpegopim = $jpegopim;
@@ -52,9 +48,6 @@ class PostProcessorsVoter implements VoterInterface
         return self::FEATURE_ABSTAIN;
     }
 
-    /**
-     * @return ParameterBag
-     */
     private function getParameters(): ParameterBag
     {
         return new ParameterBag([

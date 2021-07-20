@@ -34,11 +34,6 @@ class AttributeGroupType extends AbstractContainerType
     /** @var array */
     protected $notRenderableAttributeTypes = [];
 
-    /**
-     * @param AttributeRenderRegistry      $attributeRenderRegistry
-     * @param AttributeManager                  $attributeManager
-     * @param AttributeBlockTypeMapperInterface $blockTypeMapper
-     */
     public function __construct(
         AttributeRenderRegistry $attributeRenderRegistry,
         AttributeManager $attributeManager,
@@ -49,9 +44,6 @@ class AttributeGroupType extends AbstractContainerType
         $this->blockTypeMapper = $blockTypeMapper;
     }
 
-    /**
-     * @param array $notRenderableAttributeTypes
-     */
     public function setNotRenderableAttributeTypes(array $notRenderableAttributeTypes)
     {
         $this->notRenderableAttributeTypes = $notRenderableAttributeTypes;
@@ -113,10 +105,6 @@ class AttributeGroupType extends AbstractContainerType
     /**
      * Fetches and sorts attributes for given attribute group.
      * Sorts attributes according to how they are added to attribute relations collection of attribute group.
-     *
-     * @param AttributeGroup $attributeGroup
-     *
-     * @return array
      */
     private function getAttributesByGroup(AttributeGroup $attributeGroup): array
     {

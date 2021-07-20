@@ -25,12 +25,6 @@ class GaufretteResolverTest extends \PHPUnit\Framework\TestCase
         $this->requestContext = $this->createMock(RequestContext::class);
     }
 
-    /**
-     * @param string $urlPrefix
-     * @param string $cachePrefix
-     *
-     * @return GaufretteResolver
-     */
     private function getResolver(string $urlPrefix = 'media/cache', string $cachePrefix = ''): GaufretteResolver
     {
         return new GaufretteResolver($this->fileManager, $this->requestContext, $urlPrefix, $cachePrefix);

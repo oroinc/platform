@@ -24,9 +24,6 @@ class SelectiveContextAggregator implements ContextAggregatorInterface
     /** @var ContextRegistry */
     protected $contextRegistry;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;

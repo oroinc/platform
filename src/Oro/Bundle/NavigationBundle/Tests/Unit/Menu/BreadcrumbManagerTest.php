@@ -62,7 +62,6 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
             ->with($subItem)
             ->will($this->returnValue(true));
 
-
         $breadcrumbs = $this->manager->getBreadcrumbs('test', false);
         $this->assertEquals('sub_item_test', $breadcrumbs[0]['label']);
     }
@@ -88,7 +87,6 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item1->addChild($item2);
         $item1->setExtra('routes', []);
         $item2->addChild($item);
-
 
         $this->provider->expects($this->once())
             ->method('get')
@@ -130,7 +128,6 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item1->addChild($item2);
         $item1->setExtra('routes', []);
         $item2->addChild($item);
-
 
         $this->provider->expects($this->once())
             ->method('get')

@@ -237,9 +237,6 @@ class Product
         return $this;
     }
 
-    /**
-     * @param Category $category
-     */
     public function removeCategory(Category $category)
     {
         $this->categories->removeElement($category);

@@ -44,9 +44,6 @@ class OroEntityExtension extends Extension
         $loader->load('collectors.yml');
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function loadHiddenFieldConfigs(ContainerBuilder $container)
     {
         $hiddenFieldConfigs = [];

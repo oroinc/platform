@@ -30,9 +30,6 @@ class EntityMetadata extends Metadata implements MetadataInterface
         }
     }
 
-    /**
-     * @param FieldMetadata $fieldMetadata
-     */
     public function addFieldMetadata(FieldMetadata $fieldMetadata)
     {
         $fieldMetadata->setEntityMetadata($this);

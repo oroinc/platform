@@ -15,9 +15,6 @@ class ParentBusinessUnitValidator extends ConstraintValidator
     /** @var OwnerTreeProviderInterface */
     private $ownerTreeProvider;
 
-    /**
-     * @param OwnerTreeProviderInterface $ownerTreeProvider
-     */
     public function __construct(OwnerTreeProviderInterface $ownerTreeProvider)
     {
         $this->ownerTreeProvider = $ownerTreeProvider;

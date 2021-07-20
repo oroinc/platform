@@ -16,9 +16,6 @@ class SetCacheControl implements ProcessorInterface
     /** @var CorsSettings */
     private $corsSettings;
 
-    /**
-     * @param CorsSettings $corsSettings
-     */
     public function __construct(CorsSettings $corsSettings)
     {
         $this->corsSettings = $corsSettings;

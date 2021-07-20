@@ -45,8 +45,6 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testInitialize(array $options, array $expected)
     {

@@ -70,11 +70,6 @@ class CompleteFilters extends CompleteSection
         $this->completeFiltersForExtendedAssociations($section, $metadata, $definition);
     }
 
-    /**
-     * @param FiltersConfig          $filters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completePreConfiguredFilters(
         FiltersConfig $filters,
         ClassMetadata $metadata,
@@ -93,10 +88,6 @@ class CompleteFilters extends CompleteSection
     }
 
     /**
-     * @param string                 $fieldName
-     * @param FilterFieldConfig      $filter
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completePreConfiguredFilter(
@@ -137,11 +128,6 @@ class CompleteFilters extends CompleteSection
         $this->setFilterRangeAllowed($filter);
     }
 
-    /**
-     * @param FiltersConfig          $filters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completeFiltersForIdentifierFields(
         FiltersConfig $filters,
         ClassMetadata $metadata,
@@ -181,11 +167,6 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    /**
-     * @param FiltersConfig          $filters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completeFiltersForFields(
         FiltersConfig $filters,
         ClassMetadata $metadata,
@@ -209,9 +190,6 @@ class CompleteFilters extends CompleteSection
     }
 
     /**
-     * @param FiltersConfig          $filters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completeFiltersForAssociations(
@@ -255,11 +233,6 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    /**
-     * @param FiltersConfig          $filters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completeFiltersForExtendedAssociations(
         FiltersConfig $filters,
         ClassMetadata $metadata,
@@ -316,9 +289,6 @@ class CompleteFilters extends CompleteSection
         return $idFieldName;
     }
 
-    /**
-     * @param FilterFieldConfig $filter
-     */
     protected function setFilterArrayAllowed(FilterFieldConfig $filter)
     {
         if (!$filter->hasArrayAllowed()) {
@@ -329,9 +299,6 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    /**
-     * @param FilterFieldConfig $filter
-     */
     protected function setFilterRangeAllowed(FilterFieldConfig $filter)
     {
         if (!$filter->hasRangeAllowed()) {
@@ -342,12 +309,6 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $propertyPath
-     *
-     * @return string|null
-     */
     protected function getFieldDataType(ClassMetadata $metadata, string $propertyPath): ?string
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
@@ -363,12 +324,6 @@ class CompleteFilters extends CompleteSection
         return $this->doctrineHelper->getFieldDataType($metadata, $lastFieldName);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $propertyPath
-     *
-     * @return bool
-     */
     protected function isCollectionValuedAssociation(ClassMetadata $metadata, string $propertyPath): bool
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);

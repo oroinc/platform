@@ -23,19 +23,12 @@ class AuditGridDataListener
      */
     private $fieldsTransformer;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param FieldsTransformer $fieldsTransformer
-     */
     public function __construct(DoctrineHelper $doctrineHelper, FieldsTransformer $fieldsTransformer)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->fieldsTransformer = $fieldsTransformer;
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function addDataSupport(OrmResultAfter $event)
     {
         $ids = [];

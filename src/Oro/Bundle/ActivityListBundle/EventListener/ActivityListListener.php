@@ -33,10 +33,6 @@ class ActivityListListener
     /** @var CollectListManager */
     protected $activityListManager;
 
-    /**
-     * @param CollectListManager $activityListManager
-     * @param DoctrineHelper     $doctrineHelper
-     */
     public function __construct(
         CollectListManager $activityListManager,
         DoctrineHelper $doctrineHelper
@@ -47,8 +43,6 @@ class ActivityListListener
 
     /**
      * Collect activities changes
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
@@ -72,8 +66,6 @@ class ActivityListListener
 
     /**
      * Save collected changes
-     *
-     * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
@@ -165,8 +157,6 @@ class ActivityListListener
 
     /**
      * Collect inserted activities
-     *
-     * @param array $entities
      */
     protected function collectInsertedEntities(array $entities)
     {

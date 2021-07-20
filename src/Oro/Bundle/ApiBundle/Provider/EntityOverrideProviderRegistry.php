@@ -41,10 +41,6 @@ class EntityOverrideProviderRegistry
     /**
      * Returns the entity override provider that contains entity substitutions for the given request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return EntityOverrideProviderInterface
-     *
      * @throws \LogicException if a entity override provider does not exist for the given request type
      */
     public function getEntityOverrideProvider(RequestType $requestType): EntityOverrideProviderInterface

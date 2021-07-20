@@ -19,10 +19,6 @@ class NestedAssociationListener implements EventSubscriberInterface
     /** @var EntityDefinitionFieldConfig */
     protected $config;
 
-    /**
-     * @param PropertyAccessorInterface   $propertyAccessor
-     * @param EntityDefinitionFieldConfig $config
-     */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         EntityDefinitionFieldConfig $config
@@ -41,9 +37,6 @@ class NestedAssociationListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         $form = $event->getForm();

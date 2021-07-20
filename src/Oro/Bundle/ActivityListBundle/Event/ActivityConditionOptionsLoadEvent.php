@@ -11,9 +11,6 @@ class ActivityConditionOptionsLoadEvent extends Event
     /** @var array */
     protected $options;
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options)
     {
         $this->options = $options;
@@ -27,9 +24,6 @@ class ActivityConditionOptionsLoadEvent extends Event
         return $this->options;
     }
 
-    /**
-     * @param array $options
-     */
     public function setOptions(array $options)
     {
         $this->options = $options;

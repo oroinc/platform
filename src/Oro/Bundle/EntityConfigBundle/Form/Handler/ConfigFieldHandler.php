@@ -17,10 +17,6 @@ class ConfigFieldHandler
     /** @var RequestStack */
     private $requestStack;
 
-    /**
-     * @param ConfigHelperHandler $configHelperHandler
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         ConfigHelperHandler $configHelperHandler,
         RequestStack $requestStack

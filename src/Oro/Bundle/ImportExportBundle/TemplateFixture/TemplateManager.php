@@ -22,9 +22,6 @@ class TemplateManager
      */
     protected $repositories = [];
 
-    /**
-     * @param TemplateEntityRegistry $entityRegistry
-     */
     public function __construct(TemplateEntityRegistry $entityRegistry)
     {
         $this->entityRegistry = $entityRegistry;
@@ -39,8 +36,6 @@ class TemplateManager
     }
 
     /**
-     * @param TemplateEntityRepositoryInterface $repository
-     *
      * @throws LogicException
      */
     public function addEntityRepository(TemplateEntityRepositoryInterface $repository)

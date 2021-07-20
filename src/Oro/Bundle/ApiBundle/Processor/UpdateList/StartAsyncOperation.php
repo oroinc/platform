@@ -21,10 +21,6 @@ class StartAsyncOperation implements ProcessorInterface
     /** @var ChunkSizeProvider */
     private $chunkSizeProvider;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param ChunkSizeProvider        $chunkSizeProvider
-     */
     public function __construct(MessageProducerInterface $producer, ChunkSizeProvider $chunkSizeProvider)
     {
         $this->producer = $producer;

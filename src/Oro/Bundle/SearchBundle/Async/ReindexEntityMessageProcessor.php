@@ -28,11 +28,6 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     private $producer;
 
-    /**
-     * @param IndexerInterface $indexer
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(IndexerInterface $indexer, JobRunner $jobRunner, MessageProducerInterface $producer)
     {
         $this->indexer = $indexer;

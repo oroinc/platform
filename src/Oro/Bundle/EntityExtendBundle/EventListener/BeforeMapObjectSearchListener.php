@@ -43,9 +43,6 @@ class BeforeMapObjectSearchListener
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -55,7 +52,6 @@ class BeforeMapObjectSearchListener
      * Process custom entities and fields. If entity or field marked as searchable - config of this custom
      *  entity or field will bw added to the main search map.
      *
-     * @param SearchMappingCollectEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepareEntityMapEvent(SearchMappingCollectEvent $event)
@@ -131,7 +127,6 @@ class BeforeMapObjectSearchListener
             } elseif (in_array($fieldType, [Indexer::RELATION_MANY_TO_MANY, Indexer::RELATION_ONE_TO_MANY])) {
                 $config       = $extendConfigProvider->getConfig($className, $fieldName);
                 $targetEntity = $config->get('target_entity');
-
 
                 $targetFields = array_unique(
                     array_merge(

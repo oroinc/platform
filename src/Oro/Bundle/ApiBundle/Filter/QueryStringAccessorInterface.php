@@ -10,8 +10,6 @@ interface QueryStringAccessorInterface
 {
     /**
      * Returns URL-encoded query string representation of all requested filters.
-     *
-     * @return string
      */
     public function getQueryString(): string;
 }

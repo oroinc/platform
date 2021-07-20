@@ -28,9 +28,6 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
      */
     private $crypter;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     */
     public function __construct(SymmetricCrypterInterface $crypter)
     {
         $this->crypter = $crypter;

@@ -15,10 +15,6 @@ class PostProcessingDataTransformer implements DataTransformerInterface
     /** @var array */
     private $postProcessorOptions;
 
-    /**
-     * @param PostProcessorInterface $postProcessor
-     * @param array                  $postProcessorOptions
-     */
     public function __construct(PostProcessorInterface $postProcessor, array $postProcessorOptions)
     {
         $this->postProcessor = $postProcessor;

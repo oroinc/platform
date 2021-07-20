@@ -43,7 +43,6 @@ class SystemConfigurationFormProviderTest extends AbstractProviderTest
         );
     }
 
-
     /**
      * {@inheritdoc}
      */

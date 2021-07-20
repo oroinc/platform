@@ -41,12 +41,6 @@ class RegisterDynamicFilters extends RegisterFilters
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param FilterFactoryInterface $filterFactory
-     * @param DoctrineHelper         $doctrineHelper
-     * @param ConfigProvider         $configProvider
-     * @param FilterNamesRegistry    $filterNamesRegistry
-     */
     public function __construct(
         FilterFactoryInterface $filterFactory,
         DoctrineHelper $doctrineHelper,
@@ -169,12 +163,6 @@ class RegisterDynamicFilters extends RegisterFilters
         return $allFilterValues->getAll();
     }
 
-    /**
-     * @param string                         $filterKey
-     * @param InvalidFilterValueKeyException $e
-     *
-     * @return Error
-     */
     private function createInvalidFilterValueKeyError(string $filterKey, InvalidFilterValueKeyException $e): Error
     {
         return Error::createValidationError(Constraint::FILTER)
@@ -186,10 +174,6 @@ class RegisterDynamicFilters extends RegisterFilters
             );
     }
 
-    /**
-     * @param FilterCollection $filterCollection
-     * @param array            $renameMap
-     */
     private function renameFilters(FilterCollection $filterCollection, array $renameMap): void
     {
         foreach ($renameMap as $filterKey => $newFilterKeys) {
@@ -227,12 +211,6 @@ class RegisterDynamicFilters extends RegisterFilters
         }
     }
 
-    /**
-     * @param string  $propertyPath
-     * @param Context $context
-     *
-     * @return StandaloneFilter|null
-     */
     private function getFilter(string $propertyPath, Context $context): ?StandaloneFilter
     {
         $entityClass = $context->getManageableEntityClass($this->doctrineHelper);

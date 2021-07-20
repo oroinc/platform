@@ -15,10 +15,6 @@ class ChunkFileClassifier implements ChunkFileClassifierInterface
     /** @var string */
     private $includedDataSectionName;
 
-    /**
-     * @param string      $primaryDataSectionName
-     * @param string|null $includedDataSectionName
-     */
     public function __construct(string $primaryDataSectionName, string $includedDataSectionName = null)
     {
         $this->primaryDataSectionName = $primaryDataSectionName;

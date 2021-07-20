@@ -55,14 +55,6 @@ class ConfigCacheWarmer
     /** @var array|null */
     private $configurableEntitiesMap;
 
-    /**
-     * @param ConfigManager                    $configManager
-     * @param ConfigCache                      $cache
-     * @param LockObject                       $configModelLockObject
-     * @param EntityManagerBag                 $entityManagerBag
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         ConfigCache $cache,

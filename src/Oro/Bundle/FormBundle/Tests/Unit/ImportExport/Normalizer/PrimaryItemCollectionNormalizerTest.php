@@ -99,7 +99,6 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-
     public function testDenormalizeWithItemType()
     {
         $format = null;

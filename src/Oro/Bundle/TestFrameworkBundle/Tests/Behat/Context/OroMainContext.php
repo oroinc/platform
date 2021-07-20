@@ -102,7 +102,6 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @BeforeStep
-     * @param BeforeStepScope $scope
      */
     public function beforeStepProfile(BeforeStepScope $scope)
     {
@@ -115,7 +114,6 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @AfterStep
-     * @param AfterStepScope $scope
      */
     public function afterStepProfile(AfterStepScope $scope)
     {
@@ -129,7 +127,6 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @BeforeStep
-     * @param BeforeStepScope $scope
      */
     public function beforeStep(BeforeStepScope $scope)
     {
@@ -154,7 +151,6 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @AfterStep
-     * @param AfterStepScope $scope
      */
     public function afterStep(AfterStepScope $scope)
     {
@@ -176,10 +172,6 @@ class OroMainContext extends MinkContext implements
         $this->checkForUnexpectedErrors($scope);
     }
 
-    /**
-     * @param Session $session
-     * @return bool
-     */
     protected function isSupportedUrl(Session $session): bool
     {
         try {
@@ -233,10 +225,6 @@ class OroMainContext extends MinkContext implements
      *
      * This helps to overcome a delay introduced by ajax calls after current step execution which prevent flash
      * message check (executed by the next step) to be done before flash message disappears.
-     *
-     * @param StepNode $currentStep
-     * @param FeatureNode $feature
-     * @return bool
      */
     private function isNextStepNeedSkip(StepNode $currentStep, FeatureNode $feature): bool
     {
@@ -395,8 +383,6 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @Then /^(?:|I )should see only following flash messages:$/
-     *
-     * @param TableNode $table
      */
     public function iShouldSeeOnlyFollowingFlashMessages(TableNode $table)
     {
@@ -799,9 +785,6 @@ class OroMainContext extends MinkContext implements
      * Example: When I click "Users" in "sidebar menu" element
      *
      * @Given /^(?:|I )click "(?P<needle>(?:[^"]|\\")*)" in "(?P<element>(?:[^"]|\\")*)" element$/
-     *
-     * @param string $needle
-     * @param string $element
      */
     public function iClickOnSmthInElement(string $needle, string $element)
     {
@@ -1557,9 +1540,6 @@ JS;
      * Example: Then the "Custom" option from "MyField" is selected
      *
      * @Then /^the "(?P<option>(?:[^"]|\\")*)" option from "(?P<fieldName>(?:[^"]|\\")*)" (?:is|should be) selected$/
-     *
-     * @param string $fieldName
-     * @param string $option
      */
     public function optionShouldBeSelected(string $fieldName, string $option)
     {
@@ -1784,7 +1764,6 @@ JS;
      * @Given sessions active:
      * @Given sessions:
      * @Given sessions has aliases:
-     * @param TableNode $table
      */
     public function sessionsInit(TableNode $table)
     {
@@ -2289,8 +2268,6 @@ JS;
      * Example: Given I set window size to 320x640
      *
      * @Given /^(?:|I )set window size to (?P<width>\d+)x(?P<height>\d+)$/
-     * @param int $width
-     * @param int $height
      */
     public function iSetWindowSize(int $width = 1920, int $height = 1080)
     {
@@ -2406,9 +2383,6 @@ JS;
      * Example: Then I should see "sample text" inside "Default Addresses" iframe
      *
      * @Then /^(?:|I )should see "(?P<text>[^\"]+)" inside "(?P<iframeName>(?:[^"]|\\")*)" iframe$/
-     *
-     * @param string $text
-     * @param string $iframeName
      */
     public function iShouldSeeTextInsideIframe(string $text, string $iframeName)
     {
@@ -2766,9 +2740,6 @@ JS;
      * Example: Then I should see "Drawing Field" goes after "Document Field"
      *
      * @Then /^(?:|I )should see "(?P<element1Name>(?:[^"]|\\")+)" goes after "(?P<element2Name>(?:[^"]|\\")+)"$/
-     *
-     * @param string $element1Name
-     * @param string $element2Name
      */
     public function iSeeElementGoesAfterAnother(string $element1Name, string $element2Name)
     {

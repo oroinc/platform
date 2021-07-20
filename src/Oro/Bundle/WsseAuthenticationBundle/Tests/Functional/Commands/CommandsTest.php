@@ -21,9 +21,6 @@ class CommandsTest extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @return array
-     */
     public function testGenerateWsse(): array
     {
         /** @var Kernel $kernel */
@@ -65,10 +62,6 @@ class CommandsTest extends WebTestCase
 
     /**
      * @depends testGenerateWsse
-     *
-     * @param array $header
-     *
-     * @return array
      */
     public function testApiWithWSSE(array $header): array
     {
@@ -79,11 +72,6 @@ class CommandsTest extends WebTestCase
         return $header;
     }
 
-    /**
-     * @param array $header
-     *
-     * @return Response
-     */
     private function checkWsse(array $header): Response
     {
         // Restore kernel after console command.
@@ -104,9 +92,6 @@ class CommandsTest extends WebTestCase
         return $this->client->getResponse();
     }
 
-    /**
-     * @return array
-     */
     private function prepareData(): array
     {
         return [
@@ -125,10 +110,6 @@ class CommandsTest extends WebTestCase
 
     /**
      * @depends testApiWithWSSE
-     *
-     * @param array $header
-     *
-     * @return array
      */
     public function testDeleteNonces(array $header): array
     {
@@ -185,10 +166,6 @@ class CommandsTest extends WebTestCase
         return $matches[1] ?? null;
     }
 
-    /**
-     * @param string $nonce
-     * @return string
-     */
     private function getNonceCacheKey(string $nonce): string
     {
         $key = preg_replace('/[^a-zA-Z0-9_.]/', '_', $nonce);

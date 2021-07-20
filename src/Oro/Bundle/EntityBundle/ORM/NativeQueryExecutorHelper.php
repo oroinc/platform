@@ -34,9 +34,6 @@ class NativeQueryExecutorHelper
      */
     protected $classesMetadata = [];
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -97,11 +94,6 @@ class NativeQueryExecutorHelper
         return $this->classesMetadata[$className];
     }
 
-    /**
-     * @param string $className
-     * @param array $fields
-     * @return array
-     */
     public function getColumns(string $className, array $fields): array
     {
         $result = [];

@@ -30,12 +30,6 @@ class MessageManager
      */
     protected $storage;
 
-    /**
-     * @param Session $session
-     * @param TranslatorInterface $translator
-     * @param EntityPaginationNavigation $navigation
-     * @param EntityPaginationStorage $storage
-     */
     public function __construct(
         Session $session,
         TranslatorInterface $translator,

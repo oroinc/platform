@@ -20,10 +20,6 @@ class SearchFieldResolver implements FieldResolverInterface
     /** @var array [field name pattern => field name pattern in search index, ...] */
     private $placeholderFieldMappings;
 
-    /**
-     * @param array $searchFieldMappings
-     * @param array $fieldMappings
-     */
     public function __construct(array $searchFieldMappings, array $fieldMappings)
     {
         $this->searchFieldMappings = $searchFieldMappings;
@@ -65,12 +61,6 @@ class SearchFieldResolver implements FieldResolverInterface
         return [];
     }
 
-    /**
-     * @param string $fieldName
-     * @param bool   $replacePlaceholdersWithVariableNames
-     *
-     * @return string
-     */
     private function resolveFieldByFieldMappings(
         string $fieldName,
         bool $replacePlaceholdersWithVariableNames = false
@@ -101,12 +91,6 @@ class SearchFieldResolver implements FieldResolverInterface
         return $fieldName;
     }
 
-    /**
-     * @param string $fieldName
-     * @param bool   $replacePlaceholdersWithVariableNames
-     *
-     * @return string|null
-     */
     private function resolveFieldByPlaceholderFieldMappings(
         string $fieldName,
         bool $replacePlaceholdersWithVariableNames
@@ -154,11 +138,6 @@ class SearchFieldResolver implements FieldResolverInterface
         }
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return InvalidFilterException
-     */
     private function createFieldNotSupportedException(string $fieldName): InvalidFilterException
     {
         return new InvalidFilterException(\sprintf('The field "%s" is not supported.', $fieldName));

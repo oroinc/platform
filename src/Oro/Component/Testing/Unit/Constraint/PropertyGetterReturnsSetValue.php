@@ -8,7 +8,6 @@ namespace Oro\Component\Testing\Unit\Constraint;
  */
 class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constraint
 {
-
     /**
      * @var string
      */
@@ -74,7 +73,6 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
             $prop->setAccessible(true);
             $prop->setValue($other, $this->testValue);
         }
-
 
         $this->getterName = 'get' . ucfirst($this->propertyName);
         if (!method_exists($other, $this->getterName)) {

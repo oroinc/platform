@@ -54,13 +54,6 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var QueryExecutorInterface */
     private $queryExecutor;
 
-    /**
-     * @param ConfigProcessorInterface $processor
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ParameterBinderInterface $parameterBinder
-     * @param QueryHintResolver        $queryHintResolver
-     * @param QueryExecutorInterface   $queryExecutor
-     */
     public function __construct(
         ConfigProcessorInterface $processor,
         EventDispatcherInterface $eventDispatcher,
@@ -120,8 +113,6 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
 
     /**
      * Gets datagrid this datasource belongs to.
-     *
-     * @return DatagridInterface
      */
     public function getDatagrid(): DatagridInterface
     {
@@ -202,9 +193,6 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->countQb = $this->countQb ? clone $this->countQb : null;
     }
 
-    /**
-     * @param array $config
-     */
     protected function processConfigs(array $config)
     {
         $this->qb = $this->configProcessor->processQuery($config);

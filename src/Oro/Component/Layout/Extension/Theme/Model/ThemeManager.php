@@ -21,10 +21,6 @@ class ThemeManager
      */
     private array $enabledThemes;
 
-    /**
-     * @param ThemeFactoryInterface       $themeFactory
-     * @param ThemeDefinitionBagInterface $themeDefinitionBag
-     */
     public function __construct(
         ThemeFactoryInterface $themeFactory,
         ThemeDefinitionBagInterface $themeDefinitionBag

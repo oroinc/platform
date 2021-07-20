@@ -14,17 +14,11 @@ class RequestListener
      */
     protected $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onRequest(GetResponseEvent $event)
     {
         $route = $event->getRequest()->get('_route');

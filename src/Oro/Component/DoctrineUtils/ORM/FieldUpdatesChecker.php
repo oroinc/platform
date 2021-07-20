@@ -23,10 +23,6 @@ class FieldUpdatesChecker
      */
     private $managerRegistry;
 
-    /**
-     * @param ManagerRegistry             $managerRegistry
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(ManagerRegistry $managerRegistry, PropertyAccessorInterface $propertyAccessor)
     {
         $this->managerRegistry = $managerRegistry;

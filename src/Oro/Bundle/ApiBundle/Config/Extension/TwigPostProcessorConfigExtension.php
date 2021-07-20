@@ -28,9 +28,6 @@ class TwigPostProcessorConfigExtension extends AbstractConfigExtension
         ];
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function addValidationOfPostProcessorOptions(NodeBuilder $node): void
     {
         $node->end()->validate()

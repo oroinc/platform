@@ -115,9 +115,6 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getActionParametersDataProvider
-     *
-     * @param array $context
-     * @param array $expected
      */
     public function testGetActionParameters(array $context, array $expected)
     {

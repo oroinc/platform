@@ -36,11 +36,6 @@ class ConfigListener
      */
     protected $affectedFeatures = [];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ConfigurationManager $featureConfigManager
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ConfigurationManager $featureConfigManager,
@@ -51,9 +46,6 @@ class ConfigListener
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param ConfigSettingsUpdateEvent $event
-     */
     public function onSettingsSaveBefore(ConfigSettingsUpdateEvent $event)
     {
         $configKeys = array_keys($event->getSettings());
@@ -72,7 +64,7 @@ class ConfigListener
         if ($changedFeatures) {
             $event = new FeaturesChange($changedFeatures);
             $this->eventDispatcher->dispatch($event, FeaturesChange::NAME);
-            
+
             foreach ($changedFeatures as $featureName => $state) {
                 $event = new FeatureChange($featureName, $state);
                 $this->eventDispatcher->dispatch($event, FeatureChange::NAME . '.' . $featureName);
@@ -119,7 +111,7 @@ class ConfigListener
             $dependentFeatures = $this->featureConfigManager->getFeatureDependents($feature);
             $affectedFeatures = array_merge($affectedFeatures, $dependentFeatures, [$feature]);
         }
-        
+
         return array_unique($affectedFeatures);
     }
 }

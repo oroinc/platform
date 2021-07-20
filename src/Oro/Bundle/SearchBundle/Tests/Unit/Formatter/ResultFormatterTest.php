@@ -179,9 +179,6 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Prepare repositories with stub data
-     *
-     * @param array $productEntities
-     * @param array $categoryEntities
      */
     protected function prepareRepositories(array $productEntities, array $categoryEntities)
     {

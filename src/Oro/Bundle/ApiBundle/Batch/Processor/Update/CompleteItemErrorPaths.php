@@ -40,12 +40,6 @@ abstract class CompleteItemErrorPaths implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Error           $error
-     * @param BatchUpdateItem $item
-     * @param int             $itemOffset
-     * @param string|null     $sectionName
-     */
     abstract protected function completeItemErrorPath(
         Error $error,
         BatchUpdateItem $item,

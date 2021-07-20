@@ -45,10 +45,6 @@ class OroSecurityExtension extends Extension
         $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function configureCookieTokenStorage(ContainerBuilder $container, array $config): void
     {
         $container->getDefinition('oro_security.csrf.cookie_token_storage')

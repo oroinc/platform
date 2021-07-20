@@ -106,11 +106,6 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return array
-     */
     protected function getFields(LoggerInterface $logger): array
     {
         $sql = 'SELECT id, data FROM oro_entity_config_field';

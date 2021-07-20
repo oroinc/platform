@@ -317,9 +317,6 @@ class LoadSegmentData extends AbstractLoadSegmentData
         return self::$segments;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function applySegmentFilterToDefinition(ObjectManager $manager)
     {
         foreach (self::$segments as $reference => $data) {

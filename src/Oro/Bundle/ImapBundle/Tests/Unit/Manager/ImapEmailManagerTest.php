@@ -44,7 +44,6 @@ class ImapEmailManagerTest extends TestCase
     /**
      * @dataProvider getEmailsDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @param $strDate
      * @throws \Exception
      */
     public function testGetEmails($strDate)
@@ -116,7 +115,6 @@ class ImapEmailManagerTest extends TestCase
         $msg->expects($this->exactly(2))
             ->method('getFlags')
             ->will($this->returnValue(['test1', 'test2']));
-
 
         $query = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\Search\SearchQuery')
             ->disableOriginalConstructor()
@@ -281,9 +279,6 @@ class ImapEmailManagerTest extends TestCase
         $this->assertEquals('Subject1', $email->getSubject());
     }
 
-    /**
-     * @return array
-     */
     public function getEmailsDataProvider(): array
     {
         return [
@@ -402,7 +397,6 @@ class ImapEmailManagerTest extends TestCase
         $msg->expects($this->once())
             ->method('getHeaders')
             ->willReturn($messageHeaders);
-
 
         return $msg;
     }

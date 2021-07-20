@@ -87,8 +87,6 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider preUpdateWhenDigitalAssetNotChangedDataProvider
-     *
-     * @param array $changeSet
      */
     public function testPreUpdateWhenDigitalAssetNotChanged(array $changeSet): void
     {
@@ -115,9 +113,6 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($this->file, $this->eventArgs);
     }
 
-    /**
-     * @return array
-     */
     public function preUpdateWhenDigitalAssetNotChangedDataProvider(): array
     {
         return [

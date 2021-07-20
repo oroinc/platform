@@ -32,9 +32,6 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider messageDataProvider
-     *
-     * @param Message $message
-     * @param DbalMessage $expectedTransportMessage
      */
     public function testSend(Message $message, DbalMessage $expectedTransportMessage): void
     {
@@ -97,9 +94,6 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $driver->getConfig());
     }
 
-    /**
-     * @return array
-     */
     public function messageDataProvider(): array
     {
         return [
@@ -181,15 +175,6 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $messageId
-     * @param string $body
-     * @param int|null $timestamp
-     * @param int|null $delay
-     * @param string|null $priority
-     *
-     * @return Message
-     */
     private function getMessage(
         string $messageId,
         string $body,
@@ -206,14 +191,6 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
         return $message;
     }
 
-    /**
-     * @param string $messageId
-     * @param string $body
-     * @param array $headers
-     * @param array $properties
-     *
-     * @return DbalMessage
-     */
     private function getTransportMessage(
         string $messageId,
         string $body,

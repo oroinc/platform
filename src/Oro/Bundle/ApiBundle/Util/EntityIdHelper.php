@@ -277,11 +277,6 @@ class EntityIdHelper
 
     /**
      * Gets a public getter for the given property.
-     *
-     * @param \ReflectionClass $reflClass
-     * @param string           $propertyName
-     *
-     * @return \ReflectionMethod|null
      */
     private function getGetter(\ReflectionClass $reflClass, string $propertyName): ?\ReflectionMethod
     {
@@ -298,11 +293,6 @@ class EntityIdHelper
 
     /**
      * Gets a public setter for the given property.
-     *
-     * @param \ReflectionClass $reflClass
-     * @param string           $propertyName
-     *
-     * @return \ReflectionMethod|null
      */
     private function getSetter(\ReflectionClass $reflClass, string $propertyName): ?\ReflectionMethod
     {
@@ -322,10 +312,6 @@ class EntityIdHelper
 
     /**
      * Camelizes a given string.
-     *
-     * @param string $value
-     *
-     * @return string
      */
     private function camelize(string $value): string
     {

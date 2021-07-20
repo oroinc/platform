@@ -25,13 +25,6 @@ class FeatureDependedFirewallMap extends FirewallMap
     /** @var array [firewall name => ['feature_name' => name, 'feature_firewall_listeners' => [class, ...]], ...] */
     private $featureDependedFirewalls;
 
-    /**
-     * @param ContainerInterface    $container
-     * @param iterable              $map
-     * @param FeatureChecker        $featureChecker
-     * @param FeatureAccessListener $featureAccessListener
-     * @param array                 $featureDependedFirewalls
-     */
     public function __construct(
         ContainerInterface $container,
         iterable $map,
@@ -72,11 +65,6 @@ class FeatureDependedFirewallMap extends FirewallMap
         return [$listeners, $exceptionListener, $logoutListener];
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return FirewallContext|null
-     */
     private function getContext(Request $request): ?FirewallContext
     {
         $method = new \ReflectionMethod($this, 'getFirewallContext');

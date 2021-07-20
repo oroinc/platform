@@ -13,9 +13,6 @@ class SqlQuery extends AbstractQuery
     /** @var SqlQueryBuilder */
     private $qb;
 
-    /**
-     * @param SqlQueryBuilder $qb
-     */
     public function setSqlQueryBuilder(SqlQueryBuilder $qb)
     {
         $this->qb = $qb;

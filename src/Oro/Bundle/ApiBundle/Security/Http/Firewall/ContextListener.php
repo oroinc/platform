@@ -31,11 +31,6 @@ class ContextListener implements ListenerInterface
     /** @var CsrfRequestManager */
     private $csrfRequestManager;
 
-    /**
-     * @param ListenerInterface     $innerListener
-     * @param TokenStorageInterface $tokenStorage
-     * @param SessionInterface|null $session
-     */
     public function __construct(
         ListenerInterface $innerListener,
         TokenStorageInterface $tokenStorage,
@@ -46,9 +41,6 @@ class ContextListener implements ListenerInterface
         $this->session = $session;
     }
 
-    /**
-     * @param CsrfRequestManager $csrfRequestManager
-     */
     public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager)
     {
         $this->csrfRequestManager = $csrfRequestManager;
@@ -95,9 +87,6 @@ class ContextListener implements ListenerInterface
             );
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     protected function processEvent(GetResponseEvent $event): void
     {
         $this->innerListener->handle($event);

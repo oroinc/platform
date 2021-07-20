@@ -26,12 +26,6 @@ class LocalizationChoicesProvider
     /** @var LocalizationManager */
     protected $localizationManager;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param LanguageCodeFormatter $languageFormatter
-     * @param LanguageProvider $languageProvider
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(
         LocaleSettings $localeSettings,
         LanguageCodeFormatter $languageFormatter,

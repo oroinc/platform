@@ -26,11 +26,6 @@ class TransitionEventTriggerHandler implements TransitionTriggerHandlerInterface
      */
     private $featureChecker;
 
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param ManagerRegistry $registry
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         ManagerRegistry $registry,

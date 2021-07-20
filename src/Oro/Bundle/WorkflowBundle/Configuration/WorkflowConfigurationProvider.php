@@ -20,12 +20,6 @@ class WorkflowConfigurationProvider
     /** @var WorkflowConfigurationImportsProcessor */
     private $importsProcessor;
 
-    /**
-     * @param WorkflowListConfiguration $configuration
-     * @param WorkflowConfigFinderBuilder $finderBuilder
-     * @param ConfigFileReaderInterface $reader
-     * @param WorkflowConfigurationImportsProcessor $configurationImportsProcessor
-     */
     public function __construct(
         WorkflowListConfiguration $configuration,
         WorkflowConfigFinderBuilder $finderBuilder,
@@ -82,10 +76,6 @@ class WorkflowConfigurationProvider
         return $configs;
     }
 
-    /**
-     * @param array $directories
-     * @return Finder
-     */
     private function getConfigFiles(array $directories): Finder
     {
         $finder = $this->finderBuilder->create();

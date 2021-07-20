@@ -30,9 +30,6 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -426,9 +423,6 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getNumberFormatter()->isCurrencySymbolPrepend($currency, $locale);
     }
 
-    /**
-     * @return bool
-     */
     public function isAllowedToRoundPricesAndAmounts(): bool
     {
         return $this->getNumberFormatter()->isAllowedToRoundPricesAndAmounts();

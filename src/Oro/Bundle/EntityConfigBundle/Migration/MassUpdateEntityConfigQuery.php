@@ -78,9 +78,6 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         $this->updateEntityConfig($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfigIndexValue(LoggerInterface $logger)
     {
         $entityConfigRecordData = $this->getEntityConfigRecordData();
@@ -141,9 +138,6 @@ class MassUpdateEntityConfigQuery implements MigrationQuery, ConnectionAwareInte
         return (string)$convertedValue;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfig(LoggerInterface $logger)
     {
         $entityConfigRecordData = $this->getEntityConfigRecordData();

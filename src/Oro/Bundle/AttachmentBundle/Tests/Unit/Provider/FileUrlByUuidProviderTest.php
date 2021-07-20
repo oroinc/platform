@@ -72,7 +72,6 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
             ->with($file, 100, 300, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/url');
 
-
         $this->assertSame(
             '/url',
             $this->provider->getResizedImageUrl($file->getUuid(), 100, 300)
@@ -120,9 +119,6 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->getFilteredImageUrl($file->getUuid(), 'testFilter');
     }
 
-    /**
-     * @return File
-     */
     private function createFile(): File
     {
         /** @var File $file */
@@ -135,9 +131,6 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
         return $file;
     }
 
-    /**
-     * @param File $file
-     */
     private function assertLoadFileFromDB(File $file): void
     {
         $repository = $this->getMockBuilder(FileRepository::class)
@@ -156,9 +149,6 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($file);
     }
 
-    /**
-     * @param File $file
-     */
     private function assertLoadNotExistFile(File $file): void
     {
         $repository = $this->getMockBuilder(FileRepository::class)

@@ -35,11 +35,6 @@ class Manager
 
     /**
      * Constructor
-     *
-     * @param Factory               $factory
-     * @param EntityManager         $entityManager
-     * @param AclHelper             $aclHelper
-     * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         Factory $factory,
@@ -200,9 +195,6 @@ class Manager
         }
     }
 
-    /**
-     * @param EntityModelInterface $entityModel
-     */
     public function remove(EntityModelInterface $entityModel)
     {
         $this->entityManager->remove($entityModel->getEntity());
@@ -333,9 +325,6 @@ class Manager
 
     /**
      * Copy widgets from source entity to dashboard model
-     *
-     * @param DashboardModel $target
-     * @param Dashboard      $source
      */
     protected function copyWidgets(DashboardModel $target, Dashboard $source)
     {

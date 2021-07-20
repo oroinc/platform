@@ -15,10 +15,6 @@ class EntityMetadataProvider implements MetadataProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param ConfigManager       $cm
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigManager $cm, TranslatorInterface $translator)
     {
         $this->cm         = $cm;

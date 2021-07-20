@@ -8,11 +8,6 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Options\OptionsProcessorTestCase;
 
 class SetCacheControlTest extends OptionsProcessorTestCase
 {
-    /**
-     * @param int $preflightMaxAge
-     *
-     * @return CorsSettings
-     */
     private function getCorsSettings(int $preflightMaxAge): CorsSettings
     {
         return new CorsSettings(

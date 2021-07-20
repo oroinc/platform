@@ -9,9 +9,6 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
 
-    /**
-     * @param RelatedEmailsProvider $relatedEmailsProvider
-     */
     public function __construct(RelatedEmailsProvider $relatedEmailsProvider)
     {
         $this->relatedEmailsProvider = $relatedEmailsProvider;

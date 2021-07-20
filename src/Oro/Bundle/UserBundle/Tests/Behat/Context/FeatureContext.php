@@ -26,8 +26,6 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * @BeforeScenario
-     *
-     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {

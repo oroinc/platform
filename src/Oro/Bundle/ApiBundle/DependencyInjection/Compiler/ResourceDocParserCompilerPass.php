@@ -74,11 +74,6 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
             ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function getApiDocViews(ContainerBuilder $container): array
     {
         $config = DependencyInjectionUtil::getConfig($container);
@@ -98,11 +93,6 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
         return \implode('&', $aspects);
     }
 
-    /**
-     * @param string $requestTypeExpr
-     *
-     * @return string
-     */
     private function normalizeRequestType(string $requestTypeExpr): string
     {
         $requestType = ExpressionParser::parse($requestTypeExpr);

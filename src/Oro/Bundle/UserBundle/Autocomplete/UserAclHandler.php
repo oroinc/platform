@@ -182,9 +182,6 @@ class UserAclHandler implements SearchHandlerInterface
         $this->fields = $properties;
     }
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function setEntityNameResolver(EntityNameResolver $entityNameResolver)
     {
         $this->entityNameResolver = $entityNameResolver;
@@ -309,8 +306,6 @@ class UserAclHandler implements SearchHandlerInterface
 
     /**
      * Add additional filter
-     *
-     * @param QueryBuilder $queryBuilder
      */
     protected function addAdditionalFilterCriteria(QueryBuilder $queryBuilder)
     {
@@ -370,9 +365,6 @@ class UserAclHandler implements SearchHandlerInterface
 
     /**
      * Adds a condition excluding user from the list
-     *
-     * @param QueryBuilder  $queryBuilder
-     * @param UserInterface $user
      */
     protected function excludeUser(QueryBuilder $queryBuilder, UserInterface $user)
     {
@@ -382,8 +374,6 @@ class UserAclHandler implements SearchHandlerInterface
 
     /**
      * Returns organization by which data should limit to
-     *
-     * @return Organization
      */
     protected function getOrganization(): Organization
     {

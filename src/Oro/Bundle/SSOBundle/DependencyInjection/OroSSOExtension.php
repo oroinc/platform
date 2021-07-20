@@ -30,9 +30,6 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
         $serviceLoader->load('services.yml');
     }
 
-    /**
-     * @param ExtendedContainerBuilder $container
-     */
     private function configureSecurityFirewalls(ExtendedContainerBuilder $container): void
     {
         if (!$container->hasParameter('web_backend_prefix')) {

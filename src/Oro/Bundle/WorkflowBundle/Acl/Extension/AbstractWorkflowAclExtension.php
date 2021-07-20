@@ -20,13 +20,6 @@ abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAcl
     /** @var WorkflowManager */
     private $workflowManager;
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManager                            $workflowManager
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,

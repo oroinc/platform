@@ -24,11 +24,6 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheMock;
 
-    /**
-     * @param \PHPUnit\Framework\TestCase $testCase
-     *
-     * @param array                       $classes
-     */
     public function __construct(\PHPUnit\Framework\TestCase $testCase, array $classes = [])
     {
         $this->configManagerMock = $testCase->getMockBuilder(ConfigManager::class)

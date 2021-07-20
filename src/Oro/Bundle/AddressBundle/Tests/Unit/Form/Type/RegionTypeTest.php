@@ -52,7 +52,6 @@ class RegionTypeTest extends \PHPUnit\Framework\TestCase
             ->method('setAttribute')
             ->with($this->equalTo(RegionType::COUNTRY_OPTION_KEY), $this->equalTo('test'));
 
-
         $this->type->buildForm($builderMock, $options);
     }
 

@@ -28,13 +28,6 @@ class RebuildTranslationCacheProcessor
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param Translator                 $translator
-     * @param TranslationDomainProvider  $domainProvider
-     * @param JsTranslationDumper        $jsTranslationDumper
-     * @param DynamicAssetVersionManager $assetVersionManager
-     * @param LoggerInterface            $logger
-     */
     public function __construct(
         Translator $translator,
         TranslationDomainProvider $domainProvider,

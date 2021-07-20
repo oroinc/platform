@@ -25,12 +25,6 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     /** @var string */
     private $placeholderName;
 
-    /**
-     * @param LayoutContextHolder $contextHolder
-     * @param ThemeManager $themeManager
-     * @param CacheManager $imagineCacheManager
-     * @param string $placeholderName
-     */
     public function __construct(
         LayoutContextHolder $contextHolder,
         ThemeManager $themeManager,
@@ -62,9 +56,6 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         );
     }
 
-    /**
-     * @return array
-     */
     private function getImagePlaceholders(): array
     {
         $context = $this->contextHolder->getContext();

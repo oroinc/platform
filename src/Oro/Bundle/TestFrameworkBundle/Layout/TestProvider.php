@@ -9,9 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Exception\LayoutChildWithInvisibleParentExcep
  */
 class TestProvider
 {
-    /**
-     * @return bool
-     */
     public function getFalse(): bool
     {
         return false;

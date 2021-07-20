@@ -742,9 +742,6 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider urlAddQueryParametersDataProvider
-     * @param string $url
-     * @param array $parameters
-     * @param string $expected
      */
     public function testUrlAddQueryParameters(string $url, array $parameters, string $expected)
     {

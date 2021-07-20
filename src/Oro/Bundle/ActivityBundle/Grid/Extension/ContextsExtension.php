@@ -63,12 +63,6 @@ class ContextsExtension extends AbstractExtension
     /** @var RouterInterface */
     protected $router;
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     * @param ActivityManager $activityManager
-     * @param ConfigProvider $entityConfigProvider
-     * @param RouterInterface $router
-     */
     public function __construct(
         EntityClassResolver $entityClassResolver,
         ActivityManager $activityManager,

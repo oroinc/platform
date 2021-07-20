@@ -47,9 +47,6 @@ class EmailAttachmentsType extends AbstractType
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'sanitizeAttachments']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function sanitizeAttachments(FormEvent $event)
     {
         /** @var Collection $attachments */

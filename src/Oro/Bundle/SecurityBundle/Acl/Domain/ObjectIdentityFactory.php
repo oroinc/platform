@@ -21,9 +21,6 @@ class ObjectIdentityFactory
     /** @var AclExtensionSelector */
     private $extensionSelector;
 
-    /**
-     * @param AclExtensionSelector $extensionSelector
-     */
     public function __construct(AclExtensionSelector $extensionSelector)
     {
         $this->extensionSelector = $extensionSelector;
@@ -54,10 +51,6 @@ class ObjectIdentityFactory
     /**
      * Constructs an underlying ObjectIdentity object for given ObjectIdentity.
      * Underlying is class level ObjectIdentity for given object level ObjectIdentity.
-     *
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return ObjectIdentity
      *
      * @throws InvalidAclException if an underlying ObjectIdentity cannot be created
      */
@@ -130,11 +123,6 @@ class ObjectIdentityFactory
         return $this->extensionSelector->select($val, false);
     }
 
-    /**
-     * @param ObjectIdentityInterface $oid
-     *
-     * @return string
-     */
     private function convertObjectIdentityToString(ObjectIdentityInterface $oid): string
     {
         return method_exists($oid, '__toString')

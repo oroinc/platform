@@ -44,9 +44,6 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
     /** @var  Process */
     protected $restoreDbFromDumpProcess;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $kernel->boot();

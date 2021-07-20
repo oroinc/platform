@@ -163,9 +163,6 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider getFirstIdentifierDataProvider
      */
     public function testGetFirstIdentifier(array $source, array $expected)
@@ -234,9 +231,6 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider getLastIdentifierDataProvider
      */
     public function testGetLastIdentifier(array $source, array $expected)

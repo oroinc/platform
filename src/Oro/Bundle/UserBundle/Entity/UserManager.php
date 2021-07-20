@@ -26,13 +26,6 @@ class UserManager extends BaseUserManager
     /** @var ServiceLink */
     private $emailProcessorLink;
 
-    /**
-     * @param UserLoaderInterface     $userLoader
-     * @param ManagerRegistry         $doctrine
-     * @param EncoderFactoryInterface $encoderFactory
-     * @param EnumValueProvider       $enumValueProvider
-     * @param ServiceLink             $emailProcessor
-     */
     public function __construct(
         UserLoaderInterface $userLoader,
         ManagerRegistry $doctrine,
@@ -47,11 +40,6 @@ class UserManager extends BaseUserManager
 
     /**
      * Return UserApi entity for the given user and organization
-     *
-     * @param User         $user
-     * @param Organization $organization
-     *
-     * @return UserApi|null
      */
     public function getApi(User $user, Organization $organization): ?UserApi
     {
@@ -60,9 +48,6 @@ class UserManager extends BaseUserManager
 
     /**
      * Sets the given authentication status for a user
-     *
-     * @param User   $user
-     * @param string $authStatus
      */
     public function setAuthStatus(User $user, string $authStatus): void
     {
@@ -85,9 +70,6 @@ class UserManager extends BaseUserManager
         parent::updateUser($user, $flush);
     }
 
-    /**
-     * @param User $user
-     */
     public function sendResetPasswordEmail(User $user): void
     {
         $user->setConfirmationToken($user->generateToken());
@@ -95,9 +77,6 @@ class UserManager extends BaseUserManager
         $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 
-    /**
-     * @return Processor
-     */
     private function getEmailProcessor(): Processor
     {
         return $this->emailProcessorLink->getService();

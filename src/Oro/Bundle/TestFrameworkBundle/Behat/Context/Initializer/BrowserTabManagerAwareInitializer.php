@@ -17,17 +17,11 @@ class BrowserTabManagerAwareInitializer implements ContextInitializer
      */
     private $manager;
 
-    /**
-     * @param BrowserTabManager $manager
-     */
     public function __construct(BrowserTabManager $manager)
     {
         $this->manager = $manager;
     }
 
-    /**
-     * @param Context $context
-     */
     public function initializeContext(Context $context)
     {
         if ($context instanceof BrowserTabManagerAwareInterface) {

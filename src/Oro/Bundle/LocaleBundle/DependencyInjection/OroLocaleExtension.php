@@ -40,9 +40,6 @@ class OroLocaleExtension extends Extension
 
     /**
      * Prepare locale system settings default values.
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
      */
     private function prepareSettings(array $config, ContainerBuilder $container)
     {

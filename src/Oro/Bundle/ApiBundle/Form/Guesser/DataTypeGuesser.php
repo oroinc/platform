@@ -24,10 +24,6 @@ class DataTypeGuesser
 
     /**
      * Returns a field guess for the given data type.
-     *
-     * @param string $dataType
-     *
-     * @return TypeGuess
      */
     public function guessType(string $dataType): TypeGuess
     {
@@ -44,19 +40,12 @@ class DataTypeGuesser
 
     /**
      * Returns a default field guess.
-     *
-     * @return TypeGuess
      */
     public function guessDefault(): TypeGuess
     {
         return new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }
 
-    /**
-     * @param string $dataType
-     *
-     * @return TypeGuess
-     */
     private function getTypeGuessForMappedDataType(string $dataType): TypeGuess
     {
         [$formType, $options] = $this->dataTypeMappings[$dataType];

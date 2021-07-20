@@ -21,8 +21,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
     private const SESSION_NAME = 'TEST_SESSION_ID';
 
     /**
-     * @param \Exception $exception
-     *
      * @dataProvider getExceptionProvider
      */
     public function testSetTargetPathShouldCallParentWithCookie(\Exception $exception)
@@ -44,8 +42,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @dataProvider getExceptionProvider
      */
     public function testSetTargetPathShouldNotCallParentWithoutCookie(\Exception $exception)

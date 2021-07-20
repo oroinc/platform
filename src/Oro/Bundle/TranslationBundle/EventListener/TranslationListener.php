@@ -24,9 +24,6 @@ class TranslationListener
         $this->jobName = $jobName;
     }
 
-    /**
-     * @param AfterJobExecutionEvent $event
-     */
     public function onAfterImportTranslations(AfterJobExecutionEvent $event)
     {
         $jobExecution = $event->getJobExecution();

@@ -557,7 +557,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-
      * Set name prefix
      *
      * @param string $namePrefix
@@ -581,7 +580,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-
      * Set first name
      *
      * @param string $firstName
@@ -605,7 +603,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-
      * Set middle name
      *
      * @param string $middleName

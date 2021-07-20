@@ -32,12 +32,6 @@ class UnidirectionalAssociationHandler
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param PropertyAccessorInterface      $propertyAccessor
-     * @param EntityIdHelper                 $entityIdHelper
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         PropertyAccessorInterface $propertyAccessor,
@@ -315,11 +309,6 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param array         $previousTargetEntities
-     * @param FormInterface $fieldForm
-     * @param string        $targetAssociationName
-     */
     private function deleteFromSingleValuedAssociation(
         array $previousTargetEntities,
         FormInterface $fieldForm,
@@ -374,12 +363,6 @@ class UnidirectionalAssociationHandler
         return false;
     }
 
-    /**
-     * @param string      $class
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
     private function getEntityClass(string $class, RequestType $requestType): string
     {
         $entityClass = $this->entityOverrideProviderRegistry
@@ -412,12 +395,6 @@ class UnidirectionalAssociationHandler
         return $methods;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $associationName
-     *
-     * @return string
-     */
     private function getAdder(string $entityClass, string $associationName): string
     {
         $methods = $this->getAdderAndRemover($entityClass, $associationName);
@@ -425,12 +402,6 @@ class UnidirectionalAssociationHandler
         return $methods[0];
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $associationName
-     *
-     * @return string
-     */
     private function getRemover(string $entityClass, string $associationName): string
     {
         $methods = $this->getAdderAndRemover($entityClass, $associationName);

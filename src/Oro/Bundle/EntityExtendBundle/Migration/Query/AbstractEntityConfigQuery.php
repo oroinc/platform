@@ -17,10 +17,6 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
      */
     abstract public function getRowBatchLimit();
 
-    /**
-     * @param array           $row
-     * @param LoggerInterface $logger
-     */
     abstract public function processRow(array $row, LoggerInterface $logger);
 
     /**

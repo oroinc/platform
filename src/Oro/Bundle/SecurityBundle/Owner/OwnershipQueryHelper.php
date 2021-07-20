@@ -16,10 +16,6 @@ class OwnershipQueryHelper
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param EntityClassResolver                $entityClassResolver
-     */
     public function __construct(
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         EntityClassResolver $entityClassResolver

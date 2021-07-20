@@ -22,9 +22,6 @@ class ChartType extends ConfigProviderAwareType
      */
     protected $eventListener;
 
-    /**
-     * @param EventSubscriberInterface $eventListener
-     */
     public function setEventListener(EventSubscriberInterface $eventListener)
     {
         $this->eventListener = $eventListener;

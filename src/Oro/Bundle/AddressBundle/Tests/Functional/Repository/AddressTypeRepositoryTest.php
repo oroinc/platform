@@ -65,9 +65,6 @@ class AddressTypeRepositoryTest extends WebTestCase
         self::assertEquals('Rechnung', $billingTranslation->getLabel());
     }
 
-    /**
-     * @return AddressTypeRepository
-     */
     protected function getRepository(): AddressTypeRepository
     {
         return static::getContainer()->get('doctrine')->getRepository(AddressType::class);

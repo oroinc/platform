@@ -25,9 +25,6 @@ class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider guessFormatterProvider
-     *
-     * @param array|null $identifier
-     * @param ColumnGuess|null $expected
      */
     public function testGuessFormatter(?array $identifier, ?ColumnGuess $expected): void
     {
@@ -50,9 +47,6 @@ class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->guesser->guessFormatter('TestClass', 'testProp', 'testType'));
     }
 
-    /**
-     * @return array
-     */
     public function guessFormatterProvider(): array
     {
         return [

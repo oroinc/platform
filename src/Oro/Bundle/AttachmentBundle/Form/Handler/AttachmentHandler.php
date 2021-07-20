@@ -18,10 +18,6 @@ class AttachmentHandler
     /** @var ObjectManager */
     protected $manager;
 
-    /**
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
     public function __construct(RequestStack $requestStack, ObjectManager $manager)
     {
         $this->requestStack = $requestStack;
@@ -48,9 +44,6 @@ class AttachmentHandler
         return false;
     }
 
-    /**
-     * @param Attachment $entity
-     */
     protected function onSuccess(Attachment $entity)
     {
         $this->manager->persist($entity);

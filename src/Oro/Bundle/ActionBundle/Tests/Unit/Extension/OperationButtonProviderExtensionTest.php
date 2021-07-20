@@ -90,10 +90,6 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider findDataProvider
-     *
-     * @param array $operations
-     * @param ButtonSearchContext $buttonSearchContext
-     * @param array $expected
      */
     public function testFind(array $operations, ButtonSearchContext $buttonSearchContext, array $expected)
     {
@@ -342,10 +338,6 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @param array $operations
-     * @param ButtonSearchContext $buttonSearchContext
-     */
     private function assertOperationRegistryMethodsCalled(array $operations, ButtonSearchContext $buttonSearchContext)
     {
         $this->operationRegistry->expects($this->once())

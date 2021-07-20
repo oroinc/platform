@@ -177,9 +177,6 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    /**
-     * @return array
-     */
     public function useRequestDataProvider(): array
     {
         return [

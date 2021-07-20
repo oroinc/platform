@@ -588,7 +588,6 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         return $transportMock;
     }
 
-
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */

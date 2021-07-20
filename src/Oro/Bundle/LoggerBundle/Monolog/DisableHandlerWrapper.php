@@ -15,7 +15,6 @@ class DisableHandlerWrapper extends HandlerWrapper
 
     /**
      * {@inheritDoc}
-     * @param LogLevelConfig $config
      */
     public function __construct(LogLevelConfig $config, HandlerInterface $handler)
     {

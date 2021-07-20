@@ -64,12 +64,6 @@ class QueryCountCalculatorTest extends OrmTestCase
         ]);
     }
 
-    /**
-     * @param string     $dql
-     * @param array|null $params
-     *
-     * @return Query
-     */
     private function getQuery(string $dql, array $params = null): Query
     {
         $query = new Query($this->em);
@@ -316,7 +310,6 @@ class QueryCountCalculatorTest extends OrmTestCase
                 ['a_0' => $expectedEntity2->a, 'b_1' => $expectedEntity2->b],
                 false
             );
-
 
         // execute the source query to initialize its ResultSetMapping
         $this->assertEquals([$expectedEntity1], $query->execute());

@@ -42,9 +42,6 @@ class AclPrivilegeEntityByConfigurableNameFilterTest extends AbstractAclPrivileg
 
     /**
      * @dataProvider filterDataProvider
-     *
-     * @param string $configurableName
-     * @param bool $expected
      */
     public function testFilter(string $configurableName, bool $expected): void
     {
@@ -63,9 +60,6 @@ class AclPrivilegeEntityByConfigurableNameFilterTest extends AbstractAclPrivileg
         $this->assertEquals($expected, $this->filter->filter($aclPrivilege, $configurablePermission));
     }
 
-    /**
-     * @return array
-     */
     public function filterDataProvider(): array
     {
         return [

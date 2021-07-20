@@ -23,17 +23,11 @@ class ModifyCreatedAndUpdatedPropertiesListener
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @param OnFlushEventArgs $args
-     */
     public function onFlush(OnFlushEventArgs $args)
     {
         if (!$this->enabled) {

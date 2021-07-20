@@ -18,9 +18,6 @@ class LoadNormalizedAsyncOperation implements ProcessorInterface
     /** @var ActionProcessorBagInterface */
     private $processorBag;
 
-    /**
-     * @param ActionProcessorBagInterface $processorBag
-     */
     public function __construct(ActionProcessorBagInterface $processorBag)
     {
         $this->processorBag = $processorBag;

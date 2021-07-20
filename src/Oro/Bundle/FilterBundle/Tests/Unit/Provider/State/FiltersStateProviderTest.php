@@ -31,10 +31,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenParameters(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -47,10 +43,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @param array $state
-     * @param array $minifiedState
-     */
     private function mockParametersState(array $state, array $minifiedState): void
     {
         $this->datagridParametersHelper
@@ -66,10 +58,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
             ->willReturn($minifiedState);
     }
 
-    /**
-     * @param array $filtersColumns
-     * @param array $defaultFilters
-     */
     private function mockFiltersColumns(array $filtersColumns, array $defaultFilters): void
     {
         $this->datagridConfiguration
@@ -83,10 +71,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenMinifiedParameters(
         array $state,
@@ -102,9 +86,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     public function stateDataProvider(): array
     {
         return [
@@ -139,10 +120,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenCurrentGridView(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -166,10 +143,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultGridView(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -201,10 +174,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenGridViewsDisabled(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -221,10 +190,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultFiltersState(array $state, array $filtersColumns, array $expectedState): void
     {
@@ -241,10 +206,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetStateFromParameters(
         array $state,
@@ -262,10 +223,6 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $defaultFilters
-     * @param array $filtersColumns
-     * @param array $expectedState
      */
     public function testGetDefaultState(
         array $defaultFilters,

@@ -37,9 +37,6 @@ class ToolbarExtension extends AbstractExtension
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
 
-    /**
-     * @param ConfigManager $cm
-     */
     public function __construct(ConfigManager $cm)
     {
         $this->cm = $cm;

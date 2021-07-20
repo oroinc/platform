@@ -11,9 +11,6 @@ class CountQueryOptimizationListener
 {
     const PRIMARY_CONDITION_PATTERN = '/%s.primary\s*=\s*(?P<value>true|1|:\w+|\?\d+)/';
 
-    /**
-     * @param CountQueryOptimizationEvent $event
-     */
     public function onOptimize(CountQueryOptimizationEvent $event)
     {
         $context     = $event->getContext();

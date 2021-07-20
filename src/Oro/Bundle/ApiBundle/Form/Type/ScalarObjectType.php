@@ -19,9 +19,6 @@ class ScalarObjectType extends AbstractType
     /** @var FormHelper */
     private $formHelper;
 
-    /**
-     * @param FormHelper $formHelper
-     */
     public function __construct(FormHelper $formHelper)
     {
         $this->formHelper = $formHelper;

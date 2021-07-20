@@ -23,19 +23,11 @@ class DecimalTypeCast extends AbstractTypeCastingHandler
         return parent::castValue($value);
     }
 
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
     public function isSupported($value): bool
     {
         return is_double($value) || is_int($value);
     }
 
-    /**
-     * @return string
-     */
     public static function getType(): string
     {
         return Query::TYPE_DECIMAL;

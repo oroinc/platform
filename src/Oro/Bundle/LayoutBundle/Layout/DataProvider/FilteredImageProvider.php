@@ -17,10 +17,6 @@ class FilteredImageProvider
     /** @var ImagePlaceholderProviderInterface */
     private $imagePlaceholderProvider;
 
-    /**
-     * @param AttachmentManager $attachmentManager
-     * @param ImagePlaceholderProviderInterface $imagePlaceholderProvider
-     */
     public function __construct(
         AttachmentManager $attachmentManager,
         ImagePlaceholderProviderInterface $imagePlaceholderProvider
@@ -29,11 +25,6 @@ class FilteredImageProvider
         $this->imagePlaceholderProvider = $imagePlaceholderProvider;
     }
 
-    /**
-     * @param File|null $file
-     * @param string $filter
-     * @return string
-     */
     public function getImageUrl(?File $file, string $filter): string
     {
         if ($file) {
@@ -43,10 +34,6 @@ class FilteredImageProvider
         return $this->getPlaceholder($filter);
     }
 
-    /**
-     * @param string $filter
-     * @return string
-     */
     public function getPlaceholder(string $filter): string
     {
         return (string) $this->imagePlaceholderProvider->getPath($filter);

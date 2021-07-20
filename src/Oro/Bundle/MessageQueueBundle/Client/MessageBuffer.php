@@ -76,10 +76,6 @@ class MessageBuffer
 
     /**
      * Checks whether the buffer contains at least one message for the given topic.
-     *
-     * @param string $topic
-     *
-     * @return bool
      */
     public function hasMessagesForTopic(string $topic): bool
     {
@@ -164,8 +160,6 @@ class MessageBuffer
 
     /**
      * Removes a message from the buffer.
-     *
-     * @param int $messageId
      */
     public function removeMessage(int $messageId): void
     {

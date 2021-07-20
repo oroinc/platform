@@ -20,11 +20,6 @@ class UpdateFactory
     /** @var FormTemplateDataProviderRegistry */
     private $dataProviderRegistry;
 
-    /**
-     * @param FormFactory $formFactory
-     * @param FormHandlerRegistry $formHandlerRegistry
-     * @param FormTemplateDataProviderRegistry $dataProviderRegistry
-     */
     public function __construct(
         FormFactory $formFactory,
         FormHandlerRegistry $formHandlerRegistry,

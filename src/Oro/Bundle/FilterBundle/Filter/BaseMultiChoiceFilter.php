@@ -70,11 +70,6 @@ abstract class BaseMultiChoiceFilter extends AbstractFilter
         return $data;
     }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
     protected function parseComparisonType(array $data): array
     {
         $type = $data['type'];

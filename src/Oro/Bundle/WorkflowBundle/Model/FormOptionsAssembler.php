@@ -28,9 +28,6 @@ class FormOptionsAssembler extends BaseAbstractAssembler
      */
     protected $actionFactory;
 
-    /**
-     * @param ActionFactoryInterface $actionFactory
-     */
     public function __construct(ActionFactoryInterface $actionFactory)
     {
         $this->actionFactory = $actionFactory;

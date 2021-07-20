@@ -119,8 +119,6 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      * Sets an accessor to target metadata by a specified target class name.
      * It is used for multi-target associations.
      * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
-     *
-     * @param TargetMetadataAccessorInterface|null $targetMetadataAccessor
      */
     public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor)
     {

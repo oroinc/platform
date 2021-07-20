@@ -43,11 +43,6 @@ class CheckRequestType extends BaseCheckRequestType
         return $detected;
     }
 
-    /**
-     * @param ParameterBagInterface $requestHeaders
-     *
-     * @return bool
-     */
     private function checkJsonApiRequest(ParameterBagInterface $requestHeaders): bool
     {
         $result = false;
@@ -89,11 +84,6 @@ class CheckRequestType extends BaseCheckRequestType
         return $value;
     }
 
-    /**
-     * @param ParameterBagInterface $requestHeaders
-     *
-     * @return string|null
-     */
     private function getContentTypeHeaderValue(ParameterBagInterface $requestHeaders): ?string
     {
         $value = $requestHeaders->get('Content-Type');
@@ -138,11 +128,6 @@ class CheckRequestType extends BaseCheckRequestType
         return $result;
     }
 
-    /**
-     * @param string $contentTypeHeaderValue
-     *
-     * @return bool
-     */
     private function checkContentTypeHeader(string $contentTypeHeaderValue): bool
     {
         $result = false;

@@ -15,9 +15,6 @@ class TranslationsDatagridRouteHelper
      */
     protected $datagridRouteHelper;
 
-    /**
-     * @param DatagridRouteHelper $datagridRouteHelper
-     */
     public function __construct(DatagridRouteHelper $datagridRouteHelper)
     {
         $this->datagridRouteHelper = $datagridRouteHelper;

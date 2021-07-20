@@ -16,11 +16,6 @@ class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider formatTypeDataProvider
-     *
-     * @param $value
-     * @param $type
-     * @param $exception
-     * @param $expected
      */
     public function testFormatType($value, $type, $exception, $expected)
     {

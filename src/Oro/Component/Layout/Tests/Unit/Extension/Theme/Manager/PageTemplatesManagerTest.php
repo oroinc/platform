@@ -29,9 +29,6 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider routePageTemplatesDataProvider
-     *
-     * @param array $themes
-     * @param array $expected
      */
     public function testGetRoutePageTemplates(array $themes, array $expected)
     {
@@ -46,9 +43,6 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->pageTemplatesManager->getRoutePageTemplates());
     }
 
-    /**
-     * @return array
-     */
     public function routePageTemplatesDataProvider(): array
     {
         return [
@@ -139,13 +133,6 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $label
-     * @param string $key
-     * @param string $routeName
-     * @param string|null $description
-     * @return PageTemplate
-     */
     private function getPageTemplate(string $label, string $key, string $routeName, ?string $description): PageTemplate
     {
         $pageTemplate = new PageTemplate($label, $key, $routeName);

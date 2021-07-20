@@ -112,9 +112,6 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider findAllDataProvider
-     *
-     * @param array $input
-     * @param array $output
      */
     public function testFindAll(array $input, array $output)
     {

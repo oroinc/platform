@@ -50,8 +50,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Gets the access rule executor.
-     *
-     * @return AccessRuleExecutor
      */
     public function getAccessRuleExecutor(): AccessRuleExecutor
     {
@@ -80,8 +78,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Returns current logged user id.
-     *
-     * @return int|null
      */
     public function getUserId(): ?int
     {
@@ -90,8 +86,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Returns organization id.
-     *
-     * @return int|null
      */
     public function getOrganizationId(): ?int
     {
@@ -100,8 +94,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Sets organization id.
-     *
-     * @param int $organizationId
      */
     public function setOrganizationId(int $organizationId): void
     {
@@ -110,10 +102,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Returns true if the additional parameter exists.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
     public function hasOption(string $key): bool
     {
@@ -160,8 +148,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Removes an additional option.
-     *
-     * @param string $key
      */
     public function removeOption(string $key): void
     {

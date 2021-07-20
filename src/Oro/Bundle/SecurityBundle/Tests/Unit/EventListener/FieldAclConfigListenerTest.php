@@ -19,7 +19,6 @@ class FieldAclConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
-
     protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -46,7 +45,6 @@ class FieldAclConfigListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($securityConfig->get('field_acl_supported'));
     }
-
 
     public function testPreFlushOnSystemEntity()
     {

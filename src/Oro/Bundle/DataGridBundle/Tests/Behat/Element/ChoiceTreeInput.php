@@ -55,9 +55,6 @@ class ChoiceTreeInput extends Element
 
     /**
      * Check that the item exists/not exists in results
-     *
-     * @param string $value
-     * @param bool $isShouldSee
      */
     public function checkValue(string $value, bool $isShouldSee): void
     {

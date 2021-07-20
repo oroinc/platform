@@ -25,9 +25,6 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
      */
     protected $eventDispatcher;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(ContextAccessor $contextAccessor)
     {
         $this->contextAccessor = $contextAccessor;
@@ -41,9 +38,6 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
         $this->condition = $condition;
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;

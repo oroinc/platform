@@ -26,11 +26,6 @@ class CopyTagging extends AbstractAction
     /** @var array */
     protected $options = [];
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param TagManager      $tagManager
-     * @param TaggableHelper  $taggableHelper
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         TagManager $tagManager,

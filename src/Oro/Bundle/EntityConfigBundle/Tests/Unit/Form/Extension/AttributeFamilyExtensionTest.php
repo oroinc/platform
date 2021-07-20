@@ -58,8 +58,6 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider notApplicableDataProvider
-     *
-     * @param array $options
      */
     public function testBuildFormWhenNotApplicable(array $options)
     {

@@ -22,9 +22,6 @@ class TimezoneType extends AbstractType
      */
     protected $cache;
 
-    /**
-     * @param null|Cache $cache
-     */
     public function __construct(Cache $cache = null)
     {
         $this->cache = $cache;

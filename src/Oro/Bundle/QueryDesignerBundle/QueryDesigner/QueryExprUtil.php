@@ -9,9 +9,6 @@ final class QueryExprUtil
 {
     /**
      * Replaces all table aliases declared in the join expression part of a query with the given aliases.
-     *
-     * @param array $joins
-     * @param array $aliases
      */
     public static function replaceTableAliasesInJoinAlias(array &$joins, array $aliases): void
     {
@@ -25,9 +22,6 @@ final class QueryExprUtil
 
     /**
      * Replaces all table aliases declared in the join expression part of a query with the given aliases.
-     *
-     * @param array $joins
-     * @param array $aliases
      */
     public static function replaceTableAliasesInJoinExpr(array &$joins, array $aliases): void
     {
@@ -48,9 +42,6 @@ final class QueryExprUtil
 
     /**
      * Replaces all table aliases declared in the join part of a query with the given aliases.
-     *
-     * @param array $joins
-     * @param array $aliases
      */
     public static function replaceTableAliasesInJoinConditions(array &$joins, array $aliases): void
     {
@@ -223,14 +214,6 @@ final class QueryExprUtil
         return null;
     }
 
-    /**
-     * @param string $expr
-     * @param int    $offset
-     * @param string $alias
-     * @param string $newAlias
-     *
-     * @return string
-     */
     private static function replaceAliasWithNewAliasPlaceholder(
         string $expr,
         int $offset,
@@ -245,12 +228,6 @@ final class QueryExprUtil
         );
     }
 
-    /**
-     * @param string $expr
-     * @param string $newAlias
-     *
-     * @return string
-     */
     private static function resolveNewAliasPlaceholder(string $expr, string $newAlias): string
     {
         return str_replace(sprintf('{{%s}}', $newAlias), $newAlias, $expr);

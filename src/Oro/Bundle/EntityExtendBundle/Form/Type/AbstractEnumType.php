@@ -29,10 +29,6 @@ abstract class AbstractEnumType extends AbstractType
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ConfigManager   $configManager
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine

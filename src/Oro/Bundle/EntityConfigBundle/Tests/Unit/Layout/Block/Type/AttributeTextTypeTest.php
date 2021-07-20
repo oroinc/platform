@@ -19,9 +19,6 @@ class AttributeTextTypeTest extends BlockTypeTestCase
     /** @var AttributeTextType */
     private $attributeTextType;
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->attributeConfigurationProvider = $this->getMockBuilder(AttributeConfigurationProvider::class)
@@ -78,7 +75,6 @@ class AttributeTextTypeTest extends BlockTypeTestCase
                 'className' => 'attributeClassName',
             ]
         );
-
 
         $this->assertEquals('=value === null', $view->vars['visible']);
     }

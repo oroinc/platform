@@ -73,9 +73,6 @@ class EmailNotificationTypeListenerTest extends TestCase
 
     /**
      * @dataProvider onPostSetDataWithoutWorkflowProvider
-     *
-     * @param EmailNotification $data
-     * @param EmailNotification $expected
      */
     public function testOnPostSetDataWithoutWorkflow(EmailNotification $data, EmailNotification $expected)
     {
@@ -255,8 +252,6 @@ class EmailNotificationTypeListenerTest extends TestCase
 
     /**
      * @dataProvider onPreSubmitUnsupportedDataProvider
-     *
-     * @param array $data
      */
     public function testOnPreSubmitUnsupportedData(array $data)
     {

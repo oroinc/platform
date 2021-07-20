@@ -160,18 +160,12 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValidLocaleDataProvider
-     *
-     * @param string|null $locale
-     * @param string $expectedLocale
      */
     public function testGetValidLocale(?string $locale, string $expectedLocale): void
     {
         $this->assertEquals($expectedLocale, LocaleSettings::getValidLocale($locale));
     }
 
-    /**
-     * @return array
-     */
     public function getValidLocaleDataProvider(): array
     {
         return [
@@ -187,18 +181,12 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getCountryByLocaleDataProvider
-     *
-     * @param string $locale
-     * @param string $expectedCountry
      */
     public function testGetCountryByLocale(string $locale, string $expectedCountry): void
     {
         $this->assertEquals($expectedCountry, LocaleSettings::getCountryByLocale($locale));
     }
 
-    /**
-     * @return array
-     */
     public function getCountryByLocaleDataProvider(): array
     {
         return [
@@ -332,8 +320,6 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $expectedValue
-     * @param $configurationValue
      * @dataProvider getTimeZoneDataProvider
      */
     public function testGetTimeZone($expectedValue, $configurationValue)

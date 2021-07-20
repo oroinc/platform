@@ -151,12 +151,6 @@ class ActivityListChainProvider implements ResetInterface
         return $this->targetClasses[$accessibleKey];
     }
 
-    /**
-     * @param string $targetClass
-     * @param string $activityClass
-     *
-     * @return bool
-     */
     public function isApplicableTarget(string $targetClass, string $activityClass): bool
     {
         return
@@ -193,10 +187,6 @@ class ActivityListChainProvider implements ResetInterface
 
     /**
      * Gets a supported activity owner class for the given activity class.
-     *
-     * @param string $activityClass
-     *
-     * @return string
      */
     public function getSupportedOwnerActivity(string $activityClass): string
     {
@@ -313,11 +303,6 @@ class ActivityListChainProvider implements ResetInterface
         );
     }
 
-    /**
-     * @param Config $config
-     *
-     * @return array
-     */
     public function getActivityListOption(Config $config): array
     {
         $templates = [];
@@ -389,10 +374,6 @@ class ActivityListChainProvider implements ResetInterface
     /**
      * Gets an activity list provider for the given activity class.
      *
-     * @param string $activityClass
-     *
-     * @return ActivityListProviderInterface
-     *
      * @throws \LogicException if a provider for the given activity class does not exist
      */
     public function getProviderByClass(string $activityClass): ActivityListProviderInterface
@@ -428,10 +409,6 @@ class ActivityListChainProvider implements ResetInterface
 
     /**
      * Gets an activity list provider for the given activity owner class.
-     *
-     * @param string $activityOwnerClass
-     *
-     * @return ActivityListProviderInterface
      *
      * @throws \LogicException if a provider for the given owner class does not exist
      */
@@ -540,11 +517,6 @@ class ActivityListChainProvider implements ResetInterface
         }
     }
 
-    /**
-     * @param string $className
-     *
-     * @return \LogicException
-     */
     private function createProviderNotFoundException(string $className): \LogicException
     {
         return new \LogicException(sprintf('An activity list provider for "%s" does not exist.', $className));

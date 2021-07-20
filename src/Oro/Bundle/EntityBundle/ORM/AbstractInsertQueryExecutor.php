@@ -22,9 +22,6 @@ abstract class AbstractInsertQueryExecutor implements InsertQueryExecutorInterfa
      */
     protected $helper;
 
-    /**
-     * @param NativeQueryExecutorHelper $helper
-     */
     public function __construct(NativeQueryExecutorHelper $helper)
     {
         $this->helper = $helper;

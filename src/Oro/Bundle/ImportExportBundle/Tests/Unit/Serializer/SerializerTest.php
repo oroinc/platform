@@ -91,7 +91,6 @@ class SerializerTest extends \PHPUnit\Framework\TestCase
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
     }
 
-
     /**
      * @dataProvider denormalizeDataProvider
      */

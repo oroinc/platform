@@ -26,9 +26,6 @@ class RemindableEntity implements RemindableInterface
         return $this->reminders;
     }
 
-    /**
-     * @param Collection $reminders
-     */
     public function setReminders(Collection $reminders)
     {
         $this->reminders = $reminders;

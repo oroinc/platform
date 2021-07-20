@@ -11,8 +11,6 @@ interface ConfigurationSectionInterface
 {
     /**
      * Builds the definition of a section configuration.
-     *
-     * @param NodeBuilder $node
      */
     public function configure(NodeBuilder $node): void;
 
@@ -27,8 +25,6 @@ interface ConfigurationSectionInterface
 
     /**
      * Injects the configuration settings.
-     *
-     * @param ConfigurationSettingsInterface $settings
      */
     public function setSettings(ConfigurationSettingsInterface $settings): void;
 }

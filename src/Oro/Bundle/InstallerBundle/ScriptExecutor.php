@@ -27,11 +27,6 @@ class ScriptExecutor
      */
     protected $commandExecutor;
 
-    /**
-     * @param OutputInterface    $output
-     * @param ContainerInterface $container
-     * @param CommandExecutor    $commandExecutor
-     */
     public function __construct(
         OutputInterface $output,
         ContainerInterface $container,

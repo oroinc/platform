@@ -23,11 +23,6 @@ class MaintenanceListener
      */
     private $tokenAccessor;
 
-    /**
-     * @param WebsocketClientInterface $client
-     * @param ConnectionChecker $connectionChecker
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         WebsocketClientInterface $client,
         ConnectionChecker $connectionChecker,
@@ -48,9 +43,6 @@ class MaintenanceListener
         $this->onMode(false);
     }
 
-    /**
-     * @param bool $isOn
-     */
     private function onMode(bool $isOn)
     {
         if (!$this->connectionChecker->checkConnection()) {

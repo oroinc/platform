@@ -29,8 +29,6 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $services
-     *
      * @dataProvider processWithMissingServicesDataProvider
      */
     public function testProcessWithMissingServices(array $services)

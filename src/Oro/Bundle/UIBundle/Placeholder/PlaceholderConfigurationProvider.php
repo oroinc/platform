@@ -33,10 +33,6 @@ class PlaceholderConfigurationProvider extends PhpArrayConfigProvider
 
     /**
      * Gets placeholder item configuration.
-     *
-     * @param string $itemName
-     *
-     * @return array|null
      */
     public function getItemConfiguration(string $itemName): ?array
     {
@@ -88,8 +84,6 @@ class PlaceholderConfigurationProvider extends PhpArrayConfigProvider
      * it is required for correct merging of placeholders
      * if we do not do this the newly loaded placeholder without 'items' attribute removes
      * already loaded items
-     *
-     * @param array $placeholders
      */
     private function ensurePlaceholdersCompleted(array &$placeholders)
     {
@@ -101,12 +95,6 @@ class PlaceholderConfigurationProvider extends PhpArrayConfigProvider
         }
     }
 
-    /**
-     * @param array $placeholders
-     * @param array $items
-     *
-     * @return array
-     */
     private function processConfiguration(array $placeholders, array $items): array
     {
         $processedConfig = CumulativeConfigProcessorUtil::processConfiguration(

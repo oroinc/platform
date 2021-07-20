@@ -25,10 +25,6 @@ class ObjectMetadataFactory
     /** @var AssociationManager */
     protected $associationManager;
 
-    /**
-     * @param MetadataHelper     $metadataHelper
-     * @param AssociationManager $associationManager
-     */
     public function __construct(
         MetadataHelper $metadataHelper,
         AssociationManager $associationManager
@@ -263,10 +259,6 @@ class ObjectMetadataFactory
         return $associationDataType;
     }
 
-    /**
-     * @param AssociationMetadata         $associationMetadata
-     * @param EntityDefinitionFieldConfig $field
-     */
     protected function setAssociationDataType(
         AssociationMetadata $associationMetadata,
         EntityDefinitionFieldConfig $field

@@ -234,7 +234,6 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         return new DynamicSegmentQueryBuilder($segmentQueryConverterFactory, $doctrine);
     }
 
-
     /**
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name

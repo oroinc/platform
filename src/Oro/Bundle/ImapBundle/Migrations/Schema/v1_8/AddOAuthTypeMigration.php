@@ -27,9 +27,6 @@ class AddOAuthTypeMigration implements Migration
         $this->alterTokenFieldsSize($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function alterTokenFieldsSize(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
@@ -41,9 +38,6 @@ class AddOAuthTypeMigration implements Migration
         ]);
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     private function alterExistingOrigins(QueryBag $queries): void
     {
         $typeGmail = AccountTypeModel::ACCOUNT_TYPE_GMAIL;

@@ -15,9 +15,6 @@ class BusinessUnitDeleteHandlerExtension extends AbstractEntityDeleteHandlerExte
     /** @var OwnerDeletionManager */
     private $ownerDeletionManager;
 
-    /**
-     * @param OwnerDeletionManager $ownerDeletionManager
-     */
     public function __construct(OwnerDeletionManager $ownerDeletionManager)
     {
         $this->ownerDeletionManager = $ownerDeletionManager;

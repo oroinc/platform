@@ -21,8 +21,6 @@ class MultiEnumManager
 
     /**
      * Handle onFlush event
-     *
-     * @param OnFlushEventArgs $event
      */
     public function handleOnFlush(OnFlushEventArgs $event)
     {

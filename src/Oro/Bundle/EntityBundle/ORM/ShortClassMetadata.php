@@ -28,11 +28,6 @@ class ShortClassMetadata implements \Serializable
      */
     public $hasAssociations;
 
-    /**
-     * @param string $name
-     * @param bool   $isMappedSuperclass
-     * @param bool   $hasAssociations
-     */
     public function __construct(string $name, bool $isMappedSuperclass = false, bool $hasAssociations = false)
     {
         $this->name = $name;

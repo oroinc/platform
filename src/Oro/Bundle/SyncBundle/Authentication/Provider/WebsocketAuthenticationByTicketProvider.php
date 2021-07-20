@@ -26,10 +26,6 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
      */
     private $providerKey;
 
-    /**
-     * @param AuthenticationProviderInterface $ticketAuthenticationProvider
-     * @param string $providerKey
-     */
     public function __construct(
         AuthenticationProviderInterface $ticketAuthenticationProvider,
         string $providerKey
@@ -57,10 +53,6 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
     }
 
     /**
-     * @param ConnectionInterface $connection
-     *
-     * @return string
-     *
      * @throws BadCredentialsException
      */
     private function getTicketFromConnection(ConnectionInterface $connection): string
@@ -87,11 +79,6 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
         return $ticket;
     }
 
-    /**
-     * @param string $ticket
-     *
-     * @return Token
-     */
     private function createTokenFromTicket(string $ticket): Token
     {
         [$ticketId, $username, $nonce, $created] = explode(';', $ticket);

@@ -16,10 +16,6 @@ class AclPrivilegeEntityByConfigurableNameFilter extends AclPrivilegeEntityFilte
     /** @var array */
     private $identityIds;
 
-    /**
-     * @param string $filteredConfigurableName
-     * @param array $entities
-     */
     public function __construct(string $filteredConfigurableName, array $entities = [])
     {
         $this->filteredConfigurableName = $filteredConfigurableName;
@@ -29,9 +25,6 @@ class AclPrivilegeEntityByConfigurableNameFilter extends AclPrivilegeEntityFilte
         }
     }
 
-    /**
-     * @param string $entity
-     */
     public function addEntity(string $entity): void
     {
         $this->identityIds[] = 'entity:' . $entity;

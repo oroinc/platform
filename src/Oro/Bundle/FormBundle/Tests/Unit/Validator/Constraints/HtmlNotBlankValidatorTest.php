@@ -29,9 +29,6 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate($value, $constraint);
     }
 
-    /**
-     * @return array
-     */
     public function validItemsDataProvider(): array
     {
         return [
@@ -72,9 +69,6 @@ class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate($value, $constraint);
     }
 
-    /**
-     * @return array
-     */
     public function invalidItemsDataProvider(): array
     {
         return [

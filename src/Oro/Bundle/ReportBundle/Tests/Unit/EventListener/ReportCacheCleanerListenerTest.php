@@ -27,9 +27,6 @@ class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new ReportCacheCleanerListener($this->cache, self::PREFIX_CACHE_KEY);
     }
 
-    /**
-     * @return Report
-     */
     private function getReport(): Report
     {
         return $this->getEntity(Report::class, ['id' => 1]);

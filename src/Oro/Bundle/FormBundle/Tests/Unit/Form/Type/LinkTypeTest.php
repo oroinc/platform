@@ -52,8 +52,6 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param array $expected
      * @dataProvider optionsProvider
      */
     public function testFinishView(array $options, array $expected)

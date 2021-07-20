@@ -18,10 +18,6 @@ class EmailRecipientsProvider
     /** @var EmailRecipientsProviderInterface[] */
     protected $providers = [];
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EmailRecipientsHelper $emailRecipientsHelper
-     */
     public function __construct(TranslatorInterface $translator, EmailRecipientsHelper $emailRecipientsHelper)
     {
         $this->translator = $translator;

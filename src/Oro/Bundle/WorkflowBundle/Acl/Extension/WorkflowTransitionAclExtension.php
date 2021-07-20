@@ -19,13 +19,6 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 {
     private const PERMISSION_PERFORM = 'PERFORM_TRANSITION';
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManager                            $workflowManager
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,

@@ -15,9 +15,6 @@ class AbstractDemoDataFixturesListenerTest extends AbstractDataFixturesListenerT
         $this->listener->disableListener(self::LISTENERS[1]);
     }
 
-    /**
-     * @param bool $isDemoData
-     */
     protected function assertListenerManagerCalled(bool $isDemoData)
     {
         if ($isDemoData) {

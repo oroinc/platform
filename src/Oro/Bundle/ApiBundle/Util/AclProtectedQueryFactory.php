@@ -21,11 +21,6 @@ class AclProtectedQueryFactory extends QueryFactory
     /** @var RequestType|null */
     private $requestType;
 
-    /**
-     * @param SerializerDoctrineHelper $doctrineHelper
-     * @param QueryResolver            $queryResolver
-     * @param QueryModifierRegistry    $queryModifier
-     */
     public function __construct(
         SerializerDoctrineHelper $doctrineHelper,
         QueryResolver $queryResolver,
@@ -35,17 +30,11 @@ class AclProtectedQueryFactory extends QueryFactory
         $this->queryModifier = $queryModifier;
     }
 
-    /**
-     * @return RequestType|null
-     */
     public function getRequestType(): ?RequestType
     {
         return $this->requestType;
     }
 
-    /**
-     * @param RequestType|null $requestType
-     */
     public function setRequestType(RequestType $requestType = null)
     {
         $this->requestType = $requestType;

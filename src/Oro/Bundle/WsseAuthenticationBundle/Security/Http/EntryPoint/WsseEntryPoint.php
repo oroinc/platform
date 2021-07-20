@@ -23,11 +23,6 @@ class WsseEntryPoint implements AuthenticationEntryPointInterface
     /** @var string */
     private $profile;
 
-    /**
-     * @param LoggerInterface|null $logger
-     * @param string $realmName
-     * @param string $profile
-     */
     public function __construct(
         ?LoggerInterface $logger = null,
         string $realmName = '',

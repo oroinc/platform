@@ -20,10 +20,6 @@ class UserProvider implements UserProviderInterface
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param UserLoaderInterface $userLoader
-     * @param ManagerRegistry     $doctrine
-     */
     public function __construct(UserLoaderInterface $userLoader, ManagerRegistry $doctrine)
     {
         $this->userLoader = $userLoader;

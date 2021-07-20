@@ -60,13 +60,6 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
      */
     private $batchSize = 500;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
@@ -81,17 +74,11 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
         $this->logger = $logger;
     }
 
-    /**
-     * @return int
-     */
     public function getBatchSize(): int
     {
         return $this->batchSize;
     }
 
-    /**
-     * @param int $batchSize
-     */
     public function setBatchSize(int $batchSize): void
     {
         $this->batchSize = $batchSize;
@@ -152,13 +139,6 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
         );
     }
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param Job $job
-     * @param array $entityData
-     * @param array $body
-     * @param int $index
-     */
     private function createDelayed(JobRunner $jobRunner, Job $job, array $entityData, array $body, int &$index): void
     {
         if (!\is_array($entityData) || !isset($entityData['fields'])) {
@@ -193,11 +173,6 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
 
     /**
      * Prepare data from collections.
-     *
-     * @param array $sourceEntitiesData
-     * @param string $set
-     *
-     * @return array
      */
     private function processEntityFromCollection(array $sourceEntitiesData, string $set): array
     {
@@ -320,14 +295,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
     }
 
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param PersistentCollection $collection
-     * @param string $class
-     * @param string $field
-     * @param bool $memberOf
-     *
      * @throws \Doctrine\ORM\Mapping\MappingException
-     * @return array
      */
     private function getIdsWithoutHydration(
         EntityManagerInterface $entityManager,

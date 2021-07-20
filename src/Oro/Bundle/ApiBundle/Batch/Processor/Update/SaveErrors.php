@@ -25,11 +25,6 @@ class SaveErrors implements ProcessorInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ErrorManager    $errorManager
-     * @param RetryHelper     $retryHelper
-     * @param LoggerInterface $logger
-     */
     public function __construct(ErrorManager $errorManager, RetryHelper $retryHelper, LoggerInterface $logger)
     {
         $this->errorManager = $errorManager;
@@ -106,11 +101,6 @@ class SaveErrors implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param Error $error
-     *
-     * @return BatchError
-     */
     private function createBatchError(Error $error): BatchError
     {
         $result = new BatchError();

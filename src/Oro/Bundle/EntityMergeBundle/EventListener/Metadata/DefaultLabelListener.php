@@ -14,17 +14,11 @@ class DefaultLabelListener
      */
     protected $entityConfigHelper;
 
-    /**
-     * @param EntityConfigHelper $entityConfigHelper
-     */
     public function __construct(EntityConfigHelper $entityConfigHelper)
     {
         $this->entityConfigHelper = $entityConfigHelper;
     }
 
-    /**
-     * @param EntityMetadataEvent $event
-     */
     public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();

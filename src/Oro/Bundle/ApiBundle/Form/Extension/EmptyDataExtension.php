@@ -20,9 +20,6 @@ class EmptyDataExtension extends AbstractTypeExtension
     /** @var EntityInstantiator */
     private $entityInstantiator;
 
-    /**
-     * @param EntityInstantiator $entityInstantiator
-     */
     public function __construct(EntityInstantiator $entityInstantiator)
     {
         $this->entityInstantiator = $entityInstantiator;

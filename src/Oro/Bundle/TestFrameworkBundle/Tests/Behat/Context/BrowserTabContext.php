@@ -27,8 +27,6 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
      *
      * Example: And I open a new browser tab and set "tab1" alias for it
      * @When /^(?:|I )open a new browser tab and set "(?P<alias>[^"]+)" alias for it$/
-     *
-     * @param string $alias
      */
     public function iOpenANewWindow(string $alias)
     {
@@ -38,10 +36,8 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
     /**
      * Sets alias for the current browser tab
      *
-     * Example: And I set alias "tab1"f or the current browser tab
+     * Example: And I set alias "tab1" for the current browser tab
      * @When /^(?:|I )set alias "(?P<alias>[^"]+)" for (?:|the )current browser tab$/
-     *
-     * @param string $alias
      */
     public function iSetAliasForTheCurrentWindow(string $alias)
     {
@@ -53,8 +49,6 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
      *
      * Example: And I switch to the browser tab "3"
      * @When /^(?:|I )switch to (?:|the )browser tab "(?P<alias>[^"]+)"$/
-     *
-     * @param string $alias
      */
     public function iSwitchToTheWindow(string $alias)
     {
@@ -67,8 +61,6 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
      * Example: And I close the current browser tab
      * @When /^(?:|I )close (?:|the )current browser tab$/
      * @When /^(?:|I )close (?:|the ) browser tab "(?P<alias>[^"]+)"$/
-     *
-     * @param string|null $alias
      */
     public function iCloseTheCurrentWindow(string $alias = null)
     {

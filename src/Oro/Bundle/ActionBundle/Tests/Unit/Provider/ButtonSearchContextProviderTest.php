@@ -34,8 +34,6 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param array $context
      */
     public function testGetButtonSearchContext(array $context)
     {

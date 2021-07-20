@@ -19,10 +19,6 @@ class ConfigVoter implements VoterInterface
      */
     protected $featureConfigManager;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param ConfigurationManager $featureConfigManager
-     */
     public function __construct(ConfigManager $configManager, ConfigurationManager $featureConfigManager)
     {
         $this->configManager = $configManager;

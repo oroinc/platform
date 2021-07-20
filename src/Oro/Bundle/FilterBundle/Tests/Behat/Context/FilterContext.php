@@ -18,8 +18,6 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )add the following filters:$/
-     *
-     * @param TableNode $table
      */
     public function iAddTheFollowingFilters(TableNode $table)
     {
@@ -141,8 +139,6 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )should see "(?P<column>(?:[^"]|\\")*)" in the field condition filter select/
-     *
-     * @param string $column
      */
     public function shouldSeeInTheFieldConditionSelect(string $column)
     {
@@ -151,18 +147,12 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )should not see "(?P<column>(?:[^"]|\\")*)" in the field condition filter select/
-     *
-     * @param string $column
      */
     public function shouldNotSeeInTheFieldConditionSelect(string $column)
     {
         $this->checkInTheFieldConditionSelect($column, false);
     }
 
-    /**
-     * @param string $column
-     * @param bool $isShouldSee
-     */
     private function checkInTheFieldConditionSelect(string $column, bool $isShouldSee): void
     {
         $lastConditionItem = $this->createElement('Last condition item');

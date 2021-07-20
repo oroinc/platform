@@ -11,9 +11,6 @@ class WorkflowDefinitionChoicesGroupProvider
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;

@@ -28,9 +28,6 @@ class TagsDictionaryFilterTest extends WebTestCase
 
     /**
      * @dataProvider filterProvider
-     *
-     * @param callable $filterFormData
-     * @param array $expectedResult
      */
     public function testFilter(callable $filterFormData, array $expectedResult): void
     {

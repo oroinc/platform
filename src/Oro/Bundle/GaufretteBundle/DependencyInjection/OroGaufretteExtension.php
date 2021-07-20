@@ -19,9 +19,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
     /** @var ConfigurationFactoryInterface[] */
     private $configurationFactories = [];
 
-    /**
-     * @param ConfigurationFactoryInterface $configurationFactory
-     */
     public function addConfigurationFactory(ConfigurationFactoryInterface $configurationFactory)
     {
         $this->configurationFactories[$configurationFactory->getKey()] = $configurationFactory;
@@ -69,10 +66,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string|null      $readonlyProtocol
-     */
     private function configureReadonlyProtocol(ContainerBuilder $container, ?string $readonlyProtocol): void
     {
         if (!$container->hasParameter('knp_gaufrette.stream_wrapper.protocol')) {
@@ -88,11 +81,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $container->setParameter('oro_gaufrette.stream_wrapper.readonly_protocol', $readonlyProtocol ?? '');
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function configureAdapters(ContainerBuilder $container): array
     {
         $configs = [];
@@ -124,11 +112,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         return $configs;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function configureFilesystems(ContainerBuilder $container): array
     {
         $configs = [];
@@ -165,12 +148,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         return $configs;
     }
 
-    /**
-     * @param string $adapterName
-     * @param string $configString
-     *
-     * @return array
-     */
     private function configureAdapter(string $adapterName, string $configString): array
     {
         foreach ($this->configurationFactories as $key => $configurationFactory) {
@@ -203,9 +180,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         ));
     }
 
-    /**
-     * @return string
-     */
     private function getAdapterTypeHints(): string
     {
         $hints = [];
@@ -240,12 +214,6 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         return $this->getGaufretteItemNames($container, 'filesystems');
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $key
-     *
-     * @return array
-     */
     private function getGaufretteItemNames(ContainerBuilder $container, string $key): array
     {
         $result = [];
@@ -262,20 +230,11 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         return $result;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function getGaufretteConfigs(ContainerBuilder $container): array
     {
         return $container->getExtensionConfig('knp_gaufrette');
     }
 
-    /**
-     * @param ExtendedContainerBuilder $container
-     * @param array                    $config
-     */
     private function addGaufretteConfig(ExtendedContainerBuilder $container, array $config): void
     {
         if ($config) {

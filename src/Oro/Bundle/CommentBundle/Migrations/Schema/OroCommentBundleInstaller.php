@@ -21,9 +21,6 @@ class OroCommentBundleInstaller implements
     /** @var CommentExtension */
     protected $comment;
 
-    /**
-     * @param CommentExtension $commentExtension
-     */
     public function setCommentExtension(CommentExtension $commentExtension)
     {
         $this->comment = $commentExtension;

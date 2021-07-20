@@ -22,9 +22,6 @@ class AddIncludeFilter implements ProcessorInterface
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;

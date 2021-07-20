@@ -619,9 +619,6 @@ class WidgetControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param array $operations
-     */
     private function setOperationsConfig(array $operations)
     {
         $config = $this->configProvider->getConfiguration();

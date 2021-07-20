@@ -20,10 +20,6 @@ class FileApplicationsDataProvider
     /** @var ConfigProvider */
     private $configProvider;
 
-    /**
-     * @param FileApplicationsProvider $fileApplicationsProvider
-     * @param CurrentApplicationProviderInterface $currentApplicationProvider
-     */
     public function __construct(
         FileApplicationsProvider $fileApplicationsProvider,
         CurrentApplicationProviderInterface $currentApplicationProvider
@@ -32,20 +28,11 @@ class FileApplicationsDataProvider
         $this->currentApplicationProvider = $currentApplicationProvider;
     }
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function setConfigProvider(ConfigProvider $configProvider): void
     {
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     public function isValidForField(string $className, string $fieldName): bool
     {
         if ($this->configProvider) {

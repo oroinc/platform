@@ -23,10 +23,6 @@ class DefaultOperationRequestHelper
     /** @var RouteProviderInterface */
     protected $routeProvider;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param RouteProviderInterface $routeProvider
-     */
     public function __construct(RequestStack $requestStack, RouteProviderInterface $routeProvider)
     {
         $this->requestStack = $requestStack;

@@ -21,19 +21,12 @@ class EntityFieldFallbackValueMergeListener
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param FieldHelper $fieldHelper
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(FieldHelper $fieldHelper, DoctrineHelper $doctrineHelper)
     {
         $this->fieldHelper = $fieldHelper;
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessAfter(StrategyEvent $event)
     {
         $entity = $event->getEntity();

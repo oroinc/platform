@@ -13,9 +13,6 @@ use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
  */
 class DraftSourceExtension extends AbstractDuplicatorExtension
 {
-    /**
-     * @return Filter
-     */
     public function getFilter(): Filter
     {
         $source = $this->getContext()->offsetGet('source');
@@ -23,19 +20,11 @@ class DraftSourceExtension extends AbstractDuplicatorExtension
         return new SourceFilter($source);
     }
 
-    /**
-     * @return Matcher
-     */
     public function getMatcher(): Matcher
     {
         return new PropertyNameMatcher('draftSource');
     }
 
-    /**
-     * @param DraftableInterface $source
-     *
-     * @return bool
-     */
     public function isSupport(DraftableInterface $source): bool
     {
         return !$source->getDraftSource();

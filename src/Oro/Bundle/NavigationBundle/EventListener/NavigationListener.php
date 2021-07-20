@@ -15,10 +15,6 @@ class NavigationListener
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor
@@ -27,9 +23,6 @@ class NavigationListener
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param ConfigureMenuEvent $event
-     */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->tokenAccessor->hasUser()) {

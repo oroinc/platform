@@ -20,11 +20,6 @@ class FileRemovalManager implements FileRemovalManagerInterface
     /** @var MediaCacheManagerRegistryInterface */
     private $mediaCacheManagerRegistry;
 
-    /**
-     * @param FileRemovalManagerConfigInterface  $configuration
-     * @param FileNamesProviderInterface         $fileNamesProvider
-     * @param MediaCacheManagerRegistryInterface $mediaCacheManagerRegistry
-     */
     public function __construct(
         FileRemovalManagerConfigInterface $configuration,
         FileNamesProviderInterface $fileNamesProvider,

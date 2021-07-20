@@ -15,9 +15,6 @@ class UserApiSubscriber implements EventSubscriberInterface
      */
     protected $factory;
 
-    /**
-     * @param FormFactoryInterface $factory
-     */
     public function __construct(FormFactoryInterface $factory)
     {
         $this->factory = $factory;

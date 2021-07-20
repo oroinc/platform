@@ -21,9 +21,6 @@ class ExtendColumn extends Column
     /** @var bool */
     protected $constructed = false;
 
-    /**
-     * @param array $args
-     */
     public function __construct(array $args)
     {
         $this->extendOptionsManager = $args['extendOptionsManager'];

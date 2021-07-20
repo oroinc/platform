@@ -263,7 +263,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         return $builder;
     }
 
-
     /**
      * @param bool $isApplicable
      *

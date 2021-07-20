@@ -30,11 +30,6 @@ class NavigationItemsProvider implements NavigationItemsProviderInterface, Featu
     /** @var UrlMatcherInterface */
     private $urlMatcher;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ItemFactory $itemFactory
-     * @param UrlMatcherInterface $urlMatcher
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ItemFactory $itemFactory,
@@ -65,11 +60,6 @@ class NavigationItemsProvider implements NavigationItemsProviderInterface, Featu
         return \array_values(array_filter($items, [$this, 'isItemEnabled']));
     }
 
-    /**
-     * @param array $item
-     *
-     * @return bool
-     */
     private function isItemEnabled(array $item): bool
     {
         $route = $this->getMatchedRoute($item);
@@ -79,10 +69,6 @@ class NavigationItemsProvider implements NavigationItemsProviderInterface, Featu
 
     /**
      * Matches a route and return its name.
-     *
-     * @param array $item
-     *
-     * @return string|null
      */
     private function getMatchedRoute(array $item): ?string
     {

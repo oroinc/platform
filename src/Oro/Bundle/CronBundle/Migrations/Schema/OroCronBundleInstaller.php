@@ -27,8 +27,6 @@ class OroCronBundleInstaller implements Installation
 
     /**
      * Create oro_cron_schedule table
-     *
-     * @param Schema $schema
      */
     protected function createOroCronScheduleTable(Schema $schema)
     {

@@ -42,7 +42,6 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-
     public function testGetViewSystemAll()
     {
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -80,7 +79,6 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         $systemAllView = new View(GridViewsExtension::DEFAULT_VIEW_ID);
         $systemAllView->setGridName('Test');
         $view = $gridViewManager->getView('Test', 0, 'Test');
-
 
         $this->assertEquals($view, $systemAllView);
     }

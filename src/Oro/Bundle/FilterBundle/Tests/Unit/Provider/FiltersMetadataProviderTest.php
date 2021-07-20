@@ -45,10 +45,6 @@ class FiltersMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMetadataForFiltersDataProvider
-     *
-     * @param array $filtersMetadata
-     * @param array $rawConfig
-     * @param array $expectedMetadata
      */
     public function testGetMetadataForFilters(
         array $filtersMetadata,

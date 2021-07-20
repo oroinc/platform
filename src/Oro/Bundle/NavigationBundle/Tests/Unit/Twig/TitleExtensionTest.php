@@ -129,8 +129,6 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider renderAfterSetDataProvider
-     * @param array $data
-     * @param array $expectedData
      */
     public function testRenderAfterSet(array $data, array $expectedData)
     {

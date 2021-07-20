@@ -51,12 +51,6 @@ class DatabaseHelper
      */
     protected $organizationLimitsByEntity = [];
 
-    /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param ServiceLink            $fieldHelperLink
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param ServiceLink            $ownershipMetadataProviderLink
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $fieldHelperLink,
@@ -288,8 +282,6 @@ class DatabaseHelper
     }
 
     /**
-     * @param object $entity
-     *
      * @throws NotManageableEntityException
      * @throws ORMInvalidArgumentException
      * @throws ORMException
@@ -300,10 +292,6 @@ class DatabaseHelper
         $entityManager->refresh($entity);
     }
 
-    /**
-     * @param $entityName
-     * @return string|null
-     */
     public function getOwnerFieldName($entityName): ?string
     {
         /** @var OwnershipMetadataProvider $ownershipMetadataProvider */

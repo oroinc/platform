@@ -23,10 +23,6 @@ class MessagePriority
         MessagePriority::VERY_HIGH => 4,
     ];
 
-    /**
-     * @param string $priority
-     * @return int
-     */
     public static function getMessagePriority(string $priority): int
     {
         if (!array_key_exists($priority, self::$map)) {

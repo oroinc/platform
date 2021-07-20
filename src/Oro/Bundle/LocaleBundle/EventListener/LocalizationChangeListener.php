@@ -20,19 +20,12 @@ class LocalizationChangeListener
     /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ConfigManager $configManager, ManagerRegistry $managerRegistry)
     {
         $this->configManager = $configManager;
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * @param ConfigUpdateEvent $event
-     */
     public function onConfigUpdate(ConfigUpdateEvent $event): void
     {
         if (!$event->isChanged('oro_locale.enabled_localizations') || 'global' !== $event->getScope()) {
@@ -57,9 +50,6 @@ class LocalizationChangeListener
         }
     }
 
-    /**
-     * @return ConfigValueRepository
-     */
     private function getRepository(): ConfigValueRepository
     {
         return $this->managerRegistry->getManagerForClass(ConfigValue::class)

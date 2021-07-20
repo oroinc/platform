@@ -23,11 +23,6 @@ class AsyncOperationDeleteHandler extends AbstractEntityDeleteHandler
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param FileNameProvider $fileNameProvider
-     * @param FileManager      $fileManager
-     * @param LoggerInterface  $logger
-     */
     public function __construct(FileNameProvider $fileNameProvider, FileManager $fileManager, LoggerInterface $logger)
     {
         $this->fileNameProvider = $fileNameProvider;
@@ -57,11 +52,6 @@ class AsyncOperationDeleteHandler extends AbstractEntityDeleteHandler
         parent::deleteWithoutFlush($entity, $options);
     }
 
-    /**
-     * @param int $operationId
-     *
-     * @return bool
-     */
     private function deleteAsyncOperationFiles(int $operationId): bool
     {
         $fileNamePrefix = $this->fileNameProvider->getFilePrefix($operationId);

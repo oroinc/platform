@@ -26,9 +26,6 @@ class OroScopeBundleInstaller implements Installation
         $this->createScopeTable($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function createScopeTable(Schema $schema): void
     {
         $table = $schema->createTable(self::ORO_SCOPE);

@@ -16,10 +16,6 @@ class EmailAssociationsDemoDataFixturesListener extends AbstractDemoDataFixtures
     /** @var AssociationManager */
     protected $associationManager;
 
-    /**
-     * @param OptionalListenerManager $listenerManager
-     * @param AssociationManager $associationManager
-     */
     public function __construct(OptionalListenerManager $listenerManager, AssociationManager $associationManager)
     {
         parent::__construct($listenerManager);

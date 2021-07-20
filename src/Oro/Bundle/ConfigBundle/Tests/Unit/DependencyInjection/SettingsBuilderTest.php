@@ -135,9 +135,6 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ArrayNodeDefinition::class, $list['value']);
     }
 
-    /**
-     * @return ArrayNodeDefinition
-     */
     private function getRootNode(): ArrayNodeDefinition
     {
         $root = new ArrayNodeDefinition('root');

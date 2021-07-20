@@ -25,11 +25,6 @@ class ApiDocDataTypeConverter
 
     /**
      * Converts a data-type to a data-type that should be returned in API documentation.
-     *
-     * @param string $dataType
-     * @param string $view
-     *
-     * @return string
      */
     public function convertDataType(string $dataType, string $view): string
     {

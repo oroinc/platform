@@ -53,7 +53,6 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit\Framework\
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */

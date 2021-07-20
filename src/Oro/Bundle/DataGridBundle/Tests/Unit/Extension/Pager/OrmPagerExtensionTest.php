@@ -28,8 +28,6 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param array $expected
      * @dataProvider setParametersDataProvider
      */
     public function testSetParameters(array $input, array $expected)

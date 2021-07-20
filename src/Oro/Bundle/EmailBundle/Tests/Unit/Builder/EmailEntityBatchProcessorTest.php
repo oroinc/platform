@@ -267,10 +267,6 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($existingEmail, $changes[2]['new']);
     }
 
-    /**
-     * @param Email        $email
-     * @param EmailAddress $addr
-     */
     protected function addEmailRecipient(Email $email, EmailAddress $addr)
     {
         $recipient = new EmailRecipient();

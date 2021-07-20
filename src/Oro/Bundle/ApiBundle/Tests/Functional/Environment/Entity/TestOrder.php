@@ -97,9 +97,6 @@ class TestOrder implements TestFrameworkEntityInterface
         $this->lineItems = $lineItems;
     }
 
-    /**
-     * @param TestOrderLineItem $lineItem
-     */
     public function addLineItem(TestOrderLineItem $lineItem)
     {
         if (!$this->lineItems->contains($lineItem)) {
@@ -108,9 +105,6 @@ class TestOrder implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestOrderLineItem $lineItem
-     */
     public function removeLineItem(TestOrderLineItem $lineItem)
     {
         if ($this->lineItems->contains($lineItem)) {
@@ -126,9 +120,6 @@ class TestOrder implements TestFrameworkEntityInterface
         return $this->target;
     }
 
-    /**
-     * @param TestTarget|null $target
-     */
     public function setTarget(TestTarget $target = null)
     {
         $this->target = $target;
@@ -136,8 +127,6 @@ class TestOrder implements TestFrameworkEntityInterface
 
     /**
      * @Assert\Callback
-     *
-     * @param ExecutionContextInterface $context
      */
     public function validate(ExecutionContextInterface $context)
     {

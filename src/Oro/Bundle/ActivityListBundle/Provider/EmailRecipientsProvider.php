@@ -36,12 +36,6 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param Registry $registry
-     * @param ActivityManager $activityManager
-     * @param RelatedEmailsProvider $relatedEmailsProvider
-     * @param AclHelper $aclHelper
-     */
     public function __construct(
         Registry $registry,
         ActivityManager $activityManager,
@@ -92,7 +86,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             foreach ($activityListQb->getParameters() as $param) {
                 $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
-            
+
             $query = $this->aclHelper->apply(
                 $qb,
                 BasicPermission::VIEW,

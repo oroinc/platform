@@ -80,11 +80,6 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
         return array_keys($result);
     }
 
-    /**
-     * @param string $className
-     *
-     * @return bool
-     */
     private function isEntityAccessible(string $className): bool
     {
         return

@@ -21,9 +21,6 @@ class GetScope implements ProcessorInterface
     /** @var ConfigurationRepository */
     protected $configRepository;
 
-    /**
-     * @param ConfigurationRepository $configRepository
-     */
     public function __construct(ConfigurationRepository $configRepository)
     {
         $this->configRepository = $configRepository;

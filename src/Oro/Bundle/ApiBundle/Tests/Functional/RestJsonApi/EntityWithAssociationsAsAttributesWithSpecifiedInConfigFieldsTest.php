@@ -21,9 +21,6 @@ class EntityWithAssociationsAsAttributesWithSpecifiedInConfigFieldsTest extends 
         $this->appendEntityConfig(TestMagazine::class, $this->getEntityConfig());
     }
 
-    /**
-     * @return array
-     */
     private function getEntityConfig(): array
     {
         return [
@@ -52,9 +49,6 @@ class EntityWithAssociationsAsAttributesWithSpecifiedInConfigFieldsTest extends 
         ];
     }
 
-    /**
-     * @param string $headline
-     */
     private function assertArticleExists(string $headline): void
     {
         /** @var TestArticle|null $article */

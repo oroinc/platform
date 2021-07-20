@@ -61,17 +61,6 @@ class ActivityListFilter extends EntityFilter
     protected $relatedActivityDatagridFactory;
 
     /**
-     * @param FormFactoryInterface           $factory
-     * @param FilterUtility                  $util
-     * @param ManagerRegistry                $doctrine
-     * @param FilterExecutionContext         $filterExecutionContext
-     * @param ActivityAssociationHelper      $activityAssociationHelper
-     * @param ActivityListChainProvider      $activityListChainProvider
-     * @param ActivityListFilterHelper       $activityListFilterHelper
-     * @param EntityRoutingHelper            $entityRoutingHelper
-     * @param QueryDesignerManager           $queryDesignerManager
-     * @param RelatedActivityDatagridFactory $relatedActivityDatagridFactory
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -270,10 +259,6 @@ class ActivityListFilter extends EntityFilter
         return $metadata->getIdentifier()[0];
     }
 
-    /**
-     * @param QueryBuilder $from
-     * @param QueryBuilder $to
-     */
     protected function copyParameters(QueryBuilder $from, QueryBuilder $to)
     {
         foreach ($from->getParameters() as $parameter) {

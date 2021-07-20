@@ -15,10 +15,6 @@ class CallServiceMethod extends AbstractAction
     /** @var array */
     protected $options;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ContainerInterface $container
-     */
     public function __construct(ContextAccessor $contextAccessor, ContainerInterface $container)
     {
         parent::__construct($contextAccessor);

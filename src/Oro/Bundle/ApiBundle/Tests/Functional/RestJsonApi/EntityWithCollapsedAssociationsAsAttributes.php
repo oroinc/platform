@@ -19,9 +19,6 @@ class EntityWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
         $this->appendEntityConfig(TestMagazine::class, $this->getEntityConfig());
     }
 
-    /**
-     * @return array
-     */
     private function getEntityConfig(): array
     {
         return [
@@ -54,9 +51,6 @@ class EntityWithCollapsedAssociationsAsAttributes extends RestJsonApiTestCase
         ];
     }
 
-    /**
-     * @param string $headline
-     */
     private function assertArticleExists(string $headline): void
     {
         /** @var TestArticle|null $article */

@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -26,12 +27,9 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
     /** @var MessageProducerInterface */
     private $messageProducer;
 
-    /**
-     * @param JobManagerInterface $jobManager
-     * @param JobStatusChecker $jobStatusChecker
-     * @param StatusCalculatorResolver $statusCalculatorResolver
-     * @param MessageProducerInterface $messageProducer
-     */
+    /** @var Registry  */
+    private $registry;
+
     public function __construct(
         JobManagerInterface $jobManager,
         JobStatusChecker $jobStatusChecker,
@@ -44,28 +42,22 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         $this->messageProducer = $messageProducer;
     }
 
-    /**
-     * @param Job $job
-     * @return void
-     */
+    public function setRegistry(Registry $registry): void
+    {
+        $this->registry = $registry;
+    }
+
     public function calculate(Job $job): void
     {
         $rootJob = $this->getRootJob($job);
-        if ($this->jobStatusChecker->isJobStopped($rootJob)) {
-            return;
-        }
-
         $this->jobManager->saveJobWithLock($rootJob, function (Job $rootJob) {
+            $rootJob = $this->refreshJob($rootJob);
             if (!$this->jobStatusChecker->isJobStopped($rootJob)) {
                 $this->updateRootJob($rootJob);
             }
         });
     }
 
-    /**
-     * @param Job $rootJob
-     * @return void
-     */
     private function updateRootJob(Job $rootJob): void
     {
         $rootJob->setLastActiveAt(new \DateTime());
@@ -91,12 +83,18 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         }
     }
 
-    /**
-     * @param Job $job
-     * @return Job
-     */
     private function getRootJob(Job $job): Job
     {
         return $job->isRoot() ? $job : $job->getRootJob();
+    }
+
+    private function refreshJob(Job $job): Job
+    {
+        $em = $this->registry->getManager();
+        if ($em->contains($job)) {
+            $em->refresh($job);
+        }
+
+        return $job;
     }
 }

@@ -17,10 +17,6 @@ class ControllerListener
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ClassAuthorizationChecker $classAuthorizationChecker
-     * @param LoggerInterface           $logger
-     */
     public function __construct(
         ClassAuthorizationChecker $classAuthorizationChecker,
         LoggerInterface $logger
@@ -33,8 +29,6 @@ class ControllerListener
      * Checks if an access to a controller action is granted or not.
      *
      * This method is executed just before any controller action.
-     *
-     * @param FilterControllerEvent $event
      *
      * @throws AccessDeniedException
      */

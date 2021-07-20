@@ -41,9 +41,6 @@ class WorkflowDatagridLabelListener
         $this->translator = $translator;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $configuration = $event->getConfig();

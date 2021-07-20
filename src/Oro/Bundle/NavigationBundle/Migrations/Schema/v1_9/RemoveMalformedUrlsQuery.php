@@ -19,10 +19,6 @@ class RemoveMalformedUrlsQuery extends ParametrizedMigrationQuery
      */
     private $urlFieldName;
 
-    /**
-     * @param string $tableName
-     * @param string $urlFieldName
-     */
     public function __construct(string $tableName, string $urlFieldName)
     {
         $this->tableName = $tableName;

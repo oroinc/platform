@@ -19,9 +19,6 @@ class TwigRenderer extends Renderer implements TwigRendererInterface
      */
     protected $engine;
 
-    /**
-     * @param TwigRendererEngineInterface $engine
-     */
     public function __construct(TwigRendererEngineInterface $engine)
     {
         parent::__construct($engine);

@@ -43,8 +43,6 @@ class OroDurationType extends AbstractType
 
     /**
      * Event listener callback to handle validation before data is submitted.
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {

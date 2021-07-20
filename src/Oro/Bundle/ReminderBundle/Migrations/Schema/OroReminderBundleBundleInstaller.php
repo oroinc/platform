@@ -26,8 +26,6 @@ class OroReminderBundleBundleInstaller implements Installation
 
     /**
      * Generate table oro_reminder
-     *
-     * @param Schema $schema
      */
     protected function createReminderTable(Schema $schema)
     {

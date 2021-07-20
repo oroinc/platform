@@ -19,19 +19,12 @@ class UpdateListBodyListenerDecorator implements BodyListenerInterface
     /** @var RestRoutes */
     private $routes;
 
-    /**
-     * @param BodyListenerInterface $listener
-     * @param RestRoutes            $routes
-     */
     public function __construct(BodyListenerInterface $listener, RestRoutes $routes)
     {
         $this->listener = $listener;
         $this->routes = $routes;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
@@ -48,11 +41,6 @@ class UpdateListBodyListenerDecorator implements BodyListenerInterface
         }
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     private function isUpdateListAction(Request $request): bool
     {
         return

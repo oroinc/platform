@@ -291,7 +291,6 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will(
@@ -450,7 +449,6 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($this->extendConfig));
-
 
         $this->featureChecker->expects($this->at(0))
             ->method('isResourceEnabled')

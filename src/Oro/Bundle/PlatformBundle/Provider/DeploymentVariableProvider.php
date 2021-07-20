@@ -13,9 +13,6 @@ class DeploymentVariableProvider
     /** @var ParameterBag */
     private $parametersBag;
 
-    /**
-     * @param ParameterBag $parametersBag
-     */
     public function __construct(ParameterBag $parametersBag)
     {
         $this->parametersBag = $parametersBag;

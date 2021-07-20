@@ -16,9 +16,6 @@ class ApplyCriteria implements ProcessorInterface
     /** @var CriteriaConnector */
     private $criteriaConnector;
 
-    /**
-     * @param CriteriaConnector $criteriaConnector
-     */
     public function __construct(CriteriaConnector $criteriaConnector)
     {
         $this->criteriaConnector = $criteriaConnector;

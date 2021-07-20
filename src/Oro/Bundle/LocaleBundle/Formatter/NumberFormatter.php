@@ -45,27 +45,17 @@ class NumberFormatter
      */
     private $configManager;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param IntlNumberFormatterFactory $intlNumberFormatterFactory
-     */
     public function __construct(LocaleSettings $localeSettings, IntlNumberFormatterFactory $intlNumberFormatterFactory)
     {
         $this->localeSettings = $localeSettings;
         $this->numberFormatterFactory = $intlNumberFormatterFactory;
     }
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
-    /**
-     * @return ConfigManager
-     */
     public function getConfigManager(): ConfigManager
     {
         if (!$this->configManager) {
@@ -161,12 +151,6 @@ class NumberFormatter
         return $formattedString;
     }
 
-    /**
-     * @param string $currencyCode
-     * @param string $locale
-     *
-     * @return string
-     */
     private function getCurrencySymbolByCurrency(string $currencyCode, string $locale): string
     {
         if (!isset($this->currencySymbols[$currencyCode][$locale])) {
@@ -179,14 +163,6 @@ class NumberFormatter
         return $this->currencySymbols[$currencyCode][$locale];
     }
 
-    /**
-     * @param IntlNumberFormatter $currencyFormatter
-     * @param float|null $value
-     * @param string $currencyCode
-     * @param bool $fixedFraction
-     *
-     * @return string
-     */
     private function formatCurrencyWithDynamicPrecision(
         IntlNumberFormatter $currencyFormatter,
         ?float $value,
@@ -543,7 +519,6 @@ class NumberFormatter
      *  SIGNIFICANT_DIGIT_SYMBOL
      *  MONETARY_GROUPING_SEPARATOR_SYMBOL
      *
-     *
      * @param int|string $symbol Format symbol constant of IntlNumberFormatter or it's string name
      * @param int|string $style Constant of IntlNumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
      * @param string|null $locale
@@ -623,9 +598,6 @@ class NumberFormatter
         return $this->currencySymbolPrepend[$key];
     }
 
-    /**
-     * @return bool
-     */
     public function isAllowedToRoundPricesAndAmounts(): bool
     {
         return $this->getConfigManager()->get('oro_locale.allow_to_round_displayed_prices_and_amounts', true);

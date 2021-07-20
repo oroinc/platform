@@ -19,17 +19,11 @@ class ConsoleFatalErrorListener implements EventSubscriberInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function configure(ConsoleCommandEvent $event): void
     {
         if ($this->logger && $this->isSupportedCommand($event->getCommand())) {
@@ -48,10 +42,6 @@ class ConsoleFatalErrorListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Command $command
-     * @return bool
-     */
     private function isSupportedCommand(Command $command): bool
     {
         return $command instanceof ConsumeMessagesCommand || $command instanceof TransportConsumeMessagesCommand;

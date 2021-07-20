@@ -24,11 +24,6 @@ class AstVisitor extends Visitor
     /** @var QueryComponentCollection */
     private $queryComponents;
 
-    /**
-     * @param EntityManagerInterface   $em
-     * @param string                   $alias
-     * @param QueryComponentCollection $queryComponents
-     */
     public function __construct(
         EntityManagerInterface $em,
         string $alias,

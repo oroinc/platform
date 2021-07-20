@@ -26,11 +26,6 @@ class Orm extends AbstractEngine
     /** @var ObjectMapper */
     protected $mapper;
 
-    /**
-     * @param ManagerRegistry          $registry
-     * @param ObjectMapper             $mapper
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $registry,
         ObjectMapper $mapper,

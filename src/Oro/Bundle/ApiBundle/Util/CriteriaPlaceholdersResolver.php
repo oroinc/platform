@@ -12,10 +12,6 @@ class CriteriaPlaceholdersResolver
 {
     use NormalizeFieldTrait;
 
-    /**
-     * @param CommonCriteria $criteria
-     * @param string         $rootAlias
-     */
     public function resolvePlaceholders(CommonCriteria $criteria, string $rootAlias): void
     {
         $placeholders = $this->getPlaceholders($criteria, $rootAlias);
@@ -26,12 +22,6 @@ class CriteriaPlaceholdersResolver
         $this->processOrderBy($criteria, $placeholders);
     }
 
-    /**
-     * @param CommonCriteria $criteria
-     * @param string         $rootAlias
-     *
-     * @return array
-     */
     private function getPlaceholders(CommonCriteria $criteria, string $rootAlias): array
     {
         $placeholders = [Criteria::ROOT_ALIAS_PLACEHOLDER => $rootAlias];
@@ -45,10 +35,6 @@ class CriteriaPlaceholdersResolver
         return $placeholders;
     }
 
-    /**
-     * @param Criteria $criteria
-     * @param array    $placeholders
-     */
     private function processJoins(Criteria $criteria, array $placeholders): void
     {
         $joins = $criteria->getJoins();
@@ -63,10 +49,6 @@ class CriteriaPlaceholdersResolver
         }
     }
 
-    /**
-     * @param CommonCriteria $criteria
-     * @param array          $placeholders
-     */
     private function processWhere(CommonCriteria $criteria, array $placeholders): void
     {
         $whereExpr = $criteria->getWhereExpression();
@@ -76,10 +58,6 @@ class CriteriaPlaceholdersResolver
         }
     }
 
-    /**
-     * @param CommonCriteria $criteria
-     * @param array          $placeholders
-     */
     private function processOrderBy(CommonCriteria $criteria, array $placeholders): void
     {
         $orderBy = $criteria->getOrderings();

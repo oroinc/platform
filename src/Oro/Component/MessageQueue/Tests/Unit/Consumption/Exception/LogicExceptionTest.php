@@ -8,7 +8,7 @@ use Oro\Component\Testing\ClassExtensionTrait;
 class LogicExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
-    
+
     public function testShouldImplementExceptionInterface()
     {
         $this->assertClassImplements(ExceptionInterface::class, LogicException::class);
@@ -18,7 +18,7 @@ class LogicExceptionTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertClassExtends(\LogicException::class, LogicException::class);
     }
-    
+
     public function testCouldBeConstructedWithoutAnyArguments()
     {
         new LogicException();

@@ -23,9 +23,6 @@ class OroEmailExtensionTest extends ExtensionTestCase
 
     /**
      * @dataProvider prependSecurityConfigDataProvider
-     *
-     * @param array $securityConfig
-     * @param array $expectedSecurityConfig
      */
     public function testPrepend(array $securityConfig, array $expectedSecurityConfig): void
     {
@@ -46,9 +43,6 @@ class OroEmailExtensionTest extends ExtensionTestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    /**
-     * @return array
-     */
     public function prependSecurityConfigDataProvider(): array
     {
         return [

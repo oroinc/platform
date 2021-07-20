@@ -19,9 +19,6 @@ class CsrfProtectionRequestListener
     /** @var CsrfRequestManager */
     private $csrfRequestManager;
 
-    /**
-     * @param CsrfRequestManager $csrfRequestManager
-     */
     public function __construct(CsrfRequestManager $csrfRequestManager)
     {
         $this->csrfRequestManager = $csrfRequestManager;
@@ -29,8 +26,6 @@ class CsrfProtectionRequestListener
 
     /**
      * Implements double submit cookie CSRF check.
-     *
-     * @param FilterControllerEvent $event
      *
      * @throws AccessDeniedHttpException when route is protected against CSRF attacks and security check failed
      */
@@ -73,8 +68,6 @@ class CsrfProtectionRequestListener
 
     /**
      * Regenerates CSRF cookie on each response.
-     *
-     * @param FilterResponseEvent $event
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

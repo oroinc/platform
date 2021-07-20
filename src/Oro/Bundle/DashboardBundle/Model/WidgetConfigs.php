@@ -46,16 +46,6 @@ class WidgetConfigs
     /** @var array */
     protected $widgetOptionsById = [];
 
-    /**
-     * @param ConfigProvider               $configProvider
-     * @param ResolverInterface            $resolver
-     * @param EntityManagerInterface       $entityManager
-     * @param ConfigValueProvider          $valueProvider
-     * @param TranslatorInterface          $translator
-     * @param EventDispatcherInterface     $eventDispatcher
-     * @param WidgetConfigVisibilityFilter $visibilityFilter
-     * @param RequestStack                 $requestStack
-     */
     public function __construct(
         ConfigProvider $configProvider,
         ResolverInterface $resolver,

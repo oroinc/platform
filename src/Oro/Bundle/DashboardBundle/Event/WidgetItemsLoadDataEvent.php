@@ -18,11 +18,6 @@ class WidgetItemsLoadDataEvent extends Event
     /** @var WidgetOptionBag */
     protected $widgetOptions;
 
-    /**
-     * @param array           $items
-     * @param array           $widgetConfig
-     * @param WidgetOptionBag $widgetOptions
-     */
     public function __construct(array $items, array $widgetConfig, WidgetOptionBag $widgetOptions)
     {
         $this->items         = $items;
@@ -54,9 +49,6 @@ class WidgetItemsLoadDataEvent extends Event
         return $this->items;
     }
 
-    /**
-     * @param array $items
-     */
     public function setItems(array $items = [])
     {
         $this->items = $items;

@@ -31,11 +31,6 @@ class AttributeConfigurationValidator extends ConstraintValidator
      */
     protected $configManager;
 
-    /**
-     * @param AttributeTypeRegistry $attributeTypeRegistry
-     * @param ConfigProvider $attributeConfigProvider
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         AttributeTypeRegistry $attributeTypeRegistry,
         ConfigProvider $attributeConfigProvider,

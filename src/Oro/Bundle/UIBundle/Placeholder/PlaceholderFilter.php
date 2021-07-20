@@ -35,11 +35,6 @@ class PlaceholderFilter
 
     /**
      * Checks if a string value equals to a given class or one of its parents.
-     *
-     * @param string|null $val
-     * @param string      $className
-     *
-     * @return bool
      */
     public function isA(?string $val, string $className): bool
     {

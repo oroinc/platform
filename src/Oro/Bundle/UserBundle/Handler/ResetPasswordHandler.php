@@ -21,12 +21,6 @@ class ResetPasswordHandler
     /** @var Registry */
     protected $registry;
 
-    /**
-     * @param EmailNotificationManager $mailManager
-     * @param UserManager $userManager
-     * @param Registry $registry
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         EmailNotificationManager $mailManager,
         UserManager $userManager,
@@ -74,10 +68,6 @@ class ResetPasswordHandler
         return false;
     }
 
-    /**
-     * @param User $user
-     * @return TemplateEmailNotificationInterface
-     */
     protected function getNotification(User $user): TemplateEmailNotificationInterface
     {
         return new TemplateEmailNotification(

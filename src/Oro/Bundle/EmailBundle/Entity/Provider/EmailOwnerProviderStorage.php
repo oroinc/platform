@@ -14,8 +14,6 @@ class EmailOwnerProviderStorage
 
     /**
      * Add email owner provider
-     *
-     * @param EmailOwnerProviderInterface $provider
      */
     public function addProvider(EmailOwnerProviderInterface $provider)
     {

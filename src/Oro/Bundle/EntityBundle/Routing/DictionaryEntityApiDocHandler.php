@@ -21,10 +21,6 @@ class DictionaryEntityApiDocHandler implements HandlerInterface
     /** @var EntityClassNameProviderInterface */
     protected $entityClassNameProvider;
 
-    /**
-     * @param EntityAliasResolver              $entityAliasResolver
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     */
     public function __construct(
         EntityAliasResolver $entityAliasResolver,
         EntityClassNameProviderInterface $entityClassNameProvider

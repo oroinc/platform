@@ -33,12 +33,6 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
-    /**
-     * @param RestRoutesRegistry    $routesRegistry
-     * @param FilterNamesRegistry   $filterNamesRegistry
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param SubresourcesProvider  $subresourcesProvider
-     */
     public function __construct(
         RestRoutesRegistry $routesRegistry,
         FilterNamesRegistry $filterNamesRegistry,
@@ -107,12 +101,6 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string $relationshipRouteName
-     * @param string $associationName
-     *
-     * @return RouteLinkMetadata
-     */
     private function getRelationshipLinkMetadata(
         string $relationshipRouteName,
         string $associationName

@@ -174,12 +174,6 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('errorLogFile', $job->getData());
     }
 
-    /**
-     * @param Job $job
-     * @param array $exportResult
-     *
-     * @return ExportMessageProcessorAbstract
-     */
     private function mockProcessor(Job $job, array $exportResult): ExportMessageProcessorAbstract
     {
         $this->jobRunner

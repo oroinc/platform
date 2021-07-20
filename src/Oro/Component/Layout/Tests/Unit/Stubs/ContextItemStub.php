@@ -6,7 +6,6 @@ use Oro\Component\Layout\ContextItemInterface;
 
 class ContextItemStub implements ContextItemInterface
 {
-
     /**
      * {@inheritdoc}
      */

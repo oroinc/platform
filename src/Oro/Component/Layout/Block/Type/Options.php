@@ -14,9 +14,6 @@ class Options implements \ArrayAccess, \Iterator
     /** @var array */
     private $options = [];
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data = [])
     {
         $this->setMultiple($data);
@@ -114,9 +111,6 @@ class Options implements \ArrayAccess, \Iterator
         return $data;
     }
 
-    /**
-     * @param array $data
-     */
     public function setMultiple(array $data)
     {
         foreach ($data as $key => $value) {

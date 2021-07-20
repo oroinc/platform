@@ -77,10 +77,6 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
 
     /**
      * @dataProvider sortingDataProvider
-     *
-     * @param array $sorter
-     * @param array $state
-     * @param array $expectedData
      */
     public function testVisitDatasource(array $sorter, array $state, array $expectedData)
     {

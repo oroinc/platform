@@ -28,11 +28,6 @@ class AttributesImportTopicSender
      */
     private $tokenAccessor;
 
-    /**
-     * @param WebsocketClientInterface $websocketClient
-     * @param ConnectionChecker $connectionChecker
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         WebsocketClientInterface $websocketClient,
         ConnectionChecker $connectionChecker,

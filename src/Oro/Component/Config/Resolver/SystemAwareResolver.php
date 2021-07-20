@@ -55,9 +55,6 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         return $config;
     }
 
-    /**
-     * @param array $config
-     */
     protected function doResolve(array &$config)
     {
         foreach ($config as $key => &$val) {

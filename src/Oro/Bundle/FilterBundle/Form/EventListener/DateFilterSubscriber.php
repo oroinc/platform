@@ -33,9 +33,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
         DateModifierInterface::PART_DOY     => [1, 366],
     ];
 
-    /**
-     * @param DateFilterModifier $modifier
-     */
     public function __construct(DateFilterModifier $modifier)
     {
         $this->dateFilterModifier = $modifier;
@@ -55,8 +52,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
     /**
      * Parses date expressions
      * If date part given, then replace value fields by choice fields with specific to that value choices
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -95,9 +90,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
         $this->processed[$oid] = true;
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function submit(FormEvent $event)
     {
         // Adds submitted values to model data.
@@ -125,9 +117,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
     /**
      * Replace values form children to "choice" type with predefined choice list
-     *
-     * @param FormInterface $form
-     * @param array         $choices
      */
     private function replaceValueFields(FormInterface $form, array $choices)
     {
@@ -137,11 +126,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormConfigInterface $config
-     *
-     * @return DateFilterSubmitContext
-     */
     private function getSubmitContext(FormConfigInterface $config): DateFilterSubmitContext
     {
         return $config->getOption('submit_context');

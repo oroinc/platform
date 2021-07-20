@@ -13,8 +13,6 @@ class ChainExclusionProvider implements ExclusionProviderInterface
 
     /**
      * Registers the given provider in the chain
-     *
-     * @param ExclusionProviderInterface $provider
      */
     public function addProvider(ExclusionProviderInterface $provider)
     {

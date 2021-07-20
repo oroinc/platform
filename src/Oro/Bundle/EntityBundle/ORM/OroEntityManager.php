@@ -50,8 +50,6 @@ class OroEntityManager extends EntityManager
 
     /**
      * Sets the Metadata factory service instead of create the factory in the manager constructor.
-     *
-     * @param ClassMetadataFactory $metadataFactory
      */
     public function setMetadataFactory(ClassMetadataFactory $metadataFactory)
     {

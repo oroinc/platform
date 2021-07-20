@@ -369,7 +369,6 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ->assertRaised();
     }
 
-
     public function testReuseOneToManyWhenNoRelationConfig()
     {
         $field = $this->getFieldConfigModel('oneToMany|Source|Target|field||');

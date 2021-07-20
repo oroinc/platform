@@ -32,9 +32,6 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     protected $propertyAccessor;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data = [])
     {
         $this->data = $data;

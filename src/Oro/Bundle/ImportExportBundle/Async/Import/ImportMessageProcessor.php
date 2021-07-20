@@ -50,14 +50,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected $postponedRowsHandler;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param LoggerInterface $logger
-     * @param FileManager $fileManager
-     * @param ImportHandler $importHandler
-     * @param PostponedRowsHandler $postponedRowsHandler
-     */
     public function __construct(
         JobRunner $jobRunner,
         ImportExportResultSummarizer $importExportResultSummarizer,
@@ -170,10 +162,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
         }
     }
 
-    /**
-     * @param Job $job
-     * @param array $data
-     */
     protected function saveJobResult(Job $job, array $data)
     {
         if (isset($data['errors']) && !empty(($data['errors']))) {

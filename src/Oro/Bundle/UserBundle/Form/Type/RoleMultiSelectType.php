@@ -19,9 +19,6 @@ class RoleMultiSelectType extends AbstractType
      */
     protected $entityManager;
 
-    /**
-     * @param EntityManager $entityManager
-     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;

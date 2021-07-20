@@ -18,8 +18,6 @@ class MultiCurrencyNormalizer implements NormalizerInterface
 
     /**
      * MultiCurrencyNormalizer constructor.
-     *
-     * @param NumberFormatter $formatter
      */
     public function __construct(NumberFormatter $formatter)
     {

@@ -11,9 +11,6 @@ class AddStepCompilerPass implements CompilerPassInterface
     const STEP_TAG = 'oro_entity_merge.step';
     const MERGER_SERVICE = 'oro_entity_merge.merger';
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $mergerDefinition = $container->getDefinition(self::MERGER_SERVICE);

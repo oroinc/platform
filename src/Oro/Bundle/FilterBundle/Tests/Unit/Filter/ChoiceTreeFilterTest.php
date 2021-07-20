@@ -98,13 +98,11 @@ class ChoiceTreeFilterTest extends OrmTestCase
         $expectedMetadata = $this->getDefaultExpectedData();
         $expectedMetadata['autocomplete_url'] = 'test_url';
 
-
         $this->filter->init('filter', $params);
         $metadata = $this->filter->getMetadata();
 
         self::assertEquals($expectedMetadata, $metadata);
     }
-
 
     public function testMetadataParameterRenderedPropertyName()
     {
@@ -115,7 +113,6 @@ class ChoiceTreeFilterTest extends OrmTestCase
 
         $expectedMetadata = $this->getDefaultExpectedData();
         $expectedMetadata['renderedPropertyName'] = 'test_field_name';
-
 
         $this->filter->init('filter', $params);
         $metadata = $this->filter->getMetadata();

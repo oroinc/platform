@@ -22,11 +22,6 @@ class SetCurrency implements ProcessorInterface
     /** @var string */
     private $currencyFieldName;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param LocaleSettings            $localeSettings
-     * @param string                    $currencyFieldName
-     */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         LocaleSettings $localeSettings,
@@ -55,8 +50,6 @@ class SetCurrency implements ProcessorInterface
 
     /**
      * Returns a currency that should be set to a processing entity.
-     *
-     * @return string|null
      */
     private function getCurrency(): ?string
     {

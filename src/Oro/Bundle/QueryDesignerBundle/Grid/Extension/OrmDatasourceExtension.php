@@ -23,9 +23,6 @@ class OrmDatasourceExtension extends AbstractExtension
     /** @var RestrictionBuilderInterface */
     protected $restrictionBuilder;
 
-    /**
-     * @param RestrictionBuilderInterface $restrictionBuilder
-     */
     public function __construct(RestrictionBuilderInterface $restrictionBuilder)
     {
         $this->restrictionBuilder = $restrictionBuilder;

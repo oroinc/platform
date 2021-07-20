@@ -11,9 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AttachmentProcessorsCompilerPass implements CompilerPassInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container): void
     {
         $processorHelper = new ProcessorHelper($container->getParameterBag());

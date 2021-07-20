@@ -40,12 +40,6 @@ class ImportVisitor implements VisitorInterface
     /** @var string */
     private $rootName = 'root';
 
-    /**
-     * @param LayoutUpdateLoaderInterface $loader
-     * @param DependencyInitializer $dependencyInitializer
-     * @param ResourceProviderInterface $resourceProvider
-     * @param ThemeManager $themeManager
-     */
     public function __construct(
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
@@ -58,9 +52,6 @@ class ImportVisitor implements VisitorInterface
         $this->themeManager = $themeManager;
     }
 
-    /**
-     * @param string $rootName
-     */
     public function setRootName(string $rootName): void
     {
         $this->rootName = $rootName;

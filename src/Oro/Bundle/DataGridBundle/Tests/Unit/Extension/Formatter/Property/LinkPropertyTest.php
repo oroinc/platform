@@ -33,10 +33,6 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $params
-     * @param array $data
-     * @param array $expected
-     *
      * @dataProvider valueDataProvider
      */
     public function testGetRawValue(array $params, array $data, array $expected)

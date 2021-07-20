@@ -43,17 +43,6 @@ class CacheManager
     /** @var ResetInterface[] */
     private $resettableServices = [];
 
-    /**
-     * @param array                       $configKeys
-     * @param array                       $apiDocViews
-     * @param RequestExpressionMatcher    $matcher
-     * @param ConfigCacheFactory          $configCacheFactory
-     * @param ConfigCacheWarmer           $configCacheWarmer
-     * @param EntityAliasResolverRegistry $entityAliasResolverRegistry
-     * @param ResourcesCacheWarmer        $resourcesCacheWarmer
-     * @param ApiDocExtractor             $apiDocExtractor
-     * @param ConfigProvider              $configProvider
-     */
     public function __construct(
         array $configKeys,
         array $apiDocViews,
@@ -188,8 +177,6 @@ class CacheManager
     /**
      * Registers a service that should be reset to its initial state
      * after API documentation cache for a specific view is warmed up.
-     *
-     * @param ResetInterface $service
      */
     public function addResettableService(ResetInterface $service)
     {

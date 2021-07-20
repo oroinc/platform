@@ -152,9 +152,6 @@ class PersistentConnection extends Connection
         static::$persistentTransactionNestingLevels[$this->getConnectionId()] = $level;
     }
 
-    /**
-     * @param DriverConnection $connection
-     */
     protected function setPersistentConnection(DriverConnection $connection)
     {
         static::$persistentConnections[$this->getConnectionId()] = $connection;

@@ -21,10 +21,6 @@ class AttachmentFilterConfiguration extends FilterConfiguration
      */
     private $filterConfiguration;
 
-    /**
-     * @param FilterConfiguration $filterConfiguration
-     * @param AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider
-     */
     public function __construct(
         FilterConfiguration $filterConfiguration,
         AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider
@@ -64,9 +60,6 @@ class AttachmentFilterConfiguration extends FilterConfiguration
         $this->filterConfiguration->set($filter, $config);
     }
 
-    /**
-     * @return array
-     */
     public function all(): array
     {
         return array_map(
@@ -77,11 +70,6 @@ class AttachmentFilterConfiguration extends FilterConfiguration
         );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     private function addProcessorsConfig(array $config = []): array
     {
         // Default processors configuration takes precedence over system settings.

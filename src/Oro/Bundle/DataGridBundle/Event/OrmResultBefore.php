@@ -27,10 +27,6 @@ class OrmResultBefore extends Event implements GridEventInterface
      */
     protected $query;
 
-    /**
-     * @param DatagridInterface   $datagrid
-     * @param AbstractQuery $query
-     */
     public function __construct(DatagridInterface $datagrid, AbstractQuery $query)
     {
         $this->datagrid = $datagrid;

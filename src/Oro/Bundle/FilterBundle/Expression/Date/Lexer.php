@@ -24,10 +24,6 @@ class Lexer
     /** @var DateModifierProvider */
     private $provider;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param DateModifierProvider $provider
-     */
     public function __construct(TranslatorInterface $translator, DateModifierProvider $provider)
     {
         $this->translator = $translator;

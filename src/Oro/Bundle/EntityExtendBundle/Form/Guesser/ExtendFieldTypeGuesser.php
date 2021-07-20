@@ -37,13 +37,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
     /** @var array */
     protected $typeMap = [];
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider  $entityConfigProvider
-     * @param ConfigProvider  $formConfigProvider
-     * @param ConfigProvider  $extendConfigProvider
-     * @param ConfigProvider  $enumConfigProvider
-     */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ConfigProvider $entityConfigProvider,

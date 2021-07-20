@@ -32,11 +32,6 @@ class ConfigProvider extends PhpArrayConfigProvider
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @param string                   $cacheFile
-     * @param bool                     $debug
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         string $cacheFile,
         bool $debug,
@@ -46,9 +41,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @return array
-     */
     public function getDashboardConfigs(): array
     {
         $configs = $this->doGetConfig();
@@ -56,11 +48,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         return $configs[self::DASHBOARDS];
     }
 
-    /**
-     * @param string $dashboardName
-     *
-     * @return bool
-     */
     public function hasDashboardConfig(string $dashboardName): bool
     {
         $configs = $this->doGetConfig();
@@ -69,10 +56,6 @@ class ConfigProvider extends PhpArrayConfigProvider
     }
 
     /**
-     * @param string $dashboardName
-     *
-     * @return array
-     *
      * @throws InvalidConfigurationException
      */
     public function getDashboardConfig(string $dashboardName): array
@@ -85,9 +68,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         return $configs[self::DASHBOARDS][$dashboardName];
     }
 
-    /**
-     * @return array
-     */
     public function getWidgetConfigs(): array
     {
         $configs = $this->doGetConfig();
@@ -95,11 +75,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         return $configs[self::WIDGETS];
     }
 
-    /**
-     * @param string $widgetName
-     *
-     * @return bool
-     */
     public function hasWidgetConfig(string $widgetName): bool
     {
         $configs = $this->doGetConfig();
@@ -162,10 +137,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         return $processedConfig;
     }
 
-    /**
-     * @param array $widgets
-     * @param array $defaultConfig
-     */
     private function prepareWidgets(array &$widgets, array $defaultConfig): void
     {
         foreach ($widgets as $widgetName => &$widget) {
@@ -179,9 +150,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         }
     }
 
-    /**
-     * @param array $items
-     */
     private function sortItemsByPosition(array &$items): void
     {
         ArrayUtil::sortBy($items, false, self::POSITION);

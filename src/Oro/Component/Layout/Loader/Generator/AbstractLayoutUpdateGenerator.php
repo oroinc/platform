@@ -58,7 +58,6 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
 
         $method->setBody($visitContext->getUpdateMethodBody());
 
-
         return "<?php\n\n" . $class->print();
     }
 

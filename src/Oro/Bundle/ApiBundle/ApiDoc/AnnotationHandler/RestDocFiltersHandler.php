@@ -35,12 +35,6 @@ class RestDocFiltersHandler
     /** @var FiltersSorterRegistry */
     private $sorterRegistry;
 
-    /**
-     * @param RestDocViewDetector     $docViewDetector
-     * @param ValueNormalizer         $valueNormalizer
-     * @param ApiDocDataTypeConverter $dataTypeConverter
-     * @param FiltersSorterRegistry   $sorterRegistry
-     */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ValueNormalizer $valueNormalizer,
@@ -53,11 +47,6 @@ class RestDocFiltersHandler
         $this->sorterRegistry = $sorterRegistry;
     }
 
-    /**
-     * @param ApiDoc           $annotation
-     * @param FilterCollection $filters
-     * @param EntityMetadata   $metadata
-     */
     public function handle(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
     {
         if (!$filters->isEmpty()) {
@@ -66,11 +55,6 @@ class RestDocFiltersHandler
         $this->sortFilters($annotation);
     }
 
-    /**
-     * @param ApiDoc           $annotation
-     * @param FilterCollection $filters
-     * @param EntityMetadata   $metadata
-     */
     private function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
     {
         foreach ($filters as $key => $filter) {
@@ -83,9 +67,6 @@ class RestDocFiltersHandler
         }
     }
 
-    /**
-     * @param ApiDoc $annotation
-     */
     private function sortFilters(ApiDoc $annotation)
     {
         $filters = $annotation->getFilters();

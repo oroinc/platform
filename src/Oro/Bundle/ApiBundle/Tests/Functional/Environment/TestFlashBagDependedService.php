@@ -9,9 +9,6 @@ class TestFlashBagDependedService
     /** @var FlashBagInterface */
     private $flashBag;
 
-    /**
-     * @param FlashBagInterface $flashBag
-     */
     public function __construct(FlashBagInterface $flashBag)
     {
         $this->flashBag = $flashBag;

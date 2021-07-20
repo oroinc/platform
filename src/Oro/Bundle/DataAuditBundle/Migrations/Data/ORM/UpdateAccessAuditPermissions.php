@@ -284,8 +284,6 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
      *
      * In fact, it does not delete ACEs of "class" type, because of ACL manager implementation specialties, so
      * only Object Identities are deleted.
-     *
-     * @param ObjectIdentityInterface $objectIdentity
      */
     private function deleteAclForObjectIdentity(ObjectIdentityInterface $objectIdentity)
     {

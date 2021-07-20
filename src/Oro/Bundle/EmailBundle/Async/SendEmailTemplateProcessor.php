@@ -34,11 +34,6 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
     /** @var EmailConstraints */
     private $emailConstraint;
 
-    /**
-     * @param ValidatorInterface $validator
-     * @param DoctrineHelper $doctrineHelper
-     * @param AggregatedEmailTemplatesSender $sender
-     */
     public function __construct(
         ValidatorInterface $validator,
         DoctrineHelper $doctrineHelper,
@@ -108,10 +103,6 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
         return self::ACK;
     }
 
-    /**
-     * @param null|string $email
-     * @return bool
-     */
     private function validateAddress(?string $email): bool
     {
         if (!$this->emailConstraint) {

@@ -10,10 +10,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class UserEmailChangeListener
 {
-    /**
-     * @param User               $user
-     * @param PreUpdateEventArgs $args
-     */
     public function preUpdate(User $user, PreUpdateEventArgs $args)
     {
         if ($args->hasChangedField('email')) {

@@ -17,9 +17,6 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
     /** @var BodyListenerInterface */
     private $listener;
 
-    /**
-     * @param BodyListenerInterface $listener
-     */
     public function __construct(BodyListenerInterface $listener)
     {
         $this->listener = $listener;
@@ -46,11 +43,6 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
         }
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string|null
-     */
     private function getInvalidJsonExceptionMessage(string $content): ?string
     {
         $errorMessage = null;

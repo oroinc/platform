@@ -9,9 +9,6 @@ class MenuGridListener
     const PATH_VIEW_LINK_ROUTE = '[properties][view_link][route]';
     const PATH_VIEW_LINK_ID = '[properties][view_link][direct_params]';
 
-    /**
-     * @param PreBuild $event
-     */
     public function onPreBuild(PreBuild $event)
     {
         $config = $event->getConfig();

@@ -12,9 +12,6 @@ class BadCredentialsException extends BaseBadCredentialsException
     /** @var string */
     private $messageKey;
 
-    /**
-     * @param string $messageKey
-     */
     public function setMessageKey(string $messageKey)
     {
         $this->messageKey = $messageKey;

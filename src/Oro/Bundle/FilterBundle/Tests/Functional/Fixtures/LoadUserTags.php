@@ -63,9 +63,6 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function initToken(ObjectManager $manager): void
     {
         /** @var Organization $organization */
@@ -80,10 +77,6 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
         );
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @return array
-     */
     private function buildTagEntities(ObjectManager $manager): array
     {
         /** @var Organization $organization */

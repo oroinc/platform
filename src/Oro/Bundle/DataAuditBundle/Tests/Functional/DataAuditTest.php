@@ -997,7 +997,6 @@ class DataAuditTest extends WebTestCase
         );
     }
 
-
     public function testManyToOneRemove()
     {
         $owner = new TestAuditDataOwner();
@@ -1737,7 +1736,6 @@ class DataAuditTest extends WebTestCase
         );
     }
 
-
     public function testOneToOneReverseUpdate()
     {
         $owner = new TestAuditDataOwner();
@@ -2146,10 +2144,6 @@ class DataAuditTest extends WebTestCase
         $this->assertEquals([], $expects);
     }
 
-    /**
-     * @param bool $withRelations
-     * @param bool $withCollections
-     */
     private function processMessages(bool $withRelations = false, bool $withCollections = false): void
     {
         $processors[] = 'oro_dataaudit.async.audit_changed_entities';
@@ -2182,10 +2176,6 @@ class DataAuditTest extends WebTestCase
         }
     }
 
-    /**
-     * @param TestAuditDataOwner $owner
-     * @return EntityManagerInterface
-     */
     private function saveOwnerAndClearMessages(TestAuditDataOwner $owner): EntityManagerInterface
     {
         $em = $this->getEntityManager();

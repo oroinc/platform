@@ -43,9 +43,6 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $isContains
-     * @param bool $expected
-     *
      * @dataProvider getDataForContains
      */
     public function testContains(bool $isContains, bool $expected)
@@ -64,9 +61,6 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->enumTranslationCache->contains(self::CLASS_NAME));
     }
 
-    /**
-     * @return array
-     */
     public function getDataForContains(): array
     {
         return [
@@ -82,9 +76,6 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $isContains
-     * @param array $values
-     *
      * @dataProvider getDataForFetch
      */
     public function testFetch(bool $isContains, array $values)
@@ -103,9 +94,6 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($values, $this->enumTranslationCache->fetch(self::CLASS_NAME));
     }
 
-    /**
-     * @return array
-     */
     public function getDataForFetch(): array
     {
         return [
@@ -164,9 +152,6 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->enumTranslationCache->invalidate(self::CLASS_NAME);
     }
 
-    /**
-     * @return string
-     */
     private function getKey(): string
     {
         return sprintf('%s|%s', self::CLASS_NAME, self::LOCALE);

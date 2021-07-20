@@ -18,12 +18,6 @@ class LayoutFactory implements LayoutFactoryInterface
     /** @var BlockViewCache|null */
     private $blockViewCache;
 
-    /**
-     * @param LayoutRegistryInterface         $registry
-     * @param LayoutRendererRegistryInterface $rendererRegistry
-     * @param ExpressionProcessor             $expressionProcessor
-     * @param BlockViewCache|null             $blockViewCache
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         LayoutRendererRegistryInterface $rendererRegistry,

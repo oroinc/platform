@@ -12,9 +12,6 @@ class LoadOptionSetsQuery extends ParametrizedMigrationQuery
     /** @var DataStorageInterface */
     protected $storage;
 
-    /**
-     * @param DataStorageInterface $storage
-     */
     public function __construct(DataStorageInterface $storage)
     {
         $this->storage = $storage;

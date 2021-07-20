@@ -15,9 +15,6 @@ class RouteCollectionEvent extends Event
      */
     protected $collection;
 
-    /**
-     * @param RouteCollection $collection
-     */
     public function __construct(RouteCollection $collection)
     {
         $this->collection = $collection;

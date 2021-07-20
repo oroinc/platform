@@ -34,7 +34,6 @@ class FunctionalTestGenerator extends AbstractTestGenerator
         $this->createFile($testPath, $content);
     }
 
-
     /**
      * @param \ReflectionClass $class
      * @return array

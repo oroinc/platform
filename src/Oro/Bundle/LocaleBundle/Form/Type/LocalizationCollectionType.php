@@ -34,9 +34,6 @@ class LocalizationCollectionType extends AbstractType
      */
     protected $dataClass;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

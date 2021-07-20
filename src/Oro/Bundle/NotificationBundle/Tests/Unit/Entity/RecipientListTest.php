@@ -48,7 +48,6 @@ class RecipientListTest extends \PHPUnit\Framework\TestCase
         $this->entity->addUser($user);
         $this->assertContains($user, $this->entity->getUsers());
 
-
         // remove group
         $this->entity->removeUser($user);
         $this->assertTrue($this->entity->getUsers()->isEmpty());
@@ -69,7 +68,6 @@ class RecipientListTest extends \PHPUnit\Framework\TestCase
         // test setter
         $this->entity->addGroup($group);
         $this->assertContains($group, $this->entity->getGroups());
-
 
         // remove group
         $this->entity->removeGroup($group);

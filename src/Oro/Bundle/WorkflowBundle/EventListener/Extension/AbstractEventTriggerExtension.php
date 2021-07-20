@@ -122,7 +122,6 @@ abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInt
         return $first == $second;
     }
 
-
     /**
      * @return ObjectRepository
      */

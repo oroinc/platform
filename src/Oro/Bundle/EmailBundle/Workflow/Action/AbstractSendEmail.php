@@ -30,12 +30,6 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
      */
     protected $entityNameResolver;
 
-    /**
-     * @param ContextAccessor    $contextAccessor
-     * @param Processor          $emailProcessor
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
@@ -50,8 +44,6 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
     }
 
     /**
-     * @param $option
-     *
      * @throws InvalidParameterException
      */
     protected function assertEmailAddressOption($option)

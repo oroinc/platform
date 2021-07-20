@@ -25,33 +25,21 @@ class QueryBuilderGroupingOrmQueryConverterContext extends GroupingOrmQueryConve
         $this->rootEntityAlias = null;
     }
 
-    /**
-     * @return QueryBuilder
-     */
     public function getQueryBuilder(): QueryBuilder
     {
         return $this->qb;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     public function setQueryBuilder(QueryBuilder $qb): void
     {
         $this->qb = $qb;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRootEntityAlias(): ?string
     {
         return $this->rootEntityAlias;
     }
 
-    /**
-     * @param string $rootEntityAlias
-     */
     public function setRootEntityAlias(string $rootEntityAlias): void
     {
         $this->rootEntityAlias = $rootEntityAlias;

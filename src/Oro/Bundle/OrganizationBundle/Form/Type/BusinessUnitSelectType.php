@@ -16,10 +16,6 @@ class BusinessUnitSelectType extends AbstractType
     /** @var TokenAccessorInterface */
     private $tokenAccessor;
 
-    /**
-     * @param Registry               $doctrine
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(Registry $doctrine, TokenAccessorInterface $tokenAccessor)
     {
         $this->doctrine = $doctrine;

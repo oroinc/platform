@@ -122,9 +122,6 @@ class WindowsStateController extends FOSRestController
         return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
-    /**
-     * @return WindowsStateManager|null
-     */
     private function getWindowsStateManager(): ?WindowsStateManager
     {
         return $this->get('oro_windows.manager.windows_state_registry')->getManager();

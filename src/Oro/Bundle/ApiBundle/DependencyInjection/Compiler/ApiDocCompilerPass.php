@@ -58,11 +58,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $this->configureApiSourceListener($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function getApiDocViews(ContainerBuilder $container): array
     {
         $config = DependencyInjectionUtil::getConfig($container);
@@ -104,9 +99,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         return true;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureUnderlyingViews(ContainerBuilder $container)
     {
         $underlyingViews = $this->getUnderlyingViews($container);
@@ -136,11 +128,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         return $underlyingViews;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $view
-     * @param string           $underlyingView
-     */
     private function registerUnderlyingViewHandler(ContainerBuilder $container, string $view, string $underlyingView)
     {
         $container
@@ -153,9 +140,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->addTag(self::API_DOC_ANNOTATION_HANDLER_TAG_NAME);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureApiDocExtractor(ContainerBuilder $container)
     {
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
@@ -177,9 +161,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureRequestTypeProvider(ContainerBuilder $container)
     {
         $requestTypeProviderDef = $container->getDefinition(self::API_DOC_REQUEST_TYPE_PROVIDER_SERVICE);
@@ -191,9 +172,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureApiSourceListener(ContainerBuilder $container)
     {
         $config = DependencyInjectionUtil::getConfig($container);
@@ -250,9 +228,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container->getDefinition(self::API_DOC_SWAGGER_FORMATTER_SERVICE)->setPublic(true);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureApiDocDataTypeConverter(ContainerBuilder $container)
     {
         $config = DependencyInjectionUtil::getConfig($container);
@@ -271,9 +246,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->setArgument(1, $viewMappings);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function registerRoutingOptionsResolvers(ContainerBuilder $container)
     {
         $services = [];

@@ -20,11 +20,6 @@ class SettingsProvider extends PhpArrayConfigProvider
     /** @var ResolverInterface */
     private $resolver;
 
-    /**
-     * @param string            $cacheFile
-     * @param bool              $debug
-     * @param ResolverInterface $resolver
-     */
     public function __construct(string $cacheFile, bool $debug, ResolverInterface $resolver)
     {
         parent::__construct($cacheFile, $debug);

@@ -14,9 +14,6 @@ class NotDangerousProtocolValidator extends ConstraintValidator
     /** @var UriSecurityHelper */
     private $uriSecurityHelper;
 
-    /**
-     * @param UriSecurityHelper $uriSecurityHelper
-     */
     public function __construct(UriSecurityHelper $uriSecurityHelper)
     {
         $this->uriSecurityHelper = $uriSecurityHelper;

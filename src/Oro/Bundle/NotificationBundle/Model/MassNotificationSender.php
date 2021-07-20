@@ -32,12 +32,6 @@ class MassNotificationSender
     /** @var EntityPool */
     private $entityPool;
 
-    /**
-     * @param EmailNotificationManager $emailNotificationManager
-     * @param NotificationSettings     $notificationSettings
-     * @param ManagerRegistry          $doctrine
-     * @param EntityPool               $entityPool
-     */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
         NotificationSettings $notificationSettings,

@@ -18,10 +18,6 @@ class ClassMethodNameCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMethodsDataProvider
-     *
-     * @param $property
-     * @param $prefixes
-     * @param array $result
      */
     public function testGetMethods($property, $prefixes, array $result)
     {

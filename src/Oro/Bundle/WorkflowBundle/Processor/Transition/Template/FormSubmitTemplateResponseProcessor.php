@@ -24,10 +24,6 @@ class FormSubmitTemplateResponseProcessor implements ProcessorInterface
     /** @var Environment */
     private $twig;
 
-    /**
-     * @param ViewHandlerInterface $viewHandler
-     * @param Environment $twig
-     */
     public function __construct(ViewHandlerInterface $viewHandler, Environment $twig)
     {
         $this->viewHandler = $viewHandler;

@@ -118,33 +118,21 @@ class Theme
         $this->icon = $icon;
     }
 
-    /**
-     * @return array
-     */
     public function getImagePlaceholders(): array
     {
         return $this->imagePlaceholders;
     }
 
-    /**
-     * @param array $imagePlaceholders
-     */
     public function setImagePlaceholders(array $imagePlaceholders): void
     {
         $this->imagePlaceholders = $imagePlaceholders;
     }
 
-    /**
-     * @return bool
-     */
     public function isRtlSupport(): bool
     {
         return $this->rtlSupport;
     }
 
-    /**
-     * @param bool $rtlSupport
-     */
     public function setRtlSupport(bool $rtlSupport): void
     {
         $this->rtlSupport = $rtlSupport;
@@ -214,9 +202,6 @@ class Theme
         $this->directory = $directory;
     }
 
-    /**
-     * @param array $groups
-     */
     public function setGroups(array $groups)
     {
         $this->groups = $groups;
@@ -239,9 +224,6 @@ class Theme
         return in_array($value, $this->groups, true);
     }
 
-    /**
-     * @param array $config
-     */
     public function setConfig(array $config)
     {
         $this->config = $config;

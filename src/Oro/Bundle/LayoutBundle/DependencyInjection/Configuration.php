@@ -58,8 +58,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Appends config nodes for "templating"
-     *
-     * @param ArrayNodeDefinition $parentNode
      */
     protected function appendTemplatingNodes(ArrayNodeDefinition $parentNode)
     {
@@ -123,8 +121,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Appends config nodes for "themes"
-     *
-     * @param ArrayNodeDefinition $parentNode
      */
     protected function appendThemingNodes(ArrayNodeDefinition $parentNode)
     {

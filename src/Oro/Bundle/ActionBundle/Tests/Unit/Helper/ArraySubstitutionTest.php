@@ -7,9 +7,6 @@ use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $map
-     * @param array $things
-     * @param array $expected
      * @dataProvider applyProvider
      */
     public function testApply(array $map, array $things, array $expected)
@@ -144,9 +141,6 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider clearUnboundProvider
-     * @param array $map
-     * @param array $things
-     * @param array $expected
      */
     public function testNotClearUnbound(array $map, array $things, array $expected)
     {

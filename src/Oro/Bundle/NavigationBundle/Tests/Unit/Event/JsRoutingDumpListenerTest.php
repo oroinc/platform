@@ -82,12 +82,6 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onConsoleCommand($this->getEvent('fos:js-routing:dump', $input, $inputDefinition));
     }
 
-    /**
-     * @param string $commandName
-     * @param InputInterface $input
-     * @param InputDefinition $def
-     * @return ConsoleCommandEvent
-     */
     private function getEvent(string $commandName, InputInterface $input, InputDefinition $def): ConsoleCommandEvent
     {
         /** @var Command|\PHPUnit\Framework\MockObject\MockObject $command */

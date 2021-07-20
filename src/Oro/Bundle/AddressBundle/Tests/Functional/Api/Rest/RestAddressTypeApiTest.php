@@ -27,7 +27,6 @@ class RestAddressTypeApiTest extends WebTestCase
 
     /**
      * @depends testGetAddressTypes
-     * @param array $expected
      */
     public function testGetAddressType(array $expected)
     {

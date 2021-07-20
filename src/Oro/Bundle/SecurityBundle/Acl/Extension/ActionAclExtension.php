@@ -24,9 +24,6 @@ class ActionAclExtension extends AbstractAclExtension
     /** @var MaskBuilder */
     protected $maskBuilder;
 
-    /**
-     * @param ActionSecurityMetadataProvider $actionMetadataProvider
-     */
     public function __construct(ActionSecurityMetadataProvider $actionMetadataProvider)
     {
         $this->actionMetadataProvider = $actionMetadataProvider;

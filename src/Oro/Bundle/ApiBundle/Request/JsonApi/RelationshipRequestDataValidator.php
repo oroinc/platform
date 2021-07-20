@@ -54,12 +54,6 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
         });
     }
 
-    /**
-     * @param array  $data
-     * @param string $rootSection
-     *
-     * @return bool
-     */
     protected function validateRequestData(array $data, string $rootSection): bool
     {
         if (!\array_key_exists($rootSection, $data)) {
@@ -122,10 +116,6 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
         }
     }
 
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
     protected function validateRelationshipObject(array $data, string $pointer): void
     {
         if (empty($data)) {

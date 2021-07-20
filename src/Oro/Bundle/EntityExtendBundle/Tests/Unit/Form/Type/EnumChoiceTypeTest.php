@@ -65,9 +65,6 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 
     /**
      * @dataProvider configureOptionsProvider
-     *
-     * @param array $options
-     * @param array $expectedOptions
      */
     public function testConfigureOptions($multiple, array $options, array $expectedOptions)
     {

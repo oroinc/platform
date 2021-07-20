@@ -16,9 +16,6 @@ class FileManager
     /** @var GaufretteFileManager */
     private $gaufretteFileManager;
 
-    /**
-     * @param GaufretteFileManager $gaufretteFileManager
-     */
     public function __construct(GaufretteFileManager $gaufretteFileManager)
     {
         $this->gaufretteFileManager = $gaufretteFileManager;
@@ -26,10 +23,6 @@ class FileManager
 
     /**
      * Saves the given file in a temporary directory and returns its name
-     *
-     * @param UploadedFile $file
-     *
-     * @return string
      */
     public function saveImportingFile(UploadedFile $file): string
     {
@@ -71,10 +64,6 @@ class FileManager
         return $files;
     }
 
-    /**
-     * @param \SplFileInfo $file
-     * @param string       $fileName
-     */
     public function saveFileToStorage(\SplFileInfo $file, string $fileName): void
     {
         $this->gaufretteFileManager->writeToStorage(
@@ -83,10 +72,6 @@ class FileManager
         );
     }
 
-    /**
-     * @param string $localFilePath
-     * @param string $fileName
-     */
     public function writeFileToStorage(string $localFilePath, string $fileName): void
     {
         $this->gaufretteFileManager->writeToStorage(
@@ -95,20 +80,11 @@ class FileManager
         );
     }
 
-    /**
-     * @param string $content
-     * @param string $fileName
-     */
     public function writeToStorage(string $content, string $fileName): void
     {
         $this->gaufretteFileManager->writeToStorage($content, $fileName);
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
     public function writeToTmpLocalStorage(string $fileName): string
     {
         $content = $this->gaufretteFileManager->getFileContent($fileName);
@@ -123,10 +99,6 @@ class FileManager
      * explicitly replace all possible `new lines` to one common
      * It is possible to replace it on field level (CsvFileStreamWriter::writeLine()) but it will be overhead because
      * it is called several times for each row in file
-     *
-     * @param string $file
-     *
-     * @return string
      */
     public function fixNewLines(string $file): string
     {
@@ -138,10 +110,6 @@ class FileManager
 
     /**
      * Generates unique file name with a given extension
-     *
-     * @param string|null $extension
-     *
-     * @return string
      */
     public static function generateUniqueFileName(string $extension = null): string
     {
@@ -153,11 +121,6 @@ class FileManager
         return $fileName;
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
     public static function generateTmpFilePath(string $fileName): string
     {
         return sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
@@ -165,11 +128,6 @@ class FileManager
 
     /**
      * Generates file name with a current date
-     *
-     * @param string $prefix
-     * @param string $extension
-     *
-     * @return string
      */
     public static function generateFileName(string $prefix, string $extension): string
     {
@@ -182,11 +140,6 @@ class FileManager
         );
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
     public function getFilePath(string $fileName): string
     {
         return $this->gaufretteFileManager->getFilePath($fileName);
@@ -220,11 +173,6 @@ class FileManager
         }
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return bool
-     */
     public function isFileExist(string $fileName): bool
     {
         return $this->gaufretteFileManager->hasFile($fileName);
@@ -246,11 +194,6 @@ class FileManager
             : null;
     }
 
-    /**
-     * @param string $pattern
-     *
-     * @return array
-     */
     public function getFilesByFilePattern(string $pattern): array
     {
         $result = [];
@@ -265,10 +208,6 @@ class FileManager
 
     /**
      * Removes byte order mark (BOM) from the beginning of the file.
-     *
-     * @param string $fileContent
-     *
-     * @return string
      */
     private function removeByteOrderMark(string $fileContent): string
     {

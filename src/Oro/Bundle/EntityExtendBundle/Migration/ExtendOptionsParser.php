@@ -22,11 +22,6 @@ class ExtendOptionsParser
     /** @var bool */
     protected $isDryRunMode = false;
 
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param FieldTypeHelper      $fieldTypeHelper
-     * @param ConfigManager        $configManager
-     */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper,

@@ -32,8 +32,6 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
 
     /**
      * Generate table oro_enum_value_trans
-     *
-     * @param Schema $schema
      */
     public static function oroEnumValueTransTable(Schema $schema)
     {

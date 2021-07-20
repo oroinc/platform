@@ -35,9 +35,6 @@ class NamedValidationConstraint extends Constraint implements ConstraintWithStat
         $this->statusCode = $statusCode;
     }
 
-    /**
-     * @return string
-     */
     public function getConstraintType(): string
     {
         return $this->constraintType;

@@ -58,9 +58,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, call_user_func_array(array($workflow, $getter), array()));
     }
 
-    /**
-     * @return array
-     */
     public function propertiesDataProvider(): array
     {
         return array(
@@ -195,8 +192,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function isTransitionAllowedDataProvider(): array
     {
@@ -428,8 +423,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider startDataProvider
-     * @param array $data
-     * @param string|null $transitionName
      */
     public function testStart(array $data, ?string $transitionName): void
     {
@@ -472,9 +465,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array_merge($data, ['entity' => $entity]), $item->getData()->getValues());
     }
 
-    /**
-     * @return array
-     */
     public function startDataProvider(): array
     {
         return [
@@ -736,8 +726,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider passedStepsDataProvider
-     * @param array $records
-     * @param array $expected
      */
     public function testGetPassedStepsByWorkflowItem(array $records, array $expected): void
     {
@@ -772,9 +760,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
     public function passedStepsDataProvider(): array
     {
         return array(
@@ -950,10 +935,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurationOptionProvider
-     *
-     * @param array $data
-     * @param string $property
-     * @param string $node
      */
     public function testGetConfigurationOption(array $data, string $property, string $node): void
     {
@@ -965,9 +946,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $accessor->getValue($workflow, $property));
     }
 
-    /**
-     * @return \Generator
-     */
     public function configurationOptionProvider(): \Generator
     {
         yield [
@@ -1013,10 +991,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity, $workflow->getWorkflowItemByEntityId(10));
     }
 
-    /**
-     * @param object $entity
-     * @param null|string $workflowName
-     */
     protected function assertDoctrineHelperCalled(object $entity, ?string $workflowName): void
     {
         $entityClass = 'stdClass';

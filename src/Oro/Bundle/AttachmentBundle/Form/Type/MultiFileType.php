@@ -26,10 +26,6 @@ class MultiFileType extends AbstractType
     /** @var MultipleFileConstraintsProvider */
     private $constraintsProvider;
 
-    /**
-     * @param EventSubscriberInterface $eventSubscriber
-     * @param MultipleFileConstraintsProvider $constraintsProvider
-     */
     public function __construct(
         EventSubscriberInterface $eventSubscriber,
         MultipleFileConstraintsProvider $constraintsProvider

@@ -63,10 +63,6 @@ class ExpressionResult
         }
     }
 
-    /**
-     * @param Token $token
-     * @param string $timezone
-     */
     private function processTypeVariable(Token $token, string $timezone): void
     {
         $dateValue = Carbon::now($timezone);
@@ -106,9 +102,6 @@ class ExpressionResult
         $this->sourceType = self::TYPE_DATE;
     }
 
-    /**
-     * @param Token $token
-     */
     private function processTypeTime(Token $token): void
     {
         $dateValue = Carbon::parse('now');
@@ -118,9 +111,6 @@ class ExpressionResult
         $this->sourceType = self::TYPE_TIME;
     }
 
-    /**
-     * @param Token $token
-     */
     private function processTypeDate(Token $token): void
     {
         $this->sourceType = self::TYPE_DATE;
@@ -140,10 +130,6 @@ class ExpressionResult
         }
     }
 
-    /**
-     * @param Token $token
-     * @param string $timeZone
-     */
     private function processTypeDayMonth(Token $token, string $timeZone): void
     {
         $this->sourceType = self::TYPE_DAYMONTH;
@@ -323,8 +309,6 @@ class ExpressionResult
 
     /**
      * Merges two results by rules
-     *
-     * @param ExpressionResult $expression
      *
      * @throws SyntaxException
      */

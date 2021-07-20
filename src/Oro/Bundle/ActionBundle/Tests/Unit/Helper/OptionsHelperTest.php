@@ -54,9 +54,6 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param ButtonInterface $button
-     * @param array $expectedData
-     *
      * @dataProvider getFrontendOptionsProvider
      */
     public function testGetFrontendOptions(ButtonInterface $button, array $expectedData)

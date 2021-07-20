@@ -24,11 +24,6 @@ class FieldConfigConstraintsFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $fieldType
-     * @param array $options
-     * @param bool $isEmptyConstraints
-     * @param string $constraintType
-     *
      * @dataProvider createProvider
      */
     public function testCreate(
@@ -50,9 +45,6 @@ class FieldConfigConstraintsFactoryTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function createProvider(): array
     {
         return [

@@ -22,9 +22,6 @@ class ConfigurablePermissionConfigurationTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider configurationProvider
-     *
-     * @param array $config
-     * @param array $expected
      */
     public function testProcessConfiguration(array $config, array $expected)
     {

@@ -18,10 +18,6 @@ class EntityApiBaseHandler
     /** @var EntityApiHandlerProcessor */
     protected $processor;
 
-    /**
-     * @param Registry $registry
-     * @param EntityApiHandlerProcessor $processor
-     */
     public function __construct(
         Registry $registry,
         EntityApiHandlerProcessor $processor
@@ -102,8 +98,6 @@ class EntityApiBaseHandler
 
     /**
      * "Success" form handler
-     *
-     * @param $entity
      */
     protected function onSuccess($entity)
     {

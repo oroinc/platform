@@ -63,7 +63,6 @@ class RequestMailboxesTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
     }
 
-
     public function testExecuteAction()
     {
         $email = new Email();

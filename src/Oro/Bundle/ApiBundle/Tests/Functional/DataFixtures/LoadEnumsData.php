@@ -9,9 +9,6 @@ use Extend\Entity\EV_Api_Enum2 as TestEnum2;
 
 class LoadEnumsData extends AbstractFixture
 {
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         for ($i = 0; $i <= 4; $i++) {

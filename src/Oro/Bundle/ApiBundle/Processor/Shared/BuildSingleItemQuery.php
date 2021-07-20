@@ -19,10 +19,6 @@ class BuildSingleItemQuery implements ProcessorInterface
     /** @var EntityIdHelper */
     private $entityIdHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityIdHelper $entityIdHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityIdHelper $entityIdHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

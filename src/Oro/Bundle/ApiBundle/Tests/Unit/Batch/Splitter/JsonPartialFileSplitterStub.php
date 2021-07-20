@@ -9,9 +9,6 @@ class JsonPartialFileSplitterStub extends JsonPartialFileSplitter
     /** @var int */
     private $sleepTimeout;
 
-    /**
-     * @param int $sleepTimeout
-     */
     public function __construct(int $sleepTimeout)
     {
         $this->sleepTimeout = $sleepTimeout * 1000;

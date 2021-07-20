@@ -35,13 +35,6 @@ class WorkflowDataHelper
     /** @var AclGroupProviderInterface */
     private $aclGroupProvider;
 
-    /**
-     * @param WorkflowManager               $workflowManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TranslatorInterface           $translator
-     * @param UrlGeneratorInterface         $router
-     * @param AclGroupProviderInterface     $aclGroupProvider
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         AuthorizationCheckerInterface $authorizationChecker,

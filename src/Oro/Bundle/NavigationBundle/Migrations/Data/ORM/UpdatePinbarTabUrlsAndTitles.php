@@ -22,9 +22,6 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
 
     private const BATCH_SIZE = 200;
 
-    /**
-     * @param \Doctrine\Persistence\ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $this->updateTitles($manager);
@@ -47,9 +44,6 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
         return NavigationItem::class;
     }
 
-    /**
-     * @param \Doctrine\Persistence\ObjectManager $manager
-     */
     private function updateTitles(ObjectManager $manager): void
     {
         /** @var PinbarTabTitleProvider $pinbarTabTitleProvider */
@@ -79,9 +73,6 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
         }
     }
 
-    /**
-     * @param \Doctrine\Persistence\ObjectManager $manager
-     */
     private function updateUrls(ObjectManager $manager): void
     {
         /** @var PinbarTabUrlNormalizer $pinbarTabUrlNormalizer */

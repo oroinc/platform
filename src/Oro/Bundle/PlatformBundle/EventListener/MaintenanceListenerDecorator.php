@@ -21,11 +21,6 @@ class MaintenanceListenerDecorator extends MaintenanceListener
     /** @var RouterListener */
     private $routerListener;
 
-    /**
-     * @param MaintenanceListener $innerListener
-     * @param DriverFactory $driverFactory
-     * @param RouterListener $routerListener
-     */
     public function __construct(
         MaintenanceListener $innerListener,
         DriverFactory $driverFactory,
@@ -36,9 +31,6 @@ class MaintenanceListenerDecorator extends MaintenanceListener
         $this->routerListener = $routerListener;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onKernelRequest(GetResponseEvent $event): void
     {
         $driver = $this->driverFactory->getDriver();
@@ -49,9 +41,6 @@ class MaintenanceListenerDecorator extends MaintenanceListener
         $this->innerListener->onKernelRequest($event);
     }
 
-    /**
-     * @param FilterResponseEvent $event
-     */
     public function onKernelResponse(FilterResponseEvent $event): void
     {
         $this->innerListener->onKernelResponse($event);

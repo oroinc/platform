@@ -54,11 +54,6 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new WindowsExtension($container);
     }
 
-    /**
-     * @param array $data
-     *
-     * @return WindowsState
-     */
     private function createWindowState(array $data = [], ?int $id = 123): WindowsState
     {
         /** @var WindowsState $state */

@@ -14,9 +14,6 @@ class PostProcessorConfigExtension extends AbstractConfigExtension
     /** @var PostProcessorRegistry */
     private $postProcessorRegistry;
 
-    /**
-     * @param PostProcessorRegistry $postProcessorRegistry
-     */
     public function __construct(PostProcessorRegistry $postProcessorRegistry)
     {
         $this->postProcessorRegistry = $postProcessorRegistry;
@@ -40,9 +37,6 @@ class PostProcessorConfigExtension extends AbstractConfigExtension
         ];
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function addValidationOfPostProcessorType(NodeBuilder $node): void
     {
         $node->end()->validate()

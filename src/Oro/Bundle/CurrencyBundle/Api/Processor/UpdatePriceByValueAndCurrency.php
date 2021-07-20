@@ -34,7 +34,6 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
     }
 
     /**
-     * @param CustomizeFormDataContext $context
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function processPreSubmit(CustomizeFormDataContext $context): void
@@ -71,9 +70,6 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
         }
     }
 
-    /**
-     * @param CustomizeFormDataContext $context
-     */
     private function processPostValidate(CustomizeFormDataContext $context): void
     {
         // fix property path for validation errors related to "price" field

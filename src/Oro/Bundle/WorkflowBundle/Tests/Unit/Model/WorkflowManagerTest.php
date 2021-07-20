@@ -101,9 +101,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedWorkflow, $this->workflowManager->getWorkflow($workflowIdentifier));
     }
 
-    /**
-     * @return array
-     */
     public function getWorkflowDataProvider(): array
     {
         return [
@@ -545,8 +542,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider massStartDataProvider
      */
     public function testMassStartWorkflow(array $source, array $expected): void
@@ -575,7 +570,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManagerForClass')
             ->with(WorkflowItem::class)
             ->willReturn($entityManager);
-
 
         if ($expected) {
             foreach ($expected as $iteration => $row) {
@@ -609,9 +603,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         $this->workflowManager->massStartWorkflow($source);
     }
 
-    /**
-     * @return array
-     */
     public function massStartDataProvider(): array
     {
         $firstEntity = new \DateTime('2012-12-12');
@@ -823,8 +814,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider massTransitDataProvider
      */
     public function testMassTransit(array $source, array $expected): void
@@ -861,9 +850,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function massTransitDataProvider(): array
     {
         return [
@@ -935,9 +921,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->workflowManager->getWorkflowItem($entity, $workflowName));
     }
 
-    /**
-     * @return array
-     */
     public function getWorkflowItemDataProvider(): array
     {
         return [
@@ -963,9 +946,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function entityDataProvider(): array
     {
         return [
@@ -1157,13 +1137,9 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
             ->method('isActive')
             ->willReturn($isActive);
 
-
         $this->assertEquals($isActive, $this->workflowManager->isActiveWorkflow($workflowName));
     }
 
-    /**
-     * @return array
-     */
     public function isActiveDataProvider(): array
     {
         return [[true], [false]];
@@ -1252,9 +1228,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         return $workflow;
     }
 
-    /**
-     * @return array
-     */
     public function trueFalseDataProvider(): array
     {
         return [

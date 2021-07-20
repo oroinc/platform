@@ -15,9 +15,6 @@ class WorkflowAwareCacheClearer implements CacheClearerInterface
      */
     private $workflowAwareCache;
 
-    /**
-     * @param WorkflowAwareCache $workflowAwareCache
-     */
     public function __construct(WorkflowAwareCache $workflowAwareCache)
     {
         $this->workflowAwareCache = $workflowAwareCache;

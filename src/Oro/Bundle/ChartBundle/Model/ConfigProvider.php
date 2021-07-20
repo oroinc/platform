@@ -25,11 +25,6 @@ class ConfigProvider extends PhpArrayConfigProvider
         return array_keys($this->doGetConfig());
     }
 
-    /**
-     * @param string $chartName
-     *
-     * @return bool
-     */
     public function hasChartConfig(string $chartName): bool
     {
         $config = $this->doGetConfig();
@@ -38,10 +33,6 @@ class ConfigProvider extends PhpArrayConfigProvider
     }
 
     /**
-     * @param string $chartName
-     *
-     * @return array
-     *
      * @throws InvalidConfigurationException
      */
     public function getChartConfig(string $chartName): array

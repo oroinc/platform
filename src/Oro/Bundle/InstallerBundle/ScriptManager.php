@@ -29,8 +29,6 @@ class ScriptManager
 
     /**
      * Constructor
-     *
-     * @param Kernel $kernel
      */
     public function __construct(Kernel $kernel)
     {

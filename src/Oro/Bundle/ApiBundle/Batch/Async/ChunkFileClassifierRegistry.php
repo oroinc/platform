@@ -34,10 +34,6 @@ class ChunkFileClassifierRegistry
 
     /**
      * Returns the chunk file classifier for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return ChunkFileClassifierInterface|null
      */
     public function getClassifier(RequestType $requestType): ?ChunkFileClassifierInterface
     {

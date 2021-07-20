@@ -53,7 +53,7 @@ class EmailAttachment
      * @var string
      */
     protected $preview;
-    
+
     /**
      * @var string
      */
@@ -231,7 +231,7 @@ class EmailAttachment
     {
         return $this->preview;
     }
-    
+
     /**
      * @param string $icon
      *
@@ -252,9 +252,6 @@ class EmailAttachment
         return $this->icon;
     }
 
-    /**
-     * @return string
-     */
     public function getMimeType(): string
     {
         return $this->mimeType;
@@ -271,9 +268,6 @@ class EmailAttachment
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getErrors(): array
     {
         return $this->errors;
@@ -290,9 +284,6 @@ class EmailAttachment
         return $this;
     }
 
-    /**
-     * @param string $errorMessage
-     */
     public function addError(string $errorMessage)
     {
         $this->errors[] = $errorMessage;

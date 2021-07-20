@@ -31,11 +31,6 @@ trait RolePermissionExtension
 
     /**
      * Updates a permission for given entity for the given role.
-     *
-     * @param string $roleName
-     * @param string $entityClass
-     * @param int    $accessLevel
-     * @param string $permission
      */
     protected function updateRolePermission(
         string $roleName,
@@ -71,12 +66,6 @@ trait RolePermissionExtension
 
     /**
      * Updates a permission for given entity for the given role.
-     *
-     * @param string $roleName
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param int    $accessLevel
-     * @param string $permission
      */
     protected function updateRolePermissionForField(
         string $roleName,
@@ -117,10 +106,6 @@ trait RolePermissionExtension
 
     /**
      * Updates a permission for given action for the given role.
-     *
-     * @param string $roleName
-     * @param string $action
-     * @param bool   $value
      */
     protected function updateRolePermissionForAction(
         string $roleName,
@@ -181,12 +166,6 @@ trait RolePermissionExtension
         }
     }
 
-    /**
-     * @param MaskBuilder $maskBuilder
-     * @param array       $permissions
-     *
-     * @return int
-     */
     private function buildAclMask(MaskBuilder $maskBuilder, array $permissions): int
     {
         foreach ($permissions as $permission => $accessLevel) {

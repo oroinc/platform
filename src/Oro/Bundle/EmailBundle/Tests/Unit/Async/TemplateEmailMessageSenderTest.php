@@ -40,16 +40,12 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider badMessageProvider
-     * @param array $message
      */
     public function testIsTranslatableWhenMessageHasNoRequiredFields(array $message): void
     {
         self::assertFalse($this->sender->isTranslatable($message));
     }
 
-    /**
-     * @return array
-     */
     public function badMessageProvider(): array
     {
         return [
@@ -105,7 +101,6 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider badMessageProvider
-     * @param array $message
      */
     public function testSendTranslatedMessageWhenMessageIsNotTranslatable(array $message): void
     {

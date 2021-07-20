@@ -12,9 +12,6 @@ class ConfigReader implements ReaderInterface
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
-    /**
-     * @param ConfigurationProvider $configurationProvider
-     */
     public function __construct(ConfigurationProvider $configurationProvider)
     {
         $this->configurationProvider = $configurationProvider;

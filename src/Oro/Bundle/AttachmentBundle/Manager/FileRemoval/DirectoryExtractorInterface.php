@@ -19,8 +19,6 @@ interface DirectoryExtractorInterface
     /**
      * Indicates whether it is allowed to use a delete from a storage operation by the extracted directory
      * even if the directory contains only one file.
-     *
-     * @return bool
      */
     public function isAllowedToUseForSingleFile(): bool;
 }

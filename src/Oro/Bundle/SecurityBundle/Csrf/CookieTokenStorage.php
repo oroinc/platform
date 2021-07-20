@@ -43,7 +43,6 @@ class CookieTokenStorage implements TokenStorageInterface
 
     /**
      * @deprecated
-     * @param string|null $sameSite
      */
     public function setSameSite(?string $sameSite): void
     {

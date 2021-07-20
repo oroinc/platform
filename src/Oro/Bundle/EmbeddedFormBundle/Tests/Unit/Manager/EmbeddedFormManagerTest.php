@@ -85,7 +85,6 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($label, $manager->getLabelByType($type));
     }
 
-
     /**
      * @test
      */

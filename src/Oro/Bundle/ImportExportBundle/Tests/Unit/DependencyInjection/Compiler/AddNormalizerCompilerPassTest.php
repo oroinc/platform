@@ -23,11 +23,6 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processDataProvider
-     *
-     * @param array $normalizers
-     * @param array $encoders
-     * @param array $expectedNormalizers
-     * @param array $expectedEncoders
      */
     public function testProcess(
         array $normalizers,

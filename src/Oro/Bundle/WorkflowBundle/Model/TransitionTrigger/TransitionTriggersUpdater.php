@@ -27,12 +27,6 @@ class TransitionTriggersUpdater
     /** @var EventTriggerCache */
     private $cache;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param TransitionTriggersUpdateDecider $decider
-     * @param TransitionTriggerCronScheduler $cronScheduler
-     * @param EventTriggerCache $cache
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TransitionTriggersUpdateDecider $decider,
@@ -47,7 +41,6 @@ class TransitionTriggersUpdater
 
     /**
      * Overrides triggers by TriggersBag. Flushes data into database.
-     * @param TriggersBag $triggersBag
      */
     public function updateTriggers(TriggersBag $triggersBag)
     {
@@ -55,9 +48,6 @@ class TransitionTriggersUpdater
         $this->updateCronSchedules($triggersBag->getDefinition());
     }
 
-    /**
-     * @param TriggersBag $triggersBag
-     */
     private function updateTransitionTriggers(TriggersBag $triggersBag)
     {
         $existingTriggers = $this->getStoredDefinitionTriggers($triggersBag->getDefinition());
@@ -77,9 +67,6 @@ class TransitionTriggersUpdater
         }
     }
 
-    /**
-     * @param WorkflowDefinition $definition
-     */
     private function updateCronSchedules(WorkflowDefinition $definition)
     {
         $cronTriggers = $this->getStoredDefinitionCronTriggers($definition);
@@ -94,17 +81,11 @@ class TransitionTriggersUpdater
         $this->cronScheduler->flush();
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     */
     private function persist(BaseTransitionTrigger $trigger)
     {
         $this->getEntityManager()->persist($trigger);
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     */
     private function remove(BaseTransitionTrigger $trigger)
     {
         $this->getEntityManager()->remove($trigger);
@@ -124,9 +105,6 @@ class TransitionTriggersUpdater
         $this->cache->build();
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     */
     public function removeTriggers(WorkflowDefinition $workflowDefinition)
     {
         $triggers = $this->getStoredDefinitionTriggers($workflowDefinition);

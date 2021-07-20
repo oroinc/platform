@@ -40,7 +40,6 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
      * @throws InvalidConfigurationException
      */
     protected function removeNestedHandlersFromHandlersToChannelsParam(ContainerBuilder $container)
@@ -68,7 +67,6 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
      * @throws InvalidConfigurationException
      */
     protected function removeNestedHandlersFromAllChannels(ContainerBuilder $container)

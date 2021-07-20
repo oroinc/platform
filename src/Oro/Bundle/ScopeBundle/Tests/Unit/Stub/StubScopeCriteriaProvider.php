@@ -27,7 +27,6 @@ class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
         $this->criteriaValueType = $criteriaValueType;
     }
 
-
     /**
      * {@inheritdoc}
      */

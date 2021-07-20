@@ -26,11 +26,6 @@ class StrategyEvent extends Event
      */
     protected $context;
 
-    /**
-     * @param StrategyInterface $strategy
-     * @param $entity
-     * @param ContextInterface $context
-     */
     public function __construct(StrategyInterface $strategy, $entity, ContextInterface $context)
     {
         $this->entity = $entity;

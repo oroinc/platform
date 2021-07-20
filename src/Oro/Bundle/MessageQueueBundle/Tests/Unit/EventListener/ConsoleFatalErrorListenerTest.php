@@ -68,8 +68,6 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider commandDataProvider
-     *
-     * @param string $command
      */
     public function testConfigure(string $command): void
     {

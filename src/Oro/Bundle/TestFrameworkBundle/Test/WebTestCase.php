@@ -588,10 +588,6 @@ abstract class WebTestCase extends BaseWebTestCase
         return $event->getListeners();
     }
 
-    /**
-     * @param DataFixturesExecutor $executor
-     * @param DataFixturesLoader   $loader
-     */
     private function doLoadFixtures(DataFixturesExecutor $executor, DataFixturesLoader $loader)
     {
         $container = self::getContainer();
@@ -1130,9 +1126,6 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Asserts the given response header equals to the expected value.
-     *
-     * @param Response $response
-     * @param string   $headerName
      */
     protected static function assertResponseHeaderNotExists(Response $response, string $headerName): void
     {
@@ -1144,10 +1137,6 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Asserts "Allow" response header equals to the expected value.
-     *
-     * @param Response $response
-     * @param string   $expectedAllowedMethods
-     * @param string   $message
      */
     protected static function assertAllowResponseHeader(
         Response $response,
@@ -1159,10 +1148,6 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Assert that intersect of $actual with $expected equals $expected
-     *
-     * @param array $expected
-     * @param array $actual
-     * @param string $message
      */
     protected static function assertArrayIntersectEquals(array $expected, array $actual, string $message = '')
     {
@@ -1210,15 +1195,12 @@ abstract class WebTestCase extends BaseWebTestCase
             }
         }
 
-
         return $result;
     }
 
     /**
      * Sorts array by key recursively. This method is used to output failures of array response comparison in
      * a more comprehensive way.
-     *
-     * @param array $array
      */
     protected static function sortArrayByKeyRecursively(array &$array)
     {

@@ -12,17 +12,11 @@ class OrmDatasourceAclListener
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * @param OrmResultBefore $event
-     */
     public function onResultBefore(OrmResultBefore $event)
     {
         $dataGrid = $event->getDatagrid();

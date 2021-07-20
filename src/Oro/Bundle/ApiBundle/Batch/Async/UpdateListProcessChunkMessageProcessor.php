@@ -54,17 +54,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param JobRunner                  $jobRunner
-     * @param FileManager                $fileManager
-     * @param BatchUpdateHandler         $handler
-     * @param DataEncoderRegistry        $dataEncoderRegistry
-     * @param RetryHelper                $retryHelper
-     * @param UpdateListProcessingHelper $processingHelper
-     * @param FileNameProvider           $fileNameProvider
-     * @param FileLockManager            $fileLockManager
-     * @param LoggerInterface            $logger
-     */
     public function __construct(
         JobRunner $jobRunner,
         FileManager $fileManager,
@@ -134,14 +123,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     }
 
     /**
-     * @param JobRunner $jobRunner
-     * @param Job       $job
-     * @param array     $body
-     * @param float     $startTimestamp
-     * @param bool      $deleteChunkFile
-     *
-     * @return bool
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -233,14 +214,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         return $result;
     }
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param Job       $job
-     * @param array     $body
-     * @param ChunkFile $chunkFile
-     *
-     * @return bool
-     */
     private function retryChunk(
         JobRunner $jobRunner,
         Job $job,
@@ -269,11 +242,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         return true;
     }
 
-    /**
-     * @param string $jobName
-     *
-     * @return string
-     */
     private function getRetryChunkJobName(string $jobName): string
     {
         $pos = strrpos($jobName, ':r');
@@ -287,15 +255,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         return $jobName . ':r1';
     }
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param Job       $job
-     * @param array     $body
-     * @param ChunkFile $parentChunkFile
-     * @param array     $chunksToRetry
-     *
-     * @return bool
-     */
     private function processChunksToRetry(
         JobRunner $jobRunner,
         Job $job,
@@ -347,12 +306,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         return true;
     }
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param string    $jobName
-     * @param array     $parentBody
-     * @param ChunkFile $chunkFile
-     */
     private function createChunkJob(
         JobRunner $jobRunner,
         string $jobName,
@@ -369,12 +322,6 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         );
     }
 
-    /**
-     * @param int $operationId
-     * @param int $numberOfNewChunks
-     *
-     * @return int|null
-     */
     private function updateChunkCount(int $operationId, int $numberOfNewChunks): ?int
     {
         $infoFileName = $this->fileNameProvider->getInfoFileName($operationId);

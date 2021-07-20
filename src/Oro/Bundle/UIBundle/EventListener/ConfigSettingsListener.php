@@ -6,9 +6,6 @@ use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
 class ConfigSettingsListener
 {
-    /**
-     * @param ConfigSettingsUpdateEvent $event
-     */
     public function onBeforeSave(ConfigSettingsUpdateEvent $event)
     {
         $settings = $event->getSettings();

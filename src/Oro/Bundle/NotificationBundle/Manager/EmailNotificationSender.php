@@ -24,10 +24,6 @@ class EmailNotificationSender
      */
     private $notificationSettings;
 
-    /**
-     * @param NotificationSettings $notificationSettings
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(NotificationSettings $notificationSettings, MessageProducerInterface $producer)
     {
         $this->notificationSettings = $notificationSettings;
@@ -37,8 +33,6 @@ class EmailNotificationSender
     /**
      * Sends ordinary notification.
      *
-     * @param TemplateEmailNotificationInterface $notification
-     * @param EmailTemplateInterface $template
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
      */
     public function send(TemplateEmailNotificationInterface $notification, EmailTemplateInterface $template): void
@@ -49,8 +43,6 @@ class EmailNotificationSender
     /**
      * Sends mass notification.
      *
-     * @param TemplateEmailNotificationInterface $notification
-     * @param EmailTemplateInterface $template
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
      */
     public function sendMass(TemplateEmailNotificationInterface $notification, EmailTemplateInterface $template): void
@@ -59,9 +51,6 @@ class EmailNotificationSender
     }
 
     /**
-     * @param TemplateEmailNotificationInterface $notification
-     * @param EmailTemplateInterface $template
-     * @param string $topic
      * @throws \Oro\Component\MessageQueue\Transport\Exception\Exception
      */
     private function sendNotification(

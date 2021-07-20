@@ -46,9 +46,6 @@ class SortersConfiguration extends AbstractConfigurationSection
         $this->configureFieldNode($fieldNode);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = 'sorters.field';

@@ -33,10 +33,6 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configuration = new WorkflowListConfiguration(new WorkflowConfiguration());
     }
 
-    /**
-     * @param array $bundles
-     * @return WorkflowConfigurationProvider
-     */
     protected function buildProvider(array $bundles): WorkflowConfigurationProvider
     {
         $finderFactory = new ConfigFinderFactory($bundles);

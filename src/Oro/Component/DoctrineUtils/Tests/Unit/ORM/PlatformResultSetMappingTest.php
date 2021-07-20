@@ -12,8 +12,6 @@ class PlatformResultSetMappingTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider databasePlatformProvider
-     *
-     * @param AbstractPlatform $platform
      */
     public function testBasicResultSetMapping(AbstractPlatform $platform, $expectedMapping)
     {

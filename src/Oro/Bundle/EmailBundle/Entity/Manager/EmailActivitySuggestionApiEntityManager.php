@@ -16,9 +16,6 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
     /** @var TokenStorageInterface|null */
     protected $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;

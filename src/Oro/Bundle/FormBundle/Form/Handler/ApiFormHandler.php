@@ -25,19 +25,12 @@ class ApiFormHandler
      */
     protected $manager;
 
-    /**
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
     public function __construct(RequestStack $requestStack, ObjectManager $manager)
     {
         $this->requestStack = $requestStack;
         $this->manager = $manager;
     }
 
-    /**
-     * @param FormInterface $form
-     */
     public function setForm(FormInterface $form)
     {
         $this->form = $form;

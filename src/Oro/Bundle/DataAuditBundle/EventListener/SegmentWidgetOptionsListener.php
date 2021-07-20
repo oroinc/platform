@@ -14,10 +14,6 @@ class SegmentWidgetOptionsListener
     /** @var ContextChecker */
     protected $contextChecker;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ContextChecker                $contextChecker
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ContextChecker $contextChecker
@@ -26,9 +22,6 @@ class SegmentWidgetOptionsListener
         $this->contextChecker = $contextChecker;
     }
 
-    /**
-     * @param WidgetOptionsLoadEvent $event
-     */
     public function onLoad(WidgetOptionsLoadEvent $event)
     {
         if (!$this->authorizationChecker->isGranted('oro_dataaudit_view')) {

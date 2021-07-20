@@ -188,7 +188,6 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      * @param string|null $prefix
      *
      * @return string
-     *
      */
     public function generateManyToManyJoinTableColumnName(
         $entityClassName,

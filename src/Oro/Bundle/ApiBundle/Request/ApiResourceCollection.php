@@ -37,8 +37,6 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
     /**
      * Adds a resource to the collection.
      *
-     * @param ApiResource $resource
-     *
      * @throws \InvalidArgumentException if a resource for the same entity already exists in the collection
      */
     public function add(ApiResource $resource)

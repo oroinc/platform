@@ -19,10 +19,6 @@ class LocalizedTemplateProvider
     /** @var EmailTemplateContentProvider */
     private $templateProvider;
 
-    /**
-     * @param PreferredLocalizationProviderInterface $localizationProvider
-     * @param EmailTemplateContentProvider $templateProvider
-     */
     public function __construct(
         PreferredLocalizationProviderInterface $localizationProvider,
         EmailTemplateContentProvider $templateProvider

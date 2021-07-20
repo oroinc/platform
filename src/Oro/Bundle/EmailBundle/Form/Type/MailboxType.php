@@ -40,11 +40,6 @@ class MailboxType extends AbstractType
     /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param MailboxProcessStorage $storage
-     * @param SymmetricCrypterInterface $encryptor
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         MailboxProcessStorage $storage,
         SymmetricCrypterInterface $encryptor,
@@ -144,8 +139,6 @@ class MailboxType extends AbstractType
      * PreSet event handler.
      *
      * Adds appropriate process field to form based on set value.
-     *
-     * @param FormEvent $event
      */
     public function preSet(FormEvent $event)
     {
@@ -191,8 +184,6 @@ class MailboxType extends AbstractType
 
     /**
      * Set password on form reload
-     *
-     * @param FormEvent $event
      */
     public function postSet(FormEvent $event)
     {
@@ -211,8 +202,6 @@ class MailboxType extends AbstractType
      * PreSubmit event handler.
      *
      * If process type is changed ... replace with proper form type and set process type to null.
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -239,8 +228,6 @@ class MailboxType extends AbstractType
 
     /**
      * Form post submit handler.
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -323,9 +310,6 @@ class MailboxType extends AbstractType
 
     /**
      * Configures user field so it searches only within mailboxes' organization.
-     *
-     * @param FormInterface $form
-     * @param Mailbox       $data
      */
     protected function configureUserField(FormInterface $form, Mailbox $data)
     {

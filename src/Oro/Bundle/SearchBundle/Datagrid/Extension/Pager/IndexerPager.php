@@ -27,9 +27,6 @@ class IndexerPager
      */
     protected $query;
 
-    /**
-     * @param SearchQueryInterface $query
-     */
     public function setQuery(SearchQueryInterface $query)
     {
         $this->query = $query;

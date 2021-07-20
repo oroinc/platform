@@ -20,10 +20,6 @@ class DeleteEntityByDeleteHandler implements ProcessorInterface
     /** @var EntityDeleteHandlerRegistry */
     private $deleteHandlerRegistry;
 
-    /**
-     * @param DoctrineHelper              $doctrineHelper
-     * @param EntityDeleteHandlerRegistry $deleteHandlerRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityDeleteHandlerRegistry $deleteHandlerRegistry

@@ -80,11 +80,6 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataHandlePostFlushProvider
-     *
-     * @param $email
-     * @param $email2
-     * @param $params
-     * @param $methods
      */
     public function testHandlePostFlushWithoutQueue($email, $email2, $params, $methods)
     {
@@ -111,7 +106,6 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         $this->emailActivityListProvider->expects($this->exactly($methods['getTargetEntities']['amountCall']))
             ->method('getTargetEntities')
             ->will($this->returnValue($methods['getTargetEntities']['return']));
-
 
         $this->emailThreadProvider->expects($this->exactly($methods['getEmailReferences']['amountCall']))
             ->method('getEmailReferences')

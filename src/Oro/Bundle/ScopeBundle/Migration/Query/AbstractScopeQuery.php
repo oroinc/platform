@@ -11,7 +11,6 @@ use Oro\Bundle\MigrationBundle\Migration\AbstractTableInformationQuery;
 abstract class AbstractScopeQuery extends AbstractTableInformationQuery
 {
     /**
-     * @return array
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getColumnNames(): array
@@ -27,8 +26,6 @@ abstract class AbstractScopeQuery extends AbstractTableInformationQuery
     }
 
     /**
-     * @param string|null $columnPrefix
-     * @return string
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getColumnsHashExpression(string $columnPrefix = null): string
@@ -41,8 +38,6 @@ abstract class AbstractScopeQuery extends AbstractTableInformationQuery
     }
 
     /**
-     * @param string|null $columnPrefix
-     * @return string
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getColumnsHashExpressionForPgSql(string $columnPrefix = null): string
@@ -53,8 +48,6 @@ abstract class AbstractScopeQuery extends AbstractTableInformationQuery
     }
 
     /**
-     * @param string|null $columnPrefix
-     * @return string
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function getColumnsHashExpressionForMySql(string $columnPrefix = null): string

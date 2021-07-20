@@ -181,7 +181,6 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
             ],
         ];
 
-
         $class = new ClassGenerator('Test\Entity');
 
         $this->extension->generate($schema, $class);

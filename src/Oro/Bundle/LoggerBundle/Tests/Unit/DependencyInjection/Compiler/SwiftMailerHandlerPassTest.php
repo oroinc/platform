@@ -30,7 +30,6 @@ class SwiftMailerHandlerPassTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->expects($this->never())->method('getParameter');
     }
 
-
     public function testProcess()
     {
         $containerBuilder = new ContainerBuilder();

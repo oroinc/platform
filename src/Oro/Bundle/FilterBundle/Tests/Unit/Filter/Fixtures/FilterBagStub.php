@@ -10,10 +10,6 @@ class FilterBagStub implements FilterBagInterface
     /** @var FilterInterface[] [filter name => filter, ...] */
     private $filters = [];
 
-    /**
-     * @param string          $name
-     * @param FilterInterface $filter
-     */
     public function addFilter(string $name, FilterInterface $filter): void
     {
         $this->filters[$name] = $filter;

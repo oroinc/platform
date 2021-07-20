@@ -23,9 +23,6 @@ class MetadataProvider implements ResetInterface
     /** @var array */
     private $cache = [];
 
-    /**
-     * @param ActionProcessorInterface $processor
-     */
     public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
@@ -67,7 +64,7 @@ class MetadataProvider implements ResetInterface
                 $withExcludedProperties
             );
         }
-        
+
         $cacheKey = $this->buildCacheKey(
             $className,
             $version,

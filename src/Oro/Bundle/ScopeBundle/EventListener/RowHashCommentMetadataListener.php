@@ -19,17 +19,11 @@ class RowHashCommentMetadataListener
      */
     protected $manager;
 
-    /**
-     * @param AddCommentToRoHashManager $manager
-     */
     public function __construct(AddCommentToRoHashManager $manager)
     {
         $this->manager = $manager;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
         $em = $event->getEntityManager();
@@ -53,10 +47,6 @@ class RowHashCommentMetadataListener
         );
     }
 
-    /**
-     * @param EntityManagerInterface $em
-     * @return bool
-     */
     protected function isPlatformSupport(EntityManagerInterface $em): bool
     {
         $platform = $em->getConnection()->getDatabasePlatform();

@@ -21,11 +21,6 @@ class ProcessorExecutableFinder
         $this->executableFinder = new ExecutableFinder();
     }
 
-    /**
-     * @param string $library
-     *
-     * @return string|null
-     */
     public function find(string $library): ?string
     {
         $binary = $this->executableFinder->find($library, null, self::EXTRA_DIRS);

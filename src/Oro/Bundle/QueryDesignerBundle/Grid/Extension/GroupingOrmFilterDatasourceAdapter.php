@@ -16,9 +16,6 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
     /** @var ExpressionBuilder */
     private $expressionBuilder;
 
-    /**
-     * @param QueryBuilder $qb
-     */
     public function __construct(QueryBuilder $qb)
     {
         parent::__construct($qb);

@@ -66,11 +66,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /** @var TargetMetadataProvider */
     private $targetMetadataProvider;
 
-    /**
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     * @param LoggerInterface             $logger
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry,
@@ -265,20 +260,8 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         EntityMetadata $metadata = null
     ): array;
 
-    /**
-     * @param Error $error
-     *
-     * @return array
-     */
     abstract protected function convertErrorToArray(Error $error): array;
 
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     * @param bool        $throwException
-     *
-     * @return string|null
-     */
     abstract protected function convertToEntityType(
         string $entityClass,
         RequestType $requestType,
@@ -301,13 +284,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
             : $this->getEntityType($metadata->getClassName(), $requestType);
     }
 
-    /**
-     * @param string|null $entityClass
-     * @param RequestType $requestType
-     * @param string|null $fallbackEntityClass
-     *
-     * @return string
-     */
     protected function getEntityType(
         ?string $entityClass,
         RequestType $requestType,
@@ -324,11 +300,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $entityType;
     }
 
-    /**
-     * @param LinkMetadataInterface $linkMetadata
-     *
-     * @return string|null
-     */
     protected function getLinkHref(LinkMetadataInterface $linkMetadata): ?string
     {
         try {
@@ -340,11 +311,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return null;
     }
 
-    /**
-     * @param LinkMetadataInterface $linkMetadata
-     *
-     * @return array|null
-     */
     protected function getLinkMeta(LinkMetadataInterface $linkMetadata): ?array
     {
         $properties = $linkMetadata->getMetaProperties();
@@ -355,11 +321,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $this->resolveMeta($properties);
     }
 
-    /**
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array|null
-     */
     protected function getAssociationMeta(AssociationMetadata $associationMetadata): ?array
     {
         $properties = $associationMetadata->getMetaProperties();
@@ -370,11 +331,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $this->resolveMeta($properties);
     }
 
-    /**
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array|null
-     */
     protected function getRelationshipMeta(AssociationMetadata $associationMetadata): ?array
     {
         $properties = $associationMetadata->getRelationshipMetaProperties();
@@ -403,12 +359,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return !empty($result) ? $result : null;
     }
 
-    /**
-     * @param string         $propertyPath
-     * @param EntityMetadata $metadata
-     *
-     * @return bool
-     */
     protected function isIgnoredMeta(string $propertyPath, EntityMetadata $metadata): bool
     {
         return
@@ -419,12 +369,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
             );
     }
 
-    /**
-     * @param array  $data
-     * @param string $associationName
-     *
-     * @return array|null
-     */
     protected function getCollectionAssociationData(array $data, string $associationName): ?array
     {
         if (!\array_key_exists($associationName, $data)) {
@@ -440,29 +384,17 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     /**
      * Checks whether a given metadata contains only identifier fields(s).
-     *
-     * @param EntityMetadata $metadata
-     *
-     * @return bool
      */
     protected function hasIdentifierFieldsOnly(EntityMetadata $metadata): bool
     {
         return $metadata->hasIdentifierFieldsOnly();
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @return AssociationToArrayAttributeConverter
-     */
     protected function getArrayAttributeConverter(): AssociationToArrayAttributeConverter
     {
         if (null === $this->arrayAttributeConverter) {
@@ -472,9 +404,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $this->arrayAttributeConverter;
     }
 
-    /**
-     * @return AssociationToArrayAttributeConverter
-     */
     protected function createArrayAttributeConverter(): AssociationToArrayAttributeConverter
     {
         return new AssociationToArrayAttributeConverter(
@@ -483,9 +412,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         );
     }
 
-    /**
-     * @return TargetMetadataProvider
-     */
     protected function getTargetMetadataProvider(): TargetMetadataProvider
     {
         if (null === $this->targetMetadataProvider) {
@@ -495,9 +421,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $this->targetMetadataProvider;
     }
 
-    /**
-     * @return TargetMetadataProvider
-     */
     protected function createTargetMetadataProvider(): TargetMetadataProvider
     {
         return new TargetMetadataProvider($this->objectAccessor);
@@ -553,12 +476,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $result;
     }
 
-    /**
-     * @param RequestType         $requestType
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array
-     */
     protected function getRelationshipData(RequestType $requestType, AssociationMetadata $associationMetadata): array
     {
         $targetClass = $associationMetadata->getTargetClassName();
@@ -608,16 +525,8 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         AssociationMetadata $associationMetadata
     );
 
-    /**
-     * @param array $object
-     */
     abstract protected function addRelatedObject(array $object): void;
 
-    /**
-     * @param array                 $result
-     * @param string                $name
-     * @param LinkMetadataInterface $link
-     */
     abstract protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void;
 
     /**
@@ -662,9 +571,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         ));
     }
 
-    /**
-     * @param array $result
-     */
     private function addLinksWithMetadataToResult(array &$result): void
     {
         if (empty($this->links)) {
@@ -692,9 +598,6 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         }
     }
 
-    /**
-     * @param array $result
-     */
     private function addCollectionMetadataToResult(array &$result): void
     {
         $data = $this->resultDataAccessor->getMetadata();

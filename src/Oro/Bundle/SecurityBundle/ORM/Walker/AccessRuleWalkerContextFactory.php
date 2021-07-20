@@ -19,10 +19,6 @@ class AccessRuleWalkerContextFactory implements AccessRuleWalkerContextFactoryIn
     /** @var AccessRuleExecutor */
     private $accessRuleExecutor;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param AccessRuleExecutor    $accessRuleExecutor
-     */
     public function __construct(TokenStorageInterface $tokenStorage, AccessRuleExecutor $accessRuleExecutor)
     {
         $this->tokenStorage = $tokenStorage;

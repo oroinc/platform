@@ -275,8 +275,6 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider             getNotEmptyAnnotationDataProvider
-     *
-     * @param array $options
      */
     public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty(array $options)
     {

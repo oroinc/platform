@@ -43,10 +43,6 @@ class WorkflowPermissionRegistry
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function __construct(DoctrineHelper $doctrineHelper, WorkflowRegistry $workflowRegistry)
     {
         $this->doctrineHelper = $doctrineHelper;

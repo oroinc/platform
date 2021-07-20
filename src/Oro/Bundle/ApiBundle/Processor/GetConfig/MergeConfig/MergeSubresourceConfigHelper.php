@@ -18,11 +18,6 @@ class MergeSubresourceConfigHelper
     /** @var MergeSorterConfigHelper */
     private $mergeSorterConfigHelper;
 
-    /**
-     * @param MergeActionConfigHelper $mergeActionConfigHelper
-     * @param MergeFilterConfigHelper $mergeFilterConfigHelper
-     * @param MergeSorterConfigHelper $mergeSorterConfigHelper
-     */
     public function __construct(
         MergeActionConfigHelper $mergeActionConfigHelper,
         MergeFilterConfigHelper $mergeFilterConfigHelper,

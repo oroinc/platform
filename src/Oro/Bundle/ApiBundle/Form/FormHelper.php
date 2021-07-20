@@ -38,12 +38,6 @@ class FormHelper
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param FormFactoryInterface      $formFactory
-     * @param DataTypeGuesser           $dataTypeGuesser
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param ContainerInterface        $container
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
         DataTypeGuesser $dataTypeGuesser,
@@ -87,10 +81,6 @@ class FormHelper
 
     /**
      * Adds all entity fields to the given form.
-     *
-     * @param FormBuilderInterface   $formBuilder
-     * @param EntityMetadata         $entityMetadata
-     * @param EntityDefinitionConfig $entityConfig
      */
     public function addFormFields(
         FormBuilderInterface $formBuilder,
@@ -220,10 +210,6 @@ class FormHelper
         return $options;
     }
 
-    /**
-     * @param FormBuilderInterface $formBuilder
-     * @param array                $eventSubscribers
-     */
     private function addFormEventSubscribers(FormBuilderInterface $formBuilder, array $eventSubscribers)
     {
         foreach ($eventSubscribers as $eventSubscriber) {

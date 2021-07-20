@@ -29,9 +29,6 @@ class NormalizeGuid implements ProcessorInterface
         }
     }
 
-    /**
-     * @param NormalizeValueContext $context
-     */
     private function processRequirement(NormalizeValueContext $context): void
     {
         $requirement = self::REQUIREMENT;
@@ -43,8 +40,6 @@ class NormalizeGuid implements ProcessorInterface
 
     /**
      * Does a value normalization (conversion to a concrete data-type) if needed.
-     *
-     * @param NormalizeValueContext $context
      */
     private function processNormalization(NormalizeValueContext $context): void
     {
@@ -59,9 +54,6 @@ class NormalizeGuid implements ProcessorInterface
         $context->setProcessed(true);
     }
 
-    /**
-     * @param string $value
-     */
     private function validateValue(string $value): void
     {
         if (!$this->isValidGuid($value)) {
@@ -97,11 +89,6 @@ class NormalizeGuid implements ProcessorInterface
         return $values;
     }
 
-    /**
-     * @param string $value
-     *
-     * @return bool
-     */
     private function isValidGuid(string $value): bool
     {
         return (bool)preg_match('/^' . self::REQUIREMENT . '$/i', $value);

@@ -31,12 +31,6 @@ abstract class AbstractEntityOwnershipDecisionMaker implements AccessLevelOwners
     /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
-    /**
-     * @param OwnerTreeProviderInterface         $treeProvider
-     * @param ObjectIdAccessor                   $objectIdAccessor
-     * @param EntityOwnerAccessor                $entityOwnerAccessor
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     */
     public function __construct(
         OwnerTreeProviderInterface $treeProvider,
         ObjectIdAccessor $objectIdAccessor,

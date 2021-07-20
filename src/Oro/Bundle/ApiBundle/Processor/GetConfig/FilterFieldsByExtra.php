@@ -27,10 +27,6 @@ class FilterFieldsByExtra implements ProcessorInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /**
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
@@ -80,12 +76,6 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ConfigContext $context
-     * @param array         $normalizedFieldFilters
-     *
-     * @return bool
-     */
     protected function isSupported(ConfigContext $context, array $normalizedFieldFilters): bool
     {
         $result = false;

@@ -14,9 +14,6 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
     /** @var ItemKeyBuilder */
     private $itemKeyBuilder;
 
-    /**
-     * @param ItemKeyBuilder $itemKeyBuilder
-     */
     public function __construct(ItemKeyBuilder $itemKeyBuilder)
     {
         $this->itemKeyBuilder = $itemKeyBuilder;

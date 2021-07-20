@@ -35,9 +35,6 @@ class BeforeGroupingChainWidgetEvent extends Event
         return $this->widgets;
     }
 
-    /**
-     * @param array $widgets
-     */
     public function setWidgets(array $widgets)
     {
         $this->widgets = $widgets;

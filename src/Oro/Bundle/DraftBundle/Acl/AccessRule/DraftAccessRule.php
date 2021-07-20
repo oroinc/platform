@@ -39,11 +39,6 @@ class DraftAccessRule implements AccessRuleInterface
      */
     private $enabled = false;
 
-    /**
-     * @param AclConditionDataBuilderInterface $builder
-     * @param DraftPermissionHelper $draftPermissionHelper
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         AclConditionDataBuilderInterface $builder,
         DraftPermissionHelper $draftPermissionHelper,
@@ -62,11 +57,6 @@ class DraftAccessRule implements AccessRuleInterface
         $this->enabled = $enabled;
     }
 
-    /**
-     * @param Criteria $criteria
-     *
-     * @return bool
-     */
     public function isApplicable(Criteria $criteria): bool
     {
         $entityClass = $criteria->getEntityClass();
@@ -77,9 +67,6 @@ class DraftAccessRule implements AccessRuleInterface
             && BasicPermission::VIEW === $permission;
     }
 
-    /**
-     * @param Criteria $criteria
-     */
     public function process(Criteria $criteria): void
     {
         $entityClass = $criteria->getEntityClass();
@@ -120,11 +107,6 @@ class DraftAccessRule implements AccessRuleInterface
         }
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return Comparison
-     */
     private function getConditionByCurrentUser(string $alias): Comparison
     {
         return new Comparison(
@@ -134,11 +116,6 @@ class DraftAccessRule implements AccessRuleInterface
         );
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return Comparison
-     */
     private function getConditionByOrganization(string $alias): Comparison
     {
         return new Comparison(

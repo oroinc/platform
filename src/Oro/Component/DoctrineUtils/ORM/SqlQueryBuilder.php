@@ -38,10 +38,6 @@ class SqlQueryBuilder
     /** @var \Doctrine\DBAL\Connection */
     private $connection;
 
-    /**
-     * @param EntityManagerInterface $em
-     * @param ResultSetMapping       $rsm
-     */
     public function __construct(EntityManagerInterface $em, ResultSetMapping $rsm)
     {
         $this->em = $em;
@@ -779,7 +775,6 @@ class SqlQueryBuilder
     /**
      * Gets the complete Update SQL string formed by the current specifications of this QueryBuilder.
      *
-     * @return string
      * @throws QueryException
      * @throws \Doctrine\DBAL\DBALException
      */

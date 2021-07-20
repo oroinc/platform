@@ -40,11 +40,6 @@ class RemoveOriginOptionQuery extends ParametrizedMigrationQuery
         $this->removeOriginOption($logger, 'oro_entity_config_field', $dryRun);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param string          $tableName
-     * @param bool            $dryRun
-     */
     private function removeOriginOption(LoggerInterface $logger, string $tableName, bool $dryRun): void
     {
         $configs = $this->loadConfigs($logger, $tableName);
@@ -79,13 +74,6 @@ class RemoveOriginOptionQuery extends ParametrizedMigrationQuery
         return $result;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @param string          $tableName
-     * @param int             $id
-     * @param array           $data
-     * @param bool            $dryRun
-     */
     private function saveConfig(LoggerInterface $logger, string $tableName, int $id, array $data, bool $dryRun): void
     {
         $query = sprintf('UPDATE %s SET data = :data WHERE id = :id', $tableName);

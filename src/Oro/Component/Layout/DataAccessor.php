@@ -19,10 +19,6 @@ class DataAccessor implements DataAccessorInterface
     /** @var array */
     private $dataProviders = [];
 
-    /**
-     * @param LayoutRegistryInterface $registry
-     * @param ContextInterface        $context
-     */
     public function __construct(LayoutRegistryInterface $registry, ContextInterface $context)
     {
         $this->registry = $registry;

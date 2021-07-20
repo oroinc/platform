@@ -73,8 +73,6 @@ class ConfigCache extends ResourceCheckerConfigCache
 
     /**
      * Registers a cache this cache depends on.
-     *
-     * @param ConfigCacheStateInterface $configCache
      */
     public function addDependency(ConfigCacheStateInterface $configCache): void
     {

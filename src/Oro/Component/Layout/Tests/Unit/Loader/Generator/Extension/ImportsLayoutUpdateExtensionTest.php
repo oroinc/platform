@@ -56,8 +56,6 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prepareWithoutNodeImportsDataProvider
-     *
-     * @param array $source
      */
     public function testPrepareWithoutNodeImports(array $source)
     {

@@ -32,13 +32,6 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new OAuthUserProvider($userProviders);
     }
 
-    /**
-     * @param string $username
-     * @param string $email
-     * @param string $resourceOwner
-     *
-     * @return UserResponseInterface
-     */
     private function getUserResponse(
         string $username = 'username',
         string $email = 'username@example.com',

@@ -20,8 +20,6 @@ class AddRelationToMailbox implements Migration
 
     /**
      * Creates 'oro_email_mailbox_users' table which represents relationship between mailboxes and authorized users.
-     *
-     * @param Schema $schema
      */
     public static function createOroEmailMailboxUsersTable(Schema $schema)
     {
@@ -35,8 +33,6 @@ class AddRelationToMailbox implements Migration
 
     /**
      * Creates 'oro_email_mailbox_roles' table which represents relationship between mailboxes and authorized roles.
-     *
-     * @param Schema $schema
      */
     public static function createOroEmailMailboxRolesTable(Schema $schema)
     {
@@ -50,8 +46,6 @@ class AddRelationToMailbox implements Migration
 
     /**
      * Adds foreign keys to 'oro_email_mailbox_users' and 'oro_email_mailbox_roles' tables.
-     *
-     * @param Schema $schema
      */
     public static function addOroEmailMailboxUsersAndRolesForeignKeys(Schema $schema)
     {

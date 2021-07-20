@@ -12,9 +12,6 @@ class SoapClient implements SoapClientInterface
      */
     private $clientFactory;
 
-    /**
-     * @param NativeSoapClientFactory $clientFactory
-     */
     public function __construct(NativeSoapClientFactory $clientFactory)
     {
         $this->clientFactory = $clientFactory;

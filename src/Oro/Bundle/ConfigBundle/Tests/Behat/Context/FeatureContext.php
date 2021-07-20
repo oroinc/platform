@@ -266,7 +266,6 @@ class FeatureContext extends OroFeatureContext implements
      *      | oro_config.setting2 |
      *
      * @Given /^I enable configuration options:$/
-     * @param TableNode $table
      */
     public function enableConfigOptions(TableNode $table): void
     {

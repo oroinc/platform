@@ -12,9 +12,6 @@ class DelegateAccessor implements AccessorInterface
      */
     protected $elements;
 
-    /**
-     * @param array $accessors
-     */
     public function __construct(array $accessors = array())
     {
         $this->elements = array();
@@ -25,7 +22,6 @@ class DelegateAccessor implements AccessorInterface
     }
 
     /**
-     * @param AccessorInterface $accessor
      * @throws InvalidArgumentException
      */
     public function add(AccessorInterface $accessor)

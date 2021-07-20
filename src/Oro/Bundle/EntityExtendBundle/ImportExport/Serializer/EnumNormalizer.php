@@ -18,9 +18,6 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     protected $fieldHelper;
 
-    /**
-     * @param FieldHelper $fieldHelper
-     */
     public function __construct(FieldHelper $fieldHelper)
     {
         $this->fieldHelper = $fieldHelper;

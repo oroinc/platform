@@ -22,9 +22,6 @@ class SmtpSettingsFactory
     /** @var SymmetricCrypterInterface */
     private $encryptor;
 
-    /**
-     * @param SymmetricCrypterInterface $encryptor
-     */
     public function __construct(SymmetricCrypterInterface $encryptor)
     {
         $this->encryptor = $encryptor;

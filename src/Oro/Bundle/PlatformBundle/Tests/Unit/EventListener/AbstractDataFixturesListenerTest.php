@@ -27,8 +27,6 @@ class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider methodsDataProvider
-     *
-     * @param bool $isDemoData
      */
     public function testMethods(bool $isDemoData)
     {
@@ -46,9 +44,6 @@ class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPostLoad($event);
     }
 
-    /**
-     * @param bool $isDemoData
-     */
     protected function assertListenerManagerCalled(bool $isDemoData)
     {
         $this->listenerManager->expects($this->at(0))

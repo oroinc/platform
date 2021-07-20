@@ -37,10 +37,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
      */
     protected $resolver;
 
-    /**
-     * @param DatagridStateProviderInterface $sortersStateProvider
-     * @param SystemAwareResolver $resolver
-     */
     public function __construct(DatagridStateProviderInterface $sortersStateProvider, SystemAwareResolver $resolver)
     {
         $this->sortersStateProvider = $sortersStateProvider;
@@ -130,10 +126,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
         $this->setMetadataStates($config, $data);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param MetadataObject        $data
-     */
     protected function processColumns(DatagridConfiguration $config, MetadataObject $data)
     {
         $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
@@ -164,10 +156,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param MetadataObject        $data
-     */
     protected function setMetadataStates(DatagridConfiguration $config, MetadataObject $data)
     {
         $sortersState = $this->sortersStateProvider->getState($config, $this->getParameters());

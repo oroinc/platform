@@ -34,9 +34,6 @@ class InlineEditColumnOptionsGuesser
         $this->validator = $validator;
     }
 
-    /**
-     * @param ConstraintConverterInterface $constraintConverter
-     */
     public function setConstraintConverter(ConstraintConverterInterface $constraintConverter): void
     {
         $this->constraintConverter = $constraintConverter;
@@ -159,11 +156,6 @@ class InlineEditColumnOptionsGuesser
         return $constraint->groups;
     }
 
-    /**
-     * @param Constraint $constraint
-     *
-     * @return string
-     */
     private function getRuleKey(Constraint $constraint): string
     {
         $reflectionClass = new \ReflectionClass($constraint);

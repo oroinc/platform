@@ -279,9 +279,6 @@ class DetailedLogsHandlerPassTest extends \PHPUnit\Framework\TestCase
         $this->compilerPass->process($this->containerBuilder);
     }
 
-    /**
-     * @param array $expectedBeforeOptimizationPasses
-     */
     private function mockCompilerPassConfig(array $expectedBeforeOptimizationPasses)
     {
         $compilerPassConfig = $this->createMock(PassConfig::class);

@@ -21,8 +21,6 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valueDataProvider
-     *
-     * @param $value
      */
     public function testGetSetHasRemove($value)
     {

@@ -85,7 +85,6 @@ class SoapTransportTest extends TestCase
 
     /**
      * Test init method errors
-     *
      */
     public function testInitErrors()
     {
@@ -95,7 +94,6 @@ class SoapTransportTest extends TestCase
 
     /**
      * @dataProvider exceptionProvider
-     *
      */
     public function testMultipleAttemptException($header, $attempt, $code)
     {

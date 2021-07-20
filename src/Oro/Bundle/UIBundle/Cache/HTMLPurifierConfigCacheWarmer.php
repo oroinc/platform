@@ -17,10 +17,6 @@ class HTMLPurifierConfigCacheWarmer implements CacheWarmerInterface
     /** @var HtmlTagProvider */
     private $htmlTagProvider;
 
-    /**
-     * @param HtmlTagHelper   $htmlTagHelper
-     * @param HtmlTagProvider $htmlTagProvider
-     */
     public function __construct(HtmlTagHelper $htmlTagHelper, HtmlTagProvider $htmlTagProvider)
     {
         $this->htmlTagHelper = $htmlTagHelper;

@@ -13,9 +13,6 @@ class InteractiveExecutionSubscriber implements EventSubscriberInterface
      */
     protected $output;
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;

@@ -47,14 +47,6 @@ class ScopeManager implements ResetInterface
     /** @var array [scope type => [ScopeCriteriaProviderInterface, ...], ...] */
     private $loadedProviders = [];
 
-    /**
-     * @param array                     $providers
-     * @param ContainerInterface        $providerContainer
-     * @param ManagerRegistry           $doctrine
-     * @param ScopeDataAccessor         $dataAccessor
-     * @param ScopeCollection           $scheduledForInsertScopes
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         array $providers,
         ContainerInterface $providerContainer,
@@ -128,9 +120,6 @@ class ScopeManager implements ResetInterface
         return $this->dataAccessor->findByCriteria($criteria);
     }
 
-    /**
-     * @return Scope|null
-     */
     public function findDefaultScope(): ?Scope
     {
         return $this->find(self::BASE_SCOPE, $this->getNullContext());
@@ -295,13 +284,6 @@ class ScopeManager implements ResetInterface
         return new ScopeCriteria($criteria, $this->getClassMetadataFactory());
     }
 
-    /**
-     * @param Scope         $scope
-     * @param ScopeCriteria $criteria
-     * @param string        $scopeType
-     *
-     * @return bool
-     */
     public function isScopeMatchCriteria(Scope $scope, ScopeCriteria $criteria, string $scopeType): bool
     {
         $criteriaContext = $criteria->toArray();
@@ -387,9 +369,6 @@ class ScopeManager implements ResetInterface
         return $value;
     }
 
-    /**
-     * @return array
-     */
     private function getNullContext(): array
     {
         if (null === $this->nullContext) {
@@ -426,9 +405,6 @@ class ScopeManager implements ResetInterface
         return $this->loadedProviders[$scopeType];
     }
 
-    /**
-     * @return ClassMetadataFactory
-     */
     private function getClassMetadataFactory(): ClassMetadataFactory
     {
         return $this->doctrine->getManagerForClass(Scope::class)->getMetadataFactory();

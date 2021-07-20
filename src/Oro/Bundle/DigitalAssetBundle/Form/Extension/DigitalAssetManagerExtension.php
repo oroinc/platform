@@ -45,13 +45,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
     /** @var FileReflector */
     private $fileReflector;
 
-    /**
-     * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param PreviewMetadataProviderInterface $previewMetadataProvider
-     * @param EntityToIdTransformer $digitalAssetToIdTransformer
-     * @param FileReflector $fileReflector
-     */
     public function __construct(
         AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider,
         EntityClassNameHelper $entityClassNameHelper,
@@ -92,11 +85,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         $resolver->setNormalizer('fileOptions', \Closure::fromCallable([$this, 'normalizeFileOptions']));
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return array
-     */
     public function validationGroupsCallback(FormInterface $form): array
     {
         $groups = ['Default'];
@@ -114,12 +102,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         return $groups;
     }
 
-    /**
-     * @param Options $allOptions
-     * @param array $option
-     *
-     * @return array
-     */
     public function normalizeFileOptions(Options $allOptions, array $option): array
     {
         if (!array_key_exists('required', $option)) {
@@ -159,8 +141,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
 
     /**
      * Populates file with properties from source file of the chosen digital asset.
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event): void
     {
@@ -213,11 +193,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return ConfigInterface|null
-     */
     private function getAttachmentConfig(FormInterface $form): ?ConfigInterface
     {
         $entityClass = $this->getParentEntityClass($form);
@@ -231,11 +206,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         return $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
     private function getParentEntityFieldName(FormInterface $form): string
     {
         $propertyPath = $form->getPropertyPath();
@@ -246,11 +216,6 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         return (string)$propertyPath;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
     private function getParentEntityClass(FormInterface $form): string
     {
         $parentForm = $form->getParent();

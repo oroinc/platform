@@ -31,13 +31,6 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var ChainAdditionalEmailAssociationProvider */
     private $additionalEmailAssociationProvider;
 
-    /**
-     * @param EmailNotificationManager                $manager
-     * @param ManagerRegistry                         $doctrine
-     * @param PropertyAccessor                        $propertyAccessor
-     * @param EventDispatcherInterface                $eventDispatcher
-     * @param ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
-     */
     public function __construct(
         EmailNotificationManager $manager,
         ManagerRegistry $doctrine,
@@ -67,12 +60,6 @@ class EmailNotificationHandler implements EventHandlerInterface
         $this->manager->process($notifications);
     }
 
-    /**
-     * @param NotificationEvent $event
-     * @param EmailNotification $notification
-     *
-     * @return TemplateEmailNotificationInterface
-     */
     protected function getEmailNotificationAdapter(
         NotificationEvent $event,
         EmailNotification $notification

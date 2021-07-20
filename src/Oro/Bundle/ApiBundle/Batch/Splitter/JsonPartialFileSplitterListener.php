@@ -10,8 +10,6 @@ class JsonPartialFileSplitterListener extends JsonFileSplitterListener
 {
     /**
      * Gets the state of the listener.
-     *
-     * @return array
      */
     public function getState(): array
     {
@@ -25,8 +23,6 @@ class JsonPartialFileSplitterListener extends JsonFileSplitterListener
 
     /**
      * Restores the state of the listener.
-     *
-     * @param array $data
      */
     public function setState(array $data): void
     {

@@ -18,18 +18,11 @@ class ExportType extends AbstractType
      */
     protected $processorRegistry;
 
-    /**
-     * @param ProcessorRegistry $processorRegistry
-     */
     public function __construct(ProcessorRegistry $processorRegistry)
     {
         $this->processorRegistry = $processorRegistry;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -52,7 +45,7 @@ class ExportType extends AbstractType
     {
         $entityName = $options['entityName'];
         $processorAlias = $options['processorAlias'] ?? null;
-        
+
         $aliases = $this->processorRegistry->getProcessorAliasesByEntity(
             $this->getProcessorType(),
             $entityName
@@ -89,9 +82,6 @@ class ExportType extends AbstractType
         return sprintf('oro.importexport.export.%s', $alias);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

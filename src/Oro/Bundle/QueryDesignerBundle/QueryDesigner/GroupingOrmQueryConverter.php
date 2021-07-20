@@ -84,14 +84,6 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $this->context()->addFilter($filter);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $tableAlias
-     * @param string $fieldName
-     * @param string $columnExpr
-     *
-     * @return string
-     */
     protected function getFilterByExpr(
         string $entityClass,
         string $tableAlias,

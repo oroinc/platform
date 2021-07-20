@@ -58,9 +58,6 @@ class ClearLoggerExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param Logger $logger
-     */
     private function clearLogger(Logger $logger)
     {
         $handlers = $logger->getHandlers();
@@ -70,9 +67,6 @@ class ClearLoggerExtension extends AbstractExtension
         $logger->reset();
     }
 
-    /**
-     * @param HandlerInterface $handler
-     */
     private function clearHandler(HandlerInterface $handler)
     {
         if (method_exists($handler, 'clear')) {

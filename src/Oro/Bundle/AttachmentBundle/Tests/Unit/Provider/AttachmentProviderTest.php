@@ -37,7 +37,6 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
         $this->attachmentProvider =
             new AttachmentProvider($this->em, $this->attachmentAssociationHelper, $this->attachmentManager);
     }

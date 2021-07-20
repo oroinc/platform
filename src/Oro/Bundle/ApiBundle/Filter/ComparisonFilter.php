@@ -69,8 +69,6 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Gets a field by which the data is filtered.
-     *
-     * @return string|null
      */
     public function getField(): ?string
     {
@@ -87,8 +85,6 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Indicates whether the filter represents a collection valued association.
-     *
-     * @return bool
      */
     public function isCollection(): bool
     {
@@ -135,8 +131,6 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Sets a value that indicates whether case-insensitive comparison should be used.
-     *
-     * @param bool $caseInsensitive
      */
     public function setCaseInsensitive(bool $caseInsensitive): void
     {
@@ -166,10 +160,6 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Creates an expression that can be used to in WHERE statement to filter data by this filter.
-     *
-     * @param FilterValue|null $value
-     *
-     * @return Expression|null
      */
     protected function createExpression(FilterValue $value = null): ?Expression
     {
@@ -364,11 +354,6 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return new Comparison($field, $operator, new Value($value));
     }
 
-    /**
-     * @param Expression $expr
-     *
-     * @return Expression
-     */
     protected function buildNotExpression(Expression $expr): Expression
     {
         return new CompositeExpression('NOT', [$expr]);

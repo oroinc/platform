@@ -239,10 +239,6 @@ class WidgetControllerTest extends WebTestCase
         ]);
     }
 
-    /**
-     * @param Crawler $crawler
-     * @param WorkflowItem $workflowItem
-     */
     protected function assertTransitionFromSubmit(Crawler $crawler, WorkflowItem $workflowItem)
     {
         $form = $crawler->selectButton('Submit')->form();

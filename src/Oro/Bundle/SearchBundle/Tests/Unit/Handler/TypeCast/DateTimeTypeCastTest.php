@@ -25,8 +25,6 @@ class DateTimeTypeCastTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidTypesDataProvider
-     *
-     * @param $value
      */
     public function testCastValueWithUnsupportedValue($value): void
     {

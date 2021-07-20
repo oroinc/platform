@@ -29,12 +29,6 @@ class PinbarTabBuilder extends AbstractBuilder
      */
     private $pinbarTabTitleProvider;
 
-    /**
-     * @param EntityManager $em
-     * @param PinbarTabUrlNormalizerInterface $pinbarTabUrlNormalizer
-     * @param PinbarTabTitleProviderInterface $pinbarTabTitleProvider
-     * @param string $type
-     */
     public function __construct(
         EntityManager $em,
         PinbarTabUrlNormalizerInterface $pinbarTabUrlNormalizer,
@@ -46,7 +40,6 @@ class PinbarTabBuilder extends AbstractBuilder
         $this->pinbarTabTitleProvider = $pinbarTabTitleProvider;
         $this->pinbarTabUrlNormalizer = $pinbarTabUrlNormalizer;
     }
-
 
     /**
      * Build navigation item

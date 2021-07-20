@@ -28,10 +28,6 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
      */
     protected $em;
 
-    /**
-     * @param ImapConnector $connector
-     * @param OroEntityManager $em
-     */
     public function __construct(ImapConnector $connector, OroEntityManager $em)
     {
         $this->connector = $connector;

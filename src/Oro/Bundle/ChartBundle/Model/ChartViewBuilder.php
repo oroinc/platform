@@ -70,11 +70,6 @@ class ChartViewBuilder
      */
     protected $options;
 
-    /**
-     * @param ConfigProvider $configProvider
-     * @param TransformerFactory $transformerFactory
-     * @param Environment $twig
-     */
     public function __construct(
         ConfigProvider $configProvider,
         TransformerFactory $transformerFactory,

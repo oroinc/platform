@@ -35,10 +35,6 @@ class FilterNamesRegistry
 
     /**
      * Returns filter names provider for a given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return FilterNames
      */
     public function getFilterNames(RequestType $requestType): FilterNames
     {

@@ -108,10 +108,6 @@ class WsseAuthenticationListener implements ListenerInterface
     /**
      * If Username, PasswordDigest, Nonce and Created are set then it returns their value,
      * otherwise the method returns empty array.
-     *
-     * @param string $wsseHeader
-     *
-     * @return array
      */
     private function getHeaderData(string $wsseHeader): array
     {

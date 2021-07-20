@@ -25,11 +25,6 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param FieldNameValidationHelper $validationHelper
-     * @param ClassMethodNameChecker $methodNameChecker
-     * @param FieldTypeHelper $fieldTypeHelper
-     */
     public function __construct(
         FieldNameValidationHelper $validationHelper,
         ClassMethodNameChecker $methodNameChecker,

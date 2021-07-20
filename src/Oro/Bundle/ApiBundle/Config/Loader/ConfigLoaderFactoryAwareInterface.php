@@ -7,8 +7,5 @@ namespace Oro\Bundle\ApiBundle\Config\Loader;
  */
 interface ConfigLoaderFactoryAwareInterface
 {
-    /**
-     * @param ConfigLoaderFactory $factory
-     */
     public function setConfigLoaderFactory(ConfigLoaderFactory $factory);
 }

@@ -193,8 +193,6 @@ class UserTest extends AbstractUserTest
 
     /**
      * @dataProvider preUpdateDataProvider
-     *
-     * @param array $changeSet
      */
     public function testPreUpdateChanged(array $changeSet)
     {

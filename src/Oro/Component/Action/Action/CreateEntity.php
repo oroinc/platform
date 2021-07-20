@@ -17,10 +17,6 @@ class CreateEntity extends CreateObject
      */
     protected $registry;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
     {
         parent::__construct($contextAccessor);

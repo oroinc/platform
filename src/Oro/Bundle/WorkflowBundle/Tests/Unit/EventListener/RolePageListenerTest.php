@@ -118,7 +118,6 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($renderedHtml);
 
-
         $this->requestStack->push(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
         $this->listener->onUpdatePageRender($event);
@@ -169,7 +168,6 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
                 ]
             )
             ->willReturn($renderedHtml);
-
 
         $this->requestStack->push(new Request([], [], ['_route' => $routeName, '_route_params' => $routeParameters]));
 
@@ -241,7 +239,6 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             $entity
         );
 
-
         $renderedHtml = '<div>Rendered datagrid position</div>';
         $twig->expects($this->once())
             ->method('render')
@@ -253,7 +250,6 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
                 ]
             )
             ->willReturn($renderedHtml);
-
 
         $this->requestStack->push(new Request([], [], ['_route' => 'oro_user_role_view']));
 

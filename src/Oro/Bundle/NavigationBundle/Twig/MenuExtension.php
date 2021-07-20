@@ -28,9 +28,6 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

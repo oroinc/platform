@@ -14,9 +14,6 @@ class RestAnnotationReader implements Reader
     /** @var Reader */
     protected $innerReader;
 
-    /**
-     * @param Reader $innerReader
-     */
     public function __construct(Reader $innerReader)
     {
         $this->innerReader = $innerReader;

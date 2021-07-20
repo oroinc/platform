@@ -138,10 +138,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider validationGroupsCallbackDataProvider
-     *
-     * @param array $options
-     * @param bool $useDam
-     * @param array $expectedGroups
      */
     public function testValidationGroupsCallbackWhenCheckEmptyFile(
         array $options,
@@ -169,9 +165,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertEquals($expectedGroups, $this->extension->validationGroupsCallback($this->form));
     }
 
-    /**
-     * @return array
-     */
     public function validationGroupsCallbackDataProvider(): array
     {
         return [
@@ -205,10 +198,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider normalizeFileOptionsDataProvider
-     *
-     * @param Options $allOptions
-     * @param array $option
-     * @param array $expectedOption
      */
     public function testNormalizeFileOptions(Options $allOptions, array $option, array $expectedOption): void
     {
@@ -222,9 +211,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function normalizeFileOptionsDataProvider(): array
     {
         return [
@@ -324,9 +310,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->extension->buildForm($builder, []);
     }
 
-    /**
-     * @return array
-     */
     public function buildFormDataProvider(): array
     {
         $commonOptions = [
@@ -633,7 +616,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertArrayNotHasKey('dam_widget', $formView->vars);
     }
 
-
     public function testBuildViewWhenDamDisabledInConfig(): void
     {
         $entityFieldConfig = $this->mockEntityFieldConfig();
@@ -653,9 +635,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertArrayNotHasKey('dam_widget', $formView->vars);
     }
 
-    /**
-     * @return ConfigInterface
-     */
     private function mockEntityFieldConfig(): ConfigInterface
     {
         $this->form
@@ -750,8 +729,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewWhenSubmittedDataProvider
-     *
-     * @param bool $isValidDigitalAsset
      */
     public function testBuildViewWhenSubmitted(bool $isValidDigitalAsset): void
     {
@@ -820,9 +797,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertEquals(['sample1', 'oro_file_with_digital_asset', 'sample2'], $formView->vars['block_prefixes']);
     }
 
-    /**
-     * @return array
-     */
     public function buildViewWhenSubmittedDataProvider(): array
     {
         return [
@@ -899,9 +873,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewWhenImageDataProvider
-     *
-     * @param string $fieldType
-     * @param bool $isImageType
      */
     public function testBuildViewWhenImage(string $fieldType, bool $isImageType): void
     {
@@ -954,9 +925,6 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertEquals(['sample1', 'oro_file_with_digital_asset', 'sample2'], $formView->vars['block_prefixes']);
     }
 
-    /**
-     * @return array
-     */
     public function buildViewWhenImageDataProvider(): array
     {
         return [

@@ -14,10 +14,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dateProvider
-     *
-     * @param string $date
-     * @param string $timeZone
-     * @param string $expected
      */
     public function testDateResult(string $date, string $timeZone, string $expected): void
     {
@@ -30,9 +26,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result->format('Y-m-d'));
     }
 
-    /**
-     * @return \Generator
-     */
     public function dateProvider(): \Generator
     {
         yield 'UTC' => [
@@ -50,10 +43,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider timeProvider
-     *
-     * @param string $time
-     * @param string $timeZone
-     * @param string $expected
      */
     public function testTimeResult(string $time, string $timeZone, string $expected): void
     {
@@ -66,9 +55,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result->format('H:i:s'));
     }
 
-    /**
-     * @return \Generator
-     */
     public function timeProvider(): \Generator
     {
         yield 'UTC' => [
@@ -84,9 +70,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     *
-     */
     public function testIntegerResults(): void
     {
         $expression = new ExpressionResult(new Token(Token::TYPE_INTEGER, 3));
@@ -102,9 +85,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider thisDayModifyProvider
-     *
-     * @param string $timeZone
-     * @param int $modifier
      *
      * @throws \Exception
      */
@@ -135,9 +115,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, (int)$result->minute);
     }
 
-    /**
-     * @return \Generator
-     */
     public function thisDayModifyProvider(): \Generator
     {
         yield 'UTC and this day' => [
@@ -187,9 +164,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param ExpressionResult $expression
-     * @param \DateTimeImmutable $expected
-     *
      * @dataProvider getThisWeekModifications
      */
     public function testThisWeekModify(ExpressionResult $expression, \DateTimeImmutable $expected): void
@@ -205,7 +179,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @throws \Exception
-     * @return \Generator
      */
     public function getThisWeekModifications(): \Generator
     {
@@ -377,9 +350,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param ExpressionResult $expression
-     * @param \DateTimeImmutable $expected
-     *
      * @dataProvider getStartOfOperations
      */
     public function testStartOfOperations(ExpressionResult $expression, \DateTimeImmutable $expected)

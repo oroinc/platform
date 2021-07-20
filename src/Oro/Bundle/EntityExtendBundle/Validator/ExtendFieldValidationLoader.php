@@ -21,10 +21,6 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
     /** @var FieldConfigConstraintsFactory */
     private $fieldConfigConstraintsFactory;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @param ConfigProvider $fieldConfigProvider
-     */
     public function __construct(
         ConfigProvider $extendConfigProvider,
         ConfigProvider $fieldConfigProvider

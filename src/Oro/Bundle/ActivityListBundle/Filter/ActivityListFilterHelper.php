@@ -22,11 +22,6 @@ class ActivityListFilterHelper
     /** @var ActivityListChainProvider */
     private $chainProvider;
 
-    /**
-     * @param FilterBagInterface        $filterBag
-     * @param EntityRoutingHelper       $routingHelper
-     * @param ActivityListChainProvider $chainProvider
-     */
     public function __construct(
         FilterBagInterface $filterBag,
         EntityRoutingHelper $routingHelper,

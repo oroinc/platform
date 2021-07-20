@@ -27,10 +27,6 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     * @param ValueNormalizer     $valueNormalizer
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
@@ -107,12 +103,6 @@ class HandleMetaPropertyFilter implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string      $filterKey
-     * @param string|null $detail
-     *
-     * @return Error
-     */
     private function createInvalidFilterValueKeyError(string $filterKey, string $detail = null): Error
     {
         return Error::createValidationError(Constraint::FILTER, $detail)

@@ -407,10 +407,6 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @return Config
-     */
     protected function createExtendEntityConfig(string $className): Config
     {
         $entityConfig = new Config(new EntityConfigId('extend', $className));
@@ -419,12 +415,6 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @return Config
-     */
     protected function createExtendFieldConfig(string $className, string $fieldName, string $fieldType): Config
     {
         $fieldConfig = new Config(new FieldConfigId('extend', $className, $fieldName, $fieldType));
@@ -433,11 +423,6 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         return $fieldConfig;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @return Config
-     */
     protected function createImportExportFieldConfig(string $className, string $fieldName): Config
     {
         $fieldConfig = new Config(new FieldConfigId('importexport', $className, $fieldName));

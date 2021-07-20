@@ -180,7 +180,6 @@ class EntitiesController extends AbstractController
         ];
     }
 
-
     /**
      * View custom entity instance.
      *

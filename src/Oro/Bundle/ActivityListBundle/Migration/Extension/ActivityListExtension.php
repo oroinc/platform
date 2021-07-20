@@ -105,7 +105,6 @@ class ActivityListExtension implements ExtendExtensionAwareInterface, NameGenera
         $targetTable->addOption(OroOptions::KEY, $options);
     }
 
-
     /**
      * Gets an activity list table name for many-to-many relation
      *

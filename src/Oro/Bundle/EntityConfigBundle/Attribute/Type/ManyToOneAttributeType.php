@@ -18,10 +18,6 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EntityNameResolver $entityNameResolver, DoctrineHelper $doctrineHelper)
     {
         $this->entityNameResolver = $entityNameResolver;

@@ -98,8 +98,6 @@ class FileManager
 
     /**
      * Sets a flag indicates whether files should be stored in a sub-directory.
-     *
-     * @param bool $useSubDirectory
      */
     public function useSubDirectory(bool $useSubDirectory): void
     {
@@ -111,8 +109,6 @@ class FileManager
 
     /**
      * Sets an object contains references to all declared Gaufrette filesystems.
-     *
-     * @param FilesystemMap $filesystemMap
      */
     public function setFilesystemMap(FilesystemMap $filesystemMap): void
     {
@@ -121,8 +117,6 @@ class FileManager
 
     /**
      * Sets the name of the protocol mapped to the Gaufrette stream wrapper.
-     *
-     * @param string $protocol
      */
     public function setProtocol(string $protocol): void
     {
@@ -131,8 +125,6 @@ class FileManager
 
     /**
      * Sets the name of the read-only protocol mapped to the Gaufrette stream wrapper.
-     *
-     * @param string $protocol
      */
     public function setReadonlyProtocol(string $protocol): void
     {
@@ -141,8 +133,6 @@ class FileManager
 
     /**
      * Gets the name of the protocol mapped to the Gaufrette stream wrapper.
-     *
-     * @return string
      */
     public function getProtocol(): string
     {
@@ -151,17 +141,12 @@ class FileManager
 
     /**
      * Gets the name of the read-only protocol mapped to the Gaufrette stream wrapper.
-     *
-     * @return string
      */
     public function getReadonlyProtocol(): string
     {
         return $this->readonlyProtocol;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSubDirectory(): ?string
     {
         if (!$this->useSubDirectory) {
@@ -174,10 +159,6 @@ class FileManager
     /**
      * Gets the full path to a file in the Gaufrette file system.
      * This path can be used in the native file functions like "copy", "unlink", etc.
-     *
-     * @param string $fileName
-     *
-     * @return string
      *
      * @throws ProtocolConfigurationException if the Gaufrette protocol is not configured
      */
@@ -194,10 +175,6 @@ class FileManager
      * Gets the full path to a file in the read-only Gaufrette file system.
      * This path can be used in the native file functions that need a read-only access to a file.
      *
-     * @param string $fileName
-     *
-     * @return string
-     *
      * @throws ProtocolConfigurationException if the Gaufrette protocol is not configured
      */
     public function getReadonlyFilePath(string $fileName): string
@@ -213,10 +190,6 @@ class FileManager
      * Gets the full path to a file in the Gaufrette file system but without the protocol part.
      * For example, if a full path is "gaufrette://my_filesystem/file.txt",
      * the full full path the protocol part is "my_filesystem/file.txt".
-     *
-     * @param string $fileName
-     *
-     * @return string
      */
     public function getFilePathWithoutProtocol(string $fileName): string
     {
@@ -250,8 +223,6 @@ class FileManager
 
     /**
      * Returns the full path to the directory for Local adapter.
-     *
-     * @return string|null
      */
     public function getLocalPath(): ?string
     {
@@ -317,10 +288,6 @@ class FileManager
 
     /**
      * Checks if the given file exists in the Gaufrette file system.
-     *
-     * @param string $fileName
-     *
-     * @return bool
      */
     public function hasFile(string $fileName): bool
     {
@@ -411,8 +378,6 @@ class FileManager
     /**
      * Deletes the given file from the Gaufrette file system if it exists.
      *
-     * @param string $fileName
-     *
      * @throws \RuntimeException if the file cannot be deleted
      */
     public function deleteFile(string $fileName): void
@@ -450,8 +415,6 @@ class FileManager
     /**
      * Deletes all files that name beginning with the given prefix from the Gaufrette file system.
      *
-     * @param string $prefix
-     *
      * @throws \RuntimeException if any file cannot be deleted
      */
     public function deleteAllFiles(string $prefix = ''): void
@@ -486,9 +449,6 @@ class FileManager
     /**
      * Writes the specified data to the Gaufrette file system.
      *
-     * @param string $content
-     * @param string $fileName
-     *
      * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
      * @throws \RuntimeException if the destination stream cannot be opened
      * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
@@ -513,9 +473,6 @@ class FileManager
 
     /**
      * Copies a file from local filesystem to the Gaufrette file system.
-     *
-     * @param string $localFilePath
-     * @param string $fileName
      *
      * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
      * @throws \RuntimeException if the destination stream cannot be opened
@@ -680,10 +637,6 @@ class FileManager
 
     /**
      * Generates unique file name with the given extension.
-     *
-     * @param string|null $extension
-     *
-     * @return string
      */
     protected function generateFileName(string $extension = null): string
     {
@@ -696,9 +649,6 @@ class FileManager
     }
 
     /**
-     * @param Stream $stream
-     * @param string $fileName
-     *
      * @throws FlushFailedException if an error occurred during the flushing data to the stream
      */
     protected function flushAndClose(Stream $stream, string $fileName): void
@@ -715,9 +665,6 @@ class FileManager
 
     /**
      * Sets a metadata for a file is stored in the Gaufrette file system.
-     *
-     * @param string $fileName
-     * @param array  $content
      */
     protected function setFileMetadata(string $fileName, array $content): void
     {
@@ -751,10 +698,6 @@ class FileManager
 
     /**
      * Checks if the given directory does not contain any files and sub-directories.
-     *
-     * @param string $realDirName
-     *
-     * @return bool
      */
     private function isDirectoryEmpty(string $realDirName): bool
     {
@@ -765,8 +708,6 @@ class FileManager
 
     /**
      * Deletes a directory from the Gaufrette file system.
-     *
-     * @param string $realDirName
      */
     private function deleteDirectory(string $realDirName): void
     {
@@ -776,10 +717,6 @@ class FileManager
 
     /**
      * Gets a directory where the given file is located.
-     *
-     * @param string $fileName
-     *
-     * @return string
      */
     private function getDirectoryName(string $fileName): string
     {
@@ -791,11 +728,6 @@ class FileManager
             : '';
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
     private function getFileNameWithSubDirectory(string $fileName): string
     {
         $result = ltrim($fileName, self::DIRECTORY_SEPARATOR);
@@ -808,11 +740,6 @@ class FileManager
         return $result;
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
     private function getFileNameWithoutSubDirectory(string $fileName): string
     {
         $subDirectory = $this->getSubDirectory();
@@ -823,11 +750,6 @@ class FileManager
         return $fileName;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return bool
-     */
     private static function endsWithDirectorySeparator(string $path): bool
     {
         return substr($path, -\strlen(self::DIRECTORY_SEPARATOR)) === self::DIRECTORY_SEPARATOR;

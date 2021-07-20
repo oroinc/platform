@@ -13,11 +13,6 @@ interface OrganizationGuesserInterface
 {
     /**
      * Guesses an organization to login into.
-     *
-     * @param AbstractUser        $user
-     * @param TokenInterface|null $token
-     *
-     * @return Organization|null
      */
     public function guess(AbstractUser $user, TokenInterface $token = null): ?Organization;
 }

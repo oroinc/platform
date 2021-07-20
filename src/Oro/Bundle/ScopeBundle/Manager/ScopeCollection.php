@@ -13,11 +13,6 @@ class ScopeCollection
     /** @var Scope[] [criteria key => scope, ...] */
     private $scopes = [];
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return Scope|null
-     */
     public function get(ScopeCriteria $criteria): ?Scope
     {
         return $this->scopes[$criteria->getIdentifier()] ?? null;
@@ -31,26 +26,16 @@ class ScopeCollection
         return array_values($this->scopes);
     }
 
-    /**
-     * @param Scope         $scope
-     * @param ScopeCriteria $criteria
-     */
     public function add(Scope $scope, ScopeCriteria $criteria): void
     {
         $this->scopes[$criteria->getIdentifier()] = $scope;
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     */
     public function remove(ScopeCriteria $criteria): void
     {
         unset($this->scopes[$criteria->getIdentifier()]);
     }
 
-    /**
-     * @return bool
-     */
     public function isEmpty(): bool
     {
         return empty($this->scopes);

@@ -11,9 +11,6 @@ class DataAccessorStub extends DataAccessor
      */
     private $data;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         $this->data = $data;

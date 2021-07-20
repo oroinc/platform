@@ -111,7 +111,6 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     public function testNoFunction()
     {
         $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);

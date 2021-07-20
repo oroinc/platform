@@ -31,9 +31,6 @@ class LoadJobExecutionData extends AbstractFixture implements ContainerAwareInte
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function clearJobTables(ObjectManager $manager)
     {
         $manager

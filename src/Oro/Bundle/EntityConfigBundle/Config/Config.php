@@ -17,10 +17,6 @@ class Config implements ConfigInterface
     /** @var array */
     private $values;
 
-    /**
-     * @param ConfigIdInterface $id
-     * @param array             $values
-     */
     public function __construct(ConfigIdInterface $id, array $values = [])
     {
         $this->id = $id;

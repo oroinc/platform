@@ -32,19 +32,12 @@ class EnumTranslationCache
      */
     private $localeSettings;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param Cache $cache
-     */
     public function __construct(TranslatorInterface $translator, Cache $cache)
     {
         $this->translator = $translator;
         $this->cache = $cache;
     }
 
-    /**
-     * @return LocalizationHelper
-     */
     public function getLocalizationHelper(): LocalizationHelper
     {
         if (!$this->localizationHelper) {
@@ -54,17 +47,11 @@ class EnumTranslationCache
         return $this->localizationHelper;
     }
 
-    /**
-     * @param LocalizationHelper $localizationHelper
-     */
     public function setLocalizationHelper(LocalizationHelper $localizationHelper): void
     {
         $this->localizationHelper = $localizationHelper;
     }
 
-    /**
-     * @return LocaleSettings
-     */
     public function getLocaleSettings(): LocaleSettings
     {
         if (!$this->localeSettings) {
@@ -74,9 +61,6 @@ class EnumTranslationCache
         return $this->localeSettings;
     }
 
-    /**
-     * @param LocaleSettings $localeSettings
-     */
     public function setLocaleSettings(LocaleSettings $localeSettings): void
     {
         $this->localeSettings = $localeSettings;
@@ -84,10 +68,6 @@ class EnumTranslationCache
 
     /**
      * Check that cache contains values
-     *
-     * @param string $enumValueEntityClass
-     *
-     * @return bool
      */
     public function contains(string $enumValueEntityClass): bool
     {
@@ -132,8 +112,6 @@ class EnumTranslationCache
 
     /**
      * Invalidate a cache by class of the enum value entity
-     *
-     * @param string $enumValueEntityClass
      */
     public function invalidate(string $enumValueEntityClass)
     {
@@ -143,20 +121,11 @@ class EnumTranslationCache
         }
     }
 
-    /**
-     * @param string $enumValueEntityClass
-     * @param string|null $locale
-     *
-     * @return string
-     */
     private function getKey(string $enumValueEntityClass, string $locale = null): string
     {
         return sprintf('%s|%s', $enumValueEntityClass, $locale ?? $this->getLocaleKey());
     }
 
-    /**
-     * @return string
-     */
     private function getLocaleKey(): string
     {
         return $this->getLocalizationHelper()->getCurrentLocalization()

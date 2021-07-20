@@ -22,8 +22,6 @@ class OroAttachmentBundle implements Migration
 
     /**
      * Create oro_attachment_file_item table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttachmentFileItemTable(Schema $schema)
     {
@@ -37,8 +35,6 @@ class OroAttachmentBundle implements Migration
 
     /**
      * Add oro_attachment_file_item foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttachmentFileItemForeignKeys(Schema $schema)
     {

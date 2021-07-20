@@ -135,8 +135,6 @@ class UserPermissionApiEntityManager extends ApiEntityManager
 
     /**
      * Switches the security context to the previous security token
-     *
-     * @param TokenInterface|null $originalToken
      */
     protected function undoImpersonation(TokenInterface $originalToken = null)
     {

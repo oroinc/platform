@@ -21,10 +21,6 @@ class ImageEncodedFormatter implements FormatterInterface
     /** @var FileLocatorInterface */
     private $fileLocator;
 
-    /**
-     * @param FileManager          $fileManager
-     * @param FileLocatorInterface $fileLocator
-     */
     public function __construct(FileManager $fileManager, FileLocatorInterface $fileLocator)
     {
         $this->fileManager = $fileManager;

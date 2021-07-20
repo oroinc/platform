@@ -17,9 +17,6 @@ class ConfigMultipleFileValidator
     /** @var ValidatorInterface */
     private $validator;
 
-    /**
-     * @param ValidatorInterface $validator
-     */
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
@@ -65,12 +62,6 @@ class ConfigMultipleFileValidator
         );
     }
 
-    /**
-     * @param Collection $value
-     * @param Constraint $constraint
-     *
-     * @return ConstraintViolationListInterface
-     */
     private function validate(Collection $value, Constraint $constraint): ConstraintViolationListInterface
     {
         return $this->validator->validate(

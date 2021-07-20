@@ -34,11 +34,6 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
      */
     private $cacheProvider;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager $configManager
-     * @param CacheProvider $cacheProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
@@ -212,9 +207,6 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
         return $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
     }
 
-    /**
-     * @param array $localizations
-     */
     private function makeLocalizationsManaged(array $localizations): void
     {
         $unitOfWork = $this->doctrineHelper->getEntityManager(Localization::class)->getUnitOfWork();

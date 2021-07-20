@@ -22,10 +22,6 @@ class DependencyInjectionUtil
 
     /**
      * Returns the loaded and processed configuration of ApiBundle.
-     *
-     * @param ContainerBuilder $container
-     *
-     * @return array
      */
     public static function getConfig(ContainerBuilder $container): array
     {
@@ -36,9 +32,6 @@ class DependencyInjectionUtil
      * Updates the loaded and processed configuration of ApiBundle.
      * IMPORTANT: all updates must be performed in extensions of bundles
      * to be able to use updated configuration in compiler passes.
-     *
-     * @param ContainerBuilder $container
-     * @param array $config
      */
     public static function setConfig(ContainerBuilder $container, array $config): void
     {
@@ -47,7 +40,6 @@ class DependencyInjectionUtil
 
     /**
      * Removes the loaded and processed configuration of ApiBundle.
-     * @param ContainerBuilder $container
      *
      * @internal never use this method outside of ApiBundle.
      */
@@ -62,11 +54,6 @@ class DependencyInjectionUtil
 
     /**
      * Gets the specific service by its identifier or alias.
-     *
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     *
-     * @return Definition|null
      */
     public static function findDefinition(ContainerBuilder $container, string $serviceId): ?Definition
     {
@@ -77,10 +64,6 @@ class DependencyInjectionUtil
 
     /**
      * Disables the specific API processor for the given request type.
-     *
-     * @param ContainerBuilder $container
-     * @param string           $processorServiceId
-     * @param string           $requestType
      */
     public static function disableApiProcessor(
         ContainerBuilder $container,
@@ -101,12 +84,6 @@ class DependencyInjectionUtil
         }
     }
 
-    /**
-     * @param array  $tag
-     * @param string $value
-     *
-     * @return array
-     */
     private static function addRequestTypeToTag(array $tag, string $value): array
     {
         $extraAttrName = 'extra';

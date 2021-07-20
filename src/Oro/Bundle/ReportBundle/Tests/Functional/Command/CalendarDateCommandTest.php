@@ -41,9 +41,6 @@ class CalendarDateCommandTest extends WebTestCase
         $this->assertCalendarDates($results);
     }
 
-    /**
-     * @param array $calendarDates
-     */
     protected function assertCalendarDates(array $calendarDates)
     {
         $generatedDates = [];

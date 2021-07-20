@@ -11,8 +11,6 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
      * Load roles full_access_role
-     *
-     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

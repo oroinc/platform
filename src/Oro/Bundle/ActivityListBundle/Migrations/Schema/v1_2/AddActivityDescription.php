@@ -18,8 +18,6 @@ class AddActivityDescription implements Migration
 
     /**
      * Add description to activity list
-     *
-     * @param Schema $schema
      */
     public static function addColumns(Schema $schema)
     {

@@ -32,8 +32,6 @@ class ConfigExtensionRegistry
 
     /**
      * Returns the maximum number of nesting target entities.
-     *
-     * @return int
      */
     public function getMaxNestingLevel(): int
     {
@@ -42,8 +40,6 @@ class ConfigExtensionRegistry
 
     /**
      * Registers the configuration extension.
-     *
-     * @param ConfigExtensionInterface $extension
      */
     public function addExtension(ConfigExtensionInterface $extension): void
     {
@@ -64,8 +60,6 @@ class ConfigExtensionRegistry
 
     /**
      * Collects the configuration definition settings from all registered extensions.
-     *
-     * @return ConfigurationSettingsInterface
      */
     public function getConfigurationSettings(): ConfigurationSettingsInterface
     {

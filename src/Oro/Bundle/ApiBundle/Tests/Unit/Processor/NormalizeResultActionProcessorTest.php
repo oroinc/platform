@@ -1236,8 +1236,6 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @dataProvider safeExceptionProvider
      */
     public function testWhenSafeExceptionOccurs(\Exception $exception)
@@ -1302,8 +1300,6 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param HttpException $exception
-     *
      * @dataProvider httpInternalServerErrorExceptionProvider
      */
     public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception)
@@ -1365,9 +1361,6 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Error $error
-     * @param array $loggedError
-     *
      * @dataProvider errorForLogConversionProvider
      */
     public function testErrorForLogConversion(Error $error, array $loggedError)

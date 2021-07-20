@@ -520,9 +520,6 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $datasource);
     }
 
-    /**
-     * @param array $ownershipFields
-     */
     private function setOwnershipFields(array $ownershipFields)
     {
         $refl = new \ReflectionClass($this->extension);

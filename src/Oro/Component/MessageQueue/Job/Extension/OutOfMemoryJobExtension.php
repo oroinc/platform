@@ -22,9 +22,6 @@ class OutOfMemoryJobExtension extends AbstractExtension
     /** @var JobProcessor */
     private static $staticJobProcessor;
 
-    /**
-     * @param JobProcessor $jobProcessor
-     */
     public function __construct(JobProcessor $jobProcessor)
     {
         $this->jobProcessor = $jobProcessor;
@@ -70,9 +67,6 @@ class OutOfMemoryJobExtension extends AbstractExtension
         $this->clear();
     }
 
-    /**
-     * @param Job $job
-     */
     private function init(Job $job): void
     {
         if (!self::$reservedMemory) {

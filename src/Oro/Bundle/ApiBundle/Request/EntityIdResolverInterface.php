@@ -11,8 +11,6 @@ interface EntityIdResolverInterface
      * Gets the description of a predefined identifier of API resource that can be resolved by this resolver.
      * This description is used in auto-generated documentation, including API sandbox.
      * The Markdown markup language can be used in the description.
-     *
-     * @return string
      */
     public function getDescription(): string;
 

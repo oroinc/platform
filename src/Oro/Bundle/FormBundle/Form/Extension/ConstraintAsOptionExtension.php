@@ -11,15 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConstraintAsOptionExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /**
      * @var ConstraintFactory
      */
     protected $constraintFactory;
 
-    /**
-     * @param ConstraintFactory $constraintFactory
-     */
     public function __construct(ConstraintFactory $constraintFactory)
     {
         $this->constraintFactory = $constraintFactory;

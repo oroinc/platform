@@ -60,8 +60,6 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $fields
-     *
      * @dataProvider constructDataProvider
      */
     public function testConstruct(array $fields)

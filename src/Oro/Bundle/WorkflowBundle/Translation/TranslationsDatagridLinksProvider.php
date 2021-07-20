@@ -19,10 +19,6 @@ class TranslationsDatagridLinksProvider
     /** @var LanguageProvider */
     private $languageProvider;
 
-    /**
-     * @param TranslationsDatagridRouteHelper $routeHelper
-     * @param LanguageProvider $languageProvider
-     */
     public function __construct(TranslationsDatagridRouteHelper $routeHelper, LanguageProvider $languageProvider)
     {
         $this->routeHelper = $routeHelper;

@@ -18,10 +18,6 @@ class ChainDraftableFieldsExclusionProvider
         $this->providers = $providers;
     }
 
-    /**
-     * @param string $className
-     * @return array
-     */
     public function getExcludedFields(string $className): array
     {
         $excludedFields = [];

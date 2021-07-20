@@ -23,9 +23,6 @@ class BehatBundleConfiguration implements ConfigurationInterface
      */
     private $kernel;
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;

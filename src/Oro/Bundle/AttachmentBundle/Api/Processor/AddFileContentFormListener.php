@@ -23,9 +23,6 @@ class AddFileContentFormListener implements ProcessorInterface
     /** @var FileManager */
     protected $fileManager;
 
-    /**
-     * @param FileManager $fileManager
-     */
     public function __construct(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
@@ -47,9 +44,6 @@ class AddFileContentFormListener implements ProcessorInterface
         $formBuilder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSubmit(FormEvent $event)
     {
         $data = $event->getData();

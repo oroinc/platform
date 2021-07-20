@@ -16,10 +16,6 @@ class MergeMassAction extends AbstractMassAction
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param ConfigProvider      $entityConfigProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         TranslatorInterface $translator
@@ -68,9 +64,6 @@ class MergeMassAction extends AbstractMassAction
         return parent::setOptions($options);
     }
 
-    /**
-     * @param ActionConfiguration $options
-     */
     protected function configureOptions(ActionConfiguration $options)
     {
         foreach ($this->defaultOptions as $name => $value) {

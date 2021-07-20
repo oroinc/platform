@@ -15,9 +15,6 @@ class NormalizeEntities implements ProcessorInterface
     /** @var ObjectNormalizer */
     protected $objectNormalizer;
 
-    /**
-     * @param ObjectNormalizer $objectNormalizer
-     */
     public function __construct(ObjectNormalizer $objectNormalizer)
     {
         $this->objectNormalizer = $objectNormalizer;

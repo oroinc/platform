@@ -30,10 +30,6 @@ class EntityRepositoryFactory implements RepositoryFactory
      */
     protected $repositoryServices = [];
 
-    /**
-     * @param ContainerInterface $container
-     * @param array $repositoryServices
-     */
     public function __construct(ContainerInterface $container, array $repositoryServices)
     {
         $this->container = $container;

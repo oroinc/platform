@@ -25,10 +25,6 @@ class WebSocketSendProcessor
      */
     protected $connectionChecker;
 
-    /**
-     * @param WebsocketClientInterface $websocketClient
-     * @param ConnectionChecker $connectionChecker
-     */
     public function __construct(WebsocketClientInterface $websocketClient, ConnectionChecker $connectionChecker)
     {
         $this->websocketClient = $websocketClient;

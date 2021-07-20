@@ -63,12 +63,6 @@ class OroRichTextType extends AbstractType
         'code', 'link', 'fullscreen', 'paste', 'lists', 'image', 'advlist'
     ];
 
-    /**
-     * @param ConfigManager $configManager
-     * @param HtmlTagProvider $htmlTagProvider
-     * @param ContextInterface $context
-     * @param HtmlTagHelper $htmlTagHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         HtmlTagProvider $htmlTagProvider,
@@ -81,9 +75,6 @@ class OroRichTextType extends AbstractType
         $this->htmlTagHelper   = $htmlTagHelper;
     }
 
-    /**
-     * @param AssetHelper $assetHelper
-     */
     public function setAssetHelper(AssetHelper $assetHelper)
     {
         $this->assetHelper = $assetHelper;

@@ -87,8 +87,6 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
     }
 
     /**
-     * @param Indexer               $indexer
-     * @param SearchMappingProvider $mappingProvider
      * @throws \RuntimeException
      */
     public function initSearchIndexer(Indexer $indexer, SearchMappingProvider $mappingProvider)
@@ -102,7 +100,6 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
     }
 
     /**
-     * @param ManagerRegistry $managerRegistry
      * @throws \RuntimeException
      */
     public function initDoctrinePropertiesByManagerRegistry(ManagerRegistry $managerRegistry)
@@ -120,9 +117,6 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
         $this->initDoctrinePropertiesByEntityManager($objectManager);
     }
 
-    /**
-     * @param ObjectManager $objectManager
-     */
     public function initDoctrinePropertiesByEntityManager(ObjectManager $objectManager)
     {
         /** @var $metadata \Doctrine\ORM\Mapping\ClassMetadata */
@@ -188,9 +182,6 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
         return $this->entityName;
     }
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;

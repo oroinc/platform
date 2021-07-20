@@ -36,9 +36,6 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
 
     /**
      * @dataProvider isApplicableDataProvider
-     *
-     * @param array $datagridConfigArray
-     * @param bool $expectedResult
      */
     public function testIsApplicable(array $datagridConfigArray, bool $expectedResult): void
     {
@@ -49,9 +46,6 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         self::assertSame($expectedResult, $this->extension->isApplicable($datagridConfig));
     }
 
-    /**
-     * @return array
-     */
     public function isApplicableDataProvider(): array
     {
         return [
@@ -94,9 +88,6 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
-    /**
-     * @param array $filtersState
-     */
     private function mockFiltersState(array $filtersState): void
     {
         $this->filtersStateProvider->expects(self::once())
@@ -105,10 +96,6 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
             ->willReturn($filtersState);
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param QueryBuilder|null $countQueryBuilder
-     */
     private function mockDatasource(QueryBuilder $queryBuilder, ?QueryBuilder $countQueryBuilder): void
     {
         $this->datasource->expects(self::once())

@@ -18,13 +18,6 @@ class NumberToLocalizedStringTransformer extends BaseTransformer
 
     private ?string $locale;
 
-    /**
-     * @param NumberFormatter $numberFormatter
-     * @param int|null $scale
-     * @param bool|null $grouping
-     * @param int|null $roundingMode
-     * @param string|null $locale
-     */
     public function __construct(
         NumberFormatter $numberFormatter,
         int $scale = null,

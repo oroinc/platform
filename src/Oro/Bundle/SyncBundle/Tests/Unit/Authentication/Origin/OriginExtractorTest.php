@@ -27,9 +27,6 @@ class OriginExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedOrigin, $this->extractor->fromUrl($url));
     }
 
-    /**
-     * @return array
-     */
     public function urlDataProvider(): array
     {
         return [

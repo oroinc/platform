@@ -23,10 +23,6 @@ class EmbeddedFormManager
     /** @var array */
     protected $formTypes = [];
 
-    /**
-     * @param FormRegistryInterface $formRegistry
-     * @param FormFactoryInterface $formFactory
-     */
     public function __construct(FormRegistryInterface $formRegistry, FormFactoryInterface $formFactory)
     {
         $this->formRegistry = $formRegistry;

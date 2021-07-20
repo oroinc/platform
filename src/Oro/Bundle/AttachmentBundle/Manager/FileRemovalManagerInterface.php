@@ -11,8 +11,6 @@ interface FileRemovalManagerInterface
 {
     /**
      * Removes all files related to the given File entity.
-     *
-     * @param File $file
      */
     public function removeFiles(File $file): void;
 }
