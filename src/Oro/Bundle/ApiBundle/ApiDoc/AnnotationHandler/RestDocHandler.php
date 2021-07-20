@@ -46,15 +46,6 @@ class RestDocHandler implements HandlerInterface
     /** @var RestDocStatusCodesHandler */
     private $statusCodesHandler;
 
-    /**
-     * @param string                    $routeGroup
-     * @param RestDocViewDetector       $docViewDetector
-     * @param RestDocContextProvider    $contextProvider
-     * @param ValueNormalizer           $valueNormalizer
-     * @param RestDocIdentifierHandler  $identifierHandler
-     * @param RestDocFiltersHandler     $filtersHandler
-     * @param RestDocStatusCodesHandler $statusCodesHandler
-     */
     public function __construct(
         string $routeGroup,
         RestDocViewDetector $docViewDetector,
@@ -127,22 +118,12 @@ class RestDocHandler implements HandlerInterface
 
     /**
      * Checks if a route has the given placeholder in a path.
-     *
-     * @param Route  $route
-     * @param string $placeholder
-     *
-     * @return bool
      */
     private function hasAttribute(Route $route, string $placeholder): bool
     {
         return false !== strpos($route->getPath(), $placeholder);
     }
 
-    /**
-     * @param string $entityType
-     *
-     * @return string
-     */
     private function getEntityClass(string $entityType): string
     {
         return ValueNormalizerUtil::convertToEntityClass(
@@ -152,14 +133,6 @@ class RestDocHandler implements HandlerInterface
         );
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param Route                  $route
-     * @param Context                $context
-     * @param EntityDefinitionConfig $config
-     * @param EntityMetadata         $metadata
-     * @param string|null            $associationName
-     */
     private function handleIdentifier(
         ApiDoc $annotation,
         Route $route,
@@ -184,10 +157,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param EntityDefinitionConfig $config
-     */
     private function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config): void
     {
         $description = $config->getDescription();
@@ -196,10 +165,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param EntityDefinitionConfig $config
-     */
     private function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config): void
     {
         $documentation = $config->getDocumentation();
@@ -208,12 +173,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param string                 $action
-     * @param EntityDefinitionConfig $config
-     * @param EntityMetadata         $metadata
-     */
     private function setInputMetadata(
         ApiDoc $annotation,
         string $action,
@@ -228,14 +187,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param string                 $entityClass
-     * @param string                 $action
-     * @param EntityDefinitionConfig $config
-     * @param EntityMetadata         $metadata
-     * @param string|null            $associationName
-     */
     private function setOutputMetadata(
         ApiDoc $annotation,
         string $entityClass,
@@ -264,12 +215,6 @@ class RestDocHandler implements HandlerInterface
         }
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param string                 $action
-     * @param EntityDefinitionConfig $config
-     * @param EntityMetadata         $metadata
-     */
     private function setOutput(
         ApiDoc $annotation,
         string $action,
@@ -282,14 +227,6 @@ class RestDocHandler implements HandlerInterface
         );
     }
 
-    /**
-     * @param string                 $action
-     * @param string                 $direction
-     * @param EntityDefinitionConfig $config
-     * @param EntityMetadata         $metadata
-     *
-     * @return array
-     */
     private function getDirectionValue(
         string $action,
         string $direction,
@@ -310,10 +247,6 @@ class RestDocHandler implements HandlerInterface
         ];
     }
 
-    /**
-     * @param ApiDoc                 $annotation
-     * @param EntityDefinitionConfig $config
-     */
     private function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config): void
     {
         $statusCodes = $config->getStatusCodes();
@@ -324,10 +257,6 @@ class RestDocHandler implements HandlerInterface
 
     /**
      * Returns true if the given action receives resource data.
-     *
-     * @param string $action
-     *
-     * @return bool
      */
     private function isActionWithInput(string $action): bool
     {
@@ -345,11 +274,6 @@ class RestDocHandler implements HandlerInterface
     /**
      * Returns true if the given ApiDoc annotation has at least one success status code
      * indicates that the resource data should be returned in the response.
-     *
-     * @param string $action
-     * @param ApiDoc $annotation
-     *
-     * @return bool
      */
     private function isActionWithOutput(string $action, ApiDoc $annotation): bool
     {
@@ -367,11 +291,6 @@ class RestDocHandler implements HandlerInterface
         return $result;
     }
 
-    /**
-     * @param int $statusCode
-     *
-     * @return bool
-     */
     private function isSuccessStatusCodeWithContent(int $statusCode): bool
     {
         return
@@ -382,10 +301,6 @@ class RestDocHandler implements HandlerInterface
 
     /**
      * Returns action name that should be used to format output data.
-     *
-     * @param string $action
-     *
-     * @return string
      */
     private function getOutputAction(string $action): string
     {

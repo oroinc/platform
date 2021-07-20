@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -26,16 +26,16 @@ class ChoiceAccountType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     /**
      * @param TranslatorInterface $translator
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     * @param OAuthManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         TranslatorInterface $translator,
-        OAuth2ManagerRegistry  $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->translator = $translator;
         $this->oauthManagerRegistry = $oauthManagerRegistry;
@@ -74,9 +74,6 @@ class ChoiceAccountType extends AbstractType
 
     /**
      * Returns choices callable for available account types
-
-     * @param string $additionalType
-     * @return callable
      */
     protected function getAccountTypeChoicesCallback(string $additionalType = null): callable
     {
@@ -109,9 +106,6 @@ class ChoiceAccountType extends AbstractType
         };
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function preSubmit(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
@@ -150,9 +144,6 @@ class ChoiceAccountType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function preSetData(FormEvent $formEvent)
     {
         $accountTypeModel = $formEvent->getData();
@@ -185,13 +176,11 @@ class ChoiceAccountType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['data_class' => 'Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel']);
+        $resolver->setDefaults(['data_class' => AccountTypeModel::class]);
     }
 
     /**
      * Update form if accountType is changed
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function initEvents(FormBuilderInterface $builder)
     {
@@ -199,10 +188,6 @@ class ChoiceAccountType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param AccountTypeModel $accountTypeModel
-     */
     protected function updateForm(FormInterface $form, AccountTypeModel $accountTypeModel)
     {
         if ($accountTypeModel instanceof AccountTypeModel) {
@@ -213,10 +198,6 @@ class ChoiceAccountType extends AbstractType
         }
     }
 
-    /**
-     * @param AccountTypeModel $accountTypeModel
-     * @return string|null
-     */
     protected function solveUserEmailOriginType(AccountTypeModel $accountTypeModel): ?string
     {
         switch (true) {
@@ -241,7 +222,7 @@ class ChoiceAccountType extends AbstractType
      */
     protected function createAccountTypeModelFromData($data)
     {
-        $imapConfiguration = isset($data['userEmailOrigin']) ? $data['userEmailOrigin'] : [];
+        $imapConfiguration = $data['userEmailOrigin'] ?? [];
 
         if (empty($imapConfiguration['user'])) {
             return null;

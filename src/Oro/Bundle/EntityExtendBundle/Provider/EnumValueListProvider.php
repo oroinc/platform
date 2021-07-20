@@ -19,10 +19,6 @@ class EnumValueListProvider implements DictionaryValueListProviderInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ConfigManager   $configManager
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine

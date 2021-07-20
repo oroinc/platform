@@ -18,10 +18,6 @@ class ProcessFactory
      */
     protected $conditionFactory;
 
-    /**
-     * @param ActionAssembler $actionAssembler
-     * @param ConditionFactory $conditionFactory
-     */
     public function __construct(ActionAssembler $actionAssembler, ConditionFactory $conditionFactory)
     {
         $this->actionAssembler = $actionAssembler;

@@ -20,19 +20,12 @@ class ContextGridListener
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param EntityClassNameHelper $entityClassNameHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityClassNameHelper $entityClassNameHelper)
     {
         $this->doctrineHelper        = $doctrineHelper;
         $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         /** @var OrmDatasource $dataSource */

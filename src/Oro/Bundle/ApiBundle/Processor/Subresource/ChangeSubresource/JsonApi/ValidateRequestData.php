@@ -22,10 +22,6 @@ class ValidateRequestData implements ProcessorInterface
     /** @var bool */
     private $allowIncludedResources;
 
-    /**
-     * @param bool $requirePrimaryResourceId
-     * @param bool $allowIncludedResources
-     */
     public function __construct(
         bool $requirePrimaryResourceId = false,
         bool $allowIncludedResources = false

@@ -59,9 +59,6 @@ class GuzzleRestClientTest extends TestCase
 
     /**
      * @dataProvider performRequestDataProvider
-     * @param string $method
-     * @param array  $args
-     * @param array  $expected
      */
     public function testPerformRequestWorks(string $method, array $args, array $expected)
     {

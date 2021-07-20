@@ -65,9 +65,6 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onAfterDatabasePreparationProvider
-     *
-     * @param bool $isScheduled
-     * @param bool $isIsolated
      */
     public function testOnAfterDatabasePreparation(bool $isScheduled, bool $isIsolated)
     {
@@ -110,9 +107,6 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onAfterDatabasePreparation($this->event);
     }
 
-    /**
-     * @return array
-     */
     public function onAfterDatabasePreparationProvider(): array
     {
         return [

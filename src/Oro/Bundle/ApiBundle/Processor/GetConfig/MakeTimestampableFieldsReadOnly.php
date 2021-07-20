@@ -15,9 +15,6 @@ class MakeTimestampableFieldsReadOnly implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -46,10 +43,6 @@ class MakeTimestampableFieldsReadOnly implements ProcessorInterface
         $this->makeFieldReadOnly($definition, 'updatedAt');
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $fieldName
-     */
     private function makeFieldReadOnly(EntityDefinitionConfig $definition, string $fieldName): void
     {
         $field = $definition->getField($fieldName);

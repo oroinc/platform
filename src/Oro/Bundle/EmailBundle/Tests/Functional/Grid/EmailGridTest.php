@@ -41,7 +41,6 @@ class EmailGridTest extends AbstractDatagridTestCase
         $this->metadataFactory->setMetadataFor(EmailAddress::class, $class);
     }
 
-
     /**
      * @dataProvider gridProvider
      *

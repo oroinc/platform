@@ -22,10 +22,6 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
     /** @var ConfigInterface[] */
     private $targetEntityConfigs;
 
-    /**
-     * @param ConfigManager      $configManager
-     * @param AssociationBuilder $associationBuilder
-     */
     public function __construct(
         ConfigManager $configManager,
         AssociationBuilder $associationBuilder

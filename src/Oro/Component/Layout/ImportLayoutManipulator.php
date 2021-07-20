@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Exception\LogicException;
@@ -31,10 +30,6 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
      */
     protected $import;
 
-    /**
-     * @param LayoutManipulatorInterface $layoutManipulator
-     * @param LayoutUpdateImport $import
-     */
     public function __construct(LayoutManipulatorInterface $layoutManipulator, LayoutUpdateImport $import)
     {
         $this->layoutManipulator = $layoutManipulator;

@@ -19,7 +19,6 @@ class Configuration implements ConfigurationInterface
     const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
     const TOTALS_EXTEND_KEY         = 'extends';
 
-
     /**
      * {@inheritDoc}
      */

@@ -11,9 +11,6 @@ class UpdateLoadedData implements ProcessorInterface
     /** @var string */
     private $suffix;
 
-    /**
-     * @param string $suffix
-     */
     public function __construct(string $suffix = '')
     {
         $this->suffix = $suffix;

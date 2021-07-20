@@ -18,9 +18,6 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validTypesDataProvider
-     *
-     * @param $value
-     * @param $expected
      */
     public function testCastValue($value, $expected): void
     {
@@ -28,9 +25,6 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
         $this->assertIsInt($this->handler->castValue($value));
     }
 
-    /**
-     * @return array
-     */
     public function validTypesDataProvider(): array
     {
         return [
@@ -51,8 +45,6 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidTypesDataProvider
-     *
-     * @param $value
      */
     public function testCastValueWithUnsupportedValue($value): void
     {
@@ -61,9 +53,6 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
         $this->handler->castValue($value);
     }
 
-    /**
-     * @return array
-     */
     public function invalidTypesDataProvider(): array
     {
         return [

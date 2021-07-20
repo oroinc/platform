@@ -13,17 +13,11 @@ class EntityConfigListener
     /** @var TemplateRendererConfigProviderInterface */
     private $emailRendererConfigProvider;
 
-    /**
-     * @param TemplateRendererConfigProviderInterface $emailRendererConfigProvider
-     */
     public function __construct(TemplateRendererConfigProviderInterface $emailRendererConfigProvider)
     {
         $this->emailRendererConfigProvider = $emailRendererConfigProvider;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         $config = $event->getConfig('email');

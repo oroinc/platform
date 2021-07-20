@@ -40,7 +40,7 @@ class ContextListener
     {
         $this->csrfRequestManager = $csrfRequestManager;
     }
-    
+
     public function __invoke(RequestEvent $event): void
     {
         $token = $this->tokenStorage->getToken();
@@ -61,10 +61,6 @@ class ContextListener
     /**
      * Checks whether the request is AJAX request
      * (cookies has the session cookie and the request has "X-CSRF-Header" header with valid CSRF token).
-     *
-     * @param Request $request
-     *
-     * @return bool
      */
     private function isAjaxRequest(Request $request): bool
     {

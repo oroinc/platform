@@ -13,9 +13,6 @@ class DependentJobContext
      */
     private $dependentJobs;
 
-    /**
-     * @param Job $job
-     */
     public function __construct(Job $job)
     {
         $this->job = $job;

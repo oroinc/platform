@@ -45,8 +45,6 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider unsupportedTokenDataProvider
-     *
-     * @param TokenInterface $token
      */
     public function testOnKernelRequestUnsupportedTokenInstance(TokenInterface $token): void
     {

@@ -6,7 +6,6 @@ use Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter;
 
 class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @var DefaultDataConverter
      */
@@ -18,8 +17,6 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $importedRecord
-     * @param array $exportedRecord
      * @dataProvider convertDataProvider
      */
     public function testConvertImportExport(array $importedRecord, array $exportedRecord)

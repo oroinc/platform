@@ -28,10 +28,6 @@ class ConfigExclusionProvider extends ChainExclusionProvider
     /** @var array */
     private $cache = [];
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param ConfigCache                      $configCache
-     */
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
         ConfigCache $configCache
@@ -95,9 +91,6 @@ class ConfigExclusionProvider extends ChainExclusionProvider
         return $result;
     }
 
-    /**
-     * @return EntityRuleMatcher
-     */
     private function getExcludeMatcher(): EntityRuleMatcher
     {
         if (null === $this->excludeMatcher) {
@@ -110,9 +103,6 @@ class ConfigExclusionProvider extends ChainExclusionProvider
         return $this->excludeMatcher;
     }
 
-    /**
-     * @return EntityRuleMatcher
-     */
     private function getIncludeMatcher(): EntityRuleMatcher
     {
         if (null === $this->includeMatcher) {

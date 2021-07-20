@@ -16,9 +16,6 @@ class RouteCollectionAccessor
     /** @var array [route path => [route name => [string representation of methods, [method, ...], ...]], ...] */
     private $routeMap;
 
-    /**
-     * @param EnhancedRouteCollection $collection
-     */
     public function __construct(EnhancedRouteCollection $collection)
     {
         $this->collection = $collection;
@@ -198,9 +195,6 @@ class RouteCollectionAccessor
         );
     }
 
-    /**
-     * @param RouteCollection $collection
-     */
     private function addCollectionToRouteMap(RouteCollection $collection)
     {
         foreach ($collection->all() as $name => $route) {

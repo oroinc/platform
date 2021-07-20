@@ -150,9 +150,6 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider updateDataProvider
-     *
-     * @param bool $isManageableEntity
-     * @param array $expected
      */
     public function testUpdateHandledWithWidget(bool $isManageableEntity, array $expected): void
     {
@@ -220,9 +217,6 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function updateDataProvider(): array
     {
         return [

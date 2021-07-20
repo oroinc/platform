@@ -29,27 +29,16 @@ class UseDefaultConfigurator
      */
     private $doNotShow = [];
 
-    /**
-     * @param ConfigHandler $configHandler
-     */
     public function __construct(ConfigHandler $configHandler)
     {
         $this->configHandler = $configHandler;
     }
 
-    /**
-     * @param string $scope
-     * @param string $section
-     * @param string $option
-     */
     public function disableUseDefaultFor(string $scope, string $section, string $option)
     {
         $this->doNotShow[$scope][] = $section . ConfigManager::SECTION_VIEW_SEPARATOR . $option;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     public function buildForm(FormBuilderInterface $builder): void
     {
         $builder->addEventListener(
@@ -71,9 +60,6 @@ class UseDefaultConfigurator
         );
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function hideUseParentScopeCheckbox(FormInterface $form): void
     {
         $options = $form->get(self::USE_PARENT_SCOPE_VALUE)

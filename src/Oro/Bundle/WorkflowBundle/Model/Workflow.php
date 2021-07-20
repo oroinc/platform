@@ -81,15 +81,6 @@ class Workflow
      */
     protected $variables;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param AclManager $aclManager
-     * @param RestrictionManager $restrictionManager
-     * @param StepManager|null $stepManager
-     * @param BaseAttributeManager|null $attributeManager
-     * @param TransitionManager|null $transitionManager
-     * @param VariableManager|null $variableManager
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AclManager $aclManager,

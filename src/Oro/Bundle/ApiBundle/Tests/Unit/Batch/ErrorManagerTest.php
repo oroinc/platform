@@ -41,9 +41,6 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         $this->errorManager = new ErrorManager(new FileNameProvider(), $this->fileLockManager, $this->logger);
     }
 
-    /**
-     * @return ChunkFile
-     */
     private function getChunkFile(string $fileName, int $fileIndex): ChunkFile
     {
         return new ChunkFile($fileName, $fileIndex, 0);

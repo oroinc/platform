@@ -198,10 +198,6 @@ abstract class AbstractLocalizedFallbackValue
         $this->id = null;
     }
 
-    /**
-     * @param AbstractLocalizedFallbackValue $value
-     * @return AbstractLocalizedFallbackValue
-     */
     public static function createFromAbstract(AbstractLocalizedFallbackValue $value): AbstractLocalizedFallbackValue
     {
         $object = new static();

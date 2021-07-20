@@ -42,11 +42,6 @@ class DateGroupingFilter extends ChoiceFilter
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManagerRegistry      $doctrine
-     */
     public function __construct(FormFactoryInterface $factory, FilterUtility $util, ManagerRegistry $doctrine)
     {
         parent::__construct($factory, $util);
@@ -142,10 +137,6 @@ class DateGroupingFilter extends ChoiceFilter
 
     /**
      * If grouping by Day or Month make sure Year order is in same direction and keep multisort.
-     *
-     * @param OrmDatasource $datasource
-     * @param String $sortKey
-     * @param String $direction
      */
     public function applyOrderBy(OrmDatasource $datasource, String $sortKey, String $direction)
     {

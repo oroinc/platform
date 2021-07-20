@@ -27,11 +27,6 @@ class EntityPaginationStorage
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityPaginationManager $paginationManager
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityPaginationManager $paginationManager,
@@ -165,9 +160,6 @@ class EntityPaginationStorage
         }
     }
 
-    /**
-     * @param array $storage
-     */
     protected function setStorage(array $storage)
     {
         $request = $this->requestStack->getCurrentRequest();

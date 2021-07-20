@@ -25,20 +25,11 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     /** @var FormContext */
     protected $context;
 
-    /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
-    /**
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     *
-     * @return array
-     */
     protected function normalizeData(array $data, EntityMetadata $metadata): array
     {
         $fieldNames = \array_keys($data);
@@ -120,22 +111,11 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return $entityId;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @param string      $title
-     * @param string|null $propertyPath
-     *
-     * @return Error
-     */
     protected function addValidationError(string $title, string $propertyPath = null): Error
     {
         $error = Error::createValidationError($title);

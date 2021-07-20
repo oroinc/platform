@@ -15,11 +15,6 @@ trait UserAwareTopicTrait
     /** @var ClientManipulatorInterface */
     protected $clientManipulator;
 
-    /**
-     * @param Topic $topic
-     * @param int $userId
-     * @return array
-     */
     protected function getSessionIds(Topic $topic, int $userId): array
     {
         $sessionIds = [];
@@ -34,11 +29,6 @@ trait UserAwareTopicTrait
         return array_filter($sessionIds);
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param int $userId
-     * @return bool
-     */
     protected function isApplicable(ConnectionInterface $connection, int $userId): bool
     {
         if (!$userId) {
@@ -50,10 +40,6 @@ trait UserAwareTopicTrait
         return $user instanceof User && $user->getId() === $userId;
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param Topic $topic
-     */
     protected function disallowSubscribe(ConnectionInterface $connection, Topic $topic): void
     {
         $topic->remove($connection);

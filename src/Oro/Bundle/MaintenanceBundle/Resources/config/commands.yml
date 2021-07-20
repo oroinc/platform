@@ -1,0 +1,16 @@
+services:
+    Oro\Bundle\MaintenanceBundle\Command\MaintenanceLockCommand:
+        arguments:
+            - '@oro_maintenance.driver.factory'
+            - '@event_dispatcher'
+        tags:
+            - { name: console.command }
+            - { name: console.command, command: 'lexik:maintenance:lock' }
+
+    Oro\Bundle\MaintenanceBundle\Command\MaintenanceUnlockCommand:
+        arguments:
+            - '@oro_maintenance.driver.factory'
+            - '@event_dispatcher'
+        tags:
+            - { name: console.command }
+            - { name: console.command, command: 'lexik:maintenance:unlock' }

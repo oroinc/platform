@@ -23,10 +23,6 @@ abstract class AbstractEngine implements ExtendedEngineInterface
     /** @var bool */
     protected $logQueries = false;
 
-    /**
-     * @param ManagerRegistry          $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $registry,
         EventDispatcherInterface $eventDispatcher
@@ -123,8 +119,6 @@ abstract class AbstractEngine implements ExtendedEngineInterface
 
     /**
      * Log query
-     *
-     * @param Result $result
      */
     protected function logQuery(Result $result)
     {

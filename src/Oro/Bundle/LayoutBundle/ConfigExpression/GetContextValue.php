@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\LayoutBundle\ConfigExpression;
 
 use Oro\Component\ConfigExpression\Exception;

@@ -43,11 +43,6 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildFormDataProvider
-     *
-     * @param null|int $data
-     * @param string $scope
-     * @param string $expectedType
-     * @param bool $expectValue
      */
     public function testBuildForm(?int $data, string $scope, string $expectedType, bool $expectValue): void
     {

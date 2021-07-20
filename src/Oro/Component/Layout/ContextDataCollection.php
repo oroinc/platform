@@ -13,9 +13,6 @@ class ContextDataCollection
     /** @var array */
     private $defaults = [];
 
-    /**
-     * @param ContextInterface $context
-     */
     public function __construct(ContextInterface $context)
     {
         $this->context = $context;

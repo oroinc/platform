@@ -18,10 +18,6 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
     /** @var AbstractDynamicFieldsExtension */
     private $extension;
 
-    /**
-     * @param AbstractDynamicFieldsExtension $extension
-     * @param ContainerInterface             $container
-     */
     public function __construct(AbstractDynamicFieldsExtension $extension, ContainerInterface $container)
     {
         parent::__construct($container);

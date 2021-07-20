@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Psr\Log\LoggerInterface;
 
@@ -21,9 +22,6 @@ use Psr\Log\LoggerInterface;
  */
 class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EmailEntityBuilder */
-    private $builder;
-
     /** @var EmailEntityBatchProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $batch;
 
@@ -33,16 +31,22 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
+    /** @var EmailEntityBuilder */
+    private $builder;
+
     protected function setUp(): void
     {
         $this->batch = $this->createMock(EmailEntityBatchProcessor::class);
-        $addrManager = new EmailAddressManager('Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures', 'Test%sProxy');
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->builder = new EmailEntityBuilder(
             $this->batch,
-            $addrManager,
+            new EmailAddressManager(
+                'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures',
+                'Test%sProxy',
+                $this->doctrine
+            ),
             new EmailAddressHelper(),
             $this->doctrine,
             $this->logger
@@ -54,23 +58,15 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         $storage = [];
         $this->batch->expects($this->any())
             ->method('getAddress')
-            ->will(
-                $this->returnCallback(
-                    function ($email) use (&$storage) {
-                        return isset($storage[$email]) ? $storage[$email] : null;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($email) use (&$storage) {
+                return $storage[$email] ?? null;
+            });
         $this->batch->expects($this->any())
             ->method('addAddress')
-            ->will(
-                $this->returnCallback(
-                    function ($obj) use (&$storage) {
-                        /** @var EmailAddress $obj */
-                        $storage[$obj->getEmail()] = $obj;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($obj) use (&$storage) {
+                /** @var EmailAddress $obj */
+                $storage[$obj->getEmail()] = $obj;
+            });
     }
 
     public function testEmailUser()
@@ -117,10 +113,6 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $recipient
-     * @param string $expectedName
-     * @param string $expectedEmail
-     *
      * @dataProvider getTestToRecipientDataProvider
      */
     public function testToRecipient(string $recipient, string $expectedName, string $expectedEmail)
@@ -148,10 +140,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedEmail, $result->getEmailAddress()->getEmail());
     }
 
-    /**
-     * @return array
-     */
-    public function getTestToRecipientDataProvider()
+    public function getTestToRecipientDataProvider(): array
     {
         return [
             'full recipient' => [
@@ -159,7 +148,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
                 'expectedName' => '"Test" <test@example.com>',
                 'expectedEmail' => 'test@example.com'
             ],
-            'email adress' => [
+            'email address' => [
                 'recipient' => 'test@example.com',
                 'expectedName' => 'test@example.com',
                 'expectedEmail' => 'test@example.com'
@@ -222,23 +211,15 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         $storage = [];
         $this->batch->expects($this->exactly(10))
             ->method('getFolder')
-            ->will(
-                $this->returnCallback(
-                    function ($type, $name) use (&$storage) {
-                        return isset($storage[$type . $name]) ? $storage[$type . $name] : null;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($type, $name) use (&$storage) {
+                return $storage[$type . $name] ?? null;
+            });
         $this->batch->expects($this->exactly(5))
             ->method('addFolder')
-            ->will(
-                $this->returnCallback(
-                    function ($obj) use (&$storage) {
-                        /** @var EmailFolder $obj */
-                        $storage[$obj->getType() . $obj->getFullName()] = $obj;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($obj) use (&$storage) {
+                /** @var EmailFolder $obj */
+                $storage[$obj->getType() . $obj->getFullName()] = $obj;
+            });
 
         $inbox = $this->builder->folderInbox('test', 'test');
         $sent = $this->builder->folderSent('test', 'test');
@@ -256,11 +237,11 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $trash->getFullName());
         $this->assertEquals('test', $other->getName());
         $this->assertEquals('test', $other->getFullName());
-        $this->assertTrue($inbox === $this->builder->folderInbox('test', 'test'));
-        $this->assertTrue($sent === $this->builder->folderSent('test', 'test'));
-        $this->assertTrue($drafts === $this->builder->folderDrafts('test', 'test'));
-        $this->assertTrue($trash === $this->builder->folderTrash('test', 'test'));
-        $this->assertTrue($other === $this->builder->folderOther('test', 'test'));
+        $this->assertSame($inbox, $this->builder->folderInbox('test', 'test'));
+        $this->assertSame($sent, $this->builder->folderSent('test', 'test'));
+        $this->assertSame($drafts, $this->builder->folderDrafts('test', 'test'));
+        $this->assertSame($trash, $this->builder->folderTrash('test', 'test'));
+        $this->assertSame($other, $this->builder->folderOther('test', 'test'));
     }
 
     public function testBody()
@@ -291,25 +272,18 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBatch()
     {
-        $this->assertTrue($this->batch === $this->builder->getBatch());
+        $this->assertSame($this->batch, $this->builder->getBatch());
     }
 
     public function testGetEmailAddressEntityClass()
     {
-        $this->assertEquals(
-            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy',
-            $this->builder->getEmailAddressEntityClass()
-        );
+        $this->assertEquals(TestEmailAddressProxy::class, $this->builder->getEmailAddressEntityClass());
     }
 
     /**
-     * @param string $email
-     * @param EmailAddressParseException|null $expectedException
-     * @param string $message
-     *
      * @dataProvider validateEmailDataProvider
      */
-    public function testValidateEmailAddress($email, $expectedException, $message)
+    public function testValidateEmailAddress(string $email, ?string $expectedException, string $message)
     {
         if ($expectedException) {
             $this->expectException($expectedException);
@@ -318,10 +292,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->address($email);
     }
 
-    /**
-     * @return array
-     */
-    public function validateEmailDataProvider()
+    public function validateEmailDataProvider(): array
     {
         return [
             [
@@ -348,9 +319,6 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $email
-     * @param string $expectedContextMessage
-     *
      * @dataProvider getTestValidateRecipientEmailAddressDataProvider
      */
     public function testValidateRecipientEmailAddress(string $email, string $expectedContextMessage)
@@ -377,10 +345,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getTestValidateRecipientEmailAddressDataProvider()
+    public function getTestValidateRecipientEmailAddressDataProvider(): array
     {
         $longEmailAddress = str_repeat('domain', 50).'@mail.com';
 

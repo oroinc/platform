@@ -31,11 +31,6 @@ class DefaultProcessor implements BoardProcessorInterface
     /** @var ChoiceFieldHelper */
     protected $choiceHelper;
 
-    /**
-     * @param ManagerRegistry     $doctrine
-     * @param EntityClassResolver $entityClassResolver
-     * @param ChoiceFieldHelper   $choiceHelper
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EntityClassResolver $entityClassResolver,
@@ -189,7 +184,6 @@ class DefaultProcessor implements BoardProcessorInterface
 
         return $result;
     }
-
 
     /**
      * Get default column to use for entities without any property value

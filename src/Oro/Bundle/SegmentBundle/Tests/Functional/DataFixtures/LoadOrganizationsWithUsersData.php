@@ -42,14 +42,6 @@ class LoadOrganizationsWithUsersData extends AbstractFixture
         return $organization;
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param Organization $defaultOrg
-     * @param Organization $organization
-     * @param string $firstName
-     * @param string $lastName
-     * @return User
-     */
     protected function createUser(
         ObjectManager $manager,
         Organization $defaultOrg,

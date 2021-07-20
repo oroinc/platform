@@ -29,11 +29,6 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCacheFactory = $this->createMock(ConfigCacheFactory::class);
     }
 
-    /**
-     * @param bool $debug
-     *
-     * @return ConfigCache
-     */
     public function getConfigCache(bool $debug = false): ConfigCache
     {
         return new ConfigCache(

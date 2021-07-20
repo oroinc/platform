@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
+use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension;
-use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
 
 class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Mode */
-    private $maintenance;
+    private Mode|\PHPUnit\Framework\MockObject\MockObject $maintenance;
 
-    /** @var MaintenanceExtension */
-    private $extension;
+    private MaintenanceExtension $extension;
 
     protected function setUp(): void
     {
@@ -22,44 +20,44 @@ class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new MaintenanceExtension($this->maintenance, 1);
     }
 
-    public function testShouldDoNothingIfMaintenanceModIsOff()
+    public function testShouldDoNothingIfMaintenanceModIsOff(): void
     {
         $context = $this->createMock(Context::class);
 
-        $this->maintenance->expects($this->once())
+        $this->maintenance->expects(self::once())
             ->method('isOn')
             ->willReturn(false);
-        $context->expects($this->never())
+        $context->expects(self::never())
             ->method('setExecutionInterrupted');
-        $context->expects($this->never())
+        $context->expects(self::never())
             ->method('setInterruptedReason');
 
         $this->extension->onBeforeReceive($context);
     }
 
-    public function testShouldSleepAnInterruptedMaintenanceModIsOn()
+    public function testShouldSleepAnInterruptedMaintenanceModIsOn(): void
     {
         $context = $this->createMock(Context::class);
         $logger = $this->createMock(LoggerInterface::class);
 
-        $context->expects($this->atLeastOnce())
+        $context->expects(self::atLeastOnce())
             ->method('getLogger')
             ->willReturn($logger);
 
-        $logger->expects($this->once())
+        $logger->expects(self::once())
             ->method('notice')
             ->with('The maintenance mode has been activated.');
-        $logger->expects($this->once())
+        $logger->expects(self::once())
             ->method('info')
             ->with('Waiting for the maintenance mode deactivation.');
 
-        $this->maintenance->expects($this->exactly(2))
+        $this->maintenance->expects(self::exactly(2))
             ->method('isOn')
             ->willReturnOnConsecutiveCalls(true, false);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('setExecutionInterrupted')
             ->with(true);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('setInterruptedReason')
             ->with('The Maintenance mode has been deactivated.');
 

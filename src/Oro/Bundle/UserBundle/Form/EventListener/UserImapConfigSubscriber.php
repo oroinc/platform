@@ -25,11 +25,6 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param EntityManager          $entityManager
-     * @param RequestStack           $requestStack
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         EntityManager $entityManager,
         RequestStack $requestStack,
@@ -51,9 +46,6 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $request = $this->getRequest();
@@ -69,8 +61,6 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Pass currenlty configured user to the form
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
@@ -12,10 +11,10 @@ use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-abstract class AbstractConnector extends IteratorBasedReader implements
-    ConnectorInterface,
-    ForceConnectorInterface,
-    StepExecutionAwareInterface
+/**
+ * Base connector for integrations.
+ */
+abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, ForceConnectorInterface
 {
     /** @var TransportInterface */
     protected $transport;
@@ -32,11 +31,6 @@ abstract class AbstractConnector extends IteratorBasedReader implements
     /** @var ConnectorContextMediator */
     protected $contextMediator;
 
-    /**
-     * @param ContextRegistry          $contextRegistry
-     * @param LoggerStrategy           $logger
-     * @param ConnectorContextMediator $contextMediator
-     */
     public function __construct(
         ContextRegistry $contextRegistry,
         LoggerStrategy $logger,

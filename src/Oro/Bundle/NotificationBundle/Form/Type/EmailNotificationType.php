@@ -37,13 +37,6 @@ class EmailNotificationType extends AbstractType
     /** @var array */
     private $events;
 
-    /**
-     * @param BuildTemplateFormSubscriber        $buildTemplateSubscriber
-     * @param AdditionalEmailsSubscriber         $additionalEmailsSubscriber
-     * @param RouterInterface                    $router
-     * @param ContactInformationEmailsSubscriber $contactInformationEmailsSubscriber
-     * @param array                              $events
-     */
     public function __construct(
         BuildTemplateFormSubscriber $buildTemplateSubscriber,
         AdditionalEmailsSubscriber $additionalEmailsSubscriber,

@@ -41,7 +41,6 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->decorator = new UpdateListBodyListenerDecorator($this->bodyListener, $routes);
     }
 
-
     public function testOnKernelRequestWithNonApiRequest(): void
     {
         $this->bodyListener->expects(self::once())

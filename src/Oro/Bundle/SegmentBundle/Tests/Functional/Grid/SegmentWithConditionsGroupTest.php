@@ -80,10 +80,6 @@ class SegmentWithConditionsGroupTest extends WebTestCase
         );
     }
 
-    /**
-     * @param Segment $segment
-     * @param array $expected
-     */
     protected function assertSegmentResults(Segment $segment, array $expected)
     {
         $gridManager = $this->getContainer()->get('oro_datagrid.datagrid.manager');

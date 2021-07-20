@@ -11,8 +11,5 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 interface AclVoterInterface extends VoterInterface, PermissionGrantingStrategyContextInterface
 {
-    /**
-     * @param OneShotIsGrantedObserver $observer
-     */
     public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void;
 }

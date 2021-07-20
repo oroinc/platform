@@ -31,11 +31,6 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
      */
     protected $fileManager;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param FileManager $fileManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         JobRunner $jobRunner,
         FileManager $fileManager,
@@ -86,10 +81,6 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
         };
     }
 
-    /**
-     * @param Job $job
-     * @param array $data
-     */
     protected function saveJobResult(Job $job, array $data)
     {
         if (!empty($data['errors'])) {
@@ -102,10 +93,6 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
         $job->setData($data);
     }
 
-    /**
-     * @param array $errors
-     * @return string
-     */
     protected function saveToStorageErrorLog(array $errors): string
     {
         $fileName = str_replace('.', '', uniqid('export', true)) . '.json';

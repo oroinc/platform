@@ -1,0 +1,3 @@
+css:
+    inputs:
+      - 'bundles/oromaintenance/css/scss/main.scss'

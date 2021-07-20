@@ -158,8 +158,6 @@ class ConfigNormalizer
 
     /**
      * Expands simplified definition of collapsed association to its full definition
-     *
-     * @param array $config
      */
     protected function applySingleFieldConfig(array &$config)
     {

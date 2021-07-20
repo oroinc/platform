@@ -34,9 +34,6 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getOptionsDataProvider
-     *
-     * @param array $actualOptions
-     * @param array $expectedOptions
      */
     public function testGetOptions(array $actualOptions, array $expectedOptions)
     {

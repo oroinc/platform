@@ -17,9 +17,6 @@ class WorkflowStepHelper
      */
     protected $workflow;
 
-    /**
-     * @param Workflow $workflow
-     */
     public function __construct(Workflow $workflow)
     {
         $this->workflow = $workflow;

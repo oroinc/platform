@@ -10,10 +10,6 @@ interface MetadataAccessorInterface
 {
     /**
      * Gets the metadata of an entity.
-     *
-     * @param string $className
-     *
-     * @return EntityMetadata|null
      */
     public function getMetadata(string $className): ?EntityMetadata;
 }

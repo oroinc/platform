@@ -18,8 +18,6 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addOwnerAndOrganizationColumns(Schema $schema)

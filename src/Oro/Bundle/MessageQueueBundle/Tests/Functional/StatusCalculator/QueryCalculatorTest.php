@@ -81,7 +81,6 @@ class QueryCalculatorTest extends WebTestCase
         $this->assertEquals(7, array_sum($jobRepository->getChildStatusesWithJobCountByRootJob($job)));
     }
 
-
     private function updateChildJobs(Job $job): void
     {
         /** @var JobManager $jobManager */

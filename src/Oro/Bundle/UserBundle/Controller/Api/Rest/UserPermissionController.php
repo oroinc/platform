@@ -35,7 +35,6 @@ class UserPermissionController extends RestGetController
      * Defaults to all classes."
      *)
      *
-     *
      * @ApiDoc(
      *      description="Get user permissions",
      *      resource=true

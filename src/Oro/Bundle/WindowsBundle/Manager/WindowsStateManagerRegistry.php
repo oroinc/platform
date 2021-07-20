@@ -34,9 +34,6 @@ class WindowsStateManagerRegistry
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @return WindowsStateManager|null
-     */
     public function getManager(): ?WindowsStateManager
     {
         $userClass = $this->getUserClass();
@@ -51,9 +48,6 @@ class WindowsStateManagerRegistry
         return null;
     }
 
-    /**
-     * @return string|null
-     */
     private function getUserClass(): ?string
     {
         $token = $this->tokenStorage->getToken();

@@ -23,13 +23,6 @@ class VariableGuesser extends AbstractGuesser
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param FormRegistry $formRegistry
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $formConfigProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FormRegistry $formRegistry,
         ManagerRegistry $managerRegistry,

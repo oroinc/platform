@@ -16,9 +16,6 @@ class DataCollectorExtension extends AbstractBlockTypeExtension
     /** @var LayoutDataCollector */
     private $dataCollector;
 
-    /**
-     * @param LayoutDataCollector $dataCollector
-     */
     public function __construct(LayoutDataCollector $dataCollector)
     {
         $this->dataCollector = $dataCollector;

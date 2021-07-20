@@ -40,14 +40,6 @@ class EmailQueryFactory
     /** @var FilterUtility */
     protected $filterUtil;
 
-    /**
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param EntityNameResolver        $entityNameResolver
-     * @param MailboxManager            $mailboxManager
-     * @param TokenAccessorInterface    $tokenAccessor
-     * @param FormFactoryInterface      $formFactory
-     * @param FilterUtility             $filterUtil
-     */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver,
@@ -137,8 +129,6 @@ class EmailQueryFactory
 
     /**
      * Apply custom ACL checks
-     *
-     * @param QueryBuilder $qb
      */
     public function applyAcl(QueryBuilder $qb)
     {

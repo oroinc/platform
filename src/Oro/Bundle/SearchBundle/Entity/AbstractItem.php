@@ -192,9 +192,6 @@ abstract class AbstractItem
         return $this->changed;
     }
 
-    /**
-     * @return float
-     */
     public function getWeight(): float
     {
         return $this->weight;

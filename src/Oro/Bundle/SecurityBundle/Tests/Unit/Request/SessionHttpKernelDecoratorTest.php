@@ -23,7 +23,6 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerInterface */
     private $container;
 
-
     /** @var SessionHttpKernelDecorator */
     private $kernelDecorator;
 

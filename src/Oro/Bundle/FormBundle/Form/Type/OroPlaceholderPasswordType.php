@@ -118,10 +118,6 @@ class OroPlaceholderPasswordType extends AbstractType
         return 'oro_placeholder_password';
     }
 
-    /**
-     * @param string $value
-     * @return string
-     */
     private function getPlaceholder(string $value): string
     {
         return str_repeat(self::DEFAULT_PLACEHOLDER, mb_strlen($value));

@@ -30,10 +30,6 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         $this->generateEntities($manager, ['test_active_flow1', 'test_active_flow2']);
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param array $workflowNames
-     */
     protected function generateEntities(ObjectManager $manager, array $workflowNames)
     {
         // load entities

@@ -11,9 +11,6 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery
     /** @var CommandExecutor */
     protected $commandExecutor;
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     */
     public function __construct(CommandExecutor $commandExecutor)
     {
         $this->commandExecutor = $commandExecutor;

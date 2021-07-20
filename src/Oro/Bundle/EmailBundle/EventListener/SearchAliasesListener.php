@@ -9,8 +9,6 @@ class SearchAliasesListener
 {
     /**
      * Add search alias to correct search by EmailUser index for Email entity
-     *
-     * @param SearchAliasesEvent $event
      */
     public function addEmailAliasEvent(SearchAliasesEvent $event)
     {

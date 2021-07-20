@@ -169,9 +169,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureTestEnvironment(ContainerBuilder $container): void
     {
         // oro_api.tests.config_bag.*
@@ -190,20 +187,12 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     public function loadApiConfiguration(ContainerBuilder $container, array $config): void
     {
         $loader = new ConfigurationLoader($container);
         $loader->load($config);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function registerConfigParameters(ContainerBuilder $container, array $config): void
     {
         $container
@@ -239,10 +228,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(1, $cacheManagerApiDocViews);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function registerActionProcessors(ContainerBuilder $container, array $config): void
     {
         $actionProcessorBagServiceDef = DependencyInjectionUtil::findDefinition(
@@ -286,10 +271,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function registerFilterOperators(ContainerBuilder $container, array $config): void
     {
         $filterOperatorRegistryDef = DependencyInjectionUtil::findDefinition(
@@ -308,10 +289,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function registerConfigExtensions(ContainerBuilder $container, array $config): void
     {
         $configExtensionRegistryDef = DependencyInjectionUtil::findDefinition(
@@ -328,11 +305,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * @param array $views
-     *
-     * @return string|null
-     */
     private function getDefaultView(array $views): ?string
     {
         $defaultView = null;
@@ -346,10 +318,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         return $defaultView;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function configureCors(ContainerBuilder $container, array $config): void
     {
         $corsConfig = $config['cors'];
@@ -361,10 +329,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(4, $corsConfig['expose_headers']);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
     private function configureErrorTitleOverrides(ContainerBuilder $container, array $config): void
     {
         $container->getDefinition('oro_api.error_title_override_provider')

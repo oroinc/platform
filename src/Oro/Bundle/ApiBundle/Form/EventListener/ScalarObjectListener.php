@@ -31,9 +31,6 @@ class ScalarObjectListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
@@ -48,9 +45,6 @@ class ScalarObjectListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event): void
     {
         if ($this->setDataToNull) {
@@ -58,9 +52,6 @@ class ScalarObjectListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event): void
     {
         $form = $event->getForm();

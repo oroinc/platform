@@ -65,8 +65,6 @@ class IncludedData
 
     /**
      * Gets an accessor for the included data.
-     *
-     * @return IncludeAccessorInterface
      */
     public function getIncludeAccessor(): IncludeAccessorInterface
     {
@@ -75,10 +73,6 @@ class IncludedData
 
     /**
      * Gets an included item by its index in source data.
-     *
-     * @param int $includedItemIndex
-     *
-     * @return array|null
      */
     public function getIncludedItem(int $includedItemIndex): ?array
     {
@@ -96,11 +90,6 @@ class IncludedData
 
     /**
      * Gets the index for the included item in source data.
-     *
-     * @param string $itemType
-     * @param string $itemId
-     *
-     * @return int|null
      */
     public function getIncludedItemIndex(string $itemType, string $itemId): ?int
     {
@@ -111,11 +100,6 @@ class IncludedData
 
     /**
      * Gets the section name for the included item in source data.
-     *
-     * @param string $itemType
-     * @param string $itemId
-     *
-     * @return string|null
      */
     public function getIncludedItemSectionName(string $itemType, string $itemId): ?string
     {
@@ -147,8 +131,6 @@ class IncludedData
 
     /**
      * Checks whether there is at least one already processed included item.
-     *
-     * @return bool
      */
     public function hasProcessedIncludedItems(): bool
     {

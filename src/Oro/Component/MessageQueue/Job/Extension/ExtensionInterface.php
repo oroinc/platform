@@ -11,8 +11,6 @@ interface ExtensionInterface
 {
     /**
      * Executed before unique job start process.
-     *
-     * @param Job $job
      */
     public function onPreRunUnique(Job $job);
 
@@ -26,8 +24,6 @@ interface ExtensionInterface
 
     /**
      * Executed before delayed job was created.
-     *
-     * @param Job $job
      */
     public function onPreCreateDelayed(Job $job);
 
@@ -41,8 +37,6 @@ interface ExtensionInterface
 
     /**
      * Executed before delayed job start process.
-     *
-     * @param Job $job
      */
     public function onPreRunDelayed(Job $job);
 
@@ -56,15 +50,11 @@ interface ExtensionInterface
 
     /**
      * Executed if root job was interrupted.
-     *
-     * @param Job $job
      */
     public function onCancel(Job $job);
 
     /**
      * Executed if job was crashed during callback processing.
-     *
-     * @param Job $job
      */
     public function onError(Job $job);
 }

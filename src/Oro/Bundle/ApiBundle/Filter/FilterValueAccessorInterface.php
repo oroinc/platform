@@ -38,8 +38,6 @@ interface FilterValueAccessorInterface extends QueryStringAccessorInterface
 
     /**
      * Gets the name of default filter's group.
-     *
-     * @return string|null
      */
     public function getDefaultGroupName(): ?string;
 

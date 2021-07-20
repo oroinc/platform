@@ -215,20 +215,11 @@ class IterableResultFactoryTest extends WebTestCase
         ], $iterableResult);
     }
 
-    /**
-     * @param array $expectedNames
-     * @param IterableResultInterface $iterableResult
-     */
     private function assertNames(array $expectedNames, IterableResultInterface $iterableResult)
     {
         $this->assertIterableResult($expectedNames, 'name', $iterableResult);
     }
 
-    /**
-     * @param array $expected
-     * @param string $column
-     * @param IterableResultInterface $iterableResult
-     */
     private function assertIterableResult(
         array $expected,
         string $column,

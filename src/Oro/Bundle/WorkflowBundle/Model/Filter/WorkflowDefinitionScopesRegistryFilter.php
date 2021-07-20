@@ -17,10 +17,6 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
     /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /**
-     * @param ScopeManager $scopeManager
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ScopeManager $scopeManager, ManagerRegistry $managerRegistry)
     {
         $this->scopeManager = $scopeManager;

@@ -344,9 +344,6 @@ class EmailControllerTest extends WebTestCase
 
     /**
      * @dataProvider autocompleteRecipientActionProvider
-     *
-     * @param string $method
-     * @param bool $searchById
      */
     public function testAutocompleteRecipientActionById(string $method, bool $searchById): void
     {
@@ -400,9 +397,6 @@ class EmailControllerTest extends WebTestCase
         $this->assertEquals($searchById ? $expected[0]['children'] : $expected, $data['results']);
     }
 
-    /**
-     * @return array
-     */
     public function autocompleteRecipientActionProvider(): array
     {
         return [

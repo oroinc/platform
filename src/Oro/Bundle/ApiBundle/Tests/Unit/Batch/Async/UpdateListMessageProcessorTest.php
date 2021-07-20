@@ -152,10 +152,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $this->createMock(SessionInterface::class);
     }
 
-    /**
-     * @param RequestType                $requestType
-     * @param FileSplitterInterface|null $splitter
-     */
     private function expectGetSplitter(RequestType $requestType, ?FileSplitterInterface $splitter)
     {
         $this->splitterRegistry->expects(self::once())
@@ -164,10 +160,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($splitter);
     }
 
-    /**
-     * @param RequestType                       $requestType
-     * @param null|ChunkFileClassifierInterface $classifier
-     */
     private function expectGetClassifier(RequestType $requestType, ?ChunkFileClassifierInterface $classifier)
     {
         $this->chunkFileClassifierRegistry->expects(self::once())
@@ -244,11 +236,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
     }
 
-    /**
-     * @param string $messageId
-     * @param int    $operationId
-     * @param Job    $job
-     */
     private function expectRunUniqueJob(string $messageId, int $operationId, Job $job)
     {
         $this->jobRunner->expects(self::once())
@@ -261,11 +248,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    /**
-     * @param int $operationId
-     * @param Job $job
-     * @param int $jobId
-     */
     private function expectCreateDelayedJob(int $operationId, Job $job, int $jobId)
     {
         $this->jobRunner->expects(self::once())
@@ -278,10 +260,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    /**
-     * @param int   $operationId
-     * @param array $jobData
-     */
     private function expectSaveJob(int $operationId, array $jobData)
     {
         $this->jobManager->expects(self::once())

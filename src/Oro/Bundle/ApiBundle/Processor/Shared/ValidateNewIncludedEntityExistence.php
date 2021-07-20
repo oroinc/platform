@@ -65,10 +65,6 @@ class ValidateNewIncludedEntityExistence implements ProcessorInterface
         }
     }
 
-    /**
-     * @param object                   $propertyEntity
-     * @param IncludedEntityCollection $includedEntities
-     */
     private function validateEntity(object $propertyEntity, IncludedEntityCollection $includedEntities): void
     {
         $propertyEntityData = $includedEntities->getData($propertyEntity);

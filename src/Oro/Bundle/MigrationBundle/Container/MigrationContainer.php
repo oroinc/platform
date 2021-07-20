@@ -26,11 +26,6 @@ class MigrationContainer extends DependencyInjectionContainer
     /** @var PsrContainerInterface */
     private $privateContainer;
 
-    /**
-     * @param ParameterBagInterface|null $parameterBag
-     * @param DependencyInjectionContainer $publicContainer
-     * @param PsrContainerInterface $privateContainer
-     */
     public function __construct(
         ?ParameterBagInterface $parameterBag,
         DependencyInjectionContainer $publicContainer,

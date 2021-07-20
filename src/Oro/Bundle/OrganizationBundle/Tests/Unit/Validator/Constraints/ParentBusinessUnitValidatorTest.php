@@ -56,7 +56,6 @@ class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
             ->with(1)
             ->willReturn([4, 6, 7]);
 
-
         $constraint = new ParentBusinessUnit();
 
         $this->validator->validate($entity, $constraint);
@@ -76,7 +75,6 @@ class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
             ->method('getSubordinateBusinessUnitIds')
             ->with(1)
             ->willReturn([4, 5, 6, 7]);
-
 
         $constraint = new ParentBusinessUnit();
 

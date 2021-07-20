@@ -48,9 +48,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         $this->defaultTimezone = new \DateTimeZone($defaultTimezone);
     }
 
-    /**
-     * @param TypeFormatterInterface $formatter
-     */
     public function setFormatter(TypeFormatterInterface $formatter)
     {
         $this->formatter = $formatter;

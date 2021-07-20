@@ -67,7 +67,6 @@ class ExpressionValidator
     /**
      * Check string for correct expression syntax
      *
-     * @param string $expression
      * @throws SyntaxError Wne given string with incorrect expression syntax
      */
     public function validate(string $expression): void
@@ -93,9 +92,6 @@ class ExpressionValidator
         }
     }
 
-    /**
-     * @return Lexer
-     */
     private function getLexer(): Lexer
     {
         if (!$this->lexer) {
@@ -105,9 +101,6 @@ class ExpressionValidator
         return $this->lexer;
     }
 
-    /**
-     * @param int $precedence
-     */
     private function validateExpression(int $precedence = 0): void
     {
         $this->validatePrimary();
@@ -330,7 +323,6 @@ class ExpressionValidator
                 ) {
                     throw new SyntaxError('Expected name', $token->cursor, $this->stream->getExpression());
                 }
-
 
                 if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '(')) {
                     $this->validateArguments();

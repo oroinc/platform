@@ -32,10 +32,6 @@ class SetTotalCountHeader implements ProcessorInterface
     /** @var QueryResolver */
     private $queryResolver;
 
-    /**
-     * @param CountQueryBuilderOptimizer $countQueryOptimizer
-     * @param QueryResolver              $queryResolver
-     */
     public function __construct(
         CountQueryBuilderOptimizer $countQueryOptimizer,
         QueryResolver $queryResolver
@@ -152,10 +148,6 @@ class SetTotalCountHeader implements ProcessorInterface
         return QueryCountCalculator::calculateCount($countQuery);
     }
 
-    /**
-     * @param Query                       $query
-     * @param EntityDefinitionConfig|null $config
-     */
     private function resolveQuery(Query $query, ?EntityDefinitionConfig $config): void
     {
         if (null !== $config) {

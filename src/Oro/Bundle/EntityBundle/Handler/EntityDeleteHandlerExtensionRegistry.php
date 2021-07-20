@@ -13,9 +13,6 @@ class EntityDeleteHandlerExtensionRegistry
     /** @var ContainerInterface */
     private $extensionContainer;
 
-    /**
-     * @param ContainerInterface $extensionContainer
-     */
     public function __construct(ContainerInterface $extensionContainer)
     {
         $this->extensionContainer = $extensionContainer;
@@ -23,10 +20,6 @@ class EntityDeleteHandlerExtensionRegistry
 
     /**
      * Gets an extension for handler responsible to delete the given entity type.
-     *
-     * @param string $entityClass
-     *
-     * @return EntityDeleteHandlerExtensionInterface
      */
     public function getHandlerExtension(string $entityClass): EntityDeleteHandlerExtensionInterface
     {

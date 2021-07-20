@@ -9,18 +9,11 @@ interface ProcessorBagInterface
 {
     /**
      * Registers a processor applicable checker.
-     *
-     * @param ApplicableCheckerInterface $checker
-     * @param int                        $priority
      */
     public function addApplicableChecker(ApplicableCheckerInterface $checker, int $priority = 0): void;
 
     /**
      * Gets an iterator that can be used to iterate through processors applicable to the given context.
-     *
-     * @param ContextInterface $context
-     *
-     * @return ProcessorIterator
      */
     public function getProcessors(ContextInterface $context): ProcessorIterator;
 

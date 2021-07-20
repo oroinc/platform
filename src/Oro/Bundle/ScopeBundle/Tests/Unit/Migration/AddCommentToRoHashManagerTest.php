@@ -79,7 +79,6 @@ class AddCommentToRoHashManagerTest extends TestCase
             ->with('oro_scope')
             ->willReturn($table);
 
-
         $em->expects($this->once())
             ->method('getConnection')
             ->willReturn($connection);

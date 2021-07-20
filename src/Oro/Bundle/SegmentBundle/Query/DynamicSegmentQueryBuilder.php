@@ -19,10 +19,6 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param SegmentQueryConverterFactory $segmentQueryConverterFactory
-     * @param ManagerRegistry              $doctrine
-     */
     public function __construct(
         SegmentQueryConverterFactory $segmentQueryConverterFactory,
         ManagerRegistry $doctrine

@@ -14,8 +14,6 @@ class GridHelper
 
     /**
      * Constructor
-     *
-     * @param EntityProvider $entityProvider
      */
     public function __construct(EntityProvider $entityProvider)
     {

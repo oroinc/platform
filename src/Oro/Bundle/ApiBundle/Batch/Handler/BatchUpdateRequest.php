@@ -56,8 +56,6 @@ class BatchUpdateRequest
 
     /**
      * Gets the API version.
-     *
-     * @return string
      */
     public function getVersion(): string
     {
@@ -66,8 +64,6 @@ class BatchUpdateRequest
 
     /**
      * Gets the request type, for example "rest", "soap", etc.
-     *
-     * @return RequestType
      */
     public function getRequestType(): RequestType
     {
@@ -76,8 +72,6 @@ class BatchUpdateRequest
 
     /**
      * Gets an identifier of an asynchronous operation this batch operation is processed within.
-     *
-     * @return int
      */
     public function getOperationId(): int
     {
@@ -97,8 +91,6 @@ class BatchUpdateRequest
 
     /**
      * Gets the information about the file contains the input data.
-     *
-     * @return ChunkFile
      */
     public function getFile(): ChunkFile
     {
@@ -108,8 +100,6 @@ class BatchUpdateRequest
     /**
      * Gets the manager responsible to work with input and output files
      * related to this batch operation.
-     *
-     * @return FileManager
      */
     public function getFileManager(): FileManager
     {

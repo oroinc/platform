@@ -17,10 +17,6 @@ class AssociationToArrayAttributeConverter
     /** @var TargetMetadataProvider */
     private $targetMetadataProvider;
 
-    /**
-     * @param ObjectAccessorInterface $objectAccessor
-     * @param TargetMetadataProvider  $targetMetadataProvider
-     */
     public function __construct(
         ObjectAccessorInterface $objectAccessor,
         TargetMetadataProvider $targetMetadataProvider
@@ -99,11 +95,6 @@ class AssociationToArrayAttributeConverter
         return $result;
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     private function addMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $properties = $metadata->getMetaProperties();
@@ -115,11 +106,6 @@ class AssociationToArrayAttributeConverter
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     private function addAttributes(array &$result, array $data, EntityMetadata $metadata): void
     {
         $fields = $metadata->getFields();
@@ -128,11 +114,6 @@ class AssociationToArrayAttributeConverter
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     private function addRelationships(array &$result, array $data, EntityMetadata $metadata): void
     {
         $associations = $metadata->getAssociations();

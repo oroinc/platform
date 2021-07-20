@@ -18,9 +18,6 @@ class ExtendTable extends TableWithNameGenerator
      */
     protected $extendOptionsManager;
 
-    /**
-     * @param array $args
-     */
     public function __construct(array $args)
     {
         $this->extendOptionsManager = $args['extendOptionsManager'];

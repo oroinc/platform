@@ -43,8 +43,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_access_group
-     *
-     * @param Schema $schema
      */
     public static function oroAccessGroupTable(Schema $schema)
     {
@@ -61,8 +59,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_access_role
-     *
-     * @param Schema $schema
      */
     public static function oroAccessRoleTable(Schema $schema)
     {
@@ -128,8 +124,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_access_group
-     *
-     * @param Schema $schema
      */
     public static function oroUserAccessGroupTable(Schema $schema)
     {
@@ -145,8 +139,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_access_group_role
-     *
-     * @param Schema $schema
      */
     public static function oroUserAccessGroupRoleTable(Schema $schema)
     {
@@ -162,8 +154,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_access_role
-     *
-     * @param Schema $schema
      */
     public static function oroUserAccessRoleTable(Schema $schema)
     {
@@ -179,8 +169,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_api
-     *
-     * @param Schema $schema
      */
     public static function oroUserApiTable(Schema $schema)
     {
@@ -197,8 +185,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_business_unit
-     *
-     * @param Schema $schema
      */
     public static function oroUserBusinessUnitTable(Schema $schema)
     {
@@ -214,8 +200,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_email
-     *
-     * @param Schema $schema
      */
     public static function oroUserEmailTable(Schema $schema)
     {
@@ -231,8 +215,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate table oro_user_status
-     *
-     * @param Schema $schema
      */
     public static function oroUserStatusTable(Schema $schema)
     {
@@ -249,8 +231,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_access_group
-     *
-     * @param Schema $schema
      */
     public static function oroAccessGroupForeignKeys(Schema $schema)
     {
@@ -267,8 +247,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_access_role
-     *
-     * @param Schema $schema
      */
     public static function oroAccessRoleForeignKeys(Schema $schema)
     {
@@ -318,8 +296,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_access_group
-     *
-     * @param Schema $schema
      */
     public static function oroUserAccessGroupForeignKeys(Schema $schema)
     {
@@ -342,8 +318,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_access_group_role
-     *
-     * @param Schema $schema
      */
     public static function oroUserAccessGroupRoleForeignKeys(Schema $schema)
     {
@@ -366,8 +340,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_access_role
-     *
-     * @param Schema $schema
      */
     public static function oroUserAccessRoleForeignKeys(Schema $schema)
     {
@@ -390,8 +362,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_api
-     *
-     * @param Schema $schema
      */
     public static function oroUserApiForeignKeys(Schema $schema)
     {
@@ -408,8 +378,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_business_unit
-     *
-     * @param Schema $schema
      */
     public static function oroUserBusinessUnitForeignKeys(Schema $schema)
     {
@@ -432,8 +400,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_email
-     *
-     * @param Schema $schema
      */
     public static function oroUserEmailForeignKeys(Schema $schema)
     {
@@ -450,8 +416,6 @@ class OroUserBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_user_status
-     *
-     * @param Schema $schema
      */
     public static function oroUserStatusForeignKeys(Schema $schema)
     {
@@ -468,8 +432,6 @@ class OroUserBundle implements Migration
 
     /**
      * Add owner to table oro_email_address
-     *
-     * @param Schema $schema
      */
     public static function addOwnerToOroEmailAddress(Schema $schema)
     {

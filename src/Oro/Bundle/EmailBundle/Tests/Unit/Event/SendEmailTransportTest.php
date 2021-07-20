@@ -15,7 +15,7 @@ class SendEmailTransportTest extends \PHPUnit\Framework\TestCase
         /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Transport_EsmtpTransport $transport */
         $transport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
             ->disableOriginalConstructor()->getMock();
-        
+
         $sendEmailTransport = new SendEmailTransport($emailOrigin, $transport);
 
         $this->assertEquals($sendEmailTransport->getEmailOrigin(), $emailOrigin);
@@ -23,7 +23,7 @@ class SendEmailTransportTest extends \PHPUnit\Framework\TestCase
 
         $sendEmailTransport->setTransport(null);
         $this->assertEquals($sendEmailTransport->getTransport(), null);
-        
+
         $sendEmailTransport->setTransport($transport);
         $this->assertEquals($sendEmailTransport->getTransport(), $transport);
     }

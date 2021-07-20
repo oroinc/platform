@@ -37,15 +37,6 @@ class EntityMetadataLoader
     /** @var EntityNestedAssociationMetadataFactory */
     protected $nestedAssociationMetadataFactory;
 
-    /**
-     * @param DoctrineHelper                         $doctrineHelper
-     * @param EntityIdHelper                         $entityIdHelper
-     * @param MetadataFactory                        $metadataFactory
-     * @param ObjectMetadataFactory                  $objectMetadataFactory
-     * @param EntityMetadataFactory                  $entityMetadataFactory
-     * @param EntityNestedObjectMetadataFactory      $nestedObjectMetadataFactory
-     * @param EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityIdHelper $entityIdHelper,

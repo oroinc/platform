@@ -47,9 +47,6 @@ class DefaultPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCa
         $this->assertSame($localization, $this->provider->getPreferredLocalization($entity));
     }
 
-    /**
-     * @return array
-     */
     public function entityDataProvider(): array
     {
         return [

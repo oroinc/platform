@@ -28,11 +28,6 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
      */
     private $logger;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(MessageProducerInterface $producer, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->producer = $producer;

@@ -27,11 +27,6 @@ class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, 
      */
     private $logger;
 
-    /**
-     * @param AssociationManager $associationManager
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface    $logger
-     */
     public function __construct(
         AssociationManager $associationManager,
         JobRunner $jobRunner,

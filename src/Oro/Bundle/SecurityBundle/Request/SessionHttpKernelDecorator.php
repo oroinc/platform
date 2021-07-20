@@ -26,10 +26,6 @@ class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInter
     /** @var array|null */
     private $collectedSessionOptions;
 
-    /**
-     * @param HttpKernelInterface $kernel
-     * @param ContainerInterface  $container
-     */
     public function __construct(
         HttpKernelInterface $kernel,
         ContainerInterface $container
@@ -64,12 +60,6 @@ class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInter
         }
     }
 
-    /**
-     * @param string $basePath
-     * @param array $options
-     *
-     * @return array
-     */
     protected function applyBasePathToCookiePath(string $basePath, array $options): array
     {
         if ($basePath && '/' !== $basePath) {
@@ -80,17 +70,11 @@ class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInter
         return $options;
     }
 
-    /**
-     * @return array
-     */
     protected function getSessionOptions(): array
     {
         return $this->container->getParameter(self::SESSION_OPTIONS_PARAMETER_NAME);
     }
 
-    /**
-     * @param array $options
-     */
     protected function setSessionOptions(array $options): void
     {
         $parametersProperty = ReflectionUtil::getProperty(new \ReflectionClass($this->container), 'parameters');

@@ -18,10 +18,6 @@ class PinbarTabTitleProvider implements PinbarTabTitleProviderInterface
     /** @var TitleService */
     private $titleService;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param TitleService $titleService
-     */
     public function __construct(DoctrineHelper $doctrineHelper, TitleService $titleService)
     {
         $this->doctrineHelper = $doctrineHelper;

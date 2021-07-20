@@ -21,12 +21,6 @@ class LoadWorkflowEntityAclIdentities extends AbstractFixture implements Depende
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param string $workflowName
-     * @param string $attribute
-     * @param int $shift
-     */
     private function createIdentity(ObjectManager $manager, string $workflowName, string $attribute, int $shift): void
     {
         $acl = $this->getReference($workflowName . '_' . $attribute);

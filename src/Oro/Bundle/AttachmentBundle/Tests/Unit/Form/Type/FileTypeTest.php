@@ -232,10 +232,6 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider normalizeFileOptionsDataProvider
-     *
-     * @param Options $allOptions
-     * @param array $option
-     * @param array $expectedOption
      */
     public function testNormalizeFileOptions(Options $allOptions, array $option, array $expectedOption): void
     {
@@ -247,9 +243,6 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function normalizeFileOptionsDataProvider(): array
     {
         return [

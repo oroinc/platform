@@ -28,10 +28,6 @@ class ApiConfiguration implements ConfigurationInterface
     /** @var int */
     protected $maxNestingLevel;
 
-    /**
-     * @param ConfigExtensionRegistry $extensionRegistry
-     * @param int|null                $maxNestingLevel
-     */
     public function __construct(ConfigExtensionRegistry $extensionRegistry, ?int $maxNestingLevel = null)
     {
         $this->settings = $extensionRegistry->getConfigurationSettings();
@@ -66,12 +62,6 @@ class ApiConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param string                              $sectionName
-     * @param TargetEntityDefinitionConfiguration $definitionSection
-     *
-     * @return EntityConfiguration
-     */
     protected function createEntityConfiguration(
         string $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection
@@ -84,11 +74,6 @@ class ApiConfiguration implements ConfigurationInterface
         );
     }
 
-    /**
-     * @param NodeBuilder $parentNode
-     *
-     * @return NodeBuilder
-     */
     protected function addEntityAliasesSection(NodeBuilder $parentNode): NodeBuilder
     {
         $node = $parentNode
@@ -102,12 +87,6 @@ class ApiConfiguration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * @param NodeBuilder         $parentNode
-     * @param EntityConfiguration $configuration
-     *
-     * @return NodeBuilder
-     */
     protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration): NodeBuilder
     {
         $node = $parentNode
@@ -121,9 +100,6 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function postProcessConfig(array $config): array

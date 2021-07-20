@@ -93,9 +93,6 @@ class TestMagazine implements TestFrameworkEntityInterface
         $this->articles = $articles;
     }
 
-    /**
-     * @param TestArticle $article
-     */
     public function addArticle(TestArticle $article)
     {
         if (!$this->articles->contains($article)) {
@@ -103,9 +100,6 @@ class TestMagazine implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestArticle $article
-     */
     public function removeArticle(TestArticle $article)
     {
         if ($this->articles->contains($article)) {

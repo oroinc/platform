@@ -17,8 +17,6 @@ class AddOriginalFilenameIndex implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addOriginalFilenameIndex(Schema $schema)

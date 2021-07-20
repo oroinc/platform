@@ -179,22 +179,12 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         $this->groups = [];
     }
 
-    /**
-     * @param string      $group
-     * @param string      $key
-     * @param FilterValue $value
-     */
     protected function setParameter(string $group, string $key, FilterValue $value): void
     {
         $this->parameters[$key] = $value;
         $this->groups[$group][$key] = $value;
     }
 
-    /**
-     * @param string|null $operator
-     *
-     * @return string
-     */
     protected function normalizeOperator(?string $operator): string
     {
         if (!$operator) {
@@ -214,11 +204,6 @@ class FilterValueAccessor implements FilterValueAccessorInterface
         }
     }
 
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
     private function extractGroup(string $key): string
     {
         $delimPos = \strpos($key, '[');

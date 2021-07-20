@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Migrations\Schema\v1_3;
 
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
@@ -21,8 +21,6 @@ class OroBatchBundle implements Migration
 
     /**
      * Delete old akeneo job execution records
-     *
-     * @param QueryBag $queries
      */
     protected function deleteJobExecutions(QueryBag $queries)
     {
@@ -43,8 +41,6 @@ SQL;
 
     /**
      * Delete old akeneo job instance records
-     *
-     * @param QueryBag $queries
      */
     protected function deleteObsoleteJobInstances(QueryBag $queries)
     {

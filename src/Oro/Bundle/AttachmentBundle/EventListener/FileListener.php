@@ -18,20 +18,12 @@ class FileListener
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param FileManager $fileManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(FileManager $fileManager, TokenAccessorInterface $tokenAccessor)
     {
         $this->fileManager = $fileManager;
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param File               $entity
-     * @param LifecycleEventArgs $args
-     */
     public function prePersist(File $entity, LifecycleEventArgs $args)
     {
         $entityManager = $args->getEntityManager();
@@ -53,19 +45,11 @@ class FileListener
         }
     }
 
-    /**
-     * @param File               $entity
-     * @param LifecycleEventArgs $args
-     */
     public function preUpdate(File $entity, LifecycleEventArgs $args)
     {
         $this->prePersist($entity, $args);
     }
 
-    /**
-     * @param File               $entity
-     * @param LifecycleEventArgs $args
-     */
     public function postPersist(File $entity, LifecycleEventArgs $args)
     {
         $entityManager = $args->getEntityManager();
@@ -78,10 +62,6 @@ class FileListener
         }
     }
 
-    /**
-     * @param File               $entity
-     * @param LifecycleEventArgs $args
-     */
     public function postUpdate(File $entity, LifecycleEventArgs $args)
     {
         $this->postPersist($entity, $args);

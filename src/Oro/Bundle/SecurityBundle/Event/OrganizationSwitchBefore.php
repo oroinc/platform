@@ -19,11 +19,6 @@ class OrganizationSwitchBefore extends Event
     /** @var Organization */
     protected $organizationToSwitch;
 
-    /**
-     * @param User         $user
-     * @param Organization $organization
-     * @param Organization $organizationToSwitch
-     */
     public function __construct(User $user, Organization $organization, Organization $organizationToSwitch)
     {
         $this->user                 = $user;
@@ -63,8 +58,6 @@ class OrganizationSwitchBefore extends Event
 
     /**
      * Possibility to change organization that will be active afterwards
-     *
-     * @param Organization $organizationToSwitch
      */
     public function setOrganizationToSwitch(Organization $organizationToSwitch)
     {

@@ -1,7 +1,7 @@
 parameters:
     oro_layout.default_active_theme: ~
     oro_layout.debug: ~
-    oro_layout.cache_dir: '%kernel.cache_dir%/layouts'
+    oro_layout.cache_dir: '%kernel.cache_dir%/oro/layouts'
     oro_layout.expression_language_cache_file: '%kernel.cache_dir%/oro/layout_expressions.php'
 
 services:

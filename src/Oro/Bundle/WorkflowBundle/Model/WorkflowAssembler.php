@@ -24,9 +24,6 @@ class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscrib
      */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -81,8 +78,6 @@ class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscrib
     }
 
     /**
-     * @param Workflow $workflow
-     *
      * @throws AssemblerException
      */
     protected function validateWorkflow(Workflow $workflow)
@@ -214,7 +209,6 @@ class WorkflowAssembler extends BaseAbstractAssembler implements ServiceSubscrib
 
     /**
      * Workflow service not shared, new instance created for each call
-     * @return Workflow
      */
     protected function createWorkflow(): Workflow
     {

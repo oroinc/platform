@@ -149,11 +149,6 @@ class BusinessUnitController extends AbstractController
         return ['entity' => $entity];
     }
 
-    /**
-     * @param BusinessUnit $entity
-     *
-     * @return bool
-     */
     private function isDeleteGranted(BusinessUnit $entity): bool
     {
         return $this->get(EntityDeleteHandlerRegistry::class)

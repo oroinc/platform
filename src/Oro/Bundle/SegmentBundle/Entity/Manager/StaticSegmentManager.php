@@ -36,12 +36,6 @@ class StaticSegmentManager
      */
     protected $nativeQueryExecutorHelper;
 
-    /**
-     * @param EntityManager $em
-     * @param DynamicSegmentQueryBuilder $dynamicSegmentQB
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param NativeQueryExecutorHelper $nativeQueryExecutorHelper
-     */
     public function __construct(
         EntityManager $em,
         DynamicSegmentQueryBuilder $dynamicSegmentQB,
@@ -57,8 +51,6 @@ class StaticSegmentManager
     /**
      * Doctrine does not supports insert in DQL. To increase the speed of query here uses plain sql query.
      *
-     * @param Segment $segment
-     * @param array $entityIds
      * @throws \Exception
      */
     public function run(Segment $segment, array $entityIds = [])
@@ -165,9 +157,6 @@ class StaticSegmentManager
 
     /**
      * Limit segment data by segment's organization
-     *
-     * @param Segment $segment
-     * @param QueryBuilder $qb
      */
     protected function applyOrganizationLimit(Segment $segment, QueryBuilder $qb)
     {
@@ -186,11 +175,6 @@ class StaticSegmentManager
         }
     }
 
-    /**
-     * @param ClassMetadata $entityMetadata
-     * @param string $identifier
-     * @return string
-     */
     private function getFieldToSelect(ClassMetadata $entityMetadata, string $identifier): string
     {
         $fieldToSelect = 'entity_id';
@@ -201,12 +185,6 @@ class StaticSegmentManager
         return $fieldToSelect;
     }
 
-    /**
-     * @param Segment $segment
-     * @param string $identifier
-     * @param array $entityIds
-     * @return QueryBuilder
-     */
     private function getQueryBuilderForSegment(
         Segment $segment,
         string $identifier,
@@ -228,10 +206,6 @@ class StaticSegmentManager
         return $queryBuilder;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param Segment $segment
-     */
     private function addSegmentSnapshotFields(QueryBuilder $queryBuilder, Segment $segment): void
     {
         $queryBuilder->addSelect((string)$queryBuilder->expr()->literal($segment->getId()));
@@ -239,10 +213,6 @@ class StaticSegmentManager
     }
 
     /**
-     * @param string $fieldToSelect
-     * @param string $selectSql
-     * @param array $values
-     * @param array $types
      * @throws \Doctrine\DBAL\DBALException
      */
     private function executeInsertFromSelect(
@@ -258,11 +228,6 @@ class StaticSegmentManager
     }
 
     /**
-     * @param string $fieldToSelect
-     * @param string $selectSql
-     * @param array $values
-     * @param array $types
-     * @param Segment $segment
      * @throws \Doctrine\DBAL\DBALException
      */
     private function executeInsertValues(
@@ -294,7 +259,6 @@ class StaticSegmentManager
     }
 
     /**
-     * @param Segment $segment
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */

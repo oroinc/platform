@@ -143,10 +143,6 @@ class EmbedFormController extends AbstractController
     /**
      * Checks if Origin request header match any of the allowed domains
      * and set Access-Control-Allow-Origin
-     *
-     * @param EmbeddedForm $formEntity
-     * @param Request $request
-     * @param Response $response
      */
     protected function setCorsHeaders(EmbeddedForm $formEntity, Request $request, Response $response)
     {

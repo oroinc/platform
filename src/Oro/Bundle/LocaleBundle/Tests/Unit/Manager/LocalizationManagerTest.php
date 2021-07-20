@@ -284,9 +284,6 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param $results
-     */
     protected function assertCacheReads($results)
     {
         $this->cacheProvider->expects($this->once())

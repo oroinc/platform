@@ -37,9 +37,6 @@ class TestHelper
     /** @var \PHPUnit\Framework\TestCase */
     private $testCase;
 
-    /**
-     * @param \PHPUnit\Framework\TestCase $testCase
-     */
     public function __construct(\PHPUnit\Framework\TestCase $testCase)
     {
         $this->testCase = $testCase;

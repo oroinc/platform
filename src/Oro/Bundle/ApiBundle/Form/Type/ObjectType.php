@@ -18,9 +18,6 @@ class ObjectType extends AbstractType
     /** @var FormHelper */
     protected $formHelper;
 
-    /**
-     * @param FormHelper $formHelper
-     */
     public function __construct(FormHelper $formHelper)
     {
         $this->formHelper = $formHelper;

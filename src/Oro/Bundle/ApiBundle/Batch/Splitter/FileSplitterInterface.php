@@ -29,15 +29,11 @@ interface FileSplitterInterface
 
     /**
      * Gets the maximum number of objects that can be saved in a chunk.
-     *
-     * @return int
      */
     public function getChunkSize(): int;
 
     /**
      * Sets the maximum number of objects that can be saved in a chunk.
-     *
-     * @param int $size
      */
     public function setChunkSize(int $size): void;
 
@@ -57,29 +53,21 @@ interface FileSplitterInterface
 
     /**
      * Gets the template that should be used to build the name of a chunk file.
-     *
-     * @return string|null
      */
     public function getChunkFileNameTemplate(): ?string;
 
     /**
      * Sets the template that should be used to build the name of a chunk file.
-     *
-     * @param string|null $template
      */
     public function setChunkFileNameTemplate(?string $template): void;
 
     /**
      * Gets the name of a header section.
-     *
-     * @return string|null
      */
     public function getHeaderSectionName(): ?string;
 
     /**
      * Sets the name of a header section.
-     *
-     * @param string|null $name
      */
     public function setHeaderSectionName(?string $name): void;
 

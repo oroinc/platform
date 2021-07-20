@@ -75,17 +75,12 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * Sets the audit logger
-     *
-     * @param AuditLoggerInterface $auditLogger
      */
     public function setAuditLogger(AuditLoggerInterface $auditLogger)
     {
         $this->auditLogger = $auditLogger;
     }
 
-    /**
-     * @param ServiceLink $securityMetadataProviderLink
-     */
     public function setSecurityMetadataProvider(ServiceLink $securityMetadataProviderLink)
     {
         $this->securityMetadataProviderLink = $securityMetadataProviderLink;

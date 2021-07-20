@@ -16,25 +16,16 @@ class PreExportMessageProcessorStub extends PreExportMessageProcessorAbstract
     /** @var array */
     private $exportingEntityIds = [];
 
-    /**
-     * @param array $exportingEntityIds
-     */
     public function setExportingEntityIds(array $exportingEntityIds): void
     {
         $this->exportingEntityIds = $exportingEntityIds;
     }
 
-    /**
-     * @param string $jobUniqueName
-     */
     public function setJobUniqueName(string $jobUniqueName): void
     {
         $this->jobUniqueName = $jobUniqueName;
     }
 
-    /**
-     * @param array $messageBody
-     */
     public function setMessageBody(array $messageBody): void
     {
         $this->messageBody = $messageBody;

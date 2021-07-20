@@ -45,12 +45,6 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param RequestStack $requestStack
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ContainerInterface $container
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         RequestStack $requestStack,
@@ -121,8 +115,6 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
 
     /**
      * Adds default or existent activity contexts data to the form
-     *
-     * @param FormEvent $event
      */
     public function addDefaultContextListener(FormEvent $event)
     {
@@ -149,8 +141,6 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
 
     /**
      * Set activity targets with context data to the form
-     *
-     * @param FormEvent $event
      */
     public function setActivityTargetsContext(FormEvent $event)
     {
@@ -241,25 +231,16 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
         return $result;
     }
 
-    /**
-     * @return ActivityManager
-     */
     protected function getActivityManager(): ActivityManager
     {
         return $this->container->get('oro_activity.manager');
     }
 
-    /**
-     * @return EntityAliasResolver
-     */
     protected function getEntityAliasResolver(): EntityAliasResolver
     {
         return $this->container->get('oro_entity.entity_alias_resolver');
     }
 
-    /**
-     * @return EntityRoutingHelper
-     */
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
         return $this->container->get('oro_entity.routing_helper');

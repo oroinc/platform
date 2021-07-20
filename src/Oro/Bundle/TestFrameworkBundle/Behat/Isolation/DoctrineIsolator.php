@@ -49,11 +49,6 @@ class DoctrineIsolator implements IsolatorInterface
      */
     protected $requiredListeners = [];
 
-    /**
-     * @param KernelInterface $kernel
-     * @param FixtureLoader $fixtureLoader
-     * @param AliceFixtureLoader $aliceLoader
-     */
     public function __construct(
         KernelInterface $kernel,
         FixtureLoader $fixtureLoader,
@@ -64,17 +59,11 @@ class DoctrineIsolator implements IsolatorInterface
         $this->aliceLoader = $aliceLoader;
     }
 
-    /**
-     * @param ReferenceRepositoryInitializerInterface $initializer
-     */
     public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
     {
         $this->initializers[] = $initializer;
     }
 
-    /**
-     * @param array $requiredListeners
-     */
     public function setRequiredListeners(array $requiredListeners)
     {
         $this->requiredListeners = $requiredListeners;
@@ -201,9 +190,6 @@ class DoctrineIsolator implements IsolatorInterface
         return $fixturesFileNames;
     }
 
-    /**
-     * @param BeforeIsolatedTestEvent $event
-     */
     private function loadFixtures(BeforeIsolatedTestEvent $event)
     {
         $fixtureFiles = $this->getFixtureFiles($event->getTags());

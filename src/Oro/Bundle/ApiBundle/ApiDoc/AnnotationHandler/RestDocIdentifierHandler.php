@@ -26,11 +26,6 @@ class RestDocIdentifierHandler
     /** @var ApiDocDataTypeConverter */
     private $dataTypeConverter;
 
-    /**
-     * @param RestDocViewDetector     $docViewDetector
-     * @param ValueNormalizer         $valueNormalizer
-     * @param ApiDocDataTypeConverter $dataTypeConverter
-     */
     public function __construct(
         RestDocViewDetector $docViewDetector,
         ValueNormalizer $valueNormalizer,
@@ -41,12 +36,6 @@ class RestDocIdentifierHandler
         $this->dataTypeConverter = $dataTypeConverter;
     }
 
-    /**
-     * @param ApiDoc         $annotation
-     * @param Route          $route
-     * @param EntityMetadata $metadata
-     * @param string|null    $description
-     */
     public function handle(ApiDoc $annotation, Route $route, EntityMetadata $metadata, ?string $description): void
     {
         $idFields = $metadata->getIdentifierFieldNames();
@@ -78,11 +67,6 @@ class RestDocIdentifierHandler
         );
     }
 
-    /**
-     * @param EntityMetadata $metadata
-     *
-     * @return string
-     */
     private function getIdRequirement(EntityMetadata $metadata): string
     {
         $idFields = $metadata->getIdentifierFieldNames();
@@ -100,11 +84,6 @@ class RestDocIdentifierHandler
         return implode(',', $requirements);
     }
 
-    /**
-     * @param string $fieldType
-     *
-     * @return string
-     */
     private function getIdFieldRequirement(string $fieldType): string
     {
         $result = $this->valueNormalizer->getRequirement(

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class Writer implements ItemWriterInterface, ClosableInterface
@@ -13,7 +13,7 @@ class Writer implements ItemWriterInterface, ClosableInterface
     public const LOGIC_EXCEPTION_MESSAGE = 'Writer logic exception message';
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      *
      * @throws InvalidItemException
      */
@@ -31,7 +31,7 @@ class Writer implements ItemWriterInterface, ClosableInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function close(): void
     {

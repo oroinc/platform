@@ -139,7 +139,6 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
                 $newTransformers [] = $transformer;
             });
 
-
         FormUtils::replaceTransformer($builder, $toReplace, $type);
 
         self::assertSame($expected, $newTransformers);

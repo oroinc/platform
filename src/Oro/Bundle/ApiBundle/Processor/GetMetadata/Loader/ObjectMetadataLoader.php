@@ -21,11 +21,6 @@ class ObjectMetadataLoader
     /** @var ObjectNestedAssociationMetadataFactory */
     protected $nestedAssociationMetadataFactory;
 
-    /**
-     * @param ObjectMetadataFactory                  $objectMetadataFactory
-     * @param ObjectNestedObjectMetadataFactory      $nestedObjectMetadataFactory
-     * @param ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
-     */
     public function __construct(
         ObjectMetadataFactory $objectMetadataFactory,
         ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory,

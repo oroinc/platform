@@ -18,11 +18,6 @@ class EntityWithFieldsProvider
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param EntityFieldProvider $fieldProvider
-     * @param EntityProvider      $entityProvider
-     * @param ConfigManager       $configManager
-     */
     public function __construct(
         EntityFieldProvider $fieldProvider,
         EntityProvider $entityProvider,

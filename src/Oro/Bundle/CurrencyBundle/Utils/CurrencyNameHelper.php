@@ -26,12 +26,6 @@ class CurrencyNameHelper
     /** @var CurrencyListProviderInterface */
     protected $currencyProvider;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param NumberFormatter $formatter
-     * @param ViewTypeProviderInterface $viewTypeProvider
-     * @param CurrencyListProviderInterface $currencyListProvider
-     */
     public function __construct(
         LocaleSettings $localeSettings,
         NumberFormatter $formatter,

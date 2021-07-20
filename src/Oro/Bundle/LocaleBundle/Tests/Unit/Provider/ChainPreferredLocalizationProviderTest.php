@@ -27,10 +27,6 @@ class ChainPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param bool $isSupportedA
-     * @param bool $isSupportedB
-     * @param bool $isSupported
      */
     public function testSupports(bool $isSupportedA, bool $isSupportedB, bool $isSupported): void
     {
@@ -49,9 +45,6 @@ class ChainPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($isSupported, $this->provider->supports($entity));
     }
 
-    /**
-     * @return array
-     */
     public function supportsDataProvider(): array
     {
         return [
@@ -75,11 +68,6 @@ class ChainPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getPreferredLocalizationDataProvider
-     *
-     * @param bool $isSupportedA
-     * @param bool $isSupportedB
-     * @param Localization|null $localizationFromA
-     * @param Localization|null $localizationFromB
      */
     public function testGetPreferredLocalization(
         bool $isSupportedA,
@@ -122,9 +110,6 @@ class ChainPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getPreferredLocalizationDataProvider(): array
     {
         return [

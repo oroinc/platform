@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -39,10 +40,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-
-        $qb    = $repo->getFoldersByOriginQueryBuilder($origin);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
+        $query = $repo->getFoldersByOriginQueryBuilder($origin)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_folder'
@@ -60,10 +59,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-
-        $qb    = $repo->getFoldersByOriginQueryBuilder($origin, true);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
+        $query = $repo->getFoldersByOriginQueryBuilder($origin, true)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_folder'
@@ -81,10 +78,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-
-        $qb    = $repo->getEmptyOutdatedFoldersByOriginQueryBuilder($origin);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
+        $query = $repo->getEmptyOutdatedFoldersByOriginQueryBuilder($origin)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_folder'

@@ -10,13 +10,6 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
  */
 class RetryHelper
 {
-    /**
-     * @param BatchUpdateItem $item
-     * @param bool            $hasItemsToRetry
-     * @param array           $processedItemStatuses
-     *
-     * @return bool
-     */
     public function hasItemErrorsToSave(
         BatchUpdateItem $item,
         bool $hasItemsToRetry,
@@ -34,12 +27,6 @@ class RetryHelper
             );
     }
 
-    /**
-     * @param array $rawItems
-     * @param array $processedItemStatuses
-     *
-     * @return bool
-     */
     public function hasItemsToRetry(array $rawItems, array $processedItemStatuses): bool
     {
         $result = false;

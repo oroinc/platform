@@ -143,8 +143,6 @@ class LayoutTest extends LayoutTestCase
 
     /**
      * @dataProvider renderWithAbsoluteUrlBlockThemeDataProvider
-     * @param $themes
-     * @param $expected
      */
     public function testRenderWithAbsoluteUrlBlockTheme($themes, $expected): void
     {

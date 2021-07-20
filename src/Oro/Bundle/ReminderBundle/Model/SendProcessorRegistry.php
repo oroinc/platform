@@ -50,10 +50,6 @@ class SendProcessorRegistry implements ResetInterface
     /**
      * Gets a processor for the given send method.
      *
-     * @param string $method
-     *
-     * @return SendProcessorInterface
-     *
      * @throws MethodNotSupportedException if the given send method is not supported
      */
     public function getProcessor(string $method): SendProcessorInterface

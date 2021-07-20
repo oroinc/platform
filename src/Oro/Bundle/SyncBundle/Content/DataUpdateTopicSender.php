@@ -29,11 +29,6 @@ class DataUpdateTopicSender
      */
     private $tokenStorage;
 
-    /**
-     * @param WebsocketClientInterface $client
-     * @param ConnectionChecker $connectionChecker
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         WebsocketClientInterface $client,
         ConnectionChecker $connectionChecker,
@@ -44,11 +39,6 @@ class DataUpdateTopicSender
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @param array $tags
-     *
-     * @return bool
-     */
     public function send(array $tags): bool
     {
         if (!empty($tags) && $this->connectionChecker->checkConnection()) {
@@ -66,9 +56,6 @@ class DataUpdateTopicSender
         return false;
     }
 
-    /**
-     * @return string|null
-     */
     private function getUserName(): ?string
     {
         $userName = null;

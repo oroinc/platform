@@ -1,4 +1,11 @@
 services:
+    oro_microsoft_integration.form.type.enable_config_checkbox:
+        class: Oro\Bundle\MicrosoftIntegrationBundle\Form\Type\EnableConfigCheckboxType
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: form.type }
+
     oro_microsoft_integration.form.type.microsoft_imap_redirect_url:
         class: Oro\Bundle\MicrosoftIntegrationBundle\Form\Type\UrlInfoType
         arguments:

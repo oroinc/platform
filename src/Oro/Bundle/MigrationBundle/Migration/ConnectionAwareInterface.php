@@ -11,8 +11,6 @@ interface ConnectionAwareInterface
 {
     /**
      * Sets the database connection
-     *
-     * @param Connection $connection
      */
     public function setConnection(Connection $connection);
 }

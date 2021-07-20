@@ -18,10 +18,6 @@ class ConsumptionExtension extends AbstractExtension
     private ConfigManager $configManager;
     private array $topicNames = [];
 
-    /**
-     * @param RequestContext $context
-     * @param ConfigManager $configManager
-     */
     public function __construct(RequestContext $context, ConfigManager $configManager)
     {
         $this->context = $context;

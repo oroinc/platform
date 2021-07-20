@@ -15,10 +15,6 @@ class DraftPublishAction extends AbstractDraftAction
      */
     private $draftManager;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param DraftManager $draftManager
-     */
     public function __construct(ContextAccessor $contextAccessor, DraftManager $draftManager)
     {
         parent::__construct($contextAccessor);

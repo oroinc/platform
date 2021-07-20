@@ -48,7 +48,6 @@ class CmsAddress
      */
     public $organization;
 
-
     public function getId()
     {
         return $this->id;

@@ -30,11 +30,6 @@ class NoDataMessagesExtension extends AbstractExtension
      */
     private $translator;
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     * @param AbstractSearchMappingProvider $mappingProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EntityClassResolver $entityClassResolver,
         AbstractSearchMappingProvider $mappingProvider,
@@ -74,10 +69,6 @@ class NoDataMessagesExtension extends AbstractExtension
         $config->offsetSetByPath(DatagridConfiguration::ENTITY_HINT_PATH, $entityHint);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @return void
-     */
     private function translateEmptyGridMessageIfExist(DatagridConfiguration $config): void
     {
         $emptyGridTranslationKey = $config->offsetGetByPath(DatagridConfiguration::EMPTY_GRID_MESSAGE_PATH);
@@ -89,10 +80,6 @@ class NoDataMessagesExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @return void
-     */
     private function translateEmptyFilteredGridMessageIfExist(DatagridConfiguration $config): void
     {
         $emptyFilteredGridTranslationKey = $config
@@ -105,10 +92,6 @@ class NoDataMessagesExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @return string|null
-     */
     private function getEntityClassNameFromQuery(DatagridConfiguration $config): ?string
     {
         $entityClassName = '';

@@ -497,9 +497,6 @@ class ExtendConfigDumper
         $this->configManager->persist($extendConfig);
     }
 
-    /**
-     * @param ConfigInterface $fieldConfig
-     */
     private function updateFieldState(ConfigInterface $fieldConfig)
     {
         if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
@@ -514,10 +511,6 @@ class ExtendConfigDumper
         }
     }
 
-    /**
-     * @param ConfigInterface $entityConfig
-     * @param ConfigProvider  $configProvider
-     */
     private function updateStateValues(ConfigInterface $entityConfig, ConfigProvider $configProvider)
     {
         if ($entityConfig->is('state', ExtendScope::STATE_DELETE)) {

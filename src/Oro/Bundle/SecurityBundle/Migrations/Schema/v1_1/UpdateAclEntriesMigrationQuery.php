@@ -155,9 +155,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         }
     }
 
-    /**
-     * @param array $aces
-     */
     protected function updateAces(array $aces)
     {
         $query = sprintf('UPDATE %s SET mask = :mask WHERE id = :id', $this->entriesTableName);
@@ -173,9 +170,6 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         }
     }
 
-    /**
-     * @param array $aces
-     */
     protected function insertAces(array $aces)
     {
         $query = $this->getSqlForInsert();

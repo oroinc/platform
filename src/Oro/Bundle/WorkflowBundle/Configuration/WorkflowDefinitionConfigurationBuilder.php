@@ -100,10 +100,6 @@ class WorkflowDefinitionConfigurationBuilder
         return $workflowDefinition;
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow           $workflow
-     */
     private function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $workflowSteps = [];
@@ -121,10 +117,6 @@ class WorkflowDefinitionConfigurationBuilder
         $workflowDefinition->setSteps($workflowSteps);
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow           $workflow
-     */
     private function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $entityAcls = [];
@@ -151,10 +143,6 @@ class WorkflowDefinitionConfigurationBuilder
         $workflowDefinition->setEntityAcls($entityAcls);
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param Workflow           $workflow
-     */
     private function setEntityRestrictions(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $restrictions = $workflow->getRestrictions();
@@ -176,9 +164,6 @@ class WorkflowDefinitionConfigurationBuilder
 
     /**
      * Collects init context of all start transitions.
-     *
-     * @param Workflow           $workflow
-     * @param WorkflowDefinition $definition
      */
     private function processInitContext(Workflow $workflow, WorkflowDefinition $definition)
     {

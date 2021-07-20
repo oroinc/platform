@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Handler;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
@@ -37,17 +37,11 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
      */
     protected $exportFailed = false;
 
-    /**
-     * @param FileManager $fileManager
-     */
     public function setFileManager(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -150,12 +144,6 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         return $idFetcher->getGridDataIds();
     }
 
-    /**
-     * @param DatagridExportIdFetcher $idFetcher
-     * @param array $parameters
-     *
-     * @return string
-     */
     public function getEntityName(DatagridExportIdFetcher $idFetcher, array $parameters): string
     {
         $context  = new Context($parameters);

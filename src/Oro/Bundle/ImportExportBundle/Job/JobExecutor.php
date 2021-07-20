@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
-use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
-use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
-use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
-use Akeneo\Bundle\BatchBundle\Job\Job;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Item\ExecutionContext;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
+use Oro\Bundle\BatchBundle\Job\Job;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
@@ -24,7 +24,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
+ * Batch job executor for import/export.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -65,13 +65,6 @@ class JobExecutor
     /** var ContextAggregatorRegistry */
     protected $contextAggregatorRegistry;
 
-    /**
-     * @param ConnectorRegistry         $jobRegistry
-     * @param BatchJobRepository        $batchJobRepository
-     * @param ContextRegistry           $contextRegistry
-     * @param ManagerRegistry           $managerRegistry
-     * @param ContextAggregatorRegistry $contextAggregatorRegistry
-     */
     public function __construct(
         ConnectorRegistry $jobRegistry,
         BatchJobRepository $batchJobRepository,
@@ -206,8 +199,6 @@ class JobExecutor
 
     /**
      * Try to save batch entities only in case when it's possible
-     *
-     * @param JobExecution $jobExecution
      */
     protected function saveFailedJobExecution(JobExecution $jobExecution)
     {
@@ -263,7 +254,7 @@ class JobExecutor
      */
     protected function getJobInstanceRepository()
     {
-        return $this->managerRegistry->getRepository('AkeneoBatchBundle:JobInstance');
+        return $this->managerRegistry->getRepository(JobInstance::class);
     }
 
     /**
@@ -327,11 +318,6 @@ class JobExecutor
 
     /**
      * Set data to JobResult
-     * TODO: Find a way to work with multiple amount of job and step executions
-     * TODO https://magecore.atlassian.net/browse/BAP-2600
-     *
-     * @param JobResult   $jobResult
-     * @param JobInstance $jobInstance
      */
     protected function setJobResultData(JobResult $jobResult, JobInstance $jobInstance)
     {
@@ -433,10 +419,6 @@ class JobExecutor
         return $this->validationMode;
     }
 
-    /**
-     * @param JobExecution $jobExecution
-     * @param JobResult    $jobResult
-     */
     protected function dispatchAfterJobExecutionEvent(JobExecution $jobExecution, JobResult $jobResult)
     {
         if ($this->eventDispatcher && $this->eventDispatcher->hasListeners(Events::AFTER_JOB_EXECUTION)) {

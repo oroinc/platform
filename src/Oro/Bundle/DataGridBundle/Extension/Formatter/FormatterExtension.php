@@ -60,8 +60,6 @@ class FormatterExtension extends AbstractExtension
 
     /**
      * Validate configs nad fill default values
-     *
-     * @param DatagridConfiguration $config
      */
     public function processConfigs(DatagridConfiguration $config)
     {
@@ -124,10 +122,6 @@ class FormatterExtension extends AbstractExtension
 
     /**
      * Returns prepared property object
-     *
-     * @param PropertyConfiguration $config
-     *
-     * @return PropertyInterface
      */
     private function getPropertyObject(PropertyConfiguration $config): PropertyInterface
     {

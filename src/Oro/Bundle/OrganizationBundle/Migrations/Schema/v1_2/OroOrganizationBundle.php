@@ -34,8 +34,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Modify table oro_organization
-     *
-     * @param Schema $schema
      */
     public static function updateOrganizationTable(Schema $schema)
     {
@@ -59,9 +57,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Modify entity config to exclude currency and currency_precision fields
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
      */
     public static function updateConfigs(Schema $schema, QueryBag $queries)
     {

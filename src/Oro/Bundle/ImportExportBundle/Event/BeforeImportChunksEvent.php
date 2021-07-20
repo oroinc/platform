@@ -12,9 +12,6 @@ class BeforeImportChunksEvent extends Event
     /** @var array */
     private $body;
 
-    /**
-     * @param array $body
-     */
     public function __construct(array $body)
     {
         $this->body = $body;

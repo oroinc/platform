@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormEvent;
@@ -21,14 +21,10 @@ class OAuthSubscriber implements EventSubscriberInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
-     */
-    public function __construct(TranslatorInterface $translator, OAuth2ManagerRegistry $oauthManagerRegistry)
+    public function __construct(TranslatorInterface $translator, OAuthManagerRegistry $oauthManagerRegistry)
     {
         $this->translator = $translator;
         $this->oauthManagerRegistry = $oauthManagerRegistry;
@@ -46,9 +42,6 @@ class OAuthSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function setToken(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
@@ -69,9 +62,6 @@ class OAuthSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function extendForm(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
@@ -82,10 +72,6 @@ class OAuthSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param UserEmailOrigin $emailOrigin
-     */
     protected function updateForm(FormInterface $form, UserEmailOrigin $emailOrigin)
     {
         $token = $emailOrigin->getAccessToken();
@@ -112,9 +98,6 @@ class OAuthSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function disableFoldersButton(FormEvent $formEvent): void
     {
         $form = $formEvent->getForm();
@@ -125,10 +108,6 @@ class OAuthSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param UserEmailOrigin $emailOrigin
-     */
     private function doDisableFoldersButton(FormInterface $form, UserEmailOrigin $emailOrigin): void
     {
         $isDisabled = $this->isDisabledAvailable($emailOrigin->getAccountType());
@@ -149,9 +128,6 @@ class OAuthSubscriber implements EventSubscriberInterface
     /**
      * Returns true if given account type is available in the system
      * but was disabled
-     *
-     * @param string $accountType
-     * @return bool
      */
     private function isDisabledAvailable(string $accountType): bool
     {

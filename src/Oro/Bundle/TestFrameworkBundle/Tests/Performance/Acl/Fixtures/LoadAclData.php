@@ -10,8 +10,6 @@ class LoadAclData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
      * Load ACL Resource
-     *
-     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

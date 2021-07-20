@@ -43,11 +43,6 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filterDataProvider
-     *
-     * @param array $disabledOperationsConfigs
-     * @param array $operationsToFilter
-     * @param OperationFindCriteria $findCriteria
-     * @param array $expected
      */
     public function testFilter(
         array $disabledOperationsConfigs,
@@ -166,9 +161,6 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
         return $operation;
     }
 
-    /**
-     * @param array $disabledOperationsConfigs
-     */
     private function setUpWorkflowDefinitionRepository(array $disabledOperationsConfigs)
     {
         $this->repository->expects($this->once())

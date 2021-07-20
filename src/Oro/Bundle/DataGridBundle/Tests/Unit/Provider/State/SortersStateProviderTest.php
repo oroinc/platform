@@ -32,10 +32,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenParameters(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -48,10 +44,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @param array $state
-     * @param array $minifiedState
-     */
     private function mockParametersState(array $state, array $minifiedState): void
     {
         $this->datagridParametersHelper
@@ -67,9 +59,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
             ->willReturn($minifiedState);
     }
 
-    /**
-     * @param array $sortersColumns
-     */
     private function mockSortersColumns(array $sortersColumns): void
     {
         $this->datagridConfiguration
@@ -81,10 +70,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenMinifiedParameters(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -97,9 +82,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     public function stateDataProvider(): array
     {
         return [
@@ -159,10 +141,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenCurrentGridView(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -184,13 +162,8 @@ class SortersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultGridView(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -222,10 +195,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenGridViewsDisabled(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -249,10 +218,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultSortersState(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -295,10 +260,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateFromParameters(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -313,10 +274,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateFromParametersWhenDefaultSortersState(
         array $state,
@@ -341,10 +298,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $defaultSorters
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetDefaultState(array $defaultSorters, array $sortersColumns, array $expectedState): void
     {

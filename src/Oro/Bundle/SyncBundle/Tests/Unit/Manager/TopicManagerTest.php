@@ -12,9 +12,8 @@ class TopicManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WampServerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $app;
 
-    /** @var TopicManager */
     private TopicManager $manager;
-    
+
     protected function setUp(): void
     {
         $this->app = $this->createMock(WampServerInterface::class);

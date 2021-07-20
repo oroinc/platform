@@ -64,9 +64,6 @@ class BeforeFormRenderEvent extends Event
         return $this->formData;
     }
 
-    /**
-     * @param array $formData
-     */
     public function setFormData(array $formData)
     {
         $this->formData = $formData;

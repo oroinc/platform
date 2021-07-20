@@ -16,9 +16,6 @@ class WsseNonceCachePass implements CompilerPassInterface
     /** @var string */
     private $wsseKey;
 
-    /**
-     * @param string $wsseKey
-     */
     public function __construct(string $wsseKey)
     {
         $this->wsseKey = $wsseKey;

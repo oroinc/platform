@@ -41,10 +41,6 @@ class FiltersConfigLoader extends AbstractConfigLoader
         return $filters;
     }
 
-    /**
-     * @param FiltersConfig $filters
-     * @param array|null    $fields
-     */
     protected function loadFields(FiltersConfig $filters, array $fields = null)
     {
         if (!empty($fields)) {

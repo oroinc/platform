@@ -11,28 +11,18 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class IncreaseTokenLength implements Migration
 {
-    /**
-     * @param Schema $schema
-     * @param QueryBag $queries
-     */
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->changeEmailAccessTokenLength($schema);
         $this->changeEmailRefreshTokenLength($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function changeEmailAccessTokenLength(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
         $table->changeColumn('access_token', ['length' => 8192]);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function changeEmailRefreshTokenLength(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');

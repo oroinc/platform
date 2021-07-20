@@ -32,12 +32,6 @@ class BusinessUnitAclProvider
     /** @var string */
     protected $accessLevel;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclVoterInterface             $aclVoter
-     * @param OwnerTreeProvider             $treeProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,

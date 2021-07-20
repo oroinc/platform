@@ -11,9 +11,6 @@ use Oro\Bundle\ReportBundle\Entity\Report;
  */
 class ColumnCurrencyNormalization
 {
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $dataGrid = $event->getDatagrid();

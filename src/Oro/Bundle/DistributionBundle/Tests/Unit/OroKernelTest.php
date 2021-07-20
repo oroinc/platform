@@ -30,9 +30,6 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         $this->removeDir($this->kernel->getLogDir());
     }
 
-    /**
-     * @param string $dir
-     */
     private function removeDir(string $dir)
     {
         if (!is_dir($dir)) {
@@ -68,9 +65,6 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function bundleList(): array
     {
         return [
@@ -125,8 +119,6 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $bundles
-     *
      * @dataProvider bundlesDataProvider
      */
     public function testRegisterBundles(array $bundles)

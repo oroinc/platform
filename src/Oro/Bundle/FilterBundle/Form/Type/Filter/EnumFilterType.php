@@ -24,10 +24,6 @@ class EnumFilterType extends AbstractMultiChoiceType
      */
     protected $valueProvider;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EnumValueProvider $valueProvider
-     */
     public function __construct(TranslatorInterface $translator, EnumValueProvider $valueProvider)
     {
         parent::__construct($translator);

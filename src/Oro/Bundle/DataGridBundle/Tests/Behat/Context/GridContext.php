@@ -47,8 +47,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @BeforeScenario
-     *
-     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -100,8 +98,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | status    | Qualified        |
      *
      * @Then I edit first record from grid:
-     *
-     * @param TableNode $table
      */
     public function iEditFirstRecordFromGrid(TableNode $table)
     {
@@ -928,10 +924,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )open "(?P<filterName>.+)" filter$/
      * @When /^(?:|I )open "(?P<filterName>.+)" filter in "(?P<filterGridName>[\w\s]+)" grid$/
-     *
-     * @param $filterName
-     * @param string $filterGridName
-     * @param string $strictly
      */
     public function openFilter(
         $filterName,
@@ -1399,10 +1391,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked "(?P<value>(?:[^"]|\\")*)"$/
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
-     *
-     * @param string $filterName
-     * @param string $value
-     * @param string $filterGridName
      */
     //@codingStandardsIgnoreEnd
     public function assertsInputValueInCheckboxFilterContainCheckedValue(
@@ -1424,10 +1412,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked "(?P<value>(?:[^"]|\\")*)"$/
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
-     *
-     * @param string $filterName
-     * @param string $value
-     * @param string $filterGridName
      */
     //@codingStandardsIgnoreEnd
     public function assertsInputValueInCheckboxFilterContainUncheckedValue(
@@ -1485,9 +1469,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )should see filter hints in frontend grid:$/
      * @When /^(?:|I )should see filter hints in "(?P<gridName>[^"]+)" frontend grid:$/
-     *
-     * @param TableNode $table
-     * @param string $gridName
      */
     public function shouldSeeFrontendGridWithFilterHints(TableNode $table, string $gridName = 'Grid')
     {
@@ -1519,9 +1500,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )should see filter hints in grid:$/
      * @When /^(?:|I )should see filter hints in "(?P<gridName>[^"]+)" grid:$/
-     *
-     * @param TableNode $table
-     * @param string $gridName
      */
     public function shouldSeeGridWithFilterHints(TableNode $table, string $gridName = 'Grid')
     {
@@ -2290,7 +2268,6 @@ TEXT;
 
     /**
      * @When /^(?:|I )should see following (filters|columns) in the grid settings in exact order:$/
-     * @param TableNode $table
      */
     public function iShouldSeeFollowingFiltersColumnsInExactOrder(TableNode $table)
     {
@@ -2314,8 +2291,6 @@ TEXT;
 
     /**
      * @When /^(?:|I )should see following filters in the grid settings:$/
-     *
-     * @param TableNode $table
      */
     public function iShouldSeeFollowingFiltersInGridSettings(TableNode $table)
     {
@@ -2339,8 +2314,6 @@ TEXT;
 
     /**
      * @When /^(?:|I )should not see following filters in the grid settings:$/
-     *
-     * @param TableNode $table
      */
     public function iShouldNotSeeFollowingFiltersInGridSettings(TableNode $table)
     {
@@ -2364,8 +2337,6 @@ TEXT;
 
     /**
      * @When /^(?:|I )should see following columns in the grid settings:$/
-     *
-     * @param TableNode $table
      */
     public function iShouldSeeFollowingColumnsInGridSettings(TableNode $table)
     {
@@ -2389,8 +2360,6 @@ TEXT;
 
     /**
      * @When /^(?:|I )should not see following columns in the grid settings:$/
-     *
-     * @param TableNode $table
      */
     public function iShouldNotSeeFollowingColumnsInGridSettings(TableNode $table)
     {
@@ -2675,9 +2644,6 @@ TEXT;
      *
      * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
      * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[^"]+)"$/
-     *
-     * @param string $content
-     * @param string|null $gridName
      */
     //@codingStandardsIgnoreEnd
     public function iShouldSeeMassActionCheckbox(string $content, string $gridName = null)
@@ -2695,9 +2661,6 @@ TEXT;
      *
      * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
      * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[^"]+)"$/
-     *
-     * @param string $content
-     * @param string|null $gridName
      */
     //@codingStandardsIgnoreEnd
     public function iShouldNotSeeMassActionCheckbox(string $content, string $gridName = null)

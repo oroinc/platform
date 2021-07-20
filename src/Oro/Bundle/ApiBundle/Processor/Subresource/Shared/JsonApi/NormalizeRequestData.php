@@ -34,10 +34,6 @@ class NormalizeRequestData implements ProcessorInterface
     /** @var ChangeRelationshipContext */
     private $context;
 
-    /**
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
@@ -61,11 +57,6 @@ class NormalizeRequestData implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
     private function normalizeData(array $data): array
     {
         $associationName = $this->context->getAssociationName();
@@ -177,12 +168,6 @@ class NormalizeRequestData implements ProcessorInterface
         return $entityId;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityType
-     *
-     * @return string|null
-     */
     private function normalizeEntityClass(string $pointer, string $entityType): ?string
     {
         try {
@@ -202,22 +187,11 @@ class NormalizeRequestData implements ProcessorInterface
         return null;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @param string $parentPath
-     * @param string $property
-     *
-     * @return string
-     */
     private function buildPath(string $parentPath, string $property): string
     {
         return '' !== $parentPath
@@ -225,22 +199,11 @@ class NormalizeRequestData implements ProcessorInterface
             : $property;
     }
 
-    /**
-     * @param string $parentPointer
-     * @param string $property
-     *
-     * @return string
-     */
     private function buildPointer(string $parentPointer, string $property): string
     {
         return $parentPointer . '/' . $property;
     }
 
-    /**
-     * @param string $associationName
-     *
-     * @return AssociationMetadata
-     */
     private function getAssociationMetadata(string $associationName): AssociationMetadata
     {
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);

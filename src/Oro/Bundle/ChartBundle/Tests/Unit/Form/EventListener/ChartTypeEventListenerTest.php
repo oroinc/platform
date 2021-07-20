@@ -26,9 +26,6 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $data
-     * @param array $expected
-     *
      * @dataProvider chartConfigsProvider
      */
 
@@ -53,9 +50,6 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $data
-     * @param array $expected
-     *
      * @dataProvider chartConfigsProvider
      */
 

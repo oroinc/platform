@@ -31,9 +31,6 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         OroEntityCreateOrSelectType::MODE_EDIT,
     ];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -155,9 +152,6 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         );
     }
 
-    /**
-     * @param FormInterface $form
-     */
     protected function disableNewEntityValidation(FormInterface $form)
     {
         FormUtils::replaceField($form, 'new_entity', ['validation_groups' => false]);

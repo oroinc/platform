@@ -34,11 +34,6 @@ class ResultStatisticsProvider
      */
     protected $translator;
 
-    /**
-     * @param Indexer $indexer
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         Indexer $indexer,
         ConfigManager $configManager,
@@ -83,10 +78,6 @@ class ResultStatisticsProvider
         return $result;
     }
 
-    /**
-     * @param string $className
-     * @param array $group
-     */
     private function addEntityInformation(string $className, array &$group): void
     {
         if (!$this->configManager->hasConfig($className)) {
@@ -102,9 +93,6 @@ class ResultStatisticsProvider
         }
     }
 
-    /**
-     * @param array $result
-     */
     private function sortResult(array &$result)
     {
         uasort(

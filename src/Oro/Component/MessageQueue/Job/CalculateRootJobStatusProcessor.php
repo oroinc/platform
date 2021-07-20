@@ -30,12 +30,6 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param RootJobStatusCalculatorInterface $calculateRootJobStatusCase
-     * @param ManagerRegistry $doctrine
-     * @param string $entityClass
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         RootJobStatusCalculatorInterface $calculateRootJobStatusCase,
         ManagerRegistry $doctrine,
@@ -81,9 +75,6 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
         return [Topics::CALCULATE_ROOT_JOB_STATUS];
     }
 
-    /**
-     * @return JobRepositoryInterface
-     */
     private function getJobRepository(): JobRepositoryInterface
     {
         return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);

@@ -32,10 +32,6 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
     /** @var array */
     private $supportedActivities;
 
-    /**
-     * @param ConfigProvider      $groupingConfigProvider
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(ConfigProvider $groupingConfigProvider, EntityAliasResolver $entityAliasResolver)
     {
         $this->groupingConfigProvider = $groupingConfigProvider;
@@ -127,8 +123,6 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
 
     /**
      * Adds not filled requirements for the given route
-     *
-     * @param Route $route
      */
     protected function completeRouteRequirements(Route $route)
     {

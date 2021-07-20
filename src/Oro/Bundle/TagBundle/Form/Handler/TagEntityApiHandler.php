@@ -18,13 +18,6 @@ class TagEntityApiHandler extends ApiFormHandler
     /** @var TaggableHelper */
     protected $taggableHelper;
 
-    /**
-     * @param FormInterface  $form
-     * @param RequestStack   $requestStack
-     * @param ObjectManager  $entityManager
-     * @param TagManager     $tagManager
-     * @param TaggableHelper $helper
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,

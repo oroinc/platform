@@ -9,8 +9,6 @@ interface RebuildTranslationCacheHandlerInterface
 {
     /**
      * Rebuilds the translation cache.
-     *
-     * @return RebuildTranslationCacheResult
      */
     public function rebuildCache(): RebuildTranslationCacheResult;
 }

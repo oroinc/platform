@@ -34,8 +34,6 @@ class PrimaryFieldFilter extends ComparisonFilter
 
     /**
      * Gets a field that contains a data value.
-     *
-     * @return string|null
      */
     public function getDataField(): ?string
     {
@@ -44,8 +42,6 @@ class PrimaryFieldFilter extends ComparisonFilter
 
     /**
      * Sets a field that contains a data value.
-     *
-     * @param string|null $fieldName
      */
     public function setDataField(?string $fieldName): void
     {
@@ -54,8 +50,6 @@ class PrimaryFieldFilter extends ComparisonFilter
 
     /**
      * Gets a field that contains a "primary" flag.
-     *
-     * @return string|null
      */
     public function getPrimaryFlagField(): ?string
     {
@@ -64,8 +58,6 @@ class PrimaryFieldFilter extends ComparisonFilter
 
     /**
      * Sets a field that contains a "primary" flag.
-     *
-     * @param string|null $fieldName
      */
     public function setPrimaryFlagField(?string $fieldName): void
     {

@@ -13,9 +13,6 @@ class ActionSecurityMetadataProvider
     /** @var ActionSecurityMetadata[] */
     private $localCache;
 
-    /**
-     * @param AclAnnotationProvider $annotationProvider
-     */
     public function __construct(AclAnnotationProvider $annotationProvider)
     {
         $this->annotationProvider = $annotationProvider;

@@ -22,10 +22,6 @@ class ValidatePaging implements ProcessorInterface
     /** @var int */
     private $maxEntitiesLimit;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     * @param int                 $maxEntitiesLimit
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry, int $maxEntitiesLimit)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
@@ -69,11 +65,6 @@ class ValidatePaging implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return int
-     */
     private function getMaxResultsLimit(?EntityDefinitionConfig $config): int
     {
         if (null === $config) {

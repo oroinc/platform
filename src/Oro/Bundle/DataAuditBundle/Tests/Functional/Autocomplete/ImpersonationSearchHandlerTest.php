@@ -102,7 +102,6 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         $impersonation2->setUser($user = $this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation2);
 
-
         $this->assertSame(
             [
                 'results' => [
@@ -195,7 +194,6 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         $impersonation2->setUser($user = $this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation2);
 
-
         $this->assertSame(
             [
                 'results' => [
@@ -275,9 +273,6 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         );
     }
 
-    /**
-     * @param Impersonation $impersonation
-     */
     private function createImpersonationAndAuditLog(Impersonation $impersonation): void
     {
         $this->saveImpresonation($impersonation);
@@ -301,9 +296,6 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         );
     }
 
-    /**
-     * @param Impersonation $impersonation
-     */
     private function saveImpresonation(Impersonation $impersonation): void
     {
         $this->doctrineHelper->getEntityManager($impersonation)->persist($impersonation);

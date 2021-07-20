@@ -13,9 +13,6 @@ abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProvide
     /** @var array */
     protected $hierarchy;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

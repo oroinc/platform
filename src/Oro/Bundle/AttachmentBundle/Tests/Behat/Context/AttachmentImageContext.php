@@ -22,12 +22,6 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
     /** @var string[] */
     private $rememberedFilenames = [];
 
-    /**
-     * @param $entity
-     * @param string $attachmentField
-     *
-     * @return string
-     */
     public function getResizeAttachmentUrl($entity, string $attachmentField): string
     {
         $attachment = $this->getAttachmentByEntity($entity, $attachmentField);
@@ -35,12 +29,6 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
         return $this->getAttachmentManager()->getResizedImageUrl($attachment);
     }
 
-    /**
-     * @param $entity
-     * @param string $attachmentField
-     *
-     * @return string
-     */
     public function getFilteredAttachmentUrl($entity, string $attachmentField): string
     {
         $attachment = $this->getAttachmentByEntity($entity, $attachmentField);
@@ -48,18 +36,12 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
         return $this->getAttachmentManager()->getFilteredImageUrl($attachment, 'avatar_xsmall');
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
     protected function assertResponseSuccess(ResponseInterface $response): void
     {
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         self::assertTrue($this->getAttachmentManager()->isImageType($response->getHeader('Content-Type')[0]));
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
     protected function assertResponseFail(ResponseInterface $response): void
     {
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_FORBIDDEN]);
@@ -68,8 +50,6 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
 
     /**
      * @Then /^(?:|I) download "(?P<attachmentName>[^"]+)" attachment/
-     *
-     * @param string $attachmentName
      */
     public function downloadFile(string $attachmentName): void
     {
@@ -82,8 +62,6 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
 
     /**
      * @Then /^(?:|I) can not download "(?P<attachmentName>[^"]+)" attachment/
-     *
-     * @param string $attachmentName
      */
     public function downloadFileForbidden(string $attachmentName): void
     {
@@ -98,8 +76,6 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
      *
      * @Then /^image "(?P<attachmentName>[^"]+)" is loaded$/
      * Example: Then "Product 1 Grid Image" is loaded
-     *
-     * @param string $imgElementName
      */
     public function assertImageIsLoaded(string $imgElementName): void
     {
@@ -131,8 +107,6 @@ JS;
     /**
      * @Given /^(?:|I )remember number of files in attachment directory$/
      * @Given /^(?:|I )remember number of files with extension "(?P<extension>[^"]+)" in attachment directory$/
-     *
-     * @param string $extension
      */
     public function rememberNumberOfAttachmentFiles(string $extension = ''): void
     {
@@ -143,10 +117,6 @@ JS;
     /**
      * @Then /^number of files in attachment directory is (?P<count>[\d]+) (?P<operator>(?:less|more)) than remembered$/
      * @Then /^number of files with extension "(?P<extension>[^"]+)" in attachment directory is (?P<count>[\d]+) (?P<operator>(?:less|more)) than remembered$/
-     *
-     * @param string $operator
-     * @param int $count
-     * @param string $extension
      */
     //@codingStandardsIgnoreEnd
     public function numberOfAttachmentFilesIsChangedBy(string $operator, int $count, string $extension = ''): void
@@ -181,11 +151,6 @@ JS;
         }
     }
 
-    /**
-     * @param string $extension
-     *
-     * @return int
-     */
     private function countFilesInAttachmentFilesystem(string $extension = ''): int
     {
         $files = $this->getContainer()->get('oro_attachment.file_manager')->findFiles();
@@ -207,7 +172,6 @@ JS;
      * Example: I remember filename of the file "product1"
      *
      * @Given /^I remember filename of the file "(?P<name>(?:[^"]|\\")*)"$/
-     * @param string $name
      */
     public function iRememberFilenameOfFile(string $name): void
     {
@@ -220,7 +184,6 @@ JS;
      * Example: Then filename of the file "product1" is as remembered
      *
      * @Then /^filename of the file "(?P<name>(?:[^"]|\\")*)" is as remembered$/
-     * @param string $name
      */
     public function filenameOfFileIsAsRemembered(string $name): void
     {
@@ -234,7 +197,6 @@ JS;
      * Example: Then filename of the file "product1" is not as remembered
      *
      * @Then /^filename of the file "(?P<name>(?:[^"]|\\")*)" is not as remembered$/
-     * @param string $name
      */
     public function filenameOfFileIsNotAsRemembered(string $name): void
     {
@@ -248,7 +210,6 @@ JS;
      * Example: I remember filename of the image "cat1.jpg"
      *
      * @Then /^I remember filename of the image "(?P<image>(?:[^"]|\\")*)"$/
-     * @param string $image
      */
     public function iRememberFilenameOfImage(string $image): void
     {
@@ -261,7 +222,6 @@ JS;
      * Example: filename of the image "cat1.jpg" is as remembered
      *
      * @Then /^filename of the image "(?P<image>(?:[^"]|\\")*)" is as remembered$/
-     * @param string $image
      */
     public function filenameOfImageIsAsRemembered(string $image): void
     {
@@ -282,7 +242,6 @@ JS;
      * Example: filename of the image "cat1.jpg" is not as remembered
      *
      * @Then /^filename of the image "(?P<image>(?:[^"]|\\")*)" is not as remembered$/
-     * @param string $image
      */
     public function filenameOfImageIsNotAsRemembered(string $image): void
     {
@@ -299,10 +258,6 @@ JS;
         );
     }
 
-    /**
-     * @param string $imageName
-     * @return string
-     */
     private function getImageFilename(string $imageName): string
     {
         $image = $this->createElement($imageName);
@@ -318,10 +273,6 @@ JS;
         return $matches['filename'];
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
     private function getFileFilename(string $name): string
     {
         if ($this->hasElement($name)) {

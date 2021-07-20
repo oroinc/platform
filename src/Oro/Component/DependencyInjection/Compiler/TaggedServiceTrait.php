@@ -58,10 +58,6 @@ trait TaggedServiceTrait
     /**
      * Gets a value of the "priority" attribute.
      * If a tag does not have this attribute, 0 is returned.
-     *
-     * @param array $attributes
-     *
-     * @return int
      */
     private function getPriorityAttribute(array $attributes): int
     {

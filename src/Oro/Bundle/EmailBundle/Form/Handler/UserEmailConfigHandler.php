@@ -17,9 +17,6 @@ class UserEmailConfigHandler
     /** @var EntityManager */
     private $entityManager;
 
-    /**
-     * @param EntityManager $entityManager
-     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -27,10 +24,6 @@ class UserEmailConfigHandler
 
     /**
      * Save user with new configuration
-     *
-     * @param ConfigManager $manager
-     * @param ConfigChangeSet $changeSet
-     * @param FormInterface $form
      */
     public function handle(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form)
     {

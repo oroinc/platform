@@ -12,9 +12,6 @@ class Label implements \Serializable
     /** @var string */
     protected $label;
 
-    /**
-     * @param string $label
-     */
     public function __construct(string $label)
     {
         $this->label = $label;
@@ -31,7 +28,6 @@ class Label implements \Serializable
     {
         return $translator->trans($this->label);
     }
-
 
     /**
      * {@inheritdoc}

@@ -51,11 +51,6 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     private $gridColumns = [];
 
-    /**
-     * @param DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider
-     * @param TranslatorInterface $translator
-     * @param FormatterProvider $formatterProvider
-     */
     public function __construct(
         DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider,
         TranslatorInterface $translator,

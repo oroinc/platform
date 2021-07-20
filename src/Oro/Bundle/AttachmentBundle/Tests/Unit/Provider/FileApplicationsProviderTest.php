@@ -94,9 +94,6 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return File
-     */
     private function getFile(): File
     {
         $file = new File();

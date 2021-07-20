@@ -9,17 +9,11 @@ class EmailHolderTestEntity implements EmailHolderInterface
     /** @var string */
     private $testField;
 
-    /**
-     * @return string
-     */
     public function getTestField(): string
     {
         return $this->testField;
     }
 
-    /**
-     * @param string $testField
-     */
     public function setTestField(string $testField): void
     {
         $this->testField = $testField;

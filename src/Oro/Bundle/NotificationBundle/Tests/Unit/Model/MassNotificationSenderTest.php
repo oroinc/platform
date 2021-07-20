@@ -159,9 +159,6 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(2, $this->sender->send($body, $subject, From::emailAddress($senderEmail, $senderName)));
     }
 
-    /**
-     * @param array $recipientEmails
-     */
     private function configureNotificationSettins(array $recipientEmails): void
     {
         $this->notificationSettings

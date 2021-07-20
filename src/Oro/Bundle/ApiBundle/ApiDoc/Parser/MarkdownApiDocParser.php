@@ -56,9 +56,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     /** @var string[] */
     private $parsedFiles = [];
 
-    /**
-     * @param FileLocatorInterface $fileLocator
-     */
     public function __construct(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;
@@ -135,7 +132,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * @param array $newData
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function merge(array $newData): void
@@ -172,7 +168,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * @param string $fileContent
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function parseDocumentation(string $fileContent): void
@@ -213,11 +208,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         $this->normalizeLoadedData();
     }
 
-    /**
-     * @param string $section
-     *
-     * @return bool
-     */
     private function hasSubElements(string $section): bool
     {
         return ConfigUtil::FIELDS === $section || ConfigUtil::SUBRESOURCES === $section;
@@ -234,9 +224,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * @param \DOMDocument              $doc
-     * @param \DOMNode                  $node
-     * @param MarkdownApiDocParserState $state
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function saveElement(\DOMDocument $doc, \DOMNode $node, MarkdownApiDocParserState $state): void
@@ -279,14 +266,6 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         }
     }
 
-    /**
-     * @param string      $className
-     * @param string      $section
-     * @param string      $element
-     * @param string|null $subElement
-     *
-     * @return string|null
-     */
     private function getDocumentation(
         string $className,
         string $section,

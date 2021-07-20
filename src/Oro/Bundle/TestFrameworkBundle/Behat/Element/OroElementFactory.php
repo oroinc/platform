@@ -41,11 +41,6 @@ class OroElementFactory implements SuiteAwareInterface
     /** @var string[] */
     private $aliases = [];
 
-    /**
-     * @param Mink $mink
-     * @param SelectorsHandler $selectorsHandler
-     * @param array $configuration
-     */
     public function __construct(Mink $mink, SelectorsHandler $selectorsHandler, array $configuration)
     {
         $this->mink = $mink;

@@ -54,8 +54,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     /**
      * Initializes compiler pass.
-     *
-     * @param null|ServiceProcessor $processor
      */
     public function __construct(ServiceProcessor $processor = null)
     {
@@ -149,9 +147,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->addCompilerPass(new DecoratorServicePass());
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function transferApplicationParameters(ContainerBuilder $container)
     {
         /** @var KernelInterface $kernel */
@@ -161,9 +156,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->setParameter('kernel.secret', $kernel->getContainer()->getParameter('kernel.secret'));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processIsolationSubscribers(ContainerBuilder $container)
     {
         $isolators = [];
@@ -195,9 +187,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processArtifactHandlers(ContainerBuilder $container)
     {
         $handlerConfigurations = $container->getParameter('oro_test.artifacts.handler_configs');
@@ -230,9 +219,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processHealthCheckers(ContainerBuilder $container)
     {
         $healthCheckerIds = array_keys($container->findTaggedServiceIds(self::HEALTH_CHECKER_TAG));
@@ -245,9 +231,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function replaceSessionListener(ContainerBuilder $container)
     {
         $container
@@ -255,9 +238,6 @@ class OroTestFrameworkExtension implements TestworkExtension
             ->setClass('Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener');
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processSuiteAwareSubscriber(ContainerBuilder $container)
     {
         $services = [];
@@ -274,8 +254,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     /**
      * Processes all context initializers.
-     *
-     * @param ContainerBuilder $container
      */
     private function processClassResolvers(ContainerBuilder $container)
     {
@@ -287,9 +265,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processBundleBehatConfigurations(ContainerBuilder $container)
     {
         /** @var KernelInterface $kernel */
@@ -357,9 +332,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processReferenceRepositoryInitializers(ContainerBuilder $container)
     {
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
@@ -392,8 +364,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     /**
      * Generate behat test suite for every bundle that registered in kernel and not configured in configuration
-     *
-     * @param ContainerBuilder $container
      */
     private function processBundleAutoload(ContainerBuilder $container)
     {

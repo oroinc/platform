@@ -22,10 +22,6 @@ class ActivityInheritanceTargetsHelper
     /** @var Registry */
     protected $registry;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param Registry $registry
-     */
     public function __construct(ConfigManager $configManager, Registry $registry)
     {
         $this->configManager = $configManager;

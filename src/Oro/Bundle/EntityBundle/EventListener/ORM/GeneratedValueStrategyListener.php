@@ -28,9 +28,6 @@ class GeneratedValueStrategyListener
         $this->databaseDriver = $databaseDriver;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
         if ($this->databaseDriver !== DatabaseDriverInterface::DRIVER_POSTGRESQL) {

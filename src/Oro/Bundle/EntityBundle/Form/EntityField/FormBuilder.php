@@ -47,10 +47,6 @@ class FormBuilder
     /** @var Registry */
     protected $registry;
 
-    /**
-     * @param FormFactory $formFactory
-     * @param Registry $registry
-     */
     public function __construct(
         FormFactory $formFactory,
         Registry $registry

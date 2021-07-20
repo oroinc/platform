@@ -14,9 +14,6 @@ class UserAgentProvider implements UserAgentProviderInterface
     /** @var UserAgent[] */
     protected $cache = [];
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;

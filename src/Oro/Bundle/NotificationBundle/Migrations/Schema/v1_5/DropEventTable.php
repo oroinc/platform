@@ -22,10 +22,6 @@ class DropEventTable implements Migration, OrderedMigrationInterface
         $this->dropEventTable($schema, $queries);
     }
 
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     */
     private function dropEventTable(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_notification_email_notif');

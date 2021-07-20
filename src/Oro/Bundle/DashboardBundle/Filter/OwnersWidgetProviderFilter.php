@@ -12,9 +12,6 @@ class OwnersWidgetProviderFilter implements WidgetProviderFilterInterface
     /** @var OwnerHelper */
     protected $ownerHelper;
 
-    /**
-     * @param OwnerHelper $ownerHelper
-     */
     public function __construct(OwnerHelper $ownerHelper)
     {
         $this->ownerHelper = $ownerHelper;

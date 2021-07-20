@@ -10,9 +10,6 @@ class SerializationHelper
     /** @var DataTransformerInterface */
     private $dataTransformer;
 
-    /**
-     * @param DataTransformerInterface $dataTransformer
-     */
     public function __construct(DataTransformerInterface $dataTransformer)
     {
         $this->dataTransformer = $dataTransformer;
@@ -39,12 +36,6 @@ class SerializationHelper
     /**
      * Passes a serialized items through "post serialization" handler for a single item
      * if the given config has this handler.
-     *
-     * @param array|null   $item
-     * @param EntityConfig $config
-     * @param array        $context
-     *
-     * @return array|null
      */
     public function postSerializeItem(?array $item, EntityConfig $config, array $context): ?array
     {
@@ -63,12 +54,6 @@ class SerializationHelper
     /**
      * Passes a serialized items through "post serialization" handler for a list of items
      * if the given config has this handler.
-     *
-     * @param array        $items
-     * @param EntityConfig $config
-     * @param array        $context
-     *
-     * @return array
      */
     public function postSerializeCollection(array $items, EntityConfig $config, array $context): array
     {
@@ -87,12 +72,6 @@ class SerializationHelper
     /**
      * Passes a serialized items through "post serialization" handlers
      * for a single item and for a list of items if the given config has these handlers.
-     *
-     * @param array        $items
-     * @param EntityConfig $config
-     * @param array        $context
-     *
-     * @return array
      */
     public function processPostSerializeItems(array $items, EntityConfig $config, array $context): array
     {
@@ -185,11 +164,6 @@ class SerializationHelper
 
     /**
      * Attempts to get the configuration of a target entity of the specified field.
-     *
-     * @param EntityConfig $entityConfig
-     * @param string       $fieldName
-     *
-     * @return EntityConfig|null
      */
     private function getTargetEntityConfig(EntityConfig $entityConfig, string $fieldName): ?EntityConfig
     {
@@ -203,11 +177,6 @@ class SerializationHelper
 
     /**
      * Gets the field name for the given entity property taking into account renaming.
-     *
-     * @param EntityConfig $entityConfig
-     * @param string       $property
-     *
-     * @return string
      */
     private function getFieldName(EntityConfig $entityConfig, string $property): string
     {

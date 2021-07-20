@@ -138,7 +138,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
             }))
         ;
 
-
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 

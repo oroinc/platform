@@ -19,10 +19,6 @@ class DelayedJobRunnerDecoratingProcessor implements MessageProcessorInterface
      */
     private $processor;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param MessageProcessorInterface $processor
-     */
     public function __construct(JobRunner $jobRunner, MessageProcessorInterface $processor)
     {
         $this->jobRunner = $jobRunner;

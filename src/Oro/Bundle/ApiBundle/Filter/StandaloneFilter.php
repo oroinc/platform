@@ -25,10 +25,6 @@ class StandaloneFilter implements FilterInterface
     /** @var string[] */
     private $operators;
 
-    /**
-     * @param string      $dataType
-     * @param string|null $description
-     */
     public function __construct(string $dataType, string $description = null)
     {
         $this->dataType = $dataType;
@@ -38,8 +34,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Gets a data-type of a value the filter works with.
-     *
-     * @return string
      */
     public function getDataType(): string
     {
@@ -48,8 +42,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Sets a data-type of a value the filter works with.
-     *
-     * @param string $dataType
      */
     public function setDataType(string $dataType): void
     {
@@ -58,10 +50,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Gets a flag determines if a value can be an array.
-     *
-     * @param string|null $operator
-     *
-     * @return bool
      */
     public function isArrayAllowed(string $operator = null): bool
     {
@@ -70,8 +58,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Sets a flag determines if a value can be an array.
-     *
-     * @param bool $arrayAllowed
      */
     public function setArrayAllowed(bool $arrayAllowed): void
     {
@@ -80,10 +66,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Gets a flag determines if a value can be a pair of "from" and "to" values.
-     *
-     * @param string|null $operator
-     *
-     * @return bool
      */
     public function isRangeAllowed(string $operator = null): bool
     {
@@ -92,8 +74,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Sets a flag determines if a value can be a pair of "from" and "to" values.
-     *
-     * @param bool $rangeAllowed
      */
     public function setRangeAllowed(bool $rangeAllowed): void
     {
@@ -102,8 +82,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Gets the filter description.
-     *
-     * @return string|null
      */
     public function getDescription(): ?string
     {
@@ -112,8 +90,6 @@ class StandaloneFilter implements FilterInterface
 
     /**
      * Sets the filter description.
-     *
-     * @param string|null $description
      */
     public function setDescription(?string $description): void
     {

@@ -79,9 +79,6 @@ class AttachmentFilterAwareUrlGeneratorTest extends WebTestCase
         $this->assertStringContainsString($this->getHash($filterParameters), $url);
     }
 
-    /**
-     * @return array
-     */
     private function getAvatarMedConfig(): array
     {
         /** @var AttachmentFilterConfiguration $attachmentFilterConfiguration */
@@ -91,11 +88,6 @@ class AttachmentFilterAwareUrlGeneratorTest extends WebTestCase
         return $attachmentFilterConfiguration->getOriginal(self::FILTER_NAME);
     }
 
-    /**
-     * @param array $parameters
-     *
-     * @return string
-     */
     private function getHash(array $parameters): string
     {
         return md5(json_encode($parameters));

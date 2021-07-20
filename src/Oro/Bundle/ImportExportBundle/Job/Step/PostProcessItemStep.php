@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job\Step;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
+/**
+ * Implementation of batch job item step that is supposed to be executed after the regular item step.
+ */
 class PostProcessItemStep extends ItemStep
 {
     /**
@@ -39,9 +42,6 @@ class PostProcessItemStep extends ItemStep
         $this->contextSharedKeys = $this->scalarToArray($contextSharedKeys);
     }
 
-    /**
-     * @param JobExecutor $jobExecutor
-     */
     public function setJobExecutor(JobExecutor $jobExecutor)
     {
         $this->jobExecutor = $jobExecutor;

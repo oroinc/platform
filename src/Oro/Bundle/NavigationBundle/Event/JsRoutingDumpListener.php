@@ -19,11 +19,6 @@ class JsRoutingDumpListener
     /** @var string */
     private $filenamePrefix;
 
-    /**
-     * @param DynamicAssetVersionManager $assetVersionManager
-     * @param string $projectDir
-     * @param string $filenamePrefix
-     */
     public function __construct(
         DynamicAssetVersionManager $assetVersionManager,
         string $projectDir,
@@ -34,9 +29,6 @@ class JsRoutingDumpListener
         $this->filenamePrefix = $filenamePrefix;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
@@ -67,9 +59,6 @@ class JsRoutingDumpListener
             );
     }
 
-    /**
-     * @return string
-     */
     private function getFilename(): string
     {
         return implode('_', array_filter([rtrim($this->filenamePrefix, '_'), 'routes']));

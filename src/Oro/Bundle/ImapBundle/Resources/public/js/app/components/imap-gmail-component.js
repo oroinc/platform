@@ -2,7 +2,6 @@
 define(function(require) {
     'use strict';
 
-    const __ = require('orotranslation/js/translator');
     const mediator = require('oroui/js/mediator');
     const ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     const BaseImapComponent = require('oroimap/js/app/components/imap-component');
@@ -21,7 +20,6 @@ define(function(require) {
 
         /** @property {Object} */
         errorsMessages: {
-            emptyClientId: 'oro.imap.connection.microsoft.oauth.error.emptyClientId',
             access_deny: 'oro.imap.connection.microsoft.oauth.error.access_deny',
             request: 'oro.imap.connection.microsoft.oauth.error.request',
             closed_auth: 'oro.imap.connection.microsoft.oauth.error.closed_auth',
@@ -57,40 +55,35 @@ define(function(require) {
             const data = this.view.getData();
             const args = {};
 
-            if (data.clientId.length === 0) {
-                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
-                this.view.render();
-            } else {
-                this._wrapFirstWindowOpen(args);
-                args.deferred = gapi.auth.authorize(
-                    {
-                        client_id: data.clientId,
-                        scope: this.scopes.join(' '),
-                        immediate: false,
-                        login_hint: emailAddress,
-                        access_type: 'offline',
-                        response_type: 'code',
-                        approval_prompt: 'force'
-                    },
-                    this.handleResponseAuthCode.bind(this)
-                ).then(
-                    null,
-                    function(reason) {
-                        if (null === reason) {
-                            // do not show the flash message if there is not rejection reason
-                            // usually this happens when all goes ok and the callback function is called,
-                            // so, any problems are handled by this callback (see handleResponseAuthCode)
-                            // e.g. we do not need the flash message if an user clicks "Deny" button
-                            return;
-                        }
-                        mediator.execute(
-                            'showFlashMessage',
-                            'error',
-                            this.getErrorMessage('closed_auth')
-                        );
-                    }.bind(this)
-                );
-            }
+            this._wrapFirstWindowOpen(args);
+            args.deferred = gapi.auth.authorize(
+                {
+                    client_id: data.clientId,
+                    scope: this.scopes.join(' '),
+                    immediate: false,
+                    login_hint: emailAddress,
+                    access_type: 'offline',
+                    response_type: 'code',
+                    approval_prompt: 'force'
+                },
+                this.handleResponseAuthCode.bind(this)
+            ).then(
+                null,
+                function(reason) {
+                    if (null === reason) {
+                        // do not show the flash message if there is not rejection reason
+                        // usually this happens when all goes ok and the callback function is called,
+                        // so, any problems are handled by this callback (see handleResponseAuthCode)
+                        // e.g. we do not need the flash message if an user clicks "Deny" button
+                        return;
+                    }
+                    mediator.execute(
+                        'showFlashMessage',
+                        'error',
+                        this.getErrorMessage('closed_auth')
+                    );
+                }.bind(this)
+            );
         },
 
         /**

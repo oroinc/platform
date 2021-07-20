@@ -36,13 +36,6 @@ class AssociationManager
     /** @var bool */
     protected $queued = true;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EmailActivityManager $emailActivityManager
-     * @param EmailOwnersProvider $emailOwnersProvider
-     * @param EmailManager $emailManager
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EmailActivityManager $emailActivityManager,

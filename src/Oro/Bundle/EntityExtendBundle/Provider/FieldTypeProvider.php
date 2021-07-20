@@ -16,11 +16,6 @@ class FieldTypeProvider
     /** @var array */
     protected $types = [];
 
-    /**
-     * @param ConfigManager $configManager
-     * @param array $fields
-     * @param array $relations
-     */
     public function __construct(ConfigManager $configManager, array $fields = [], array $relations = [])
     {
         $this->configManager = $configManager;

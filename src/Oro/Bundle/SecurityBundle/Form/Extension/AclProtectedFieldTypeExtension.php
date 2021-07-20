@@ -36,10 +36,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var array List of non accessible fields with committed data */
     protected $disabledFields = [];
 
-    /**
-     * @param FieldAclHelper  $fieldAclHelper
-     * @param LoggerInterface $logger
-     */
     public function __construct(FieldAclHelper $fieldAclHelper, LoggerInterface $logger)
     {
         $this->fieldAclHelper = $fieldAclHelper;
@@ -113,8 +109,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
     /**
      * Used on post submit to add validation errors
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -132,7 +126,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      * Validate input data. If form data contain data for forbidden fields - set the original data for such fields and
      * collect this fields to add validation error.
      *
-     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event)
@@ -281,10 +274,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
     /**
      * in case if we have error in the non accessible fields - add validation error.
-     *
-     * @param array         $hiddenFieldsWithErrors
-     * @param FormView      $view
-     * @param FormInterface $form
      */
     protected function processHiddenFieldsWithErrors(array $hiddenFieldsWithErrors, FormView $view, FormInterface $form)
     {

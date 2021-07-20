@@ -184,8 +184,6 @@ class UserTest extends AbstractUserTest
 
     /**
      * @dataProvider preUpdateDataProvider
-     *
-     * @param array $changeSet
      */
     public function testPreUpdateChanged(array $changeSet): void
     {
@@ -209,9 +207,6 @@ class UserTest extends AbstractUserTest
         self::assertNull($user->getPasswordRequestedAt());
     }
 
-    /**
-     * @return array
-     */
     public function preUpdateDataProvider(): array
     {
         return [
@@ -378,10 +373,6 @@ class UserTest extends AbstractUserTest
     }
 
     /**
-     * @param bool $skipOrigin
-     * @param string $accessToken
-     * @param string $accountType
-     *
      * @dataProvider setDataProviderAccountType
      */
     public function testGetAccountType(bool $skipOrigin, string $accessToken, string $accountType): void
@@ -406,9 +397,6 @@ class UserTest extends AbstractUserTest
         }
     }
 
-    /**
-     * @return array
-     */
     public function setDataProviderAccountType(): array
     {
         return [

@@ -21,11 +21,6 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
      */
     protected $configManager;
 
-    /**
-     * @param string $entityName
-     * @param array $properties
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         string $entityName,
         array $properties,
@@ -90,10 +85,6 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
         );
     }
 
-    /**
-     * @param string $scope
-     * @return array
-     */
     private function getEnabledLocalizationsByScope(string $scope): array
     {
         return (array) $this->configManager->get(

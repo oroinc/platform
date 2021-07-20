@@ -36,7 +36,6 @@ class CompoundObjectListener implements EventSubscriberInterface
     }
 
     /**
-     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event): void
@@ -78,9 +77,6 @@ class CompoundObjectListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event): void
     {
         if ($this->setDataToNull) {
@@ -88,9 +84,6 @@ class CompoundObjectListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
@@ -109,11 +102,6 @@ class CompoundObjectListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return array
-     */
     private function getEmptySubmittedData(FormInterface $form): array
     {
         $submittedData = [];
@@ -127,22 +115,11 @@ class CompoundObjectListener implements EventSubscriberInterface
         return $submittedData;
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string        $fieldName
-     */
     private function addRequiredFieldConstraintViolation(FormInterface $form, string $fieldName): void
     {
         FormUtil::addFormError($form, 'This value is mandatory.', $fieldName);
     }
 
-    /**
-     * @param array          $submittedData
-     * @param string         $name
-     * @param EntityMetadata $metadata
-     *
-     * @return bool
-     */
     private function isEmptyValue(array $submittedData, string $name, EntityMetadata $metadata): bool
     {
         $dataType = null;

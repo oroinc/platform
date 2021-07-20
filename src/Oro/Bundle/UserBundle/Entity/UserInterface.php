@@ -26,8 +26,6 @@ interface UserInterface extends SymfonyUserInterface
 
     /**
      * Get plain user password.
-     *
-     * @return string|null
      */
     public function getPlainPassword(): ?string;
 
@@ -40,10 +38,6 @@ interface UserInterface extends SymfonyUserInterface
 
     /**
      * Adds a Role to the Collection.
-     *
-     * @param Role $role
-     *
-     * @return self
      */
     public function addUserRole(Role $role): self;
 

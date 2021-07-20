@@ -20,10 +20,6 @@ class RolePrivilegeCategoryProvider
     /** @var PrivilegeCategory[]|null */
     private $categories;
 
-    /**
-     * @param PrivilegeCategoryConfigurationProvider $configurationProvider
-     * @param TranslatorInterface                    $translator
-     */
     public function __construct(
         PrivilegeCategoryConfigurationProvider $configurationProvider,
         TranslatorInterface $translator

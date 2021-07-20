@@ -20,11 +20,6 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     /** @var array */
     private $requestTypes;
 
-    /**
-     * @param ResourcesProvider    $resourcesProvider
-     * @param SubresourcesProvider $subresourcesProvider
-     * @param array                $requestTypes
-     */
     public function __construct(
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,

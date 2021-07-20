@@ -10,9 +10,6 @@ class MergeMassActionListener
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @param ConfigProvider $entityConfigProvider
-     */
     public function __construct(ConfigProvider $entityConfigProvider)
     {
         $this->entityConfigProvider = $entityConfigProvider;
@@ -20,8 +17,6 @@ class MergeMassActionListener
 
     /**
      * Remove mass action if entity config mass action disabled
-     *
-     * @param BuildBefore $event
      */
     public function onBuildBefore(BuildBefore $event)
     {

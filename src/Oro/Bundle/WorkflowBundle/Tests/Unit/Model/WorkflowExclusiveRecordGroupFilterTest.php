@@ -31,9 +31,6 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $expected
-     * @param array $workflowItems
-     * @param ArrayCollection $workflows
      * @dataProvider filterDataProvider
      */
     public function testFilter($expected, array $workflowItems, ArrayCollection $workflows)

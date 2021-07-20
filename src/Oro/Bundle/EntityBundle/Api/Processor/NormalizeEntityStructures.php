@@ -16,9 +16,6 @@ class NormalizeEntityStructures implements ProcessorInterface
     /** @var EntityStructureNormalizer */
     private $normalizer;
 
-    /**
-     * @param EntityStructureNormalizer $normalizer
-     */
     public function __construct(EntityStructureNormalizer $normalizer)
     {
         $this->normalizer = $normalizer;

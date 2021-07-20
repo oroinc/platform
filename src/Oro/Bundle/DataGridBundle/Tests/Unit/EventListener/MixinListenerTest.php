@@ -58,7 +58,6 @@ class MixinListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfig')
             ->will($this->returnValue($config));
 
-
         if ($hasParameter && $isApplicable) {
             $config
                 ->expects($this->once())

@@ -41,13 +41,6 @@ class AutoResponseTemplateType extends AbstractType
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @param ConfigManager $cm
-     * @param ConfigManager $userConfig
-     * @param Registry $registry
-     * @param LocalizationManager $localizationManager
-     * @param HtmlTagHelper $htmlTagHelper
-     */
     public function __construct(
         ConfigManager $cm,
         ConfigManager $userConfig,

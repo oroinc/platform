@@ -60,17 +60,6 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /** @var array [mask => group mask, ...] */
     private $permissionGroupMasks = [];
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param EntityClassResolver                        $entityClassResolver
-     * @param EntitySecurityMetadataProvider             $entityMetadataProvider
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param PermissionManager                          $permissionManager
-     * @param AclGroupProviderInterface                  $groupProvider
-     * @param FieldAclExtension                          $fieldAclExtension
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
@@ -726,11 +715,6 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * @param int $identity
-     *
-     * @return int
-     */
     private function getValidMasksForRoot(int $identity): int
     {
         $maskBuilder = $this->getEntityMaskBuilder($identity);

@@ -25,10 +25,6 @@ class ReportHandler
      */
     protected $manager;
 
-    /**
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
     public function __construct(RequestStack $requestStack, ObjectManager $manager)
     {
         $this->requestStack = $requestStack;
@@ -61,8 +57,6 @@ class ReportHandler
 
     /**
      * "Success" form handler
-     *
-     * @param Report $entity
      */
     protected function onSuccess(Report $entity)
     {

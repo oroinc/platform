@@ -27,12 +27,6 @@ class PreloadingManager
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EventDispatcherInterface $eventDispatcher,
@@ -72,11 +66,6 @@ class PreloadingManager
 
     /**
      * Recursively goes through $fieldsToPreload tree, dispatches preload events.
-     *
-     * @param string $className
-     * @param array $entities
-     * @param array $fieldsToPreload
-     * @param array $context
      */
     private function preloadRecursively(
         string $className,
@@ -142,11 +131,6 @@ class PreloadingManager
         return $targetFieldEntities;
     }
 
-    /**
-     * @param ClassMetadata $entityMetadata
-     * @param string $targetField
-     * @param string $className
-     */
     private function assertAssociationExists(
         ClassMetadata $entityMetadata,
         string $targetField,
@@ -163,10 +147,6 @@ class PreloadingManager
         }
     }
 
-    /**
-     * @param object|null $collection
-     * @return bool
-     */
     private function isCollectionNotInitialized(?object $collection): bool
     {
         return $collection instanceof AbstractLazyCollection && !$collection->isInitialized();

@@ -11,9 +11,6 @@ class ConfigurationChecker
 {
     use ContextAccessorAwareTrait;
 
-    /**
-     * @param ContextAccessorInterface $contextAccessor
-     */
     public function __construct(ContextAccessorInterface $contextAccessor)
     {
         $this->contextAccessor = $contextAccessor;

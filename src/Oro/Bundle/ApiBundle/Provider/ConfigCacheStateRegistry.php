@@ -34,10 +34,6 @@ class ConfigCacheStateRegistry
     /**
      * Returns the config cache state service for the given request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return ConfigCacheStateInterface
-     *
      * @throws \LogicException if a config cache state service does not exist for the given request type
      */
     public function getConfigCacheState(RequestType $requestType): ConfigCacheStateInterface

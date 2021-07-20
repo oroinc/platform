@@ -14,9 +14,6 @@ class LocalRepositoryFactory
     /** @var string */
     private $file;
 
-    /**
-     * @param string $file
-     */
     public function __construct(string $file)
     {
         $this->file = $file;

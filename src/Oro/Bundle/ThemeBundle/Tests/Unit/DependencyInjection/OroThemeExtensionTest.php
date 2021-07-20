@@ -11,9 +11,6 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadDataProvider
-     * @param array $configs
-     * @param array $expectedThemeSettings
-     * @param $expectedActiveTheme
      */
     public function testLoad(array $configs, array $expectedThemeSettings, $expectedActiveTheme)
     {

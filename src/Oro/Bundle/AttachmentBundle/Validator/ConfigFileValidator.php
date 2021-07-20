@@ -19,10 +19,6 @@ class ConfigFileValidator
     /** @var FileConstraintsProvider */
     private $fileConstraintsProvider;
 
-    /**
-     * @param ValidatorInterface $validator
-     * @param FileConstraintsProvider $fileConstraintsProvider
-     */
     public function __construct(ValidatorInterface $validator, FileConstraintsProvider $fileConstraintsProvider)
     {
         $this->validator = $validator;

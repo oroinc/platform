@@ -49,8 +49,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Create oro_test_dataaudit_owner table
-     *
-     * @param Schema $schema
      */
     protected function createTestDataAuditOwnerTable(Schema $schema)
     {
@@ -146,8 +144,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Create oro_test_dataaudit_child table
-     *
-     * @param Schema $schema
      */
     protected function createTestDataAuditChildTable(Schema $schema)
     {
@@ -161,8 +157,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
     }
 
     /**
-     * @param Schema $schema
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function createTestDataAuditRelations(Schema $schema)
@@ -301,8 +295,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Create oro_test_dataaudit_many2many table
-     *
-     * @param Schema $schema
      */
     protected function createTestDataAuditManyToManyTable(Schema $schema)
     {
@@ -316,8 +308,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Create oro_test_dataaudit_many2many_u table
-     *
-     * @param Schema $schema
      */
     protected function createTestDataAuditManyToManyUnidirectionalTable(Schema $schema)
     {
@@ -331,8 +321,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Add oro_test_dataaudit_owner foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestDataAuditOwnerForeignKeys(Schema $schema)
     {
@@ -363,8 +351,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Add oro_test_dataaudit_child foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestDataAuditChildForeignKeys(Schema $schema)
     {
@@ -378,8 +364,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Add oro_test_dataaudit_many2many foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestDataAuditManyToManyForeignKeys(Schema $schema)
     {
@@ -399,8 +383,6 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
     /**
      * Add oro_test_dataaudit_many2many_u foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addTestDataAuditManyToManyUnidirectionalForeignKeys(Schema $schema)
     {

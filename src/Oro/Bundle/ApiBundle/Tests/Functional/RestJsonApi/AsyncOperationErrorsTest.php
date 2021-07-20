@@ -22,12 +22,6 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
         $this->loadFixtures([LoadOperationsErrorsData::class]);
     }
 
-    /**
-     * @param string $expectedContentFileName
-     * @param int    $operationId
-     *
-     * @return array
-     */
     protected function updateIds(string $expectedContentFileName, int $operationId): array
     {
         $expectedContent = $this->getResponseData($expectedContentFileName);

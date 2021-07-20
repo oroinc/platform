@@ -34,9 +34,6 @@ class OroLocaleBundleScopeRelations implements Migration, ExtendExtensionAwareIn
         $this->addRelationsToScope($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addRelationsToScope(Schema $schema)
     {
         $this->extendExtension->addManyToOneRelation(

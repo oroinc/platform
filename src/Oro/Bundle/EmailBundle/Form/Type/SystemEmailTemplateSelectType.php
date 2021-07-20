@@ -17,9 +17,6 @@ class SystemEmailTemplateSelectType extends AbstractType
      */
     protected $em;
 
-    /**
-     * @param ObjectManager $objectManager
-     */
     public function __construct(ObjectManager $objectManager)
     {
         $this->em  = $objectManager;

@@ -47,7 +47,6 @@ class StateManagerTest extends \PHPUnit\Framework\TestCase
         $this->repository->expects($this->never())->method($this->anything());
         $this->entityManager->expects($this->never())->method($this->anything());
 
-
         $state = $this->stateManager->getWidgetState($widget);
 
         $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject', $state);

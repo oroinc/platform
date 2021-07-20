@@ -31,12 +31,6 @@ class LoadErrors implements ProcessorInterface
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /**
-     * @param ErrorManager                  $errorManager
-     * @param FileManager                   $fileManager
-     * @param DoctrineHelper                $doctrineHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         ErrorManager $errorManager,
         FileManager $fileManager,

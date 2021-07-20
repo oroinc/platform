@@ -30,11 +30,6 @@ class FieldAccessor
     /** @var EntityFieldFilterInterface */
     private $entityFieldFilter;
 
-    /**
-     * @param DoctrineHelper                  $doctrineHelper
-     * @param DataAccessorInterface           $dataAccessor
-     * @param EntityFieldFilterInterface|null $entityFieldFilter
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
@@ -188,11 +183,6 @@ class FieldAccessor
 
     /**
      * Gets the name of identifier field.
-     *
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     *
-     * @return string
      */
     public function getIdField(string $entityClass, EntityConfig $config): string
     {
@@ -201,10 +191,6 @@ class FieldAccessor
 
     /**
      * Checks whether the given property represents a metadata property.
-     *
-     * @param string $property
-     *
-     * @return bool
      */
     public function isMetadataProperty(string $property): bool
     {
@@ -232,12 +218,6 @@ class FieldAccessor
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $field
-     *
-     * @return bool
-     */
     private function isApplicableField(string $entityClass, string $field): bool
     {
         if (!$this->dataAccessor->hasGetter($entityClass, $field)) {
@@ -251,11 +231,6 @@ class FieldAccessor
 
     /**
      * Gets the field name for the given entity property taking into account renaming.
-     *
-     * @param EntityConfig $config
-     * @param string       $property
-     *
-     * @return string
      */
     private function getField(EntityConfig $config, string $property): string
     {
@@ -269,11 +244,6 @@ class FieldAccessor
 
     /**
      * Gets the path to entity property for the given field.
-     *
-     * @param string           $fieldName
-     * @param FieldConfig|null $fieldConfig
-     *
-     * @return string
      */
     private function getPropertyPath(string $fieldName, FieldConfig $fieldConfig = null): string
     {

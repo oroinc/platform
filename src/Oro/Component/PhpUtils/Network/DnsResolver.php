@@ -8,8 +8,6 @@ namespace Oro\Component\PhpUtils\Network;
 class DnsResolver
 {
     /**
-     * @param string $ipAddress
-     * @return string
      * @throws \InvalidArgumentException
      */
     public function getHostnameByIp(string $ipAddress): string

@@ -26,11 +26,6 @@ class UpdateEntityConfigFieldModeQuery extends ParametrizedMigrationQuery
      */
     protected $mode;
 
-    /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @param string $mode
-     */
     public function __construct(string $entityName, string $fieldName, string $mode)
     {
         $this->entityName = $entityName;

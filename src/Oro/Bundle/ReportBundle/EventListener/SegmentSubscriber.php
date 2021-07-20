@@ -19,9 +19,6 @@ class SegmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param WidgetOptionsLoadEvent $event
-     */
     public function loadAggregatedFieldsWidgetOptions(WidgetOptionsLoadEvent $event)
     {
         if ($event->getWidgetType() !== 'oro_report') {
@@ -38,9 +35,6 @@ class SegmentSubscriber implements EventSubscriberInterface
         ));
     }
 
-    /**
-     * @param ConditionBuilderOptionsLoadEvent $event
-     */
     public function loadAggregatedFieldsBuilderOptions(ConditionBuilderOptionsLoadEvent $event)
     {
         $event->setOptions(array_merge_recursive(

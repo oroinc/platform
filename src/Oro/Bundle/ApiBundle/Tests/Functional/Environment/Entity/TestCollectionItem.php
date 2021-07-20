@@ -273,9 +273,6 @@ class TestCollectionItem
         return $this->withOrphanRemovalParent;
     }
 
-    /**
-     * @param TestCollection|null $parent
-     */
     public function setWithOrphanRemovalParent(TestCollection $parent = null)
     {
         $this->withOrphanRemovalParent = $parent;
@@ -289,9 +286,6 @@ class TestCollectionItem
         return $this->withoutOrphanRemovalParent;
     }
 
-    /**
-     * @param TestCollection|null $parent
-     */
     public function setWithoutOrphanRemovalParent(TestCollection $parent = null)
     {
         $this->withoutOrphanRemovalParent = $parent;
@@ -305,9 +299,6 @@ class TestCollectionItem
         return $this->lazyWithOrphanRemovalParent;
     }
 
-    /**
-     * @param TestCollection|null $parent
-     */
     public function setLazyWithOrphanRemovalParent(TestCollection $parent = null)
     {
         $this->lazyWithOrphanRemovalParent = $parent;
@@ -321,9 +312,6 @@ class TestCollectionItem
         return $this->lazyWithoutOrphanRemovalParent;
     }
 
-    /**
-     * @param TestCollection|null $parent
-     */
     public function setLazyWithoutOrphanRemovalParent(TestCollection $parent = null)
     {
         $this->lazyWithoutOrphanRemovalParent = $parent;
@@ -337,9 +325,6 @@ class TestCollectionItem
         return $this->extraLazyWithOrphanRemovalParent;
     }
 
-    /**
-     * @param TestCollection|null $parent
-     */
     public function setExtraLazyWithOrphanRemovalParent(TestCollection $parent = null)
     {
         $this->extraLazyWithOrphanRemovalParent = $parent;
@@ -353,9 +338,6 @@ class TestCollectionItem
         return $this->extraLazyWithoutOrphanRemovalParent;
     }
 
-    /**
-     * @param TestCollection|null $parent
-     */
     public function setExtraLazyWithoutOrphanRemovalParent(TestCollection $parent = null)
     {
         $this->extraLazyWithoutOrphanRemovalParent = $parent;
@@ -377,9 +359,6 @@ class TestCollectionItem
         $this->manyToManyWithOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addManyToManyWithOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getManyToManyWithOrphanRemovalParents()->contains($parent)) {
@@ -388,9 +367,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeManyToManyWithOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getManyToManyWithOrphanRemovalParents()->contains($parent)) {
@@ -415,9 +391,6 @@ class TestCollectionItem
         $this->manyToManyWithoutOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addManyToManyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getManyToManyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -426,9 +399,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeManyToManyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getManyToManyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -453,9 +423,6 @@ class TestCollectionItem
         $this->manyToManyLazyWithOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addManyToManyLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getManyToManyLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -464,9 +431,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeManyToManyLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getManyToManyLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -491,9 +455,6 @@ class TestCollectionItem
         $this->manyToManyLazyWithoutOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addManyToManyLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getManyToManyLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -502,9 +463,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeManyToManyLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getManyToManyLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -529,9 +487,6 @@ class TestCollectionItem
         $this->manyToManyExtraLazyWithOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addManyToManyExtraLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getManyToManyExtraLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -540,9 +495,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeManyToManyExtraLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getManyToManyExtraLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -567,9 +519,6 @@ class TestCollectionItem
         $this->manyToManyExtraLazyWithoutOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addManyToManyExtraLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getManyToManyExtraLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -578,9 +527,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeManyToManyExtraLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getManyToManyExtraLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -605,9 +551,6 @@ class TestCollectionItem
         $this->inverseManyToManyWithOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addInverseManyToManyWithOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getInverseManyToManyWithOrphanRemovalParents()->contains($parent)) {
@@ -616,9 +559,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeInverseManyToManyWithOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getInverseManyToManyWithOrphanRemovalParents()->contains($parent)) {
@@ -643,9 +583,6 @@ class TestCollectionItem
         $this->inverseManyToManyWithoutOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addInverseManyToManyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getInverseManyToManyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -654,9 +591,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeInverseManyToManyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getInverseManyToManyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -681,9 +615,6 @@ class TestCollectionItem
         $this->inverseManyToManyLazyWithOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addInverseManyToManyLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getInverseManyToManyLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -692,9 +623,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeInverseManyToManyLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getInverseManyToManyLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -719,9 +647,6 @@ class TestCollectionItem
         $this->inverseManyToManyLazyWithoutOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addInverseManyToManyLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getInverseManyToManyLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -730,9 +655,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeInverseManyToManyLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getInverseManyToManyLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -757,9 +679,6 @@ class TestCollectionItem
         $this->inverseManyToManyExtraLazyWithOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addInverseManyToManyExtraLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getInverseManyToManyExtraLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -768,9 +687,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeInverseManyToManyExtraLazyWithOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getInverseManyToManyExtraLazyWithOrphanRemovalParents()->contains($parent)) {
@@ -795,9 +711,6 @@ class TestCollectionItem
         $this->inverseManyToManyExtraLazyWithoutOrphanRemovalParents = $parents;
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function addInverseManyToManyExtraLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if (!$this->getInverseManyToManyExtraLazyWithoutOrphanRemovalParents()->contains($parent)) {
@@ -806,9 +719,6 @@ class TestCollectionItem
         }
     }
 
-    /**
-     * @param TestCollection $parent
-     */
     public function removeInverseManyToManyExtraLazyWithoutOrphanRemovalParent(TestCollection $parent)
     {
         if ($this->getInverseManyToManyExtraLazyWithoutOrphanRemovalParents()->contains($parent)) {

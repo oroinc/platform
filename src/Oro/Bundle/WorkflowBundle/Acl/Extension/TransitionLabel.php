@@ -20,11 +20,6 @@ class TransitionLabel extends Label
     /** @var string */
     protected $fromLabel;
 
-    /**
-     * @param string      $transitionLabel
-     * @param string|null $toStepLabel
-     * @param string|null $fromStepLabel
-     */
     public function __construct(string $transitionLabel, string $toStepLabel = null, string $fromStepLabel = null)
     {
         parent::__construct($transitionLabel);
@@ -54,7 +49,6 @@ class TransitionLabel extends Label
 
         return sprintf(self::TRANSITION_LABEL_TEMPLATE, $transition, $fromStep, $toStep);
     }
-
 
     /**
      * {@inheritdoc}

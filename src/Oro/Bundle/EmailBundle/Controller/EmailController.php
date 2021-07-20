@@ -388,7 +388,6 @@ class EmailController extends AbstractController
         return ['results' => $results];
     }
 
-
     /**
      * This action is used to render the list of emails associated with the given entity
      * on the view page of this entity
@@ -700,7 +699,7 @@ class EmailController extends AbstractController
     {
         try {
             $this->get(EmailSynchronizationManager::class)->syncOrigins(
-                $this->get(EmailSynchronizationManager::class)->getEmailOrigins(
+                $this->get(EmailGridHelper::class)->getEmailOrigins(
                     $this->get(TokenAccessorInterface::class)->getUserId()
                 ),
                 true

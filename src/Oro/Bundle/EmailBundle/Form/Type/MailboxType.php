@@ -5,10 +5,9 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
@@ -37,18 +36,13 @@ class MailboxType extends AbstractType
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param MailboxProcessStorage $storage
-     * @param SymmetricCrypterInterface $encryptor
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         MailboxProcessStorage $storage,
         SymmetricCrypterInterface $encryptor,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->storage = $storage;
         $this->encryptor = $encryptor;
@@ -61,7 +55,7 @@ class MailboxType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'         => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
+            'data_class' => Mailbox::class,
         ]);
     }
 
@@ -144,8 +138,6 @@ class MailboxType extends AbstractType
      * PreSet event handler.
      *
      * Adds appropriate process field to form based on set value.
-     *
-     * @param FormEvent $event
      */
     public function preSet(FormEvent $event)
     {
@@ -191,8 +183,6 @@ class MailboxType extends AbstractType
 
     /**
      * Set password on form reload
-     *
-     * @param FormEvent $event
      */
     public function postSet(FormEvent $event)
     {
@@ -211,8 +201,6 @@ class MailboxType extends AbstractType
      * PreSubmit event handler.
      *
      * If process type is changed ... replace with proper form type and set process type to null.
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -239,8 +227,6 @@ class MailboxType extends AbstractType
 
     /**
      * Form post submit handler.
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -257,7 +243,6 @@ class MailboxType extends AbstractType
      */
     protected function setFolderStartSync(Mailbox $data = null)
     {
-        /* @var $origin UserEmailOrigin */
         if (!$data || !$origin = $data->getOrigin()) {
             return;
         }
@@ -272,8 +257,6 @@ class MailboxType extends AbstractType
 
     /**
      * Sets proper organization to origin. Set owner to null.
-     *
-     * @param Mailbox $data
      */
     protected function setOriginOrganizationAndOwner(Mailbox $data = null)
     {
@@ -323,9 +306,6 @@ class MailboxType extends AbstractType
 
     /**
      * Configures user field so it searches only within mailboxes' organization.
-     *
-     * @param FormInterface $form
-     * @param Mailbox       $data
      */
     protected function configureUserField(FormInterface $form, Mailbox $data)
     {

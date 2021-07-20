@@ -23,8 +23,6 @@ class OroEmailBundle implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addEmailFolderFields(Schema $schema)
@@ -43,8 +41,6 @@ class OroEmailBundle implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addEmailOriginFields(Schema $schema)
@@ -55,10 +51,6 @@ class OroEmailBundle implements Migration
         $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
     }
 
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     */
     public static function updateMailboxName(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_email_origin');
@@ -95,8 +87,6 @@ class OroEmailBundle implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function updateEmailRecipientConstraint(Schema $schema)

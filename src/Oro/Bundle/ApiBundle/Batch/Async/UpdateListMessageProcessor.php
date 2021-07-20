@@ -81,21 +81,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     private $splitFileTimeout = 30000; // 30 seconds
 
     /**
-     * @param JobRunner                   $jobRunner
-     * @param JobManagerInterface         $jobManager
-     * @param DependentJobService         $dependentJob
-     * @param FileSplitterRegistry        $splitterRegistry
-     * @param ChunkFileClassifierRegistry $chunkFileClassifierRegistry
-     * @param IncludeAccessorRegistry     $includeAccessorRegistry
-     * @param IncludeMapManager           $includeMapManager
-     * @param FileManager                 $sourceDataFileManager
-     * @param FileManager                 $fileManager
-     * @param MessageProducerInterface    $producer
-     * @param AsyncOperationManager       $operationManager
-     * @param UpdateListProcessingHelper  $processingHelper
-     * @param FileNameProvider            $fileNameProvider
-     * @param LoggerInterface             $logger
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -309,11 +294,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
     }
 
-    /**
-     * @param array $body
-     * @param array $splitterState
-     * @param int   $aggregateTime
-     */
     private function processNextSplitIteration(array $body, array $splitterState, int $aggregateTime): void
     {
         $body['splitterState'] = $splitterState;
@@ -385,13 +365,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
     }
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param Job       $rootJob
-     * @param int       $operationId
-     * @param string    $chunkJobNameTemplate
-     * @param array     $parentBody
-     */
     private function sendMessageToCreateChunkJobs(
         JobRunner $jobRunner,
         Job $rootJob,
@@ -414,10 +387,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         );
     }
 
-    /**
-     * @param int $operationId
-     * @param Job $rootJob
-     */
     private function saveOperationIdToJob(int $operationId, Job $rootJob): void
     {
         $data = $rootJob->getData();
@@ -426,10 +395,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->jobManager->saveJob($rootJob);
     }
 
-    /**
-     * @param int $operationId
-     * @param int $chunkCount
-     */
     private function createOperationInfoFile(int $operationId, int $chunkCount): void
     {
         $this->fileManager->writeToStorage(
@@ -438,10 +403,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         );
     }
 
-    /**
-     * @param array $body
-     * @param Job   $rootJob
-     */
     private function createFinishJob(array $body, Job $rootJob): void
     {
         $context = $this->dependentJob->createDependentJobContext($rootJob);
@@ -454,11 +415,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->dependentJob->saveDependentJob($context);
     }
 
-    /**
-     * @param array $body
-     *
-     * @return array
-     */
     private function getSplitterState(array $body): array
     {
         $splitterState = [];
@@ -513,11 +469,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
     }
 
-    /**
-     * @param \Exception       $exception
-     * @param array            $body
-     * @param MessageInterface $message
-     */
     private function handleSplitterException(\Exception $exception, array $body, MessageInterface $message): void
     {
         $operationId = $body['operationId'];
@@ -560,9 +511,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->operationManager->markAsFailed($operationId, $dataFileName, $errorMessage);
     }
 
-    /**
-     * @param string $fileName
-     */
     public function safeDeleteDataFile(string $fileName): void
     {
         try {

@@ -29,11 +29,6 @@ class AddExcludedActions implements ProcessorInterface
     /** @var MergeActionConfigHelper */
     private $mergeActionConfigHelper;
 
-    /**
-     * @param ConfigLoaderFactory     $configLoaderFactory
-     * @param ConfigBagRegistry       $configBagRegistry
-     * @param MergeActionConfigHelper $mergeActionConfigHelper
-     */
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
         ConfigBagRegistry $configBagRegistry,
@@ -73,12 +68,6 @@ class AddExcludedActions implements ProcessorInterface
 
     /**
      * Loads configuration from the "actions" section from "Resources/config/oro/api.yml"
-     *
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return ActionsConfig|null
      */
     private function getActionsConfig(string $entityClass, string $version, RequestType $requestType): ?ActionsConfig
     {
@@ -112,13 +101,6 @@ class AddExcludedActions implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return array
-     */
     private function getConfigs(string $entityClass, string $version, RequestType $requestType): array
     {
         $configs = [];
@@ -143,23 +125,11 @@ class AddExcludedActions implements ProcessorInterface
         return $configs;
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return array|null
-     */
     private function getConfig(string $entityClass, string $version, RequestType $requestType): ?array
     {
         return $this->configBagRegistry->getConfigBag($requestType)->getConfig($entityClass, $version);
     }
 
-    /**
-     * @param array|null $config
-     *
-     * @return bool
-     */
     private function isInherit(?array $config): bool
     {
         if (null !== $config && array_key_exists(ConfigUtil::INHERIT, $config)) {
@@ -169,11 +139,6 @@ class AddExcludedActions implements ProcessorInterface
         return true;
     }
 
-    /**
-     * @param array $configs
-     *
-     * @return array
-     */
     private function mergeActionConfigs(array $configs): array
     {
         $result = [];

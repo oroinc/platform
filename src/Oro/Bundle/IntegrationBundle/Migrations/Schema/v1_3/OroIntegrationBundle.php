@@ -30,8 +30,6 @@ class OroIntegrationBundle implements Migration, OrderedMigrationInterface
 
     /**
      * Change oro_integration_channel table
-     *
-     * @param Schema $schema
      */
     public static function modifyChannelTable(Schema $schema)
     {

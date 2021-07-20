@@ -17,9 +17,6 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
-    /**
-     * @param FilterNamesRegistry $filterNamesRegistry
-     */
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
@@ -49,12 +46,6 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
         $context->setInfoRecords($infoRecords);
     }
 
-    /**
-     * @param FilterValueAccessorInterface $filterValues
-     * @param string                       $pageNumberFilterName
-     *
-     * @return int
-     */
     protected function getPageNumber(FilterValueAccessorInterface $filterValues, string $pageNumberFilterName): int
     {
         $pageNumber = null;

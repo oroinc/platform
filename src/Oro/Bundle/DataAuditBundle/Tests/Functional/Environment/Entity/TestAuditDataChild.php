@@ -196,9 +196,6 @@ class TestAuditDataChild extends ExtendTestAuditDataChild implements
         $this->ownerManyToOne = $ownerManyToOne;
     }
 
-    /**
-     * @param array $fields
-     */
     public function setAdditionalFields(array $fields)
     {
         $this->additionalFields = $fields;
@@ -219,9 +216,7 @@ class TestAuditDataChild extends ExtendTestAuditDataChild implements
     {
         return $this->ownerCascade;
     }
-    /**
-     * @param TestAuditDataOwner $ownerCascade
-     */
+
     public function setOwnerCascade(TestAuditDataOwner $ownerCascade)
     {
         $this->ownerCascade = $ownerCascade;
@@ -233,9 +228,7 @@ class TestAuditDataChild extends ExtendTestAuditDataChild implements
     {
         return $this->ownerOrphanRemoval;
     }
-    /**
-     * @param TestAuditDataOwner $ownerOrphanRemoval
-     */
+
     public function setOwnerOrphanRemoval(TestAuditDataOwner $ownerOrphanRemoval)
     {
         $this->ownerOrphanRemoval = $ownerOrphanRemoval;

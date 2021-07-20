@@ -28,8 +28,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
 
     /**
      * Sets a flag indicates whether the primary data is a collection.
-     *
-     * @param bool $isCollection
      */
     public function setCollection(bool $isCollection): void
     {
@@ -59,8 +57,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
 
     /**
      * Adds the given entity data to the end of the data stack.
-     *
-     * @param array $data
      */
     public function addEntity(array $data = []): void
     {
@@ -80,8 +76,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
      * Sets the given entity data as the last element of the data stack.
      * If the last element contains data for another entity,
      * it will be overridden by the given data.
-     *
-     * @param array $data
      */
     public function setEntity(array $data): void
     {
@@ -100,10 +94,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
      * Sets the given association data as the last element of the data stack.
      * If the last element contains data for another association,
      * it will be overridden by the given data.
-     *
-     * @param string     $name
-     * @param array|null $data
-     * @param int|null   $index
      */
     public function setAssociation(string $name, ?array $data, int $index = null): void
     {
@@ -126,8 +116,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
 
     /**
      * Sets the item index for a current association.
-     *
-     * @param int|null $index
      */
     public function setAssociationIndex(int $index = null): void
     {
@@ -254,9 +242,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
         return $this->metadata[$itemPath][$propertyPath];
     }
 
-    /**
-     * @return string
-     */
     private function getPath(): string
     {
         if (null === $this->path) {
@@ -278,9 +263,6 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
         return $this->path;
     }
 
-    /**
-     * @return bool
-     */
     private function isLastElementAssociation(): bool
     {
         return 0 !== $this->lastIndex % 2;

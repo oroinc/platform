@@ -35,12 +35,6 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param EnumSynchronizer $enumSynchronizer
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(
         ConfigManager $configManager,
         TranslatorInterface $translator,
@@ -74,8 +68,6 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
 
     /**
      * Pre set data event handler
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
@@ -115,8 +107,6 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
 
     /**
      * Post submit event handler
-     *
-     * @param FormEvent $event
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -206,9 +196,6 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
             : null;
     }
 
-    /**
-     * @param array $options
-     */
     protected function sortOptions(array &$options)
     {
         usort($options, static fn ($a, $b) => $a['priority'] <=> $b['priority']);

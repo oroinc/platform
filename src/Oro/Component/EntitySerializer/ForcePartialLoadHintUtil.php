@@ -11,10 +11,6 @@ final class ForcePartialLoadHintUtil
 {
     /**
      * Checks whether using of Doctrine HINT_FORCE_PARTIAL_LOAD query hint is allowed.
-     *
-     * @param EntityConfig $config
-     *
-     * @return bool
      */
     public static function isForcePartialLoadHintEnabled(EntityConfig $config): bool
     {
@@ -39,8 +35,6 @@ final class ForcePartialLoadHintUtil
 
     /**
      * Disallows using of Doctrine HINT_FORCE_PARTIAL_LOAD query hint.
-     *
-     * @param EntityConfig $config
      */
     public static function disableForcePartialLoadHint(EntityConfig $config): void
     {
@@ -68,11 +62,6 @@ final class ForcePartialLoadHintUtil
         }
     }
 
-    /**
-     * @param string $hintName
-     *
-     * @return bool
-     */
     private static function isForcePartialLoadHint(string $hintName): bool
     {
         return

@@ -40,9 +40,6 @@ class CsrfProtection extends ConfigurationAnnotation
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isEnabled(): bool
     {
         return $this->enabled;
@@ -59,9 +56,6 @@ class CsrfProtection extends ConfigurationAnnotation
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isUseRequest(): bool
     {
         return $this->useRequest;

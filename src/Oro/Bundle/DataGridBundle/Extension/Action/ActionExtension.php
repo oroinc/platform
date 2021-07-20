@@ -326,11 +326,6 @@ class ActionExtension extends AbstractExtension
         };
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return array
-     */
     private function getUniqueAclResources(DatagridConfiguration $config): array
     {
         $aclResources = $this->getActionsAclResources($config);

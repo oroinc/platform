@@ -17,10 +17,6 @@ class SuiteConfigurationDivider implements SpecificationDividerInterface
      */
     protected $featurePathLocator;
 
-    /**
-     * @param FeatureAvgTimeRegistry $featureAvgTimeRegistry
-     * @param FeaturePathLocator $featurePathLocator
-     */
     public function __construct(
         FeatureAvgTimeRegistry $featureAvgTimeRegistry,
         FeaturePathLocator $featurePathLocator

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Job;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\BatchBundle\Tests\Functional\Fixture\LoadDoctrineJobRepositoryData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

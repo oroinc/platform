@@ -45,7 +45,6 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $options)
@@ -166,10 +165,6 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param ItemStub $actualContext
-     * @param ItemStub $expectedContext
-     * @param array $expectedData
      * @dataProvider optionsDataProvider
      */
     public function testExecute(

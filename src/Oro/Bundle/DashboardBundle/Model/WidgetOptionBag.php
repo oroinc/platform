@@ -9,9 +9,6 @@ class WidgetOptionBag implements \Serializable
      */
     protected $options = [];
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options = [])
     {
         $this->options = $options;

@@ -19,11 +19,6 @@ class Subquery implements ExpressionInterface
     /** @var Criteria */
     private $criteria;
 
-    /**
-     * @param string $from
-     * @param string $alias
-     * @param Criteria $criteria
-     */
     public function __construct(string $from, string $alias, Criteria $criteria)
     {
         $this->from = $from;
@@ -31,25 +26,16 @@ class Subquery implements ExpressionInterface
         $this->criteria = $criteria;
     }
 
-    /**
-     * @return string
-     */
     public function getFrom(): string
     {
         return $this->from;
     }
 
-    /**
-     * @return string
-     */
     public function getAlias(): string
     {
         return $this->alias;
     }
 
-    /**
-     * @return Criteria
-     */
     public function getCriteria(): Criteria
     {
         return $this->criteria;

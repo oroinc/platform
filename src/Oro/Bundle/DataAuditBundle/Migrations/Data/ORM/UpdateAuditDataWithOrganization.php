@@ -18,8 +18,6 @@ class UpdateAuditDataWithOrganization extends UpdateWithOrganization implements 
 
     /**
      * Update data audit with organization
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

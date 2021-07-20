@@ -14,9 +14,6 @@ class FixtureLoaderInitializer implements ContextInitializer
      */
     protected $fixtureLoader;
 
-    /**
-     * @param FixtureLoader $fixtureLoader
-     */
     public function __construct(FixtureLoader $fixtureLoader)
     {
         $this->fixtureLoader = $fixtureLoader;

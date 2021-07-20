@@ -37,9 +37,6 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
 
     /**
      * @dataProvider isApplicableDataProvider
-     *
-     * @param array $datagridConfigArray
-     * @param bool $expectedResult
      */
     public function testIsApplicable(array $datagridConfigArray, bool $expectedResult): void
     {
@@ -50,9 +47,6 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         self::assertSame($expectedResult, $this->extension->isApplicable($datagridConfig));
     }
 
-    /**
-     * @return array
-     */
     public function isApplicableDataProvider(): array
     {
         return [
@@ -95,9 +89,6 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
-    /**
-     * @param array $filtersState
-     */
     private function mockFiltersState(array $filtersState): void
     {
         $this->filtersStateProvider->expects(self::once())

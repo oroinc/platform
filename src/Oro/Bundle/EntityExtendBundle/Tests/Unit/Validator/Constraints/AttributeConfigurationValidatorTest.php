@@ -160,9 +160,6 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider validateDataProvider
-     *
-     * @param array $options
-     * @param array $expectedViolationParams
      */
     public function testValidate(array $options, array $expectedViolationParams)
     {

@@ -28,11 +28,6 @@ class ResponseHistoryListener implements ServiceSubscriberInterface
     /** @var array [route name => true, ...] */
     private $excludedRoutes = [];
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param string                 $userEntityClass
-     * @param ContainerInterface     $container
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         string $userEntityClass,
@@ -55,17 +50,12 @@ class ResponseHistoryListener implements ServiceSubscriberInterface
 
     /**
      * Adds a route to the list of routes that should not be added to the navigation history.
-     *
-     * @param string $routeName
      */
     public function addExcludedRoute(string $routeName): void
     {
         $this->excludedRoutes[$routeName] = true;
     }
 
-    /**
-     * @param ResponseEvent $event
-     */
     public function onResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
@@ -86,11 +76,6 @@ class ResponseHistoryListener implements ServiceSubscriberInterface
 
     /**
      * Checks if a current request can be added to a history.
-     *
-     * @param Request  $request
-     * @param Response $response
-     *
-     * @return bool
      */
     private function canAddToHistory(Request $request, Response $response): bool
     {
@@ -114,11 +99,6 @@ class ResponseHistoryListener implements ServiceSubscriberInterface
         return $result;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     private function isSupportedRoute(Request $request): bool
     {
         $route = $request->attributes->get('_route');

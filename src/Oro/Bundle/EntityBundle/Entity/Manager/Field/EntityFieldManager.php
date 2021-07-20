@@ -43,14 +43,6 @@ class EntityFieldManager
     /** @var EntityFieldValidator */
     protected $entityFieldValidator;
 
-    /**
-     * @param Registry $registry
-     * @param FormBuilder $formBuilder
-     * @param EntityApiBaseHandler $handler
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param EntityFieldValidator $entityFieldValidator
-     */
     public function __construct(
         Registry $registry,
         FormBuilder $formBuilder,

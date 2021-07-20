@@ -45,11 +45,6 @@ trait ChangedEntityGeneratorTrait
         }
     }
 
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return \Generator
-     */
     protected function getInsertedAndUpdatedEntities(UnitOfWork $uow): \Generator
     {
         foreach ($uow->getScheduledEntityInsertions() as $entity) {

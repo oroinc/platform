@@ -35,13 +35,6 @@ class WorkflowEntityValidator extends ConstraintValidator
     /** @var FieldHelper */
     protected $fieldHelper;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowPermissionRegistry $permissionRegistry
-     * @param RestrictionManager $restrictionManager
-     * @param FieldHelper $fieldHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         DoctrineHelper $doctrineHelper,

@@ -147,12 +147,6 @@ class AttachmentTest extends TestCase
 
     /**
      * @dataProvider getContentProvider
-     * @param $contentTransferEncoding
-     * @param $contentType
-     * @param $contentCharset
-     * @param $contentValue
-     * @param $expected
-     * @param $decodedValue
      */
     public function testGetContent(
         $contentTransferEncoding,
@@ -218,8 +212,6 @@ class AttachmentTest extends TestCase
 
     /**
      * @dataProvider getEmbeddedContentIdProvider
-     * @param $rawHeaders
-     * @param $expected
      */
     public function testGetEmbeddedContentId($rawHeaders, $expected)
     {

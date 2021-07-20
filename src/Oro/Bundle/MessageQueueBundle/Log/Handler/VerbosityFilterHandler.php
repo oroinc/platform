@@ -75,9 +75,6 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
             && parent::handle($record);
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onCommand(ConsoleCommandEvent $event)
     {
         $this->output = $event->getOutput();

@@ -21,7 +21,7 @@ class ScheduleManager
 
     /**
      * @param ManagerRegistry $registry
-     * @param SchedulesByArgumentsFilterInterface $schedulesByArgumentsFilter,
+     * @param SchedulesByArgumentsFilterInterface $schedulesByArgumentsFilter
      * @param string $scheduleClass
      */
     public function __construct(

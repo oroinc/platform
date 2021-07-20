@@ -25,12 +25,6 @@ class ServiceLocatorCompilerPass implements CompilerPassInterface
     /** @var bool */
     private $isServiceLocatorOptional;
 
-    /**
-     * @param string      $serviceLocatorServiceId
-     * @param string      $tagName
-     * @param string|null $nameAttribute
-     * @param bool        $isServiceLocatorOptional
-     */
     public function __construct(
         string $serviceLocatorServiceId,
         string $tagName,

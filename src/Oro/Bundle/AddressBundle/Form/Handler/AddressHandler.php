@@ -27,12 +27,6 @@ class AddressHandler
      */
     protected $manager;
 
-    /**
-     *
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
     public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $manager)
     {
         $this->form = $form;
@@ -65,8 +59,6 @@ class AddressHandler
 
     /**
      * "Success" form handler
-     *
-     * @param AbstractAddress $address
      */
     protected function onSuccess(AbstractAddress $address)
     {

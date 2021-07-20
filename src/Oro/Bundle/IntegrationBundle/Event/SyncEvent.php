@@ -51,9 +51,6 @@ class SyncEvent extends Event
         return $this->configuration;
     }
 
-    /**
-     * @param array $configuration
-     */
     public function setConfiguration(array $configuration)
     {
         $this->configuration = $configuration;

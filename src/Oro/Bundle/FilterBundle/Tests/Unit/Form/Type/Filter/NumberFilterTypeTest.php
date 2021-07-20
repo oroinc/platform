@@ -87,11 +87,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
 
     /**
      * @dataProvider bindDataProvider
-     *
-     * @param array $bindData
-     * @param array $formData
-     * @param array $viewData
-     * @param array $customOptions
      */
     public function testBindData(
         array $bindData,
@@ -286,11 +281,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
 
     /**
      * @dataProvider bindDataWithAnotherLocaleProvider
-     *
-     * @param array $bindData
-     * @param array $formData
-     * @param array $viewData
-     * @param array $customOptions
      */
     public function testBindDataWithAnotherLocale(
         array $bindData,

@@ -9,9 +9,6 @@ class LoadTemplateFixturesEvent extends Event
     /** @var array */
     protected $entities;
 
-    /**
-     * @param array $entities
-     */
     public function __construct(array $entities)
     {
         $this->entities = $entities;

@@ -57,9 +57,6 @@ class OrmResultAfter extends Event implements GridEventInterface
         return $this->records;
     }
 
-    /**
-     * @param array $records
-     */
     public function setRecords(array $records)
     {
         $this->records = $records;

@@ -16,10 +16,6 @@ abstract class AttachmentContext extends OroFeatureContext
 
     /**
      * Download the file using active session
-     *
-     * @param string $url
-     *
-     * @return ResponseInterface
      */
     public function downloadAttachment(string $url): ResponseInterface
     {
@@ -32,12 +28,6 @@ abstract class AttachmentContext extends OroFeatureContext
         return $client->get($this->locatePath($url));
     }
 
-    /**
-     * @param $entity
-     * @param string $attachmentField
-     *
-     * @return string
-     */
     public function getAttachmentUrl($entity, string $attachmentField): string
     {
         $attachment = $this->getAttachmentByEntity($entity, $attachmentField);
@@ -45,12 +35,6 @@ abstract class AttachmentContext extends OroFeatureContext
         return $this->getAttachmentManager()->getFileUrl($attachment);
     }
 
-    /**
-     * @param $entity
-     * @param string $field
-     *
-     * @return File
-     */
     protected function getAttachmentByEntity($entity, string $field): File
     {
         $accessor = PropertyAccess::createPropertyAccessor();
@@ -58,21 +42,12 @@ abstract class AttachmentContext extends OroFeatureContext
         return $accessor->getValue($entity, $field);
     }
 
-    /**
-     * @return AttachmentManager
-     */
     protected function getAttachmentManager(): AttachmentManager
     {
         return $this->getContainer()->get('oro_attachment.manager');
     }
 
-    /**
-     * @param ResponseInterface $response
-     */
     abstract protected function assertResponseSuccess(ResponseInterface $response): void;
 
-    /**
-     * @param ResponseInterface $response
-     */
     abstract protected function assertResponseFail(ResponseInterface $response): void;
 }

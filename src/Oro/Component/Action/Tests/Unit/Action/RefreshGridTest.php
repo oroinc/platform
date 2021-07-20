@@ -55,9 +55,6 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider executeMethodProvider
      */
     public function testExecuteMethod(array $inputData, array $expectedData)

@@ -41,14 +41,6 @@ class NeqOrNullComparisonExpression implements ComparisonExpressionInterface
         return $builder->orX($mainExpr, $builder->isNull($expression));
     }
 
-    /**
-     * @param QueryExpressionVisitor $visitor
-     * @param string                 $field
-     * @param string                 $parameterName
-     * @param Range                  $value
-     *
-     * @return Expr\Func
-     */
     private function walkRangeExpression(
         QueryExpressionVisitor $visitor,
         string $field,

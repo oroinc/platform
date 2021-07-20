@@ -18,8 +18,6 @@ class AddSegmentNameValidationColumn implements Migration, DatabasePlatformAware
 
     /**
      * Sets the database platform
-     *
-     * @param AbstractPlatform $platform
      */
     public function setDatabasePlatform(AbstractPlatform $platform): void
     {
@@ -71,11 +69,6 @@ class AddSegmentNameValidationColumn implements Migration, DatabasePlatformAware
         }
     }
 
-    /**
-     * @param Schema $schema
-     * @param Schema $toSchema
-     * @return array
-     */
     protected function getSchemaDiff(Schema $schema, Schema $toSchema): array
     {
         return (new Comparator())->compare($schema, $toSchema)->toSql($this->platform);

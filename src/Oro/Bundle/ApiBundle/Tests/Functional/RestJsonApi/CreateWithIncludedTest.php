@@ -24,17 +24,11 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
         ]);
     }
 
-    /**
-     * @return Organization
-     */
     private function getOrganization(): Organization
     {
         return $this->getReference('organization');
     }
 
-    /**
-     * @return BusinessUnit
-     */
     private function getBusinessUnit(): BusinessUnit
     {
         return $this->getReference('business_unit');

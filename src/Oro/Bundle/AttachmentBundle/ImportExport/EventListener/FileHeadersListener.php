@@ -12,9 +12,6 @@ use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
  */
 class FileHeadersListener
 {
-    /**
-     * @param LoadEntityRulesAndBackendHeadersEvent $event
-     */
     public function afterLoadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event): void
     {
         if ($event->getEntityName() !== File::class) {

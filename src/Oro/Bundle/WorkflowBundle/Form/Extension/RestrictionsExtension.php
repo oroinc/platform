@@ -17,12 +17,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class RestrictionsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /**
      * @var WorkflowManager
      */
     protected $workflowManager;
-    
+
     /**
      * @var DoctrineHelper
      */
@@ -33,11 +33,6 @@ class RestrictionsExtension extends AbstractTypeExtension
      */
     protected $restrictionsManager;
 
-    /**
-     * @param WorkflowManager    $workflowManager
-     * @param DoctrineHelper     $doctrineHelper
-     * @param RestrictionManager $restrictionManager
-     */
     public function __construct(
         WorkflowManager $workflowManager,
         DoctrineHelper $doctrineHelper,
@@ -66,9 +61,6 @@ class RestrictionsExtension extends AbstractTypeExtension
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function addRestrictionListener(FormEvent $event)
     {
         $entity = $event->getData();
@@ -93,10 +85,6 @@ class RestrictionsExtension extends AbstractTypeExtension
         $resolver->setDefaults(['disable_workflow_restrictions' => false]);
     }
 
-    /**
-     * @param array         $restriction
-     * @param FormInterface $form
-     */
     protected function applyRestriction(array $restriction, FormInterface $form)
     {
         $field = $restriction['field'];

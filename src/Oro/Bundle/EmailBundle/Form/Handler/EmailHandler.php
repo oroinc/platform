@@ -37,12 +37,6 @@ class EmailHandler
      */
     protected $logger;
 
-    /**
-     * @param FormInterface   $form
-     * @param RequestStack    $requestStack
-     * @param Processor       $emailProcessor
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,

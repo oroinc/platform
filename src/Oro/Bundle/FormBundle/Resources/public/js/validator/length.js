@@ -1,6 +1,7 @@
-define(['underscore', './number'
-], function(_, numberValidator) {
+define(function(require) {
     'use strict';
+
+    const numberValidator = require('oroform/js/validator/number');
 
     const defaultParam = {
         exactMessage: 'This value should have exactly {{ limit }} character.|' +
@@ -22,7 +23,7 @@ define(['underscore', './number'
         function(param, element) {
             const value = this.elementValue(element);
             const placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             placeholders.value = value;
             return numberValidator[2].call(this, param, element, value.length, placeholders);
         }

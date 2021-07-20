@@ -77,9 +77,6 @@ abstract class WorkflowTestCase extends WebTestCase
         $this->assertCount($expected, $this->getEntityManager($class)->getRepository($class)->findBy($criteria));
     }
 
-    /**
-     * @param $expected
-     */
     protected function assertWorkflowTransitionRecordCount($expected)
     {
         $class = WorkflowTransitionRecord::class;

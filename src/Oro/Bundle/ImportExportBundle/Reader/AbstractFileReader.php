@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -56,7 +56,6 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
     protected function initializeFromContext(ContextInterface $context)
@@ -79,8 +78,6 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
     }
 
     /**
-     * @param array $data
-     * @return array
      * @throws InvalidItemException
      */
     protected function normalizeRow(array $data): array
@@ -138,8 +135,6 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
     }
 
     /**
-     * @param array $data
-     *
      * @throws InvalidItemException
      */
     protected function validateColumnCount(array $data)
@@ -168,9 +163,6 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
         }
     }
 
-    /**
-     * @param array $data
-     */
     protected function convertEncoding(array &$data): void
     {
         foreach ($data as $key => $item) {
@@ -180,10 +172,6 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
         }
     }
 
-    /**
-     * @param string $item
-     * @return bool
-     */
     protected function validateEncoding(string $item): bool
     {
         return (boolean)mb_detect_encoding($item, self::DEFAULT_ENCODING, true);

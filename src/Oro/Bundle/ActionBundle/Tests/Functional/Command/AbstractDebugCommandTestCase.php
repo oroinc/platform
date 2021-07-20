@@ -45,13 +45,7 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $this->assertEquals(sprintf('Type "%s" is not found', $name), $result);
     }
 
-    /**
-     * @return string
-     */
     abstract protected function getFactoryServiceId(): string;
 
-    /**
-     * @return string
-     */
     abstract protected function getCommandName(): string;
 }

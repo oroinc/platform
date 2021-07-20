@@ -23,17 +23,11 @@ class EventTriggerCache
     /** @var string */
     protected $triggerClassName;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
-    /**
-     * @param CacheProvider $provider
-     */
     public function setProvider(CacheProvider $provider)
     {
         $this->provider = $provider;

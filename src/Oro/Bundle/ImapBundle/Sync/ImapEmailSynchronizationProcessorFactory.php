@@ -22,11 +22,6 @@ class ImapEmailSynchronizationProcessorFactory
     /** @var ImapEmailRemoveManager */
     protected $removeManager;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param ImapEmailRemoveManager $removeManager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailEntityBuilder $emailEntityBuilder,

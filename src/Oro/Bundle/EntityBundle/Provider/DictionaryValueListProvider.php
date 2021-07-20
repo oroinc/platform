@@ -16,10 +16,6 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ConfigManager   $configManager
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine

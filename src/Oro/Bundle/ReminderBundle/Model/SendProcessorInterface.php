@@ -11,8 +11,6 @@ interface SendProcessorInterface
 {
     /**
      * Push reminder to process queue
-     *
-     * @param Reminder $reminder
      */
     public function push(Reminder $reminder);
 

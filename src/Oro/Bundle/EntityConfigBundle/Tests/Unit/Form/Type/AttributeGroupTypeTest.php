@@ -268,10 +268,6 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider postSetDataDataProvider
-     *
-     * @param AttributeGroup $attributeGroup
-     * @param array $choices
-     * @param array $expectedChoices
      */
     public function testPostSetData(AttributeGroup $attributeGroup, array $choices, array $expectedChoices): void
     {
@@ -312,9 +308,6 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         (new AttributeGroupType())->postSetData($formEvent);
     }
 
-    /**
-     * @return array
-     */
     public function postSetDataDataProvider(): array
     {
         $attributeGroup = new AttributeGroup();

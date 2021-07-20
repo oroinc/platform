@@ -21,10 +21,6 @@ class OroNoteBundle implements Migration, AttachmentExtensionAwareInterface
         self::addAttachment($schema, $this->attachmentExtension);
     }
 
-    /**
-     * @param Schema              $schema
-     * @param AttachmentExtension $attachmentExtension
-     */
     public static function addAttachment(Schema $schema, AttachmentExtension $attachmentExtension)
     {
         $attachmentExtension->addFileRelation(

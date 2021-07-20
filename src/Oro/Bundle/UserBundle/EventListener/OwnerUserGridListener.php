@@ -55,9 +55,6 @@ class OwnerUserGridListener
         $this->treeProvider = $treeProvider;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $parameters  = $event->getDatagrid()->getParameters();

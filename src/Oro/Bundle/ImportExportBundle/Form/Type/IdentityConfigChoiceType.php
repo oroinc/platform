@@ -28,10 +28,6 @@ class IdentityConfigChoiceType extends AbstractConfigType
      */
     protected $registry;
 
-    /**
-     * @param ConfigTypeHelper $typeHelper
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ConfigTypeHelper $typeHelper, ManagerRegistry $registry)
     {
         parent::__construct($typeHelper);
@@ -51,8 +47,6 @@ class IdentityConfigChoiceType extends AbstractConfigType
 
     /**
      * Set default value
-     *
-     * @param FormEvent $event
      */
     public function onPreSetData(FormEvent $event)
     {

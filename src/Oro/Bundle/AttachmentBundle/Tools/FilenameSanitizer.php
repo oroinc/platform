@@ -7,10 +7,6 @@ namespace Oro\Bundle\AttachmentBundle\Tools;
  */
 class FilenameSanitizer
 {
-    /**
-     * @param string $fileName
-     * @return string
-     */
     public static function sanitizeFilename(string $fileName): string
     {
         return trim(

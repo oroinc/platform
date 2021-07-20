@@ -24,11 +24,6 @@ class InstallCommandListener
     /** @var bool */
     protected $isScheduled;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param string $reindexCommandName
-     * @param bool $isScheduled
-     */
     public function __construct(RequestStack $requestStack, string $reindexCommandName, bool $isScheduled = false)
     {
         $this->requestStack = $requestStack;
@@ -36,9 +31,6 @@ class InstallCommandListener
         $this->isScheduled = $isScheduled;
     }
 
-    /**
-     * @param InstallerEvent $event
-     */
     public function onAfterDatabasePreparation(InstallerEvent $event)
     {
         if (!$this->isApplicable($event->getCommand())) {
@@ -59,10 +51,6 @@ class InstallCommandListener
         $output->writeln('');
     }
 
-    /**
-     * @param Command $command
-     * @return bool
-     */
     protected function isApplicable(Command $command): bool
     {
         return $command->getName() === InstallCommand::getDefaultName();

@@ -13,9 +13,6 @@ use Symfony\Component\Routing\Route;
  */
 class RouteCollectionListener
 {
-    /**
-     * @param RouteCollectionEvent $event
-     */
     public function onCollectionAutoload(RouteCollectionEvent $event): void
     {
         $collection = $event->getCollection();

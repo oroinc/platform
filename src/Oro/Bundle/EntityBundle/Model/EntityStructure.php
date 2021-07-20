@@ -120,9 +120,6 @@ class EntityStructure implements \Serializable
         }
     }
 
-    /**
-     * @param EntityFieldStructure $field
-     */
     public function addField(EntityFieldStructure $field)
     {
         $this->fields[] = $field;

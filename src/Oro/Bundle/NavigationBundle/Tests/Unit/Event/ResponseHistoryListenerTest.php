@@ -42,9 +42,6 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->addExcludedRoute('oro_default');
     }
 
-    /**
-     * @return Request
-     */
     private function getRequest(string $route = 'test_route', string $format = 'html', string $method = 'GET'): Request
     {
         $request = new Request(['id' => 1], [], ['_route' => $route, '_route_params' => []]);
@@ -54,21 +51,11 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         return $request;
     }
 
-    /**
-     * @return Response
-     */
     private function getResponse(int $statusCode = 200): Response
     {
         return new Response('message', $statusCode);
     }
 
-    /**
-     * @param Request  $request
-     * @param Response $response
-     * @param bool     $isMasterRequest
-     *
-     * @return ResponseEvent
-     */
     private function getEvent(Request $request, Response $response, bool $isMasterRequest = true): ResponseEvent
     {
         return new ResponseEvent(

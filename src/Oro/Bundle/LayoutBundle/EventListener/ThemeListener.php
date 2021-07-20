@@ -32,9 +32,6 @@ class ThemeListener implements EventSubscriberInterface
         $this->defaultActiveTheme = $defaultActiveTheme;
     }
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -62,9 +59,6 @@ class ThemeListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [

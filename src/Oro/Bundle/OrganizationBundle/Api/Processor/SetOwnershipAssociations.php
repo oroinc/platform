@@ -16,9 +16,6 @@ class SetOwnershipAssociations implements ProcessorInterface
     /** @var EntityOwnershipAssociationsSetter */
     private $entityOwnershipAssociationsSetter;
 
-    /**
-     * @param EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter
-     */
     public function __construct(EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter)
     {
         $this->entityOwnershipAssociationsSetter = $entityOwnershipAssociationsSetter;

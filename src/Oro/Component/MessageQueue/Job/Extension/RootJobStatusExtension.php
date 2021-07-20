@@ -14,9 +14,6 @@ class RootJobStatusExtension extends AbstractExtension
     /** @var RootJobStatusCalculatorInterface */
     private $rootJobStatusCalculator;
 
-    /**
-     * @param RootJobStatusCalculatorInterface $rootJobStatusCalculator
-     */
     public function __construct(RootJobStatusCalculatorInterface $rootJobStatusCalculator)
     {
         $this->rootJobStatusCalculator = $rootJobStatusCalculator;
@@ -54,9 +51,6 @@ class RootJobStatusExtension extends AbstractExtension
         $this->calculateJobStatusMessage($job);
     }
 
-    /**
-     * @param Job $job
-     */
     private function calculateJobStatusMessage(Job $job): void
     {
         $this->rootJobStatusCalculator->calculate($job);

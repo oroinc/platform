@@ -415,7 +415,6 @@ class ProcessorDecorator
      * @param string $fieldName
      * @param $filedOptions
      * @return bool
-     *
      */
     protected function isVariableNameValid($fieldName, $filedOptions)
     {

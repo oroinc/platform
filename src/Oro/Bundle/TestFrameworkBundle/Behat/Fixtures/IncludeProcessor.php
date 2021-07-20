@@ -20,10 +20,6 @@ class IncludeProcessor implements IncludeProcessorInterface
     /** @var KernelInterface */
     protected $kernel;
 
-    /**
-     * @param IncludeProcessorInterface $includeProcessor
-     * @param KernelInterface $kernel
-     */
     public function __construct(IncludeProcessorInterface $includeProcessor, KernelInterface $kernel)
     {
         $this->includeProcessor = $includeProcessor;

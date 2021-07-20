@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -20,9 +20,6 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
     /** @var DoctrineClearWriter */
     protected $clearWriter;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;
@@ -40,9 +37,6 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
         }
     }
 
-    /**
-     * @param DoctrineClearWriter $clearWriter
-     */
     public function setClearWriter(DoctrineClearWriter $clearWriter): void
     {
         $this->clearWriter = $clearWriter;

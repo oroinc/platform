@@ -38,19 +38,11 @@ trait DraftableTrait
      */
     protected $draftOwner;
 
-    /**
-     * @return string|null
-     */
     public function getDraftUuid(): ?string
     {
         return $this->draftUuid;
     }
 
-    /**
-     * @param string $draftUuid
-     *
-     * @return DraftableInterface
-     */
     public function setDraftUuid(string $draftUuid): DraftableInterface
     {
         $this->draftUuid = $draftUuid;
@@ -58,11 +50,6 @@ trait DraftableTrait
         return $this;
     }
 
-    /**
-     * @param DraftProject $draftProject
-     *
-     * @return DraftableInterface
-     */
     public function setDraftProject(DraftProject $draftProject): DraftableInterface
     {
         $this->draftProject = $draftProject;
@@ -70,19 +57,11 @@ trait DraftableTrait
         return $this;
     }
 
-    /**
-     * @return DraftProject|null
-     */
     public function getDraftProject(): ?DraftProject
     {
         return $this->draftProject;
     }
 
-    /**
-     * @param DraftableInterface $draftSource
-     *
-     * @return DraftableInterface
-     */
     public function setDraftSource(DraftableInterface $draftSource): DraftableInterface
     {
         $this->draftSource = $draftSource;
@@ -90,9 +69,6 @@ trait DraftableTrait
         return $this;
     }
 
-    /**
-     * @return DraftableInterface|null
-     */
     public function getDraftSource(): ?DraftableInterface
     {
         return $this->draftSource;
@@ -106,11 +82,6 @@ trait DraftableTrait
         return $this->draftOwner;
     }
 
-    /**
-     * @param User $draftOwner
-     *
-     * @return DraftableInterface
-     */
     public function setDraftOwner(User $draftOwner): DraftableInterface
     {
         $this->draftOwner = $draftOwner;

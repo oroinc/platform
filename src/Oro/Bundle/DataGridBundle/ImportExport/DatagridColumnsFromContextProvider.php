@@ -27,10 +27,6 @@ class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextPr
     /** @var DatagridStateProviderInterface */
     private $columnsStateProvider;
 
-    /**
-     * @param Manager $datagridManager
-     * @param DatagridStateProviderInterface $columnsStateProvider
-     */
     public function __construct(Manager $datagridManager, DatagridStateProviderInterface $columnsStateProvider)
     {
         $this->datagridManager = $datagridManager;
@@ -65,11 +61,6 @@ class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextPr
      * - updates properties of columns with actual values taken from state - "order" and "renderable";
      * - sorts columns by "order" property;
      * - excludes non-renderable columns;
-     *
-     * @param array $columns
-     * @param ContextInterface $context
-     *
-     * @return array
      */
     private function applyState(array $columns, ContextInterface $context): array
     {
@@ -102,11 +93,6 @@ class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextPr
         });
     }
 
-    /**
-     * @param ContextInterface $context
-     *
-     * @return DatagridConfiguration
-     */
     private function getDatagridConfiguration(ContextInterface $context): DatagridConfiguration
     {
         $gridName = $context->getOption('gridName');

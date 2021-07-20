@@ -32,11 +32,6 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
      */
     protected $deletedAttributeProvider;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param LoggerInterface $logger
-     * @param DeletedAttributeProviderInterface $deletedAttributeProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LoggerInterface $logger,

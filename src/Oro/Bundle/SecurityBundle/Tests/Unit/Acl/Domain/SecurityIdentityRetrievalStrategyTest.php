@@ -11,7 +11,6 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SecurityIdentityRetrievalStrategy */
     private SecurityIdentityRetrievalStrategy $strategy;
 
     protected function setUp(): void

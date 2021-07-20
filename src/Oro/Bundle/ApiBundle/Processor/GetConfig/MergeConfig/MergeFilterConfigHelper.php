@@ -9,12 +9,6 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class MergeFilterConfigHelper
 {
-    /**
-     * @param array $config
-     * @param array $filtersConfig
-     *
-     * @return array
-     */
     public function mergeFiltersConfig(array $config, array $filtersConfig): array
     {
         if (ConfigUtil::isExcludeAll($filtersConfig) || !\array_key_exists(ConfigUtil::FILTERS, $config)) {
@@ -33,11 +27,6 @@ class MergeFilterConfigHelper
         return $config;
     }
 
-    /**
-     * @param array $config
-     * @param array $filtersConfig
-     * @return array
-     */
     private function merge(array $config, array $filtersConfig): array
     {
         foreach ($filtersConfig as $filterName => $filterConfig) {

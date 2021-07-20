@@ -31,10 +31,6 @@ class AttributeMultiSelectType extends AbstractType
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param AttributeManager $attributeManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(AttributeManager $attributeManager, TranslatorInterface $translator)
     {
         $this->attributeManager = $attributeManager;
@@ -80,10 +76,6 @@ class AttributeMultiSelectType extends AbstractType
         return $this->choices;
     }
 
-    /**
-     * @param int $id
-     * @return string
-     */
     private function getFieldNameByFieldId(int $id): string
     {
         if ($this->isSystem($id)) {

@@ -30,9 +30,6 @@ abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator imp
     /** @var string */
     protected $dbUser;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $kernel->boot();
@@ -89,9 +86,6 @@ abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator imp
         $event->writeln('<info>Db was restored from dump</info>');
     }
 
-    /**
-     * @param string $dbName
-     */
     protected function dropDb(string $dbName): void
     {
         $this->runProcess(

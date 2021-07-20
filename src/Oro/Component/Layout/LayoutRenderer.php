@@ -13,10 +13,6 @@ class LayoutRenderer implements LayoutRendererInterface
     /** @var FormRendererEngineInterface */
     private $formRendererEngine;
 
-    /**
-     * @param FormRendererInterface $innerRenderer
-     * @param FormRendererEngineInterface $formRendererEngine
-     */
     public function __construct(FormRendererInterface $innerRenderer, FormRendererEngineInterface $formRendererEngine)
     {
         $this->innerRenderer = $innerRenderer;

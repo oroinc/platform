@@ -11,9 +11,6 @@ class EmptyFixture extends AbstractTemplateRepository implements TemplateFixture
     /** @var string */
     protected $entityClass;
 
-    /**
-     * @param $entityClass
-     */
     public function __construct($entityClass)
     {
         $this->entityClass = $entityClass;

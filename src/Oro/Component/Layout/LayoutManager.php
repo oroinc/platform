@@ -7,9 +7,6 @@ class LayoutManager
     /** @var LayoutFactoryBuilderInterface */
     protected $layoutFactoryBuilder;
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     public function __construct(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->layoutFactoryBuilder = $layoutFactoryBuilder;

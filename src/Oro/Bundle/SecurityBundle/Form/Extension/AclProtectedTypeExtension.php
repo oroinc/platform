@@ -26,9 +26,6 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;

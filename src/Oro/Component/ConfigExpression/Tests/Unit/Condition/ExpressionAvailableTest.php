@@ -43,9 +43,6 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     *
-     * @param array $options
-     * @param $expectedResult
      */
     public function testEvaluate(array $options, $expectedResult)
     {

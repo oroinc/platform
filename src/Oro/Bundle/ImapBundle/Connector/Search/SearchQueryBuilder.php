@@ -11,8 +11,6 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
 {
     /**
      * Constructor.
-     *
-     * @param SearchQuery $query
      */
     public function __construct(SearchQuery $query)
     {
@@ -179,11 +177,6 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
         }
     }
 
-    /**
-     * @param $name
-     * @param $value
-     * @param $match
-     */
     public function processField($name, $value, $match)
     {
         if ($value instanceof \Closure) {

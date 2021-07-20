@@ -51,12 +51,6 @@ abstract class AbstractGuesser
      */
     protected $doctrineTypeMappingProvider;
 
-    /**
-     * @param FormRegistry    $formRegistry
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider  $entityConfigProvider
-     * @param ConfigProvider  $formConfigProvider
-     */
     public function __construct(
         FormRegistry $formRegistry,
         ManagerRegistry $managerRegistry,
@@ -69,9 +63,6 @@ abstract class AbstractGuesser
         $this->formConfigProvider = $formConfigProvider;
     }
 
-    /**
-     * @param DoctrineTypeMappingProvider|null $doctrineTypeMappingProvider
-     */
     public function setDoctrineTypeMappingProvider(DoctrineTypeMappingProvider $doctrineTypeMappingProvider = null)
     {
         $this->doctrineTypeMappingProvider = $doctrineTypeMappingProvider;

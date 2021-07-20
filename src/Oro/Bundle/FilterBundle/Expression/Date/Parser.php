@@ -13,9 +13,6 @@ class Parser
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(LocaleSettings $localeSettings)
     {
         $this->localeSettings = $localeSettings;
@@ -118,8 +115,6 @@ class Parser
 
     /**
      * Validates token stream
-     *
-     * @param array $tokens
      *
      * @throws SyntaxException
      */

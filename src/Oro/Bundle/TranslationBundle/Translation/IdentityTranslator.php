@@ -48,11 +48,6 @@ class IdentityTranslator implements TranslatorInterface, LoggerAwareInterface
 
     /**
      * The implementation of this method originates from Symfony\Contracts\Translation\TranslatorTrait
-     *
-     * @param string $id
-     * @param array $parameters
-     * @param string|null $locale
-     * @return string
      */
     private function transLastPluralOption(string $id, array $parameters = [], string $locale = null): string
     {

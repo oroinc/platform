@@ -23,9 +23,6 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

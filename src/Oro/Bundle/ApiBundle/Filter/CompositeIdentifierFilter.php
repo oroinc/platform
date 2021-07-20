@@ -46,9 +46,6 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         $this->metadata = $metadata;
     }
 
-    /**
-     * @param EntityIdTransformerRegistry $registry
-     */
     public function setEntityIdTransformerRegistry(EntityIdTransformerRegistry $registry): void
     {
         $this->entityIdTransformerRegistry = $registry;
@@ -130,11 +127,6 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         return $expr;
     }
 
-    /**
-     * @param array $value
-     *
-     * @return Expression
-     */
     private function buildEqualExpression(array $value): Expression
     {
         $expressions = [];
@@ -148,11 +140,6 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         return new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
     }
 
-    /**
-     * @param array $value
-     *
-     * @return Expression
-     */
     private function buildNotEqualExpression(array $value): Expression
     {
         $expressions = [];
@@ -166,9 +153,6 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         return new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
     }
 
-    /**
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($this->requestType);

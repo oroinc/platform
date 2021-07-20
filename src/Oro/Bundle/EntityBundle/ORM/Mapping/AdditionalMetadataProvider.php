@@ -15,10 +15,6 @@ class AdditionalMetadataProvider
     /** @var Cache */
     protected $cacheDriver;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param Cache $cacheDriver
-     */
     public function __construct(ManagerRegistry $registry, Cache $cacheDriver)
     {
         $this->registry = $registry;

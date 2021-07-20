@@ -206,11 +206,6 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         );
     }
 
-    /**
-     * @param array $statements
-     * @param int $statementCounter
-     * @param array|null $actualSqls
-     */
     private function mockQuery(array &$statements, int &$statementCounter, ?array &$actualSqls): void
     {
         $this->getDriverConnectionMock($this->em)
@@ -516,10 +511,6 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
     /**
      * @dataProvider pageCallbackDataProvider
-     *
-     * @param array $statements
-     * @param int $bufferSize
-     * @param int $expectedPages
      */
     public function testPageCallback(array $statements, int $bufferSize, int $expectedPages): void
     {
@@ -543,9 +534,6 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals($expectedPages, $pages);
     }
 
-    /**
-     * @return array
-     */
     public function pageCallbackDataProvider(): array
     {
         $records = [
@@ -600,10 +588,6 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
     /**
      * @dataProvider pageLoadedCallbackProvider
-     *
-     * @param array $statements
-     * @param array $expectedResult
-     * @param callable $pageLoadedCallback
      */
     public function testPageLoadedCallback(array $statements, array $expectedResult, callable $pageLoadedCallback): void
     {
@@ -621,9 +605,6 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals($expectedResult, iterator_to_array($iterator));
     }
 
-    /**
-     * @return array
-     */
     public function pageLoadedCallbackProvider(): array
     {
         $records = [

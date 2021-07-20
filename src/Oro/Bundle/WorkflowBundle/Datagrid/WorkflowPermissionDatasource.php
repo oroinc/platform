@@ -29,13 +29,6 @@ class WorkflowPermissionDatasource extends RolePrivilegeAbstractProvider impleme
     /** @var AbstractRole */
     protected $role;
 
-    /**
-     * @param TranslatorInterface           $translator
-     * @param PermissionManager             $permissionManager
-     * @param AclRoleHandler                $aclRoleHandler
-     * @param RolePrivilegeCategoryProvider $categoryProvider
-     * @param ConfigManager                 $configEntityManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         PermissionManager $permissionManager,

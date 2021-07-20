@@ -1,8 +1,4 @@
 services:
-    oro_entity_config.link.entity_manager:
-        tags:
-            - { name: oro_service_link, service: doctrine.orm.config_entity_manager }
-
     oro_entity_config.entity_manager_bag:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag
@@ -40,7 +36,7 @@ services:
     oro_entity_config.config_model_manager:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
         arguments:
-            - '@oro_entity_config.link.entity_manager'
+            - '@doctrine'
             - '@oro_entity_config.config_model_lock_object'
             - '@oro_entity_config.database_checker'
 

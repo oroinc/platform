@@ -7,17 +7,11 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollectionItem;
 
 abstract class AbstractManyToManyCollectionTestCase extends AbstractCollectionTestCase
 {
-    /**
-     * @return string
-     */
     protected function getCollectionEntityClass(): string
     {
         return TestCollection::class;
     }
 
-    /**
-     * @return string
-     */
     protected function getCollectionItemEntityClass(): string
     {
         return TestCollectionItem::class;

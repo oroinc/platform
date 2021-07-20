@@ -16,17 +16,12 @@ class GoogleResourceOwner extends BaseGoogleResourceOwner
 
     /**
      * Sets crypter instance
-     *
-     * @param SymmetricCrypterInterface $crypter
      */
     public function setCrypter(SymmetricCrypterInterface $crypter): void
     {
         $this->crypter = $crypter;
     }
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function configureCredentials(ConfigManager $configManager): void
     {
         $clientId = $configManager->get('oro_google_integration.client_id');

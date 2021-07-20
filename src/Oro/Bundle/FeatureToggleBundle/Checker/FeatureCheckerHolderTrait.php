@@ -14,9 +14,6 @@ trait FeatureCheckerHolderTrait
      */
     protected $features = [];
 
-    /**
-     * @param FeatureChecker $checker
-     */
     public function setFeatureChecker(FeatureChecker $checker)
     {
         $this->featureChecker = $checker;

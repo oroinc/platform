@@ -5,8 +5,11 @@ system_configuration:
             title: oro.microsoft_integration.system_configuration.groups.microsoft_settings.title
         microsoft_integration_settings:
             title: oro.microsoft_integration.system_configuration.groups.microsoft_integration_settings.title
-            priority: 60
+            priority: 50
             tooltip: oro.microsoft_integration.system_configuration.groups.microsoft_integration_settings.tooltip
+        microsoft_integrations:
+            title: oro.microsoft_integration.system_configuration.groups.microsoft_integrations.title
+            priority: 40
 
     fields:
         oro_microsoft_integration.client_id:

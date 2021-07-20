@@ -17,10 +17,6 @@ class NavigationItemBuilder implements BuilderInterface
     /** @var NavigationItemsProviderInterface */
     private $navigationItemsProvider;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param NavigationItemsProviderInterface $navigationItemsProvider
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         NavigationItemsProviderInterface $navigationItemsProvider

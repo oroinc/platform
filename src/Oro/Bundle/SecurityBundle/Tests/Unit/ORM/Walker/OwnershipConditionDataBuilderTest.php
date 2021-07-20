@@ -123,7 +123,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
          *
          * bu1   bu2   bu3   bu31   bu4   bu411
          * bu2         bu2
-         *
          */
         $this->tree->addBusinessUnit('bu1', null);
         $this->tree->addBusinessUnit('bu2', null);

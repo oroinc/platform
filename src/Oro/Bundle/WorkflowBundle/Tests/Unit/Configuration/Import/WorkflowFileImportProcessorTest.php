@@ -27,12 +27,6 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->parentProcessor = $this->createMock(ConfigImportProcessorInterface::class);
     }
 
-    /**
-     * @param WorkflowFileImportProcessor $processor
-     * @param string $resource
-     * @param string $target
-     * @param array $replacements
-     */
     private function applyImportOptions(
         WorkflowFileImportProcessor $processor,
         string $resource,

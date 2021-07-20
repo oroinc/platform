@@ -17,7 +17,7 @@ use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
@@ -37,27 +37,19 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     /** @var SyncCredentialsIssueManager */
     private $credentialsIssueManager;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
-     * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
         ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
 
@@ -67,10 +59,6 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-
-    /**
-     * @param SyncCredentialsIssueManager $credentialsIssueManager
-     */
     public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager)
     {
         $this->credentialsIssueManager = $credentialsIssueManager;
@@ -84,10 +72,6 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         return ($origin instanceof UserEmailOrigin) && $this->isTypeSupported($origin->getAccountType());
     }
 
-    /**
-     * @param string $accountType
-     * @return bool
-     */
     protected function isTypeSupported(string $accountType): bool
     {
         return (AccountTypeModel::ACCOUNT_TYPE_OTHER === $accountType)
@@ -99,7 +83,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     protected function getEmailOriginClass()
     {
-        return 'OroImapBundle:UserEmailOrigin';
+        return UserEmailOrigin::class;
     }
 
     /**

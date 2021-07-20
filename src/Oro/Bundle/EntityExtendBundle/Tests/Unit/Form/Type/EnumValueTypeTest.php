@@ -63,9 +63,6 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider submitProvider
      */
     public function testSubmit(array $inputData, array $expectedData)
@@ -140,9 +137,6 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider allowDeleteProvider
      */
     public function testAllowDelete(array $inputData, array $expectedData)
@@ -365,9 +359,6 @@ class EnumValueTypeTest extends TypeTestCase
         return $validator;
     }
 
-    /**
-     * @param ClassMetadata $meta
-     */
     protected function loadMetadata(ClassMetadata $meta)
     {
         if (false !== ($configFile = $this->getConfigFile($meta->name))) {

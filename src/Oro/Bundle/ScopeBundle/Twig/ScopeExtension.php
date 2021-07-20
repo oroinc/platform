@@ -20,9 +20,6 @@ class ScopeExtension extends AbstractExtension
      */
     private $propertyAccessor;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
@@ -38,11 +35,6 @@ class ScopeExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param array $scopeEntities
-     * @param Collection $scopes
-     * @return bool
-     */
     public function isScopesEmpty(array $scopeEntities, Collection $scopes): bool
     {
         if ($scopes->count() > 1) {

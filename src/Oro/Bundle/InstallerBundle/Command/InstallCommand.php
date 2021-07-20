@@ -36,7 +36,6 @@ use Symfony\Component\Validator\Constraints\Url;
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
-
     /** @var string */
     protected static $defaultName = 'oro:install';
 

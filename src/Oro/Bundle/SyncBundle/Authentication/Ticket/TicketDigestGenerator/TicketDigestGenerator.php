@@ -19,10 +19,6 @@ class TicketDigestGenerator implements TicketDigestGeneratorInterface
      */
     private $secret;
 
-    /**
-     * @param PasswordEncoderInterface $passwordEncoder
-     * @param string $secret
-     */
     public function __construct(PasswordEncoderInterface $passwordEncoder, string $secret)
     {
         $this->passwordEncoder = $passwordEncoder;

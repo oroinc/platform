@@ -20,10 +20,6 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param DoctrineHelper     $doctrineHelper
-     * @param ContainerInterface $container
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
     {
         parent::__construct($doctrineHelper);
@@ -60,9 +56,6 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
             : self::ACCESS_DENIED;
     }
 
-    /**
-     * @return WorkflowPermissionRegistry
-     */
     private function getPermissionRegistry(): WorkflowPermissionRegistry
     {
         return $this->container->get('oro_workflow.permission_registry');

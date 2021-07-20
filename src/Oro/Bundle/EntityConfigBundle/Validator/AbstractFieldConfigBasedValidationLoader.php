@@ -119,21 +119,12 @@ abstract class AbstractFieldConfigBasedValidationLoader extends AbstractLoader
      * Ignores proxy classes. Basically, all properties of the validating entities are proxy classes,
      * but we can securely ignore them because we receive also real entity classes.
      * see Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory::mergeConstraints
-     *
-     * @param ClassMetadata $metadata
-     *
-     * @return bool
      */
     protected function isClassApplicable(ClassMetadata $metadata): bool
     {
         return $metadata->getClassName() === ClassUtils::getRealClass($metadata->getClassName());
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     *
-     * @return bool
-     */
     private function hasEntityConfig(ClassMetadata $metadata): bool
     {
         // do preliminary checks to avoid unneeded calls of hasConfig() method

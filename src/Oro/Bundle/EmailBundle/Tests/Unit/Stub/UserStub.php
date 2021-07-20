@@ -12,10 +12,6 @@ class UserStub implements EmailInterface
     /** @var string */
     private $email;
 
-    /**
-     * @param $id
-     * @param $email
-     */
     public function __construct($id, $email)
     {
         $this->id = $id;

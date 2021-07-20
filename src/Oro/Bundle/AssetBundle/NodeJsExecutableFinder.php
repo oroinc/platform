@@ -21,9 +21,6 @@ class NodeJsExecutableFinder
         $this->executableFinder = new ExecutableFinder();
     }
 
-    /**
-     * @return null|string
-     */
     public function findNodeJs(): ?string
     {
         foreach (self::NODEJS_EXECUTABLE_NAMES as $engine) {
@@ -36,9 +33,6 @@ class NodeJsExecutableFinder
         return null;
     }
 
-    /**
-     * @return null|string
-     */
     public function findNpm(): ?string
     {
         return $this->executableFinder->find('npm');

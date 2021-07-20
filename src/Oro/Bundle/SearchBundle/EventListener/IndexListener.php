@@ -58,11 +58,6 @@ class IndexListener implements OptionalListenerInterface
     /** @var array */
     protected $entitiesIndexedFieldsCache = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param IndexerInterface $searchIndexer
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         IndexerInterface $searchIndexer,
@@ -73,17 +68,11 @@ class IndexListener implements OptionalListenerInterface
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @param SearchMappingProvider $mappingProvider
-     */
     public function setMappingProvider(SearchMappingProvider $mappingProvider)
     {
         $this->mappingProvider = $mappingProvider;
     }
 
-    /**
-     * @param OnFlushEventArgs $args
-     */
     public function onFlush(OnFlushEventArgs $args)
     {
         if (!$this->enabled) {
@@ -205,9 +194,6 @@ class IndexListener implements OptionalListenerInterface
         return $entitiesToReindex;
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
         if (!$this->enabled) {
@@ -221,8 +207,6 @@ class IndexListener implements OptionalListenerInterface
 
     /**
      * Clear object storage when error was occurred during UOW#Commit
-     *
-     * @param OnClearEventArgs $args
      */
     public function onClear(OnClearEventArgs $args)
     {

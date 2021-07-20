@@ -18,11 +18,6 @@ class TitleReaderRegistry
         $this->readers = $readers;
     }
 
-    /**
-     * @param string $route
-     *
-     * @return string|null
-     */
     public function getTitleByRoute(string $route): ?string
     {
         foreach ($this->readers as $reader) {

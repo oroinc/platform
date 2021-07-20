@@ -30,17 +30,11 @@ class IndexationEntitiesContainer
         }
     }
 
-    /**
-     * @return array
-     */
     public function getEntities(): array
     {
         return $this->entities;
     }
 
-    /**
-     * @param string $className
-     */
     public function removeEntities(string $className): void
     {
         unset($this->entities[$className]);

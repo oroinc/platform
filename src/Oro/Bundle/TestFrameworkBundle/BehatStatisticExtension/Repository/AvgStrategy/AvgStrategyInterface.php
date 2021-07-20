@@ -8,8 +8,5 @@ interface AvgStrategyInterface
 {
     const TIME_FIELD_NAME = 'time';
 
-    /**
-     * @param QueryBuilder $builder
-     */
     public function addSelect(QueryBuilder $builder);
 }

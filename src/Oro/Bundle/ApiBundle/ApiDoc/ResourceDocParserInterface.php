@@ -9,22 +9,11 @@ interface ResourceDocParserInterface
 {
     /**
      * Gets a documentation for API resource.
-     *
-     * @param string $className
-     * @param string $actionName
-     *
-     * @return string|null
      */
     public function getActionDocumentation(string $className, string $actionName): ?string;
 
     /**
      * Gets a documentation for a field.
-     *
-     * @param string      $className
-     * @param string      $fieldName
-     * @param string|null $actionName
-     *
-     * @return string|null
      */
     public function getFieldDocumentation(
         string $className,
@@ -34,22 +23,11 @@ interface ResourceDocParserInterface
 
     /**
      * Gets a documentation for a filter.
-     *
-     * @param string $className
-     * @param string $filterName
-     *
-     * @return string|null
      */
     public function getFilterDocumentation(string $className, string $filterName): ?string;
 
     /**
      * Gets a documentation for API sub-resource.
-     *
-     * @param string $className
-     * @param string $subresourceName
-     * @param string $actionName
-     *
-     * @return string|null
      */
     public function getSubresourceDocumentation(
         string $className,

@@ -66,8 +66,6 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
 
     /**
      * @dataProvider buildViewDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testBuildView(array $options, array $expected)
     {

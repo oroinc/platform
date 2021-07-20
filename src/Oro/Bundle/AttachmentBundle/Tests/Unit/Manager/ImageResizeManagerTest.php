@@ -116,9 +116,6 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resizeWhenResizeFailsDataProvider
-     *
-     * @param string $rawResizedImage
-     * @param bool $forceUpdate
      */
     public function testResizeWhenFails(string $rawResizedImage, bool $forceUpdate): void
     {
@@ -139,9 +136,6 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->manager->resize($file, self::WIDTH, self::HEIGHT, $forceUpdate));
     }
 
-    /**
-     * @return array
-     */
     public function resizeWhenResizeFailsDataProvider(): array
     {
         return [
@@ -158,9 +152,6 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resizeWhenResizeFailsDataProvider
-     *
-     * @param string $rawResizedImage
-     * @param bool $forceUpdate
      */
     public function testResize(string $rawResizedImage, bool $forceUpdate): void
     {
@@ -196,9 +187,6 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resizeWhenResizeFailsDataProvider
-     *
-     * @param string $rawResizedImage
-     * @param bool $forceUpdate
      */
     public function testApplyFilterWhenFails(string $rawResizedImage, bool $forceUpdate): void
     {
@@ -221,9 +209,6 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resizeWhenResizeFailsDataProvider
-     *
-     * @param string $rawResizedImage
-     * @param bool $forceUpdate
      */
     public function testApplyFilter(string $rawResizedImage, bool $forceUpdate): void
     {

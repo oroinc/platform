@@ -17,8 +17,6 @@ class NotificationContext extends OroFeatureContext implements OroPageObjectAwar
      * Example: And I check "Customer User" additional association
      *
      * @Then /^(?:|I )check "(?P<name>([\w\s]+))" additional association$/
-     *
-     * @param string $name
      */
     public function checkAdditionalAssociation(string $name)
     {

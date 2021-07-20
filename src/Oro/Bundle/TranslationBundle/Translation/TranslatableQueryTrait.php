@@ -14,10 +14,6 @@ use Gedmo\Translatable\TranslatableListener;
  */
 trait TranslatableQueryTrait
 {
-    /**
-     * @param AbstractQuery $query
-     * @param EntityManager $entityManager
-     */
     private function addTranslatableLocaleHint(AbstractQuery $query, EntityManager $entityManager)
     {
         $locale = $this->getTranslatableListener($entityManager)

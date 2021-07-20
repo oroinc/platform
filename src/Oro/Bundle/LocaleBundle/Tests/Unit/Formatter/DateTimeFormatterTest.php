@@ -42,7 +42,6 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $this->formatter->formatDate(null));
     }
 
-
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @dataProvider formatDataProvider

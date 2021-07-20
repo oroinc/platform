@@ -28,13 +28,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     /** @var OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
-    /**
-     * @param ManagerRegistry                    $doctrine
-     * @param DatabaseChecker                    $databaseChecker
-     * @param CacheProvider                      $cache
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param TokenStorageInterface              $tokenStorage
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         DatabaseChecker $databaseChecker,
@@ -130,12 +123,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         }
     }
 
-    /**
-     * @param array  $item
-     * @param string $property
-     *
-     * @return int|null
-     */
     private function getId(array $item, string $property): ?int
     {
         $id = $item[$property];
@@ -162,10 +149,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         ];
     }
 
-    /**
-     * @param OwnerTreeBuilderInterface $tree
-     * @param $businessUnits
-     */
     protected function setSubordinateBusinessUnitIds(OwnerTreeBuilderInterface $tree, $businessUnits)
     {
         foreach ($businessUnits as $parentId => $businessUnitIds) {
@@ -173,21 +156,11 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         }
     }
 
-    /**
-     * @param string $className
-     *
-     * @return EntityManagerInterface
-     */
     private function getManagerForClass(string $className): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($className);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityRepository
-     */
     private function getRepository(string $entityClass): EntityRepository
     {
         return $this->getManagerForClass($entityClass)->getRepository($entityClass);

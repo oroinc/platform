@@ -101,10 +101,6 @@ class JsTranslationDumper implements LoggerAwareInterface
         return true;
     }
 
-    /**
-     * @param string $locale
-     * @return bool
-     */
     public function isTranslationFileExist(string $locale): bool
     {
         $translationFilePath = $this->getTranslationFilePath($locale);
@@ -112,10 +108,6 @@ class JsTranslationDumper implements LoggerAwareInterface
         return file_exists($translationFilePath);
     }
 
-    /**
-     * @param string $locale
-     * @return string
-     */
     private function getTranslationFilePath(string $locale): string
     {
         $targetPattern = realpath($this->kernelProjectDir . '/public')

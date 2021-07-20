@@ -35,12 +35,6 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $definition
-     * @param string           $method
-     * @param array            $arguments
-     */
     private function checkArguments(
         ContainerBuilder $container,
         Definition $definition,
@@ -54,11 +48,6 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $definition
-     * @param array            $call
-     */
     private function checkCall(ContainerBuilder $container, Definition $definition, array $call): void
     {
         if (count($call[1]) === 1) {
@@ -69,12 +58,6 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $definition
-     * @param string           $method
-     * @param Definition       $argument
-     */
     private function assertDefinitionIsAllowedAsArgument(
         ContainerBuilder $container,
         Definition $definition,

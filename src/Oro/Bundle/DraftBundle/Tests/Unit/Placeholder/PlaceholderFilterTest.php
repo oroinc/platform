@@ -21,8 +21,6 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $isGranted
-     *
      * @dataProvider permissionDataProvider
      */
     public function testIsApplicable(bool $isGranted): void
@@ -38,9 +36,6 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isGranted, $hasAccess);
     }
 
-    /**
-     * @return array
-     */
     public function permissionDataProvider(): array
     {
         return [

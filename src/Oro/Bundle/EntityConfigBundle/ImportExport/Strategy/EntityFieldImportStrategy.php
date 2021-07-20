@@ -29,33 +29,21 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     /** @var FieldNameValidationHelper */
     protected $fieldValidationHelper;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param ConstraintFactory $constraintFactory
-     */
     public function setConstraintFactory(ConstraintFactory $constraintFactory)
     {
         $this->constraintFactory = $constraintFactory;
     }
 
-    /**
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function setFieldTypeProvider(FieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
-    /**
-     * @param FieldNameValidationHelper $fieldValidationHelper
-     */
     public function setFieldValidationHelper(FieldNameValidationHelper $fieldValidationHelper)
     {
         $this->fieldValidationHelper = $fieldValidationHelper;
@@ -127,9 +115,6 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $this->strategyHelper->addValidationErrors((array)$errors, $this->context);
     }
 
-    /**
-     * @param FieldConfigModel $entity
-     */
     protected function updateContextCounters(FieldConfigModel $entity)
     {
         $fieldName = $entity->getFieldName();
@@ -196,26 +181,16 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         return $errors;
     }
 
-    /**
-     * @return array
-     */
     protected function getValidationGroups(): array
     {
         return ['FieldConfigModel', 'Sql', 'ChangeTypeField'];
     }
 
-    /**
-     * @return array
-     */
     protected function getValidationGroupsForNewField(): array
     {
         return ['UniqueField', 'UniqueMethod'];
     }
 
-    /**
-     * @param FieldConfigModel $entity
-     * @return bool
-     */
     protected function isNewField(FieldConfigModel $entity): bool
     {
         if (!$entity->getFieldName() || !$entity->getEntity() || !$entity->getEntity()->getClassName()) {
@@ -228,10 +203,6 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         );
     }
 
-    /**
-     * @param FieldConfigModel $entity
-     * @return array
-     */
     private function getErrors(FieldConfigModel $entity): array
     {
         $validationGroups = $this->getValidationGroups();

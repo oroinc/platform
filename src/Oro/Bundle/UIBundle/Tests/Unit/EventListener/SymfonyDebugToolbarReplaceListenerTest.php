@@ -61,7 +61,6 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
         $this->listener->onKernelResponse($this->event);
     }
 
-
     public function testOnKernelResponseNotHashNavigation(): void
     {
         $this->kernel->method('isDebug')

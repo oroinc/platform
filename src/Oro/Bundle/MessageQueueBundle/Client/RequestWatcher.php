@@ -16,9 +16,6 @@ class RequestWatcher implements EventSubscriberInterface
     /** @var BufferedMessageProducer */
     private $producer;
 
-    /**
-     * @param BufferedMessageProducer $producer
-     */
     public function __construct(BufferedMessageProducer $producer)
     {
         $this->producer = $producer;
@@ -35,9 +32,6 @@ class RequestWatcher implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onRequestStart(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {
@@ -48,9 +42,6 @@ class RequestWatcher implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param TerminateEvent $event
-     */
     public function onRequestEnd(TerminateEvent $event): void
     {
         if (!$event->isMasterRequest()) {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Fixtures;
 
 class TestEntity
 {
-
     /** @var int */
     protected $id;
 

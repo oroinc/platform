@@ -22,7 +22,6 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-
     protected function setUp(): void
     {
         $this->event = new ConfigUpdateEvent($this->changeSet);
@@ -74,7 +73,6 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
      * @param string $key
      * @param array  $expectedValues
      * @param bool   $exception
-     *
      */
     public function testValueRetrieving($key, array $expectedValues, $exception = false)
     {

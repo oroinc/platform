@@ -574,8 +574,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider massStartDataProvider
      */
     public function testMassStartWorkflow(array $source, array $expected): void
@@ -610,7 +608,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManagerForClass')
             ->with(WorkflowItem::class)
             ->willReturn($entityManager);
-
 
         if ($expected) {
             $getWorkflowExpectations = [];
@@ -853,8 +850,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider massTransitDataProvider
      */
     public function testMassTransit(array $source, array $expected): void
@@ -1223,7 +1218,6 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         $workflowMock->expects($this->once())
             ->method('isActive')
             ->willReturn($isActive);
-
 
         $this->assertEquals($isActive, $this->workflowManager->isActiveWorkflow($workflowName));
     }

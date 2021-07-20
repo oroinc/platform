@@ -60,9 +60,6 @@ class TestOrderLineItem implements TestFrameworkEntityInterface
         return $this->order;
     }
 
-    /**
-     * @param TestOrder $order
-     */
     public function setOrder(TestOrder $order)
     {
         $this->order = $order;
@@ -76,9 +73,6 @@ class TestOrderLineItem implements TestFrameworkEntityInterface
         return $this->product;
     }
 
-    /**
-     * @param TestProduct $product
-     */
     public function setProduct(TestProduct $product)
     {
         $this->product = $product;

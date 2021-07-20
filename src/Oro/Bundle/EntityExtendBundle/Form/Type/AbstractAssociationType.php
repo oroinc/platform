@@ -17,10 +17,6 @@ abstract class AbstractAssociationType extends AbstractConfigType
     /** @var AssociationTypeHelper */
     protected $typeHelper;
 
-    /**
-     * @param AssociationTypeHelper $typeHelper
-     * @param ConfigManager         $configManager
-     */
     public function __construct(AssociationTypeHelper $typeHelper, ConfigManager $configManager)
     {
         parent::__construct($typeHelper, $configManager);

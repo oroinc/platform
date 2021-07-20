@@ -41,10 +41,6 @@ class FiltersSorterRegistry implements ResetInterface
 
     /**
      * Returns a sorter for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return FiltersSorterInterface|null
      */
     public function getSorter(RequestType $requestType): ?FiltersSorterInterface
     {

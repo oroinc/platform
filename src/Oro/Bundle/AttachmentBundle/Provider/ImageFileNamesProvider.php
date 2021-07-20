@@ -16,10 +16,6 @@ class ImageFileNamesProvider implements FileNamesProviderInterface
     /** @var ResizedImagePathProviderInterface */
     private $imagePathProvider;
 
-    /**
-     * @param FilterConfiguration               $filterConfiguration
-     * @param ResizedImagePathProviderInterface $imagePathProvider
-     */
     public function __construct(
         FilterConfiguration $filterConfiguration,
         ResizedImagePathProviderInterface $imagePathProvider
@@ -47,11 +43,6 @@ class ImageFileNamesProvider implements FileNamesProviderInterface
         return array_values(array_unique($fileNames));
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
     private function normalizeFileName(string $fileName): string
     {
         return ltrim($fileName, '/');

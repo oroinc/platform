@@ -52,9 +52,6 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider validateMaxLengthDataProvider
-     *
-     * @param string $value
-     * @param bool $violation
      */
     public function testValidateMaxLength(string $value, bool $violation)
     {
@@ -93,9 +90,6 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @dataProvider validateMinLengthDataProvider
-     *
-     * @param string $value
-     * @param bool $violation
      */
     public function testValidateMinLength(string $value, bool $violation)
     {

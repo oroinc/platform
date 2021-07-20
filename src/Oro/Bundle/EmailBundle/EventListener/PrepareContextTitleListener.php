@@ -15,10 +15,6 @@ class PrepareContextTitleListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param Router $router
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         Router $router,
         DoctrineHelper $doctrineHelper
@@ -29,8 +25,6 @@ class PrepareContextTitleListener
 
     /**
      * Correct link and title for email context by EmailUser entity index
-     *
-     * @param PrepareContextTitleEvent $event
      */
     public function prepareEmailContextTitleEvent(PrepareContextTitleEvent $event)
     {

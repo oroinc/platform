@@ -14,9 +14,6 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider variableDefinitionsProvider
-     *
-     * @param array $configuration
-     * @param array $expected
      */
     public function testParseVariableDefinitions(array $configuration, array $expected)
     {

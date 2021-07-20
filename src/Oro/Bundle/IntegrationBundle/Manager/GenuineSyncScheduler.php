@@ -15,9 +15,6 @@ class GenuineSyncScheduler
     /** @var MessageProducerInterface */
     protected $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(MessageProducerInterface $producer)
     {
         $this->producer = $producer;

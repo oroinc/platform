@@ -39,10 +39,6 @@ class NumberFormatter
     /** @var array */
     protected $currencySymbols = [];
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param IntlNumberFormatterFactory $intlNumberFormatterFactory
-     */
     public function __construct(LocaleSettings $localeSettings, IntlNumberFormatterFactory $intlNumberFormatterFactory)
     {
         $this->localeSettings = $localeSettings;
@@ -135,14 +131,6 @@ class NumberFormatter
         return $formattedString;
     }
 
-    /**
-     * @param IntlNumberFormatter $currencyFormatter
-     * @param float|null $value
-     * @param string $currencyCode
-     * @param bool $fixedFraction
-     *
-     * @return string
-     */
     private function formatCurrencyWithDynamicPrecision(
         IntlNumberFormatter $currencyFormatter,
         ?float $value,
@@ -170,12 +158,6 @@ class NumberFormatter
         return $formattedString;
     }
 
-    /**
-     * @param string $currencyCode
-     * @param string $locale
-     *
-     * @return string
-     */
     private function getCurrencySymbolByCurrency(string $currencyCode, string $locale): string
     {
         if (!isset($this->currencySymbols[$currencyCode][$locale])) {
@@ -516,7 +498,6 @@ class NumberFormatter
      *  NAN_SYMBOL
      *  SIGNIFICANT_DIGIT_SYMBOL
      *  MONETARY_GROUPING_SEPARATOR_SYMBOL
-     *
      *
      * @param int|string $symbol Format symbol constant of IntlNumberFormatter or it's string name
      * @param int|string $style Constant of IntlNumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name

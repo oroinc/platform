@@ -78,9 +78,6 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         return $names;
     }
 
-    /**
-     * @return int
-     */
     private function getAsyncOperationCount(): int
     {
         return $this->getEntityManager(AsyncOperation::class)
@@ -91,16 +88,6 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ->getSingleScalarResult();
     }
 
-    /**
-     * @param string      $id
-     * @param int         $statusCode
-     * @param string      $title
-     * @param string|null $detail
-     * @param int|null    $itemIndex
-     * @param string|null $sourcePointer
-     *
-     * @return BatchError
-     */
     protected function createBatchError(
         string $id,
         int $statusCode,
@@ -122,9 +109,6 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         return $error;
     }
 
-    /**
-     * @return BatchUpdateExceptionController
-     */
     private function getBatchUpdateExceptionController(): BatchUpdateExceptionController
     {
         return self::getContainer()->get('oro_api.tests.batch_update_exception_controller');

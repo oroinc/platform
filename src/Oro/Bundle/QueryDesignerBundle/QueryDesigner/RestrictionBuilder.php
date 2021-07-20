@@ -28,11 +28,6 @@ class RestrictionBuilder implements RestrictionBuilderInterface
     /** @var ConditionsGroupBuilder|null */
     private $conditionsGroupBuilder;
 
-    /**
-     * @param Manager                $manager
-     * @param ConfigManager          $configManager
-     * @param filterExecutionContext $filterExecutionContext
-     */
     public function __construct(
         Manager $manager,
         ConfigManager $configManager,
@@ -54,9 +49,6 @@ class RestrictionBuilder implements RestrictionBuilderInterface
 
     /**
      * Recursive iterates through filters and builds an expression to be applied to the given data source.
-     *
-     * @param array                              $filters
-     * @param GroupingOrmFilterDatasourceAdapter $ds
      */
     protected function doBuildRestrictions(array $filters, GroupingOrmFilterDatasourceAdapter $ds): void
     {
@@ -79,11 +71,6 @@ class RestrictionBuilder implements RestrictionBuilderInterface
         }
     }
 
-    /**
-     * @param GroupingOrmFilterDatasourceAdapter $ds
-     * @param string                             $operator
-     * @param array                              $item
-     */
     protected function buildGroupedRestrictions(
         GroupingOrmFilterDatasourceAdapter $ds,
         string $operator,
@@ -105,12 +92,6 @@ class RestrictionBuilder implements RestrictionBuilderInterface
         }
     }
 
-    /**
-     * @param GroupingOrmFilterDatasourceAdapter $ds
-     * @param string                             $operator
-     * @param array                              $item
-     * @param bool                               $isInGroup
-     */
     protected function buildSingleRestriction(
         GroupingOrmFilterDatasourceAdapter $ds,
         string $operator,
@@ -154,9 +135,6 @@ class RestrictionBuilder implements RestrictionBuilderInterface
         return $this->manager->createFilter($name, $params);
     }
 
-    /**
-     * @return ConditionsGroupBuilder
-     */
     protected function getConditionsGroupBuilder(): ConditionsGroupBuilder
     {
         if (null === $this->conditionsGroupBuilder) {
@@ -166,9 +144,6 @@ class RestrictionBuilder implements RestrictionBuilderInterface
         return $this->conditionsGroupBuilder;
     }
 
-    /**
-     * @return bool
-     */
     protected function isConditionsGroupingEnabled(): bool
     {
         if (null === $this->conditionsGroupingEnabled) {

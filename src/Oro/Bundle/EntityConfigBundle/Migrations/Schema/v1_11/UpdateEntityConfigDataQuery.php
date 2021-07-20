@@ -202,7 +202,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
                     $data['entity']['icon'] = $newIconName;
 
                     $data = $type->convertToDatabaseValue($data, $platform);
-                    
+
                     $query = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
                     $params = [$data, $row['id']];
 

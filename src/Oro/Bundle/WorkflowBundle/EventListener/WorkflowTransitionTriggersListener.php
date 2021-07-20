@@ -21,10 +21,6 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
     /** @var TriggersBag[] */
     private $triggerBags = [];
 
-    /**
-     * @param WorkflowTransitionTriggersAssembler $assembler
-     * @param TransitionTriggersUpdater $triggersUpdater
-     */
     public function __construct(
         WorkflowTransitionTriggersAssembler $assembler,
         TransitionTriggersUpdater $triggersUpdater
@@ -33,9 +29,6 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
         $this->triggersUpdater = $triggersUpdater;
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function updateTriggers(WorkflowChangesEvent $event)
     {
         $workflowName = $event->getDefinition()->getName();
@@ -46,16 +39,12 @@ class WorkflowTransitionTriggersListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function deleteTriggers(WorkflowChangesEvent $event)
     {
         $this->triggersUpdater->removeTriggers($event->getDefinition());
     }
 
     /**
-     * @param WorkflowChangesEvent $event
      * @throws AssemblerException
      */
     public function createTriggers(WorkflowChangesEvent $event)

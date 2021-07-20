@@ -65,13 +65,6 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $type
-     * @param $getRepositoryCalls
-     * @param $getRepositoryArgument
-     * @param $repoReturnObject
-     * @param $attachmentEntityToEntityCalls
-     * @param $entityFromUploadedFileCalls
-     *
      * @dataProvider attachmentProvider
      */
     public function testInitAttachmentEntity(

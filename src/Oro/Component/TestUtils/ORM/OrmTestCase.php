@@ -93,9 +93,6 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Changes a connection object for the given entity manager
-     *
-     * @param Connection        $connection
-     * @param EntityManagerMock $em
      */
     protected function setDriverConnection(Connection $connection, EntityManagerMock $em)
     {
@@ -152,7 +149,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
      *
      * @param EntityManagerMock $em
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
@@ -180,11 +177,11 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $conn
-     * @param string                                   $sql    SQL that run in database
-     * @param array                                    $result data that will return after SQL execute
-     * @param array                                    $params
-     * @param array                                    $types
+     * @param Connection|\PHPUnit\Framework\MockObject\MockObject $conn
+     * @param string|\PHPUnit\Framework\Constraint\Constraint     $sql
+     * @param array                                               $result
+     * @param array                                               $params
+     * @param array                                               $types
      */
     protected function setQueryExpectation(
         \PHPUnit\Framework\MockObject\MockObject $conn,
@@ -208,10 +205,10 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $sql
-     * @param array  $result
-     * @param array  $params
-     * @param array  $types
+     * @param string|\PHPUnit\Framework\Constraint\Constraint $sql
+     * @param array                                           $result
+     * @param array                                           $params
+     * @param array                                           $types
      */
     protected function addQueryExpectation(
         $sql,

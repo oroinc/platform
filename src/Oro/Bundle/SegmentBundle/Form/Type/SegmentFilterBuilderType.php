@@ -51,10 +51,6 @@ class SegmentFilterBuilderType extends AbstractType
      */
     private $tokenStorage;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TokenStorageInterface $tokenStorage
@@ -175,9 +171,6 @@ class SegmentFilterBuilderType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         // Remove owner field if was is automatically added, as owner is set in POST_SUBMIT
@@ -203,9 +196,6 @@ class SegmentFilterBuilderType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         /** @var Segment $segment */
@@ -232,10 +222,6 @@ class SegmentFilterBuilderType extends AbstractType
         }
     }
 
-    /**
-     * @param Segment $segment
-     * @param FormConfigInterface $config
-     */
     private function setSegmentDefinition(Segment $segment, FormConfigInterface $config)
     {
         $definition = QueryDefinitionUtil::decodeDefinition($segment->getDefinition());
@@ -259,11 +245,6 @@ class SegmentFilterBuilderType extends AbstractType
         $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
     }
 
-    /**
-     * @param Segment $segment
-     * @param FormConfigInterface $config
-     * @param FormInterface $form
-     */
     private function setSegmentName(Segment $segment, FormConfigInterface $config, FormInterface $form)
     {
         $segmentName = null;

@@ -39,10 +39,6 @@ class AttributeGroupType extends AbstractType
         $resolver->setRequired(['attributeEntityClass']);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -86,9 +82,6 @@ class AttributeGroupType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSetData(FormEvent $event)
     {
         /** @var AttributeGroup $data */
@@ -124,12 +117,6 @@ class AttributeGroupType extends AbstractType
         $form->add('attributeRelations', AttributeMultiSelectType::class, $options);
     }
 
-    /**
-     * @param array $choices
-     * @param Collection $attributeRelations
-     *
-     * @return array
-     */
     private function getSortedChoices(array $choices, Collection $attributeRelations): array
     {
         $sortedChoices = [];

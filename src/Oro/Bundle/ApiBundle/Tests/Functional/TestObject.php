@@ -53,9 +53,6 @@ class TestObject
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
     public function setTitle(string $title)
     {
         $this->title = $title;

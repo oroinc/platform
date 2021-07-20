@@ -17,9 +17,6 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
     /** @var Logger */
     private $logger;
 
-    /**
-     * @param Logger $logger
-     */
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
@@ -36,9 +33,6 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         if ($event->commandShouldRun()) {
@@ -51,9 +45,6 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ConsoleErrorEvent $event
-     */
     public function onConsoleError(ConsoleErrorEvent $event)
     {
         $input = $event->getInput();

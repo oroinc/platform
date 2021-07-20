@@ -39,11 +39,6 @@ class MassActionExtension extends AbstractExtension
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
 
-    /**
-     * @param MassActionFactory             $actionFactory
-     * @param MassActionMetadataFactory     $actionMetadataFactory
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         MassActionFactory $actionFactory,
         MassActionMetadataFactory $actionMetadataFactory,

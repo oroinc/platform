@@ -13,11 +13,6 @@ use Twig\Environment;
  */
 class TwigLayoutRenderer extends LayoutRenderer
 {
-    /**
-     * @param TwigRendererInterface $innerRenderer
-     * @param FormRendererEngineInterface $formRendererEngine
-     * @param Environment $environment
-     */
     public function __construct(
         TwigRendererInterface $innerRenderer,
         FormRendererEngineInterface $formRendererEngine,

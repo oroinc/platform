@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -54,15 +55,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /** @var  LoggerInterface */
     private $emailErrorsLogger;
 
-    /**
-     * Constructor
-     *
-     * @param EntityManager $em
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
-     * @param ImapEmailManager $manager
-     * @param ImapEmailRemoveManager $removeManager
-     */
     public function __construct(
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
@@ -75,9 +67,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->removeManager = $removeManager;
     }
 
-    /**
-     * @param LoggerInterface $emailErrorsLogger
-     */
     public function setEmailErrorsLogger(LoggerInterface $emailErrorsLogger)
     {
         $this->emailErrorsLogger = $emailErrorsLogger;
@@ -147,8 +136,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         try {
             $uids = $this->manager->getUnseenEmailUIDs($startDate);
 
-            $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
-            $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+            $emailImapRepository = $this->em->getRepository(ImapEmail::class);
+            $emailUserRepository = $this->em->getRepository(EmailUser::class);
 
             $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder(), $startDate);
             $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder(), $startDate);
@@ -466,7 +455,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         );
 
         /** @var ImapEmailRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $repo = $this->em->getRepository(ImapEmail::class);
 
         return $repo->getExistingUids($folder, $uids);
     }
@@ -485,7 +474,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             return [];
         }
         /** @var ImapEmailRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $repo = $this->em->getRepository(ImapEmail::class);
 
         return $repo->getEmailsByMessageIds($origin, $messageIds);
     }
@@ -543,7 +532,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     ) {
         $lastUid = null;
         if (false === $this->getSettings()->isForceMode()) {
-            $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+            $lastUid = $this->em->getRepository(ImapEmail::class)->findLastUidByFolder($imapFolder);
         }
 
         if (!$lastUid && $origin->getMailbox() && $folder->getSyncStartDate()) {
@@ -594,7 +583,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->logger->info('Get folders enabled for sync...');
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
         $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE, $sortByFailedCount);
 
         $this->logger->info(sprintf('Got %d folder(s).', count($imapFolders)));
@@ -604,8 +593,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
     /**
      * Process actions when email folder can't be selected.
-     *
-     * @param EmailFolder $folder
      */
     protected function processUnselectableFolderException(EmailFolder $folder)
     {
@@ -638,7 +625,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         return false === $this->getSettings()->isForceMode()
             && time() - $this->processStartTime > self::MAX_ORIGIN_SYNC_TIME;
     }
-
 
     /**
      * @param \Exception $e

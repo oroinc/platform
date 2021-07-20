@@ -56,9 +56,6 @@ class LocalizationRepositoryTest extends WebTestCase
         $this->em->getConnection()->getConfiguration()->setSQLLogger($prevLogger);
     }
 
-    /**
-     * @param Localization $localization
-     */
     protected function visitChildren(Localization $localization)
     {
         $localization->getLanguageCode();

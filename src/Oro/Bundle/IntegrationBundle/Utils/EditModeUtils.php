@@ -26,7 +26,6 @@ class EditModeUtils
      *
      * @param Integration $integration
      * @param int         $newEditMode
-     *
      */
     public static function attemptChangeEditMode(Integration $integration, $newEditMode)
     {

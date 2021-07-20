@@ -13,9 +13,6 @@ class ProcessTriggerListConfiguration implements ConfigurationInterface
      */
     protected $triggerConfiguration;
 
-    /**
-     * @param ProcessTriggerConfiguration $triggerConfiguration
-     */
     public function __construct(ProcessTriggerConfiguration $triggerConfiguration)
     {
         $this->triggerConfiguration = $triggerConfiguration;

@@ -325,7 +325,6 @@ trait MenuUpdateTrait
         return $this;
     }
 
-
     /**
      * @return boolean
      */

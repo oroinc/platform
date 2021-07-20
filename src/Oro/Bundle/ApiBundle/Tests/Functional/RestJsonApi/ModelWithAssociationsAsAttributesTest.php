@@ -20,11 +20,6 @@ class ModelWithAssociationsAsAttributesTest extends RestJsonApiTestCase
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/test_magazine.yml']);
     }
 
-    /**
-     * @param string $headline
-     *
-     * @return int
-     */
     private function getArticleId(string $headline): int
     {
         /** @var TestArticle|null $article */
@@ -37,9 +32,6 @@ class ModelWithAssociationsAsAttributesTest extends RestJsonApiTestCase
         return $article->getId();
     }
 
-    /**
-     * @param string $headline
-     */
     private function assertArticleExists(string $headline): void
     {
         /** @var TestArticle|null $article */

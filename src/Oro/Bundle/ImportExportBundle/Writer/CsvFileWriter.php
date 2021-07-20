@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Batch job CSV file writer.
+ */
 class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInterface
 {
     /**
@@ -22,9 +25,6 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
      */
     protected $clearWriter;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         parent::__construct();
@@ -53,9 +53,6 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
         }
     }
 
-    /**
-     * @param DoctrineClearWriter $clearWriter
-     */
     public function setClearWriter(DoctrineClearWriter $clearWriter)
     {
         $this->clearWriter = $clearWriter;

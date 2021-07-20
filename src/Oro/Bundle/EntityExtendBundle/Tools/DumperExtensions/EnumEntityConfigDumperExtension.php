@@ -35,13 +35,6 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     /** @var ExtendEntityConfigProviderInterface */
     protected $extendEntityConfigProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param RelationBuilder $relationBuilder
-     * @param FieldTypeHelper $fieldTypeHelper
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param ExtendEntityConfigProviderInterface $extendEntityConfigProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         RelationBuilder $relationBuilder,

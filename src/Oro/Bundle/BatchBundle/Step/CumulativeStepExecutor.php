@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\Step;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
 
 /**
  * Executor for the import/export step. Write batch size processed by a writer
@@ -12,7 +12,7 @@ class CumulativeStepExecutor extends StepExecutor
     /**
      * {@inheritdoc}
      */
-    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
+    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         try {
             $stopExecution = false;

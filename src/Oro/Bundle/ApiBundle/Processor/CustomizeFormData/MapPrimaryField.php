@@ -84,9 +84,6 @@ class MapPrimaryField implements ProcessorInterface
         }
     }
 
-    /**
-     * @param CustomizeFormDataContext $context
-     */
     protected function processPreSubmit(CustomizeFormDataContext $context)
     {
         $submittedData = $context->getData();
@@ -126,7 +123,6 @@ class MapPrimaryField implements ProcessorInterface
     }
 
     /**
-     * @param CustomizeFormDataContext $context
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processPostSubmit(CustomizeFormDataContext $context)
@@ -164,9 +160,6 @@ class MapPrimaryField implements ProcessorInterface
         }
     }
 
-    /**
-     * @param CustomizeFormDataContext $context
-     */
     protected function processPostValidate(CustomizeFormDataContext $context)
     {
         $form = $context->getForm();

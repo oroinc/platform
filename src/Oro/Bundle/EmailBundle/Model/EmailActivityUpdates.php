@@ -14,9 +14,6 @@ class EmailActivityUpdates
     /** @var EmailAddress[] */
     protected $updatedEmailAddresses = [];
 
-    /**
-     * @param EmailOwnersProvider $emailOwnersProvider
-     */
     public function __construct(EmailOwnersProvider $emailOwnersProvider)
     {
         $this->emailOwnersProvider = $emailOwnersProvider;

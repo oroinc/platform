@@ -61,9 +61,6 @@ class ExpressionLanguageCacheWarmer
     /**
      * When an expression works only with the context variable, there is no need to cache it,
      * as it's evaluated during layout tree build.
-     *
-     * @param Node $node
-     * @return bool
      */
     private function shouldBeSkipped(Node $node): bool
     {

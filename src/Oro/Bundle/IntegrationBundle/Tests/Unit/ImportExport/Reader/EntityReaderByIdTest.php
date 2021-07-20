@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;

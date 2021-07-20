@@ -19,9 +19,6 @@ class AliceToStringResolver implements ResolverInterface, ReferencesAwareInterfa
      */
     protected static $regex = '/^<toString\((?P<value>[^<]*)\)>$/';
 
-    /**
-     * @param ResolverInterface $resolver
-     */
     public function __construct(ResolverInterface $resolver)
     {
         $this->resolver = $resolver;

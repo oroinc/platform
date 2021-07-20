@@ -64,9 +64,6 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         return $item;
     }
 
-    /**
-     * @param BatchUpdateContext $context
-     */
     private function initializeProcessedItemStatuses(BatchUpdateContext $context)
     {
         $processedItemStatuses = [];

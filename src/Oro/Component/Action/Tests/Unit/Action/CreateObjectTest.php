@@ -91,9 +91,6 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param array $contextData
-     * @param null|array $expectedData
      * @dataProvider executeDataProvider
      */
     public function testExecute(array $options, array $contextData = [], array $expectedData = null)

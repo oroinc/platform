@@ -75,9 +75,6 @@ class EmailApi
     /** @var string */
     protected $refs;
 
-    /**
-     * @param EmailEntity|null $entity
-     */
     public function __construct(EmailEntity $entity = null)
     {
         $this->entity = $entity;

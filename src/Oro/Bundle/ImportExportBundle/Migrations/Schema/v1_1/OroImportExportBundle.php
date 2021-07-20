@@ -17,9 +17,6 @@ class OroImportExportBundle implements Migration
         $this->addForeignKeys($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createImportExportResultTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_import_export_result');
@@ -40,8 +37,6 @@ class OroImportExportBundle implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function addForeignKeys(Schema $schema): void

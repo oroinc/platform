@@ -64,8 +64,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets an object that will be used to accessing request headers.
-     *
-     * @param ParameterBagInterface $parameterBag
      */
     public function setRequestHeaders(ParameterBagInterface $parameterBag);
 
@@ -78,8 +76,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets an object that will be used to accessing response headers.
-     *
-     * @param ParameterBagInterface $parameterBag
      */
     public function setResponseHeaders(ParameterBagInterface $parameterBag);
 
@@ -113,8 +109,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets the response document builder.
-     *
-     * @param DocumentBuilderInterface|null $documentBuilder
      */
     public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder);
 
@@ -134,61 +128,45 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets an object that will be used to accessing incoming filters.
-     *
-     * @param FilterValueAccessorInterface $accessor
      */
     public function setFilterValues(FilterValueAccessorInterface $accessor);
 
     /**
      * Indicates whether the current action processes a master API request
      * or it is executed as part of another action.
-     *
-     * @return bool
      */
     public function isMasterRequest(): bool;
 
     /**
      * Sets a flag indicates whether the current action processes a master API request
      * or it is executed as part of another action.
-     *
-     * @param bool $master
      */
     public function setMasterRequest(bool $master): void;
 
     /**
      * Indicates whether the current request is CORS request.
      * @link https://www.w3.org/TR/cors/
-     *
-     * @return bool
      */
     public function isCorsRequest(): bool;
 
     /**
      * Sets a flag indicates whether the current request is CORS request.
      * @link https://www.w3.org/TR/cors/
-     *
-     * @param bool $cors
      */
     public function setCorsRequest(bool $cors): void;
 
     /**
      * Indicates whether HATEOAS is enabled.
-     *
-     * @return bool
      */
     public function isHateoasEnabled(): bool;
 
     /**
      * Sets a flag indicates whether HATEOAS is enabled.
-     *
-     * @param bool $flag
      */
     public function setHateoas(bool $flag);
 
     /**
      * Gets a context for response data normalization.
-     *
-     * @return array
      */
     public function getNormalizationContext(): array;
 
@@ -223,9 +201,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Adds records that contain an additional information about a collection valued association.
-     *
-     * @param string $propertyPath
-     * @param array  $infoRecords
      */
     public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void;
 
@@ -281,8 +256,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets the Criteria object is used to add additional restrictions to a query is used to get result data.
-     *
-     * @param Criteria|null $criteria
      */
     public function setCriteria(Criteria $criteria = null);
 
@@ -302,8 +275,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Registers an error.
-     *
-     * @param Error $error
      */
     public function addError(Error $error);
 
@@ -392,8 +363,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
     /**
      * Adds a request for some configuration data.
      *
-     * @param ConfigExtraInterface $extra
-     *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
     public function addConfigExtra(ConfigExtraInterface $extra);
@@ -428,8 +397,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets a configuration of an entity.
-     *
-     * @param EntityDefinitionConfig|null $definition
      */
     public function setConfig(?EntityDefinitionConfig $definition);
 
@@ -449,8 +416,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets a configuration of filters for an entity.
-     *
-     * @param FiltersConfig|null $config
      */
     public function setConfigOfFilters(?FiltersConfig $config);
 
@@ -470,8 +435,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets a configuration of sorters for an entity.
-     *
-     * @param SortersConfig|null $config
      */
     public function setConfigOfSorters(?SortersConfig $config);
 
@@ -544,8 +507,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
     /**
      * Adds a request for some additional metadata info.
      *
-     * @param MetadataExtraInterface $extra
-     *
      * @throws \InvalidArgumentException if a metadata extra with the same name already exists
      */
     public function addMetadataExtra(MetadataExtraInterface $extra);
@@ -573,8 +534,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Sets metadata of an entity.
-     *
-     * @param EntityMetadata|null $metadata
      */
     public function setMetadata(?EntityMetadata $metadata);
 }

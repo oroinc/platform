@@ -32,9 +32,6 @@ class ConfigProvider implements ResetInterface
     /** @var bool */
     private $fullConfigsCacheDisabled = false;
 
-    /**
-     * @param ActionProcessorInterface $processor
-     */
     public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
@@ -115,16 +112,6 @@ class ConfigProvider implements ResetInterface
         $this->fullConfigsCacheDisabled = true;
     }
 
-    /**
-     * @param string      $className
-     * @param string      $version
-     * @param RequestType $requestType
-     * @param array       $extras
-     * @param bool        $identifierFieldsOnly
-     * @param string      $cacheKey
-     *
-     * @return Config
-     */
     private function loadConfig(
         string $className,
         string $version,
@@ -191,11 +178,6 @@ class ConfigProvider implements ResetInterface
         return $configKey;
     }
 
-    /**
-     * @param ConfigContext $context
-     *
-     * @return Config
-     */
     private function buildResult(ConfigContext $context): Config
     {
         $config = new Config();

@@ -30,10 +30,6 @@ class RestDocContextProvider
     /** @var ActionProcessorBagInterface */
     private $processorBag;
 
-    /**
-     * @param RestDocViewDetector         $docViewDetector
-     * @param ActionProcessorBagInterface $processorBag
-     */
     public function __construct(RestDocViewDetector $docViewDetector, ActionProcessorBagInterface $processorBag)
     {
         $this->docViewDetector = $docViewDetector;
@@ -79,10 +75,6 @@ class RestDocContextProvider
     }
 
     /**
-     * @param Context $context
-     *
-     * @return EntityDefinitionConfig
-     *
      * @throws \LogicException if the configuration cannot be loaded
      */
     public function getConfig(Context $context): EntityDefinitionConfig
@@ -96,10 +88,6 @@ class RestDocContextProvider
     }
 
     /**
-     * @param Context $context
-     *
-     * @return EntityMetadata
-     *
      * @throws \LogicException if the metadata cannot be loaded
      */
     public function getMetadata(Context $context): EntityMetadata
@@ -112,12 +100,6 @@ class RestDocContextProvider
         return $metadata;
     }
 
-    /**
-     * @param string  $type
-     * @param Context $context
-     *
-     * @return \LogicException
-     */
     private static function createCannotBeLoadedException(string $type, Context $context): \LogicException
     {
         $message = sprintf(
@@ -134,12 +116,6 @@ class RestDocContextProvider
     }
 
     /**
-     * @param OptionsContext $context
-     * @param Route          $route
-     * @param string         $action
-     * @param string         $entityClass
-     * @param string|null    $associationName
-     *
      * @throws \LogicException if the action type cannot be set
      */
     private static function setActionType(
@@ -172,11 +148,6 @@ class RestDocContextProvider
         }
     }
 
-    /**
-     * @param Route $route
-     *
-     * @return string|null
-     */
     private static function getActionType(Route $route): ?string
     {
         $actionType = $route->getOption(self::ACTION_TYPE_ATTRIBUTE);
@@ -201,25 +172,11 @@ class RestDocContextProvider
         return $actionType;
     }
 
-    /**
-     * @param Route $route
-     *
-     * @return string
-     */
     private static function getController(Route $route): string
     {
         return $route->getDefault(self::CONTROLLER_ATTRIBUTE);
     }
 
-    /**
-     * @param string      $message
-     * @param Route       $route
-     * @param string      $action
-     * @param string      $entityClass
-     * @param string|null $associationName
-     *
-     * @return \LogicException
-     */
     private static function createActionTypeException(
         string $message,
         Route $route,
@@ -241,12 +198,6 @@ class RestDocContextProvider
         return new \LogicException($message);
     }
 
-    /**
-     * @param string $haystack
-     * @param string $needle
-     *
-     * @return bool
-     */
     private static function endsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, -\strlen($needle)) === $needle;

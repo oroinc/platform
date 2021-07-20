@@ -39,9 +39,6 @@ class ImapEmailManager
     /** @var ImapConnector */
     protected $connector;
 
-    /**
-     * @param ImapConnector $connector
-     */
     public function __construct(ImapConnector $connector)
     {
         $this->connector = $connector;

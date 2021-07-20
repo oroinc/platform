@@ -14,17 +14,11 @@ class TransitionTranslationHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param Transition $transition
-     */
     public function processTransitionTranslations(Transition $transition)
     {
         $buttonLabel = $this->trans($transition->getButtonLabel());

@@ -1,17 +1,17 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const XRegExp = require('xregexp');
     require('jquery.validate');
 
     const defaultParam = {
-        message: 'This value is not a valid URL.'
+        message: 'This value is not a valid URL.',
+        protocols: ['http', 'https']
     };
 
     // JS version of \Symfony\Component\Validator\Constraints\UrlValidator::PATTERN
-    const pattern = '^(http|https)://' + // protocol
+    const patternURL = '^({{ protocols }})://' + // protocol
         '(([\\pL\\pN-]+:)?([\\pL\\pN-]+)@)?' + // basic auth
         '(' +
             '([-\\pL\\pN\\pS\\.])+(\\.?([\\pL\\pN]|xn\\-\\-[\\pL\\pN-]+)+\\.?)' + // a domain name
@@ -47,12 +47,17 @@ define(function(require) {
      */
     return [
         'Url',
-        function(value, element) {
+        function(value, element, param) {
+            param = Object.assign({}, defaultParam, param);
+            const protocols = param.protocols
+                .map(protocol => protocol.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&'))
+                .join('|');
+            const pattern = patternURL.replace('{{ protocols }}', protocols);
             const regexp = new XRegExp(pattern);
             return this.optional(element) || regexp.test(value);
         },
         function(param) {
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             return __(param.message);
         }
     ];

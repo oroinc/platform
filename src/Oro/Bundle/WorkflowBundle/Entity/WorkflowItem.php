@@ -620,9 +620,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
         return $this->restrictionIdentities;
     }
 
-    /**
-     * @param WorkflowRestrictionIdentity $restrictionIdentity
-     */
     public function addRestrictionIdentity(WorkflowRestrictionIdentity $restrictionIdentity)
     {
         $restrictionIdentity->setWorkflowItem($this);
@@ -630,9 +627,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
         $this->restrictionIdentities->add($restrictionIdentity);
     }
 
-    /**
-     * @param WorkflowRestrictionIdentity $restrictionIdentity
-     */
     public function removeRestrictionIdentity(WorkflowRestrictionIdentity $restrictionIdentity)
     {
         $this->restrictionIdentities->removeElement($restrictionIdentity);
@@ -666,7 +660,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 
         return $this;
     }
-
 
     /**
      * Get created date/time

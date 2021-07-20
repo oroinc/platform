@@ -21,20 +21,11 @@ class CustomizeFormDataHandler
     /** @var ActionProcessorInterface */
     private $customizationProcessor;
 
-    /**
-     * @param ActionProcessorInterface $customizationProcessor
-     */
     public function __construct(ActionProcessorInterface $customizationProcessor)
     {
         $this->customizationProcessor = $customizationProcessor;
     }
 
-    /**
-     * @param string    $eventName
-     * @param FormEvent $event
-     *
-     * @return CustomizeFormDataContext|null
-     */
     public function handleFormEvent(string $eventName, FormEvent $event): ?CustomizeFormDataContext
     {
         $context = $this->getInitializedContext($event->getForm());
@@ -47,11 +38,6 @@ class CustomizeFormDataHandler
         return $context;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return CustomizeFormDataContext|null
-     */
     private function getInitializedContext(FormInterface $form): ?CustomizeFormDataContext
     {
         /** @var CustomizeFormDataContext $context */
@@ -96,11 +82,6 @@ class CustomizeFormDataHandler
         return $context;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
     private function getPropertyPath(FormInterface $form): string
     {
         $path = [];
@@ -118,12 +99,6 @@ class CustomizeFormDataHandler
         return \implode('.', \array_reverse($path));
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionConfig|null
-     */
     private function getAssociationConfig(
         EntityDefinitionConfig $config,
         string $propertyPath

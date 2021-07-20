@@ -12,7 +12,7 @@ class TopicMeta
      * @var string
      */
     private $description;
-    
+
     /**
      * @var string[]
      */

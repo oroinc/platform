@@ -13,8 +13,6 @@ class SearchListener
 {
     /**
      * Clear PrepareEntityMapEvent data to skip indexation of the entity
-     *
-     * @param PrepareEntityMapEvent $event
      */
     public function prepareEntityMapEvent(PrepareEntityMapEvent $event): void
     {

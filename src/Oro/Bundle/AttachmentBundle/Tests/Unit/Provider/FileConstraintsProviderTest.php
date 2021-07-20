@@ -57,13 +57,8 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['sample/type1', 'sample/type2'], $this->provider->getImageMimeTypes());
     }
 
-
     /**
      * @dataProvider mimeTypesDataProvider
-     *
-     * @param string|null $fileMimeTypes
-     * @param string|null $imageMimeTypes
-     * @param array $expected
      */
     public function testGetMimeTypes(?string $fileMimeTypes, ?string $imageMimeTypes, array $expected): void
     {
@@ -79,9 +74,6 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getMimeTypes());
     }
 
-    /**
-     * @return array
-     */
     public function mimeTypesDataProvider(): array
     {
         return [
@@ -111,10 +103,6 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mimeTypesAsChoicesDataProvider
-     *
-     * @param string|null $fileMimeTypes
-     * @param string|null $imageMimeTypes
-     * @param array $expected
      */
     public function testGetMimeTypesAsChoices(?string $fileMimeTypes, ?string $imageMimeTypes, array $expected): void
     {
@@ -130,9 +118,6 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getMimeTypesAsChoices());
     }
 
-    /**
-     * @return array
-     */
     public function mimeTypesAsChoicesDataProvider(): array
     {
         return [
@@ -257,10 +242,6 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypesProvider
-     *
-     * @param string $inputType
-     * @param array $expectedResult
-     * @return void
      */
     public function testGetAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypes(
         string $inputType,
@@ -302,9 +283,6 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getAllowedMimeTypesForEntityFieldWhenImageAndNoMimeTypesProvider(): array
     {
         return [

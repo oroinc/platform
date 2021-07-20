@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -30,12 +30,6 @@ class EntityFieldWriter implements ItemWriterInterface
     /** @var EntityFieldStateChecker */
     private $stateChecker;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param ConfigTranslationHelper $translationHelper
-     * @param EnumSynchronizer $enumSynchronizer
-     * @param EntityFieldStateChecker $entityFieldStateChecker
-     */
     public function __construct(
         ConfigManager $configManager,
         ConfigTranslationHelper $translationHelper,
@@ -106,11 +100,6 @@ class EntityFieldWriter implements ItemWriterInterface
         return $translations;
     }
 
-    /**
-     * @param FieldConfigModel $fieldConfigModel
-     *
-     * @return string
-     */
     private function getFieldModelState(FieldConfigModel $fieldConfigModel): string
     {
         $extendConfig = $fieldConfigModel->toArray('extend');

@@ -108,12 +108,6 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int|null $id
-     * @param string $filename
-     *
-     * @return File
-     */
     private function getFile(int $id = null, string $filename = ''): File
     {
         $file = $this->createMock(File::class);

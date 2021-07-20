@@ -30,9 +30,6 @@ class DataFixturesLoader extends ContainerAwareLoader
 
     /**
      * Constructor.
-     *
-     * @param EntityManager      $em
-     * @param ContainerInterface $container
      */
     public function __construct(EntityManager $em, ContainerInterface $container)
     {
@@ -99,9 +96,6 @@ class DataFixturesLoader extends ContainerAwareLoader
 
     /**
      * Collect fixture to rename if needed
-     *
-     * @param FixtureInterface $fixtureObject
-     * @param RenameDataFixturesFixture $renameFixture
      */
     private function collectToRename(FixtureInterface $fixtureObject, RenameDataFixturesFixture $renameFixture): void
     {
@@ -124,9 +118,6 @@ class DataFixturesLoader extends ContainerAwareLoader
 
     /**
      * Collect fixture to load if needed
-     *
-     * @param FixtureInterface $fixtureObject
-     * @param UpdateDataFixturesFixture $updateFixture
      */
     private function collectToLoad(FixtureInterface $fixtureObject, UpdateDataFixturesFixture $updateFixture): void
     {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;

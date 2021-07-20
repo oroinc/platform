@@ -47,8 +47,6 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array $options
      */
     public function testBuildOptionsNoChanges(array $options)
     {

@@ -41,13 +41,6 @@ class QueryValidator extends ConstraintValidator
     /** @var array [grid name => true, ...] */
     private $processing = [];
 
-    /**
-     * @param FilterExecutionContext     $filterExecutionContext
-     * @param ChainConfigurationProvider $configurationProvider
-     * @param Builder                    $gridBuilder
-     * @param DoctrineHelper             $doctrineHelper
-     * @param bool                       $isDebug
-     */
     public function __construct(
         FilterExecutionContext $filterExecutionContext,
         ChainConfigurationProvider $configurationProvider,
@@ -123,11 +116,6 @@ class QueryValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return DatagridConfigurationBuilder
-     */
     private function getBuilder(string $gridName): DatagridConfigurationBuilder
     {
         /** @var ConfigurationProviderInterface[] $providers */

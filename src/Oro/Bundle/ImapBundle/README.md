@@ -4,24 +4,22 @@ OroImapBundle enables the data synchronization between local user mailboxes prov
 
 ## Usage
 
-``` php
+```php
 <?php
     // Preparing connection config
     $imapConfig = new ImapConfig('imap.gmail.com', 993, 'ssl', 'user', 'pwd');
 
     // Accessing IMAP connector factory
-    /** @var $factory \Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory */
+    /** @var ImapConnectorFactory $factory */
     $factory = $this->get('oro_imap.connector.factory');
 
     // Creating IMAP connector for the ORO user
-    /** @var $imap \Oro\Bundle\ImapBundle\Connector\ImapConnector */
     $imapConnector = $factory->createImapConnector($imapConfig);
 
     // Creating IMAP manager
     $imapManager = new ImapEmailManager($imapConnector);
 
     // Creating the search query builder
-    /** @var $queryBuilder \Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder */
     $queryBuilder = $imapManager->getSearchQueryBuilder();
 
     // Building a search query
@@ -85,106 +83,41 @@ Google Gmail implementation - provides OAuth authentication/authorization via cu
 - Required fields: `Client ID`, `Client Secret` - values can be found in the Google application management panel
 - Select *OAuth 2.0 for Gmail emails sync -> Enable* - If credentials are invalid, the integration *will not enable*.
 
-### Microsoft Office 365
+### Microsoft 365
 
-MS Office implementation - provides OAuth authentication/authorization via custom Microsoft Azure application 
+Microsoft 365 implementation - provides OAuth authentication/authorization via custom Microsoft Azure application 
 - integration configuration via *System Configuration -> Integrations -> Microsoft Settings*
 - Required fields: `Client ID`, `Client Secret`, `Tenant` - values can be found in the MS Azure application management panel.
-- Select *OAuth 2.0 for Office 365 emails sync -> Enable* - If credentials are invalid, the integration *will not enable*.
+- Select *Enable Emails Sync* in *Microsoft 365 Integrations*.
 
 
 ### Custom provider implementation
 
-- Implement new provider class that inherits from `Oro\Bundle\ImapBundle\Manager\Oauth2ManagerInterface`
-- Tag the implementation with tag `oro_imap.oauth2_manager` (the service will be automatically picked up and, 
+- Implement new OAuth provider class that inherits from `Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface`
+- Implement new OAuth manager class that inherits from `Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface`
+- Tag the manager implementation with tag `oro_imap.oauth_manager` (the service will be automatically picked up and, 
 if provider enabled, additional account type will be available for *User Configuration -> General Setup -> 
 Email Configuration -> Email synchronization settings -> Account Type*)
- 1. Make sure all interface methods are implemented
- 2. `getType()` method should return unique name of the provider you are implementing
- 3. `getConnectionFormTypeClass()` should return custom configuration form class fully qualified class name
-
-```
-# services.yml
-
-services:
-
-    # ...
-
-    example_vendor.example_bundle.imap_email_oauth2_manager:
-        class: ExampleVendor\Bundle\ImapBundle\Manager\ImapEmailOauth2Manager
-        arguments:
-            # ...
-        tags:
-            - { name: 'oro_imap.oauth2_manager' }
-```
 - Implement form type with default Email Origin values for certain provider 
-(see `Oro\Bundle\ImapBundle\Form\Type\AbstractOauthAwareConfigurationType` 
+(see `Oro\Bundle\ImapBundle\Form\Type\AbstractOAuthAwareConfigurationType` 
 and existing inheriting types)
-```
-<?php 
-namespace ExampleVendor\Bundle\ImapBundle\Form\Type;
-
-use Oro\Bundle\ImapBundle\Form\Type\AbstractOauthAwareConfigurationType;
-
-class ExampleConfigurationType extends AbstractOauthAwareConfigurationType 
-{
-    /* ... */
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'example_imap_configuration_type';
-    }
-}
-```
- - Implement custom controller for handling access token and connection check endpoints
- (see `Oro\Bundle\ImapBundle\Controller\AbstractVendorConnectionController` and 
- inheriting controllers) - provide necessary endpoints. Out-of-the-box the abstraction implements
- two methods for providing access token and checking connection.
- 
-   - `Check connection endpoint` - endpoint for checking connection to the OAuth-secured service and provides 
- additional form data (folders)
- 
-   - `Get Token endpoint` - Endpoint for providing token data
-   
-   ```
-   <?php
-
-   namespace ExampleVendor\Bundle\ImapBundle\Controller;
-
-   use Oro\Bundle\ImapBundle\Controller\AbstractVendorConnectionController;
-
-   class ExampleController extends AbstractVendorConnectionController
-   {
-       /* ... */
-   }
-   ```
-
-  Default Token data format:
-  
-  ```
-  {
-  	"access_token":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  	"refresh_token":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  	"expires_in":3599,
-  	"email_address":"user@example.com"
-  }
-  ```
-
+- Register a route for `Oro\Bundle\ImapBundle\Controller\CheckConnectionController` for new OAuth vendor
+- Implement custom controller for handling access token
+ (see `Oro\Bundle\ImapBundle\Controller\AbstractAccessTokenController` and 
+ inheriting controllers) and register a route for it.
 - Register custom form block widgets definitions 
 
   1. `Resources/config/oro/twig.yml` - add this file to register global set of
   definitions of form fields
-  
-  ```
+
+  ```yaml
   bundles:
       - '@ExampleVendorImap/Form/fields.html.twig'
   ```
+
   2. Create fields definitions file with custom definition of previously defined form field
   
-  ```
+  ```twig
   {# '@ExampleVendorImap/Form/fields.html.twig' #}
   
   {% block example_imap_configuration_type_widget %}
@@ -213,6 +146,3 @@ class ExampleConfigurationType extends AbstractOauthAwareConfigurationType
    3. Depending on OAuth implementation from your provider, claim token data via previously defined
    controller
    4. By default, the component/view handle population of proper DOM elements with provided token data
- 
- 
- 

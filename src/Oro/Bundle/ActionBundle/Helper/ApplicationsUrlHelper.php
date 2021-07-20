@@ -13,10 +13,6 @@ class ApplicationsUrlHelper
     /** @var RouterInterface */
     private $router;
 
-    /**
-     * @param RouteProviderInterface $routeProvider
-     * @param RouterInterface $router
-     */
     public function __construct(RouteProviderInterface $routeProvider, RouterInterface $router)
     {
         $this->routeProvider = $routeProvider;

@@ -37,9 +37,6 @@ class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtensio
         }
     }
 
-    /**
-     * @param ConfigInterface $extendFieldConfig
-     */
     private function addRelations(ConfigInterface $extendFieldConfig)
     {
         /* @var $extendFieldConfigId FieldConfigId */
@@ -69,9 +66,6 @@ class FileEntityConfigDumperExtension extends RelationEntityConfigDumperExtensio
         $this->createRelation($extendFieldConfig);
     }
 
-    /**
-     * @param ConfigInterface $extendFieldConfig
-     */
     private function addMultiRelations(ConfigInterface $extendFieldConfig)
     {
         /* @var $extendFieldConfigId FieldConfigId */

@@ -54,9 +54,6 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param $exceptionName
-     *
      * @dataProvider initializeExceptionDataProvider
      */
     public function testInitializeException(array $options, $exceptionName): void
@@ -65,9 +62,6 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
     public function initializeExceptionDataProvider(): array
     {
         return [

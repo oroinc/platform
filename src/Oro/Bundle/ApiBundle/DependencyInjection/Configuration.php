@@ -51,9 +51,6 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendOptions(NodeBuilder $node)
     {
         $node
@@ -107,9 +104,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendConfigFilesNode(NodeBuilder $node)
     {
         $node
@@ -178,7 +172,6 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param NodeBuilder $node
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function appendApiDocViewsNode(NodeBuilder $node)
@@ -307,11 +300,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param array  $views
-     * @param string $underlyingViewName
-     * @param string $viewName
-     */
     private static function assertUnderlyingView(array $views, string $underlyingViewName, string $viewName)
     {
         if (empty($views[$underlyingViewName])) {
@@ -333,10 +321,6 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param array $view
-     * @param array $underlyingView
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private static function mergeViews(array $view, array $underlyingView): array
@@ -370,9 +354,6 @@ class Configuration implements ConfigurationInterface
         return $view;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendApiDocCacheNode(NodeBuilder $node)
     {
         $node
@@ -390,9 +371,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendConfigExtensionsNode(NodeBuilder $node)
     {
         $node
@@ -404,9 +382,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendActionsNode(NodeBuilder $node)
     {
         $node
@@ -466,9 +441,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFilterOperatorsNode(NodeBuilder $node)
     {
         $node
@@ -488,9 +460,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFiltersNode(NodeBuilder $node)
     {
         $node
@@ -552,9 +521,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFormTypesNode(NodeBuilder $node)
     {
         $node
@@ -569,9 +535,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFormTypeExtensionsNode(NodeBuilder $node)
     {
         $node
@@ -583,9 +546,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFormTypeGuessersNode(NodeBuilder $node)
     {
         $node
@@ -597,9 +557,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFormTypeGuessesNode(NodeBuilder $node)
     {
         $node
@@ -632,9 +589,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendErrorTitleOverrideNode(NodeBuilder $node)
     {
         $node
@@ -647,9 +601,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendCorsNode(NodeBuilder $node)
     {
         $node
@@ -685,9 +636,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendFeatureDependedFirewalls(NodeBuilder $node)
     {
         $node
@@ -713,9 +661,6 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendBatchApiNode(NodeBuilder $node)
     {
         $batchApiNode = $node
@@ -777,9 +722,6 @@ class Configuration implements ConfigurationInterface
         $this->configureChunkSizePerEntity($includedDataChunkSizePerEntityNode);
     }
 
-    /**
-     * @param ArrayNodeDefinition $node
-     */
     private function configureChunkSizePerEntity(ArrayNodeDefinition $node)
     {
         $node

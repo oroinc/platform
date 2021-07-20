@@ -18,9 +18,6 @@ class StoreRequestData implements ProcessorInterface
     /** @var FileManager */
     private $fileManager;
 
-    /**
-     * @param FileManager $fileManager
-     */
     public function __construct(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;

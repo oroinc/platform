@@ -33,11 +33,6 @@ class NavigationHistoryLoggerTest extends WebTestCase
         $this->assertNotNull($this->tokenAccessor->getUser(), 'No logged in user');
     }
 
-    /**
-     * @param int $id
-     *
-     * @return NavigationHistoryItem|null
-     */
     private function findNavigationHistoryItem(int $id): ?NavigationHistoryItem
     {
         $doctrine = $this->getContainer()->get('doctrine');
@@ -47,9 +42,6 @@ class NavigationHistoryLoggerTest extends WebTestCase
         return $repo->find($id);
     }
 
-    /**
-     * @return NavigationHistoryItem|null
-     */
     private function findLastNavigationHistoryItem(): ?NavigationHistoryItem
     {
         $doctrine = $this->getContainer()->get('doctrine');

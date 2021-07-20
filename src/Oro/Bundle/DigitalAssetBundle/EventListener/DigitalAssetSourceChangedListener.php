@@ -15,18 +15,11 @@ class DigitalAssetSourceChangedListener
     /** @var FileReflector */
     private $fileReflector;
 
-    /**
-     * @param FileReflector $fileReflector
-     */
     public function __construct(FileReflector $fileReflector)
     {
         $this->fileReflector = $fileReflector;
     }
 
-    /**
-     * @param File $file
-     * @param LifecycleEventArgs $args
-     */
     public function postUpdate(File $file, LifecycleEventArgs $args): void
     {
         if ($file->getParentEntityClass() !== DigitalAsset::class) {

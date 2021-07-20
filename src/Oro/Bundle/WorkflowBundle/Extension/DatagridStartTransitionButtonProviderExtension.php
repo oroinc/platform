@@ -22,12 +22,6 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param RouteProviderInterface $routeProvider
-     * @param OriginalUrlProvider    $originalUrlProvider
-     * @param DoctrineHelper         $doctrineHelper
-     */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         RouteProviderInterface $routeProvider,

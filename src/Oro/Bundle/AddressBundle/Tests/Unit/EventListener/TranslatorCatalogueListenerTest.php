@@ -199,9 +199,6 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return ObjectManager
-     */
     private function configureManager(): ObjectManager
     {
         /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $manager */
@@ -222,10 +219,6 @@ class TranslatorCatalogueListenerTest extends \PHPUnit\Framework\TestCase
         return $manager;
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @return ManagerRegistry
-     */
     private function configureRegistry(ObjectManager $manager): ManagerRegistry
     {
         /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */

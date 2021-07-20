@@ -12,14 +12,8 @@ abstract class AbstractMatchingEntityHydrator extends AbstractHydrator
 {
     public const MATCHED_SCOPE_ID = 'matchedScopeId';
 
-    /**
-     * @return string
-     */
     abstract protected function getRootEntityAlias(): string;
 
-    /**
-     * @return string
-     */
     abstract protected function getEntityClass(): string;
 
     /**

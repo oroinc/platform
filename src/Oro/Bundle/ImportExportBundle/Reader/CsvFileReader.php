@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\ParseException;
+use Oro\Bundle\BatchBundle\Exception\ParseException;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -33,9 +33,6 @@ class CsvFileReader extends AbstractFileReader
      */
     private $file;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(ContextRegistry $contextRegistry)
     {
         parent::__construct($contextRegistry);
@@ -116,7 +113,6 @@ class CsvFileReader extends AbstractFileReader
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
     protected function initializeFromContext(ContextInterface $context)

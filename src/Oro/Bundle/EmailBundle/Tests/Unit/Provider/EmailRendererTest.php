@@ -69,12 +69,6 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $content
-     * @param string $subject
-     *
-     * @return EmailTemplateInterface
-     */
     private function getEmailTemplate(string $content, string $subject = ''): EmailTemplateInterface
     {
         $emailTemplate = new EmailTemplateModel();
@@ -84,13 +78,6 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         return $emailTemplate;
     }
 
-    /**
-     * @param string $propertyName
-     * @param string $path
-     * @param string $parentPath
-     *
-     * @return string
-     */
     private function getEntityVariableTemplate(string $propertyName, string $path, string $parentPath): string
     {
         return strtr(
@@ -103,10 +90,6 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $entityVariableProcessors
-     * @param array $systemVariableValues
-     */
     private function expectVariables(array $entityVariableProcessors = [], array $systemVariableValues = []): void
     {
         $entityVariableProcessorsMap = [];

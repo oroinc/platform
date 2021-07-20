@@ -65,9 +65,6 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->extendableCondition->isConditionAllowed([]));
     }
 
-    /**
-     * @param array $options
-     */
     private function expectsDispatchWithErrors(array $options)
     {
         $this->extendableCondition->initialize($options);
@@ -86,8 +83,6 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider notDisplayingErrorsDataProvider
-     * @param array $context
-     * @param array $options
      */
     public function testIsConditionAllowedWhenNotDisplayingErrors(array $context, array $options)
     {

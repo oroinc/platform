@@ -41,12 +41,6 @@ class CompleteCustomDataTypeHelper
         $this->matcher = $matcher;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ClassMetadata          $metadata
-     * @param string                 $version
-     * @param RequestType            $requestType
-     */
     public function completeCustomDataTypes(
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
@@ -70,15 +64,6 @@ class CompleteCustomDataTypeHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig      $definition
-     * @param ClassMetadata               $metadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $dataType
-     * @param string                      $version
-     * @param RequestType                 $requestType
-     */
     public function completeCustomDataType(
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,

@@ -40,13 +40,6 @@ class MarkMassActionHandler implements MassActionHandlerInterface
     /** @var EmailManager */
     protected $emailManager;
 
-    /**
-     * @param EntityManager                 $entityManager
-     * @param TranslatorInterface           $translator
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param EmailManager                  $emailManager
-     */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,

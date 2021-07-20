@@ -25,12 +25,6 @@ class TestConfigRegistry
     /** @var bool */
     private $isResourcesCacheAffected = false;
 
-    /**
-     * @param ConfigBagRegistry $configBagRegistry
-     * @param ConfigProvider    $configProvider
-     * @param MetadataProvider  $metadataProvider
-     * @param ResourcesProvider $resourcesProvider
-     */
     public function __construct(
         ConfigBagRegistry $configBagRegistry,
         ConfigProvider $configProvider,
@@ -58,9 +52,6 @@ class TestConfigRegistry
         $this->clearCaches();
     }
 
-    /**
-     * @param RequestType $requestType
-     */
     public function restoreConfigs(RequestType $requestType)
     {
         if ($this->getConfigBag($requestType)->restoreConfigs()) {

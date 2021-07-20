@@ -12,9 +12,6 @@ class ExtensionProvider
      */
     private $extensions;
 
-    /**
-     * @param iterable $extensions
-     */
     public function __construct(iterable $extensions)
     {
         $this->extensions = $extensions;

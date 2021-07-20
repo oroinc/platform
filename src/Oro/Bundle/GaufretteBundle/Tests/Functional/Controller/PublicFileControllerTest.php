@@ -13,17 +13,11 @@ class PublicFileControllerTest extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @return FileManager
-     */
     private function getTestPublicFileManager(): FileManager
     {
         return self::getContainer()->get('oro_gaufrette.tests.public_file_manager');
     }
 
-    /**
-     * @return FileManager
-     */
     private function getTestNotPublicFileManager(): FileManager
     {
         return self::getContainer()->get('oro_gaufrette.tests.not_public_file_manager');

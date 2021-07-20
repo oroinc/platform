@@ -37,77 +37,47 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
 {
     use MessageQueueExtension;
 
-    /**
-     * @return FileManager
-     */
     protected function getFileManager(): FileManager
     {
         return self::getContainer()->get('oro_api.batch.file_manager');
     }
 
-    /**
-     * @return FileManager
-     */
     protected function getSourceDataFileManager(): FileManager
     {
         return self::getContainer()->get('oro_api.batch.file_manager.source_data');
     }
 
-    /**
-     * @return ErrorManager
-     */
     protected function getErrorManager(): ErrorManager
     {
         return self::getContainer()->get('oro_api.batch.error_manager');
     }
 
-    /**
-     * @return ChunkSizeProvider
-     */
     protected function getChunkSizeProvider(): ChunkSizeProvider
     {
         return self::getContainer()->get('oro_api.batch.chunk_size_provider');
     }
 
-    /**
-     * @return JobProcessor
-     */
     protected function getJobProcessor(): JobProcessor
     {
         return self::getContainer()->get('oro_message_queue.job.processor');
     }
 
-    /**
-     * @param int $jobId
-     *
-     * @return Job
-     */
     protected function getJob(int $jobId): Job
     {
         return $this->getJobProcessor()->findJobById($jobId);
     }
 
-    /**
-     * @return TokenStorageInterface
-     */
     private function getTokenStorage(): TokenStorageInterface
     {
         return self::getContainer()->get('security.token_storage');
     }
 
-    /**
-     * @return TokenSerializerInterface
-     */
     private function getTokenSerializer(): TokenSerializerInterface
     {
         return self::getContainer()->get('oro_security.token_serializer');
     }
 
     /**
-     * @param string           $processorServiceId
-     * @param MessageInterface $message
-     *
-     * @return string
      * @throws InvalidSecurityTokenException
      * @throws MappingException
      */
@@ -133,11 +103,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $processor->process($message, $connection->createSession());
     }
 
-    /**
-     * @param array $body
-     *
-     * @return MessageInterface
-     */
     protected function createMessage(array $body): MessageInterface
     {
         $message = new Message();
@@ -157,11 +122,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $message;
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
     protected function getFileContentAndDeleteFile(string $fileName): ?string
     {
         $dataFileContent = $this->getFileManager()->getFileContent($fileName);
@@ -172,11 +132,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $dataFileContent;
     }
 
-    /**
-     * @param MessageInterface $message
-     *
-     * @return int
-     */
     protected function extractJobIdFromMessage(MessageInterface $message): int
     {
         $messageBody = self::jsonToArray($message->getBody());
@@ -186,11 +141,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $jobId;
     }
 
-    /**
-     * @param Response $response
-     *
-     * @return int
-     */
     protected function extractOperationIdFromContentLocationHeader(Response $response): int
     {
         self::assertTrue($response->headers->has('Content-Location'));
@@ -200,12 +150,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return substr($locationHeader, $delimiterPosition + 1);
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $data
-     *
-     * @return AsyncOperation
-     */
     protected function createAsyncOperation(string $entityClass, array $data): AsyncOperation
     {
         $dataFileName = UUIDGenerator::v4();
@@ -224,13 +168,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $operation;
     }
 
-    /**
-     * @param AsyncOperation $operation
-     * @param int|null       $chunkSize
-     * @param int|null       $includedDataChunkSize
-     *
-     * @return MessageInterface
-     */
     protected function createUpdateListMessage(
         AsyncOperation $operation,
         int $chunkSize = null,
@@ -256,10 +193,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         ]);
     }
 
-    /**
-     * @param int   $operationId
-     * @param array $attributes
-     */
     protected function assertAsyncOperationStatus(int $operationId, array $attributes): void
     {
         $this->getEntityManager()->clear();
@@ -267,11 +200,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         $this->assertAsyncOperationResponse($operationId, $attributes, $response);
     }
 
-    /**
-     * @param int      $operationId
-     * @param array    $attributes
-     * @param Response $response
-     */
     protected function assertAsyncOperationResponse(int $operationId, array $attributes, Response $response): void
     {
         $this->assertResponseContains(
@@ -286,20 +214,12 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param array $expectedError
-     * @param int   $operationId
-     */
     protected function assertAsyncOperationError(array $expectedError, int $operationId): void
     {
         self::assertNotEmpty($expectedError, 'The expected error should not be empty.');
         $this->assertAsyncOperationErrors([$expectedError], $operationId);
     }
 
-    /**
-     * @param array $expectedErrors
-     * @param int   $operationId
-     */
     protected function assertAsyncOperationErrors(array $expectedErrors, int $operationId): void
     {
         if (!$expectedErrors && !$this->getErrorManager()->readErrors($this->getFileManager(), $operationId, 0, 1)) {
@@ -315,19 +235,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         }
     }
 
-    /**
-     * @param int $operationId
-     */
     protected function dumpYmlTemplateForAsyncOperationErrors(int $operationId): void
     {
         $this->dumpYmlTemplate(null, $this->getAsyncOperationErrors($operationId));
     }
 
-    /**
-     * @param int $operationId
-     *
-     * @return Response
-     */
     private function getAsyncOperationErrors(int $operationId): Response
     {
         $this->getEntityManager()->clear();
@@ -337,11 +249,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param array $errors
-     *
-     * @return array
-     */
     private function buildAsyncOperationErrors(array $errors): array
     {
         $result = [];
@@ -357,13 +264,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return ['data' => $result];
     }
 
-    /**
-     * @param int    $operationId
-     * @param string $status
-     * @param float  $progress
-     * @param bool   $hasErrors
-     * @param array  $summary
-     */
     protected function assertAsyncOperationRootJobStatus(
         int $operationId,
         string $status,
@@ -420,9 +320,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $operationId;
     }
 
-    /**
-     * @param MessageInterface $message
-     */
     protected function processUpdateListMessage(MessageInterface $message): void
     {
         self::assertEquals(
@@ -493,13 +390,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $operationId;
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $data
-     * @param array  $expectedJobs
-     *
-     * @return int
-     */
     protected function processUpdateListAndValidateJobs(string $entityClass, array $data, array $expectedJobs): int
     {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);

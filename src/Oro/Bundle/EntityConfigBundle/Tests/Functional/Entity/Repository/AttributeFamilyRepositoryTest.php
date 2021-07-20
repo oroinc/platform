@@ -130,10 +130,6 @@ class AttributeFamilyRepositoryTest extends WebTestCase
         $this->assertEquals($expectedFamily->getId(), $family->getId());
     }
 
-    /**
-     * @param array $expected
-     * @param array $result
-     */
     private function assertFamilyIds(array $expected, array $result): void
     {
         $this->assertCount(count($expected), $result);

@@ -14,9 +14,6 @@ class EntityLoader
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

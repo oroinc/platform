@@ -37,10 +37,6 @@ class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $isAclProtected
-     * @param bool $isApplicationsValid
-     * @param bool $expectedResult
-     *
      * @dataProvider getIsValidForFieldDataProvider
      */
     public function testIsValidForField(

@@ -20,17 +20,11 @@ class ConfigConverter extends BaseConfigConverter
     /** @var RequestType|null */
     private $requestType;
 
-    /**
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(EntityOverrideProviderRegistry $entityOverrideProviderRegistry)
     {
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
-    /**
-     * @param RequestType|null $requestType
-     */
     public function setRequestType(RequestType $requestType = null): void
     {
         $this->requestType = $requestType;
@@ -64,11 +58,6 @@ class ConfigConverter extends BaseConfigConverter
         }
     }
 
-    /**
-     * @param string $class
-     *
-     * @return string
-     */
     protected function getEntityClass(string $class): string
     {
         if (null === $this->requestType) {

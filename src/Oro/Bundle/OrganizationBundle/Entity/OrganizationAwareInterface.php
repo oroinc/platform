@@ -4,9 +4,6 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 
 interface OrganizationAwareInterface
 {
-    /**
-     * @param OrganizationInterface $organization
-     */
     public function setOrganization(OrganizationInterface $organization);
 
     /**

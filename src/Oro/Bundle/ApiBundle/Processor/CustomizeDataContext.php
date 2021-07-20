@@ -100,8 +100,6 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
 
     /**
      * Sets a configuration of a root entity.
-     *
-     * @param EntityDefinitionConfig|null $config
      */
     public function setRootConfig(EntityDefinitionConfig $config = null)
     {
@@ -120,8 +118,6 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
 
     /**
      * Sets a configuration of a customizing entity.
-     *
-     * @param EntityDefinitionConfig|null $config
      */
     public function setConfig(EntityDefinitionConfig $config = null)
     {
@@ -132,8 +128,6 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
      * Gets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @return ParameterBagInterface
      */
     public function getSharedData(): ParameterBagInterface
     {
@@ -144,8 +138,6 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
      * Sets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @param ParameterBagInterface $sharedData
      */
     public function setSharedData(ParameterBagInterface $sharedData): void
     {
@@ -154,8 +146,6 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
 
     /**
      * Gets a context for response data normalization.
-     *
-     * @return array
      */
     public function getNormalizationContext(): array
     {

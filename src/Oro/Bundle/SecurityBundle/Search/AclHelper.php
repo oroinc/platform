@@ -29,12 +29,6 @@ class AclHelper
     /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
-    /**
-     * @param SearchMappingProvider         $mappingProvider
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclConditionDataBuilderInterface $ownershipDataBuilder
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     */
     public function __construct(
         SearchMappingProvider $mappingProvider,
         TokenAccessorInterface $tokenAccessor,
@@ -137,11 +131,6 @@ class AclHelper
     }
 
     /**
-     * @param string $className
-     * @param string $entityAlias
-     * @param array $condition
-     * @param ExpressionBuilder $expressionBuilder
-     * @return Expression|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getExpressionByCondition(
@@ -181,10 +170,6 @@ class AclHelper
         return $expressionBuilder->eq('integer.' . $filterField, $owners);
     }
 
-    /**
-     * @param string $className
-     * @return string
-     */
     private function getOwnerField(string $className): string
     {
         $metadata = $this->metadataProvider->getMetadata($className);
@@ -192,12 +177,6 @@ class AclHelper
         return $metadata->getOwnerFieldName() ?? '';
     }
 
-    /**
-     * @param ExpressionBuilder $expressionBuilder
-     * @param string $className
-     * @param string $entityAlias
-     * @return Expression
-     */
     private function getNoLimitExpression(
         ExpressionBuilder $expressionBuilder,
         string $className,
@@ -209,11 +188,6 @@ class AclHelper
         );
     }
 
-    /**
-     * @param string $entityAlias
-     * @param string $field
-     * @return string
-     */
     private function getFieldWithEntityAlias(string $entityAlias, string $field): string
     {
         return sprintf('%s_%s', $entityAlias, $field);

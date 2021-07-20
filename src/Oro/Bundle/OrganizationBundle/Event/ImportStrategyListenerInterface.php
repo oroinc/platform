@@ -9,9 +9,6 @@ use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
  */
 interface ImportStrategyListenerInterface
 {
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessAfter(StrategyEvent $event);
 
     /**

@@ -39,9 +39,6 @@ class OroEmailBundle implements Migration, ContainerAwareInterface
             ->send(UpgradeEmailBodyMessageProcessor::TOPIC_NAME, '');
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addTextBodyFieldToEmailBodyTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_body');

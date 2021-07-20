@@ -168,9 +168,6 @@ class QueryUtil
         return $parseClosure($query);
     }
 
-    /**
-     * @param Query $query
-     */
     public static function resetResultSetMapping(Query $query): void
     {
         // unfortunately the reflection is the only way to reset the result-set mapping

@@ -17,9 +17,6 @@ class StringFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
-     * @param int|null $length
-     * @param int $expectedLength
-     *
      * @dataProvider createProvider
      */
     public function testCreate(?int $length, int $expectedLength): void

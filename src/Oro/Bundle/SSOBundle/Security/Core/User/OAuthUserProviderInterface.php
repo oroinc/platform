@@ -12,8 +12,6 @@ interface OAuthUserProviderInterface
 {
     /**
      * Checks if this OAuth user provider is enabled.
-     *
-     * @return bool
      */
     public function isEnabled(): bool;
 
@@ -26,10 +24,6 @@ interface OAuthUserProviderInterface
 
     /**
      * Finds a user.
-     *
-     * @param UserResponseInterface $response
-     *
-     * @return UserInterface|null
      */
     public function findUser(UserResponseInterface $response): ?UserInterface;
 }

@@ -26,17 +26,11 @@ class WebpackServer
      */
     private $webpackDevServerOptions;
 
-    /**
-     * @param array $webpackDevServerOptions
-     */
     public function __construct(array $webpackDevServerOptions)
     {
         $this->webpackDevServerOptions = $webpackDevServerOptions;
     }
 
-    /**
-     * @return bool
-     */
     public function isRunning(): bool
     {
         if (!$this->isEnabled()) {
@@ -61,10 +55,6 @@ class WebpackServer
         return $this->isRunning;
     }
 
-    /**
-     * @param string $url
-     * @return string
-     */
     public function getServerUrl(string $url = ''): string
     {
         $url = str_replace('.css', '.bundle.js', $url);
@@ -77,9 +67,6 @@ class WebpackServer
         return sprintf('%s://%s:%s/%s', $http, $devServerHost, $devServerPort, $url);
     }
 
-    /**
-     * @return ClientInterface
-     */
     private function getClient(): ClientInterface
     {
         if (!$this->client) {
@@ -96,9 +83,6 @@ class WebpackServer
         return $this->client;
     }
 
-    /**
-     * @return bool
-     */
     private function isEnabled(): bool
     {
         return $this->webpackDevServerOptions['enable_hmr'];

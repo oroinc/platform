@@ -43,14 +43,6 @@ class AttachmentManager
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param FileUrlProviderInterface $fileUrlProvider
-     * @param FileIconProvider $fileIconProvider
-     * @param MimeTypeChecker $mimeTypeChecker
-     * @param AssociationManager $associationManager
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         FileUrlProviderInterface $fileUrlProvider,
         FileIconProvider $fileIconProvider,
@@ -81,12 +73,6 @@ class AttachmentManager
 
     /**
      * Get file URL.
-     *
-     * @param File $file
-     * @param string $action
-     * @param int $referenceType
-     *
-     * @return string
      */
     public function getFileUrl(
         File $file,
@@ -98,13 +84,6 @@ class AttachmentManager
 
     /**
      * Get resized image url
-     *
-     * @param File $file
-     * @param int $width
-     * @param int $height
-     * @param int $referenceType
-     *
-     * @return string
      */
     public function getResizedImageUrl(
         File $file,
@@ -117,12 +96,6 @@ class AttachmentManager
 
     /**
      * Get image attachment link with liip imagine filter applied to image
-     *
-     * @param File $file
-     * @param string $filterName
-     * @param int $referenceType
-     *
-     * @return string
      */
     public function getFilteredImageUrl(
         File $file,
@@ -132,14 +105,6 @@ class AttachmentManager
         return $this->fileUrlProvider->getFilteredImageUrl($file, $filterName, $referenceType);
     }
 
-    /**
-     * @param int $fileId
-     * @param string $filename
-     * @param string $filterName
-     * @param int $referenceType
-     *
-     * @return string
-     */
     public function getFilteredImageUrlByIdAndFilename(
         int $fileId,
         string $filename,
@@ -156,10 +121,6 @@ class AttachmentManager
 
     /**
      * Get file type icon
-     *
-     * @param FileExtensionInterface $entity
-     *
-     * @return string
      */
     public function getAttachmentIconClass(FileExtensionInterface $entity): string
     {
@@ -168,19 +129,12 @@ class AttachmentManager
 
     /**
      * Check if content type is an image
-     *
-     * @param string $mimeType
-     *
-     * @return bool
      */
     public function isImageType(string $mimeType): bool
     {
         return $this->mimeTypeChecker->isImageMimeType($mimeType);
     }
 
-    /**
-     * @return array
-     */
     public function getFileIcons(): array
     {
         return $this->fileIconProvider->getFileIcons();
@@ -200,12 +154,6 @@ class AttachmentManager
         );
     }
 
-    /**
-     * @param int $fileId
-     * @param string $filename
-     *
-     * @return File|null
-     */
     private function getFileByIdAndFilename(int $fileId, string $filename): ?File
     {
         /** @var File $file */

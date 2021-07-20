@@ -22,13 +22,6 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator = new RequestDataValidator();
     }
 
-    /**
-     * @param array  $expectedErrors
-     * @param array  $expectedPointers
-     * @param string $expectedTitle
-     * @param int    $expectedStatusCode
-     * @param array  $errors
-     */
     private function assertValidationErrors(
         array $expectedErrors,
         array $expectedPointers,

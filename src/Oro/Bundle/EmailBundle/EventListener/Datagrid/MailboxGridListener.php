@@ -25,19 +25,12 @@ class MailboxGridListener implements FeatureToggleableInterface
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param Registry  $doctrine
-     * @param AclHelper $aclHelper
-     */
     public function __construct(Registry $doctrine, AclHelper $aclHelper)
     {
         $this->doctrine = $doctrine;
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * @param PreBuild $event
-     */
     public function onPreBuild(PreBuild $event)
     {
         if (!$this->isFeaturesEnabled()) {
@@ -63,8 +56,6 @@ class MailboxGridListener implements FeatureToggleableInterface
 
     /**
      * Mailbox grids have to be manually filtered because mailbox access is determined by access to different entity.
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {

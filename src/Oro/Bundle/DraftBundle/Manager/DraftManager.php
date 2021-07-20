@@ -33,11 +33,6 @@ class DraftManager
      */
     private $publisher;
 
-    /**
-     * @param ExtensionProvider $extensionProvider
-     * @param ContextAccessor $contextAccessor
-     * @param Publisher $publisher
-     */
     public function __construct(
         ExtensionProvider $extensionProvider,
         ContextAccessor $contextAccessor,
@@ -85,12 +80,6 @@ class DraftManager
         return $this->publisher->create($source);
     }
 
-    /**
-     * @param DraftableInterface $source
-     * @param \ArrayAccess $context
-     *
-     * @return DeepCopy
-     */
     private function getDeepCopy(DraftableInterface $source, \ArrayAccess $context): DeepCopy
     {
         // Context options are used in the draft extension
@@ -108,9 +97,6 @@ class DraftManager
         return $deepCopy;
     }
 
-    /**
-     * @return DraftContext
-     */
     private function createContext(): DraftContext
     {
         return new DraftContext();

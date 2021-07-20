@@ -27,9 +27,6 @@ class NameVariantsIterator implements \IteratorAggregate
         }
     }
 
-    /**
-     * @param NamePartsTransformerInterface $transformer
-     */
     public function addPartsTransformer(NamePartsTransformerInterface $transformer)
     {
         $this->transformers[] = $transformer;

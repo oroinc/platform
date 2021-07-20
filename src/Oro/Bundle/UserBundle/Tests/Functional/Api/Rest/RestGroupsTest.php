@@ -92,7 +92,6 @@ class RestGroupsTest extends WebTestCase
 
     /**
      * @depends testUpdateGroup
-     * @param $group
      */
     public function testDeleteGroup($group)
     {

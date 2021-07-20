@@ -14,9 +14,6 @@ class SpecificationLocatorStub implements SpecificationLocator
      */
     protected $suiteNames;
 
-    /**
-     * @param array $suiteNames
-     */
     public function __construct(array $suiteNames)
     {
         $this->suiteNames = $suiteNames;

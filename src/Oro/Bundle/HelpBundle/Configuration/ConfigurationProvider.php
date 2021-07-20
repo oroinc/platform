@@ -17,8 +17,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
     /**
      * Gets configuration data.
-     *
-     * @return array
      */
     public function getConfiguration(): array
     {

@@ -18,9 +18,6 @@ class EmailNotificationTypeExtension extends AbstractTypeExtension
     /** @var EmailNotificationTypeListener */
     protected $listener;
 
-    /**
-     * @param EmailNotificationTypeListener $listener
-     */
     public function __construct(EmailNotificationTypeListener $listener)
     {
         $this->listener = $listener;

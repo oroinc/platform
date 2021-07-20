@@ -24,10 +24,6 @@ class EntityType extends AbstractType
     /** @var EntityLoader */
     protected $entityLoader;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityLoader   $entityLoader
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityLoader $entityLoader)
     {
         $this->doctrineHelper = $doctrineHelper;

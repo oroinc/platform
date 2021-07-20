@@ -47,10 +47,6 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
     /** @var int */
     private $cacheDirLength;
 
-    /**
-     * @param string $cacheDir
-     * @param bool   $debug
-     */
     public function __construct(string $cacheDir, bool $debug)
     {
         $this->cacheDir = $cacheDir;
@@ -58,11 +54,6 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         $this->cacheDirLength = \strlen($this->cacheDir);
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return array|null
-     */
     public function getRawConfiguration(string $gridName): ?array
     {
         $this->ensureRawConfigurationLoaded($gridName);
@@ -104,9 +95,6 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         }
     }
 
-    /**
-     * @param string $gridName
-     */
     private function ensureRawConfigurationLoaded(string $gridName): void
     {
         $this->ensureCacheWarmedUp();
@@ -174,9 +162,6 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         return $result;
     }
 
-    /**
-     * @return PhpConfigCacheAccessor
-     */
     private function getRootCacheAccessor(): PhpConfigCacheAccessor
     {
         if (null === $this->rootCacheAccessor) {
@@ -190,9 +175,6 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         return $this->rootCacheAccessor;
     }
 
-    /**
-     * @return PhpConfigCacheAccessor
-     */
     private function getGridCacheAccessor(): PhpConfigCacheAccessor
     {
         if (null === $this->gridCacheAccessor) {
@@ -206,21 +188,11 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         return $this->gridCacheAccessor;
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return ConfigCacheInterface
-     */
     private function getGridConfigCache(string $gridName): ConfigCacheInterface
     {
         return new ResourceCheckerConfigCache($this->getGridFile($gridName));
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return string
-     */
     private function getGridFile(string $gridName): string
     {
         // This ensures that the filename does not contain invalid chars.

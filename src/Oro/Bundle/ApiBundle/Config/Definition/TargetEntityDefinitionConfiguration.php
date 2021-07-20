@@ -17,9 +17,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /** @var string */
     protected $sectionName;
 
-    /**
-     * @param string $sectionName
-     */
     public function __construct(string $sectionName = 'entity')
     {
         $this->sectionName = $sectionName;
@@ -27,8 +24,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 
     /**
      * Gets the name of the section.
-     *
-     * @return string
      */
     public function getSectionName(): string
     {
@@ -37,8 +32,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 
     /**
      * Gets the name of the parent section.
-     *
-     * @return string|null
      */
     public function getParentSectionName(): ?string
     {
@@ -47,8 +40,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 
     /**
      * Sets the name of the parent section.
-     *
-     * @param string $sectionName
      */
     public function setParentSectionName(string $sectionName): void
     {
@@ -87,11 +78,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         $this->configureFieldNode($fieldNode);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessConfig(array $config): array
     {
         if (empty($config[ConfigUtil::ORDER_BY])) {
@@ -116,9 +102,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         return $config;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     public function configureEntityNode(NodeBuilder $node): void
     {
         $node
@@ -170,9 +153,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
@@ -219,11 +199,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->end();
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ConfigUtil::FORM_TYPE])) {

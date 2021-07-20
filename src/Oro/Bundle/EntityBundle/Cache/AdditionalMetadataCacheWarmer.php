@@ -10,9 +10,6 @@ class AdditionalMetadataCacheWarmer implements CacheWarmerInterface
     /** @var AdditionalMetadataProvider */
     protected $additionalMetadataProvider;
 
-    /**
-     * @param AdditionalMetadataProvider $additionalMetadataProvider
-     */
     public function __construct(AdditionalMetadataProvider $additionalMetadataProvider)
     {
         $this->additionalMetadataProvider = $additionalMetadataProvider;

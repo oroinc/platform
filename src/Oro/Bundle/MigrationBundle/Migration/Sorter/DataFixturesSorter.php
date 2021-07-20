@@ -35,7 +35,6 @@ class DataFixturesSorter
         $usePrioritySorting     = $this->usePrioritySorting($fixtures);
         $useDependenciesSorting = $this->useDependenciesSorting($fixtures);
 
-
         if ($usePrioritySorting) {
             $this->orderFixturesByNumber();
         }

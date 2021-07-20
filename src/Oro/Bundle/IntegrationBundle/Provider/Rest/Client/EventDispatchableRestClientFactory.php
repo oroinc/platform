@@ -24,10 +24,6 @@ class EventDispatchableRestClientFactory implements FactoryInterface
      */
     protected $dispatcher;
 
-    /**
-     * @param RestClientFactoryInterface $clientFactory
-     * @param EventDispatcherInterface   $dispatcher
-     */
     public function __construct(RestClientFactoryInterface $clientFactory, EventDispatcherInterface $dispatcher)
     {
         $this->legacyClientFactory = $clientFactory;

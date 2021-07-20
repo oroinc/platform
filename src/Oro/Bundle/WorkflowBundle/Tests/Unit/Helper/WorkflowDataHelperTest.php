@@ -196,9 +196,6 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider workflowsDataProvider
-     *
-     * @param $workflowsData
-     * @param $expected
      */
     public function testGetEntityWorkflowsData($workflowsData, $expected)
     {
@@ -331,7 +328,6 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
         $transitionManager->expects($this->any())
             ->method('getStartTransitions')
             ->willReturn($startTransitions);
-
 
         $defaultTransitions = array_filter(
             array_column($extractTransitionsMap, 1),

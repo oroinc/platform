@@ -39,12 +39,6 @@ class CopyTaggingToNewEntity extends AbstractAction
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param TagManager      $tagManager
-     * @param TaggableHelper  $taggableHelper
-     * @param DoctrineHelper  $doctrineHelper
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         TagManager $tagManager,

@@ -35,9 +35,6 @@ class Renderer implements FormRendererInterface
      */
     private $variableStack = [];
 
-    /**
-     * @param FormRendererEngineInterface $engine
-     */
     public function __construct(FormRendererEngineInterface $engine)
     {
         $this->engine = $engine;

@@ -25,9 +25,6 @@ class ExportQueryTupleLengthProviderTest extends WebTestCase
         );
     }
 
-    /**
-     * @return Query
-     */
     private function getUserExportQuery(): Query
     {
         /** @var EntityReader $entityReader */
@@ -39,11 +36,6 @@ class ExportQueryTupleLengthProviderTest extends WebTestCase
         return $sourceIterator->getSource();
     }
 
-    /**
-     * @param Query $query
-     *
-     * @return int
-     */
     private function getTupleLengthFromQuery(Query $query): int
     {
         $parser = new Parser($query);

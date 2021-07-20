@@ -23,9 +23,6 @@ class SearchControllerTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @param array $request
-     * @param array $response
-     *
      * @dataProvider searchDataProvider
      */
     public function testSearchSuggestion(array $request, array $response)

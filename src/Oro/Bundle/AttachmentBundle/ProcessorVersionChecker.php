@@ -13,11 +13,6 @@ class ProcessorVersionChecker
     public const PNGQUANT_VERSION = '>=2.5.0';
     public const JPEGOPTIM_VERSION = '>=1.4.0';
 
-    /**
-     * @param string $executable
-     *
-     * @return bool
-     */
     public static function satisfies(string $executable): bool
     {
         $executableParts = explode('/', $executable);
@@ -35,11 +30,6 @@ class ProcessorVersionChecker
         return Semver::satisfies($matches[0], $version);
     }
 
-    /**
-     * @param string $library
-     *
-     * @return array
-     */
     public static function getLibraryInfo(string $library): array
     {
         return $library === ProcessorHelper::JPEGOPTIM
@@ -47,11 +37,6 @@ class ProcessorVersionChecker
             : [ProcessorHelper::PNGQUANT, self::PNGQUANT_VERSION];
     }
 
-    /**
-     * @param string $library
-     *
-     * @return string
-     */
     private static function getVersionPattern(string $library): string
     {
         $versionPrefix = $library === ProcessorHelper::JPEGOPTIM ? 'v' : '';

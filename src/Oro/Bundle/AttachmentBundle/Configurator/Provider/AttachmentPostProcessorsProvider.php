@@ -34,17 +34,11 @@ class AttachmentPostProcessorsProvider implements FeatureToggleableInterface
      */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
-    /**
-     * @return bool
-     */
     public function isPostProcessingEnabled(): bool
     {
         if (null === $this->postProcessingEnabled) {
@@ -55,9 +49,6 @@ class AttachmentPostProcessorsProvider implements FeatureToggleableInterface
         return $this->postProcessingEnabled;
     }
 
-    /**
-     * @return bool
-     */
     public function isPostProcessorsAllowed(): bool
     {
         if (null === $this->postProcessorsAllowed) {
@@ -68,9 +59,6 @@ class AttachmentPostProcessorsProvider implements FeatureToggleableInterface
         return $this->postProcessorsAllowed;
     }
 
-    /**
-     * @return array
-     */
     private function getSystemConfig(): array
     {
         if (!$this->postProcessorsConfigs) {

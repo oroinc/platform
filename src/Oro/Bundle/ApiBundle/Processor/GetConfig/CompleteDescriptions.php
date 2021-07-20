@@ -34,12 +34,6 @@ class CompleteDescriptions implements ProcessorInterface
     /** @var FiltersDescriptionHelper */
     private $filtersDescriptionHelper;
 
-    /**
-     * @param ResourcesProvider        $resourcesProvider
-     * @param EntityDescriptionHelper  $entityDescriptionHelper
-     * @param FieldsDescriptionHelper  $fieldsDescriptionHelper
-     * @param FiltersDescriptionHelper $filtersDescriptionHelper
-     */
     public function __construct(
         ResourcesProvider $resourcesProvider,
         EntityDescriptionHelper $entityDescriptionHelper,

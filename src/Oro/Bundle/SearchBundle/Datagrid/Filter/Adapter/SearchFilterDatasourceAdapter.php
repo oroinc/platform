@@ -16,9 +16,6 @@ class SearchFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     /** @var SearchQueryInterface */
     private $searchQuery;
 
-    /**
-     * @param SearchQueryInterface $query
-     */
     public function __construct(SearchQueryInterface $query)
     {
         $this->searchQuery = $query;

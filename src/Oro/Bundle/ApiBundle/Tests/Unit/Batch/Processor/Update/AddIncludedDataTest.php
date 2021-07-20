@@ -21,11 +21,6 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
         $this->processor = new AddIncludedData();
     }
 
-    /**
-     * @param array $includedItems
-     *
-     * @return IncludedData
-     */
     private function getIncludedData(array $includedItems): IncludedData
     {
         $itemKeyBuilder = new ItemKeyBuilder();

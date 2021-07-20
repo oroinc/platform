@@ -29,11 +29,6 @@ class NestedTreeComparisonExpression implements ComparisonExpressionInterface
     /** @var bool */
     private $includeRoot;
 
-    /**
-     * @param TreeListener    $treeListener
-     * @param ManagerRegistry $doctrine
-     * @param bool            $includeRoot
-     */
     public function __construct(
         TreeListener $treeListener,
         ManagerRegistry $doctrine,
@@ -69,10 +64,6 @@ class NestedTreeComparisonExpression implements ComparisonExpressionInterface
         return $visitor->getExpressionBuilder()->exists($subquery->getDQL());
     }
 
-    /**
-     * @param QueryBuilder $subquery
-     * @param string       $parameterPlaceholder
-     */
     private function buildSubquery(QueryBuilder $subquery, string $parameterPlaceholder): void
     {
         $entityClass = QueryBuilderUtil::getSingleRootEntity($subquery);

@@ -34,7 +34,6 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
 
     /**
      * Update activity
-     * @param ObjectManager $manager
      */
     public function updateEmailActivityDescription(ObjectManager $manager)
     {
@@ -67,10 +66,6 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param array         $entities
-     */
     protected function saveEntities(ObjectManager $manager, array $entities)
     {
         foreach ($entities as $activity) {

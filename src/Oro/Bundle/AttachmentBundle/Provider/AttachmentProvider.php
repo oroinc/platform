@@ -26,11 +26,6 @@ class AttachmentProvider
     /** @var AttachmentManager */
     private $attachmentManager;
 
-    /**
-     * @param EntityManager               $entityManager
-     * @param AttachmentAssociationHelper $attachmentAssociationHelper
-     * @param AttachmentManager           $attachmentManager
-     */
     public function __construct(
         EntityManager $entityManager,
         AttachmentAssociationHelper $attachmentAssociationHelper,

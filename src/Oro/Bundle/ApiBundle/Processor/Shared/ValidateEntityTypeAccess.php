@@ -83,11 +83,6 @@ class ValidateEntityTypeAccess implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return bool
-     */
     private function isGrantedForClass(Context $context): bool
     {
         $isGranted = true;

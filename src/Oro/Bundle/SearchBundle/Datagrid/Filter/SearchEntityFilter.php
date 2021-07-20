@@ -83,9 +83,6 @@ class SearchEntityFilter extends EntityFilter
         return true;
     }
 
-    /**
-     * @return string|null
-     */
     protected function getEntityClass(): ?string
     {
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY);

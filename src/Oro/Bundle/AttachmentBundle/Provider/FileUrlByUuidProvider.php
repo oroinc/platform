@@ -18,10 +18,6 @@ class FileUrlByUuidProvider
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param FileUrlProviderInterface $fileUrlProvider
-     */
     public function __construct(
         ManagerRegistry $registry,
         FileUrlProviderInterface $fileUrlProvider
@@ -32,12 +28,6 @@ class FileUrlByUuidProvider
 
     /**
      * Get file URL.
-     *
-     * @param string $uuid
-     * @param string $action
-     * @param int $referenceType
-     *
-     * @return string
      *
      * @throws FileNotFoundException
      */
@@ -55,13 +45,6 @@ class FileUrlByUuidProvider
 
     /**
      * Get resized image URL.
-     *
-     * @param string $uuid
-     * @param int $width
-     * @param int $height
-     * @param int $referenceType
-     *
-     * @return string
      *
      * @throws FileNotFoundException
      */
@@ -82,12 +65,6 @@ class FileUrlByUuidProvider
     /**
      * Get URL to the image with applied liip imagine filter.
      *
-     * @param string $uuid
-     * @param string $filterName
-     * @param int $referenceType
-     *
-     * @return string
-     *
      * @throws FileNotFoundException
      */
     public function getFilteredImageUrl(
@@ -103,10 +80,6 @@ class FileUrlByUuidProvider
     }
 
     /**
-     * @param string $uuid
-     *
-     * @return File
-     *
      * @throws FileNotFoundException
      */
     private function findFileByUuid(string $uuid): File

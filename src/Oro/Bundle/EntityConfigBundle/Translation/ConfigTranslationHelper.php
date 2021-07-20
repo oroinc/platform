@@ -17,10 +17,6 @@ class ConfigTranslationHelper
     /** @var Translator */
     protected $translator;
 
-    /**
-     * @param TranslationManager $translationManager
-     * @param Translator $translator
-     */
     public function __construct(TranslationManager $translationManager, Translator $translator)
     {
         $this->translationManager = $translationManager;
@@ -53,9 +49,6 @@ class ConfigTranslationHelper
         $this->translationManager->invalidateCache($locale);
     }
 
-    /**
-     * @param array $translations
-     */
     public function saveTranslations(array $translations)
     {
         if (!$translations) {

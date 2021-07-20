@@ -10,9 +10,6 @@ class RebuildTranslationCacheHandler implements RebuildTranslationCacheHandlerIn
     /** @var RebuildTranslationCacheProcessor */
     private $rebuildTranslationCacheProcessor;
 
-    /**
-     * @param RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor
-     */
     public function __construct(RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor)
     {
         $this->rebuildTranslationCacheProcessor = $rebuildTranslationCacheProcessor;

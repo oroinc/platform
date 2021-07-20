@@ -20,17 +20,11 @@ class EntityConfigListener
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         $config = $event->getConfig('extend');
@@ -61,9 +55,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param EntityConfigEvent $event
-     */
     public function updateEntity(EntityConfigEvent $event)
     {
         $className       = $event->getClassName();
@@ -104,9 +95,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param FieldConfigEvent $event
-     */
     public function createField(FieldConfigEvent $event)
     {
         $configManager = $event->getConfigManager();
@@ -117,9 +105,6 @@ class EntityConfigListener
         }
     }
 
-    /**
-     * @param RenameFieldEvent $event
-     */
     public function renameField(RenameFieldEvent $event)
     {
         $configManager = $event->getConfigManager();

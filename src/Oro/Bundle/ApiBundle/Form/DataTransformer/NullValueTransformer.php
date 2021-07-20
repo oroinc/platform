@@ -16,9 +16,6 @@ class NullValueTransformer implements DataTransformerInterface
     /** @var DataTransformerInterface */
     private $transformer;
 
-    /**
-     * @param DataTransformerInterface $transformer
-     */
     public function __construct(DataTransformerInterface $transformer)
     {
         $this->transformer = $transformer;
@@ -36,8 +33,6 @@ class NullValueTransformer implements DataTransformerInterface
 
     /**
      * Sets the wrapped data transformer.
-     *
-     * @param DataTransformerInterface $transformer
      */
     public function setInnerTransformer(DataTransformerInterface $transformer)
     {

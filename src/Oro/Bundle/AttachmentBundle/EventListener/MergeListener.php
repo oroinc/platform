@@ -19,17 +19,11 @@ class MergeListener
     /** @var AttachmentManager $attachmentManager */
     protected $attachmentManager;
 
-    /**
-     * @param AttachmentManager $attachmentManager
-     */
     public function __construct(AttachmentManager $attachmentManager)
     {
         $this->attachmentManager = $attachmentManager;
     }
 
-    /**
-     * @param EntityMetadataEvent $event
-     */
     public function onBuildMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();

@@ -21,10 +21,6 @@ class AliceCombinedLoader implements LoaderInterface
     /** @var array */
     protected $loadedParameters = [];
 
-    /**
-     * @param FilesLoaderInterface $filesLoader
-     * @param DataLoaderInterface $dataLoader
-     */
     public function __construct(FilesLoaderInterface $filesLoader, DataLoaderInterface $dataLoader)
     {
         $this->filesLoader = $filesLoader;

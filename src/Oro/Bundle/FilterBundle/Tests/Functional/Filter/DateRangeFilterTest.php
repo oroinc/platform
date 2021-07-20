@@ -341,7 +341,6 @@ class DateRangeFilterTest extends WebTestCase
         return self::getContainer()->get('doctrine')->getManagerForClass(User::class);
     }
 
-
     /**
      * @return User
      */

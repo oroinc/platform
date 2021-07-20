@@ -67,11 +67,6 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->scopeClassMetadata);
     }
 
-    /**
-     * @param array $providers
-     *
-     * @return ScopeManager
-     */
     private function getScopeManager(array $providers = []): ScopeManager
     {
         $serviceMap = [];
@@ -660,10 +655,6 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isScopeMatchCriteriaDataProvider
-     *
-     * @param $expectedResult
-     * @param $criteriaContext
-     * @param $scopeFieldValue
      */
     public function testIsScopeMatchCriteria($expectedResult, $criteriaContext, $scopeFieldValue)
     {

@@ -26,9 +26,6 @@ class NormalizeRequestData implements ProcessorInterface
     /** @var ChangeRelationshipContext */
     private $context;
 
-    /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -49,11 +46,6 @@ class NormalizeRequestData implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
     private function normalizeData(array $data): array
     {
         $associationValue = reset($data);
@@ -142,11 +134,6 @@ class NormalizeRequestData implements ProcessorInterface
         return $entityId;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

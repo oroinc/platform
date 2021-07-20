@@ -75,9 +75,6 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function bodyExceptionDataProvider(): array
     {
         return [

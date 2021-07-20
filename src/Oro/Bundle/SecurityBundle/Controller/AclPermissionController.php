@@ -21,10 +21,6 @@ class AclPermissionController
     /** @var AclManager */
     private $aclManager;
 
-    /**
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param AclManager          $aclManager
-     */
     public function __construct(EntityRoutingHelper $entityRoutingHelper, AclManager $aclManager)
     {
         $this->entityRoutingHelper = $entityRoutingHelper;
@@ -39,11 +35,6 @@ class AclPermissionController
      *      defaults={"_format"="json", "permission"=null}
      * )
      * @Template
-     *
-     * @param string      $oid
-     * @param string|null $permission
-     *
-     * @return array
      */
     public function aclAccessLevelsAction(string $oid, string $permission = null): array
     {

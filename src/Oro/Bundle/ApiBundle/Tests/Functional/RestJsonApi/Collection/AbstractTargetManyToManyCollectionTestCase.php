@@ -8,17 +8,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractTargetManyToManyCollectionTestCase extends AbstractCollectionTestCase
 {
-    /**
-     * @return string
-     */
     protected function getCollectionEntityClass(): string
     {
         return TestCollectionItem::class;
     }
 
-    /**
-     * @return string
-     */
     protected function getCollectionItemEntityClass(): string
     {
         return TestCollection::class;

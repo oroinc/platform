@@ -407,8 +407,6 @@ class AsyncOperation
 
     /**
      * Sets the summary statistics of the asynchronous operation.
-     *
-     * @param array $summary
      */
     public function setSummary(array $summary)
     {

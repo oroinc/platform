@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job\Step;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator;
 
 /**
@@ -35,8 +35,6 @@ trait AddToJobSummaryStepTrait
     /**
      * Adds "add_to_job_summary" option to the step execution
      * if this step execution summary need to be added to job execution summary.
-     *
-     * @param StepExecution $stepExecution
      */
     protected function addToJobSummaryToStepExecution(StepExecution $stepExecution)
     {

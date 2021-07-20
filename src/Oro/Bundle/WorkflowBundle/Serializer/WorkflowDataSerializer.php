@@ -18,9 +18,6 @@ class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializ
      */
     protected $workflowRegistry;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function setWorkflowRegistry(WorkflowRegistry $workflowRegistry)
     {
         $this->workflowRegistry = $workflowRegistry;

@@ -12,9 +12,6 @@ class ConnectionChecker
     /** @var WebsocketClientInterface */
     private $client;
 
-    /**
-     * @param WebsocketClientInterface $client
-     */
     public function __construct(WebsocketClientInterface $client)
     {
         $this->client = $client;

@@ -71,25 +71,16 @@ class HtmlFormatter extends AbstractFormatter
     /** @var DocumentationProviderInterface|null */
     protected $documentationProvider;
 
-    /**
-     * @param SecurityContextInterface $securityContext
-     */
     public function setSecurityContext(SecurityContextInterface $securityContext)
     {
         $this->securityContext = $securityContext;
     }
 
-    /**
-     * @param FileLocatorInterface $fileLocator
-     */
     public function setFileLocator(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;
     }
 
-    /**
-     * @param Environment $twig
-     */
     public function setTwig(Environment $twig)
     {
         $this->twig = $twig;
@@ -119,9 +110,6 @@ class HtmlFormatter extends AbstractFormatter
         $this->enableSandbox = $enableSandbox;
     }
 
-    /**
-     * @param array $formats
-     */
     public function setRequestFormats(array $formats)
     {
         $this->requestFormats = $formats;
@@ -151,9 +139,6 @@ class HtmlFormatter extends AbstractFormatter
         $this->acceptType = $acceptType;
     }
 
-    /**
-     * @param array $bodyFormats
-     */
     public function setBodyFormats(array $bodyFormats)
     {
         $this->bodyFormats = $bodyFormats;
@@ -199,17 +184,11 @@ class HtmlFormatter extends AbstractFormatter
         $this->rootRoute = $rootRoute;
     }
 
-    /**
-     * @param array $views
-     */
     public function setViews(array $views)
     {
         $this->views = $views;
     }
 
-    /**
-     * @param DocumentationProviderInterface $documentationProvider
-     */
     public function setDocumentationProvider(DocumentationProviderInterface $documentationProvider)
     {
         $this->documentationProvider = $documentationProvider;

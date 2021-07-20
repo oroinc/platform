@@ -54,16 +54,6 @@ class LoadFromConfigBag implements ProcessorInterface
     /** @var string|null */
     private $parentResourceClass;
 
-    /**
-     * @param ConfigExtensionRegistry      $configExtensionRegistry
-     * @param ConfigLoaderFactory          $configLoaderFactory
-     * @param ConfigBagRegistry            $configBagRegistry
-     * @param ResourcesProvider            $resourcesProvider
-     * @param EntityConfigMerger           $entityConfigMerger
-     * @param MergeParentResourceHelper    $mergeParentResourceHelper
-     * @param MergeActionConfigHelper      $mergeActionConfigHelper
-     * @param MergeSubresourceConfigHelper $mergeSubresourceConfigHelper
-     */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
@@ -99,9 +89,6 @@ class LoadFromConfigBag implements ProcessorInterface
         $this->processConfig($context);
     }
 
-    /**
-     * @param ConfigContext $context
-     */
     private function processConfig(ConfigContext $context)
     {
         $this->entityClass = $context->getClassName();
@@ -194,9 +181,6 @@ class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
-     * @param ConfigContext $context
-     * @param array         $config
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */

@@ -33,13 +33,6 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
     /** @var array */
     protected $scheduled = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventTriggerCache $triggerCache
-     * @param MessageProducerInterface $producer
-     * @param TransitionEventTriggerHelper $helper
-     * @param TransitionEventTriggerHandler $handler
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EventTriggerCache $triggerCache,

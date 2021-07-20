@@ -14,9 +14,6 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

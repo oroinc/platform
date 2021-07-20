@@ -210,9 +210,6 @@ class ClientEventListenerTest extends TestCase
         self::assertTrue($clientErrorEvent->isPropagationStopped());
     }
 
-    /**
-     * @return ConnectionInterface
-     */
     private function createConnection(): ConnectionInterface
     {
         $connection = $this->createMock(ConnectionInterface::class);

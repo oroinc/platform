@@ -17,9 +17,6 @@ class ApplyController
     /** @var EntityExtendUpdateHandlerInterface */
     private $entityExtendUpdateHandler;
 
-    /**
-     * @param EntityExtendUpdateHandlerInterface $entityExtendUpdateHandler
-     */
     public function __construct(EntityExtendUpdateHandlerInterface $entityExtendUpdateHandler)
     {
         $this->entityExtendUpdateHandler = $entityExtendUpdateHandler;

@@ -21,10 +21,6 @@ final class DirectoryExtractor implements DirectoryExtractorInterface
     /** @var bool */
     private $allowedToUseForSingleFile;
 
-    /**
-     * @param string $regex
-     * @param bool   $allowedToUseForSingleFile
-     */
     public function __construct(string $regex, bool $allowedToUseForSingleFile)
     {
         $this->assertRegexValid($regex);
@@ -55,9 +51,6 @@ final class DirectoryExtractor implements DirectoryExtractorInterface
         return $this->allowedToUseForSingleFile;
     }
 
-    /**
-     * @param string $regex
-     */
     private function assertRegexValid(string $regex): void
     {
         if (strncmp($regex, '/^(', 3) !== 0) {

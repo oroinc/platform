@@ -26,8 +26,6 @@ class ApplySyncSubscriber implements EventSubscriberInterface
 
     /**
      * Merge folder and set sync
-     *
-     * @param FormEvent $event
      */
     public function applySync(FormEvent $event)
     {

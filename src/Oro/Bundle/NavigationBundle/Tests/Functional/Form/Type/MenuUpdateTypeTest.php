@@ -50,9 +50,6 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getValidators(): array
     {
         $uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
@@ -203,8 +200,6 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitCustomWithJavascriptUriDataProvider
-     *
-     * @param string $uri
      */
     public function testSubmitCustomWithJavascriptUri(string $uri): void
     {
@@ -235,9 +230,6 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expected, $form->getData());
     }
 
-    /**
-     * @return array
-     */
     public function submitCustomWithJavascriptUriDataProvider(): array
     {
         return [

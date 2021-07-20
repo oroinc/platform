@@ -20,8 +20,6 @@ class OroIntegrationBundle implements Migration
 
     /**
      * Creates table oro_integration_channel
-     *
-     * @param Schema $schema
      */
     public static function createChannelTable(Schema $schema)
     {
@@ -48,8 +46,6 @@ class OroIntegrationBundle implements Migration
 
     /**
      * Creates table oro_integration_channel_status
-     *
-     * @param Schema $schema
      */
     public static function createChannelStatusTable(Schema $schema)
     {
@@ -77,8 +73,6 @@ class OroIntegrationBundle implements Migration
 
     /**
      * Creates table oro_integration_transport
-     *
-     * @param Schema $schema
      */
     public static function createTransportTable(Schema $schema)
     {

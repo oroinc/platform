@@ -22,10 +22,6 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider convertGridUrlToPageUrlInvalidUrlProvider
-     *
-     * @param $url
-     * @param $gridName
-     * @param $expectedResult
      */
     public function testConvertGridUrlToPageUrlInvalidUrl($url, $gridName, $expectedResult)
     {

@@ -40,14 +40,6 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     /** @var TemplateEmailMessageSender */
     private $templateEmailMessageSender;
 
-    /**
-     * @param DirectMailer               $mailer
-     * @param Processor                  $processor
-     * @param ManagerRegistry            $managerRegistry
-     * @param EmailRenderer              $emailRenderer
-     * @param LoggerInterface            $logger
-     * @param TemplateEmailMessageSender $templateEmailMessageSender
-     */
     public function __construct(
         DirectMailer $mailer,
         Processor $processor,

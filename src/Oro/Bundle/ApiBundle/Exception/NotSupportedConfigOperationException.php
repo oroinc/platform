@@ -31,8 +31,6 @@ class NotSupportedConfigOperationException extends \RuntimeException implements 
 
     /**
      * Gets the class name of an entity the config is loaded for.
-     *
-     * @return string
      */
     public function getClassName(): string
     {
@@ -41,8 +39,6 @@ class NotSupportedConfigOperationException extends \RuntimeException implements 
 
     /**
      * Gets the name of a config operation that cannot be satisfied.
-     *
-     * @return string
      */
     public function getOperation(): string
     {

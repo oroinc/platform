@@ -54,8 +54,6 @@ abstract class AbstractComposite extends AbstractCondition
 
     /**
      * Adds an operand to the composite.
-     *
-     * @param ExpressionInterface $operand
      */
     public function add(ExpressionInterface $operand)
     {

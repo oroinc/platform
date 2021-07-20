@@ -23,19 +23,11 @@ class DateTimeTypeCast extends AbstractTypeCastingHandler
         return parent::castValue($value);
     }
 
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
     public function isSupported($value): bool
     {
         return $value instanceof \DateTime;
     }
 
-    /**
-     * @return string
-     */
     public static function getType(): string
     {
         return Query::TYPE_DATETIME;

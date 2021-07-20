@@ -49,10 +49,6 @@ class TransitWorkflow extends ComponentAbstractAction
      */
     private $ifAllowed = false;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param WorkflowManager $workflowManager
-     */
     public function __construct(ContextAccessor $contextAccessor, WorkflowManager $workflowManager)
     {
         parent::__construct($contextAccessor);

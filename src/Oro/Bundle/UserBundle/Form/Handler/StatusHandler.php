@@ -34,13 +34,6 @@ class StatusHandler
      */
     protected $um;
 
-    /**
-     *
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $em
-     * @param UserManager   $um
-     */
     public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $em, UserManager $um)
     {
         $this->form = $form;

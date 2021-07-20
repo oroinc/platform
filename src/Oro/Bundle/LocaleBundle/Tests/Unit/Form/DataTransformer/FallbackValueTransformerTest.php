@@ -27,9 +27,6 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transformer->transform($input));
     }
 
-    /**
-     * @return array
-     */
     public function transformDataProvider(): array
     {
         return [
@@ -58,9 +55,6 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->transformer->reverseTransform($input));
     }
 
-    /**
-     * @return array
-     */
     public function reverseTransformDataProvider(): array
     {
         return [
@@ -93,9 +87,6 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transformer->reverseTransform($input));
     }
 
-    /**
-     * @return array
-     */
     public function reverseTransformWhenFallbackDataProvider(): array
     {
         return [

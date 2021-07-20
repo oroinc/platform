@@ -305,7 +305,6 @@ class QueryCountCalculatorTest extends OrmTestCase
                 false
             );
 
-
         // execute the source query to initialize its ResultSetMapping
         $this->assertEquals([$expectedEntity1], $query->execute());
 

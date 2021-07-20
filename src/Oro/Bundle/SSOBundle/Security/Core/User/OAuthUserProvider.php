@@ -18,9 +18,6 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
     /** @var ContainerInterface */
     private $userProviders;
 
-    /**
-     * @param ContainerInterface $userProviders
-     */
     public function __construct(ContainerInterface $userProviders)
     {
         $this->userProviders = $userProviders;
@@ -54,11 +51,6 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         return $user;
     }
 
-    /**
-     * @param string $resourceOwner
-     *
-     * @return OAuthUserProviderInterface
-     */
     private function getUserProvider(string $resourceOwner): OAuthUserProviderInterface
     {
         if (!$this->userProviders->has($resourceOwner)) {

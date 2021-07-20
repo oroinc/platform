@@ -33,8 +33,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * Gets the name of default filter's group.
-     *
-     * @return string|null
      */
     public function getDefaultGroupName(): ?string
     {
@@ -53,10 +51,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * Checks if a filter with the specified key can be included in the default group.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
     public function isIncludeInDefaultGroup(string $key): bool
     {
@@ -81,10 +75,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * Checks whether the collection contains a filter with the specified key.
      * In additional finds the filter in the default filter's group if it is set.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -123,9 +113,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * Sets a filter by key.
-     *
-     * @param string          $key
-     * @param FilterInterface $filter
      */
     public function set(string $key, FilterInterface $filter): void
     {
@@ -147,8 +134,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * Removes a filter by key from the collection.
-     *
-     * @param string $key
      */
     public function remove(string $key): void
     {

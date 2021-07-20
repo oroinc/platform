@@ -26,19 +26,12 @@ class DraftHelper
      */
     private $draftProvider;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param ConfigProvider $draftProvider
-     */
     public function __construct(RequestStack $requestStack, ConfigProvider $draftProvider)
     {
         $this->requestStack = $requestStack;
         $this->draftProvider = $draftProvider;
     }
 
-    /**
-     * @return bool
-     */
     public function isSaveAsDraftAction(): bool
     {
         if (!$this->requestStack->getMasterRequest()) {
@@ -50,21 +43,11 @@ class DraftHelper
         return self::SAVE_AS_DRAFT_ACTION === $action;
     }
 
-    /**
-     * @param DraftableInterface $object
-     *
-     * @return bool
-     */
     public static function isDraft(DraftableInterface $object): bool
     {
         return null != $object->getDraftUuid();
     }
 
-    /**
-     * @param DraftableInterface $source
-     *
-     * @return array
-     */
     public function getDraftableProperties(DraftableInterface $source): array
     {
         $className = ClassUtils::getRealClass($source);

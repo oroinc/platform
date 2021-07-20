@@ -110,16 +110,6 @@ class LoadOperationsErrorsData extends AbstractFixture implements ContainerAware
         );
     }
 
-    /**
-     * @param string      $id
-     * @param int         $itemIndex
-     * @param int         $statusCode
-     * @param string      $sourcePointer
-     * @param string      $title
-     * @param string|null $detail
-     *
-     * @return BatchError
-     */
     protected function createBatchError(
         string $id,
         int $itemIndex,

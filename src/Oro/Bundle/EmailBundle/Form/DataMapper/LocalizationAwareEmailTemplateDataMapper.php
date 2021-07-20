@@ -128,7 +128,6 @@ class LocalizationAwareEmailTemplateDataMapper implements DataMapperInterface
     }
 
     /**
-     * @param $viewData
      * @throws UnexpectedTypeException
      */
     private function assertViewDataType($viewData): void

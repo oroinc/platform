@@ -35,12 +35,6 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
      */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param IndexerInterface $indexer
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         IndexerInterface $indexer,

@@ -19,9 +19,6 @@ class ImportExportIsolator implements IsolatorInterface
     /** @var KernelInterface */
     private $kernel;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
@@ -88,9 +85,6 @@ class ImportExportIsolator implements IsolatorInterface
         }
     }
 
-    /**
-     * @return FileManager
-     */
     private function getImportExportFileManager(): FileManager
     {
         return $this->kernel->getContainer()->get('oro_importexport.file.file_manager');

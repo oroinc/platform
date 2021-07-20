@@ -36,9 +36,6 @@ class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $extensions
-     * @param string|null $expectedFormat
-     *
      * @dataProvider getCreateImagineBinaryDataProvider
      */
     public function testCreateImagineBinary(array $extensions, ?string $expectedFormat): void

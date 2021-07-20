@@ -16,11 +16,6 @@ class BooleanFilter extends AbstractFilter
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param TranslatorInterface  $translator
-     */
     public function __construct(FormFactoryInterface $factory, FilterUtility $util, TranslatorInterface $translator)
     {
         parent::__construct($factory, $util);
@@ -74,7 +69,6 @@ class BooleanFilter extends AbstractFilter
             },
             $fieldView->vars['choices']
         );
-
 
         $metadata = parent::getMetadata();
         $metadata['choices'] = $choices;

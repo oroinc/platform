@@ -84,7 +84,6 @@ class AttachmentController extends AbstractController
     }
 
     /**
-     *
      * @Route("attachment/update/{id}", name="oro_attachment_update")
      *
      * @Template("@OroAttachment/Attachment/update.html.twig")
@@ -142,17 +141,11 @@ class AttachmentController extends AbstractController
         return $responseData;
     }
 
-    /**
-     * @return EntityRoutingHelper
-     */
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
         return $this->get(EntityRoutingHelper::class);
     }
 
-    /**
-     * @return AttachmentManager
-     */
     protected function getAttachmentManager(): AttachmentManager
     {
         return $this->get(AttachmentManager::class);

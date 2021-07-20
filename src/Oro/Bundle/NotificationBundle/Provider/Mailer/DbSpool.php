@@ -31,11 +31,6 @@ class DbSpool extends \Swift_ConfigurableSpool
     /** @var string */
     protected $logType;
 
-    /**
-     * @param ManagerRegistry          $doctrine
-     * @param EntityPool               $entityPool
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EntityPool $entityPool,

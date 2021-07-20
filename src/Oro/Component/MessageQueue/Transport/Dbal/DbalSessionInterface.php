@@ -10,8 +10,5 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 interface DbalSessionInterface extends SessionInterface
 {
-    /**
-     * @return ConnectionInterface
-     */
     public function getConnection(): ConnectionInterface;
 }

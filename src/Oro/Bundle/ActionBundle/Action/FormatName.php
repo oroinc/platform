@@ -19,10 +19,6 @@ class FormatName extends AbstractAction
      */
     protected $options;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(ContextAccessor $contextAccessor, EntityNameResolver $entityNameResolver)
     {
         parent::__construct($contextAccessor);

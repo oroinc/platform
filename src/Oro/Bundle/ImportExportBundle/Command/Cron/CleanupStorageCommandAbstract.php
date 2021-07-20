@@ -78,9 +78,5 @@ HELP
      */
     abstract protected function getFilesForDeletion(\DateTime $from, \DateTime $to): array;
 
-    /**
-     * @param File $file
-     * @return void
-     */
     abstract protected function deleteFile(File $file): void;
 }

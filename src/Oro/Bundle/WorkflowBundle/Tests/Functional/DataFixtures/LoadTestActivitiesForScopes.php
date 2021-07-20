@@ -23,9 +23,6 @@ class LoadTestActivitiesForScopes extends AbstractFixture
         self::TEST_ACTIVITY_4 => ['message' => 'message 4'],
     ];
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         foreach (self::$activities as $name => $activity) {

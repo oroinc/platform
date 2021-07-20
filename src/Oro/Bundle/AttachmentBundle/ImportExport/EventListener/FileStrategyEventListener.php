@@ -55,15 +55,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
     /** @var SymfonyFile[] */
     private $scheduledForUpload = [];
 
-    /**
-     * @param FileManager $fileManager
-     * @param FieldHelper $fieldHelper
-     * @param DatabaseHelper $databaseHelper
-     * @param ImportStrategyHelper $importStrategyHelper
-     * @param FileImportStrategyHelper $fileImportStrategyHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FileManager $fileManager,
         FieldHelper $fieldHelper,
@@ -83,9 +74,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessBefore(StrategyEvent $event): void
     {
         $entity = $event->getEntity();
@@ -106,11 +94,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         );
     }
 
-    /**
-     * @param object $entity
-     * @param array $itemData
-     * @param callable $callback
-     */
     private function processRelations(object $entity, array $itemData, callable $callback): void
     {
         $entityClass = $this->fileImportStrategyHelper->getClass($entity);
@@ -124,11 +107,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
     private function getRelations(string $entityClass): array
     {
         return $this->fieldHelper->getRelations(
@@ -139,11 +117,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         );
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     * @param array $itemData
-     */
     private function beforeProcessFileField(object $entity, string $fieldName, array $itemData): void
     {
         /** @var File $file */
@@ -165,10 +138,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param File $file
-     * @param File|null $existingFile
-     */
     private function processFile(File $file, ?File $existingFile): void
     {
         if ($existingFile) {
@@ -185,10 +154,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         $this->scheduledForUpload[$file->getUuid()] = $file->getFile();
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     */
     private function beforeProcessMultiFileField(object $entity, string $fieldName): void
     {
         /** @var FileItem[]|Collection $fileItems */
@@ -253,9 +218,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param StrategyEvent $event
-     */
     public function onProcessAfter(StrategyEvent $event): void
     {
         $errors = [[]];
@@ -287,11 +249,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     * @param array $itemData
-     */
     private function afterProcessFileField(object $entity, string $fieldName, array $itemData): array
     {
         $errors = [];
@@ -317,15 +274,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         return $errors;
     }
 
-    /**
-     * @param File $file
-     * @param string $originUuid
-     * @param object $entity
-     * @param string $fieldName
-     * @param int|null $index
-     *
-     * @return array
-     */
     private function processUploadAndValidate(
         File $file,
         string $originUuid,
@@ -451,13 +399,6 @@ class FileStrategyEventListener implements LoggerAwareInterface
         return $errors;
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     * @param array $itemData
-     *
-     * @return array
-     */
     private function afterProcessMultiFileField(object $entity, string $fieldName, array $itemData): array
     {
         $errors = [[]];

@@ -32,9 +32,6 @@ class WidgetOptionsLoadEvent extends Event
         return $this->widgetOptions;
     }
 
-    /**
-     * @param array $widgetOptions
-     */
     public function setWidgetOptions(array $widgetOptions)
     {
         $this->widgetOptions = $widgetOptions;

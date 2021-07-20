@@ -25,17 +25,11 @@ class InvalidMessageHeadersException extends \Exception
         $this->emailMessage = $emailMessage;
     }
 
-    /**
-     * @return Message
-     */
     public function getEmailMessage(): Message
     {
         return $this->emailMessage;
     }
 
-    /**
-     * @return array
-     */
     public function getExceptions(): array
     {
         return $this->exceptions;

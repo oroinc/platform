@@ -27,19 +27,12 @@ class StaleAssociationListener
      */
     protected $doctrineHelper;
 
-    /**
-     * @param AccessorInterface $accessor
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(AccessorInterface $accessor, DoctrineHelper $doctrineHelper)
     {
         $this->accessor = $accessor;
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param FieldDataEvent $event
-     */
     public function afterMergeField(FieldDataEvent $event)
     {
         $fieldData = $event->getFieldData();

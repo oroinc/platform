@@ -72,14 +72,12 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
                 $this->addStatusCodesForOptions($statusCodes);
                 break;
         }
-        
+
         parent::addStatusCodes($statusCodes, $targetAction);
     }
 
     /**
      * Adds status codes for "get_list" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForGetList(StatusCodesConfig $statusCodes)
     {
@@ -97,8 +95,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "get" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForGet(StatusCodesConfig $statusCodes)
     {
@@ -121,8 +117,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "update" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForUpdate(StatusCodesConfig $statusCodes)
     {
@@ -150,8 +144,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "update_list" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForUpdateList(StatusCodesConfig $statusCodes)
     {
@@ -164,8 +156,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "create" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForCreate(StatusCodesConfig $statusCodes)
     {
@@ -188,8 +178,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "delete" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForDelete(StatusCodesConfig $statusCodes)
     {
@@ -212,8 +200,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "delete_list" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForDeleteList(StatusCodesConfig $statusCodes)
     {
@@ -231,8 +217,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "get_subresource" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForGetSubresource(StatusCodesConfig $statusCodes)
     {
@@ -255,8 +239,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "update_subresource" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForUpdateSubresource(StatusCodesConfig $statusCodes)
     {
@@ -279,8 +261,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "add_subresource" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForAddSubresource(StatusCodesConfig $statusCodes)
     {
@@ -303,8 +283,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "delete_subresource" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForDeleteSubresource(StatusCodesConfig $statusCodes)
     {
@@ -327,8 +305,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "get_relationship" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForGetRelationship(StatusCodesConfig $statusCodes)
     {
@@ -351,8 +327,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "update_relationship" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForUpdateRelationship(StatusCodesConfig $statusCodes)
     {
@@ -370,8 +344,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "add_relationship" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForAddRelationship(StatusCodesConfig $statusCodes)
     {
@@ -389,8 +361,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "delete_relationship" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForDeleteRelationship(StatusCodesConfig $statusCodes)
     {
@@ -408,8 +378,6 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
 
     /**
      * Adds status codes for "options" action
-     *
-     * @param StatusCodesConfig $statusCodes
      */
     protected function addStatusCodesForOptions(StatusCodesConfig $statusCodes)
     {

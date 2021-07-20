@@ -21,8 +21,6 @@ interface ThemeConfigurationExtensionInterface
 
     /**
      * Adds definition of additional sections(s) to "config" section.
-     *
-     * @param NodeBuilder $configNode
      */
     public function appendConfig(NodeBuilder $configNode);
 }

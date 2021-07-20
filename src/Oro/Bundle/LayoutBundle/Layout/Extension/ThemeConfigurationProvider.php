@@ -26,12 +26,6 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     /** @var string */
     private $folderPattern;
 
-    /**
-     * @param string             $cacheFile
-     * @param bool               $debug
-     * @param ThemeConfiguration $configuration
-     * @param string             $folderPattern
-     */
     public function __construct(
         string $cacheFile,
         bool $debug,

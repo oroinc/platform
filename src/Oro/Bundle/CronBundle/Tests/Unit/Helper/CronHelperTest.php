@@ -20,11 +20,6 @@ class CronHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider cronDataProvider
-     *
-     * @param string $definition
-     * @param CronExpression $expectedCronExpression
-     *
-     * @return void
      */
     public function testCreateCron(string $definition, CronExpression $expectedCronExpression): void
     {
@@ -33,9 +28,6 @@ class CronHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCronExpression, $cronExpression);
     }
 
-    /**
-     * @return array
-     */
     public function cronDataProvider(): array
     {
         return [

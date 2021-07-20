@@ -15,9 +15,6 @@ class ObjectCacheDataSerializer implements ObjectCacheDataConverterInterface
      */
     protected $serializer;
 
-    /**
-     * @param SerializerInterface $serializer
-     */
     public function __construct(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;

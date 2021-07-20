@@ -24,9 +24,6 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
             ?? null;
     }
 
-    /**
-     * @param array $jobConfiguration
-     */
     public function setConfiguration(array $jobConfiguration)
     {
         $this->configuration = $jobConfiguration;

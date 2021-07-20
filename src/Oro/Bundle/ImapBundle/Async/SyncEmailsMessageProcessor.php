@@ -22,10 +22,6 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     private $logger;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     */
     public function __construct(MessageProducerInterface $producer, LoggerInterface $logger)
     {
         $this->producer = $producer;
@@ -48,7 +44,6 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
         foreach ($body['ids'] as $id) {
             $this->producer->send(Topics::SYNC_EMAIL, ['id' => $id]);
         }
-
 
         return self::ACK;
     }

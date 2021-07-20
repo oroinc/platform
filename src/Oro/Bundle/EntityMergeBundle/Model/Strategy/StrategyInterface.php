@@ -8,8 +8,6 @@ interface StrategyInterface
 {
     /**
      * Merge field
-     *
-     * @param FieldData $fieldData
      */
     public function merge(FieldData $fieldData);
 

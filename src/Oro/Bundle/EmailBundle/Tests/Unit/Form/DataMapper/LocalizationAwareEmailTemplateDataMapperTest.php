@@ -165,13 +165,6 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
         $this->assertEquals($existTemplateLocalizationData, $existTemplateLocalization);
     }
 
-    /**
-     * @param Localization $localization
-     * @param string $data
-     * @param bool $subjectFallback
-     * @param bool $contentFallback
-     * @return EmailTemplateTranslation
-     */
     private function getEmailTemplateTranslation(
         Localization $localization,
         string $data,

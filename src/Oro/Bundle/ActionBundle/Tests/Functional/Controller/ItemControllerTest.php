@@ -145,10 +145,6 @@ class ItemControllerTest extends WebTestCase
         return $options['data'];
     }
 
-    /**
-     * @param Crawler $crawler
-     * @param array $operations
-     */
     protected function assertPageContainsOperations(Crawler $crawler, array $operations)
     {
         $node = $crawler->filter('a.operation-button');

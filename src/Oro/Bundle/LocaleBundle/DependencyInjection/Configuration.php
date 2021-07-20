@@ -36,7 +36,6 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('language')->defaultValue(self::DEFAULT_LANGUAGE)->end()
         ->end();
 
-
         /**
          * default values for "country" and "currency" are calculated automatically
          * @see \Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension::prepareSettings
@@ -60,19 +59,11 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
     public static function getConfigKeyByName(string $name): string
     {
         return TreeUtils::getConfigKey(self::ROOT_NAME, $name, ConfigManager::SECTION_MODEL_SEPARATOR);
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
     public static function getFieldKeyByName(string $name): string
     {
         return TreeUtils::getConfigKey(self::ROOT_NAME, $name, ConfigManager::SECTION_VIEW_SEPARATOR);

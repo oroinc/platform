@@ -16,10 +16,6 @@ class MemoryCacheProvider implements MemoryCacheProviderInterface
     /** @var ArrayAdapter */
     private $cache;
 
-    /**
-     * @param UniversalCacheKeyGenerator $universalCacheKeyGenerator
-     * @param ArrayAdapter $cache
-     */
     public function __construct(UniversalCacheKeyGenerator $universalCacheKeyGenerator, ArrayAdapter $cache)
     {
         $this->universalCacheKeyGenerator = $universalCacheKeyGenerator;

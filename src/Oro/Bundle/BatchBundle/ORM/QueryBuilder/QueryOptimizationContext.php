@@ -20,10 +20,6 @@ class QueryOptimizationContext
     /** @var array [alias => Expr\Join, ...] */
     private $aliasToJoinMap;
 
-    /**
-     * @param QueryBuilder      $queryBuilder
-     * @param QueryBuilderTools $qbTools
-     */
     public function __construct(QueryBuilder $queryBuilder, QueryBuilderTools $qbTools)
     {
         // make sure 'from' DQL part is initialized for both original and optimized query builders

@@ -23,7 +23,6 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
     protected $resolvedColumnAliases = [];
 
     /**
-     * @return bool
      * @throws \Doctrine\DBAL\DBALException
      */
     private function isOrderByModificationAllowed(): bool
@@ -113,9 +112,6 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
         return false;
     }
 
-    /**
-     * @param AST\FromClause $fromClause
-     */
     private function saveResolvedTableAliases(AST\FromClause $fromClause)
     {
         if (!$this->isOrderByModificationAllowed()) {
@@ -140,9 +136,6 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
         }
     }
 
-    /**
-     * @param AST\JoinAssociationDeclaration $declaration
-     */
     private function processJoinAssociationDeclaration(AST\JoinAssociationDeclaration $declaration)
     {
         $expr = $declaration->joinAssociationPathExpression;
@@ -155,17 +148,11 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
         }
     }
 
-    /**
-     * @param AST\RangeVariableDeclaration $declaration
-     */
     private function processRangeDeclaration(AST\RangeVariableDeclaration $declaration)
     {
         $this->resolvedTableAliases[$declaration->aliasIdentificationVariable] = $declaration->abstractSchemaName;
     }
 
-    /**
-     * @param AST\SelectClause $selectClause
-     */
     private function saveResolvedColumnAliases(AST\SelectClause $selectClause)
     {
         if (!$this->isOrderByModificationAllowed()) {

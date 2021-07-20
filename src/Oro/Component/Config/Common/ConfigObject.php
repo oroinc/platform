@@ -45,7 +45,6 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /**
      * Creates object from array, add name as regular param option
      *
-     *
      * @param string $name
      * @param array  $params
      *

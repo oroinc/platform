@@ -9,9 +9,6 @@ class ConfigurationManager
      */
     protected $configurationProvider;
 
-    /**
-     * @param ConfigurationProvider $configurationProvider
-     */
     public function __construct(ConfigurationProvider $configurationProvider)
     {
         $this->configurationProvider = $configurationProvider;
@@ -40,13 +37,13 @@ class ConfigurationManager
     public function getFeatureByToggle($toggle)
     {
         $configuration = $this->configurationProvider->getFeaturesConfiguration();
-        
+
         foreach ($configuration as $featureName => $featureConfig) {
             if (isset($featureConfig['toggle']) && $featureConfig['toggle'] == $toggle) {
                 return $featureName;
             }
         }
-        
+
         return null;
     }
 

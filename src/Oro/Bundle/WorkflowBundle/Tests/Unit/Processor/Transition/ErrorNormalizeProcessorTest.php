@@ -35,10 +35,6 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider errorsProvider
-     *
-     * @param \Throwable $error
-     * @param int $code
-     * @param string $message
      */
     public function testMessagesAndCodesCatch(\Throwable $error, int $code, string $message)
     {
@@ -50,10 +46,6 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($message, $context->get('responseMessage'));
     }
 
-    /**
-     * @param \Throwable $error
-     * @return TransitionContext
-     */
     protected function createContextAndLoggingAssertions(\Throwable $error): TransitionContext
     {
         /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */

@@ -30,11 +30,6 @@ class ConfigType extends AbstractType
     /** @var Translator */
     protected $translator;
 
-    /**
-     * @param ConfigTranslationHelper $translationHelper
-     * @param ConfigManager $configManager
-     * @param Translator $translator
-     */
     public function __construct(
         ConfigTranslationHelper $translationHelper,
         ConfigManager $configManager,
@@ -168,9 +163,6 @@ class ConfigType extends AbstractType
         return $result;
     }
 
-    /**
-     * @param array $config
-     */
     protected function applyFormBlockConfigTranslations(array &$config)
     {
         foreach ($config as $key => &$val) {

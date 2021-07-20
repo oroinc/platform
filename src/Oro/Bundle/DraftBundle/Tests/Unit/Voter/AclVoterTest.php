@@ -15,9 +15,6 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /**
-     * @param array $expected
-     * @param string|null $sourceUuid
-     *
      * @dataProvider permissionProvider
      */
     public function testVote(array $expected, string $sourceUuid = null): void
@@ -43,9 +40,6 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function permissionProvider(): array
     {
         return [

@@ -19,14 +19,6 @@ class OptimizedProcessorBag extends ProcessorBag
     /** @var ProcessorIteratorFactoryInterface */
     private $ungroupedProcessorIteratorFactory;
 
-    /**
-     * @param ProcessorBagConfigProviderInterface        $configProvider
-     * @param ProcessorRegistryInterface                 $processorRegistry
-     * @param bool                                       $debug
-     * @param ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory
-     * @param ProcessorIteratorFactoryInterface          $processorIteratorFactory
-     * @param ProcessorIteratorFactoryInterface          $ungroupedProcessorIteratorFactory
-     */
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,
         ProcessorRegistryInterface $processorRegistry,

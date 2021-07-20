@@ -29,9 +29,6 @@ class PdoMysql extends BaseDriver
 
     /**
      * Init additional doctrine functions
-     *
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata $class
      */
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {

@@ -55,13 +55,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      */
     private $recipientUserId;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     * @param ImportExportResultSummarizer $importJobSummaryResultService
-     * @param NotificationSettings $notificationSettings
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,

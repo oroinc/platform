@@ -27,10 +27,6 @@ class ConfigCacheWarmer implements CacheWarmerInterface
     /** @var bool */
     private $optional;
 
-    /**
-     * @param WarmableConfigCacheInterface $configCache
-     * @param bool                         $optional
-     */
     public function __construct(WarmableConfigCacheInterface $configCache, bool $optional = true)
     {
         $this->configCache = $configCache;

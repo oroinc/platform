@@ -19,9 +19,6 @@ class OptimizeJoinsFieldVisitor extends ExpressionVisitor
     /** @var array */
     private $fields = [];
 
-    /**
-     * @param OptimizeJoinsDecisionMakerInterface $decisionMaker
-     */
     public function __construct(OptimizeJoinsDecisionMakerInterface $decisionMaker)
     {
         $this->decisionMaker = $decisionMaker;
@@ -76,11 +73,6 @@ class OptimizeJoinsFieldVisitor extends ExpressionVisitor
         }
     }
 
-    /**
-     * @param Comparison $comparison
-     *
-     * @return bool
-     */
     private function isOptimizationSupported(Comparison $comparison): bool
     {
         return $this->decisionMaker->isOptimizationSupported(

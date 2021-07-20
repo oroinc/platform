@@ -55,8 +55,6 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider argumentsDataProvider
-     *
-     * @param $arguments
      */
     public function testProcessInvalidArguments($arguments)
     {

@@ -24,11 +24,6 @@ class BigNumberDateHelper
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param AclHelper $aclHelper
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper, LocaleSettings $localeSettings)
     {
         $this->doctrine       = $doctrine;

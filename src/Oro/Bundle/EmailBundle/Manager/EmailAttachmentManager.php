@@ -38,13 +38,6 @@ class EmailAttachmentManager
     /** @var AttachmentAssociationHelper */
     private $attachmentAssociationHelper;
 
-    /**
-     * @param FileManager                 $fileManager
-     * @param ManagerRegistry             $doctrine
-     * @param RouterInterface             $router
-     * @param ConfigFileValidator         $configFileValidator
-     * @param AttachmentAssociationHelper $attachmentAssociationHelper
-     */
     public function __construct(
         FileManager $fileManager,
         ManagerRegistry $doctrine,

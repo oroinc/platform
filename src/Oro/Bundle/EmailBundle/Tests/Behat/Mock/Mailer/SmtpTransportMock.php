@@ -25,13 +25,6 @@ class SmtpTransportMock implements \Swift_Transport
     /** @var bool */
     private $started = false;
 
-    /**
-     * @param string $host
-     * @param string $port
-     * @param string $encryption
-     * @param string $username
-     * @param string $password
-     */
     public function __construct(string $host, string $port, string $encryption, string $username, string $password)
     {
         $this->host = $host;

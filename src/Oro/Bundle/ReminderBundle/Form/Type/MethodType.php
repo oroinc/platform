@@ -15,9 +15,6 @@ class MethodType extends AbstractType
     /** @var SendProcessorRegistry */
     private $sendProcessorRegistry;
 
-    /**
-     * @param SendProcessorRegistry $sendProcessorRegistry
-     */
     public function __construct(SendProcessorRegistry $sendProcessorRegistry)
     {
         $this->sendProcessorRegistry = $sendProcessorRegistry;

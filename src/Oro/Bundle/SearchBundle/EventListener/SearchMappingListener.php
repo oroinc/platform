@@ -14,9 +14,6 @@ class SearchMappingListener
      */
     private $searchMappingProvider;
 
-    /**
-     * @param SearchMappingProvider $searchMappingProvider
-     */
     public function __construct(SearchMappingProvider $searchMappingProvider)
     {
         $this->searchMappingProvider = $searchMappingProvider;

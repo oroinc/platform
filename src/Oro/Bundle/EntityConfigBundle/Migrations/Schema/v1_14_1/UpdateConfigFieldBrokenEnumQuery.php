@@ -104,11 +104,6 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return array
-     */
     protected function loadEntitiesBrokenFields(LoggerInterface $logger): array
     {
         $sql = 'SELECT id, entity_id, data FROM oro_entity_config_field';
@@ -126,10 +121,6 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
         return $result;
     }
 
-    /**
-     * @param array $data
-     * @return bool
-     */
     protected function isBrokenEnum(array $data): bool
     {
         return !empty($data['enum'])

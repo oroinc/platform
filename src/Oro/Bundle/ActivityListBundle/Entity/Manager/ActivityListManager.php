@@ -61,16 +61,6 @@ class ActivityListManager
     protected $htmlTagHelper;
 
     /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityNameResolver            $entityNameResolver
-     * @param ConfigManager                 $config
-     * @param ActivityListChainProvider     $provider
-     * @param ActivityListIdProvider        $activityListIdProvider
-     * @param CommentApiManager             $commentManager
-     * @param DoctrineHelper                $doctrineHelper
-     * @param EventDispatcherInterface      $eventDispatcher
-     * @param WorkflowDataHelper            $workflowHelper
-     * @param HtmlTagHelper                 $htmlTagHelper
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(

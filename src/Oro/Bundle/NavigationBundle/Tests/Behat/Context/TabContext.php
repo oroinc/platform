@@ -21,9 +21,6 @@ class TabContext extends OroFeatureContext implements
      *
      * @When /^(?:|I )click "(?P<name>(?:[^"]|\\")*)" tab$/
      * @When /^(?:|I )click "(?P<name>(?:[^"]|\\")*)" tab in "(?P<element>(?:[^"]|\\")*)" element$/
-     *
-     * @param string $name
-     * @param string|null $element
      */
     public function iClickTabLink(string $name, ?string $element = null)
     {

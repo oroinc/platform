@@ -37,9 +37,6 @@ class FtpHandler implements ArtifactsHandlerInterface
      */
     protected $screenshotRemoteBaseUrl;
 
-    /**
-     * @param array $ftpConfig
-     */
     public function __construct(array $ftpConfig)
     {
         $this->ftpHost = $this->getConfigValue($ftpConfig, 'host', true);

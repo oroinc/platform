@@ -17,12 +17,6 @@ class TwigTemplateRendererTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider renderDataProvider
-     *
-     * @param string $template
-     * @param array $context
-     * @param string $expectedResult
-     *
-     * @return void
      */
     public function testRender(string $template, array $context, string $expectedResult): void
     {
@@ -46,9 +40,6 @@ class TwigTemplateRendererTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
     public function renderDataProvider(): array
     {
         $factory = Forms::createFormFactoryBuilder()

@@ -29,12 +29,6 @@ class AclPrivilegeConfigurableFilter
         $this->configurablePermissionProvider = $configurablePermissionProvider;
     }
 
-    /**
-     * @param ArrayCollection $aclPrivileges
-     * @param string          $configurableName
-     *
-     * @return ArrayCollection
-     */
     public function filter(ArrayCollection $aclPrivileges, string $configurableName): ArrayCollection
     {
         $configurablePermission = $this->configurablePermissionProvider->get($configurableName);

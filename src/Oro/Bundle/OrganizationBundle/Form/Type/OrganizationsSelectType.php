@@ -29,11 +29,6 @@ class OrganizationsSelectType extends AbstractType
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param EntityManager          $em
-     * @param BusinessUnitManager    $buManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         EntityManager $em,
         BusinessUnitManager $buManager,
@@ -139,8 +134,6 @@ class OrganizationsSelectType extends AbstractType
 
     /**
      * Adds organizations field to form
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function addOrganizationsField(FormBuilderInterface $builder)
     {

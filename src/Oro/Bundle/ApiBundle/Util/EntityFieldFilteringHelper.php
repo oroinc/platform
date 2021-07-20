@@ -14,9 +14,6 @@ class EntityFieldFilteringHelper
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -64,11 +61,6 @@ class EntityFieldFilteringHelper
         return $fieldNames;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
     public function isExtendSystemEntity(string $entityClass): bool
     {
         if (!$this->configManager->hasConfig($entityClass)) {
@@ -82,12 +74,6 @@ class EntityFieldFilteringHelper
             && !$entityConfig->is('owner', ExtendScope::OWNER_CUSTOM);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     public function isCustomField(string $entityClass, string $fieldName): bool
     {
         if (!$this->configManager->hasConfig($entityClass, $fieldName)) {
@@ -101,12 +87,6 @@ class EntityFieldFilteringHelper
             && $fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $associationName
-     *
-     * @return bool
-     */
     public function isCustomAssociation(string $entityClass, string $associationName): bool
     {
         return

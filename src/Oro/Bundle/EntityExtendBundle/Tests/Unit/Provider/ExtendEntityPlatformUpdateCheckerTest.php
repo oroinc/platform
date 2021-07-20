@@ -25,13 +25,6 @@ class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $scope
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
-     */
     private function getEntityConfig(string $scope, string $className, array $values): Config
     {
         return new Config(new EntityConfigId($scope, $className), $values);

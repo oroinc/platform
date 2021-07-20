@@ -21,10 +21,6 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
 
     /**
      * @dataProvider executeDataProvider
-     *
-     * @param array $expectedMessages
-     * @param array $expectedDefinitions
-     * @param array $expectedTriggers
      */
     public function testExecute(array $expectedMessages, array $expectedDefinitions, array $expectedTriggers)
     {

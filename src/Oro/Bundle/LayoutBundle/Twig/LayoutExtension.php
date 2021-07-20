@@ -219,10 +219,6 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
         return $attr;
     }
 
-    /**
-     * @param FormView $formView
-     * @param          $classPrefix
-     */
     public function setClassPrefixToForm(FormView $formView, $classPrefix)
     {
         $formView->vars['class_prefix'] = $classPrefix;
@@ -267,12 +263,6 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
         return $highlightString;
     }
 
-    /**
-     * @param FormView $form
-     * @param string $uniqueId
-     * @param FormView|null $parent
-     * @return FormView
-     */
     public function cloneFormViewWithUniqueId(FormView $form, string $uniqueId, FormView $parent = null): FormView
     {
         $newForm = new FormView($parent);

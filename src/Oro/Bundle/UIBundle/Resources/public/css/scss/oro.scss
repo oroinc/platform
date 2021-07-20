@@ -571,6 +571,10 @@ label.radio.error {
         margin: 0 0 $content-padding-small;
     }
 
+    .btn-icon {
+        height: auto;
+    }
+
     .enum-value-collection & {
         .row-oro {
             &.oro-multiselect-holder {

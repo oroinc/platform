@@ -37,14 +37,6 @@ class NoteManager
     /** @var AttachmentManager */
     protected $attachmentManager;
 
-    /**
-     * @param EntityManager                 $em
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param AclHelper                     $aclHelper
-     * @param EntityNameResolver            $entityNameResolver
-     * @param AttachmentProvider            $attachmentProvider
-     * @param AttachmentManager             $attachmentManager
-     */
     public function __construct(
         EntityManager $em,
         AuthorizationCheckerInterface $authorizationChecker,

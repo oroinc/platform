@@ -13,17 +13,12 @@ class ConsoleCommandListener
 
     /**
      * ConsoleCommandListener constructor.
-     *
-     * @param FeatureChecker $featureChecker
      */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         $command = $event->getCommand();

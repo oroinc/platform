@@ -18,10 +18,6 @@ class OroNotificationBundle implements Migration
         $this->dropOwnerColumn($schema, $queries);
     }
 
-    /**
-     * @param Schema $schema
-     * @param QueryBag $queries
-     */
     private function dropOwnerColumn(Schema $schema, QueryBag $queries)
     {
         $tableName = 'oro_notification_recip_list';
@@ -61,9 +57,6 @@ class OroNotificationBundle implements Migration
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function addEntityEmailsField(Schema $schema)
     {
         $table = $schema->getTable('oro_notification_recip_list');

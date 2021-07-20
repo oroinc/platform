@@ -26,11 +26,6 @@ class RequestMailboxes extends AbstractAction
     /** @var MailboxProcessStorage */
     private $processStorage;
 
-    /**
-     * @param ContextAccessor       $contextAccessor
-     * @param Registry              $doctrine
-     * @param MailboxProcessStorage $processStorage
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         Registry $doctrine,

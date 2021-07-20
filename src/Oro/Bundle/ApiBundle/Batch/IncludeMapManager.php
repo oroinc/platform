@@ -47,12 +47,6 @@ class IncludeMapManager
     /** @var int */
     private $moveToProcessedLockWaitBetweenAttempts = 50;
 
-    /**
-     * @param ItemKeyBuilder   $itemKeyBuilder
-     * @param FileNameProvider $fileNameProvider
-     * @param FileLockManager  $fileLockManager
-     * @param LoggerInterface  $logger
-     */
     public function __construct(
         ItemKeyBuilder $itemKeyBuilder,
         FileNameProvider $fileNameProvider,
@@ -67,8 +61,6 @@ class IncludeMapManager
 
     /**
      * Sets the max number of attempts to acquire the lock for the get included items operation.
-     *
-     * @param int $limit
      */
     public function setReadLockAttemptLimit(int $limit): void
     {
@@ -77,8 +69,6 @@ class IncludeMapManager
 
     /**
      * Sets the time in milliseconds between acquire the lock attempts for the get included items operation.
-     *
-     * @param int $milliseconds
      */
     public function setReadLockWaitBetweenAttempts(int $milliseconds): void
     {
@@ -87,8 +77,6 @@ class IncludeMapManager
 
     /**
      * Sets the max number of attempts to acquire the lock for the move to processed operation.
-     *
-     * @param int $limit
      */
     public function setMoveToProcessedLockAttemptLimit(int $limit): void
     {
@@ -97,8 +85,6 @@ class IncludeMapManager
 
     /**
      * Sets the time in milliseconds between acquire the lock attempts for the move to processed operation.
-     *
-     * @param int $milliseconds
      */
     public function setMoveToProcessedLockWaitBetweenAttempts(int $milliseconds): void
     {
@@ -373,12 +359,6 @@ class IncludeMapManager
         }
     }
 
-    /**
-     * @param IncludeAccessorInterface $includeAccessor
-     * @param array                    $data
-     *
-     * @return array
-     */
     private function getRelationships(IncludeAccessorInterface $includeAccessor, array $data): array
     {
         $relationships = [];
@@ -536,11 +516,6 @@ class IncludeMapManager
         return JsonUtil::decode($file->getContent());
     }
 
-    /**
-     * @param FileManager $fileManager
-     * @param int         $operationId
-     * @param array       $data
-     */
     private function saveIndexData(FileManager $fileManager, int $operationId, array $data): void
     {
         $fileManager->writeToStorage(
@@ -567,11 +542,6 @@ class IncludeMapManager
             : JsonUtil::decode($file->getContent());
     }
 
-    /**
-     * @param FileManager $fileManager
-     * @param int         $operationId
-     * @param array       $data
-     */
     private function saveProcessedIndexData(FileManager $fileManager, int $operationId, array $data): void
     {
         $fileManager->writeToStorage(
@@ -598,11 +568,6 @@ class IncludeMapManager
             : array_fill_keys(JsonUtil::decode($file->getContent()), true);
     }
 
-    /**
-     * @param FileManager $fileManager
-     * @param int         $operationId
-     * @param array       $data
-     */
     private function saveLinkedIndexData(FileManager $fileManager, int $operationId, array $data): void
     {
         $fileManager->writeToStorage(
@@ -611,11 +576,6 @@ class IncludeMapManager
         );
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
     private function acquireReadLock(string $fileName): ?string
     {
         $lockFileName = $this->fileNameProvider->getLockFileName($fileName);
@@ -630,11 +590,6 @@ class IncludeMapManager
         return $lockFileName;
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
     private function acquireMoveToProcessedLock(string $fileName): ?string
     {
         $lockFileName = $this->fileNameProvider->getLockFileName($fileName);

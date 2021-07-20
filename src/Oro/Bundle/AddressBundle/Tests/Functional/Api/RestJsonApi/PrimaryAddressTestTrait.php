@@ -21,9 +21,6 @@ use Oro\Bundle\FormBundle\Entity\PrimaryItem;
  */
 trait PrimaryAddressTestTrait
 {
-    /**
-     * @param Collection $addresses
-     */
     private function removeAllAddressesExceptPrimary(Collection $addresses)
     {
         $toRemoveAddresses = [];

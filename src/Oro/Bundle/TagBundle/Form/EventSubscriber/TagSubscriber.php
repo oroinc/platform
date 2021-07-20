@@ -23,10 +23,6 @@ class TagSubscriber implements EventSubscriberInterface
     /** @var Organization|null */
     protected $organization;
 
-    /**
-     * @param TagManager     $tagManager
-     * @param TaggableHelper $taggableHelper
-     */
     public function __construct(TagManager $tagManager, TaggableHelper $taggableHelper)
     {
         $this->tagManager     = $tagManager;
@@ -43,9 +39,6 @@ class TagSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSet(FormEvent $event)
     {
         $entity = $event->getForm()->getParent()->getData();

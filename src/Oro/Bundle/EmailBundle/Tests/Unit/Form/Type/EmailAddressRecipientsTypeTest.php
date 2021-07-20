@@ -27,7 +27,6 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
         parent::setUp();
     }
 
-
     public function testFormShouldBeSubmittendAndViewShouldContainsRouteParameters(): void
     {
         $email = new Email();

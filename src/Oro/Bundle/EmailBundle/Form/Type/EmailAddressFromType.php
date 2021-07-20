@@ -24,11 +24,6 @@ class EmailAddressFromType extends AbstractType
     /** @var MailboxManager */
     protected $mailboxManager;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param RelatedEmailsProvider  $relatedEmailsProvider
-     * @param MailboxManager         $mailboxManager
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         RelatedEmailsProvider $relatedEmailsProvider,

@@ -20,9 +20,6 @@ class ExpressionBuilder
     /** @var GroupNode|null */
     private $currentGroupNode;
 
-    /**
-     * @param string $condition
-     */
     public function beginGroup(string $condition): void
     {
         $groupNode = new GroupNode($condition);
@@ -43,9 +40,6 @@ class ExpressionBuilder
         $this->currentGroupNode = $this->currentGroupNode->getParent();
     }
 
-    /**
-     * @param Restriction $restriction
-     */
     public function addRestriction(Restriction $restriction): void
     {
         if (null === $this->groupNode) {
@@ -56,9 +50,6 @@ class ExpressionBuilder
         $this->currentGroupNode->addNode($restriction);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     public function applyRestrictions(QueryBuilder $qb): void
     {
         if (null === $this->groupNode) {
@@ -79,9 +70,6 @@ class ExpressionBuilder
         }
     }
 
-    /**
-     * @return ConstraintViolationInterface|null
-     */
     private function validate(): ?ConstraintViolationInterface
     {
         $violations = Validation::createValidator()->validate($this->groupNode, new GroupNodeConditions());

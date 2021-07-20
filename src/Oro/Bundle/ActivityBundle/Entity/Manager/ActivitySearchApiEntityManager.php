@@ -15,11 +15,6 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
     /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @param ObjectManager   $om
-     * @param ActivityManager $activityManager
-     * @param SearchIndexer   $searchIndexer
-     */
     public function __construct(
         ObjectManager $om,
         ActivityManager $activityManager,

@@ -1,7 +1,7 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-], function($, _, __) {
+define(function(require) {
     'use strict';
 
+    const __ = require('orotranslation/js/translator');
     const defaultParam = {
         invalid_message: 'This value is not valid.',
         invalid_message_parameters: {}
@@ -22,7 +22,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
             return firstElement && (this.optional(firstElement) || value === this.elementValue(firstElement));
         },
         function(param) {
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             return __(param.invalid_message, param.invalid_message_parameters);
         }
     ];

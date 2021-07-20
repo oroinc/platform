@@ -9,12 +9,6 @@ use Oro\Bundle\ApiBundle\Collection\Criteria;
  */
 trait NormalizeFieldTrait
 {
-    /**
-     * @param string $field
-     * @param array  $placeholders
-     *
-     * @return string
-     */
     private function normalizeField(string $field, array $placeholders): string
     {
         $normalizedField = null;

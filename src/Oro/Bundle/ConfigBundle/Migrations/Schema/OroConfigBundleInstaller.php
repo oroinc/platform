@@ -31,8 +31,6 @@ class OroConfigBundleInstaller implements Installation
 
     /**
      * Create oro_config table
-     *
-     * @param Schema $schema
      */
     protected function createOroConfigTable(Schema $schema)
     {
@@ -46,8 +44,6 @@ class OroConfigBundleInstaller implements Installation
 
     /**
      * Create oro_config_value table
-     *
-     * @param Schema $schema
      */
     protected function createOroConfigValueTable(Schema $schema)
     {
@@ -69,8 +65,6 @@ class OroConfigBundleInstaller implements Installation
 
     /**
      * Add oro_config_value foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroConfigValueForeignKeys(Schema $schema)
     {

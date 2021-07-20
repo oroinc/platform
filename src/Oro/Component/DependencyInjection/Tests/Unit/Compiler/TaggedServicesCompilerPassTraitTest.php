@@ -31,7 +31,6 @@ class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider taggedServicesDataProvider
-     * @param array $taggedServices
      */
     public function testRegisterTaggedServices(array $taggedServices)
     {

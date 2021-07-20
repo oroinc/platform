@@ -211,8 +211,6 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider convertValueToStringDataProvider
-     * @param $value
-     * @param $expectedConvertedValue
      */
     public function testConvertValueToString($value, $expectedConvertedValue)
     {

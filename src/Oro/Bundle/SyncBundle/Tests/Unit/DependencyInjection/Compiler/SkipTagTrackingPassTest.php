@@ -46,8 +46,8 @@ class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
                 'Oro\Bundle\SearchBundle\Entity\IndexInteger',
                 'Oro\Bundle\SearchBundle\Entity\IndexDecimal',
                 'Oro\Bundle\SearchBundle\Entity\IndexDatetime',
-                'Akeneo\Bundle\BatchBundle\Entity\JobExecution',
-                'Akeneo\Bundle\BatchBundle\Entity\StepExecution',
+                'Oro\Bundle\BatchBundle\Entity\JobExecution',
+                'Oro\Bundle\BatchBundle\Entity\StepExecution',
                 'Oro\Bundle\MessageQueueBundle\Entity\Job',
             ],
             $skippedEntityClasses

@@ -38,10 +38,6 @@ class EmailTemplateTranslationType extends AbstractType
     /** @var LocalizationManager */
     private $localizationManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(TranslatorInterface $translator, LocalizationManager $localizationManager)
     {
         $this->translator = $translator;
@@ -151,10 +147,6 @@ class EmailTemplateTranslationType extends AbstractType
         return 'oro_email_emailtemplate_localization';
     }
 
-    /**
-     * @param Localization $localization
-     * @return string
-     */
     private function getFallbackLabel(Localization $localization): string
     {
         if ($localization->getParentLocalization()) {
@@ -175,10 +167,6 @@ class EmailTemplateTranslationType extends AbstractType
         return $fallbackLabel;
     }
 
-    /**
-     * @param array $options
-     * @return CallbackTransformer
-     */
     private function getViewTransformer(array $options): CallbackTransformer
     {
         return new CallbackTransformer(

@@ -12,9 +12,6 @@ class ManagerBag implements ManagerBagInterface
     /** @var string[] */
     protected $managerNames;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

@@ -14,9 +14,6 @@ class InsertFromSelectQueryExecutor implements InsertQueryExecutorInterface
      */
     private $helper;
 
-    /**
-     * @param NativeQueryExecutorHelper $helper
-     */
     public function __construct(NativeQueryExecutorHelper $helper)
     {
         $this->helper = $helper;

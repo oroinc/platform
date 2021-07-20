@@ -13,9 +13,6 @@ class ReplaceStrategy implements StrategyInterface
      */
     protected $accessor;
 
-    /**
-     * @param AccessorInterface $accessor
-     */
     public function __construct(AccessorInterface $accessor)
     {
         $this->accessor = $accessor;

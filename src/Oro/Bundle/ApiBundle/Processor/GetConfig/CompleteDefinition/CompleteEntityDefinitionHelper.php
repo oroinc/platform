@@ -53,16 +53,6 @@ class CompleteEntityDefinitionHelper
     /** @var EntityFieldFilteringHelper */
     private $entityFieldFilteringHelper;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     * @param EntityIdHelper                 $entityIdHelper
-     * @param CompleteAssociationHelper      $associationHelper
-     * @param CompleteCustomDataTypeHelper   $customDataTypeHelper
-     * @param ExclusionProviderRegistry      $exclusionProviderRegistry
-     * @param ExpandedAssociationExtractor   $expandedAssociationExtractor
-     * @param EntityFieldFilteringHelper     $entityFieldFilteringHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityOverrideProviderRegistry $entityOverrideProviderRegistry,
@@ -83,10 +73,6 @@ class CompleteEntityDefinitionHelper
         $this->entityFieldFilteringHelper = $entityFieldFilteringHelper;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ConfigContext          $context
-     */
     public function completeDefinition(
         EntityDefinitionConfig $definition,
         ConfigContext $context
@@ -174,9 +160,6 @@ class CompleteEntityDefinitionHelper
         return $existingFields;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     */
     private function addClassNameField(EntityDefinitionConfig $definition)
     {
         $classNameField = $definition->findFieldNameByPropertyPath(ConfigUtil::CLASS_NAME);
@@ -187,10 +170,6 @@ class CompleteEntityDefinitionHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ClassMetadata          $metadata
-     */
     private function setIdentifierFieldNames(EntityDefinitionConfig $definition, ClassMetadata $metadata)
     {
         $idFieldNames = [];
@@ -230,8 +209,6 @@ class CompleteEntityDefinitionHelper
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
-     * @param ClassMetadata          $metadata
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeIdentifierFields(
@@ -675,12 +652,6 @@ class CompleteEntityDefinitionHelper
         return $definition;
     }
 
-    /**
-     * @param string                          $entityClass
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return string
-     */
     private function resolveAssociationEntityClass(
         string $entityClass,
         EntityOverrideProviderInterface $entityOverrideProvider
@@ -694,12 +665,6 @@ class CompleteEntityDefinitionHelper
         return $this->resolveEntityClass($entityClass, $entityOverrideProvider);
     }
 
-    /**
-     * @param string                          $entityClass
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return string
-     */
     private function resolveEntityClass(
         string $entityClass,
         EntityOverrideProviderInterface $entityOverrideProvider
@@ -730,12 +695,6 @@ class CompleteEntityDefinitionHelper
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionFieldConfig|null
-     */
     private function getOrAddNotComputedField(
         EntityDefinitionConfig $definition,
         string $propertyPath

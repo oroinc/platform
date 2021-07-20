@@ -19,9 +19,6 @@ class EntityType extends AbstractType
      */
     protected $nameGenerator;
 
-    /**
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;

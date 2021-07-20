@@ -39,11 +39,6 @@ class CompleteDisableInclusion implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return bool
-     */
     private function hasAssociations(EntityDefinitionConfig $definition): bool
     {
         $hasAssociations = false;

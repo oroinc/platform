@@ -16,17 +16,11 @@ class LocalizedTemplateDTO
     /** @var EmailHolderInterface[] */
     private $recipients;
 
-    /**
-     * @param EmailTemplate $emailTemplate
-     */
     public function __construct(EmailTemplate $emailTemplate)
     {
         $this->emailTemplate = $emailTemplate;
     }
 
-    /**
-     * @return EmailTemplate
-     */
     public function getEmailTemplate(): EmailTemplate
     {
         return $this->emailTemplate;

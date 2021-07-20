@@ -37,9 +37,6 @@ class OroEntityExtendBundle extends Bundle
     /** @var string */
     private $phpExecutable;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel   = $kernel;
@@ -181,9 +178,6 @@ class OroEntityExtendBundle extends Bundle
 
     /**
      * Creates and returns Process instance with configured parameters and timeout set
-     * @param string $commandName
-     *
-     * @return Process
      */
     private function getProcess(string $commandName): Process
     {

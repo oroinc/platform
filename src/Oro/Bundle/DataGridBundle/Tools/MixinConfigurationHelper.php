@@ -20,9 +20,6 @@ class MixinConfigurationHelper
         '[source][query]'
     ];
 
-    /**
-     * @param ConfigurationProviderInterface $configurationProvider
-     */
     public function __construct(ConfigurationProviderInterface $configurationProvider)
     {
         $this->configurationProvider = $configurationProvider;

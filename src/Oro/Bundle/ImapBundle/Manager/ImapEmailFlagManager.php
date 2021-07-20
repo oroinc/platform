@@ -8,11 +8,10 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
+use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 
 /**
- * Class ImapEmailFlagManager
- *
- * @package Oro\Bundle\ImapBundle\Manager
+ * Provides a set of methods to manage flags for IMAP email messages.
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -24,15 +23,9 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     /** @var ImapConnector */
     protected $connector;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param ImapConnector $connector
-     * @param OroEntityManager $em
-     */
     public function __construct(ImapConnector $connector, OroEntityManager $em)
     {
         $this->connector = $connector;
@@ -40,18 +33,18 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     /**
-     * (@inherit)
+     * {@inheritDoc}
      */
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
-        $repoImapEmail = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $repoImapEmail = $this->em->getRepository(ImapEmail::class);
         $uid = $repoImapEmail->getUid($folder->getId(), $email->getId());
         $this->connector->selectFolder($folder->getFullName());
         $this->connector->setFlags($uid, $flags);
     }
 
     /**
-     * (@inherit)
+     * {@inheritDoc}
      */
     public function setUnseen(EmailFolder $folder, Email $email)
     {
@@ -59,7 +52,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     /**
-     * (@inherit)
+     * {@inheritDoc}
      */
     public function setSeen(EmailFolder $folder, Email $email)
     {

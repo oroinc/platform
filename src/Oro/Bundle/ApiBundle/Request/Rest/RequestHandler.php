@@ -13,9 +13,6 @@ class RequestHandler
     /** @var RequestActionHandler */
     private $actionHandler;
 
-    /**
-     * @param RequestActionHandler $actionHandler
-     */
     public function __construct(RequestActionHandler $actionHandler)
     {
         $this->actionHandler = $actionHandler;
@@ -23,10 +20,6 @@ class RequestHandler
 
     /**
      * Handles "/api/{entity}/{id}" requests.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function handleItem(Request $request): Response
     {
@@ -46,10 +39,6 @@ class RequestHandler
 
     /**
      * Handles "/api/{entity}" requests.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function handleList(Request $request): Response
     {
@@ -71,10 +60,6 @@ class RequestHandler
 
     /**
      * Handles "/api/{entity}/{id}/{association}" requests.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function handleSubresource(Request $request): Response
     {
@@ -96,10 +81,6 @@ class RequestHandler
 
     /**
      * Handles "/api/{entity}/{id}/relationships/{association}" requests.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function handleRelationship(Request $request): Response
     {
@@ -121,10 +102,6 @@ class RequestHandler
 
     /**
      * Handles "/api/{entity}" requests for single item API resources that do not have an identifier.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function handleItemWithoutId(Request $request): Response
     {

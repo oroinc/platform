@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Doctrine\DBAL\Exception\RetryableException;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -35,11 +35,6 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var array */
     private $config;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityDetachFixer $detachFixer
-     * @param ContextRegistry $contextRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityDetachFixer $detachFixer,
@@ -74,9 +69,6 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
         }
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

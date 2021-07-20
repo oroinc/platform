@@ -25,10 +25,6 @@ class OroMoneyType extends AbstractType
      */
     protected $numberFormatter;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param NumberFormatter $numberFormatter
-     */
     public function __construct(LocaleSettings $localeSettings, NumberFormatter $numberFormatter)
     {
         $this->localeSettings = $localeSettings;

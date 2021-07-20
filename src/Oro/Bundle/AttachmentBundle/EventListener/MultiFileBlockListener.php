@@ -26,19 +26,12 @@ class MultiFileBlockListener
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param ConfigProvider $configProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigProvider $configProvider, TranslatorInterface $translator)
     {
         $this->entityConfigProvider = $configProvider;
         $this->translator = $translator;
     }
 
-    /**
-     * @param ValueRenderEvent $event
-     */
     public function onBeforeValueRender(ValueRenderEvent $event)
     {
         if (FieldConfigHelper::isMultiField($event->getFieldConfigId())) {
@@ -53,9 +46,6 @@ class MultiFileBlockListener
         }
     }
 
-    /**
-     * @param BeforeViewRenderEvent $event
-     */
     public function onBeforeViewRender(BeforeViewRenderEvent $event)
     {
         if (!$event->getEntity()) {
@@ -105,9 +95,6 @@ class MultiFileBlockListener
         $event->setData($scrollData->getData());
     }
 
-    /**
-     * @param BeforeFormRenderEvent $event
-     */
     public function onBeforeFormRender(BeforeFormRenderEvent $event)
     {
         if (!$event->getEntity()) {
@@ -152,9 +139,6 @@ class MultiFileBlockListener
         $event->setFormData($scrollData->getData());
     }
 
-    /**
-     * @param string $type
-     */
     private function isFileOrImageField(string $type): bool
     {
         return in_array($type, [FieldConfigHelper::FILE_TYPE, FieldConfigHelper::IMAGE_TYPE], true);

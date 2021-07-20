@@ -26,8 +26,6 @@ class OroNavigationBundle implements Migration
 
     /**
      * Update oro_navigation_menu_upd
-     *
-     * @param Schema $schema
      */
     protected function updateOroNavigationMenuUpdateTable(Schema $schema)
     {
@@ -43,8 +41,6 @@ class OroNavigationBundle implements Migration
 
     /**
      * Create `oro_navigation_menu_upd_descr` table
-     *
-     * @param Schema $schema
      */
     protected function createOroNavigationMenuUpdateDescriptionTable(Schema $schema)
     {
@@ -57,8 +53,6 @@ class OroNavigationBundle implements Migration
 
     /**
      * Add `oro_navigation_menu_upd_descr` foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNavigationMenuUpdateDescriptionForeignKeys(Schema $schema)
     {

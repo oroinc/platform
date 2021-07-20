@@ -45,9 +45,6 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider connectDataProvider
-     *
-     * @param string $target
-     * @param string $expectedTarget
      */
     public function testConnect(string $target, string $expectedTarget)
     {
@@ -73,9 +70,6 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertSame($connectionSession, $this->websocketClient->connect());
     }
 
-    /**
-     * @return array
-     */
     public function connectDataProvider(): array
     {
         return [

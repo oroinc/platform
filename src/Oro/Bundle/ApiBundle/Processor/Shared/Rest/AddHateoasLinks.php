@@ -28,11 +28,6 @@ class AddHateoasLinks implements ProcessorInterface
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
-    /**
-     * @param RestRoutesRegistry    $routesRegistry
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param ResourcesProvider     $resourcesProvider
-     */
     public function __construct(
         RestRoutesRegistry $routesRegistry,
         UrlGeneratorInterface $urlGenerator,
@@ -71,13 +66,6 @@ class AddHateoasLinks implements ProcessorInterface
         ));
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
     private function isGetListActionExcluded(string $entityClass, string $version, RequestType $requestType): bool
     {
         return \in_array(

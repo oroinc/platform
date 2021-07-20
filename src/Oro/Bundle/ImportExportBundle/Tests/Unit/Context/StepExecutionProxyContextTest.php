@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\Warning;
+use Oro\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
 /**
@@ -24,7 +27,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $this->stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->context = new StepExecutionProxyContext($this->stepExecution);
@@ -104,7 +107,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
     {
         $expectedCount = 1;
 
-        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->createMock(ExecutionContext::class);
 
         $this->stepExecution->expects($this->exactly(2))
             ->method('getExecutionContext')
@@ -142,7 +145,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
     {
         $expectedCount = 1;
 
-        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->createMock(ExecutionContext::class);
 
         $this->stepExecution->expects($this->once())
             ->method('getExecutionContext')
@@ -210,14 +213,14 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     protected function expectGetRawConfiguration(array $expectedConfiguration, $count = 1)
     {
-        $jobInstance = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobInstance')
+        $jobInstance = $this->getMockBuilder(JobInstance::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $jobInstance->expects($this->exactly($count))->method('getRawConfiguration')
             ->will($this->returnValue($expectedConfiguration));
 
-        $jobExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobExecution')
+        $jobExecution = $this->getMockBuilder(JobExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -251,11 +254,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWarnings()
     {
-        $warning =
-            $this
-                ->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\Warning')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $warning = $this->createMock(Warning::class);
         $expected = new ArrayCollection();
         $expected->add($warning);
 

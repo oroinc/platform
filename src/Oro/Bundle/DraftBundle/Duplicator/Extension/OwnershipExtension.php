@@ -21,25 +21,16 @@ class OwnershipExtension extends AbstractDuplicatorExtension
      */
     private $ownershipMetadataProvider;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     */
     public function __construct(OwnershipMetadataProviderInterface $ownershipMetadataProvider)
     {
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
-    /**
-     * @return Filter
-     */
     public function getFilter(): Filter
     {
         return new SetNullFilter();
     }
 
-    /**
-     * @return Matcher
-     */
     public function getMatcher(): Matcher
     {
         $ownerProperties = $this->getSourceOwnerShipProperties();
@@ -47,11 +38,6 @@ class OwnershipExtension extends AbstractDuplicatorExtension
         return new PropertiesNameMatcher($ownerProperties);
     }
 
-    /**
-     * @param DraftableInterface $source
-     *
-     * @return bool
-     */
     public function isSupport(DraftableInterface $source): bool
     {
         $className = ClassUtils::getRealClass($source);
@@ -72,9 +58,6 @@ class OwnershipExtension extends AbstractDuplicatorExtension
         return array_unique(array_filter($ownerProperties));
     }
 
-    /**
-     * @return DraftableInterface
-     */
     private function getSource(): DraftableInterface
     {
         return $this->getContext()->offsetGet('source');

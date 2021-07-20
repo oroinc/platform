@@ -59,12 +59,6 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processAddAssociationDataProvider
-     *
-     * @param $ids
-     * @param $targetClass
-     * @param $targetId
-     * @param $expectedCountAssociation
-     * @param $addAssociation
      */
     public function testProcessAddAssociation($ids, $targetClass, $targetId, $expectedCountAssociation, $addAssociation)
     {

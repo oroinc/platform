@@ -13,9 +13,6 @@ class TranslatableListener
 {
     use TranslatableQueryTrait;
 
-    /**
-     * @param OrmResultBefore $event
-     */
     public function onResultBefore(OrmResultBefore $event)
     {
         $datagrid = $event->getDatagrid();

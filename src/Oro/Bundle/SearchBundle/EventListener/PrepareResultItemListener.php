@@ -37,13 +37,6 @@ class PrepareResultItemListener
 
     /**
      * Constructor
-     *
-     * @param Router              $router
-     * @param ObjectMapper        $mapper
-     * @param EntityManager       $em
-     * @param EntityNameResolver  $entityNameResolver
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         Router $router,
@@ -63,8 +56,6 @@ class PrepareResultItemListener
 
     /**
      * Process event
-     *
-     * @param PrepareResultItemEvent $event
      */
     public function process(PrepareResultItemEvent $event)
     {

@@ -27,7 +27,6 @@ class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\Te
         $knownEmailAddressChecker = $this->createMock('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface');
         $logger = $this->createMock(LoggerInterface::class);
 
-
         $doctrine->expects($this->exactly(2))
             ->method('getManager')
             ->with(null)

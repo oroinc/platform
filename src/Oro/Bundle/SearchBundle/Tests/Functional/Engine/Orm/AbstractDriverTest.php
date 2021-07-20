@@ -63,14 +63,8 @@ abstract class AbstractDriverTest extends WebTestCase
         $this->assertTruncateQueries($queries);
     }
 
-    /**
-     * @param Configuration $configuration
-     */
     abstract protected function assertInitConfiguration(Configuration $configuration);
 
-    /**
-     * @param array $queries
-     */
     abstract protected function assertTruncateQueries(array $queries);
 
     /**

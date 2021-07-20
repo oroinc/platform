@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class Reader implements ItemReaderInterface, ClosableInterface
@@ -12,13 +12,10 @@ class Reader implements ItemReaderInterface, ClosableInterface
     public const INVALID_ITEM_EXCEPTION_MESSAGE = 'Reader exception message';
     public const LOGIC_EXCEPTION_MESSAGE = 'Reader logic exception message';
 
-    /**
-     * @var \ArrayIterator
-     */
-    private $iterator;
+    private \ArrayIterator $iterator;
 
     /**
-     * @param array|string[] $items
+     * @param string[] $items
      */
     public function __construct(array $items = [])
     {
@@ -26,8 +23,8 @@ class Reader implements ItemReaderInterface, ClosableInterface
     }
 
     /**
-     * @throws InvalidItemException
      * @return mixed|null
+     * @throws InvalidItemException
      */
     public function read()
     {
@@ -50,7 +47,7 @@ class Reader implements ItemReaderInterface, ClosableInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function close(): void
     {

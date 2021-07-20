@@ -34,11 +34,6 @@ class DigitalAssetSourceFileMimeTypeValidator extends ConstraintValidator implem
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * @param ConfigManager $entityConfigManager
-     * @param MimeTypeChecker $mimeTypeChecker
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(
         ConfigManager $entityConfigManager,
         MimeTypeChecker $mimeTypeChecker,
@@ -113,12 +108,6 @@ class DigitalAssetSourceFileMimeTypeValidator extends ConstraintValidator implem
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
     private function fieldTypeIsImage(string $entityClass, string $fieldName): bool
     {
         $fieldConfigModel = $this->entityConfigManager->getConfigFieldModel($entityClass, $fieldName);
@@ -126,11 +115,6 @@ class DigitalAssetSourceFileMimeTypeValidator extends ConstraintValidator implem
         return $fieldConfigModel && $fieldConfigModel->getType() === 'image';
     }
 
-    /**
-     * @param DigitalAsset $digitalAsset
-     *
-     * @return Collection
-     */
     private function getChildFiles(DigitalAsset $digitalAsset): Collection
     {
         $childFiles = $digitalAsset->getChildFiles();
@@ -141,11 +125,6 @@ class DigitalAssetSourceFileMimeTypeValidator extends ConstraintValidator implem
         return $childFiles;
     }
 
-    /**
-     * @param DigitalAsset $digitalAsset
-     *
-     * @return ComponentFile|null
-     */
     private function getUploadedFile(DigitalAsset $digitalAsset): ?ComponentFile
     {
         $sourceFile = $digitalAsset->getSourceFile();

@@ -29,9 +29,6 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         return [LoadRolesData::class];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */
@@ -46,10 +43,6 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         $aclManager->flush();
     }
 
-    /**
-     * @param AclManager $aclManager
-     * @param Role       $role
-     */
     private function setPermissionsForAdminRole(AclManager $aclManager, Role $role)
     {
         $sid = $aclManager->getSid($role);
@@ -64,10 +57,6 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         }
     }
 
-    /**
-     * @param AclManager $aclManager
-     * @param Role       $role
-     */
     private function setPermissionsForManagerRole(AclManager $aclManager, Role $role)
     {
         $sid = $aclManager->getSid($role);
@@ -82,10 +71,6 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
         }
     }
 
-    /**
-     * @param AclManager $aclManager
-     * @param Role       $role
-     */
     private function setPermissionsForUserRole(AclManager $aclManager, Role $role)
     {
         $sid = $aclManager->getSid($role);

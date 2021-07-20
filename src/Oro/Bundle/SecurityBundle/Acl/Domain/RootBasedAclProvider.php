@@ -33,10 +33,6 @@ class RootBasedAclProvider implements AclProviderInterface, ResetInterface
     /** @var RootAclWrapper[] */
     private $rootAclWrappers = [];
 
-    /**
-     * @param ObjectIdentityFactory                      $objectIdentityFactory
-     * @param SecurityIdentityToStringConverterInterface $sidConverter
-     */
     public function __construct(
         ObjectIdentityFactory $objectIdentityFactory,
         SecurityIdentityToStringConverterInterface $sidConverter
@@ -47,8 +43,6 @@ class RootBasedAclProvider implements AclProviderInterface, ResetInterface
 
     /**
      * Sets Underlying cache.
-     *
-     * @param UnderlyingAclCache $underlyingCache
      */
     public function setUnderlyingCache(UnderlyingAclCache $underlyingCache)
     {
@@ -57,8 +51,6 @@ class RootBasedAclProvider implements AclProviderInterface, ResetInterface
 
     /**
      * Sets the base ACL provider.
-     *
-     * @param AclProviderInterface $provider
      */
     public function setBaseAclProvider(AclProviderInterface $provider)
     {

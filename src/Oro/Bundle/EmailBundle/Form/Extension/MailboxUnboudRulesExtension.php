@@ -19,9 +19,6 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
     /** @var Registry */
     protected $registry;
 
-    /**
-     * @param Registry $registry
-     */
     public function __construct(Registry $registry)
     {
         $this->registry = $registry;

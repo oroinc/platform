@@ -13,10 +13,6 @@ class TitleTranslator
     /** @var ConfigManager */
     protected $userConfigManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigManager       $userConfigManager
-     */
     public function __construct(TranslatorInterface $translator, ConfigManager $userConfigManager)
     {
         $this->translator        = $translator;

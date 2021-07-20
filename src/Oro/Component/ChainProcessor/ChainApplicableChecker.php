@@ -29,8 +29,6 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
 
     /**
      * Adds a checker to the chain
-     *
-     * @param ApplicableCheckerInterface $checker
      */
     public function addChecker(ApplicableCheckerInterface $checker)
     {

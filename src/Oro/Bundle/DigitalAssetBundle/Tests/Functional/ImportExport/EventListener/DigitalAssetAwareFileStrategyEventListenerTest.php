@@ -5,6 +5,8 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\ImportExport\EventListe
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener;
+use Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyEventListener;
+use Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyPersistEventListener;
 use Oro\Bundle\DigitalAssetBundle\Tests\Functional\DataFixtures\LoadUsersAvatarsDigitalAssets;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
@@ -22,15 +24,15 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 {
     use EntityTrait;
 
-    /** @var FileStrategyEventListener|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FileStrategyEventListener */
     private $fileStrategyListener;
 
-    /** @var DigitalAssetAwareFileStrategyEventListenerTest */
+    /** @var DigitalAssetAwareFileStrategyEventListener */
     private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var DigitalAssetAwareFileStrategyPersistEventListener */
+    private $persistListener;
+
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -38,11 +40,15 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $this->loadFixtures([LoadUsersAvatarsDigitalAssets::class]);
 
-        $this->fileStrategyListener = $this->getContainer()
-            ->get('oro_attachment.import_export.event_listener.file_strategy');
-
-        $this->listener = $this->getContainer()
-            ->get('oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_event_listener');
+        $this->fileStrategyListener = $this->getContainer()->get(
+            'oro_attachment.import_export.event_listener.file_strategy'
+        );
+        $this->listener = $this->getContainer()->get(
+            'oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_event_listener'
+        );
+        $this->persistListener = $this->getContainer()->get(
+            'oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_persist_event_listener'
+        );
     }
 
     public function testWhenNoFileFields(): void
@@ -55,11 +61,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->assertEmpty($context->getErrors());
     }
 
-    /**
-     * @param array $itemData
-     *
-     * @return Context
-     */
     private function getContext(array $itemData = []): Context
     {
         $context = new Context([]);
@@ -68,12 +69,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         return $context;
     }
 
-    /**
-     * @param Context $context
-     * @param object $entity
-     *
-     * @return StrategyEvent
-     */
     private function getEvent(Context $context, object $entity): StrategyEvent
     {
         return new StrategyEvent(
@@ -191,14 +186,11 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
-        $this->listener->preFlush($preFlushEventArgs);
+        $this->persistListener->preFlush($preFlushEventArgs);
 
         $this->assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
     }
 
-    /**
-     * @param bool $isEnabled
-     */
     private function toggleDam(bool $isEnabled): void
     {
         $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
@@ -245,7 +237,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
-        $this->listener->preFlush($preFlushEventArgs);
+        $this->persistListener->preFlush($preFlushEventArgs);
 
         $this->assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
     }
@@ -285,7 +277,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
-        $this->listener->preFlush($preFlushEventArgs);
+        $this->persistListener->preFlush($preFlushEventArgs);
 
         $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
     }
@@ -315,7 +307,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->listener->onProcessAfter($event);
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
-        $this->listener->preFlush($preFlushEventArgs);
+        $this->persistListener->preFlush($preFlushEventArgs);
 
         $this->assertNotNull($existingUser->getAvatar());
         $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
@@ -358,7 +350,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->listener->onProcessAfter($event);
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
-        $this->listener->preFlush($preFlushEventArgs);
+        $this->persistListener->preFlush($preFlushEventArgs);
 
         $this->assertNotNull($existingUser->getAvatar());
         $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
@@ -375,9 +367,6 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         );
     }
 
-    /**
-     * @param User $user
-     */
     private function setToken(User $user): void
     {
         $token = new UsernamePasswordOrganizationToken(

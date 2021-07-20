@@ -45,11 +45,6 @@ class NotEmptySortingValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param array $columns
-     *
-     * @return bool
-     */
     private function hasSortingColumn(array $columns): bool
     {
         foreach ($columns as $column) {

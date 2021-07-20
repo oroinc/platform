@@ -31,8 +31,6 @@ class NavigationConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param NodeBuilder $node
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function appendMenuConfig(NodeBuilder $node)
@@ -140,9 +138,6 @@ class NavigationConfiguration implements ConfigurationInterface
         ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendNavigationElements(NodeBuilder $node)
     {
         $node->arrayNode('navigation_elements')
@@ -162,9 +157,6 @@ class NavigationConfiguration implements ConfigurationInterface
         ->end();
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     private function appendTitles(NodeBuilder $node)
     {
         $node->arrayNode('titles')

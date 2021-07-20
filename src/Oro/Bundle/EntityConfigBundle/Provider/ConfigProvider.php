@@ -37,8 +37,6 @@ class ConfigProvider
 
     /**
      * Gets a configuration of the scope this provider works with.
-     *
-     * @return PropertyConfigContainer
      */
     public function getPropertyConfig(): PropertyConfigContainer
     {
@@ -47,8 +45,6 @@ class ConfigProvider
 
     /**
      * Gets the configuration manager.
-     *
-     * @return ConfigManager
      */
     public function getConfigManager(): ConfigManager
     {
@@ -57,12 +53,6 @@ class ConfigProvider
 
     /**
      * Gets an instance of FieldConfigId or EntityConfigId depends on the given parameters.
-     *
-     * @param string|null $className
-     * @param string|null $fieldName
-     * @param string|null $fieldType
-     *
-     * @return ConfigIdInterface
      */
     public function getId(
         string $className = null,
@@ -86,11 +76,6 @@ class ConfigProvider
 
     /**
      * Determines if this provider has configuration data for the given entity or field.
-     *
-     * @param string      $className
-     * @param string|null $fieldName
-     *
-     * @return bool
      */
     public function hasConfig(string $className, string $fieldName = null): bool
     {
@@ -99,10 +84,6 @@ class ConfigProvider
 
     /**
      * Determines if this provider has configuration data for an entity or a field represents the given id.
-     *
-     * @param ConfigIdInterface $configId
-     *
-     * @return bool
      */
     public function hasConfigById(ConfigIdInterface $configId): bool
     {
@@ -115,11 +96,6 @@ class ConfigProvider
 
     /**
      * Gets configuration data for the given entity or field.
-     *
-     * @param string|null $className
-     * @param string|null $fieldName
-     *
-     * @return ConfigInterface
      */
     public function getConfig(string $className = null, string $fieldName = null): ConfigInterface
     {
@@ -140,10 +116,6 @@ class ConfigProvider
 
     /**
      * Gets configuration data for the given entity or field.
-     *
-     * @param ConfigIdInterface $configId
-     *
-     * @return ConfigInterface
      */
     public function getConfigById(ConfigIdInterface $configId): ConfigInterface
     {
@@ -233,8 +205,6 @@ class ConfigProvider
 
     /**
      * Gets the name of the scope this provider works with.
-     *
-     * @return string
      */
     public function getScope(): string
     {

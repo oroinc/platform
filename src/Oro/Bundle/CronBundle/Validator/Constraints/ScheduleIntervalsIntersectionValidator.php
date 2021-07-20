@@ -32,10 +32,6 @@ class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
         $this->validateSchedules($value, $constraint);
     }
 
-    /**
-     * @param ScheduleIntervalInterface $validatedSchedule
-     * @param Constraint                $constraint
-     */
     private function validateSchedules(ScheduleIntervalInterface $validatedSchedule, Constraint $constraint): void
     {
         if (null === $validatedSchedule->getScheduleIntervalsHolder()) {
@@ -78,13 +74,6 @@ class ScheduleIntervalsIntersectionValidator extends ConstraintValidator
     }
 
     /**
-     * @param \DateTimeInterface|null $aLeft
-     * @param \DateTimeInterface|null $aRight
-     * @param \DateTimeInterface|null $bLeft
-     * @param \DateTimeInterface|null $bRight
-     *
-     * @return bool
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function isSegmentsIntersected(

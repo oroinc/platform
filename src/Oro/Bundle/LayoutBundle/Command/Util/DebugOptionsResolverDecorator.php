@@ -17,49 +17,31 @@ class DebugOptionsResolverDecorator
      */
     protected $optionsResolver;
 
-    /**
-     * @param OptionsResolver $optionsResolver
-     */
     public function __construct(OptionsResolver $optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
     }
 
-    /**
-     * @return OptionsResolver
-     */
     public function getOptionResolver(): OptionsResolver
     {
         return $this->optionsResolver;
     }
 
-    /**
-     * @return array
-     */
     public function getDefaultOptions(): array
     {
         return $this->getOptionPropertyValue($this->optionsResolver, 'defaults');
     }
 
-    /**
-     * @return array
-     */
     public function getRequiredOptions(): array
     {
         return $this->getOptionPropertyValue($this->optionsResolver, 'required');
     }
 
-    /**
-     * @return array
-     */
     public function getDefinedOptions(): array
     {
         return array_keys($this->getOptionPropertyValue($this->optionsResolver, 'defined'));
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         $defaultOptions = $this->getDefaultOptions();

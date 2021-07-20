@@ -38,12 +38,6 @@ class ConfigHelperHandler
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
-    /**
-     * @param FormFactoryInterface $formFactory
-     * @param Session $session
-     * @param Router $router
-     * @param ConfigHelper $configHelper
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
         Session $session,

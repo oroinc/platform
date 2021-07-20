@@ -121,9 +121,6 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         return $event->getRecipients();
     }
 
-    /**
-     * @param array $recipients
-     */
     protected function removeDisabledUsers(array &$recipients)
     {
         foreach ($recipients as $key => $recipient) {

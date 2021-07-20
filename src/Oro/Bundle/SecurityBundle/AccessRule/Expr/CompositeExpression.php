@@ -18,10 +18,6 @@ class CompositeExpression implements ExpressionInterface
     /** @var ExpressionInterface[]  */
     private $expressions = [];
 
-    /**
-     * @param string $type
-     * @param array  $expressions
-     */
     public function __construct(string $type, array $expressions)
     {
         $this->type = $type;
@@ -43,8 +39,6 @@ class CompositeExpression implements ExpressionInterface
 
     /**
      * Returns the composite type (AND or OR).
-     *
-     * @return string
      */
     public function getType(): string
     {

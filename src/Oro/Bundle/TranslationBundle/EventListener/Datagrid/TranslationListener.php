@@ -12,17 +12,11 @@ class TranslationListener
     /** @var LanguageProvider */
     protected $provider;
 
-    /**
-     * @param LanguageProvider $provider
-     */
     public function __construct(LanguageProvider $provider)
     {
         $this->provider = $provider;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $datagrid = $event->getDatagrid();

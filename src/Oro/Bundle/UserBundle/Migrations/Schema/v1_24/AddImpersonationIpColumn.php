@@ -19,7 +19,6 @@ class AddImpersonationIpColumn implements Migration
     /**
      * Add ip_address to Impersonation
      *
-     * @param Schema $schema
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addColumn(Schema $schema)

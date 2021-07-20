@@ -131,10 +131,6 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $listener($event);
     }
 
-    /**
-     * @param OrigRememberMeListener $innerListener
-     * @return RememberMeListener
-     */
     private function getListener(OrigRememberMeListener $innerListener): RememberMeListener
     {
         $sessionMock = $this->createMock(SessionInterface::class);

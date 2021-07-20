@@ -23,10 +23,6 @@ class MassEmailDirectMailer extends \Swift_Mailer
      */
     private $eventDispatcher;
 
-    /**
-     * @param DirectMailer $directMailer
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         DirectMailer $directMailer,
         EventDispatcherInterface $eventDispatcher
@@ -56,9 +52,6 @@ class MassEmailDirectMailer extends \Swift_Mailer
         return $result;
     }
 
-    /**
-     * @param \Swift_Events_EventListener $plugin
-     */
     public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
         $this->directMailer->registerPlugin($plugin);

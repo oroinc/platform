@@ -30,9 +30,6 @@ class EmailRendererTest extends WebTestCase
     }
 
     /**
-     * @param $variable
-     * @param $expected
-     *
      * @dataProvider variablesDataProvider
      */
     public function testVariables($variable, $expected)
@@ -45,9 +42,6 @@ class EmailRendererTest extends WebTestCase
         $this->assertEquals($expected, $data);
     }
 
-    /**
-     * @return array
-     */
     public function variablesDataProvider(): array
     {
         return [
@@ -134,9 +128,6 @@ class EmailRendererTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return TestActivity
-     */
     private function createTestEntity(): TestActivity
     {
         $org = new Organization();
@@ -156,11 +147,6 @@ class EmailRendererTest extends WebTestCase
         return $testEntity;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityManagerInterface
-     */
     private function getEntityManager(string $entityClass): EntityManagerInterface
     {
         return self::getContainer()->get('doctrine')->getManagerForClass($entityClass);

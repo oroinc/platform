@@ -39,8 +39,6 @@ class OroTagBundleInstaller implements Installation
 
     /**
      * Create oro_tag_tagging table
-     *
-     * @param Schema $schema
      */
     protected function createOroTagTaggingTable(Schema $schema)
     {
@@ -60,8 +58,6 @@ class OroTagBundleInstaller implements Installation
 
     /**
      * Create oro_tag_tag table
-     *
-     * @param Schema $schema
      */
     protected function createOroTagTagTable(Schema $schema)
     {
@@ -80,8 +76,6 @@ class OroTagBundleInstaller implements Installation
 
     /**
      * Add oro_tag_tagging foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroTagTaggingForeignKeys(Schema $schema)
     {
@@ -102,8 +96,6 @@ class OroTagBundleInstaller implements Installation
 
     /**
      * Add oro_tag_tag foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroTagTagForeignKeys(Schema $schema)
     {
@@ -122,9 +114,6 @@ class OroTagBundleInstaller implements Installation
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addTaxonomy(Schema $schema)
     {
         /** Generate table oro_tag_tag **/
@@ -155,8 +144,6 @@ class OroTagBundleInstaller implements Installation
 
     /**
      * Add oro_tag_taxonomy foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroTaxonomyForeignKeys(Schema $schema)
     {

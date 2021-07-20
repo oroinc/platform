@@ -26,10 +26,6 @@ class Traverse extends AbstractAction
      */
     protected $configurableAction;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param Configurable $configurableAction
-     */
     public function __construct(ContextAccessor $contextAccessor, Configurable $configurableAction)
     {
         parent::__construct($contextAccessor);

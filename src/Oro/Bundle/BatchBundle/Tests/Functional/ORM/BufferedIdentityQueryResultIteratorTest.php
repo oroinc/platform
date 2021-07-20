@@ -352,8 +352,6 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     /**
      * Asserts 2 datasets are equal
-     *
-     * @param QueryBuilder $queryBuilder
      */
     private function assertSameResult(QueryBuilder $queryBuilder)
     {
@@ -372,8 +370,6 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     /**
      * Asserts 2 datasets are equal by comparing only result IDs without taking into account results order.
-     *
-     * @param QueryBuilder $queryBuilder
      */
     private function assertSameByIdWithoutOrder(QueryBuilder $queryBuilder)
     {

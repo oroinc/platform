@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 
+/**
+ * Chain of batch jobs writers.
+ */
 class WriterChain
 {
     /**
@@ -16,10 +19,6 @@ class WriterChain
         $this->writers = [];
     }
 
-    /**
-     * @param ItemWriterInterface $writer
-     * @param $alias
-     */
     public function addWriter(ItemWriterInterface $writer, $alias)
     {
         $this->writers[$alias] = $writer;

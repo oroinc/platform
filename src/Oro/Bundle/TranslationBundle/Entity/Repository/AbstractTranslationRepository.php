@@ -10,12 +10,6 @@ use Gedmo\Translatable\Entity\Repository\TranslationRepository;
  */
 abstract class AbstractTranslationRepository extends TranslationRepository
 {
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param array $data
-     * @param string $locale
-     */
     protected function doUpdateTranslations(string $className, string $fieldName, array $data, string $locale)
     {
         if (!$data) {

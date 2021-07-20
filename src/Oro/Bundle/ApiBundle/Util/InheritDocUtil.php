@@ -16,10 +16,6 @@ class InheritDocUtil
 
     /**
      * Checks whether the given string contains the inheritdoc placeholder.
-     *
-     * @param string|null $text
-     *
-     * @return bool
      */
     public static function hasInheritDoc(?string $text): bool
     {
@@ -28,11 +24,6 @@ class InheritDocUtil
 
     /**
      * Replaces the inheritdoc placeholder in $text with $inheritText.
-     *
-     * @param string      $text
-     * @param string|null $inheritText
-     *
-     * @return string
      */
     public static function replaceInheritDoc(string $text, ?string $inheritText): string
     {
@@ -41,10 +32,6 @@ class InheritDocUtil
 
     /**
      * Checks whether the given string contains the placeholder for the entity or field description.
-     *
-     * @param string|null $text
-     *
-     * @return bool
      */
     public static function hasDescriptionInheritDoc(?string $text): bool
     {
@@ -53,11 +40,6 @@ class InheritDocUtil
 
     /**
      * Replaces the placeholder for the entity or field description inheritdoc in $text with $inheritText.
-     *
-     * @param string      $text
-     * @param string|null $inheritText
-     *
-     * @return string
      */
     public static function replaceDescriptionInheritDoc(string $text, ?string $inheritText): string
     {
@@ -66,12 +48,6 @@ class InheritDocUtil
 
     /**
      * Replaces the given inheritdoc placeholder in $text with $inheritText.
-     *
-     * @param string      $placeholder
-     * @param string      $text
-     * @param string|null $inheritText
-     *
-     * @return string
      */
     private static function doReplaceInheritDoc(string $placeholder, string $text, ?string $inheritText): string
     {
@@ -95,21 +71,11 @@ class InheritDocUtil
         return str_replace($placeholder, $inheritText, $text);
     }
 
-    /**
-     * @param string $text
-     *
-     * @return bool
-     */
     private static function hasParagraphTag(string $text): bool
     {
         return false !== strpos($text, '<p>');
     }
 
-    /**
-     * @param string $text
-     *
-     * @return bool
-     */
     private static function isEnclosedByParagraphTag(string $text): bool
     {
         if (\strlen($text) < 7 || false === strpos($text, '</p>', -4) || 0 !== strncmp($text, '<p>', 3)) {
@@ -119,11 +85,6 @@ class InheritDocUtil
         return false === strpos($text, '<p>', 3);
     }
 
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
     private static function removeEnclosedParagraphTag(string $text): string
     {
         return substr($text, 3, -4);

@@ -19,13 +19,6 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
     /** @var IncludedEntityCollection|null */
     protected $includedEntities;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param EntityLoader                  $entityLoader
-     * @param AssociationMetadata           $metadata
-     * @param EntityMapper|null             $entityMapper
-     * @param IncludedEntityCollection|null $includedEntities
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,

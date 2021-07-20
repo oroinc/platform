@@ -32,11 +32,6 @@ class AvailableReferencesController implements Controller
      */
     protected $kernel;
 
-    /**
-     * @param AliceFixtureLoader $aliceLoader
-     * @param DoctrineIsolator $doctrineIsolator
-     * @param KernelInterface $kernel
-     */
     public function __construct(
         AliceFixtureLoader $aliceLoader,
         DoctrineIsolator $doctrineIsolator,

@@ -34,11 +34,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @param ManagerRegistry        $registry
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param ServiceLink            $metadataProviderLink
-     */
     public function __construct(
         ManagerRegistry $registry,
         TokenAccessorInterface $tokenAccessor,
@@ -60,9 +55,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit'], 128);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSubmit(FormEvent $event)
     {
         $data = $event->getForm()->getData();

@@ -32,10 +32,6 @@ class AddMasterRequestRouteListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($route, $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
     }
 
-    /**
-     * @param string $route
-     * @return RequestEvent
-     */
     protected function createMasterRequestEvent(string $route): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);

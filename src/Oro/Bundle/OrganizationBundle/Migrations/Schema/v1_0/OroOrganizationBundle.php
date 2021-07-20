@@ -21,8 +21,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Generate table oro_organization
-     *
-     * @param Schema $schema
      */
     public static function oroOrganizationTable(Schema $schema)
     {
@@ -36,8 +34,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Generate table oro_business_unit
-     *
-     * @param Schema $schema
      */
     public static function oroBusinessUnitTable(Schema $schema)
     {
@@ -61,8 +57,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_business_unit
-     *
-     * @param Schema $schema
      */
     public static function oroBusinessUnitForeignKeys(Schema $schema)
     {

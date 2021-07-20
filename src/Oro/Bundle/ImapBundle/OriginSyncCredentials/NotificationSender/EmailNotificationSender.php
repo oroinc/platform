@@ -23,10 +23,6 @@ class EmailNotificationSender implements NotificationSenderInterface
      */
     private $emailTemplateManager;
 
-    /**
-     * @param NotificationSettings $notificationSettingsModel
-     * @param EmailTemplateManager $emailTemplateManager
-     */
     public function __construct(
         NotificationSettings $notificationSettingsModel,
         EmailTemplateManager $emailTemplateManager

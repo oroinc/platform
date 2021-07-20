@@ -31,10 +31,6 @@ class CommandRunnerProcessor implements
     /** @var CommandRunnerInterface */
     private $commandRunner;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param CommandRunnerInterface $commandRunner
-     */
     public function __construct(JobRunner $jobRunner, CommandRunnerInterface $commandRunner)
     {
         $this->jobRunner = $jobRunner;

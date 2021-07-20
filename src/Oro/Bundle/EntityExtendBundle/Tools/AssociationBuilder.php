@@ -22,11 +22,6 @@ class AssociationBuilder
     /** @var RelationBuilder */
     protected $relationBuilder;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param ConfigManager   $configManager
-     * @param RelationBuilder $relationBuilder
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         ConfigManager $configManager,

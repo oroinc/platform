@@ -10,11 +10,6 @@ use Symfony\Component\Process\Process;
  */
 class NodeJsVersionChecker
 {
-    /**
-     * @param string $nodeJsExecutable
-     * @param string $constraints
-     * @return bool
-     */
     public static function satisfies(string $nodeJsExecutable, string $constraints): bool
     {
         $process = new Process([$nodeJsExecutable, '-v']);

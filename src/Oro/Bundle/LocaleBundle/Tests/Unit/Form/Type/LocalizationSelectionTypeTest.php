@@ -115,9 +115,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         $this->assertEquals($isValid, $form->isSynchronized());
     }
 
-    /**
-     * @return array
-     */
     public function submitFormDataProvider(): array
     {
         return [
@@ -134,9 +131,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider finishViewProvider
-     *
-     * @param null|array $enabledLocalizations
-     * @param array $expected
      */
     public function testFinishView(?array $enabledLocalizations, array $expected): void
     {
@@ -166,9 +160,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function finishViewProvider(): array
     {
         return [

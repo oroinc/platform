@@ -18,10 +18,6 @@ class ResourceFileImportProcessorFactory implements ImportProcessorFactoryInterf
     /** @var FileLocatorInterface */
     private $fileLocator;
 
-    /**
-     * @param ConfigFileReaderInterface $reader
-     * @param FileLocatorInterface $fileLocator
-     */
     public function __construct(ConfigFileReaderInterface $reader, FileLocatorInterface $fileLocator)
     {
         $this->reader = $reader;

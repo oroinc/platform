@@ -153,8 +153,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_email table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserEmailTable(Schema $schema)
     {
@@ -168,8 +166,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_api table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserApiTable(Schema $schema)
     {
@@ -186,8 +182,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserTable(Schema $schema)
     {
@@ -237,8 +231,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_access_role table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserAccessRoleTable(Schema $schema)
     {
@@ -252,8 +244,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_access_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserAccessGroupTable(Schema $schema)
     {
@@ -267,8 +257,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_business_unit table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserBusinessUnitTable(Schema $schema)
     {
@@ -282,8 +270,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_access_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroAccessGroupTable(Schema $schema)
     {
@@ -296,8 +282,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_access_group_role table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserAccessGroupRoleTable(Schema $schema)
     {
@@ -311,8 +295,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_access_role table
-     *
-     * @param Schema $schema
      */
     protected function createOroAccessRoleTable(Schema $schema)
     {
@@ -340,8 +322,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_status table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserStatusTable(Schema $schema)
     {
@@ -356,8 +336,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_email foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserEmailForeignKeys(Schema $schema)
     {
@@ -372,8 +350,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_api foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserApiForeignKeys(Schema $schema)
     {
@@ -394,8 +370,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserForeignKeys(Schema $schema)
     {
@@ -416,8 +390,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_access_role foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserAccessRoleForeignKeys(Schema $schema)
     {
@@ -438,8 +410,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_access_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserAccessGroupForeignKeys(Schema $schema)
     {
@@ -460,8 +430,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_business_unit foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserBusinessUnitForeignKeys(Schema $schema)
     {
@@ -482,8 +450,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_access_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAccessGroupForeignKeys(Schema $schema)
     {
@@ -498,8 +464,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_access_group_role foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserAccessGroupRoleForeignKeys(Schema $schema)
     {
@@ -520,8 +484,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_status foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserStatusForeignKeys(Schema $schema)
     {
@@ -534,9 +496,6 @@ class OroUserBundleInstaller implements
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addOroAccessGroupIndexes(Schema $schema)
     {
         $table = $schema->getTable('oro_access_group');
@@ -544,9 +503,6 @@ class OroUserBundleInstaller implements
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addRelationsToScope(Schema $schema)
     {
         if ($schema->hasTable('oro_scope')) {
@@ -569,9 +525,6 @@ class OroUserBundleInstaller implements
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function updateOroEmailUserTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

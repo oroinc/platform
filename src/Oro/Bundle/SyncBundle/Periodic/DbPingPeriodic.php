@@ -23,10 +23,6 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
     /** @var int */
     private $timeout;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param int $timeout
-     */
     public function __construct(ManagerRegistry $doctrine, int $timeout = 20)
     {
         $this->doctrine = $doctrine;

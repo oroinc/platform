@@ -44,9 +44,6 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -309,7 +306,6 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     {
         return self::NAME;
     }
-
 
     /**
      * @param $route

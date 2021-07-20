@@ -16,9 +16,6 @@ class PhpArrayConfigCacheModifier
     /** @var PhpArrayConfigProvider */
     private $provider;
 
-    /**
-     * @param PhpArrayConfigProvider $provider
-     */
     public function __construct(PhpArrayConfigProvider $provider)
     {
         $this->provider = $provider;
@@ -29,9 +26,6 @@ class PhpArrayConfigCacheModifier
         $this->provider->warmUpCache();
     }
 
-    /**
-     * @param array $configuration
-     */
     public function updateCache(array $configuration)
     {
         $cacheFile = $this->getProviderPrivateProperty('cacheFile')->getValue($this->provider);
@@ -42,11 +36,6 @@ class PhpArrayConfigCacheModifier
         $this->getProviderPrivateProperty('config')->setValue($this->provider, null);
     }
 
-    /**
-     * @param string $propertyName
-     *
-     * @return \ReflectionProperty
-     */
     private function getProviderPrivateProperty(string $propertyName): \ReflectionProperty
     {
         $property = ReflectionUtil::getProperty(new \ReflectionClass($this->provider), $propertyName);

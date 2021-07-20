@@ -35,9 +35,6 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @param FieldHelper $fieldHelper
-     */
     public function __construct(FieldHelper $fieldHelper)
     {
         $this->fieldHelper = $fieldHelper;
@@ -45,17 +42,11 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         parent::__construct([self::FULL_MODE, self::SHORT_MODE], self::FULL_MODE);
     }
 
-    /**
-     * @param DenormalizerInterface $scalarFieldDenormalizer
-     */
     public function setScalarFieldDenormalizer(DenormalizerInterface $scalarFieldDenormalizer)
     {
         $this->scalarFieldDenormalizer = $scalarFieldDenormalizer;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

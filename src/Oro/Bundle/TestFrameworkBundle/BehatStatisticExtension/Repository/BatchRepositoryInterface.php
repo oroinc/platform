@@ -8,7 +8,6 @@ interface BatchRepositoryInterface
 {
     /**
      * Add Model to collection
-     * @param StatisticModelInterface $model
      */
     public function add(StatisticModelInterface $model);
 

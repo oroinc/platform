@@ -77,9 +77,6 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider configureOptionsDataProvider
-     *
-     * @param bool $groupingUsed
-     * @param array $expectedOptions
      */
     public function testConfigureOptions(bool $groupingUsed, array $expectedOptions)
     {
@@ -96,9 +93,6 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
         self::assertEquals($expectedOptions, $options);
     }
 
-    /**
-     * @return array
-     */
     public function configureOptionsDataProvider(): array
     {
         return [

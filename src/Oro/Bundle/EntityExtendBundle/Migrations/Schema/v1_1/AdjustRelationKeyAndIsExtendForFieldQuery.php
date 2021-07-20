@@ -19,9 +19,6 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param FieldTypeHelper $fieldTypeHelper
-     */
     public function __construct(FieldTypeHelper $fieldTypeHelper)
     {
         $this->fieldTypeHelper = $fieldTypeHelper;

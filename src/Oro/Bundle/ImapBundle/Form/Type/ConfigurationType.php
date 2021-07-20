@@ -44,11 +44,6 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param SymmetricCrypterInterface $encryptor
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         SymmetricCrypterInterface $encryptor,
         TokenAccessorInterface $tokenAccessor,
@@ -160,9 +155,6 @@ class ConfigurationType extends AbstractType
             ]);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
     {
         $encryptor = $this->encryptor;
@@ -196,7 +188,6 @@ class ConfigurationType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
@@ -245,9 +236,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addOwnerOrganizationEventListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -272,9 +260,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function modifySettingsFields(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -306,9 +291,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function finalDataCleaner(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -332,9 +314,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     public function addEnableSMTPImapListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(

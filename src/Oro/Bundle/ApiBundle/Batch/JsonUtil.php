@@ -8,11 +8,6 @@ namespace Oro\Bundle\ApiBundle\Batch;
 class JsonUtil
 {
     /**
-     * @param array $data
-     * @param bool  $prettyPrint
-     *
-     * @return string
-     *
      * @throws \JsonException if an error occurs
      */
     public static function encode(array $data, bool $prettyPrint = false): string
@@ -21,10 +16,6 @@ class JsonUtil
     }
 
     /**
-     * @param string $str
-     *
-     * @return array
-     *
      * @throws \JsonException if an error occurs
      */
     public static function decode(string $str): array

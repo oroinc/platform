@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\DBAL\Exception\DeadlockException;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -29,11 +30,11 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -41,11 +42,11 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManager')
             ->will($this->returnValue($this->entityManager));
 
-        $this->detachFixer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer')
+        $this->detachFixer = $this->getMockBuilder(EntityDetachFixer::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
         $this->writer = new EntityWriter(
             $this->doctrineHelper,
@@ -76,11 +77,11 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->method('flush');
 
         /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue($configuration));
@@ -116,7 +117,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new \Exception());
 
         /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -155,7 +156,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
 
         /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -184,11 +185,11 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('entityName not resolved');
 
         /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue([]));
@@ -205,14 +206,14 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
     public function testClassResolvedOnce()
     {
         /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue(['entityName' => '\stdClass']));
+            ->will($this->returnValue(['entityName' => \stdClass::class]));
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
@@ -235,7 +236,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             'no clear flag'    => [[]],
             'clear flag false' => [[EntityWriter::SKIP_CLEAR => false]],
             'clear flag true'  => [[EntityWriter::SKIP_CLEAR => true]],
-            'className from config'  => [[EntityWriter::SKIP_CLEAR => true, 'entityName' => '\stdClass']],
+            'className from config'  => [[EntityWriter::SKIP_CLEAR => true, 'entityName' => \stdClass::class]],
         ];
     }
 }

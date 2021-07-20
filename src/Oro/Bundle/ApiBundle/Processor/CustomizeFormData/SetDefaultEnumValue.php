@@ -29,13 +29,6 @@ class SetDefaultEnumValue implements ProcessorInterface
     /** @var string */
     private $enumCode;
 
-    /**
-     * @param EnumValueProvider         $enumValueProvider
-     * @param DoctrineHelper            $doctrineHelper
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param string                    $enumFieldName
-     * @param string                    $enumCode
-     */
     public function __construct(
         EnumValueProvider $enumValueProvider,
         DoctrineHelper $doctrineHelper,

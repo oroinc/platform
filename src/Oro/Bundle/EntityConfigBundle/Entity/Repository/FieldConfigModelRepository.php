@@ -71,10 +71,6 @@ class FieldConfigModelRepository extends EntityRepository
         return $attributes;
     }
 
-    /**
-     * @param string $className
-     * @return QueryBuilder
-     */
     public function getActiveAttributesByClassQueryBuilder(string $className): QueryBuilder
     {
         $queryBuilder = $this->getBaseAttributeQueryBuilderByClass($className)
@@ -123,7 +119,7 @@ class FieldConfigModelRepository extends EntityRepository
         $queryBuilder = $this->getBaseAttributeQueryBuilder()
             ->andWhere('f.id IN (:ids)')
             ->setParameter('ids', $ids);
-        
+
         return $queryBuilder;
     }
 

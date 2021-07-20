@@ -23,11 +23,6 @@ trait TaggedServicesCompilerPassTrait
     use TaggedServiceTrait;
 
     /**
-     * @param ContainerBuilder $container
-     * @param string $serviceId
-     * @param string $tagName
-     * @param string $addMethodName
-     *
      * @deprecated use "!tagged_iterator tag_name" for new tags
      */
     private function registerTaggedServices(

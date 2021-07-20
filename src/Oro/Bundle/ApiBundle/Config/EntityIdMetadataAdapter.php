@@ -15,10 +15,6 @@ class EntityIdMetadataAdapter implements EntityIdMetadataInterface
     /** @var EntityDefinitionConfig */
     private $config;
 
-    /**
-     * @param string                 $className
-     * @param EntityDefinitionConfig $config
-     */
     public function __construct(string $className, EntityDefinitionConfig $config)
     {
         $this->className = $className;

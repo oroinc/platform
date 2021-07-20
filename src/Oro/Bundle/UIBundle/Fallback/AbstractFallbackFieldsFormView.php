@@ -29,11 +29,6 @@ abstract class AbstractFallbackFieldsFormView
      */
     protected $translator;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param ManagerRegistry $doctrine
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
@@ -114,13 +109,6 @@ abstract class AbstractFallbackFieldsFormView
         return $em->getReference($entityPath, $entityId);
     }
 
-    /**
-     * @param ScrollData $scrollData
-     * @param $sectionTitle
-     * @param $blockId
-     * @param $subBlockId
-     * @param $template
-     */
     protected function addBlockWithSectionTitle(
         ScrollData $scrollData,
         $sectionTitle,

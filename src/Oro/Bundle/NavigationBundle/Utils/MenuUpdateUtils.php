@@ -73,11 +73,6 @@ class MenuUpdateUtils
 
     /**
      * Apply changes from menu update to menu item
-     *
-     * @param MenuUpdateInterface $update
-     * @param ItemInterface $menu
-     * @param LocalizationHelper $localizationHelper
-     * @param array $options
      */
     public static function updateMenuItem(
         MenuUpdateInterface $update,

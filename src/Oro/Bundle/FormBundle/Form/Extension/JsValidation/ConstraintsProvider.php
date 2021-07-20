@@ -21,10 +21,6 @@ class ConstraintsProvider implements ConstraintsProviderInterface
     /** @var array */
     private $metadataConstraintsCache;
 
-    /**
-     * @param MetadataFactoryInterface     $metadataFactory
-     * @param ConstraintConverterInterface $constraintConverter
-     */
     public function __construct(
         MetadataFactoryInterface $metadataFactory,
         ConstraintConverterInterface $constraintConverter

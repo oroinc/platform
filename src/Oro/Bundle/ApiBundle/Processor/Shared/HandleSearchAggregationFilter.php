@@ -17,9 +17,6 @@ class HandleSearchAggregationFilter implements ProcessorInterface
     /** @var string */
     private $aggregationFilterName;
 
-    /**
-     * @param string $aggregationFilterName
-     */
     public function __construct(string $aggregationFilterName = 'aggregations')
     {
         $this->aggregationFilterName = $aggregationFilterName;

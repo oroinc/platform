@@ -23,11 +23,6 @@ class EmailTemplateManager
     /** @var LocalizedTemplateProvider */
     private $localizedTemplateProvider;
 
-    /**
-     * @param \Swift_Mailer $mailer
-     * @param Processor $mailerProcessor
-     * @param LocalizedTemplateProvider $localizedTemplateProvider
-     */
     public function __construct(
         \Swift_Mailer $mailer,
         Processor $mailerProcessor,

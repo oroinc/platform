@@ -25,10 +25,6 @@ class DraftableFilterExtension extends AbstractExtension
     /** @var string|null */
     private $className;
 
-    /**
-     * @param DraftableFilterManager $filterManager
-     * @param DraftAccessRule $draftAccessRule
-     */
     public function __construct(
         DraftableFilterManager $filterManager,
         DraftAccessRule $draftAccessRule

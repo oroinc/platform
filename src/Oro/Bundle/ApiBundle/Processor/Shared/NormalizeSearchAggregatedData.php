@@ -21,10 +21,6 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
     /** @var string */
     private $aggregationFilterName;
 
-    /**
-     * @param ValueTransformer $valueTransformer
-     * @param string           $aggregationFilterName
-     */
     public function __construct(
         ValueTransformer $valueTransformer,
         string $aggregationFilterName = 'aggregations'
@@ -61,13 +57,6 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $aggregatedData
-     * @param array $dataTypes
-     * @param array $normalizationContext
-     *
-     * @return array
-     */
     private function normalizeAggregatedData(
         array $aggregatedData,
         array $dataTypes,

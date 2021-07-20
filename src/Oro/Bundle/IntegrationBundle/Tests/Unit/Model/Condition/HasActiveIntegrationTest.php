@@ -25,7 +25,6 @@ class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider failingOptionsDataProvider
-     * @param array $options
      */
     public function testInitializeException(array $options)
     {

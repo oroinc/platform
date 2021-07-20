@@ -8,10 +8,6 @@ use Oro\Bundle\NavigationBundle\Entity\AbstractPinbarTab;
 
 class PinbarPostPersist
 {
-    /**
-     * @param $pinbarTab
-     * @param LifecycleEventArgs $args
-     */
     public function postPersist(AbstractPinbarTab $pinbarTab, LifecycleEventArgs $args)
     {
         /** @var $repo \Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository */

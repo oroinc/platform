@@ -61,17 +61,6 @@ class EmailRecipientsHelper
     /** @var EmailAddressHelper */
     protected $addressHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     * @param DQLNameFormatter $dqlNameFormatter
-     * @param NameFormatter $nameFormatter
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param Registry $registry
-     * @param EmailAddressHelper $addressHelper
-     * @param Indexer $search
-     */
     public function __construct(
         AclHelper $aclHelper,
         DQLNameFormatter $dqlNameFormatter,

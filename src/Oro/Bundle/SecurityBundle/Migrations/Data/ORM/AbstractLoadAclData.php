@@ -34,9 +34,6 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
         return [LoadRolesData::class];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */
@@ -103,7 +100,6 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
      *         permissions:
      *             entity|Some\Bundle\Entity\Name: [VIEW_SYSTEM, CREATE_SYSTEM, ...]
      *             action|some_acl_capability: [EXECUTE]
-     *
      *
      * @return array
      */

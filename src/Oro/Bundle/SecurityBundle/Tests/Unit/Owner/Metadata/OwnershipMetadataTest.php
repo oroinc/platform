@@ -101,8 +101,6 @@ class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $arguments
-     * @param array $levels
      * @dataProvider getAccessLevelNamesDataProvider
      */
     public function testGetAccessLevelNames(array $arguments, array $levels)

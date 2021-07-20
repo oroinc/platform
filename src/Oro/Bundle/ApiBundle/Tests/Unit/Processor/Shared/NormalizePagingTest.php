@@ -9,11 +9,6 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizePagingTest extends GetListProcessorTestCase
 {
-    /**
-     * @param int $maxEntitiesLimit
-     *
-     * @return NormalizePaging
-     */
     private function getProcessor(int $maxEntitiesLimit): NormalizePaging
     {
         return new NormalizePaging($maxEntitiesLimit);

@@ -77,8 +77,6 @@ class EmailNotificationControllerTest extends WebTestCase
 
     /**
      * @depends testCreate
-     *
-     * @param $id
      */
     public function testDelete($id)
     {

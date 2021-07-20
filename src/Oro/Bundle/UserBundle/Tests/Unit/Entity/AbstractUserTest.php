@@ -227,9 +227,6 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider provider
-     *
-     * @param string $property
-     * @param mixed $value
      */
     public function testSettersAndGetters(string $property, mixed $value): void
     {

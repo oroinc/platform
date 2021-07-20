@@ -52,9 +52,6 @@ class FileItem extends ExtendFileItem implements EmptyItem
      */
     protected $sortOrder = 0;
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return (string)$this->getId();
@@ -68,9 +65,6 @@ class FileItem extends ExtendFileItem implements EmptyItem
         return null === $this->getFile();
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
@@ -87,17 +81,11 @@ class FileItem extends ExtendFileItem implements EmptyItem
         return $this;
     }
 
-    /**
-     * @return File|null
-     */
     public function getFile(): ?File
     {
         return $this->file;
     }
 
-    /**
-     * @return int|null
-     */
     public function getSortOrder(): ?int
     {
         return $this->sortOrder;

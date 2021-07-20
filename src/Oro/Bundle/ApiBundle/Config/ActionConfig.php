@@ -464,8 +464,6 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Adds a validation constraint to the form options.
-     *
-     * @param Constraint $constraint
      */
     public function addFormConstraint(Constraint $constraint)
     {
@@ -752,8 +750,6 @@ class ActionConfig implements ConfigBagInterface
 
     /**
      * Sets response status codes.
-     *
-     * @param StatusCodesConfig|null $statusCodes
      */
     public function setStatusCodes(StatusCodesConfig $statusCodes = null)
     {

@@ -106,9 +106,6 @@ class EntityCacheWarmer extends CacheWarmer
 
     /**
      * Create a proxy class for EmailAddress entity and save it in cache
-     *
-     * @param Filesystem        $fs
-     * @param Environment $twig
      */
     protected function processEmailAddressTemplate(Filesystem $fs, Environment $twig)
     {

@@ -19,10 +19,6 @@ class ImpersonationSearchHandler implements SearchHandlerInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(DoctrineHelper $doctrineHelper, TranslatorInterface $translator)
     {
         $this->doctrineHelper = $doctrineHelper;

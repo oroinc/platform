@@ -29,12 +29,6 @@ class EmailTemplateHandler
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack $requestStack
-     * @param ObjectManager $manager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,

@@ -5,6 +5,9 @@ namespace Oro\Bundle\SyncBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Adds FQCN of entities which should be skipped from content update tracking.
+ */
 class SkipTagTrackingPass implements CompilerPassInterface
 {
     const SERVICE_ID = 'oro_sync.event_listener.doctrine_tag';
@@ -20,8 +23,8 @@ class SkipTagTrackingPass implements CompilerPassInterface
         'Oro\Bundle\SearchBundle\Entity\IndexInteger',
         'Oro\Bundle\SearchBundle\Entity\IndexDecimal',
         'Oro\Bundle\SearchBundle\Entity\IndexDatetime',
-        'Akeneo\Bundle\BatchBundle\Entity\JobExecution',
-        'Akeneo\Bundle\BatchBundle\Entity\StepExecution',
+        'Oro\Bundle\BatchBundle\Entity\JobExecution',
+        'Oro\Bundle\BatchBundle\Entity\StepExecution',
         'Oro\Bundle\MessageQueueBundle\Entity\Job',
     ];
 

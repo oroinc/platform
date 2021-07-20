@@ -47,7 +47,6 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->action, $this->action->initialize([]));
     }
 
-
     public function testInitializeAttributeWrongException()
     {
         $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);

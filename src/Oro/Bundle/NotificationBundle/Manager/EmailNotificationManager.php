@@ -26,10 +26,6 @@ class EmailNotificationManager
 
     /**
      * EmailNotificationManager constructor.
-     *
-     * @param EmailNotificationSender $emailNotificationSender
-     * @param LoggerInterface $logger
-     * @param LocalizedTemplateProvider $localizedTemplateProvider
      */
     public function __construct(
         EmailNotificationSender $emailNotificationSender,
@@ -71,9 +67,6 @@ class EmailNotificationManager
     }
 
     /**
-     * @param TemplateEmailNotificationInterface $notification
-     * @param array $params
-     * @param LoggerInterface|null $logger
      * @throws NotificationSendException
      */
     public function processSingle(

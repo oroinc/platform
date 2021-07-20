@@ -47,13 +47,6 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
      */
     private $logger;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param TokenStorageInterface $tokenStorage
-     * @param SyncProcessorRegistry $syncProcessorRegistry
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger;
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         TokenStorageInterface $tokenStorage,

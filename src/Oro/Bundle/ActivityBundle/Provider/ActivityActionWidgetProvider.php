@@ -18,10 +18,6 @@ class ActivityActionWidgetProvider implements WidgetProviderInterface
     /** @var PlaceholderProvider */
     protected $placeholderProvider;
 
-    /**
-     * @param ActivityManager     $activityManager
-     * @param PlaceholderProvider $placeholderProvider
-     */
     public function __construct(
         ActivityManager $activityManager,
         PlaceholderProvider $placeholderProvider

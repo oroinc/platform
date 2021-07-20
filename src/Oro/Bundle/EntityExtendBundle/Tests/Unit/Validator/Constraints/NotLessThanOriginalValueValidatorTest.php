@@ -19,11 +19,6 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @param int $id
-     *
-     * @return FieldConfigModel
-     */
     private function getModel(int $id): FieldConfigModel
     {
         $model = new FieldConfigModel();
@@ -52,9 +47,6 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         return parent::createContext();
     }
 
-    /**
-     * @return MockObject
-     */
     protected function getFormStub(array $config): MockObject
     {
         $formConfig = new FormConfigBuilder(null, null, $this->createMock(EventDispatcherInterface::class), $config);

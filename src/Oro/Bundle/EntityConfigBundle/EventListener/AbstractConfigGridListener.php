@@ -38,24 +38,14 @@ abstract class AbstractConfigGridListener
     /** @var SystemAwareResolver */
     protected $datagridResolver;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param SystemAwareResolver $datagridResolver
-     */
     public function __construct(ConfigManager $configManager, SystemAwareResolver $datagridResolver)
     {
         $this->configManager    = $configManager;
         $this->datagridResolver = $datagridResolver;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     abstract public function onBuildAfter(BuildAfter $event);
 
-    /**
-     * @param BuildBefore $event
-     */
     abstract public function onBuildBefore(BuildBefore $event);
 
     /**
@@ -233,10 +223,6 @@ abstract class AbstractConfigGridListener
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param                       $itemType
-     */
     protected function addEntityConfigProperties(DatagridConfiguration $config, $itemType)
     {
         // configure properties from config providers

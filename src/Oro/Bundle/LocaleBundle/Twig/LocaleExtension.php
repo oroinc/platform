@@ -27,17 +27,11 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * @return LocaleSettings
-     */
     protected function getLocaleSettings(): LocaleSettings
     {
         return $this->container->get(LocaleSettings::class);
@@ -100,9 +94,6 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getLocaleSettings()->getLanguage();
     }
 
-    /**
-     * @return bool
-     */
     public function isRtlMode(): bool
     {
         return $this->getLocaleSettings()->isRtlMode();

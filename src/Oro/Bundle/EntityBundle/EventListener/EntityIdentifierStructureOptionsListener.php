@@ -16,17 +16,11 @@ class EntityIdentifierStructureOptionsListener
     /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();

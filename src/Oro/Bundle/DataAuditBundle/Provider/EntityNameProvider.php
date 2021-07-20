@@ -18,10 +18,6 @@ class EntityNameProvider
     /** @var EntityNameResolver */
     private $entityNameResolver;
 
-    /**
-     * @param ManagerRegistry    $doctrine
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(ManagerRegistry $doctrine, EntityNameResolver $entityNameResolver)
     {
         $this->doctrine = $doctrine;

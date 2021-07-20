@@ -15,20 +15,11 @@ class PublicFileController extends AbstractController
     /** @var iterable|FileManager[] */
     private $publicFileManagers;
 
-    /**
-     * @param iterable $publicFileManagers
-     */
     public function __construct(iterable $publicFileManagers)
     {
         $this->publicFileManagers = $publicFileManagers;
     }
 
-    /**
-     * @param string $subDirectory
-     * @param string $fileName
-     *
-     * @return Response
-     */
     public function getPublicFileAction(string $subDirectory, string $fileName): Response
     {
         $fileManager = $this->getPublicFileManager($subDirectory);
@@ -46,11 +37,6 @@ class PublicFileController extends AbstractController
         return $response;
     }
 
-    /**
-     * @param string $subDirectory
-     *
-     * @return FileManager|null
-     */
     private function getPublicFileManager(string $subDirectory): ?FileManager
     {
         foreach ($this->publicFileManagers as $fileManager) {

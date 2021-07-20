@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 

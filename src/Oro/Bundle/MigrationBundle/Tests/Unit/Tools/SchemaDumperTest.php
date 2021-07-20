@@ -25,12 +25,6 @@ class SchemaDumperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dumpDataProvider
-     * @param array|null $allowedTables
-     * @param string|null $namespace
-     * @param string|null $expectedNamespace
-     * @param string|null $className
-     * @param string|null $version
-     * @param array|null $extendedOptions
      */
     public function testDump(
         ?array $allowedTables,

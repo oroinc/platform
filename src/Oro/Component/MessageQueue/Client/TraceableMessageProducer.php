@@ -13,9 +13,6 @@ class TraceableMessageProducer implements MessageProducerInterface
     /** @var array */
     private $traces = [];
 
-    /**
-     * @param MessageProducerInterface $messageProducer
-     */
     public function __construct(MessageProducerInterface $messageProducer)
     {
         $this->messageProducer = $messageProducer;

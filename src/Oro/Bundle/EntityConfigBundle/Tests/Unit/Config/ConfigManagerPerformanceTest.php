@@ -3,7 +3,11 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
+use Metadata\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
@@ -16,7 +20,8 @@ use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -28,28 +33,19 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
 {
-    const ENABLE_TESTS = false;
-    const ENABLE_ASSERTS = true;
-    const SHOW_DURATIONS = true;
+    private const ENABLE_TESTS = false;
+    private const ENABLE_ASSERTS = true;
+    private const SHOW_DURATIONS = true;
 
-    const NUMBER_OF_ITERATION = 3000;
-    const NUMBER_OF_ENTITIES = 150;
-    const NUMBER_OF_FIELDS = 30;
+    private const NUMBER_OF_ITERATION = 3000;
+    private const NUMBER_OF_ENTITIES = 150;
+    private const NUMBER_OF_FIELDS = 30;
 
     /** @var int */
-    protected static $standardDuration;
+    private static $standardDuration;
 
     /** @var Stopwatch */
-    protected static $stopwatch;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private static $stopwatch;
 
     public function testConfigGet()
     {
@@ -332,22 +328,12 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         self::$stopwatch = null;
     }
 
-    /**
-     * @param int $i
-     *
-     * @return int
-     */
-    protected static function doStandardOperation($i)
+    private static function doStandardOperation(int $i): int
     {
         return $i;
     }
 
-    /**
-     * @param string   $testName
-     * @param float    $maxDeviation
-     * @param callable $function
-     */
-    protected static function assertBenchmark($testName, $maxDeviation, $function)
+    private static function assertBenchmark(string $testName, float $maxDeviation, callable $function): void
     {
         $duration = self::benchmark($testName, $function);
 
@@ -364,101 +350,78 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string   $testName
-     * @param callable $function
-     *
-     * @return int The duration (in milliseconds)
+     * Measures how many long the given test works.
+     * The returned value is in milliseconds.
      */
-    protected static function benchmark($testName, $function)
+    private static function benchmark(string $testName, callable $function): int
     {
         if (!self::ENABLE_TESTS) {
             return 0;
         }
 
-        if (false !== $pos = strpos($testName, '::')) {
+        $pos = strpos($testName, '::');
+        if (false !== $pos) {
             $testName = substr($testName, $pos + 2);
         }
         self::$stopwatch->start($testName);
         for ($i = 0; $i < self::NUMBER_OF_ITERATION; $i++) {
-            call_user_func($function);
+            $function();
         }
         self::$stopwatch->stop($testName);
 
         return self::$stopwatch->getEvent($testName)->getDuration();
     }
 
-    /**
-     * @return ConfigManager
-     */
-    protected function createConfigManager()
+    private function createConfigManager(): ConfigManager
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emLink   = $this->createMock(ServiceLink::class);
-        $emLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($this->em));
-
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->any())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repo = $this->createMock(EntityRepository::class);
+        $em->expects($this->any())
             ->method('getRepository')
-            ->with('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
+            ->with(EntityConfigModel::class)
             ->willReturn($repo);
         $repo->expects($this->any())
             ->method('findAll')
             ->willReturn($this->getEntityConfigModels());
         $repo->expects($this->any())
             ->method('findOneBy')
-            ->willReturnCallback(
-                function ($criteria) {
-                    $className = $criteria['className'];
-                    foreach ($this->getEntityConfigModels() as $model) {
-                        if ($className === $model->getClassName()) {
-                            return $model;
-                        }
+            ->willReturnCallback(function ($criteria) {
+                $className = $criteria['className'];
+                foreach ($this->getEntityConfigModels() as $model) {
+                    if ($className === $model->getClassName()) {
+                        return $model;
                     }
-
-                    return null;
                 }
-            );
 
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->any())
+                return null;
+            });
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects($this->any())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->willReturn($uow);
         $uow->expects($this->any())
             ->method('getEntityState')
             ->willReturn(UnitOfWork::STATE_MANAGED);
 
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $securityTokenStorage = $this
-            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $securityTokenStorage = $this->createMock(TokenStorageInterface::class);
         $securityTokenStorage->expects($this->any())
             ->method('getToken')
             ->willReturn(null);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(EntityConfigModel::class)
+            ->willReturn($em);
 
         $lockObject = new LockObject();
         $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], true);
 
         return new ConfigManager(
-            $this->eventDispatcher,
-            $this->metadataFactory,
-            new ConfigModelManager($emLink, $lockObject, $databaseChecker),
+            $this->createMock(EventDispatcher::class),
+            $this->createMock(MetadataFactory::class),
+            new ConfigModelManager($doctrine, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache(), ['test' => 'test'])
         );
@@ -467,7 +430,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
     /**
      * @return EntityConfigModel[]
      */
-    protected function getEntityConfigModels()
+    private function getEntityConfigModels(): array
     {
         $models = [];
         for ($i = 1; $i <= self::NUMBER_OF_ENTITIES; $i++) {
@@ -489,7 +452,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
     /**
      * @return FieldConfigModel[]
      */
-    protected function getFieldConfigModels()
+    private function getFieldConfigModels(): array
     {
         $models = [];
         for ($i = 1; $i <= self::NUMBER_OF_FIELDS; $i++) {

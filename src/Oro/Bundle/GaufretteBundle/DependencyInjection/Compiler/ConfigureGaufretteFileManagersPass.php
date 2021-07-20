@@ -104,12 +104,6 @@ class ConfigureGaufretteFileManagersPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param Definition       $def
-     * @param ContainerBuilder $container
-     *
-     * @return string|null
-     */
     private function getClassName(Definition $def, ContainerBuilder $container): ?string
     {
         $className = $def->getClass();
@@ -120,12 +114,6 @@ class ConfigureGaufretteFileManagersPass implements CompilerPassInterface
         return $container->getParameterBag()->resolveValue($className);
     }
 
-    /**
-     * @param Definition       $def
-     * @param ContainerBuilder $container
-     *
-     * @return string|null
-     */
     private function getFilesystemName(Definition $def, ContainerBuilder $container): ?string
     {
         $arguments = $def->getArguments();

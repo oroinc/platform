@@ -12,9 +12,6 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
     /** @var array */
     protected $excludedFields = ['enum.enum_options', 'attachment.attachment'];
 
-    /**
-     * @param FieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(FieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;

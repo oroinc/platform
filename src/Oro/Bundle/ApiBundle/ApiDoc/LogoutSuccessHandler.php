@@ -17,10 +17,6 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
     /** @var RestDocUrlGeneratorInterface */
     private $restDocUrlGenerator;
 
-    /**
-     * @param LogoutSuccessHandlerInterface $innerHandler
-     * @param RestDocUrlGeneratorInterface  $restDocUrlGenerator
-     */
     public function __construct(
         LogoutSuccessHandlerInterface $innerHandler,
         RestDocUrlGeneratorInterface $restDocUrlGenerator

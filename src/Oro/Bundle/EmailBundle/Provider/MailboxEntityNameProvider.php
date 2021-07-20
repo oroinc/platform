@@ -14,14 +14,10 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
     /** @var Translator */
     private $translator;
 
-    /**
-     * @param Translator $translator
-     */
     public function __construct(Translator $translator)
     {
         $this->translator = $translator;
     }
-
 
     /**
      * {@inheritdoc}

@@ -45,7 +45,7 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
     private function resolveDuplicatesPostgres()
     {
         $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
-        
+
         while (true) {
             $rowsFound = $this->connection->executeQuery(
                 'SELECT COUNT(*)

@@ -40,11 +40,6 @@ class RecipientListRepository extends EntityRepository
         return array_unique($emails->toArray());
     }
 
-    /**
-     * @param RecipientList $recipientList
-     *
-     * @return array
-     */
     public function getRecipients(RecipientList $recipientList): array
     {
         $users = $recipientList->getUsers();
@@ -71,10 +66,6 @@ class RecipientListRepository extends EntityRepository
         return $recipients;
     }
 
-    /**
-     * @param ArrayCollection $emails
-     * @param RecipientList   $recipientList
-     */
     protected function addGroupUsersEmails(ArrayCollection $emails, RecipientList $recipientList)
     {
         if ($recipientList->getGroups()->isEmpty()) {
@@ -93,10 +84,6 @@ class RecipientListRepository extends EntityRepository
         );
     }
 
-    /**
-     * @param Collection $groups
-     * @return QueryBuilder
-     */
     private function getUserEmailsInGroupsQueryBuilder(Collection $groups): QueryBuilder
     {
         return $this->_em->createQueryBuilder()

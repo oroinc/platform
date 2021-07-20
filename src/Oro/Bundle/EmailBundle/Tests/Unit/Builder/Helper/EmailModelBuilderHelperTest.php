@@ -424,10 +424,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $prefix
-     * @param string $subject
-     * @param string $result
-     *
      * @dataProvider prependWithProvider
      */
     public function testPrependWith(string $prefix, string $subject, string $result): void

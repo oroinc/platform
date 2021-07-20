@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Akeneo\Bundle\BatchBundle\Job\Job;
+use Oro\Bundle\BatchBundle\Job\Job;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -71,9 +71,6 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider splitImportFileDataProvider
-     *
-     * @param int|null $batchSize
-     * @param array $expectedOptions
      */
     public function testSplitImportFile(?int $batchSize, array $expectedOptions): void
     {
@@ -88,7 +85,7 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
         $step->setBatchSize($batchSize);
 
         $job = new Job($jobName);
-        $job->addStep($processorType, $step);
+        $job->addStep($step);
 
         $this->jobExecutor->expects($this->once())
             ->method('getJob')
@@ -114,9 +111,6 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['data'], $this->importHandler->splitImportFile($jobName, $processorType, $writer));
     }
 
-    /**
-     * @return array
-     */
     public function splitImportFileDataProvider(): array
     {
         return [

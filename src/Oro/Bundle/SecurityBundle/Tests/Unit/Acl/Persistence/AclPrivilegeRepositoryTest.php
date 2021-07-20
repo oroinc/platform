@@ -32,7 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclPrivilegeRepository */
     private AclPrivilegeRepository $repository;
 
     /** @var AclManager|\PHPUnit\Framework\MockObject\MockObject */
@@ -417,9 +416,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectation, $result[0]->getFields());
     }
 
-    /**
-     * @return array
-     */
     public function getPrivilegesWithFieldsDataProvider(): array
     {
         $fieldPrivilege1 = new AclPrivilege();
@@ -972,8 +968,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param  array $src
-     * @return \SplObjectStorage
      * @throws NotAllAclsFoundException
      */
     public static function getAcls(array $src): \SplObjectStorage

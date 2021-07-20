@@ -11,17 +11,11 @@ class TestServiceLocatorInjectedViaSetter extends TestServiceLocatorInjection
     /** @var ContainerInterface */
     private $containerInjectedViaConstructor;
 
-    /**
-     * @param ContainerInterface|null $container
-     */
     public function __construct(ContainerInterface $container = null)
     {
         $this->containerInjectedViaConstructor = $container;
     }
 
-    /**
-     * @return ContainerInterface|null
-     */
     public function getContainerInjectedViaConstructor(): ?ContainerInterface
     {
         return $this->containerInjectedViaConstructor;

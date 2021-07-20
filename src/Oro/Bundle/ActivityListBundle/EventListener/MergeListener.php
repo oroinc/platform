@@ -26,11 +26,6 @@ class MergeListener
     /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider $configProvider
-     * @param ActivityManager $activityManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigProvider $configProvider,
@@ -41,9 +36,6 @@ class MergeListener
         $this->activityManager = $activityManager;
     }
 
-    /**
-     * @param EntityMetadataEvent $event
-     */
     public function onBuildMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();

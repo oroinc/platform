@@ -30,12 +30,6 @@ class ConfigurationBuilder implements BuilderInterface
     /** @var ConfigurationProvider */
     protected $configurationProvider;
 
-    /**
-     * @param ResolverInterface        $resolver
-     * @param FactoryInterface         $factory
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ConfigurationProvider    $configurationProvider
-     */
     public function __construct(
         ResolverInterface $resolver,
         FactoryInterface $factory,
@@ -80,10 +74,6 @@ class ConfigurationBuilder implements BuilderInterface
     }
 
     /**
-     * @param ItemInterface $menu
-     * @param array $sliceData
-     * @param array $options
-     * @param array $existingNames
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function appendChildData(ItemInterface $menu, array $sliceData, array $options, array &$existingNames)

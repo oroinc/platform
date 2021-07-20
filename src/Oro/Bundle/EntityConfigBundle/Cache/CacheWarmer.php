@@ -10,9 +10,6 @@ class CacheWarmer implements CacheWarmerInterface
     /** @var ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    /**
-     * @param ConfigCacheWarmer $configCacheWarmer
-     */
     public function __construct(ConfigCacheWarmer $configCacheWarmer)
     {
         $this->configCacheWarmer = $configCacheWarmer;

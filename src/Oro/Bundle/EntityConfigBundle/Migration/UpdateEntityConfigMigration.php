@@ -14,9 +14,6 @@ class UpdateEntityConfigMigration implements Migration
      */
     protected $commandExecutor;
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     */
     public function __construct(CommandExecutor $commandExecutor)
     {
         $this->commandExecutor = $commandExecutor;

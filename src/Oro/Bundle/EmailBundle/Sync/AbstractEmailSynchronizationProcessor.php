@@ -59,10 +59,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
 
     /**
      * Constructor
-     *
-     * @param EntityManager                     $em
-     * @param EmailEntityBuilder                $emailEntityBuilder
-     * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
      */
     protected function __construct(
         EntityManager $em,
@@ -347,9 +343,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         return ($folderType1 === $folderType2);
     }
 
-    /**
-     * @param EmailOrigin $emailOrigin
-     */
     protected function initEnv(EmailOrigin $emailOrigin)
     {
         $this->currentUser = $this->em->getRepository('OroEmailBundle:Mailbox')->findOneByOrigin($emailOrigin);
@@ -462,9 +455,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         );
     }
 
-    /**
-     * @param SynchronizationProcessorSettings $settings
-     */
     public function setSettings(SynchronizationProcessorSettings $settings)
     {
         $this->settings = $settings;

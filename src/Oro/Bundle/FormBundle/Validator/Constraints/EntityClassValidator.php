@@ -16,10 +16,6 @@ class EntityClassValidator extends ConstraintValidator
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param EntityClassNameHelper $entityClassNameHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassNameHelper $entityClassNameHelper

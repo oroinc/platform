@@ -75,9 +75,6 @@ class Contact
         return $this->accounts;
     }
 
-    /**
-     * @param Account $account
-     */
     public function addAccount(Account $account)
     {
         if (!$this->getAccounts()->contains($account)) {
@@ -86,9 +83,6 @@ class Contact
         }
     }
 
-    /**
-     * @param Account $account
-     */
     public function removeAccount(Account $account)
     {
         if ($this->getAccounts()->contains($account)) {

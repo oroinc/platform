@@ -22,9 +22,6 @@ class ConfigurationResolver
 
     /**
      * Constructor
-     *
-     * @param EntityClassResolver $entityClassResolver
-     * @param ContainerInterface  $container
      */
     public function __construct(EntityClassResolver $entityClassResolver, ContainerInterface $container)
     {

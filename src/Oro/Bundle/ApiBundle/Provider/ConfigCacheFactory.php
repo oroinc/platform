@@ -21,29 +21,17 @@ class ConfigCacheFactory
     /** @var ConfigCacheStateInterface[]|null */
     private $dependencies;
 
-    /**
-     * @param string $cacheDir
-     * @param bool   $debug
-     */
     public function __construct(string $cacheDir, bool $debug)
     {
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
 
-    /**
-     * @param ConfigCacheWarmer $configCacheWarmer
-     */
     public function setConfigCacheWarmer(ConfigCacheWarmer $configCacheWarmer): void
     {
         $this->configCacheWarmer = $configCacheWarmer;
     }
 
-    /**
-     * @param string $configKey
-     *
-     * @return ConfigCacheFile
-     */
     public function getCache(string $configKey): ConfigCacheFile
     {
         $cache = new ConfigCacheFile(
@@ -63,8 +51,6 @@ class ConfigCacheFactory
 
     /**
      * Registers a cache the API configuration cache depends on.
-     *
-     * @param ConfigCacheStateInterface $configCache
      */
     public function addDependency(ConfigCacheStateInterface $configCache): void
     {

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;

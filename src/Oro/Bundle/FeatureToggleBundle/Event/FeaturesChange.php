@@ -13,9 +13,6 @@ class FeaturesChange extends Event
      */
     protected $changeSet = [];
 
-    /**
-     * @param array $changeSet
-     */
     public function __construct(array $changeSet)
     {
         $this->changeSet = $changeSet;

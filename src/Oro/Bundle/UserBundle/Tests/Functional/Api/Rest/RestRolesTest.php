@@ -111,8 +111,6 @@ class RestRolesTest extends WebTestCase
 
     /**
      * @depends testGetRoleById
-     *
-     * @param $roleId
      */
     public function testDeleteRole($roleId)
     {

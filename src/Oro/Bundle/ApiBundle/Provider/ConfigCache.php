@@ -36,11 +36,6 @@ class ConfigCache implements ConfigCacheStateInterface
     /** @var bool|null */
     private $cacheFresh;
 
-    /**
-     * @param string             $configKey
-     * @param bool               $debug
-     * @param ConfigCacheFactory $configCacheFactory
-     */
     public function __construct(
         string $configKey,
         bool $debug,
@@ -51,11 +46,6 @@ class ConfigCache implements ConfigCacheStateInterface
         $this->configCacheFactory = $configCacheFactory;
     }
 
-    /**
-     * @param string $configFile
-     *
-     * @return array
-     */
     public function getConfig(string $configFile): array
     {
         $configs = $this->getSection(ConfigCacheWarmer::CONFIG);
@@ -66,9 +56,6 @@ class ConfigCache implements ConfigCacheStateInterface
         return $configs[$configFile];
     }
 
-    /**
-     * @return array
-     */
     public function getAliases(): array
     {
         return $this->getSection(ConfigCacheWarmer::ALIASES);
@@ -90,17 +77,11 @@ class ConfigCache implements ConfigCacheStateInterface
         return $this->getSection(ConfigCacheWarmer::SUBSTITUTIONS);
     }
 
-    /**
-     * @return array
-     */
     public function getExclusions(): array
     {
         return $this->getSection(ConfigCacheWarmer::EXCLUSIONS);
     }
 
-    /**
-     * @return array
-     */
     public function getInclusions(): array
     {
         return $this->getSection(ConfigCacheWarmer::INCLUSIONS);
@@ -160,9 +141,6 @@ class ConfigCache implements ConfigCacheStateInterface
         return $data[$section];
     }
 
-    /**
-     * @return array
-     */
     private function getData(): array
     {
         if (null === $this->data) {
@@ -190,9 +168,6 @@ class ConfigCache implements ConfigCacheStateInterface
         return $this->data;
     }
 
-    /**
-     * @return ConfigCacheFile
-     */
     private function getCache(): ConfigCacheFile
     {
         if (null === $this->cache) {

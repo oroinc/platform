@@ -138,8 +138,6 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
      * @dataProvider initializeDataProvider
      */
     public function testInitialize(array $source, array $expected)

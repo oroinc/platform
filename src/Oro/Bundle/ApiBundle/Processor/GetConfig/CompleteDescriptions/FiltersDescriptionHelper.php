@@ -27,11 +27,6 @@ class FiltersDescriptionHelper
     /** @var DescriptionProcessor */
     private $descriptionProcessor;
 
-    /**
-     * @param TranslatorInterface       $translator
-     * @param ResourceDocParserProvider $resourceDocParserProvider
-     * @param DescriptionProcessor      $descriptionProcessor
-     */
     public function __construct(
         TranslatorInterface $translator,
         ResourceDocParserProvider $resourceDocParserProvider,
@@ -42,13 +37,6 @@ class FiltersDescriptionHelper
         $this->descriptionProcessor = $descriptionProcessor;
     }
 
-    /**
-     * @param FiltersConfig          $filters
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     * @param string                 $entityClass
-     * @param bool                   $isInherit
-     */
     public function setDescriptionsForFilters(
         FiltersConfig $filters,
         EntityDefinitionConfig $definition,
@@ -88,12 +76,6 @@ class FiltersDescriptionHelper
         }
     }
 
-    /**
-     * @param string                           $fieldName
-     * @param EntityDefinitionFieldConfig|null $fieldConfig
-     *
-     * @return string
-     */
     private function getFilterDefaultDescription(string $fieldName, ?EntityDefinitionFieldConfig $fieldConfig): string
     {
         if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
@@ -103,11 +85,6 @@ class FiltersDescriptionHelper
         return \sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName);
     }
 
-    /**
-     * @param Label $label
-     *
-     * @return string|null
-     */
     private function trans(Label $label): ?string
     {
         return $label->trans($this->translator) ?: null;

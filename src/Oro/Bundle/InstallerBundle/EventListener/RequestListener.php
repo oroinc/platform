@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class RequestListener
 {
-    /** @var bool */
     private bool $debug;
 
     /**
@@ -22,9 +21,6 @@ class RequestListener
         $this->debug = (bool) $debug;
     }
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {

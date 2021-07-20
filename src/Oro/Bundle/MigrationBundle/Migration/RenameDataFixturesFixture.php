@@ -14,18 +14,11 @@ class RenameDataFixturesFixture extends AbstractFixture
     /** @var string[] */
     private $renamedDataFixtures = [];
 
-    /**
-     * @param string $previousClassName
-     * @param string $currentClassName
-     */
     public function addRename(string $previousClassName, string $currentClassName): void
     {
         $this->renamedDataFixtures[$previousClassName] = $currentClassName;
     }
 
-    /**
-     * @return bool
-     */
     public function isNeedPerform(): bool
     {
         return (bool)$this->renamedDataFixtures;

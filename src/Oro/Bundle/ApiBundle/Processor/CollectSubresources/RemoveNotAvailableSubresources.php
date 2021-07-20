@@ -29,10 +29,6 @@ class RemoveNotAvailableSubresources implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ApiResourceSubresources $entitySubresources
-     * @param int                     $numberOfSubresourceActions
-     */
     private function removeNotAvailableSubresources(
         ApiResourceSubresources $entitySubresources,
         int $numberOfSubresourceActions

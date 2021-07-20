@@ -17,12 +17,6 @@ class WorkflowFilter extends EntityFilter
     /** @var WorkflowTranslationHelper */
     private $translationHelper;
 
-    /**
-     * @param FormFactoryInterface      $factory
-     * @param FilterUtility             $util
-     * @param ManagerRegistry           $doctrine
-     * @param WorkflowTranslationHelper $translationHelper
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

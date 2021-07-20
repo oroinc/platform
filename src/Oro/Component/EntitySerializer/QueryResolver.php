@@ -14,18 +14,11 @@ class QueryResolver
     /** @var QueryHintResolverInterface */
     private $queryHintResolver;
 
-    /**
-     * @param QueryHintResolverInterface $queryHintResolver
-     */
     public function __construct(QueryHintResolverInterface $queryHintResolver)
     {
         $this->queryHintResolver = $queryHintResolver;
     }
 
-    /**
-     * @param Query        $query
-     * @param EntityConfig $config
-     */
     public function resolveQuery(Query $query, EntityConfig $config)
     {
         $this->queryHintResolver->resolveHints($query, $config->getHints());

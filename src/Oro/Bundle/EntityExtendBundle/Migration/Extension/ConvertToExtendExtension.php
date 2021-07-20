@@ -27,11 +27,6 @@ class ConvertToExtendExtension
     /** @var array */
     protected $scopes = ['entity', 'extend', 'form', 'view', 'merge', 'dataaudit'];
 
-    /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param ConfigModelManager $modelManager
-     */
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
         EntityMetadataHelper $entityMetadataHelper,
@@ -162,8 +157,6 @@ class ConvertToExtendExtension
 
     /**
      * Makes sure that required for any extend field attributes are set
-     *
-     * @param array $options
      */
     protected function ensureExtendFieldSet(array &$options)
     {

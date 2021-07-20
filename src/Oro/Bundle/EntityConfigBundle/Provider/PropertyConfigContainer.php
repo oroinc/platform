@@ -37,9 +37,6 @@ class PropertyConfigContainer
         return $this->config;
     }
 
-    /**
-     * @param $config
-     */
     public function setConfig($config)
     {
         $this->config = $config;

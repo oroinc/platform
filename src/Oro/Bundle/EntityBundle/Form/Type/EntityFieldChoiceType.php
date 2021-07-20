@@ -29,11 +29,6 @@ class EntityFieldChoiceType extends AbstractType
     /** @var array */
     protected $itemsCache;
 
-    /**
-     * @param EntityProvider      $entityProvider
-     * @param EntityFieldProvider $entityFieldProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EntityProvider $entityProvider,
         EntityFieldProvider $entityFieldProvider,

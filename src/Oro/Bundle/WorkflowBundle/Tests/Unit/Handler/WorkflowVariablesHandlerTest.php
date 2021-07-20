@@ -109,7 +109,6 @@ class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
             'other_fields' => [],
         ]);
 
-
         return [
             [$definition, $data, $expected],
         ];

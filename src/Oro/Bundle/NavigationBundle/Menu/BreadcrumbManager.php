@@ -28,11 +28,6 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
      */
     protected $router;
 
-    /**
-     * @param MenuProviderInterface $provider
-     * @param Matcher $matcher
-     * @param Router $router
-     */
     public function __construct(MenuProviderInterface $provider, Matcher $matcher, Router $router)
     {
         $this->matcher = $matcher;

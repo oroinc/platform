@@ -42,17 +42,11 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         $this->leftJoins = [];
     }
 
-    /**
-     * @return DatagridConfiguration
-     */
     public function getConfig(): DatagridConfiguration
     {
         return $this->config;
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     public function setConfig(DatagridConfiguration $config): void
     {
         $this->config = $config;
@@ -66,9 +60,6 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         return $this->selectColumns;
     }
 
-    /**
-     * @param string $column
-     */
     public function addSelectColumn(string $column): void
     {
         $this->selectColumns[] = $column;
@@ -82,9 +73,6 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         return $this->groupingColumns;
     }
 
-    /**
-     * @param string $column
-     */
     public function addGroupingColumn(string $column): void
     {
         $this->groupingColumns[] = $column;
@@ -98,10 +86,6 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         return $this->from;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $tableAlias
-     */
     public function addFrom(string $entityClass, string $tableAlias): void
     {
         $this->from[] = ['table' => $entityClass, 'alias' => $tableAlias];
@@ -115,12 +99,6 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         return $this->innerJoins;
     }
 
-    /**
-     * @param string      $join
-     * @param string      $alias
-     * @param string|null $conditionType
-     * @param string|null $condition
-     */
     public function addInnerJoin(
         string $join,
         string $alias,
@@ -138,12 +116,6 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         return $this->leftJoins;
     }
 
-    /**
-     * @param string      $join
-     * @param string      $alias
-     * @param string|null $conditionType
-     * @param string|null $condition
-     */
     public function addLeftJoin(
         string $join,
         string $alias,
@@ -153,14 +125,6 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
         $this->leftJoins[] = $this->buildJoin($join, $alias, $conditionType, $condition);
     }
 
-    /**
-     * @param string      $join
-     * @param string      $alias
-     * @param string|null $conditionType
-     * @param string|null $condition
-     *
-     * @return array
-     */
     private function buildJoin(string $join, string $alias, ?string $conditionType, ?string $condition): array
     {
         $result = ['join' => $join, 'alias' => $alias];

@@ -9,8 +9,6 @@ class ContextSelector extends Element
 {
     /**
      * Select context in popup entity selector
-     *
-     * @param $needle
      */
     public function select($needle)
     {

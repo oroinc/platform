@@ -13,10 +13,6 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
     /** @var EntityConfigurationProvider */
     private $configProvider;
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param EntityConfigurationProvider      $configProvider
-     */
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
         EntityConfigurationProvider $configProvider

@@ -29,11 +29,6 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
     /** @var AssociationManager */
     private $associationManager;
 
-    /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param CompleteAssociationHelper $associationHelper
-     * @param AssociationManager        $associationManager
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         CompleteAssociationHelper $associationHelper,

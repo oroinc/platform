@@ -19,8 +19,6 @@ class SetOwnerForEmailTemplates implements Migration
 
     /**
      * Add owner to table oro_email_template
-     *
-     * @param Schema $schema
      */
     public static function addOwnerToOroEmailTemplate(Schema $schema)
     {

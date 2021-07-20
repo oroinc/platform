@@ -19,10 +19,6 @@ class LocalizationListener
      */
     private $localizationManager;
 
-    /**
-     * @param LocalizationFallbackStrategy $localizationFallbackStrategy
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(
         LocalizationFallbackStrategy $localizationFallbackStrategy,
         LocalizationManager $localizationManager
@@ -32,8 +28,6 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization       $localization
-     * @param LifecycleEventArgs $event
      * @throws \Exception
      */
     public function postUpdate(Localization $localization, LifecycleEventArgs $event)
@@ -42,8 +36,6 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization       $localization
-     * @param LifecycleEventArgs $event
      * @throws \Exception
      */
     public function postPersist(Localization $localization, LifecycleEventArgs $event)
@@ -52,8 +44,6 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization       $localization
-     * @param LifecycleEventArgs $event
      * @throws \Exception
      */
     public function postRemove(Localization $localization, LifecycleEventArgs $event)

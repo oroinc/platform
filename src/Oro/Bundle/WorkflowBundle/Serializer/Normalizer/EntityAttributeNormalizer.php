@@ -21,10 +21,6 @@ class EntityAttributeNormalizer implements AttributeNormalizer
      */
     protected $doctrineHelper;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;

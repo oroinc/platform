@@ -112,10 +112,6 @@ services:
         class: Oro\Bundle\CurrencyBundle\Converter\RateConverter
         public: false
 
-    oro_currency.converter.rate.link:
-        tags:
-            - { name: oro_service_link, service: oro_currency.converter.rate }
-
     oro_currency.datagrid.listener.column_config:
         class: Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener
         arguments:

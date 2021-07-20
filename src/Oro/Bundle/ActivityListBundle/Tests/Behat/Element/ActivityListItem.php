@@ -71,9 +71,6 @@ class ActivityListItem extends Element
         self::fail(sprintf('Context with "%s" name not found', $text));
     }
 
-    /**
-     * @param TableNode $table
-     */
     public function addComment(TableNode $table)
     {
         $addCommentButton = $this->find('css', '.add-comment-button');
@@ -128,7 +125,6 @@ class ActivityListItem extends Element
     {
         return $this->findAll('css', 'div.activity-context-activity-list div.context-item');
     }
-
 
     /**
      * @return \DateTime

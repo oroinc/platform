@@ -73,7 +73,6 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
             ->method('create')
             ->with(ConfigurableCondition::ALIAS, $expectedConditionConfiguration);
 
-
         $this->assertTrue($this->process->isApplicable([]));
     }
 

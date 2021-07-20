@@ -25,9 +25,6 @@ class MenuBuilderPass implements CompilerPassInterface
         $this->processItems($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processMenu(ContainerBuilder $container): void
     {
         $builders = [];
@@ -49,9 +46,6 @@ class MenuBuilderPass implements CompilerPassInterface
             ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function processItems(ContainerBuilder $container): void
     {
         $services = [];
@@ -95,14 +89,6 @@ class MenuBuilderPass implements CompilerPassInterface
         return $items;
     }
 
-    /**
-     * @param array       $attributes
-     * @param string      $id
-     * @param string      $tagName
-     * @param string|null $defaultAlias
-     *
-     * @return string
-     */
     private function getAlias(array $attributes, string $id, string $tagName, ?string $defaultAlias): string
     {
         if (!$defaultAlias) {

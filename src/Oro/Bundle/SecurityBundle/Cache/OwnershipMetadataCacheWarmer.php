@@ -12,9 +12,6 @@ class OwnershipMetadataCacheWarmer implements CacheWarmerInterface
      */
     private $provider;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $provider
-     */
     public function __construct(OwnershipMetadataProviderInterface $provider)
     {
         $this->provider = $provider;

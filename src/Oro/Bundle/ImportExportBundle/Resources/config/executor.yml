@@ -2,8 +2,8 @@ services:
     oro_importexport.job_executor:
         class: Oro\Bundle\ImportExportBundle\Job\JobExecutor
         arguments:
-            - '@akeneo_batch.connectors'
-            - '@akeneo_batch.job_repository'
+            - '@oro_batch.connector.registry'
+            - '@oro_batch.job.repository'
             - '@oro_importexport.context_registry'
             - '@doctrine'
             - '@oro_importexport.job.context.aggregator_registry'

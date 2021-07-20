@@ -87,9 +87,6 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
         }
     }
 
-    /**
-     * @param ObjectManager $om
-     */
     protected function loadEmailsDemo(ObjectManager $om)
     {
         $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');

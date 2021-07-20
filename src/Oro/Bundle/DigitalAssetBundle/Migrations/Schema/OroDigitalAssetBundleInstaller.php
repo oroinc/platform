@@ -58,8 +58,6 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Create oro_digital_asset_title table
-     *
-     * @param Schema $schema
      */
     private function createOroDigitalAssetTitleTable(Schema $schema): void
     {
@@ -75,8 +73,6 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Create oro_digital_asset table
-     *
-     * @param Schema $schema
      */
     private function createOroDigitalAssetTable(Schema $schema): void
     {
@@ -96,9 +92,6 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
         $table->addUniqueIndex(['source_file_id'], 'uniq_a886b35793cb796c');
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function addDigitalAssetRelationToFile(Schema $schema): void
     {
         $this->extendExtension->addManyToOneRelation(
@@ -185,8 +178,6 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Add oro_digital_asset_title foreign keys.
-     *
-     * @param Schema $schema
      */
     private function addOroDigitalAssetTitleForeignKeys(Schema $schema): void
     {
@@ -207,8 +198,6 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Add oro_digital_asset foreign keys.
-     *
-     * @param Schema $schema
      */
     private function addOroDigitalAssetForeignKeys(Schema $schema): void
     {

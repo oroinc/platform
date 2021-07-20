@@ -35,11 +35,6 @@ class AssignDraftableFields extends AbstractAction
      */
     private $chainDraftableFieldsExclusionProvider;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param DraftHelper $draftHelper
-     * @param ChainDraftableFieldsExclusionProvider $chainDraftableFieldsExclusionProvider
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         DraftHelper $draftHelper,
@@ -80,9 +75,6 @@ class AssignDraftableFields extends AbstractAction
         }
     }
 
-    /**
-     * @return OptionsResolver
-     */
     private function getOptionResolver(): OptionsResolver
     {
         $optionResolver = new OptionsResolver();

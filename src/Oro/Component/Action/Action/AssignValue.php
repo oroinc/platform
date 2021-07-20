@@ -65,7 +65,6 @@ class AssignValue extends AbstractAction
     }
 
     /**
-     * @param array $options
      * @throws InvalidParameterException
      */
     protected function addAssign(array $options)

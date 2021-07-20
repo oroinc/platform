@@ -26,9 +26,6 @@ class AnnotationDriver implements DriverInterface
      */
     protected $reader;
 
-    /**
-     * @param Reader $reader
-     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
