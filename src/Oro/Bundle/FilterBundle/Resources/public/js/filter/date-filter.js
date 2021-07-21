@@ -9,20 +9,13 @@ define(function(require, exports, module) {
     const tools = require('oroui/js/tools');
     const __ = require('orotranslation/js/translator');
     const ChoiceFilter = require('oro/filter/choice-filter');
-    const DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+    const DatePickerView = require('orofilter/js/app/views/datepicker/filter-datapicker-view').default;
     const VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     const DateVariableHelper = require('orofilter/js/date-variable-helper');
     const DateValueHelper = require('orofilter/js/date-value-helper');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
     const localeSettings = require('orolocale/js/locale-settings');
     const layout = require('oroui/js/layout');
-    const {
-        ARROW_UP,
-        ARROW_DOWN,
-        ARROW_LEFT,
-        ARROW_RIGHT,
-        ESCAPE
-    } = require('oroui/js/tools/keyboard-key-codes').default;
     let config = require('module-config').default(module.id);
 
     config = _.extend({
@@ -189,16 +182,8 @@ define(function(require, exports, module) {
          */
         dayFormats: null,
 
-        events() {
-            const events = {
-                'change select': 'onChangeFilterType'
-            };
-
-            if (!this.isSimplePickerView()) {
-                events['keydown [data-toggle="dropdown"]'] = 'onKeyDownDropdownTrigger';
-            }
-
-            return events;
+        events: {
+            'change select': 'onChangeFilterType'
         },
 
         /**
@@ -267,27 +252,6 @@ define(function(require, exports, module) {
             }
 
             DateFilter.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * Handle and navigate to dropdown when toggler in focus
-         * @param event
-         */
-        onKeyDownDropdownTrigger(event) {
-            const $target = $(event.target);
-            switch (event.keyCode) {
-                case ARROW_UP:
-                case ARROW_DOWN:
-                case ARROW_RIGHT:
-                case ARROW_LEFT:
-                    event.preventDefault();
-                    $target.dropdown('show');
-                    break;
-                case ESCAPE:
-                    event.preventDefault();
-                    this._hideCriteria();
-                    break;
-            }
         },
 
         /**

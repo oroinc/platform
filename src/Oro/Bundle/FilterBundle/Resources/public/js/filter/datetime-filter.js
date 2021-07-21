@@ -5,7 +5,7 @@ define(function(require, exports, module) {
     const moment = require('moment');
     const __ = require('orotranslation/js/translator');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
-    const DateTimePickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
+    const DateTimePickerView = require('orofilter/js/app/views/datepicker/filter-datapicker-view').default;
     const VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     const DateFilter = require('oro/filter/date-filter');
     const tools = require('oroui/js/tools');
