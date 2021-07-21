@@ -8,6 +8,7 @@ define(function(require, exports, module) {
     const AbstractFilter = require('oro/filter/abstract-filter');
     const MultiselectDecorator = require('orofilter/js/multiselect-decorator');
     const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const KEYBOARD_CODES = require('oroui/js/tools/keyboard-key-codes').default;
     let config = require('module-config').default(module.id);
 
     config = _.extend({
@@ -439,6 +440,10 @@ define(function(require, exports, module) {
         },
 
         onKeyDownCriteriaSelector(e) {
+            if (e.keyCode === KEYBOARD_CODES.ENTER || e.keyCode === KEYBOARD_CODES.SPACE) {
+                e.preventDefault();
+                this._onClickFilterArea(e);
+            }
             this.trigger('keydownOnToggle', e, this);
         },
 

@@ -450,6 +450,10 @@ define(function(require, exports, module) {
         },
 
         onKeyDownCriteriaSelector(e) {
+            if (e.keyCode === KEYBOARD_CODES.ENTER || e.keyCode === KEYBOARD_CODES.SPACE) {
+                e.preventDefault();
+                this._onClickCriteriaSelector(e);
+            }
             this.trigger('keydownOnToggle', e, this);
         },
 
