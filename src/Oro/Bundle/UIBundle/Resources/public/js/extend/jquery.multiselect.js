@@ -147,11 +147,14 @@ define(function(require) {
             this.button.attr('aria-expanded', true);
             this.$outerTrigger.attr('aria-expanded', true);
 
-            // Remove outdated styles
-            this.labels.filter(':not(.ui-state-disabled)').eq(0).trigger('mouseover').find('input').trigger('blur');
-            // Remove outdated class
-            this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
-            manageFocus.focusTabbable(this.menu);
+            if (this.options.preventTabOutOfContainer) {
+                // Remove outdated styles
+                this.labels.filter(':not(.ui-state-disabled)')
+                    .eq(0).trigger('mouseover').find('input').trigger('blur');
+                // Remove outdated class
+                this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
+                manageFocus.focusTabbable(this.menu);
+            }
         },
 
         /**
@@ -165,7 +168,10 @@ define(function(require) {
 
             const superResult = this._superApply();
 
-            if ($.contains(this.menu[0], document.activeElement)) {
+            if (
+                this.options.preventTabOutOfContainer &&
+                $.contains(this.menu[0], document.activeElement)
+            ) {
                 this.button.trigger('focus');
 
                 // move focus to $outerTrigger element in case own multiselect button is hidden
