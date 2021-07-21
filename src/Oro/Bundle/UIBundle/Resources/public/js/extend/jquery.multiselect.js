@@ -91,7 +91,6 @@ define(function(require) {
                         this._traverse(e.which, e.currentTarget);
                         break;
                     case KEY_CODES.ENTER:
-                    case KEY_CODES.SPACE:
                         e.preventDefault();
                         $(e.currentTarget).find('input').click();
                         break;
