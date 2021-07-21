@@ -788,7 +788,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
     {
         $library = null;
         try {
-            [$library, ] = $this->getImageProcessorLibrary($libraryName, $this->imageProcessorConfig);
+            $library = $this->getImageProcessorLibrary($libraryName, $this->imageProcessorConfig);
         } catch (ProcessorsException $exception) {
             return;
         } catch (ProcessorsVersionException $exception) {
