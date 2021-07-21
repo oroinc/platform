@@ -84,6 +84,7 @@ define(function(require, exports, module) {
 
         bindKeepFocusInside: function() {
             $(this._menu).on(_events(['keydown']), e => {
+                e.stopPropagation();
                 if (e.keyCode === ESC_KEY_CODE) {
                     this.hide();
                     this._element.focus();
