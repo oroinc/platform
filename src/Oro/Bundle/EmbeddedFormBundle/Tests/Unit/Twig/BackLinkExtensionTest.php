@@ -33,14 +33,6 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new BackLinkExtension($container);
     }
 
-    public function testShouldReturnName()
-    {
-        $this->assertEquals(
-            'oro_embedded_form_back_link_extension',
-            $this->extension->getName()
-        );
-    }
-
     public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText()
     {
         $id = uniqid('id');

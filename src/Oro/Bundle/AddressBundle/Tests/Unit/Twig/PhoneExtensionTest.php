@@ -90,9 +90,4 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
             'valid object' => [new \stdClass()]
         ];
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_phone_extension', $this->extension->getName());
-    }
 }

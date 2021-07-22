@@ -29,14 +29,6 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new SerializerExtension($this->container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'jms_serializer',
-            $this->extension->getName()
-        );
-    }
-
     public function testSerialize()
     {
         $obj = new \stdClass();

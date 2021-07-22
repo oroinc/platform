@@ -62,9 +62,4 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
             'foo_global' => 'foo_global',
         );
     }
-
-    public function getName()
-    {
-        return 'environment_test';
-    }
 }

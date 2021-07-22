@@ -105,14 +105,6 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_address';
-    }
-
-    /**
      * {@inheritdoc]
      */
     public static function getSubscribedServices()

@@ -50,11 +50,6 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroSecurityExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_security_extension', $this->extension->getName());
-    }
-
     public function testGetOrganizations()
     {
         $user = new User();

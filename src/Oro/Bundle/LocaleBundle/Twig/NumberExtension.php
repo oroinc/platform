@@ -436,14 +436,6 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_locale_number';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

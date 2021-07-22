@@ -67,11 +67,6 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new UiExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_ui', $this->extension->getName());
-    }
-
     public function testOnScrollDataBefore()
     {
         $pageIdentifier = 'test-page';

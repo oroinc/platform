@@ -17,8 +17,6 @@ use Twig\TwigFunction;
  */
 class TranslationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_translation';
-
     /** @var ContainerInterface */
     private $container;
 
@@ -41,14 +39,6 @@ class TranslationExtension extends AbstractExtension implements ServiceSubscribe
     protected function getTranslationsDatagridRouteHelper()
     {
         return $this->container->get('oro_translation.helper.translation_route');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

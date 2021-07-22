@@ -30,11 +30,6 @@ class TranslationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TranslationExtension($container, true, true);
     }
 
-    public function testGetName(): void
-    {
-        $this->assertEquals(TranslationExtension::NAME, $this->extension->getName());
-    }
-
     public function testIsDebugTranslator(): void
     {
         $this->assertTrue($this->extension->isDebugTranslator());

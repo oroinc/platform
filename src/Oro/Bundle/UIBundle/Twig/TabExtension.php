@@ -185,14 +185,6 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_ui.tab_panel';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

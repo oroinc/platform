@@ -234,14 +234,6 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_entity';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

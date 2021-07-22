@@ -63,11 +63,6 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         return $state;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_windows', $this->extension->getName());
-    }
-
     public function testRenderNoUser()
     {
         $this->stateManagerRegistry->expects($this->once())

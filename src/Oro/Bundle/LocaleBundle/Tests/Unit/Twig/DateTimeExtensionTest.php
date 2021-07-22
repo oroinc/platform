@@ -183,9 +183,4 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'oro_format_time', [$value, $options])
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_datetime', $this->extension->getName());
-    }
 }

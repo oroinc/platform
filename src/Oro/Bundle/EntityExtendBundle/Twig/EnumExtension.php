@@ -107,14 +107,6 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_enum';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

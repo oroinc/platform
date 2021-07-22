@@ -22,8 +22,6 @@ use Twig\TwigFunction;
  */
 class OperationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_action';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -70,14 +68,6 @@ class OperationExtension extends AbstractExtension implements ServiceSubscriberI
     protected function getButtonSearchContextProvider()
     {
         return $this->container->get('oro_action.provider.button_search_context');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

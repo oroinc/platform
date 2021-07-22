@@ -19,22 +19,12 @@ use Twig\TwigFunction;
  */
 class PlaceholderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_placeholder';
-
     /** @var ContainerInterface */
     protected $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::EXTENSION_NAME;
     }
 
     /**

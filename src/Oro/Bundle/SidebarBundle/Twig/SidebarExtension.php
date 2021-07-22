@@ -20,8 +20,6 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
 {
     use FeatureCheckerHolderTrait;
 
-    const NAME = 'oro_sidebar';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -93,14 +91,6 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
         }
 
         return $definitions;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

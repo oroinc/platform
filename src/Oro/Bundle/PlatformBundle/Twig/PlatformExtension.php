@@ -14,8 +14,6 @@ use Twig\TwigFunction;
  */
 class PlatformExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_platform';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -48,14 +46,6 @@ class PlatformExtension extends AbstractExtension implements ServiceSubscriberIn
     public function getVersion()
     {
         return $this->getVersionHelper()->getVersion();
-    }
-
-    /**
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return self::EXTENSION_NAME;
     }
 
     /**

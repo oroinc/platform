@@ -38,11 +38,6 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
         unset($this->extension);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_dateformat', $this->extension->getName());
-    }
-
     public function testGetDateFormat()
     {
         $locale = 'en';

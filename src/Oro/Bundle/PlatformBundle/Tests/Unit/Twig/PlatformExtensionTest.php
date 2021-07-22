@@ -45,12 +45,4 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFunction($this->extension, 'oro_version', [])
         );
     }
-
-    /**
-     * @return string The extension name
-     */
-    public function testGetName()
-    {
-        $this->assertEquals(PlatformExtension::EXTENSION_NAME, $this->extension->getName());
-    }
 }

@@ -29,11 +29,6 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new FeatureExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_featuretoggle_extension', $this->extension->getName());
-    }
-
     public function testIsFeatureEnabled()
     {
         $feature = 'test';

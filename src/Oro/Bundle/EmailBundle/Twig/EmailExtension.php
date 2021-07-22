@@ -39,8 +39,6 @@ use Twig\TwigFunction;
  */
 class EmailExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_email';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -297,14 +295,6 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     public function getMailboxProcessLabel($type)
     {
         return $this->getMailboxProcessStorage()->getProcess($type)->getLabel();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

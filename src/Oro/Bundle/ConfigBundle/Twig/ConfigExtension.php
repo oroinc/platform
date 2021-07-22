@@ -60,14 +60,6 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'config_extension';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

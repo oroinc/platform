@@ -29,11 +29,6 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new HtmlTagExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_ui.html_tag', $this->extension->getName());
-    }
-
     public function testHtmlSanitize()
     {
         $html = '<html>HTML</html>';

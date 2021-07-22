@@ -28,11 +28,6 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroUserExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('user_extension', $this->extension->getName());
-    }
-
     public function testGetGenderLabel()
     {
         $label = 'Male';

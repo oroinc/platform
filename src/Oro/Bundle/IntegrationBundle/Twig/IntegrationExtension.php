@@ -85,14 +85,6 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_integration';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

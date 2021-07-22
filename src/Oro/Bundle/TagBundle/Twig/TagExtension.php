@@ -64,14 +64,6 @@ class TagExtension extends AbstractExtension implements ServiceSubscriberInterfa
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_tag';
-    }
-
-    /**
      * @param  object $entity
      *
      * @return bool

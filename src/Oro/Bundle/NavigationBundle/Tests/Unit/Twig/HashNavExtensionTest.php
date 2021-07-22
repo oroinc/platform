@@ -54,9 +54,4 @@ class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
             $this->extension->getHashNavigationHeaderConst()
         );
     }
-
-    public function testGetName(): void
-    {
-        self::assertEquals('oro_hash_nav', $this->extension->getName());
-    }
 }

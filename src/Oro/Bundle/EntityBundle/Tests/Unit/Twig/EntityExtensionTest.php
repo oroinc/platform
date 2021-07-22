@@ -189,11 +189,6 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_entity', $this->extension->getName());
-    }
-
     public function testGetUrlClassName()
     {
         $originalClass = 'Test\\Class';

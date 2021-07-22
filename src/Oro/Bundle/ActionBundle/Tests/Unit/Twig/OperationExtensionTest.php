@@ -78,11 +78,6 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(OperationExtension::NAME, $this->extension->getName());
-    }
-
     /**
      * @dataProvider hasButtonsDataProvider
      *

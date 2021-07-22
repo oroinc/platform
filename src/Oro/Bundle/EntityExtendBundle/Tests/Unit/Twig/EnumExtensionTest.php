@@ -123,12 +123,4 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'sort_enum', ['val1,val2,val4', $enumValueEntityClass])
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_enum',
-            $this->extension->getName()
-        );
-    }
 }

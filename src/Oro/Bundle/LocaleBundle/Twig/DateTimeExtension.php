@@ -199,14 +199,6 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_datetime';
-    }
-
-    /**
      * {@inheritdoc]
      */
     public static function getSubscribedServices()

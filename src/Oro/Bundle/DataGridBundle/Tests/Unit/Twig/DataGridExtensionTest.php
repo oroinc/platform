@@ -72,11 +72,6 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DataGridExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_datagrid', $this->extension->getName());
-    }
-
     public function testGetGridWorks()
     {
         $gridName = 'test-grid';

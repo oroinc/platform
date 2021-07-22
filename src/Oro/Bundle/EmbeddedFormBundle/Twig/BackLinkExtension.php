@@ -40,14 +40,6 @@ class BackLinkExtension extends AbstractExtension implements ServiceSubscriberIn
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_embedded_form_back_link_extension';
-    }
-
-    /**
      * @return TwigFilter[]
      */
     public function getFilters()
@@ -66,7 +58,7 @@ class BackLinkExtension extends AbstractExtension implements ServiceSubscriberIn
     {
         $backLinkRegexp = '/{back_link(?:\|([^}]+))?}/';
         preg_match($backLinkRegexp, $string, $matches);
-        list($placeholder, $linkText) = array_pad($matches, 2, '');
+        [$placeholder, $linkText] = array_pad($matches, 2, '');
         if (!$linkText) {
             $linkText = 'oro.embeddedform.back_link_default_text';
         }

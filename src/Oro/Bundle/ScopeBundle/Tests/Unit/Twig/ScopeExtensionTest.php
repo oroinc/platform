@@ -96,9 +96,4 @@ class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($this->scopeExtension->isScopesEmpty($scopeEntities, $scopes));
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_scope', $this->scopeExtension->getName());
-    }
 }

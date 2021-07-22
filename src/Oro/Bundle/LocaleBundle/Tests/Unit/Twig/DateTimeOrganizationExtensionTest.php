@@ -101,9 +101,4 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'oro_format_datetime_organization', [$date, $options])
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_datetime_organization', $this->extension->getName());
-    }
 }

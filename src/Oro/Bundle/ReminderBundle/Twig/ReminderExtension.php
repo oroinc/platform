@@ -92,14 +92,6 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_reminder.subscriber';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

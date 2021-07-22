@@ -251,11 +251,6 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testName()
-    {
-        $this->assertEquals('oro_ui.tab_panel', $this->extension->getName());
-    }
-
     /**
      * @return MenuItem|\PHPUnit\Framework\MockObject\MockObject
      */

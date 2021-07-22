@@ -53,11 +53,6 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OrganizationExtension($container);
     }
 
-    public function testName()
-    {
-        $this->assertEquals('oro_owner_type', $this->extension->getName());
-    }
-
     public function testGetOwnerType()
     {
         $entity = new BusinessUnit();

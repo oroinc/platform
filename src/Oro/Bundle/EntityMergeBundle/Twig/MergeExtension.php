@@ -151,14 +151,6 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_entity_merge';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

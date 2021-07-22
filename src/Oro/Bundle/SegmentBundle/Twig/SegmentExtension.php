@@ -17,8 +17,6 @@ use Twig\TwigFunction;
  */
 class SegmentExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_segment';
-
     /** @var ContainerInterface */
     private $container;
 
@@ -78,14 +76,6 @@ class SegmentExtension extends AbstractExtension implements ServiceSubscriberInt
         $eventDispatcher->dispatch($event, ConditionBuilderOptionsLoadEvent::EVENT_NAME);
 
         return $event->getOptions();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return static::NAME;
     }
 
     /**

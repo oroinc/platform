@@ -183,14 +183,6 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_form';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

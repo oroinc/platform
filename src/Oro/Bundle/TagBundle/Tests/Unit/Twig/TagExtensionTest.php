@@ -46,11 +46,6 @@ class TagExtensionTest extends \PHPUnit\Framework\TestCase
         unset($this->extension);
     }
 
-    public function testName()
-    {
-        $this->assertEquals('oro_tag', $this->extension->getName());
-    }
-
     public function testGetList()
     {
         $entity = $this->createMock('Oro\Bundle\TagBundle\Entity\Taggable');

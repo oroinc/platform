@@ -58,11 +58,6 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(LocalizationExtension::NAME, $this->extension->getName());
-    }
-
     public function testGetFormattingTitleByCode()
     {
         $expected = 'result';

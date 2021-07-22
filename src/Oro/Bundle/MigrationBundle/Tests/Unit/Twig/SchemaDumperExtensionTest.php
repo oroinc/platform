@@ -39,11 +39,6 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new SchemaDumperExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('schema_dumper_extension', $this->extension->getName());
-    }
-
     public function testGetStringColumnOptions()
     {
         $this->platform->expects($this->once())

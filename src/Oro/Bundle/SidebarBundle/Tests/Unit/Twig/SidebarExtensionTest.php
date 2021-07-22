@@ -45,11 +45,6 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setFeatureChecker($this->featureChecker);
     }
 
-    public function testGetName()
-    {
-        self::assertEquals(SidebarExtension::NAME, $this->extension->getName());
-    }
-
     public function testGetWidgetDefinitions()
     {
         $placement = 'left';

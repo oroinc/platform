@@ -22,8 +22,6 @@ use Twig\TwigFunction;
  */
 class WorkflowExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_workflow';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -60,14 +58,6 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
                 ['is_safe' => ['html']]
             ),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

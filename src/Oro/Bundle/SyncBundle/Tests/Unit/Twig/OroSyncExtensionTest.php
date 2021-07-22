@@ -33,11 +33,6 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroSyncExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('sync_extension', $this->extension->getName());
-    }
-
     public function testGenerate()
     {
         $data = 'string';

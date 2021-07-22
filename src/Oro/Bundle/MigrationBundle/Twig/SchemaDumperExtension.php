@@ -50,14 +50,6 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'schema_dumper_extension';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

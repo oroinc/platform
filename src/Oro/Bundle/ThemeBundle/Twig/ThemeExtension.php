@@ -15,8 +15,6 @@ use Twig\TwigFunction;
  */
 class ThemeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_theme';
-
     /** @var ContainerInterface */
     private $container;
 
@@ -80,13 +78,5 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
             $result = $activeTheme->getIcon();
         }
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 }

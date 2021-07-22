@@ -266,9 +266,4 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'oro_format_ordinal', [$value, $options])
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_number', $this->extension->getName());
-    }
 }

@@ -40,14 +40,6 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_locale';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

@@ -41,11 +41,6 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ConfigExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(ConfigExtension::NAME, $this->extension->getName());
-    }
-
     public function testGetClassConfigNoConfig()
     {
         $className = 'Test\Entity';

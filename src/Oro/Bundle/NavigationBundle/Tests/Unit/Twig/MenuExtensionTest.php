@@ -53,11 +53,6 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new MenuExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(MenuExtension::MENU_NAME, $this->extension->getName());
-    }
-
     public function testRenderBreadCrumbs()
     {
         $environment = $this->createMock(Environment::class);

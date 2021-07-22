@@ -109,14 +109,6 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_ui';
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getTokenParsers()

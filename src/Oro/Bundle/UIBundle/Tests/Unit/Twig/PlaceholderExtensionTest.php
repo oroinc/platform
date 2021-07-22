@@ -141,9 +141,4 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals(PlaceholderExtension::EXTENSION_NAME, $this->extension->getName());
-    }
 }

@@ -39,11 +39,6 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new FormatExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_formatter_extension', $this->extension->getName());
-    }
-
     public function testFormat()
     {
         $parameter = 'test';

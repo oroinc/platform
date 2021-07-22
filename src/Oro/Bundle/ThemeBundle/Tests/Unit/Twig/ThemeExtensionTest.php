@@ -36,11 +36,6 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ThemeExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(ThemeExtension::NAME, $this->extension->getName());
-    }
-
     public function testGetThemeLogo()
     {
         $this->themeRegistry->expects($this->once())

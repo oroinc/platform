@@ -30,8 +30,6 @@ use Twig\TwigFunction;
  */
 class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_config';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -84,14 +82,6 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     protected function getDoctrineHelper()
     {
         return $this->container->get(DoctrineHelper::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

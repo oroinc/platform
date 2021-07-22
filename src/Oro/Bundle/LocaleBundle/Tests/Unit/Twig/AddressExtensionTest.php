@@ -217,9 +217,4 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_address', $this->extension->getName());
-    }
 }

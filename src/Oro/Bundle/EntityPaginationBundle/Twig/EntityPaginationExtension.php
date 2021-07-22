@@ -19,8 +19,6 @@ use Twig\TwigFunction;
  */
 class EntityPaginationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_pagination';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -120,14 +118,6 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
         if ($message) {
             $messageManager->addFlashMessage('info', $message);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

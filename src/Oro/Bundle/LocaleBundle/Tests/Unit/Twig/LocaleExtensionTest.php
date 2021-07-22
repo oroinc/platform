@@ -30,11 +30,6 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LocaleExtension($container);
     }
 
-    public function testGetName(): void
-    {
-        self::assertEquals('oro_locale', $this->extension->getName());
-    }
-
     public function testGetTimeZoneOffset(): void
     {
         $timezoneString = 'UTC';

@@ -36,9 +36,4 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
         $result = $this->extension->highlightTrim('Writing Tests for PHPUnit search string The tests', 'search', 15);
         $this->assertTrue($result == '...Writing Tests <strong>search</strong> string...');
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('search_extension', $this->extension->getName());
-    }
 }

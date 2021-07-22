@@ -38,11 +38,6 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new WorkflowExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowExtension::NAME, $this->extension->getName());
-    }
-
     public function testHasApplicableWorkflows()
     {
         $entity = new StubEntity();

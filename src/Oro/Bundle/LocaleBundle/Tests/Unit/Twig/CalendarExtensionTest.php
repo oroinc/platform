@@ -94,9 +94,4 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFunction($this->extension, 'oro_calendar_first_day_of_week', [$locale])
         );
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_calendar', $this->extension->getName());
-    }
 }

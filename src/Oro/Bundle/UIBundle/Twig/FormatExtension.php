@@ -79,14 +79,6 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_formatter_extension';
-    }
-
-    /**
      * @param mixed  $parameter
      * @param string $formatterName
      * @param array  $formatterArguments

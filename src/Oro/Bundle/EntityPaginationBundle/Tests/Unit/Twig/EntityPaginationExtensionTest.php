@@ -155,9 +155,4 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
             'no message'  => [false],
         ];
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals(EntityPaginationExtension::NAME, $this->extension->getName());
-    }
 }

@@ -98,14 +98,6 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritDoc}
      */
-    public function getName()
-    {
-        return 'oro_datagrid';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getFunctions()
     {
         return [
