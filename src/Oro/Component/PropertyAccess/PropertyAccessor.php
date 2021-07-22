@@ -8,11 +8,11 @@
 
 namespace Oro\Component\PropertyAccess;
 
-use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\String\Inflector\EnglishInflector;
 
 /**
  * Writes and reads values to/from an object/array graph.
@@ -58,6 +58,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     /** @var array */
     protected $writePropertyCache = [];
 
+    private EnglishInflector $symfonyInflector;
+
     /**
      * @param bool $magicCall            Determines whether the use of "__call" is enabled
      * @param bool $ignoreInvalidIndices Determines whether a reading a value by non-existing index
@@ -69,8 +71,9 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function __construct($magicCall = false, $ignoreInvalidIndices = false)
     {
-        $this->magicCall            = $magicCall;
+        $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = $ignoreInvalidIndices;
+        $this->symfonyInflector = new EnglishInflector();
     }
 
     /**
@@ -922,7 +925,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $reflClass = new \ReflectionClass($class);
             $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
             $camelized = $this->camelize($property);
-            $singulars = (array)Inflector::singularize($camelized);
+            $singulars = (array)$this->symfonyInflector->singularize($camelized);
 
             if (is_array($value) || $value instanceof \Traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);

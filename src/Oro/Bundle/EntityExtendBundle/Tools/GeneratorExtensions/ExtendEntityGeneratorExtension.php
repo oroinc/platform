@@ -8,20 +8,22 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Component\PhpUtils\ClassGenerator;
-use Symfony\Component\Inflector\Inflector as SymfonyInflector;
+use Symfony\Component\String\Inflector\EnglishInflector;
 
 /**
  * The main extension of the entity generator. This extension is responsible for generation of an extend entity skeleton
  * and all extend fields and relations.
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
 {
     private Inflector $inflector;
 
+    private EnglishInflector $symfonyInflector;
+
     public function __construct(Inflector $inflector)
     {
         $this->inflector = $inflector;
+        $this->symfonyInflector = new EnglishInflector();
     }
 
     /**
@@ -241,7 +243,7 @@ METHOD_BODY;
 
     protected function getSingular(string $fieldName): string
     {
-        $singular = SymfonyInflector::singularize($this->inflector->classify($fieldName));
+        $singular = $this->symfonyInflector->singularize($this->inflector->classify($fieldName));
         if (\is_array($singular)) {
             $singular = \reset($singular);
         }

@@ -43,7 +43,7 @@
         "symfony/http-client": "~4.4.24",
         "symfony/http-foundation": "~4.4.24",
         "symfony/http-kernel": "~4.4.24",
-        "symfony/inflector": "~4.4.24",
+        "symfony/string": "~5.3.0",
         "symfony/intl": "~4.4.24",
         "symfony/lock": "~4.4.24",
         "symfony/mime": "~4.4.24",
