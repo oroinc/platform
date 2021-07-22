@@ -4,7 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Traits\DoctrineTrait;
 
 /**
  * Implementation of {@see \Symfony\Component\Cache\Adapter\DoctrineAdapter} that hash the id keys to be sure
@@ -12,22 +11,19 @@ use Symfony\Component\Cache\Traits\DoctrineTrait;
  */
 class ExpressionLanguageDoctrineAdapter extends AbstractAdapter
 {
-    use DoctrineTrait {
-        doFetch as traitDoFetch;
-        doHave as traitDoHave;
-        doDelete as traitDoDelete;
-        doSave as traitDoSave;
-    }
+    private CacheProvider $provider;
 
     public function __construct(CacheProvider $provider, string $namespace = '', int $defaultLifetime = 0)
     {
         parent::__construct('', $defaultLifetime);
-        $this->provider = $provider;
+
         $provider->setNamespace($namespace);
+
+        $this->provider = $provider;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function doFetch(array $ids)
     {
@@ -36,32 +32,66 @@ class ExpressionLanguageDoctrineAdapter extends AbstractAdapter
             $updatedIds[] = $this->hashId($id);
         }
 
-        return $this->traitDoFetch($updatedIds);
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', parent::class.'::handleUnserializeCallback');
+        try {
+            return $this->provider->fetchMultiple($updatedIds);
+        } catch (\Error $e) {
+            $trace = $e->getTrace();
+
+            if (isset($trace[0]['function']) && !isset($trace[0]['class'])) {
+                switch ($trace[0]['function']) {
+                    case 'unserialize':
+                    case 'apcu_fetch':
+                    case 'apc_fetch':
+                        throw new \ErrorException(
+                            $e->getMessage(),
+                            $e->getCode(),
+                            \E_ERROR,
+                            $e->getFile(),
+                            $e->getLine()
+                        );
+                }
+            }
+
+            throw $e;
+        } finally {
+            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
+        }
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function doHave($id)
+    protected function doHave($id): bool
     {
-        return $this->traitDoHave($this->hashId($id));
+        return $this->provider->contains($this->hashId($id));
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function doDelete(array $ids)
+    protected function doClear($namespace): bool
     {
-        $updatedIds = [];
+        $providerNamespace = $this->provider->getNamespace();
+
+        return isset($providerNamespace[0]) ? $this->provider->deleteAll() : $this->provider->flushAll();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doDelete(array $ids): bool
+    {
+        $result = true;
         foreach ($ids as $id) {
-            $updatedIds[] = $this->hashId($id);
+            $result = $this->provider->delete($this->hashId($id)) && $result;
         }
 
-        return $this->traitDoDelete($updatedIds);
+        return $result;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function doSave(array $values, int $lifetime)
     {
@@ -70,7 +100,7 @@ class ExpressionLanguageDoctrineAdapter extends AbstractAdapter
             $updatedValues[$this->hashId($key)] = $value;
         }
 
-        return $this->traitDoSave($updatedValues, $lifetime);
+        return $this->provider->saveMultiple($updatedValues, $lifetime);
     }
 
     private function hashId(string $id): string
