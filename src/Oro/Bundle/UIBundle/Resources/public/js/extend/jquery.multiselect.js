@@ -153,6 +153,8 @@ define(function(require) {
                 this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
                 manageFocus.focusTabbable(this.menu);
             }
+
+            this.menu.attr('tabindex', '-1');
         },
 
         close() {
@@ -174,6 +176,7 @@ define(function(require) {
                 }
             }
 
+            this.menu.removeAttr('tabindex');
             return superResult;
         },
 
@@ -195,7 +198,8 @@ define(function(require) {
                 let $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 const scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
                 let {activeElement} = document;
-                if (!$checkboxesContainer[0].contains(activeElement)) {
+
+                if (!this.menu[0].contains(activeElement)) {
                     activeElement = null;
                 }
 
@@ -205,8 +209,15 @@ define(function(require) {
                 $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 if (activeElement) {
                     // move focus back to last active checkbox
-                    $checkboxesContainer.find(`#${activeElement.id}`).focus();
+                    if (activeElement.id) {
+                        this.menu.find(`#${activeElement.id}`).focus();
+                    } else if (this.menu.find(activeElement).length && !activeElement.disabled) {
+                        this.menu.find(activeElement).focus();
+                    } else {
+                        manageFocus.focusTabbable(this.menu);
+                    }
                 }
+
                 $checkboxesContainer.scrollTop(scrollTop);
             }
             this.menu.find('.ui-multiselect-checkboxes').attr({
