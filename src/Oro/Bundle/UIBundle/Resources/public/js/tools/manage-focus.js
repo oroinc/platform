@@ -67,7 +67,7 @@ export default {
     getNextTabbable(elements, target) {
         let findCurrent = false;
         return elements.find(element => {
-            if (element.isSameNode(target)) {
+            if (element === target) {
                 findCurrent = true;
                 return false;
             }

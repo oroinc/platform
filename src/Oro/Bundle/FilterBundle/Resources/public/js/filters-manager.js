@@ -782,7 +782,7 @@ define(function(require, exports, module) {
         _createButtonReset: function() {
             return $(
                 '<div class="ui-multiselect-footer">' +
-                    '<a href="#" class="ui-multiselect-reset" role="button" data-role="reset-filters">' +
+                    '<a href="#" class="ui-multiselect-reset" data-role="reset-filters">' +
                         '<i class="fa-refresh"></i>' + this.multiselectResetButtonLabel + '' +
                     '</a>' +
                 '</div>'
