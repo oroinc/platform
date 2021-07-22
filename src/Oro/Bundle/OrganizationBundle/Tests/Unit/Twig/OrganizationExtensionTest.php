@@ -38,11 +38,9 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->entityOwnerAccessor->expects($this->any())
             ->method('getOwner')
-            ->willReturnCallback(
-                function ($entity) {
-                    return $entity->getOwner();
-                }
-            );
+            ->willReturnCallback(function ($entity) {
+                return $entity->getOwner();
+            });
 
         $container = self::getContainerBuilder()
             ->add(EntityOwnerAccessor::class, $this->entityOwnerAccessor)
@@ -132,9 +130,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBusinessUnitCount()
     {
-        $repo = $this->getMockBuilder(BusinessUnitRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(BusinessUnitRepository::class);
         $repo->expects($this->once())
             ->method('getBusinessUnitsCount')
             ->willReturn(2);

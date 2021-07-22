@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\NavigationBundle\Twig\HashNavExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -11,6 +12,8 @@ use Symfony\Component\HttpKernel\HttpKernel;
 
 class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     private HashNavExtension $extension;
 
     protected function setUp(): void
@@ -44,14 +47,16 @@ class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->onKernelRequest($event);
 
-        self::assertTrue($this->extension->checkIsHashNavigation());
+        self::assertTrue(
+            self::callTwigFunction($this->extension, 'oro_is_hash_navigation', [])
+        );
     }
 
     public function testGetHashNavigationHeaderConst(): void
     {
         self::assertEquals(
             ResponseHashnavListener::HASH_NAVIGATION_HEADER,
-            $this->extension->getHashNavigationHeaderConst()
+            self::callTwigFunction($this->extension, 'oro_hash_navigation_header', [])
         );
     }
 }

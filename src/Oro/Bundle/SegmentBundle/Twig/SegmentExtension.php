@@ -17,8 +17,7 @@ use Twig\TwigFunction;
  */
 class SegmentExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -47,7 +46,7 @@ class SegmentExtension extends AbstractExtension implements ServiceSubscriberInt
      */
     public function updateSegmentWidgetOptions(array $widgetOptions, $type = null)
     {
-        $eventDispatcher = $this->container->get('event_dispatcher');
+        $eventDispatcher = $this->getEventDispatcher();
 
         if (!$eventDispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
             return $widgetOptions;
@@ -66,7 +65,7 @@ class SegmentExtension extends AbstractExtension implements ServiceSubscriberInt
      */
     public function updateSegmentConditionBuilderOptions(array $options)
     {
-        $eventDispatcher = $this->container->get('event_dispatcher');
+        $eventDispatcher = $this->getEventDispatcher();
 
         if (!$eventDispatcher->hasListeners(ConditionBuilderOptionsLoadEvent::EVENT_NAME)) {
             return $options;
@@ -84,7 +83,12 @@ class SegmentExtension extends AbstractExtension implements ServiceSubscriberInt
     public static function getSubscribedServices()
     {
         return [
-            'event_dispatcher' => EventDispatcherInterface::class,
+            EventDispatcherInterface::class,
         ];
+    }
+
+    private function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
     }
 }

@@ -19,10 +19,9 @@ use Twig\TwigFunction;
  */
 class IntegrationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_THEME = '@OroIntegration/Form/fields.html.twig';
+    private const DEFAULT_THEME = '@OroIntegration/Form/fields.html.twig';
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -48,9 +47,8 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
      */
     public function getThemes(FormView $view)
     {
-        $eventDispatcher = $this->container->get('event_dispatcher');
-
-        $themes = [static::DEFAULT_THEME];
+        $themes = [self::DEFAULT_THEME];
+        $eventDispatcher = $this->getEventDispatcher();
         if (!$eventDispatcher->hasListeners(LoadIntegrationThemesEvent::NAME)) {
             return $themes;
         }
@@ -88,7 +86,12 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
     public static function getSubscribedServices()
     {
         return [
-            'event_dispatcher' => EventDispatcherInterface::class,
+            EventDispatcherInterface::class,
         ];
+    }
+
+    private function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
     }
 }

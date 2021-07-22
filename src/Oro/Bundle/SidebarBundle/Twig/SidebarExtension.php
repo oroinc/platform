@@ -41,7 +41,7 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -49,7 +49,7 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
      */
     protected function getAssetHelper()
     {
-        return $this->container->get('assets.packages');
+        return $this->container->get(AssetHelper::class);
     }
 
     /**
@@ -100,8 +100,8 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
     {
         return [
             'oro_sidebar.widget_definition_provider' => WidgetDefinitionProvider::class,
-            'translator' => TranslatorInterface::class,
-            'assets.packages' => AssetHelper::class,
+            TranslatorInterface::class,
+            AssetHelper::class,
         ];
     }
 }

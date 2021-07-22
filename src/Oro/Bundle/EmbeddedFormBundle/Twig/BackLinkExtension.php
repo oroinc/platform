@@ -28,7 +28,7 @@ class BackLinkExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getRouter()
     {
-        return $this->container->get('router');
+        return $this->container->get(RouterInterface::class);
     }
 
     /**
@@ -36,7 +36,7 @@ class BackLinkExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -93,8 +93,8 @@ class BackLinkExtension extends AbstractExtension implements ServiceSubscriberIn
     public static function getSubscribedServices()
     {
         return [
-            'router' => RouterInterface::class,
-            'translator' => TranslatorInterface::class,
+            RouterInterface::class,
+            TranslatorInterface::class,
         ];
     }
 }

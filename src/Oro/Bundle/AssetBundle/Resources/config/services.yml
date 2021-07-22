@@ -40,8 +40,10 @@ services:
         class: Oro\Bundle\AssetBundle\Webpack\WebpackServer
         arguments:
             - '%oro_asset.webpack_dev_server_options%'
-        tags: ['twig.runtime']
 
     oro_asset.webpack_twig_extension:
         class: Oro\Bundle\AssetBundle\Twig\WebpackExtension
-        tags: ['twig.extension']
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }

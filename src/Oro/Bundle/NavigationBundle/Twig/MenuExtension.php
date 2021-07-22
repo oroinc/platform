@@ -21,7 +21,7 @@ use Twig\TwigFunction;
  */
 class MenuExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const BREADCRUMBS_TEMPLATE = '@OroNavigation/Menu/breadcrumbs.html.twig';
+    private const BREADCRUMBS_TEMPLATE = '@OroNavigation/Menu/breadcrumbs.html.twig';
 
     /** @var ContainerInterface */
     protected $container;

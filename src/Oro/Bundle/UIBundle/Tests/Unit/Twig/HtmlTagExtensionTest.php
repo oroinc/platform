@@ -11,16 +11,14 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
+    private $htmlTagHelper;
 
     /* @var HtmlTagExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->htmlTagHelper = $this->getMockBuilder(HtmlTagHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_ui.html_tag_helper', $this->htmlTagHelper)
@@ -33,8 +31,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $html = '<html>HTML</html>';
 
-        $this->htmlTagHelper
-            ->expects($this->once())
+        $this->htmlTagHelper->expects($this->once())
             ->method('sanitize')
             ->with($html)
             ->willReturn('HTML');
@@ -49,8 +46,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $html = '<html>HTML</html>';
 
-        $this->htmlTagHelper
-            ->expects($this->once())
+        $this->htmlTagHelper->expects($this->once())
             ->method('stripTags')
             ->with($html)
             ->willReturn('HTML');
@@ -65,8 +61,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $html = '<div>HTML</div><script type="text/javascript"></script>';
 
-        $this->htmlTagHelper
-            ->expects($this->once())
+        $this->htmlTagHelper->expects($this->once())
             ->method('escape')
             ->with($html)
             ->willReturn('<div>HTML</div>');

@@ -6,23 +6,24 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var DateTimeOrganizationExtension */
-    protected $extension;
-
     /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
+    private $formatter;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationManager;
+    private $localizationManager;
+
+    /** @var DateTimeOrganizationExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -44,18 +45,16 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime('2016-05-31 00:00:00');
         $expected = 'May 30, 2016, 4:00 PM';
 
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
+        $organization = $this->createMock(OrganizationInterface::class);
 
         $organizationLocale = 'en_US';
         $organizationTimezone = 'America/Los_Angeles';
         $this->configManager->expects($this->exactly(2))
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_locale.default_localization', false, false, null, 42],
-                    ['oro_locale.timezone', false, false, null, $organizationTimezone],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_locale.default_localization', false, false, null, 42],
+                ['oro_locale.timezone', false, false, null, $organizationTimezone],
+            ]);
         $this->formatter->expects($this->once())
             ->method('format')
             ->with($date, null, null, $organizationLocale, $organizationTimezone)

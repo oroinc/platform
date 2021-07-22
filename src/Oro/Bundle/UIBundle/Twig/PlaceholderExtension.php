@@ -19,28 +19,11 @@ use Twig\TwigFunction;
  */
 class PlaceholderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    protected ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return PlaceholderProvider
-     */
-    protected function getPlaceholderProvider()
-    {
-        return $this->container->get('oro_ui.placeholder.provider');
-    }
-
-    /**
-     * @return Request|null
-     */
-    protected function getRequest()
-    {
-        return $this->container->get('request_stack')->getCurrentRequest();
     }
 
     /**
@@ -108,7 +91,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
                 $query = $request->query->all();
             }
 
-            return $this->container->get('fragment.handler')->render(
+            return $this->getFragmentHandler()->render(
                 HttpKernelExtension::controller($item['action'], $variables, $query)
             );
         }
@@ -147,8 +130,23 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
     {
         return [
             'oro_ui.placeholder.provider' => PlaceholderProvider::class,
-            'request_stack' => RequestStack::class,
             'fragment.handler' => FragmentHandler::class,
+            RequestStack::class,
         ];
+    }
+
+    protected function getPlaceholderProvider(): PlaceholderProvider
+    {
+        return $this->container->get('oro_ui.placeholder.provider');
+    }
+
+    protected function getFragmentHandler(): FragmentHandler
+    {
+        return $this->container->get('fragment.handler');
+    }
+
+    protected function getRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 }

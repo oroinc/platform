@@ -11,10 +11,10 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $enumValueProvider;
+    private $enumValueProvider;
 
     /** @var EnumExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {

@@ -24,33 +24,17 @@ use Twig\TwigFunction;
  */
 class FormExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_TEMPLATE = '@OroForm/Form/fields.html.twig';
-    const BLOCK_NAME       = 'oro_form_js_validation';
+    private const DEFAULT_TEMPLATE = '@OroForm/Form/fields.html.twig';
+    private const BLOCK_NAME = 'oro_form_js_validation';
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
+    private string $templateName;
+    private array $defaultOptions;
 
-    /**
-     * @var string
-     */
-    protected $templateName;
-
-    /**
-     * @var array
-     */
-    protected $defaultOptions;
-
-    /**
-     * @param ContainerInterface $container
-     * @param string $templateName
-     * @param array $defaultOptions
-     */
     public function __construct(
         ContainerInterface $container,
-        $templateName = self::DEFAULT_TEMPLATE,
-        $defaultOptions = []
+        string $templateName = self::DEFAULT_TEMPLATE,
+        array $defaultOptions = []
     ) {
         $this->container = $container;
         $this->templateName = $templateName;
@@ -58,15 +42,7 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     }
 
     /**
-     * @return DataBlockRenderer
-     */
-    protected function getDataBlockRenderer()
-    {
-        return new DataBlockRenderer();
-    }
-
-    /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -120,7 +96,6 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
      * @param array             $options
      *
      * @return string
-     * @throws \RuntimeException
      */
     public function renderFormJsValidationBlock(Environment $environment, FormView $view, $options = [])
     {
@@ -156,7 +131,7 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     {
         $block = $prototype ? 'javascript_prototype' : 'javascript';
 
-        return $this->container->get('twig.form.renderer')->searchAndRenderBlock($view, $block);
+        return $this->getFormRenderer()->searchAndRenderBlock($view, $block);
     }
 
     /**
@@ -166,7 +141,7 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
      *
      * @return array
      */
-    protected function filterJsOptions(array $options)
+    private function filterJsOptions(array $options)
     {
         foreach ($options as $name => $value) {
             if (is_object($value)) {
@@ -188,5 +163,15 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
         return [
             'twig.form.renderer' => FormRendererInterface::class,
         ];
+    }
+
+    private function getFormRenderer(): FormRendererInterface
+    {
+        return $this->container->get('twig.form.renderer');
+    }
+
+    private function getDataBlockRenderer(): DataBlockRenderer
+    {
+        return new DataBlockRenderer();
     }
 }

@@ -11,16 +11,14 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
     /** @var FeatureExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $container = self::getContainerBuilder()
             ->add(FeatureChecker::class, $this->featureChecker)

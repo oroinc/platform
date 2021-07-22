@@ -7,22 +7,23 @@ use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatterManager;
+    private $formatterManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $urlProvider;
+    private $urlProvider;
 
     /** @var FormatExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -31,7 +32,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->urlProvider = $this->createMock(UrlWithoutFrontControllerProvider::class);
 
         $container = self::getContainerBuilder()
-            ->add('translator', $this->translator)
+            ->add(TranslatorInterface::class, $this->translator)
             ->add('oro_ui.formatter', $this->formatterManager)
             ->add('oro_ui.provider.url_without_front_controller', $this->urlProvider)
             ->getContainer($this);
@@ -152,7 +153,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.age', ['%count%' => 1])
-            ->will($this->returnValue('age 1'));
+            ->willReturn('age 1');
 
         $this->assertEquals(
             'age 1',

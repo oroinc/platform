@@ -9,7 +9,7 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
     /**
      * {@inheritDoc}
      */
-    protected function getFilters()
+    protected function getFilters(): array
     {
         return [
             'filter1',
@@ -20,7 +20,7 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
     /**
      * {@inheritDoc}
      */
-    protected function getFunctions()
+    protected function getFunctions(): array
     {
         return [
             'function1',
@@ -29,9 +29,20 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getTags(): array
+    {
+        return [
+            'tag1',
+            'tag2'
+        ];
+    }
+
+    /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             'extension1',

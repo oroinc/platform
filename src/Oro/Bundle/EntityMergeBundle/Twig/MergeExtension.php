@@ -52,7 +52,7 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -156,7 +156,7 @@ class MergeExtension extends AbstractExtension implements ServiceSubscriberInter
         return [
             'oro_entity_merge.accessor' => AccessorInterface::class,
             'oro_entity_merge.twig.renderer' => MergeRenderer::class,
-            'translator' => TranslatorInterface::class,
+            TranslatorInterface::class,
         ];
     }
 }

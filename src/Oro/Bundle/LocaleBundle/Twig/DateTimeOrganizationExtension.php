@@ -78,9 +78,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
 
         [$locale, $timeZone] = $this->getLocaleSettings($organization, $options);
 
-        $result = $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
-
-        return $result;
+        return $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
     }
 
     /**

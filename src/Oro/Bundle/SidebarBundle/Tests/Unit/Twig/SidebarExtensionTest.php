@@ -14,19 +14,19 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionProvider */
-    protected $widgetDefinitionProvider;
+    private $widgetDefinitionProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AssetHelper */
-    protected $assetHelper;
-
-    /** @var SidebarExtension */
-    protected $extension;
+    private $assetHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
+
+    /** @var SidebarExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -37,8 +37,8 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = self::getContainerBuilder()
             ->add('oro_sidebar.widget_definition_provider', $this->widgetDefinitionProvider)
-            ->add('translator', $this->translator)
-            ->add('assets.packages', $this->assetHelper)
+            ->add(TranslatorInterface::class, $this->translator)
+            ->add(AssetHelper::class, $this->assetHelper)
             ->getContainer($this);
 
         $this->extension = new SidebarExtension($container);
@@ -88,7 +88,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
                     'module' => 'widget/foo',
                     'placement' => 'left',
                     'description' => 'Simple',
-                    'dialogIcon' => "/test-icon.png"
+                    'dialogIcon' => '/test-icon.png'
                 ]
             ],
             self::callTwigFunction($this->extension, 'oro_sidebar_get_available_widgets', [$placement])

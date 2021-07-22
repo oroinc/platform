@@ -20,15 +20,9 @@ use Twig\TwigFunction;
  */
 class WindowsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * Protect extension from infinite loop
-     *
-     * @var bool
-     */
-    protected $rendered = false;
+    protected ContainerInterface $container;
+    /** Protect extension from infinite loop */
+    private bool $rendered = false;
 
     public function __construct(ContainerInterface $container)
     {

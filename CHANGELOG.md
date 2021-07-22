@@ -32,6 +32,10 @@ The current file describes significant changes in the code that may affect the u
 * The DIC compiler pass `Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass`
   was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.
 
+#### UIBundle
+* The `oro_ui_content_provider_manager` global variable was removed from Twig.
+  Use the `oro_get_content` Twig function instead.
+
 ## 5.0.0-alpha.2 (2021-05-28)
 [Show detailed list of changes](incompatibilities-5-0-alpha-2.md)
 

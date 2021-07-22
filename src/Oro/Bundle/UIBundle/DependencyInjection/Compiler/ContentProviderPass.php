@@ -50,11 +50,5 @@ class ContentProviderPass implements CompilerPassInterface
             ->setArgument(0, $providers)
             ->setArgument(1, ServiceLocatorTagPass::register($container, $services))
             ->setArgument(2, $enabledProviders);
-
-        $container->getDefinition('twig')
-            ->addMethodCall(
-                'addGlobal',
-                ['oro_ui_content_provider_manager', new Reference('oro_ui.content_provider.manager.twig')]
-            );
     }
 }

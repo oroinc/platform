@@ -430,7 +430,7 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     protected function getOption(array $options, $name, $default = null)
     {
-        return isset($options[$name]) ? $options[$name] : $default;
+        return $options[$name] ?? $default;
     }
 
     /**

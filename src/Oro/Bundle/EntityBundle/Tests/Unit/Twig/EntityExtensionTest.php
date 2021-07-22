@@ -20,26 +20,26 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityIdAccessor;
+    /** @var EntityIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityIdAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityRoutingHelper;
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRoutingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityFallbackResolver;
+    private $entityFallbackResolver;
 
     /** @var EntityExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -47,8 +47,8 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->entityAliasResolver = $this->createMock(EntityAliasResolver::class);
-        $this->entityFallbackResolver = $this->createMock(EntityFallbackResolver::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityFallbackResolver = $this->createMock(EntityFallbackResolver::class);
 
         $container = self::getContainerBuilder()
             ->add(EntityIdAccessor::class, $this->entityIdAccessor)
@@ -62,18 +62,10 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new EntityExtension($container);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->extension);
-    }
-
     /**
-     * @param string $expectedClass
-     * @param mixed $object
-     *
      * @dataProvider getClassNameDataProvider
      */
-    public function testGetClassName($expectedClass, $object)
+    public function testGetClassName(?string $expectedClass, mixed $object)
     {
         $this->entityRoutingHelper->expects($this->never())
             ->method('getUrlSafeClassName');
@@ -84,10 +76,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getClassNameDataProvider()
+    public function getClassNameDataProvider(): array
     {
         return [
             'null' => [
@@ -99,7 +88,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
                 'object' => 'string',
             ],
             'object' => [
-                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'expectedClass' => ItemStub::class,
                 'object' => new ItemStub(),
             ],
             'proxy' => [
@@ -118,7 +107,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper->expects($this->once())
             ->method('getUrlSafeClassName')
             ->with($class)
-            ->will($this->returnValue($expectedClass));
+            ->willReturn($expectedClass);
 
         $this->assertEquals(
             $expectedClass,
@@ -155,16 +144,16 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->expects($this->once())
             ->method('getIdentifier')
             ->with($this->identicalTo($object))
-            ->will($this->returnValue($objectId));
+            ->willReturn($objectId);
 
         $this->entityRoutingHelper->expects($this->once())
             ->method('getUrlSafeClassName')
             ->with($class)
-            ->will($this->returnValue($expectedClass));
+            ->willReturn($expectedClass);
         $this->entityRoutingHelper->expects($this->once())
             ->method('getRouteParameters')
             ->with($expectedClass, $objectId, $action)
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals(
             $expected,
@@ -181,7 +170,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver->expects($this->once())
             ->method('getName')
             ->with($this->identicalTo($entity), null, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,

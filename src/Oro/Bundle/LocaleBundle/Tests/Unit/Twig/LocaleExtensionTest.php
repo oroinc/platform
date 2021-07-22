@@ -10,14 +10,14 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const TEST_TYPE = 'test_format_type';
-    const TEST_FORMAT = 'MMM, d y t';
+    private const TEST_TYPE = 'test_format_type';
+    private const TEST_FORMAT = 'MMM, d y t';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    private $localeSettings;
 
     /** @var LocaleExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -37,7 +37,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->will(self::returnValue($timezoneString));
+            ->willReturn($timezoneString);
 
         self::assertEquals(
             $timezoneOffset,

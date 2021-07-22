@@ -15,51 +15,51 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
 {
     public function getTokenParsers()
     {
-        return array(
+        return [
             new EnvironmentTokenParser(),
-        );
+        ];
     }
 
     public function getNodeVisitors()
     {
-        return array(
+        return [
             new EnvironmentNodeVisitor(),
-        );
+        ];
     }
 
     public function getFilters()
     {
-        return array(
+        return [
             new TwigFilter('foo_filter', 'foo_filter'),
-        );
+        ];
     }
 
     public function getTests()
     {
-        return array(
+        return [
             new TwigTest('foo_test', 'foo_test'),
-        );
+        ];
     }
 
     public function getFunctions()
     {
-        return array(
+        return [
             new TwigFunction('foo_function', 'foo_function'),
-        );
+        ];
     }
 
     public function getOperators()
     {
-        return array(
-            array('foo_unary' => array()),
-            array('foo_binary' => array()),
-        );
+        return [
+            ['foo_unary' => []],
+            ['foo_binary' => []],
+        ];
     }
 
     public function getGlobals()
     {
-        return array(
+        return [
             'foo_global' => 'foo_global',
-        );
+        ];
     }
 }

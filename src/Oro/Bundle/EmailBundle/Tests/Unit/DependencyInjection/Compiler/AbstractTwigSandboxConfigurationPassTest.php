@@ -46,14 +46,14 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
     {
         $container = new ContainerBuilder();
         $securityPolicyDef = $container->register('oro_email.twig.email_security_policy')
-            ->setArguments([[], ['some_existing_filter'], [], [], ['some_existing_function']]);
+            ->setArguments([['some_existing_tag'], ['some_existing_filter'], [], [], ['some_existing_function']]);
         $rendererDef = $container->register('oro_email.email_renderer');
 
         $this->compiler->process($container);
 
         self::assertEquals(
             [
-                [],
+                ['some_existing_tag', 'tag1', 'tag2'],
                 ['some_existing_filter', 'filter1', 'filter2'],
                 [],
                 [],

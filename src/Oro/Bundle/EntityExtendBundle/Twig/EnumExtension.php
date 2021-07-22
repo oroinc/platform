@@ -16,8 +16,7 @@ use Twig\TwigFilter;
  */
 class EnumExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -50,7 +49,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
         $ids = $enumValueIds;
         if ($ids === null) {
             $ids = [];
-        } elseif (is_string($ids)) {
+        } elseif (\is_string($ids)) {
             $ids = explode(',', $ids);
         }
 
@@ -58,7 +57,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
             return $ids;
         }
 
-        $ids    = array_fill_keys($ids, true);
+        $ids = array_fill_keys($ids, true);
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
 
         $result = [];
@@ -88,20 +87,17 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     }
 
     /**
-     * @param $enumValueEntityClassOrEnumCode
+     * @param string $enumValueEntityClassOrEnumCode
      *
-     * @return array sorted by value priority
-     *      key   => enum value id
-     *      value => enum value name
+     * @return array [enum value id => enum value name, ...] sorted by value priority
      */
-    protected function getEnumValues($enumValueEntityClassOrEnumCode)
+    private function getEnumValues($enumValueEntityClassOrEnumCode)
     {
-        if (strpos($enumValueEntityClassOrEnumCode, '\\') === false) {
+        if (!str_contains($enumValueEntityClassOrEnumCode, '\\')) {
             $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
         }
 
-        return $this->container->get('oro_entity_extend.enum_value_provider')
-            ->getEnumChoices($enumValueEntityClassOrEnumCode);
+        return $this->getEnumValueProvider()->getEnumChoices($enumValueEntityClassOrEnumCode);
     }
 
     /**
@@ -112,5 +108,10 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
         return [
             'oro_entity_extend.enum_value_provider' => EnumValueProvider::class,
         ];
+    }
+
+    private function getEnumValueProvider(): EnumValueProvider
+    {
+        return $this->container->get('oro_entity_extend.enum_value_provider');
     }
 }

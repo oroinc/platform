@@ -13,17 +13,15 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var NumberExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
+    private $formatter;
+
+    /** @var NumberExtension */
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->formatter = $this->getMockBuilder(NumberFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(NumberFormatter::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_locale.formatter.number', $this->formatter)
@@ -40,9 +38,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         $attributes = ['decimal_digits' => 4];
         $expectedResult = 1;
 
-        $this->formatter->expects($this->once())->method('getAttribute')
+        $this->formatter->expects($this->once())
+            ->method('getAttribute')
             ->with($attribute, $style, $locale, $attributes)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -61,9 +60,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         $locale = 'en_US';
         $expectedResult = '$';
 
-        $this->formatter->expects($this->once())->method('getTextAttribute')
+        $this->formatter->expects($this->once())
+            ->method('getTextAttribute')
             ->with($attribute, $style, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -82,9 +82,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         $locale = 'fr_CA';
         $expectedResult = '%';
 
-        $this->formatter->expects($this->once())->method('getSymbol')
+        $this->formatter->expects($this->once())
+            ->method('getSymbol')
             ->with($symbol, $style, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -105,9 +106,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = '1,234.45';
 
-        $this->formatter->expects($this->once())->method('format')
+        $this->formatter->expects($this->once())
+            ->method('format')
             ->with($value, $style, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -132,9 +134,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = '$1,234.45';
 
-        $this->formatter->expects($this->once())->method('formatCurrency')
+        $this->formatter->expects($this->once())
+            ->method('formatCurrency')
             ->with($value, $currency, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -157,9 +160,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = '1,234.45';
 
-        $this->formatter->expects($this->once())->method('formatDecimal')
+        $this->formatter->expects($this->once())
+            ->method('formatDecimal')
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -182,9 +186,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = '99%';
 
-        $this->formatter->expects($this->once())->method('formatPercent')
+        $this->formatter->expects($this->once())
+            ->method('formatPercent')
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -207,9 +212,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = 'one';
 
-        $this->formatter->expects($this->once())->method('formatSpellout')
+        $this->formatter->expects($this->once())
+            ->method('formatSpellout')
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -232,9 +238,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = '1 sec';
 
-        $this->formatter->expects($this->once())->method('formatDuration')
+        $this->formatter->expects($this->once())
+            ->method('formatDuration')
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -257,9 +264,10 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $expectedResult = '1st';
 
-        $this->formatter->expects($this->once())->method('formatOrdinal')
+        $this->formatter->expects($this->once())
+            ->method('formatOrdinal')
             ->with($value, $attributes, $textAttributes, $symbols, $locale)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,

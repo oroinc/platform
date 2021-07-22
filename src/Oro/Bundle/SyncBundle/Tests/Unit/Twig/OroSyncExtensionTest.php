@@ -12,13 +12,13 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $connectionChecker;
+    private $connectionChecker;
 
     /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tagGenerator;
+    private $tagGenerator;
 
     /** @var OroSyncExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -38,9 +38,10 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         $data = 'string';
         $tags = ['string_tag'];
 
-        $this->tagGenerator->expects($this->once())->method('generate')
+        $this->tagGenerator->expects($this->once())
+            ->method('generate')
             ->with($this->equalTo($data), $this->equalTo(false))
-            ->will($this->returnValue($tags));
+            ->willReturn($tags);
 
         $this->assertSame(
             $tags,

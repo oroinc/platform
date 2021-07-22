@@ -10,14 +10,14 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var SerializerExtension */
-    protected $extension;
-
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    private $container;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $serializer;
+    private $serializer;
+
+    /** @var SerializerExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -33,13 +33,11 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $obj = new \stdClass();
 
-        $this->container
-            ->expects($this->once())
+        $this->container->expects($this->once())
             ->method('get')
             ->with('jms_serializer');
 
-        $this->serializer
-            ->expects($this->once())
+        $this->serializer->expects($this->once())
             ->method('serialize')
             ->with($this->equalTo($obj), $this->equalTo('json'));
 

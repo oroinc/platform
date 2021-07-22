@@ -19,41 +19,30 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
     const REQUEST_URI = '/test/request/uri';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|RouteProviderInterface */
-    protected $routeProvider;
-
-    /** @var OperationExtension */
-    protected $extension;
+    private $routeProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContextHelper */
-    protected $contextHelper;
+    private $contextHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsHelper */
-    protected $optionsHelper;
+    private $optionsHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonProvider */
-    protected $buttonProvider;
+    private $buttonProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonSearchContextProvider */
-    protected $buttonSearchContextProvider;
+    private $buttonSearchContextProvider;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var OperationExtension */
+    private $extension;
+
     protected function setUp(): void
     {
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->optionsHelper = $this->getMockBuilder(OptionsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->buttonProvider = $this->getMockBuilder(ButtonProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->buttonSearchContextProvider = $this->getMockBuilder(ButtonSearchContextProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextHelper = $this->createMock(ContextHelper::class);
+        $this->optionsHelper = $this->createMock(OptionsHelper::class);
+        $this->buttonProvider = $this->createMock(ButtonProvider::class);
+        $this->buttonSearchContextProvider = $this->createMock(ButtonSearchContextProvider::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_action.provider.route', $this->routeProvider)
@@ -66,35 +55,22 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OperationExtension($container);
     }
 
-    protected function tearDown(): void
-    {
-        unset(
-            $this->extension,
-            $this->routeProvider,
-            $this->contextHelper,
-            $this->optionsHelper,
-            $this->buttonProvider,
-            $this->buttonSearchContextProvider
-        );
-    }
-
     /**
      * @dataProvider hasButtonsDataProvider
-     *
-     * @param bool $value
      */
-    public function testHasButtons($value)
+    public function testHasButtons(bool $value)
     {
         $this->contextHelper->expects($this->once())
             ->method('getContext')
             ->willReturn([]);
 
-        $this->buttonSearchContextProvider
-            ->expects($this->once())
+        $this->buttonSearchContextProvider->expects($this->once())
             ->method('getButtonSearchContext')
             ->willReturn(new ButtonSearchContext());
 
-        $this->buttonProvider->expects($this->once())->method('hasButtons')->willReturn($value);
+        $this->buttonProvider->expects($this->once())
+            ->method('hasButtons')
+            ->willReturn($value);
 
         $this->assertEquals(
             $value,

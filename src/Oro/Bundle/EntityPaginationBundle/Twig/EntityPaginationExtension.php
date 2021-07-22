@@ -56,7 +56,7 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
      */
     protected function getRequestStack()
     {
-        return $this->container->get('request_stack');
+        return $this->container->get(RequestStack::class);
     }
 
     /**
@@ -129,7 +129,7 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
             'oro_entity_pagination.navigation' => EntityPaginationNavigation::class,
             'oro_entity_pagination.storage.data_collector' => StorageDataCollector::class,
             'oro_entity_pagination.message_manager' => MessageManager::class,
-            'request_stack' => RequestStack::class,
+            RequestStack::class,
         ];
     }
 }
