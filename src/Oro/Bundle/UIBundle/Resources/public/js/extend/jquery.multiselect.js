@@ -73,6 +73,14 @@ define(function(require) {
             });
         },
 
+        _bindHeaderEvents() {
+            const superResult = this._super();
+
+            this.header.undelegate('a', 'keydown.multiselect');
+
+            return superResult;
+        },
+
         _bindMenuEvents() {
             const superResult = this._super();
 
@@ -154,6 +162,8 @@ define(function(require) {
                 this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
                 manageFocus.focusTabbable(this.menu);
             }
+
+            this.menu.attr('tabindex', '-1');
         },
 
         /**
@@ -169,7 +179,8 @@ define(function(require) {
 
             if (
                 this.options.preventTabOutOfContainer &&
-                $.contains(this.menu[0], document.activeElement)
+                ($.contains(this.menu[0], document.activeElement) ||
+                this.menu[0].isSameNode(document.activeElement))
             ) {
                 this.button.trigger('focus');
 
@@ -179,6 +190,7 @@ define(function(require) {
                 }
             }
 
+            this.menu.removeAttr('tabindex');
             return superResult;
         },
 
@@ -200,7 +212,8 @@ define(function(require) {
                 let $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 const scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
                 let {activeElement} = document;
-                if (!$checkboxesContainer[0].contains(activeElement)) {
+
+                if (!this.menu[0].contains(activeElement)) {
                     activeElement = null;
                 }
 
@@ -209,9 +222,21 @@ define(function(require) {
                 // updated checkbox container
                 $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 if (activeElement) {
-                    // move focus back to last active checkbox
-                    $checkboxesContainer.find(`#${activeElement.id}`).focus();
+                    if (activeElement.id) {
+                        this.menu.find(`#${activeElement.id}`).focus();
+                    } else if (this.menu.find(activeElement).length && !activeElement.disabled) {
+                        this.menu.find(activeElement).focus();
+                    } else {
+                        this.menu.focus();
+                    }
+
+                    // Fallback when activeElement was present but can't focused
+                    // Keep focus inside menu
+                    if (!this.menu[0].contains(document.activeElement)) {
+                        this.menu.focus();
+                    }
                 }
+
                 $checkboxesContainer.scrollTop(scrollTop);
             }
             this.headerLinkContainer.attr('role', 'presentation');
