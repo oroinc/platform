@@ -11,16 +11,14 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|PhoneProvider */
-    protected $provider;
+    private $provider;
 
     /** @var PhoneExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->provider = $this->getMockBuilder(PhoneProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->provider = $this->createMock(PhoneProvider::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_address.provider.phone', $this->provider)
@@ -89,10 +87,5 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
             'no object' => [null],
             'valid object' => [new \stdClass()]
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_phone_extension', $this->extension->getName());
     }
 }

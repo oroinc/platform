@@ -21,47 +21,14 @@ use Twig\TwigFunction;
  */
 class TabExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const TEMPLATE = '@OroUI/tab_panel.html.twig';
-    const DEFAULT_WIDGET_TYPE = 'block';
+    private const TEMPLATE = '@OroUI/tab_panel.html.twig';
+    private const DEFAULT_WIDGET_TYPE = 'block';
 
-    /** @var ContainerInterface */
-    protected $container;
+    protected ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return MenuExtension
-     */
-    protected function getMenuExtension()
-    {
-        return $this->container->get('oro_menu.twig.extension');
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        return $this->container->get('router');
-    }
-
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
-    {
-        return $this->container->get('security.authorization_checker');
-    }
-
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
-    {
-        return $this->container->get('translator');
     }
 
     /**
@@ -105,8 +72,8 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
      * @param string $menuName
      * @param array  $options
      *
-     * @throws \Symfony\Component\Validator\Exception\InvalidArgumentException
      * @return array
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getTabs($menuName, $options = [])
@@ -120,8 +87,10 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
                 continue;
             }
 
-            if (!$url = $child->getUri()) {
-                if ($route = $child->getExtra('widgetRoute')) {
+            $url = $child->getUri();
+            if (!$url) {
+                $route = $child->getExtra('widgetRoute');
+                if ($route) {
                     $routeParameters = array_merge(
                         $child->getExtra('widgetRouteParameters', []),
                         $options
@@ -185,21 +154,33 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_ui.tab_panel';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [
             'oro_menu.twig.extension' => MenuExtension::class,
-            'router' => RouterInterface::class,
-            'security.authorization_checker' => AuthorizationCheckerInterface::class,
-            'translator' => TranslatorInterface::class,
+            RouterInterface::class,
+            AuthorizationCheckerInterface::class,
+            TranslatorInterface::class,
         ];
+    }
+
+    protected function getMenuExtension(): MenuExtension
+    {
+        return $this->container->get('oro_menu.twig.extension');
+    }
+
+    protected function getRouter(): RouterInterface
+    {
+        return $this->container->get(RouterInterface::class);
+    }
+
+    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
+    {
+        return $this->container->get(AuthorizationCheckerInterface::class);
+    }
+
+    protected function getTranslator(): TranslatorInterface
+    {
+        return $this->container->get(TranslatorInterface::class);
     }
 }

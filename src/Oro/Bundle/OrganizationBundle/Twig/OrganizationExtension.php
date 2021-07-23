@@ -20,8 +20,6 @@ use Twig\TwigFunction;
  */
 class OrganizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_owner_type';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -117,14 +115,6 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
     public function getBusinessUnitCount()
     {
         return $this->getBusinessUnitManager()->getBusinessUnitRepo()->getBusinessUnitsCount();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::EXTENSION_NAME;
     }
 
     /**

@@ -18,6 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -28,29 +29,29 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var DynamicFieldsExtension */
-    protected $extension;
+    /** @var ConfigProviderMock */
+    private $extendConfigProvider;
 
     /** @var ConfigProviderMock */
-    protected $extendConfigProvider;
+    private $entityConfigProvider;
 
     /** @var ConfigProviderMock */
-    protected $entityConfigProvider;
-
-    /** @var ConfigProviderMock */
-    protected $viewConfigProvider;
+    private $viewConfigProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldTypeHelper;
+    private $fieldTypeHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
+    private $dispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
-    protected $featureChecker;
+    private $featureChecker;
+
+    /** @var DynamicFieldsExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -73,9 +74,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->add('oro_entity_config.provider.entity', $this->entityConfigProvider)
             ->add('oro_entity_config.provider.view', $this->viewConfigProvider)
             ->add('oro_entity_extend.extend.field_type_helper', $this->fieldTypeHelper)
-            ->add('property_accessor', $propertyAccessor)
-            ->add('event_dispatcher', $this->dispatcher)
-            ->add('security.authorization_checker', $this->authorizationChecker)
+            ->add(PropertyAccessorInterface::class, $propertyAccessor)
+            ->add(EventDispatcherInterface::class, $this->dispatcher)
+            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
             ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
             ->getContainer($this);
 
@@ -88,7 +89,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
      *
      * @return FieldConfigModel
      */
-    protected function getFieldConfigModel($entityClass, $fieldName)
+    private function getFieldConfigModel($entityClass, $fieldName)
     {
         $entityModel = new EntityConfigModel($entityClass);
         $fieldModel = new FieldConfigModel($fieldName);
@@ -697,7 +698,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(static::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
+            ->with(self::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
 
         self::assertSame(
             [
@@ -767,7 +768,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(static::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
+            ->with(self::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
 
         self::assertSame(
             [

@@ -15,10 +15,7 @@ use Twig\TwigFunction;
  */
 class GetImportExportConfigurationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -26,7 +23,7 @@ class GetImportExportConfigurationExtension extends AbstractExtension implements
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -42,8 +39,7 @@ class GetImportExportConfigurationExtension extends AbstractExtension implements
      */
     public function getConfiguration(string $alias): array
     {
-        return $this->container->get('oro_importexport.configuration.registry')
-            ->getConfigurations($alias);
+        return $this->getImportExportConfigurationRegistry()->getConfigurations($alias);
     }
 
     /**
@@ -54,5 +50,10 @@ class GetImportExportConfigurationExtension extends AbstractExtension implements
         return [
             'oro_importexport.configuration.registry' => ImportExportConfigurationRegistryInterface::class,
         ];
+    }
+
+    private function getImportExportConfigurationRegistry(): ImportExportConfigurationRegistryInterface
+    {
+        return $this->container->get('oro_importexport.configuration.registry');
     }
 }

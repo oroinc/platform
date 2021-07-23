@@ -36,7 +36,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -76,14 +76,6 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction('asset_path', [$this, 'generateUrlWithoutFrontController']),
             new TwigFunction('oro_format_filename', [$this, 'formatFilename']),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_formatter_extension';
     }
 
     /**
@@ -142,12 +134,13 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
         if (!$date) {
             return null;
         }
+
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
             return null;
-        } else {
-            return $dateDiff->y;
         }
+
+        return $dateDiff->y;
     }
 
     /**
@@ -185,7 +178,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
             return null;
         }
         if (!$date instanceof \DateTime) {
-            $format = isset($options['format']) ? $options['format'] : 'Y-m-d';
+            $format = $options['format'] ?? 'Y-m-d';
             $tz = isset($options['timezone'])
                 ? new \DateTimeZone($options['timezone'])
                 : new \DateTimeZone('UTC');
@@ -201,7 +194,7 @@ class FormatExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices()
     {
         return [
-            'translator' => TranslatorInterface::class,
+            TranslatorInterface::class,
             'oro_ui.formatter' => FormatterManager::class,
             'oro_ui.provider.url_without_front_controller' => UrlWithoutFrontControllerProvider::class,
         ];

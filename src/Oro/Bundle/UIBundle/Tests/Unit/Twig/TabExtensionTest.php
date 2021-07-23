@@ -44,9 +44,9 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = self::getContainerBuilder()
             ->add('oro_menu.twig.extension', $this->menuExtension)
-            ->add('router', $this->router)
-            ->add('security.authorization_checker', $this->authorizationChecker)
-            ->add('translator', $this->translator)
+            ->add(RouterInterface::class, $this->router)
+            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
+            ->add(TranslatorInterface::class, $this->translator)
             ->getContainer($this);
 
         $this->extension = new TabExtension($container);
@@ -176,7 +176,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 'tab'        => [
                     'alias'      => 'item',
                     'label'      => 'testLabel',
-                    'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
+                    'widgetType' => 'block',
                     'url'        => 'test'
                 ],
                 'tabOptions' => [],
@@ -194,7 +194,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 'tab'        => [
                     'alias'      => 'item',
                     'label'      => null,
-                    'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
+                    'widgetType' => 'block',
                     'url'        => 'route?' . http_build_query(['type' => 'code'])
                 ],
                 'tabOptions' => [],
@@ -213,7 +213,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 'tab'        => [
                     'alias'      => 'item',
                     'label'      => null,
-                    'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
+                    'widgetType' => 'block',
                     'url'        => 'route?' . http_build_query(['type' => 'test']),
                 ],
                 'tabOptions' => ['type2' => 'test'],
@@ -249,11 +249,6 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
                 false
             ],
         ];
-    }
-
-    public function testName()
-    {
-        $this->assertEquals('oro_ui.tab_panel', $this->extension->getName());
     }
 
     /**

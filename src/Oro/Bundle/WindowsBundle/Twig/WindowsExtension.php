@@ -20,17 +20,9 @@ use Twig\TwigFunction;
  */
 class WindowsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_windows';
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * Protect extension from infinite loop
-     *
-     * @var bool
-     */
-    protected $rendered = false;
+    protected ContainerInterface $container;
+    /** Protect extension from infinite loop */
+    private bool $rendered = false;
 
     public function __construct(ContainerInterface $container)
     {
@@ -133,14 +125,6 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
         }
 
         return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::EXTENSION_NAME;
     }
 
     /**

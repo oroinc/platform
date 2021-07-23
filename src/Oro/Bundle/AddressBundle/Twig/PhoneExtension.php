@@ -77,14 +77,6 @@ class PhoneExtension extends AbstractExtension implements ServiceSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_phone_extension';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [

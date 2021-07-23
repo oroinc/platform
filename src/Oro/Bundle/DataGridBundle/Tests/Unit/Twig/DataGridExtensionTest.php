@@ -62,19 +62,14 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         $container = self::getContainerBuilder()
             ->add('oro_datagrid.datagrid.manager', $this->manager)
             ->add('oro_datagrid.datagrid.name_strategy', $this->nameStrategy)
-            ->add('router', $this->router)
-            ->add('security.authorization_checker', $this->authorizationChecker)
+            ->add(RouterInterface::class, $this->router)
+            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
             ->add('oro_datagrid.helper.route', $this->datagridRouteHelper)
-            ->add('request_stack', $this->requestStack)
-            ->add('logger', $this->logger)
+            ->add(RequestStack::class, $this->requestStack)
+            ->add(LoggerInterface::class, $this->logger)
             ->getContainer($this);
 
         $this->extension = new DataGridExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_datagrid', $this->extension->getName());
     }
 
     public function testGetGridWorks()
@@ -214,7 +209,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     public function routeProvider(): array
     {
         return [
-            [null, DataGridExtension::ROUTE],
+            [null, 'oro_datagrid_index'],
         ];
     }
 

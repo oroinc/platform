@@ -75,16 +75,6 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'sync_extension';
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()

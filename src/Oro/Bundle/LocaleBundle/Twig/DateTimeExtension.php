@@ -53,22 +53,10 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
     public function getFilters()
     {
         return [
-            new TwigFilter(
-                'oro_format_datetime',
-                [$this, 'formatDateTime']
-            ),
-            new TwigFilter(
-                'oro_format_date',
-                [$this, 'formatDate']
-            ),
-            new TwigFilter(
-                'oro_format_day',
-                [$this, 'formatDay']
-            ),
-            new TwigFilter(
-                'oro_format_time',
-                [$this, 'formatTime']
-            ),
+            new TwigFilter('oro_format_datetime', [$this, 'formatDateTime']),
+            new TwigFilter('oro_format_date', [$this, 'formatDate']),
+            new TwigFilter('oro_format_day', [$this, 'formatDay']),
+            new TwigFilter('oro_format_time', [$this, 'formatTime']),
         ];
     }
 
@@ -195,15 +183,7 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getOption(array $options, $name, $default = null)
     {
-        return isset($options[$name]) ? $options[$name] : $default;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_datetime';
+        return $options[$name] ?? $default;
     }
 
     /**

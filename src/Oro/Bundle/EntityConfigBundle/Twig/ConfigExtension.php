@@ -30,68 +30,13 @@ use Twig\TwigFunction;
  */
 class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_config';
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var ConfigManager|null */
-    private $configManager;
-
-    /** @var RouterInterface|null */
-    private $router;
+    private ContainerInterface $container;
+    private ?ConfigManager $configManager = null;
+    private ?RouterInterface $router = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        if (null === $this->configManager) {
-            $this->configManager = $this->container->get(ConfigManager::class);
-        }
-
-        return $this->configManager;
-    }
-
-    /**
-     * @return EntityClassNameHelper
-     */
-    protected function getEntityClassNameHelper()
-    {
-        return $this->container->get(EntityClassNameHelper::class);
-    }
-
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
-    {
-        if (null === $this->router) {
-            $this->router = $this->container->get(RouterInterface::class);
-        }
-
-        return $this->router;
-    }
-
-    /**
-     * @return DoctrineHelper
-     */
-    protected function getDoctrineHelper()
-    {
-        return $this->container->get(DoctrineHelper::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**
@@ -255,7 +200,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
      *
      * @return bool
      */
-    protected function hasRoute($routeName)
+    private function hasRoute($routeName)
     {
         try {
             $this->getRouter()->generate($routeName);
@@ -296,7 +241,7 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     }
 
     /**
-     * @param $entity object
+     * @param object $entity
      *
      * @return string|null
      */
@@ -323,5 +268,33 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
             RouterInterface::class,
             DoctrineHelper::class,
         ];
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        if (null === $this->configManager) {
+            $this->configManager = $this->container->get(ConfigManager::class);
+        }
+
+        return $this->configManager;
+    }
+
+    private function getEntityClassNameHelper(): EntityClassNameHelper
+    {
+        return $this->container->get(EntityClassNameHelper::class);
+    }
+
+    private function getRouter(): RouterInterface
+    {
+        if (null === $this->router) {
+            $this->router = $this->container->get(RouterInterface::class);
+        }
+
+        return $this->router;
+    }
+
+    private function getDoctrineHelper(): DoctrineHelper
+    {
+        return $this->container->get(DoctrineHelper::class);
     }
 }

@@ -11,11 +11,11 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var OroUserExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $genderProvider;
+    private $genderProvider;
+
+    /** @var OroUserExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -28,18 +28,13 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroUserExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('user_extension', $this->extension->getName());
-    }
-
     public function testGetGenderLabel()
     {
         $label = 'Male';
         $this->genderProvider->expects($this->once())
             ->method('getLabelByName')
             ->with(Gender::MALE)
-            ->will($this->returnValue($label));
+            ->willReturn($label);
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'oro_gender', [null])

@@ -12,21 +12,21 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EventDispatcherInterface */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dispatcher;
 
     /** @var IntegrationExtension */
-    private $integrationExtension;
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('event_dispatcher', $this->dispatcher)
+            ->add(EventDispatcherInterface::class, $this->dispatcher)
             ->getContainer($this);
 
-        $this->integrationExtension = new IntegrationExtension($container);
+        $this->extension = new IntegrationExtension($container);
     }
 
     public function testGetThemesShouldReturnDefaultThemeIfNoListenerIsRegistered()
@@ -38,8 +38,10 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
 
-        $themes = $this->integrationExtension->getThemes(new FormView());
-        $this->assertEquals([IntegrationExtension::DEFAULT_THEME], $themes);
+        $this->assertEquals(
+            ['@OroIntegration/Form/fields.html.twig'],
+            self::callTwigFunction($this->extension, 'oro_integration_themes', [new FormView()])
+        );
     }
 
     public function testGetThemesShouldReturnEventThemesIfListenerIsRegistered()
@@ -53,11 +55,13 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(static::anything(), LoadIntegrationThemesEvent::NAME)
-            ->will($this->returnCallback(function (LoadIntegrationThemesEvent $event, $eventName) use ($themes) {
+            ->willReturnCallback(function (LoadIntegrationThemesEvent $event) use ($themes) {
                 $event->setThemes($themes);
-            }));
+            });
 
-        $actualThemes = $this->integrationExtension->getThemes(new FormView());
-        $this->assertEquals($themes, $actualThemes);
+        $this->assertEquals(
+            $themes,
+            self::callTwigFunction($this->extension, 'oro_integration_themes', [new FormView()])
+        );
     }
 }

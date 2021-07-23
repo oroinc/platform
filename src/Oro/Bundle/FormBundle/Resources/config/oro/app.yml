@@ -79,8 +79,12 @@ oro_form:
                     attributes:
                         - data-title
                         - data-type
-                ul: ~
-                ol: ~
+                ul:
+                    attributes:
+                        - type
+                ol:
+                    attributes:
+                        - type
                 li: ~
                 em: ~
                 strong: ~

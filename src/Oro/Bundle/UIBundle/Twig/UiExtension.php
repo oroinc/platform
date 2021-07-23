@@ -58,62 +58,21 @@ use Twig\TwigFunction;
  */
 class UiExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const SKYPE_BUTTON_TEMPLATE = '@OroUI/skype_button.html.twig';
-
     // Big number is set to guarantee Additional section is rendered at the end
     public const ADDITIONAL_SECTION_PRIORITY = 10000;
 
     // Represents key which is used for Additional section in array of blocks to identify it and make possible to work
     public const ADDITIONAL_SECTION_KEY = 'oro_additional_section_key';
 
-    /** @var ContainerInterface */
-    protected $container;
+    private const SKYPE_BUTTON_TEMPLATE = '@OroUI/skype_button.html.twig';
 
-    /**
-     * Protect extension from infinite loop during a widget rendering
-     *
-     * @var array
-     */
-    protected $renderedWidgets = [];
+    protected ContainerInterface $container;
+    /** Protect extension from infinite loop during a widget rendering */
+    private array $renderedWidgets = [];
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return EventDispatcherInterface
-     */
-    protected function getEventDispatcher()
-    {
-        return $this->container->get(EventDispatcherInterface::class);
-    }
-
-    /**
-     * @return Request|null
-     */
-    protected function getRequest()
-    {
-        return $this->container->get(RequestStack::class)->getCurrentRequest();
-    }
-
-    /**
-     * @return UserAgent
-     */
-    protected function getUserAgent()
-    {
-        /** @var UserAgentProviderInterface $userAgentProvider */
-        $userAgentProvider = $this->container->get('oro_ui.user_agent_provider');
-
-        return $userAgentProvider->getUserAgent();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_ui';
     }
 
     /**
@@ -133,10 +92,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     {
         return [
             new TwigFilter('oro_js_template_content', [$this, 'prepareJsTemplateContent']),
-            new TwigFilter(
-                'merge_recursive',
-                [ArrayUtil::class, 'arrayMergeRecursiveDistinct']
-            ),
+            new TwigFilter('merge_recursive', [ArrayUtil::class, 'arrayMergeRecursiveDistinct']),
             new TwigFilter('uniqid', 'uniqid'),
             new TwigFilter('floor', 'floor'),
             new TwigFilter('ceil', 'ceil'),
@@ -209,7 +165,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      * @param string            $pageIdentifier
      * @param array             $data
      * @param object            $entity
-     * @param FormView          $formView
+     * @param FormView|null     $formView
      * @return array
      */
     public function scrollDataBefore(
@@ -338,7 +294,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 
         $elementId = 'widget-container-' . $options['wid'];
 
-        if (!array_key_exists('elementFirst', $options)) {
+        if (!\array_key_exists('elementFirst', $options)) {
             $options['elementFirst'] = true;
         }
 
@@ -375,11 +331,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     protected function validateOptions(array $options)
     {
-        if (!array_key_exists('url', $options)) {
+        if (!\array_key_exists('url', $options)) {
             throw new \InvalidArgumentException('Option url is required');
         }
 
-        if (!array_key_exists('widgetType', $options)) {
+        if (!\array_key_exists('widgetType', $options)) {
             throw new \InvalidArgumentException('Option widgetType is required');
         }
     }
@@ -394,13 +350,13 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     protected function getUrlWithContainer($url, $widgetType, $wid, $widgetTemplate = null)
     {
-        if (strpos($url, '_widgetContainer=') === false) {
+        if (!str_contains($url, '_widgetContainer=')) {
             $parts = parse_url($url);
             $widgetPart = '_widgetContainer=' . $widgetType . '&_wid=' . $wid;
             if ($widgetTemplate && $widgetTemplate !== $widgetType) {
                 $widgetPart .= '&_widgetContainerTemplate=' . $widgetTemplate;
             }
-            if (array_key_exists('query', $parts)) {
+            if (\array_key_exists('query', $parts)) {
                 $separator = $parts['query'] ? '&' : '';
                 $newQuery = $parts['query'] . $separator . $widgetPart;
                 $url = str_replace($parts['query'], $newQuery, $url);
@@ -454,9 +410,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function getContent(array $additionalContent = null, array $keys = null)
     {
-        /** @var TwigContentProviderManager $contentProviderManager */
-        $contentProviderManager = $this->container->get('oro_ui.content_provider.manager.twig');
-        $content = $contentProviderManager->getContent($keys);
+        $content = $this->getTwigContentProviderManager()->getContent($keys);
         if ($additionalContent) {
             $content = array_merge($content, $additionalContent);
         }
@@ -516,7 +470,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function pregReplace($subject, $pattern, $replacement, $limit = -1)
     {
-        if (is_string($subject) && !empty($subject)) {
+        if (\is_string($subject) && !empty($subject)) {
             $subject = preg_replace($pattern, $replacement, $subject, $limit);
         }
 
@@ -696,7 +650,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 
     public function getDefaultPage(): string
     {
-        return $this->container->get(RouterInterface::class)->generate('oro_default');
+        return $this->getRouter()->generate('oro_default');
     }
 
     /**
@@ -708,7 +662,36 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             'oro_ui.content_provider.manager.twig' => TwigContentProviderManager::class,
             'oro_ui.user_agent_provider' => UserAgentProviderInterface::class,
             EventDispatcherInterface::class,
+            RouterInterface::class,
             RequestStack::class,
         ];
+    }
+
+    protected function getTwigContentProviderManager(): TwigContentProviderManager
+    {
+        return $this->container->get('oro_ui.content_provider.manager.twig');
+    }
+
+    protected function getUserAgent(): UserAgent
+    {
+        /** @var UserAgentProviderInterface $userAgentProvider */
+        $userAgentProvider = $this->container->get('oro_ui.user_agent_provider');
+
+        return $userAgentProvider->getUserAgent();
+    }
+
+    protected function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
+    }
+
+    protected function getRouter(): RouterInterface
+    {
+        return $this->container->get(RouterInterface::class);
+    }
+
+    protected function getRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 }

@@ -22,8 +22,6 @@ use Twig\TwigFilter;
  */
 class LocalizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_locale_localization';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -121,14 +119,6 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
     public function getLocalizedValue(Collection $values, Localization $localization = null)
     {
         return (string)$this->getLocalizationHelper()->getLocalizedValue($values, $localization);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return static::NAME;
     }
 
     /**

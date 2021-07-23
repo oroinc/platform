@@ -76,11 +76,9 @@ class DateTimeOrganizationExtension extends DateTimeExtension
         $timeType = $this->getOption($options, 'timeType');
         $organization = $this->getOption($options, 'organization');
 
-        list($locale, $timeZone) = $this->getLocaleSettings($organization, $options);
+        [$locale, $timeZone] = $this->getLocaleSettings($organization, $options);
 
-        $result = $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
-
-        return $result;
+        return $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
     }
 
     /**
@@ -105,14 +103,6 @@ class DateTimeOrganizationExtension extends DateTimeExtension
         }
 
         return [$locale, $timeZone];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_datetime_organization';
     }
 
     /**

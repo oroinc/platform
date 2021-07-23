@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,12 +33,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
             ->add(RequestStack::class, $this->requestStack)
             ->getContainer($this);
 
-        $this->extension = new class($container) extends TitleExtension {
-            public function xgetTemplateFileTitleDataStack(): array
-            {
-                return $this->templateFileTitleDataStack;
-            }
-        };
+        $this->extension = new TitleExtension($container);
     }
 
     public function testRenderSerialized()
@@ -107,7 +103,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('setData')
             ->with([])
             ->willReturnSelf();
-        $this->titleService->expects(self::once(2))
+        $this->titleService->expects(self::once())
             ->method('render')
             ->with([], $title, null, null, true, true)
             ->willReturn($expectedResult);
@@ -140,7 +136,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
         $this->titleService->expects(self::once())
             ->method('setData')
-            ->with($expectedData)
+            ->with(self::identicalTo($expectedData))
             ->willReturnSelf();
         $this->titleService->expects(self::once())
             ->method('render')
@@ -169,12 +165,20 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
                     [['k1' => 'v1'], 'child_template'],
                     [['k1' => 'v2'], 'child_template'],
                     [['k3' => 'v3'], 'child_template'],
+                    [['k5' => ['k1' => 'v2', 'k2' => 'val2']], 'child_template'],
                     [['k1' => 'v4'], 'parent_template'],
                     [['k2' => 'v5'], 'parent_template'],
                     [['k3' => 'v6'], 'parent_template'],
                     [['k4' => 'v7'], 'parent_template'],
+                    [['k5' => ['k1' => 'v1', 'k3' => 'val3']], 'parent_template'],
                 ],
-                ['k1' => 'v2', 'k2' => 'v5', 'k3' => 'v3', 'k4' => 'v7'],
+                [
+                    'k1' => 'v2',
+                    'k2' => 'v5',
+                    'k3' => 'v3',
+                    'k4' => 'v7',
+                    'k5' => ['k1' => 'v2', 'k3' => 'val3', 'k2' => 'val2']
+                ],
             ],
             'empty data' => [
                 [],
@@ -196,7 +200,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [md5(__FILE__) => [$fooData, $barData]],
-            $this->extension->xgetTemplateFileTitleDataStack()
+            ReflectionUtil::getPropertyValue($this->extension, 'templateFileTitleDataStack')
         );
     }
 

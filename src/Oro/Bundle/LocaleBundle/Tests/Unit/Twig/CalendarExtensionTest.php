@@ -11,23 +11,19 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $calendar;
+
     /** @var CalendarExtension */
-    protected $extension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $calendar;
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->localeSettings = $this->getMockBuilder(LocaleSettings::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->calendar = $this->getMockBuilder(Calendar::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->calendar = $this->createMock(Calendar::class);
 
         $container = self::getContainerBuilder()
             ->add(LocaleSettings::class, $this->localeSettings)
@@ -42,13 +38,15 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
         $locale = 'en_US';
         $expectedResult = array('expected_result');
 
-        $this->calendar->expects($this->once())->method('getMonthNames')
+        $this->calendar->expects($this->once())
+            ->method('getMonthNames')
             ->with($width)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->localeSettings->expects($this->once())->method('getCalendar')
+        $this->localeSettings->expects($this->once())
+            ->method('getCalendar')
             ->with($locale)
-            ->will($this->returnValue($this->calendar));
+            ->willReturn($this->calendar);
 
         $this->assertEquals(
             $expectedResult,
@@ -62,13 +60,15 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
         $locale = 'en_US';
         $expectedResult = array('expected_result');
 
-        $this->calendar->expects($this->once())->method('getDayOfWeekNames')
+        $this->calendar->expects($this->once())
+            ->method('getDayOfWeekNames')
             ->with($width)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->localeSettings->expects($this->once())->method('getCalendar')
+        $this->localeSettings->expects($this->once())
+            ->method('getCalendar')
             ->with($locale)
-            ->will($this->returnValue($this->calendar));
+            ->willReturn($this->calendar);
 
         $this->assertEquals(
             $expectedResult,
@@ -81,22 +81,19 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
         $locale = 'en_US';
         $expectedResult = Calendar::DOW_MONDAY;
 
-        $this->calendar->expects($this->once())->method('getFirstDayOfWeek')
+        $this->calendar->expects($this->once())
+            ->method('getFirstDayOfWeek')
             ->with()
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->localeSettings->expects($this->once())->method('getCalendar')
+        $this->localeSettings->expects($this->once())
+            ->method('getCalendar')
             ->with($locale)
-            ->will($this->returnValue($this->calendar));
+            ->willReturn($this->calendar);
 
         $this->assertEquals(
             $expectedResult,
             self::callTwigFunction($this->extension, 'oro_calendar_first_day_of_week', [$locale])
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_calendar', $this->extension->getName());
     }
 }

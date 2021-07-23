@@ -19,19 +19,19 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $permissionManager;
+    private $permissionManager;
 
     /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $uriSecurityHelper;
 
     /** @var OroSecurityExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -50,11 +50,6 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroSecurityExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_security_extension', $this->extension->getName());
-    }
-
     public function testGetOrganizations()
     {
         $user = new User();
@@ -63,11 +58,11 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 
         $organization->setEnabled(true);
 
-        $user->setOrganizations(new ArrayCollection(array($organization, $disabledOrganization)));
+        $user->setOrganizations(new ArrayCollection([$organization, $disabledOrganization]));
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $result = self::callTwigFunction($this->extension, 'get_enabled_organizations', []);
 
@@ -82,7 +77,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
 
         $this->assertSame(
             $organization,
@@ -94,7 +89,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'get_current_organization', [])
@@ -121,8 +116,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testStripDangerousProtocols(): void
     {
-        $this->uriSecurityHelper
-            ->expects($this->once())
+        $this->uriSecurityHelper->expects($this->once())
             ->method('stripDangerousProtocols')
             ->with($uri = 'sample-proto:sample-data')
             ->willReturn($expectedUri = 'sample-data');

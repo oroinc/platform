@@ -15,30 +15,11 @@ use Twig\TwigFunction;
  */
 class ThemeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_theme';
-
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return [ThemeRegistry::class];
-    }
-
-    /**
-     * @return ThemeRegistry
-     */
-    protected function getThemeRegistry()
-    {
-        return $this->container->get(ThemeRegistry::class);
     }
 
     /**
@@ -53,8 +34,6 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
     }
 
     /**
-     * Get theme logo
-     *
      * @return string
      */
     public function getThemeLogo()
@@ -64,12 +43,11 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
         if ($activeTheme) {
             $result = $activeTheme->getLogo();
         }
+
         return $result;
     }
 
     /**
-     * Get theme icon
-     *
      * @return string
      */
     public function getThemeIcon()
@@ -79,14 +57,22 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
         if ($activeTheme) {
             $result = $activeTheme->getIcon();
         }
+
         return $result;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::NAME;
+        return [
+            ThemeRegistry::class
+        ];
+    }
+
+    private function getThemeRegistry(): ThemeRegistry
+    {
+        return $this->container->get(ThemeRegistry::class);
     }
 }

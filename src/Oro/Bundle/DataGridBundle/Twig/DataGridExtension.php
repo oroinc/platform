@@ -29,7 +29,7 @@ use Twig\TwigFunction;
  */
 class DataGridExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const ROUTE = 'oro_datagrid_index';
+    private const ROUTE = 'oro_datagrid_index';
 
     /** @var ContainerInterface */
     protected $container;
@@ -60,7 +60,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getRouter()
     {
-        return $this->container->get('router');
+        return $this->container->get(RouterInterface::class);
     }
 
     /**
@@ -68,7 +68,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getAuthorizationChecker()
     {
-        return $this->container->get('security.authorization_checker');
+        return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
     /**
@@ -84,7 +84,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getRequestStack()
     {
-        return $this->container->get('request_stack');
+        return $this->container->get(RequestStack::class);
     }
 
     /**
@@ -92,15 +92,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getLogger()
     {
-        return $this->container->get('logger');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'oro_datagrid';
+        return $this->container->get(LoggerInterface::class);
     }
 
     /**
@@ -341,11 +333,11 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         return [
             'oro_datagrid.datagrid.manager' => ManagerInterface::class,
             'oro_datagrid.datagrid.name_strategy' => NameStrategyInterface::class,
-            'router' => RouterInterface::class,
-            'security.authorization_checker' => AuthorizationCheckerInterface::class,
             'oro_datagrid.helper.route' => DatagridRouteHelper::class,
-            'request_stack' => RequestStack::class,
-            'logger' => LoggerInterface::class,
+            RouterInterface::class,
+            AuthorizationCheckerInterface::class,
+            RequestStack::class,
+            LoggerInterface::class,
         ];
     }
 }

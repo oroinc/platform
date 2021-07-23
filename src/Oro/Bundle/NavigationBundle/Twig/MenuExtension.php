@@ -21,9 +21,7 @@ use Twig\TwigFunction;
  */
 class MenuExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const MENU_NAME = 'oro_menu';
-
-    const BREADCRUMBS_TEMPLATE = '@OroNavigation/Menu/breadcrumbs.html.twig';
+    private const BREADCRUMBS_TEMPLATE = '@OroNavigation/Menu/breadcrumbs.html.twig';
 
     /** @var ContainerInterface */
     protected $container;
@@ -178,16 +176,6 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
         }
 
         return null;
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return self::MENU_NAME;
     }
 
     /**

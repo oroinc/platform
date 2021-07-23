@@ -13,8 +13,6 @@ use Twig\TwigFunction;
  */
 class ScopeExtension extends AbstractExtension
 {
-    const NAME = 'oro_scope';
-
     /**
      * @var PropertyAccessorInterface
      */
@@ -49,13 +47,5 @@ class ScopeExtension extends AbstractExtension
         }
 
         return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return static::NAME;
     }
 }

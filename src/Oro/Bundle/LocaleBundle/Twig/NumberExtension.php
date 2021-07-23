@@ -430,15 +430,7 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     protected function getOption(array $options, $name, $default = null)
     {
-        return isset($options[$name]) ? $options[$name] : $default;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_locale_number';
+        return $options[$name] ?? $default;
     }
 
     /**

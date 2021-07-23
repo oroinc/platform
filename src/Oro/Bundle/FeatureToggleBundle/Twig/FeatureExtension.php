@@ -43,14 +43,6 @@ class FeatureExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_featuretoggle_extension';
-    }
-
-    /**
      * @param string $feature
      * @param int|object|null $scopeIdentifier
      * @return bool

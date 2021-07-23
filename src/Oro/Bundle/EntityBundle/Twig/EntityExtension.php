@@ -23,65 +23,16 @@ use Twig\TwigFunction;
  *   - oro_action_params
  *   - oro_entity_fallback_value
  *
- * Provides a Twig filters to render entity name:
+ * Provides a Twig filter to render entity name:
  *   - oro_format_name
  */
 class EntityExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return DoctrineHelper
-     */
-    protected function getDoctrineHelper()
-    {
-        return $this->container->get(DoctrineHelper::class);
-    }
-
-    /**
-     * @return EntityIdAccessor
-     */
-    protected function getEntityIdAccessor()
-    {
-        return $this->container->get(EntityIdAccessor::class);
-    }
-
-    /**
-     * @return EntityRoutingHelper
-     */
-    protected function getEntityRoutingHelper()
-    {
-        return $this->container->get(EntityRoutingHelper::class);
-    }
-
-    /**
-     * @return EntityNameResolver
-     */
-    protected function getEntityNameResolver()
-    {
-        return $this->container->get(EntityNameResolver::class);
-    }
-
-    /**
-     * @return EntityAliasResolver
-     */
-    protected function getEntityAliasResolver()
-    {
-        return $this->container->get(EntityAliasResolver::class);
-    }
-
-    /**
-     * @return EntityFallbackResolver
-     */
-    protected function getEntityFallbackResolver()
-    {
-        return $this->container->get(EntityFallbackResolver::class);
     }
 
     /**
@@ -121,7 +72,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function getClassName($object, $escape = false)
     {
-        if (!is_object($object)) {
+        if (!\is_object($object)) {
             return null;
         }
 
@@ -154,7 +105,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function getClassAlias($object, $isPlural = false)
     {
-        if (!is_object($object)) {
+        if (!\is_object($object)) {
             return null;
         }
 
@@ -173,7 +124,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function getActionParams($object, $action = null)
     {
-        if (!is_object($object)) {
+        if (!\is_object($object)) {
             return [];
         }
 
@@ -234,14 +185,6 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_entity';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [
@@ -252,5 +195,35 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
             EntityFallbackResolver::class,
             DoctrineHelper::class
         ];
+    }
+
+    private function getDoctrineHelper(): DoctrineHelper
+    {
+        return $this->container->get(DoctrineHelper::class);
+    }
+
+    private function getEntityIdAccessor(): EntityIdAccessor
+    {
+        return $this->container->get(EntityIdAccessor::class);
+    }
+
+    private function getEntityRoutingHelper(): EntityRoutingHelper
+    {
+        return $this->container->get(EntityRoutingHelper::class);
+    }
+
+    private function getEntityNameResolver(): EntityNameResolver
+    {
+        return $this->container->get(EntityNameResolver::class);
+    }
+
+    private function getEntityAliasResolver(): EntityAliasResolver
+    {
+        return $this->container->get(EntityAliasResolver::class);
+    }
+
+    private function getEntityFallbackResolver(): EntityFallbackResolver
+    {
+        return $this->container->get(EntityFallbackResolver::class);
     }
 }

@@ -45,11 +45,6 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(AbstractDynamicFieldsExtension::NAME, $this->extension->getName());
-    }
-
     public function testGetField()
     {
         $expectedData = [

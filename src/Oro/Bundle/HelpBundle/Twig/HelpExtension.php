@@ -14,20 +14,11 @@ use Twig\TwigFunction;
  */
 class HelpExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return HelpLinkProvider
-     */
-    private function getHelpLinkProvider()
-    {
-        return $this->container->get('oro_help.help_link_provider');
     }
 
     /**
@@ -41,9 +32,7 @@ class HelpExtension extends AbstractExtension implements ServiceSubscriberInterf
     }
 
     /**
-     * Get help link
-     *
-     * @return bool
+     * @return string
      */
     public function getHelpLinkUrl()
     {
@@ -58,5 +47,10 @@ class HelpExtension extends AbstractExtension implements ServiceSubscriberInterf
         return [
             'oro_help.help_link_provider' => HelpLinkProvider::class,
         ];
+    }
+
+    private function getHelpLinkProvider(): HelpLinkProvider
+    {
+        return $this->container->get('oro_help.help_link_provider');
     }
 }

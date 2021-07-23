@@ -73,14 +73,6 @@ class DashboardExtension extends AbstractExtension implements ServiceSubscriberI
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_dashboard';
-    }
-
-    /**
      * @return array
      */
     public function getQueryFilterMetadata()

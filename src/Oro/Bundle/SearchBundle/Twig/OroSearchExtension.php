@@ -90,11 +90,6 @@ class OroSearchExtension extends AbstractExtension
         return $this->highlight($this->trimByString($text, $searchString, $symbolCount), $searchString);
     }
 
-    public function getName()
-    {
-        return 'search_extension';
-    }
-
     /**
      * @param  string $inputString
      * @return string

@@ -27,49 +27,44 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $environment;
+    private $environment;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $contentProviderManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    private $userAgentProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $contentProviderManager;
+    private $eventDispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $userAgentProvider;
+    private $requestStack;
 
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
     /** @var UiExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
         $this->contentProviderManager = $this->createMock(TwigContentProviderManager::class);
         $this->userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->router = $this->createMock(RouterInterface::class);
 
         $container = self::getContainerBuilder()
+            ->add('oro_ui.content_provider.manager.twig', $this->contentProviderManager)
+            ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
             ->add(EventDispatcherInterface::class, $this->eventDispatcher)
             ->add(RequestStack::class, $this->requestStack)
             ->add(RouterInterface::class, $this->router)
-            ->add('oro_ui.content_provider.manager.twig', $this->contentProviderManager)
-            ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
             ->getContainer($this);
 
         $this->extension = new UiExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_ui', $this->extension->getName());
     }
 
     public function testOnScrollDataBefore()
@@ -84,14 +79,13 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $this->isInstanceOf(BeforeListRenderEvent::class),
                 'oro_ui.scroll_data.before.' . $pageIdentifier
-            )->willReturnCallback(
-                function (BeforeListRenderEvent $event, $name) use ($data, $alteredData, $formView) {
-                    $this->assertEquals($this->environment, $event->getEnvironment());
-                    $this->assertEquals($data, $event->getScrollData());
-                    $this->assertEquals($formView, $event->getFormView());
-                    $event->setScrollData($alteredData);
-                }
-            );
+            )
+            ->willReturnCallback(function (BeforeListRenderEvent $event) use ($data, $alteredData, $formView) {
+                $this->assertEquals($this->environment, $event->getEnvironment());
+                $this->assertEquals($data, $event->getScrollData());
+                $this->assertEquals($formView, $event->getFormView());
+                $event->setScrollData($alteredData);
+            });
 
         $entity = new \stdClass();
 
@@ -146,13 +140,11 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 $this->isInstanceOf(BeforeFormRenderEvent::class),
                 Events::BEFORE_UPDATE_FORM_RENDER
             )
-            ->willReturnCallback(
-                function (BeforeFormRenderEvent $event, $eventName) use ($formView, $formData, $entity) {
-                    self::assertSame($formView, $event->getForm());
-                    self::assertSame($formData, $event->getFormData());
-                    self::assertSame($entity, $event->getEntity());
-                }
-            );
+            ->willReturnCallback(function (BeforeFormRenderEvent $event) use ($formView, $formData, $entity) {
+                self::assertSame($formView, $event->getForm());
+                self::assertSame($formData, $event->getFormData());
+                self::assertSame($entity, $event->getEntity());
+            });
 
         $this->assertSame(
             $formData,
@@ -177,13 +169,11 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 $this->isInstanceOf(BeforeFormRenderEvent::class),
                 Events::BEFORE_UPDATE_FORM_RENDER
             )
-            ->willReturnCallback(
-                function (BeforeFormRenderEvent $event, $eventName) use ($formView, $formData) {
-                    self::assertSame($formView, $event->getForm());
-                    self::assertSame($formData, $event->getFormData());
-                    self::assertNull($event->getEntity());
-                }
-            );
+            ->willReturnCallback(function (BeforeFormRenderEvent $event) use ($formView, $formData) {
+                self::assertSame($formView, $event->getForm());
+                self::assertSame($formData, $event->getFormData());
+                self::assertNull($event->getEntity());
+            });
 
         $this->assertSame(
             $formData,
@@ -203,7 +193,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->contentProviderManager->expects($this->once())
             ->method('getContent')
             ->with($keys)
-            ->will($this->returnValue($content));
+            ->willReturn($content);
 
         $this->assertEquals(
             $expected,
@@ -211,7 +201,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function contentDataProvider()
+    public function contentDataProvider(): array
     {
         return [
             [
@@ -240,7 +230,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function prepareJsTemplateContentProvider()
+    public function prepareJsTemplateContentProvider(): array
     {
         return [
             'null' => [
@@ -303,7 +293,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function pregReplaceProvider()
+    public function pregReplaceProvider(): array
     {
         return [
             'pattern 1' => [
@@ -335,7 +325,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testAddUrlQuery($expected, $source, array $query = null)
     {
-        $request = new Request(null !== $query ? $query : []);
+        $request = new Request($query ?? []);
 
         $this->requestStack->expects(self::once())
             ->method('getCurrentRequest')
@@ -347,7 +337,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function addUrlQueryProvider()
+    public function addUrlQueryProvider(): array
     {
         return [
             'no request' => [
@@ -427,7 +417,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isUrlLocalProvider()
+    public function isUrlLocalProvider(): array
     {
         return [
             'same page' => [
@@ -619,36 +609,23 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->environment->expects($this->once())
             ->method('render')
             ->with($expectedTemplate, $this->anything())
-            ->will(
-                $this->returnCallback(
-                    function ($template, $options) use ($expectedOptions, $username) {
-                        \PHPUnit\Framework\TestCase::assertArrayHasKey('name', $options['options']);
-                        \PHPUnit\Framework\TestCase::assertEquals(
-                            $expectedOptions['name'],
-                            $options['options']['name']
-                        );
-                        \PHPUnit\Framework\TestCase::assertArrayHasKey('participants', $options['options']);
-                        \PHPUnit\Framework\TestCase::assertEquals(
-                            $expectedOptions['participants'],
-                            $options['options']['participants']
-                        );
-                        \PHPUnit\Framework\TestCase::assertArrayHasKey('element', $options['options']);
-                        \PHPUnit\Framework\TestCase::assertStringContainsString(
-                            'skype_button_' . md5($username),
-                            $options['options']['element']
-                        );
+            ->willReturnCallback(function ($template, $options) use ($expectedOptions, $username) {
+                self::assertArrayHasKey('name', $options['options']);
+                self::assertEquals($expectedOptions['name'], $options['options']['name']);
+                self::assertArrayHasKey('participants', $options['options']);
+                self::assertEquals($expectedOptions['participants'], $options['options']['participants']);
+                self::assertArrayHasKey('element', $options['options']);
+                self::assertStringContainsString('skype_button_' . md5($username), $options['options']['element']);
 
-                        return 'BUTTON_CODE';
-                    }
-                )
-            );
+                return 'BUTTON_CODE';
+            });
         $this->assertEquals(
             'BUTTON_CODE',
             self::callTwigFunction($this->extension, 'skype_button', [$this->environment, $username, $options])
         );
     }
 
-    public function skypeButtonProvider()
+    public function skypeButtonProvider(): array
     {
         return [
             [
@@ -658,7 +635,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                     'participants' => ['echo123'],
                     'name' => 'call',
                 ],
-                UiExtension::SKYPE_BUTTON_TEMPLATE
+                '@OroUI/skype_button.html.twig'
             ],
             [
                 'echo123',
@@ -687,7 +664,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function ceilProvider()
+    public function ceilProvider(): array
     {
         return [
             [5, 4.6],
@@ -728,11 +705,11 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDefaultPage(): void
     {
-        $this->router
-            ->expects($this->once())
+        $url = 'http://sample-app/sample-url';
+        $this->router->expects($this->once())
             ->method('generate')
-            ->with($routeName = 'oro_default')
-            ->willReturn($url = 'http://sample-app/sample-url');
+            ->with('oro_default')
+            ->willReturn($url);
 
         $this->assertEquals(
             $url,
@@ -751,10 +728,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function urlAddQueryParametersDataProvider()
+    public function urlAddQueryParametersDataProvider(): array
     {
         return [
             ['http://example.com/test', [], 'http://example.com/test'],
