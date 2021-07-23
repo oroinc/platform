@@ -2,35 +2,49 @@
 
 namespace Oro\Bundle\ReminderBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\AbstractTwigSandboxConfigurationPass;
 
-class TwigSandboxConfigurationPass implements CompilerPassInterface
+/**
+ * Registers the following Twig functions for the email templates rendering sandbox:
+ * * url
+ * * path
+ */
+class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
 {
-    const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
-    const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
-    const ROUTING_EXTENSION_SERVICE_KEY = 'twig.extension.routing';
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFunctions(): array
+    {
+        return [
+            'url',
+            'path'
+        ];
+    }
 
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    protected function getFilters(): array
     {
-        if ($container->hasDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY)
-            && $container->hasDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY)
-            && $container->hasDefinition(self::ROUTING_EXTENSION_SERVICE_KEY)) {
-            // register available function
-            $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
-            $functions = $securityPolicyDef->getArgument(4);
-            $functions = array_merge(
-                $functions,
-                array('url', 'path')
-            );
-            $securityPolicyDef->replaceArgument(4, $functions);
-            // register an twig extension implements this function
-            $rendererDef = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);
-            $rendererDef->addMethodCall('addExtension', array(new Reference(self::ROUTING_EXTENSION_SERVICE_KEY)));
-        }
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTags(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
+    {
+        return [
+            'twig.extension.routing'
+        ];
     }
 }

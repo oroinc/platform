@@ -130,16 +130,6 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'oro_security_extension';
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()

@@ -14,22 +14,11 @@ use Twig\TwigFunction;
  */
 class PlatformExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_platform';
-
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return VersionHelper
-     */
-    protected function getVersionHelper()
-    {
-        return $this->container->get('oro_platform.composer.version_helper');
     }
 
     /**
@@ -42,20 +31,9 @@ class PlatformExtension extends AbstractExtension implements ServiceSubscriberIn
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->getVersionHelper()->getVersion();
-    }
-
-    /**
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return self::EXTENSION_NAME;
     }
 
     /**
@@ -66,5 +44,10 @@ class PlatformExtension extends AbstractExtension implements ServiceSubscriberIn
         return [
             'oro_platform.composer.version_helper' => VersionHelper::class,
         ];
+    }
+
+    private function getVersionHelper(): VersionHelper
+    {
+        return $this->container->get('oro_platform.composer.version_helper');
     }
 }

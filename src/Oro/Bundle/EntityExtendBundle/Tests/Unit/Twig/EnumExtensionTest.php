@@ -11,10 +11,10 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $enumValueProvider;
+    private $enumValueProvider;
 
     /** @var EnumExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -121,14 +121,6 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             ['val1', 'val4', 'val2'],
             self::callTwigFilter($this->extension, 'sort_enum', ['val1,val2,val4', $enumValueEntityClass])
-        );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_enum',
-            $this->extension->getName()
         );
     }
 }

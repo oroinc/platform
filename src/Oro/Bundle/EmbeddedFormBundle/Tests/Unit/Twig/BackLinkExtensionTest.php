@@ -12,13 +12,13 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var BackLinkExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -26,19 +26,11 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('router', $this->router)
-            ->add('translator', $this->translator)
+            ->add(RouterInterface::class, $this->router)
+            ->add(TranslatorInterface::class, $this->translator)
             ->getContainer($this);
 
         $this->extension = new BackLinkExtension($container);
-    }
-
-    public function testShouldReturnName()
-    {
-        $this->assertEquals(
-            'oro_embedded_form_back_link_extension',
-            $this->extension->getName()
-        );
     }
 
     public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText()
@@ -53,11 +45,11 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
-            ->will($this->returnValue($url));
+            ->willReturn($url);
         $this->translator->expects($this->once())
             ->method('trans')
             ->with($text)
-            ->will($this->returnValue($translatedText));
+            ->willReturn($translatedText);
 
         $this->assertEquals(
             $expectedString,
@@ -78,7 +70,7 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->once())
             ->method('trans')
             ->with($text)
-            ->will($this->returnValue($translatedText));
+            ->willReturn($translatedText);
 
         $this->assertEquals(
             $expectedString,
@@ -96,11 +88,11 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_embedded_form_submit', ['id' => $id])
-            ->will($this->returnValue($url));
+            ->willReturn($url);
         $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.embeddedform.back_link_default_text')
-            ->will($this->returnValue('Back'));
+            ->willReturn('Back');
 
         $this->assertEquals(
             $expectedString,

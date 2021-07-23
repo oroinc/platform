@@ -91,14 +91,6 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'oro_ui.html_tag';
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()

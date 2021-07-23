@@ -22,19 +22,11 @@ use Twig\TwigFunction;
  */
 class WorkflowExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_workflow';
-
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    protected function getWorkflowManager(): WorkflowManager
-    {
-        return $this->container->get(WorkflowManagerRegistry::class)->getManager();
     }
 
     /**
@@ -60,14 +52,6 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
                 ['is_safe' => ['html']]
             ),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**
@@ -100,19 +84,24 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->getWorkflowVariableFormatter()->formatWorkflowVariableValue($variable);
     }
 
-    protected function getWorkflowVariableFormatter(): WorkflowVariableFormatter
-    {
-        return $this->container->get(WorkflowVariableFormatter::class);
-    }
-
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices(): array
+    public static function getSubscribedServices()
     {
         return [
             WorkflowVariableFormatter::class,
             WorkflowManagerRegistry::class,
         ];
+    }
+
+    private function getWorkflowVariableFormatter(): WorkflowVariableFormatter
+    {
+        return $this->container->get(WorkflowVariableFormatter::class);
+    }
+
+    private function getWorkflowManager(): WorkflowManager
+    {
+        return $this->container->get(WorkflowManagerRegistry::class)->getManager();
     }
 }

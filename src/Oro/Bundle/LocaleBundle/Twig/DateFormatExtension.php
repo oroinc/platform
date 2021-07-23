@@ -37,14 +37,6 @@ class DateFormatExtension extends AbstractExtension implements ServiceSubscriber
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_locale_dateformat';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

@@ -19,8 +19,6 @@ use Twig\TwigFunction;
  */
 class EntityPaginationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_pagination';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -58,7 +56,7 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
      */
     protected function getRequestStack()
     {
-        return $this->container->get('request_stack');
+        return $this->container->get(RequestStack::class);
     }
 
     /**
@@ -125,21 +123,13 @@ class EntityPaginationExtension extends AbstractExtension implements ServiceSubs
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return self::NAME;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [
             'oro_entity_pagination.navigation' => EntityPaginationNavigation::class,
             'oro_entity_pagination.storage.data_collector' => StorageDataCollector::class,
             'oro_entity_pagination.message_manager' => MessageManager::class,
-            'request_stack' => RequestStack::class,
+            RequestStack::class,
         ];
     }
 }

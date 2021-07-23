@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
@@ -20,25 +21,12 @@ use Twig\TwigFunction;
  */
 class TitleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXT_NAME = 'oro_title';
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var array */
-    protected $templateFileTitleDataStack = [];
+    private ContainerInterface $container;
+    private array $templateFileTitleDataStack = [];
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return TitleServiceInterface
-     */
-    protected function getTitleService()
-    {
-        return $this->container->get('oro_navigation.title_service');
     }
 
     /**
@@ -138,7 +126,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
      * @param array $options
      * @param string|null $templateScope
      */
-    protected function addTitleData(array $options = [], $templateScope = null)
+    private function addTitleData(array $options = [], $templateScope = null)
     {
         if (!$templateScope) {
             $backtrace = debug_backtrace(false);
@@ -149,38 +137,32 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
             }
         }
 
-        if (!isset($this->templateFileTitleDataStack[$templateScope])) {
-            $this->templateFileTitleDataStack[$templateScope] = [];
-        }
         $this->templateFileTitleDataStack[$templateScope][] = $options;
     }
 
-    /**
-     * @return array
-     */
-    protected function getTitleData()
+    private function getTitleData(): array
     {
         $result = [];
         if ($this->templateFileTitleDataStack) {
-            $result = [];
-            foreach (array_reverse($this->templateFileTitleDataStack) as $templateOptions) {
+            $reversedTemplateFileTitleDataStack = array_reverse($this->templateFileTitleDataStack);
+            foreach ($reversedTemplateFileTitleDataStack as $templateOptions) {
                 foreach ($templateOptions as $options) {
-                    $result = array_replace_recursive($result, $options);
+                    $result[] = $options;
                 }
             }
+            if ($result) {
+                $result = array_replace_recursive(...$result);
+            }
         }
+
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    private function getCurrenRoute()
+    private function getCurrenRoute(): ?string
     {
-        return $this->container
-            ->get(RequestStack::class)
-            ->getCurrentRequest()
-            ->get('_route');
+        $request = $this->getRequest();
+
+        return null !== $request ? $request->get('_route') : null;
     }
 
     /**
@@ -192,5 +174,15 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
             'oro_navigation.title_service' => TitleServiceInterface::class,
             RequestStack::class,
         ];
+    }
+
+    private function getTitleService(): TitleServiceInterface
+    {
+        return $this->container->get('oro_navigation.title_service');
+    }
+
+    protected function getRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 }

@@ -32,7 +32,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getSecurityTokenStorage()
     {
-        return $this->container->get('security.token_storage');
+        return $this->container->get(TokenStorageInterface::class);
     }
 
     /**
@@ -48,7 +48,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     protected function getEntityManager()
     {
-        return $this->container->get('doctrine')->getManagerForClass(Reminder::class);
+        return $this->container->get(ManagerRegistry::class)->getManagerForClass(Reminder::class);
     }
 
     /**
@@ -92,20 +92,12 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_reminder.subscriber';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [
-            'security.token_storage' => TokenStorageInterface::class,
             'oro_reminder.web_socket.message_params_provider' => MessageParamsProvider::class,
-            'doctrine' => ManagerRegistry::class,
+            TokenStorageInterface::class,
+            ManagerRegistry::class,
         ];
     }
 }

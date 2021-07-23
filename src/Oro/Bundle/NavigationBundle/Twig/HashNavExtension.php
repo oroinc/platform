@@ -68,14 +68,4 @@ class HashNavExtension extends AbstractExtension
     {
         return ResponseHashnavListener::HASH_NAVIGATION_HEADER;
     }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName(): string
-    {
-        return 'oro_hash_nav';
-    }
 }

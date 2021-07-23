@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Twig;
 
 use Doctrine\Inflector\Inflector;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
@@ -45,8 +46,6 @@ use Twig\TwigTest;
  */
 class LayoutExtension extends AbstractExtension implements InitRuntimeInterface, ServiceSubscriberInterface
 {
-    const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
-
     /**
      * This property is public so that it can be accessed directly from compiled
      * templates without having to call a getter, which slightly decreases performance.
@@ -55,12 +54,9 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
      */
     public $renderer;
 
-    /** @var TextHelper */
-    private $textHelper;
-
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
     private Inflector $inflector;
+    private ?TextHelper $textHelper = null;
 
     public function __construct(ContainerInterface $container, Inflector $inflector)
     {
@@ -96,22 +92,22 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
             new TwigFunction(
                 'block_widget',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
             new TwigFunction(
                 'block_label',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
             new TwigFunction(
                 'block_row',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
             new TwigFunction(
                 'parent_block_widget',
                 null,
-                ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
+                ['node_class' => SearchAndRenderBlockNode::class, 'is_safe' => ['html']]
             ),
             new TwigFunction(
                 'layout_attr_defaults',
@@ -201,17 +197,17 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
     public function defaultAttributes(array $attr, array $defaultAttr)
     {
         foreach ($defaultAttr as $key => $value) {
-            if (strpos($key, '~') === 0) {
+            if (str_starts_with($key, '~')) {
                 $key = substr($key, 1);
-                if (array_key_exists($key, $attr)) {
-                    if (is_array($value)) {
+                if (\array_key_exists($key, $attr)) {
+                    if (\is_array($value)) {
                         $attr[$key] = ArrayUtil::arrayMergeRecursiveDistinct($value, (array)$attr[$key]);
                     } else {
                         $attr[$key] .= $value;
                     }
                 }
             }
-            if (!array_key_exists($key, $attr)) {
+            if (!\array_key_exists($key, $attr)) {
                 $attr[$key] = $value;
             }
         }
@@ -240,11 +236,11 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
      */
     public function convertValueToString($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $value = stripslashes(json_encode($value));
-        } elseif (is_object($value)) {
-            $value = get_class($value);
-        } elseif (!is_string($value)) {
+        } elseif (\is_object($value)) {
+            $value = \get_class($value);
+        } elseif (!\is_string($value)) {
             $value = var_export($value, true);
         }
 
@@ -292,7 +288,7 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
      */
     public function isString($value)
     {
-        return is_string($value);
+        return \is_string($value);
     }
 
     /**

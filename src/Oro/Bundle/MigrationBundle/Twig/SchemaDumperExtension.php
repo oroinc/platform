@@ -18,20 +18,11 @@ use Twig\TwigFunction;
  */
 class SchemaDumperExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var AbstractPlatform */
-    protected $platform;
-
-    /** @var Column */
-    protected $defaultColumn;
-
-    /** @var array */
-    protected $defaultColumnOptions = [];
-
-    /** @var array */
-    protected $optionNames = [
+    private ContainerInterface $container;
+    private ?AbstractPlatform $platform = null;
+    private ?Column $defaultColumn = null;
+    private array $defaultColumnOptions = [];
+    private array $optionNames = [
         'default',
         'notnull',
         'length',
@@ -50,14 +41,6 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'schema_dumper_extension';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -65,11 +48,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         ];
     }
 
-    /**
-     * @param Column $column
-     * @return array
-     */
-    public function getColumnOptions(Column $column)
+    public function getColumnOptions(Column $column): array
     {
         $defaultOptions = $this->getDefaultOptions();
         $platform = $this->getPlatform();
@@ -93,25 +72,17 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         return $options;
     }
 
-    /**
-     * @param Column $column
-     * @param string $optionName
-     * @return mixed
-     */
-    protected function getColumnOption(Column $column, $optionName)
+    private function getColumnOption(Column $column, string $optionName): mixed
     {
         $method = 'get' . $optionName;
 
         return $column->$method();
     }
 
-    /**
-     * @return AbstractPlatform
-     */
-    protected function getPlatform()
+    private function getPlatform(): AbstractPlatform
     {
-        if (!$this->platform) {
-            $this->platform = $this->container->get('doctrine')
+        if (null === $this->platform) {
+            $this->platform = $this->container->get(ManagerRegistry::class)
                 ->getConnection()
                 ->getDatabasePlatform();
         }
@@ -119,12 +90,9 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         return $this->platform;
     }
 
-    /**
-     * @return array
-     */
-    protected function getDefaultOptions()
+    private function getDefaultOptions(): array
     {
-        if (!$this->defaultColumn) {
+        if (null === $this->defaultColumn) {
             $this->defaultColumn = new Column('_template_', Type::getType(Types::STRING));
         }
         if (!$this->defaultColumnOptions) {
@@ -142,7 +110,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     public static function getSubscribedServices()
     {
         return [
-            'doctrine' => ManagerRegistry::class,
+            ManagerRegistry::class,
         ];
     }
 }

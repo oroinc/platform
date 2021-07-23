@@ -10,11 +10,11 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var DateTimeExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
+    private $formatter;
+
+    /** @var DateTimeExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -42,9 +42,10 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         ];
         $expectedResult = '12/31/13 12:00 AM';
 
-        $this->formatter->expects($this->once())->method('format')
+        $this->formatter->expects($this->once())
+            ->method('format')
             ->with($value, $dateType, $timeType, $locale, $timeZone)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -88,9 +89,10 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
             'timeZone' => $timeZone
         ];
 
-        $this->formatter->expects($this->once())->method('formatDate')
+        $this->formatter->expects($this->once())
+            ->method('formatDate')
             ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals(
             $expected,
@@ -128,9 +130,10 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $dateType = null;
         $options = ['locale' => $locale];
 
-        $this->formatter->expects($this->once())->method('formatDay')
+        $this->formatter->expects($this->once())
+            ->method('formatDay')
             ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals(
             $expected,
@@ -174,18 +177,14 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
             'timeZone' => $timeZone
         ];
 
-        $this->formatter->expects($this->once())->method('formatTime')
+        $this->formatter->expects($this->once())
+            ->method('formatTime')
             ->with($value, $timeType, $locale, $timeZone ?: 'UTC')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals(
             $expected,
             self::callTwigFilter($this->extension, 'oro_format_time', [$value, $options])
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_datetime', $this->extension->getName());
     }
 }

@@ -13,17 +13,15 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var AddressExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
+    private $formatter;
+
+    /** @var AddressExtension */
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->formatter = $this->getMockBuilder(AddressFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(AddressFormatter::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_locale.formatter.address', $this->formatter)
@@ -34,14 +32,15 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testFormatAddress()
     {
-        $address = $this->createMock('Oro\Bundle\LocaleBundle\Model\AddressInterface');
+        $address = $this->createMock(AddressInterface::class);
         $country = 'CA';
         $newLineSeparator = '<br/>';
         $expectedResult = 'expected result';
 
-        $this->formatter->expects($this->once())->method('format')
+        $this->formatter->expects($this->once())
+            ->method('format')
             ->with($address, $country, $newLineSeparator)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals(
             $expectedResult,
@@ -61,43 +60,35 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
     ): void {
         $address = $this->createMock(AddressInterface::class);
 
-        $this->formatter
-            ->expects($this->any())
+        $this->formatter->expects($this->any())
             ->method('getCountry')
             ->willReturn($country);
 
-        $this->formatter
-            ->expects($this->once())
+        $this->formatter->expects($this->once())
             ->method('getAddressFormat')
             ->with($country)
             ->willReturn($addressFormat);
 
-        $this->formatter
-            ->expects($this->once())
+        $this->formatter->expects($this->once())
             ->method('getAddressParts')
             ->with($address, $addressFormat, $country)
             ->willReturn($addressParts);
 
         $environment = $this->createMock(Environment::class);
         $template = $this->createMock(Template::class);
-        $environment
-            ->expects($this->once())
+        $environment->expects($this->once())
             ->method('loadTemplate')
             ->with('@OroLocale/Twig/address.html.twig')
             ->willReturn($template);
 
-        $template
-            ->expects($this->any())
+        $template->expects($this->any())
             ->method('hasBlock')
-            ->willReturnMap(
-                [
-                    ['address_part', [], [], true],
-                    ['address_part_phone', [], [], true],
-                ]
-            );
+            ->willReturnMap([
+                ['address_part', [], [], true],
+                ['address_part_phone', [], [], true],
+            ]);
 
-        $template
-            ->expects($this->any())
+        $template->expects($this->any())
             ->method('renderBlock')
             ->willReturnCallback(
                 static fn (string $blockName, array $context) => implode(
@@ -216,10 +207,5 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
                     ' address_part_phone_part_name_part_value_phone_424242',
             ],
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale_address', $this->extension->getName());
     }
 }

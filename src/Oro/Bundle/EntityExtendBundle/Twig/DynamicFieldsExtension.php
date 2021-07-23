@@ -27,14 +27,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 {
-    /** @var ConfigProvider|null */
-    private $extendConfigProvider;
-
-    /** @var ConfigProvider|null */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|null */
-    private $viewConfigProvider;
+    private ?ConfigProvider $extendConfigProvider = null;
+    private ?ConfigProvider $entityConfigProvider = null;
+    private ?ConfigProvider $viewConfigProvider = null;
 
     /**
      * {@inheritdoc}
@@ -46,25 +41,19 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
             'oro_entity_config.provider.extend' => ConfigProvider::class,
             'oro_entity_config.provider.entity' => ConfigProvider::class,
             'oro_entity_config.provider.view' => ConfigProvider::class,
-            'property_accessor' => PropertyAccessorInterface::class,
-            'event_dispatcher' => EventDispatcherInterface::class,
-            'security.authorization_checker' => AuthorizationCheckerInterface::class,
             'oro_featuretoggle.checker.feature_checker' => FeatureChecker::class,
+            PropertyAccessorInterface::class,
+            EventDispatcherInterface::class,
+            AuthorizationCheckerInterface::class,
         ];
     }
 
-    /**
-     * @return FieldTypeHelper
-     */
-    private function getFieldTypeHelper()
+    private function getFieldTypeHelper(): FieldTypeHelper
     {
         return $this->container->get('oro_entity_extend.extend.field_type_helper');
     }
 
-    /**
-     * @return ConfigProvider
-     */
-    private function getExtendConfigProvider()
+    private function getExtendConfigProvider(): ConfigProvider
     {
         if (null === $this->extendConfigProvider) {
             $this->extendConfigProvider = $this->container->get('oro_entity_config.provider.extend');
@@ -73,10 +62,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         return $this->extendConfigProvider;
     }
 
-    /**
-     * @return ConfigProvider
-     */
-    private function getEntityConfigProvider()
+    private function getEntityConfigProvider(): ConfigProvider
     {
         if (null === $this->entityConfigProvider) {
             $this->entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
@@ -85,10 +71,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         return $this->entityConfigProvider;
     }
 
-    /**
-     * @return ConfigProvider
-     */
-    private function getViewConfigProvider()
+    private function getViewConfigProvider(): ConfigProvider
     {
         if (null === $this->viewConfigProvider) {
             $this->viewConfigProvider = $this->container->get('oro_entity_config.provider.view');
@@ -97,34 +80,22 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         return $this->viewConfigProvider;
     }
 
-    /**
-     * @return PropertyAccessorInterface
-     */
-    private function getPropertyAccessor()
+    private function getPropertyAccessor(): PropertyAccessorInterface
     {
-        return $this->container->get('property_accessor');
+        return $this->container->get(PropertyAccessorInterface::class);
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    private function getEventDispatcher()
+    private function getEventDispatcher(): EventDispatcherInterface
     {
-        return $this->container->get('event_dispatcher');
+        return $this->container->get(EventDispatcherInterface::class);
     }
 
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    private function getAuthorizationChecker()
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
-        return $this->container->get('security.authorization_checker');
+        return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
-    /**
-     * @return FeatureChecker
-     */
-    private function getFeatureChecker()
+    private function getFeatureChecker(): FeatureChecker
     {
         return $this->container->get('oro_featuretoggle.checker.feature_checker');
     }

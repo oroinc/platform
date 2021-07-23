@@ -5,8 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Routing\RouterInterface;
@@ -18,11 +21,11 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ConfigExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
+
+    /** @var ConfigExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -41,11 +44,6 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ConfigExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(ConfigExtension::NAME, $this->extension->getName());
-    }
-
     public function testGetClassConfigNoConfig()
     {
         $className = 'Test\Entity';
@@ -53,7 +51,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->configManager->expects($this->never())
             ->method('getConfig');
 
@@ -79,7 +77,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->configManager->expects($this->never())
             ->method('getProvider');
 
@@ -100,22 +98,20 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'testField';
         $config    = array('key' => 'value');
 
-        $configEntity = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
 
         $configEntity->expects($this->any())
             ->method('all')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $scope = $inputScope ? $inputScope : 'entity';
+        $scope = $inputScope ?: 'entity';
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
@@ -174,7 +170,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->configManager->expects($this->never())
             ->method('getProvider');
 
@@ -195,23 +191,21 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $attrName  = 'attrName';
         $config    = array('key' => 'value');
 
-        $configEntity = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
 
         $configEntity->expects($this->any())
             ->method('get')
             ->with($attrName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $scope = $inputScope ? $inputScope : 'entity';
+        $scope = $inputScope ?: 'entity';
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
@@ -271,25 +265,25 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $config    = array('key' => 'value');
 
-        $configEntity = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $configEntity->expects($this->any())->method('all')->will($this->returnValue($config));
+        $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
+        $configEntity->expects($this->any())
+            ->method('all')
+            ->willReturn($config);
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configManager->expects($this->once())
             ->method('getConfig')
-            ->with($this->isInstanceOf('Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId'))
-            ->will(
-                $this->returnCallback(
-                    function (EntityConfigId $configId) use ($className, $expectedScope, $configEntity) {
-                        self::assertEquals($className, $configId->getClassName());
-                        self::assertEquals($expectedScope, $configId->getScope());
+            ->with($this->isInstanceOf(EntityConfigId::class))
+            ->willReturnCallback(
+                function (EntityConfigId $configId) use ($className, $expectedScope, $configEntity) {
+                    self::assertEquals($className, $configId->getClassName());
+                    self::assertEquals($expectedScope, $configId->getScope());
 
-                        return $configEntity;
-                    }
-                )
+                    return $configEntity;
+                }
             );
 
         if ($inputScope) {
@@ -321,7 +315,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->configManager->expects($this->never())
             ->method('getConfig');
 
@@ -349,24 +343,22 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->any())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configManager->expects($this->any())
             ->method('getConfig')
-            ->with($this->isInstanceOf('Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId'))
-            ->will(
-                $this->returnCallback(
-                    function (EntityConfigId $configId) use ($className, $configEntityScope, $configAnotherScope) {
-                        self::assertEquals($className, $configId->getClassName());
-                        switch ($configId->getScope()) {
-                            case 'entity':
-                                return $configEntityScope;
-                            case 'another':
-                                return $configAnotherScope;
-                            default:
-                                return null;
-                        }
+            ->with($this->isInstanceOf(EntityConfigId::class))
+            ->willReturnCallback(
+                function (EntityConfigId $configId) use ($className, $configEntityScope, $configAnotherScope) {
+                    self::assertEquals($className, $configId->getClassName());
+                    switch ($configId->getScope()) {
+                        case 'entity':
+                            return $configEntityScope;
+                        case 'another':
+                            return $configAnotherScope;
+                        default:
+                            return null;
                     }
-                )
+                }
             );
 
         // test default scope
@@ -414,15 +406,20 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $viewRoute = 'route_view';
 
-        $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()->getMock();
-        $metadata->expects($this->once())->method('getRoute')
-            ->with('view', false)->willReturn($viewRoute);
+        $metadata = $this->createMock(EntityMetadata::class);
+        $metadata->expects($this->once())
+            ->method('getRoute')
+            ->with('view', false)
+            ->willReturn($viewRoute);
 
-        $this->configManager->expects($this->once())->method('hasConfig')
-            ->with($className)->willReturn(true);
-        $this->configManager->expects($this->once())->method('getEntityMetadata')
-            ->with($className)->willReturn($metadata);
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn($metadata);
 
         $this->assertSame(
             $viewRoute,
@@ -435,15 +432,20 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $createRoute = 'route_create';
 
-        $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()->getMock();
-        $metadata->expects($this->once())->method('getRoute')
-            ->with('create', $strict = true)->willReturn($createRoute);
+        $metadata = $this->createMock(EntityMetadata::class);
+        $metadata->expects($this->once())
+            ->method('getRoute')
+            ->with('create', $strict = true)
+            ->willReturn($createRoute);
 
-        $this->configManager->expects($this->once())->method('hasConfig')
-            ->with($className)->willReturn(true);
-        $this->configManager->expects($this->once())->method('getEntityMetadata')
-            ->with($className)->willReturn($metadata);
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with($className)
+            ->willReturn($metadata);
 
         $this->assertSame(
             $createRoute,
@@ -466,7 +468,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->configManager->expects($this->never())
             ->method('getConfig');
 
@@ -486,7 +488,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->any())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'oro_entity_metadata_value', [$className, 'test'])
@@ -499,19 +501,16 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $attrName = 'routeView';
         $attrVal  = 'test_route';
 
-        $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()->getMock();
+        $metadata = $this->createMock(EntityMetadata::class);
         $reflection = new \ReflectionClass($metadata);
         $routeViewProp = $reflection->getProperty($attrName);
         $routeViewProp->setValue($metadata, $attrVal);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('getEntityMetadata')
             ->with($className)
             ->willReturn($metadata);

@@ -6,6 +6,7 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\FormattersPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\GroupingWidgetProviderPass;
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ReplaceTwigEnvironmentPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -33,6 +34,7 @@ class OroUIBundle extends Bundle
             ActivityScope::UPDATE_PAGE
         ));
         $container->addCompilerPass(new ContentProviderPass());
+        $container->addCompilerPass(new ReplaceTwigEnvironmentPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new FormattersPass());
     }

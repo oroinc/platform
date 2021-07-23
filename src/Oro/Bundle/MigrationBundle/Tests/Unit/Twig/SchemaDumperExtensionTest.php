@@ -33,15 +33,10 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
 
         $container = self::getContainerBuilder()
-            ->add('doctrine', $this->doctrine)
+            ->add(ManagerRegistry::class, $this->doctrine)
             ->getContainer($this);
 
         $this->extension = new SchemaDumperExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('schema_dumper_extension', $this->extension->getName());
     }
 
     public function testGetStringColumnOptions()
@@ -60,7 +55,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $column = new Column('string_column', Type::getType(Types::STRING));
         $column->setLength(255);
-        $result = $this->extension->getColumnOptions($column);
+        $result = self::callTwigFunction($this->extension, 'oro_migration_get_schema_column_options', [$column]);
         $this->assertCount(1, $result);
         $this->assertEquals(255, $result['length']);
     }
@@ -83,7 +78,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $column->setNotnull(false);
         $column->setAutoincrement(true);
         $column->setUnsigned(true);
-        $result = $this->extension->getColumnOptions($column);
+        $result = self::callTwigFunction($this->extension, 'oro_migration_get_schema_column_options', [$column]);
         $this->assertCount(4, $result);
         $this->assertTrue($result['unsigned']);
         $this->assertTrue($result['autoincrement']);

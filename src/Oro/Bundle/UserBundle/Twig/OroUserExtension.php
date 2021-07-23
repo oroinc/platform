@@ -55,16 +55,6 @@ class OroUserExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'user_extension';
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()

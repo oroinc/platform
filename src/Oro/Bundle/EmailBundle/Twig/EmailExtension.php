@@ -39,8 +39,6 @@ use Twig\TwigFunction;
  */
 class EmailExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_email';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -78,7 +76,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
      */
     protected function getDoctrine()
     {
-        return $this->container->get('doctrine');
+        return $this->container->get(ManagerRegistry::class);
     }
 
     /**
@@ -94,7 +92,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
      */
     protected function getAuthorizationChecker()
     {
-        return $this->container->get('security.authorization_checker');
+        return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
     /**
@@ -300,14 +298,6 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
-    }
-
-    /**
      * @param $route
      * @param array $routeParams
      * @return string
@@ -326,12 +316,12 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
             'oro_email.email_holder_helper' => EmailHolderHelper::class,
             'oro_email.email.address.helper' => EmailAddressHelper::class,
             'oro_email.manager.email_attachment_manager' => EmailAttachmentManager::class,
-            'doctrine' => ManagerRegistry::class,
             'oro_email.mailbox.process_storage' => MailboxProcessStorage::class,
-            'security.authorization_checker' => AuthorizationCheckerInterface::class,
             'oro_security.token_accessor' => TokenAccessorInterface::class,
             'oro_email.related_emails.provider' => RelatedEmailsProvider::class,
             'oro_email.provider.url_provider' => UrlProvider::class,
+            ManagerRegistry::class,
+            AuthorizationCheckerInterface::class,
         ];
     }
 }

@@ -91,15 +91,7 @@ class CalendarExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'oro_locale_calendar';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices(): array
+    public static function getSubscribedServices()
     {
         return [
             LocaleSettings::class,

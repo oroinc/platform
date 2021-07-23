@@ -63,11 +63,6 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         return $state;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_windows', $this->extension->getName());
-    }
-
     public function testRenderNoUser()
     {
         $this->stateManagerRegistry->expects($this->once())
@@ -102,7 +97,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
                 '@OroWindows/states.html.twig',
                 ['windowStates' => [$windowStateFoo, $windowStateBar]]
             )
-            ->will($this->returnValue($expectedOutput));
+            ->willReturn($expectedOutput);
 
         $this->assertEquals(
             $expectedOutput,
@@ -132,7 +127,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
 
                 return ($count === 1 && $cleanUrl === $expectedUrl);
             }))
-            ->will($this->returnValue($expectedOutput));
+            ->willReturn($expectedOutput);
 
         $this->stateManagerRegistry->expects($this->never())
             ->method('getManager');

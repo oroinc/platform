@@ -9,11 +9,9 @@ use Symfony\Component\Cache\CacheItem;
 
 class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
+    private CacheProvider|\PHPUnit\Framework\MockObject\MockObject $provider;
 
-    /** @var ExpressionLanguageDoctrineAdapter */
-    private $adapter;
+    private ExpressionLanguageDoctrineAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -22,7 +20,7 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
         $this->adapter = new ExpressionLanguageDoctrineAdapter($this->provider, 'test');
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $key = 'test_item';
         $expectedId = 'orv1thlk24gwoo0k8o0cs8go382qua26l8owcssk04gokso48oooscs';
@@ -39,7 +37,7 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $result->get());
     }
 
-    public function testGetItems()
+    public function testGetItems(): void
     {
         $key = 'test_item';
         $expectedId = 'orv1thlk24gwoo0k8o0cs8go382qua26l8owcssk04gokso48oooscs';
@@ -57,7 +55,7 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $item->get());
     }
 
-    public function testHasItem()
+    public function testHasItem(): void
     {
         $key = 'test_item';
         $expectedId = 'orv1thlk24gwoo0k8o0cs8go382qua26l8owcssk04gokso48oooscs';
@@ -70,7 +68,7 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->adapter->hasItem($key));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $key = 'test_item';
         $expectedId = 'orv1thlk24gwoo0k8o0cs8go382qua26l8owcssk04gokso48oooscs';
@@ -83,7 +81,7 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->adapter->deleteItem($key));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $data = 'data';
         $key = 'test_item';
@@ -99,5 +97,31 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         self::assertTrue($this->adapter->save($item));
+    }
+
+    public function testClearWhenNamespace(): void
+    {
+        $this->provider->expects(self::once())
+            ->method('getNamespace')
+            ->willReturn('sample_namespace');
+
+        $this->provider->expects(self::once())
+            ->method('deleteAll')
+            ->willReturn(true);
+
+        self::assertTrue($this->adapter->clear('dummy_namespace'));
+    }
+
+    public function testClearWhenNoNamespace(): void
+    {
+        $this->provider->expects(self::once())
+            ->method('getNamespace')
+            ->willReturn('');
+
+        $this->provider->expects(self::once())
+            ->method('flushAll')
+            ->willReturn(true);
+
+        self::assertTrue($this->adapter->clear('dummy_namespace'));
     }
 }

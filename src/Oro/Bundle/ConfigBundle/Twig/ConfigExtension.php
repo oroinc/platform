@@ -9,32 +9,17 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * Provides Twig functions to retrieve values of configuration settings:
+ * Provides a Twig function to retrieve values of configuration settings:
  *   - oro_config_value
  */
 class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var ConfigManager|null */
-    private $configManager;
+    private ContainerInterface $container;
+    private ?ConfigManager $configManager = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        if (!$this->configManager) {
-            $this->configManager = $this->container->get('oro_config.user');
-        }
-
-        return $this->configManager;
     }
 
     /**
@@ -60,18 +45,19 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'config_extension';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return [
             'oro_config.user' => ConfigManager::class
         ];
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        if (!$this->configManager) {
+            $this->configManager = $this->container->get('oro_config.user');
+        }
+
+        return $this->configManager;
     }
 }

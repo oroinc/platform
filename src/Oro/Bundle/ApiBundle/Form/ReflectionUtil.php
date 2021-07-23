@@ -4,14 +4,16 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\String\Inflector\EnglishInflector;
 
 /**
  * A set of utility methods for performing reflective operations are used in API forms.
  */
 class ReflectionUtil
 {
+    private static ?EnglishInflector $symfonyInflector = null;
+
     /**
      * Returns all possible add and remove methods.
      *
@@ -23,7 +25,7 @@ class ReflectionUtil
     {
         $result = [];
         $camelized = self::camelize($property);
-        $singulars = (array)Inflector::singularize($camelized);
+        $singulars = (array)self::getInflector()->singularize($camelized);
         foreach ($singulars as $singular) {
             $result[] = ['add' . $singular, 'remove' . $singular];
         }
@@ -43,7 +45,7 @@ class ReflectionUtil
     {
         $reflClass = new \ReflectionClass($object);
         $camelized = self::camelize($property);
-        $singulars = (array)Inflector::singularize($camelized);
+        $singulars = (array)self::getInflector()->singularize($camelized);
         foreach ($singulars as $singular) {
             $addMethod = 'add' . $singular;
             $removeMethod = 'remove' . $singular;
@@ -157,5 +159,14 @@ class ReflectionUtil
     private static function camelize(string $string): string
     {
         return \strtr(\ucwords(\strtr($string, ['_' => ' '])), [' ' => '']);
+    }
+
+    private static function getInflector(): EnglishInflector
+    {
+        if (!self::$symfonyInflector) {
+            self::$symfonyInflector = new EnglishInflector();
+        }
+
+        return self::$symfonyInflector;
     }
 }

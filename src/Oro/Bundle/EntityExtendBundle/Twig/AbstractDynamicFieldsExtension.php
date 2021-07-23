@@ -15,8 +15,6 @@ use Twig\TwigFunction;
  */
 abstract class AbstractDynamicFieldsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_config_fields';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -49,12 +47,4 @@ abstract class AbstractDynamicFieldsExtension extends AbstractExtension implemen
      * @return array
      */
     abstract public function getField($entity, FieldConfigModel $field);
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
-    }
 }

@@ -23,7 +23,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('event_dispatcher', $this->dispatcher)
+            ->add(EventDispatcherInterface::class, $this->dispatcher)
             ->getContainer($this);
 
         $this->segmentExtension = new SegmentExtension($container);
@@ -34,7 +34,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(WidgetOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $originalWidgetOptions = ['opt1' => 'val1'];
         $options = $this->segmentExtension->updateSegmentWidgetOptions($originalWidgetOptions);
@@ -46,7 +46,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(ConditionBuilderOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $originalWidgetOptions = ['opt1' => 'val1'];
         $options = $this->segmentExtension->updateSegmentConditionBuilderOptions($originalWidgetOptions);
@@ -58,15 +58,15 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(WidgetOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $eventOptions = ['eventOpt1' => 'eventVal1'];
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(static::anything(), WidgetOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnCallback(function ($event, $eventName) use ($eventOptions) {
+            ->willReturnCallback(function ($event, $eventName) use ($eventOptions) {
                 $event->setWidgetOptions($eventOptions);
-            }));
+            });
 
         $originalWidgetOptions = ['opt1' => 'val1'];
         $options = $this->segmentExtension->updateSegmentWidgetOptions($originalWidgetOptions);
@@ -78,15 +78,15 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(ConditionBuilderOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $eventOptions = ['eventOpt1' => 'eventVal1'];
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(static::anything(), ConditionBuilderOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnCallback(function ($event, $eventName) use ($eventOptions) {
+            ->willReturnCallback(function ($event, $eventName) use ($eventOptions) {
                 $event->setOptions($eventOptions);
-            }));
+            });
 
         $originalWidgetOptions = ['opt1' => 'val1'];
         $options = $this->segmentExtension->updateSegmentConditionBuilderOptions($originalWidgetOptions);

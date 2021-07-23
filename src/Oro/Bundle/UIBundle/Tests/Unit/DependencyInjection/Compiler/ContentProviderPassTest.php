@@ -48,15 +48,5 @@ class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
         );
 
         self::assertEquals(['provider1', 'provider3'], $manager->getArgument(2));
-
-        $this->assertEquals(
-            [
-                [
-                    'addGlobal',
-                    ['oro_ui_content_provider_manager', new Reference('oro_ui.content_provider.manager.twig')]
-                ]
-            ],
-            $twig->getMethodCalls()
-        );
     }
 }
