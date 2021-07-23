@@ -373,6 +373,8 @@ abstract class BaseDriver implements DBALPersisterInterface
             $fieldName = implode('_', $fieldName);
         }
 
+        $fieldName = str_replace('.', '_', $fieldName);
+
         $i = 0;
         do {
             $i++;
