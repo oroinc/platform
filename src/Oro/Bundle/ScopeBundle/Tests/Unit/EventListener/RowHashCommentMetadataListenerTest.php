@@ -9,35 +9,28 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\ScopeBundle\EventListener\RowHashCommentMetadataListener;
-use Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager;
+use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class RowHashCommentMetadataListenerTest extends TestCase
 {
-    /**
-     * @var LoadClassMetadataEventArgs|MockObject
-     */
+    private const RELATIONS = 'customer_id,customergroup_id,localization_id';
+
+    /** @var LoadClassMetadataEventArgs|MockObject */
     private $event;
 
-    /**
-     * @var RowHashCommentMetadataListener
-     */
+    /** @var RowHashCommentMetadataListener */
     private $listener;
-
-    /**
-     * @var string
-     */
-    private $relations = 'customer_id,customergroup_id,localization_id';
 
     protected function setUp(): void
     {
         $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
 
-        $manager = $this->createMock(AddCommentToRoHashManager::class);
+        $manager = $this->createMock(AddCommentToRowHashManager::class);
         $manager->expects($this->any())
             ->method('getRelations')
-            ->willReturn($this->relations);
+            ->willReturn(self::RELATIONS);
 
         $this->listener = new RowHashCommentMetadataListener($manager);
     }
@@ -112,7 +105,7 @@ class RowHashCommentMetadataListenerTest extends TestCase
             'precision' => 0,
             'columnName' => 'row_hash',
             'options' => [
-                'comment' => $this->relations
+                'comment' => self::RELATIONS
             ]
         ];
         $metadata->fieldMappings = [
