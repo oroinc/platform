@@ -13,8 +13,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\ReflectionUtil;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
@@ -33,12 +33,11 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         $this->serializer = $this->createMock(WorkflowAwareSerializer::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $serializerLink = $this->createMock(ServiceLink::class);
-        $serializerLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->serializer);
+        $container = TestContainerBuilder::create()
+            ->add('oro_workflow.serializer.data.serializer', $this->serializer)
+            ->getContainer($this);
 
-        $this->listener = new WorkflowDataSerializeListener($serializerLink, $this->doctrineHelper);
+        $this->listener = new WorkflowDataSerializeListener($container, $this->doctrineHelper);
     }
 
     /**

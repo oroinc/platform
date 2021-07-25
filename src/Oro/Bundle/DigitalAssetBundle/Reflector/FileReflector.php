@@ -4,25 +4,21 @@ namespace Oro\Bundle\DigitalAssetBundle\Reflector;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Reflects file from source file of digital asset.
  */
-class FileReflector implements LoggerAwareInterface
+class FileReflector
 {
-    use LoggerAwareTrait;
+    private PropertyAccessorInterface $propertyAccessor;
+    private LoggerInterface $logger;
 
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, LoggerInterface $logger)
     {
         $this->propertyAccessor = $propertyAccessor;
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
     /**

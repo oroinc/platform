@@ -11,22 +11,18 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
- * Listener that clears the owner tree and doctrine query caches.
+ * Clears the owner tree and doctrine query caches.
  */
 class OwnerTreeListener
 {
+    private OwnerTreeProviderInterface $ownerTreeProvider;
     /** @var array [class name => [[field name, ...], [association name, ...]], ...] */
-    protected $securityClasses = [];
+    private array $securityClasses = [];
+    private bool $isCacheOutdated = false;
 
-    /** @var OwnerTreeProviderInterface */
-    protected $treeProvider;
-
-    /** @var bool */
-    protected $isCacheOutdated = false;
-
-    public function __construct(OwnerTreeProviderInterface $treeProvider)
+    public function __construct(OwnerTreeProviderInterface $ownerTreeProvider)
     {
-        $this->treeProvider = $treeProvider;
+        $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
     /**
@@ -34,7 +30,7 @@ class OwnerTreeListener
      * @param string[] $fields       The names of fields or to-one associations
      * @param string[] $associations The names of to-many associations
      */
-    public function addSupportedClass($class, array $fields = [], array $associations = [])
+    public function addSupportedClass(string $class, array $fields = [], array $associations = []): void
     {
         $this->securityClasses[$class] = [$fields, $associations];
     }
@@ -42,7 +38,7 @@ class OwnerTreeListener
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function onFlush(OnFlushEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args): void
     {
         if ($this->isCacheOutdated || !$this->securityClasses) {
             return;
@@ -57,7 +53,7 @@ class OwnerTreeListener
             || $this->checkToManyRelations($uow->getScheduledCollectionDeletions());
 
         if ($this->isCacheOutdated) {
-            $this->treeProvider->clearCache();
+            $this->ownerTreeProvider->clearCache();
 
             // Clear doctrine query cache to be sure that queries will process hints
             // again with updated security information.
@@ -68,12 +64,7 @@ class OwnerTreeListener
         }
     }
 
-    /**
-     * @param object[] $entities
-     *
-     * @return bool
-     */
-    protected function checkInsertedOrDeletedEntities($entities)
+    private function checkInsertedOrDeletedEntities(array $entities): bool
     {
         foreach ($entities as $entity) {
             if (isset($this->securityClasses[ClassUtils::getRealClass($entity)])) {
@@ -84,12 +75,7 @@ class OwnerTreeListener
         return false;
     }
 
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return bool
-     */
-    protected function checkUpdatedEntities(UnitOfWork $uow)
+    private function checkUpdatedEntities(UnitOfWork $uow): bool
     {
         $entities = $uow->getScheduledEntityUpdates();
         foreach ($entities as $entity) {
@@ -98,7 +84,7 @@ class OwnerTreeListener
                 continue;
             }
 
-            list($fields) = $this->securityClasses[$entityClass];
+            [$fields] = $this->securityClasses[$entityClass];
             if ($fields) {
                 $changeSet = $uow->getEntityChangeSet($entity);
                 if (array_intersect(array_keys($changeSet), $fields)) {
@@ -110,23 +96,19 @@ class OwnerTreeListener
         return false;
     }
 
-    /**
-     * @param PersistentCollection[] $collections
-     *
-     * @return bool
-     */
-    protected function checkToManyRelations($collections)
+    private function checkToManyRelations(array $collections): bool
     {
+        /** @var PersistentCollection $collection */
         foreach ($collections as $collection) {
             $entityClass = ClassUtils::getRealClass($collection->getOwner());
             if (!isset($this->securityClasses[$entityClass])) {
                 continue;
             }
 
-            list(, $associations) = $this->securityClasses[$entityClass];
+            [, $associations] = $this->securityClasses[$entityClass];
             if ($associations) {
                 $associationMapping = $collection->getMapping();
-                if (in_array($associationMapping['fieldName'], $associations, true)) {
+                if (\in_array($associationMapping['fieldName'], $associations, true)) {
                     return true;
                 }
             }
