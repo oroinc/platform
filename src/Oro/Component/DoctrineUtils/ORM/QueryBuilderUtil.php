@@ -183,10 +183,10 @@ class QueryBuilderUtil
             self::checkIdentifier($key);
             if (empty($val)) {
                 $qb->leftJoin($rootAlias . '.' . $key, $key);
-            } elseif (is_array($val)) {
+            } elseif (\is_array($val)) {
                 if (isset($val['join'])) {
                     $join = $val['join'];
-                    if (false === strpos($join, '.')) {
+                    if (!str_contains($join, '.')) {
                         $join = $rootAlias . '.' . $join;
                     }
                 } else {
@@ -195,7 +195,7 @@ class QueryBuilderUtil
                 $condition     = null;
                 $conditionType = null;
                 if (isset($val['condition'])) {
-                    $condition     = $val['condition'];
+                    $condition = $val['condition'];
                     $conditionType = Expr\Join::WITH;
                 }
                 if (isset($val['conditionType'])) {
@@ -442,7 +442,7 @@ class QueryBuilderUtil
      */
     public static function checkField($str)
     {
-        if (strpos($str, '.') !== false) {
+        if (str_contains($str, '.')) {
             [$alias, $field] = explode('.', $str, 2);
             self::checkIdentifier($alias);
             self::checkIdentifier($field);
@@ -473,7 +473,7 @@ class QueryBuilderUtil
      */
     public static function checkParameter($str)
     {
-        if (strpos($str, ':') === 0) {
+        if (str_starts_with($str, ':')) {
             self::checkIdentifier(substr($str, 1));
         }
     }

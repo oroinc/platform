@@ -59,8 +59,8 @@ abstract class AssociationFilter extends ComparisonFilter implements
         /** @var FilterValue $filterValue */
         foreach ($filterValues as $filterKey => $filterValue) {
             $path = $filterValue->getPath();
-            if (0 === \strpos($path, $prefix)) {
-                $filterValueName = \substr($path, \strlen($field) + 1);
+            if (str_starts_with($path, $prefix)) {
+                $filterValueName = substr($path, \strlen($field) + 1);
                 if (empty($filterValueName)) {
                     throw new InvalidFilterValueKeyException(
                         'The target type of an association is not specified.',
@@ -69,7 +69,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
                 }
                 if ($this->getFilterValueName() === $filterValueName) {
                     throw new InvalidFilterValueKeyException(
-                        \sprintf(
+                        sprintf(
                             'Replace "%s" placeholder with the target type of an association.',
                             $this->getFilterValueName()
                         ),
@@ -99,8 +99,8 @@ abstract class AssociationFilter extends ComparisonFilter implements
 
     protected function assertFilterValuePath(string $field, string $path): void
     {
-        if (0 !== \strpos($path, $field . '.')) {
-            throw new \InvalidArgumentException(\sprintf(
+        if (!str_starts_with($path, $field . '.')) {
+            throw new \InvalidArgumentException(sprintf(
                 'The filter value path must starts with "%s".',
                 $field
             ));

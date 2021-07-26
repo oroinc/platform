@@ -4,7 +4,7 @@ services:
         arguments:
             - '@oro_test.alice_loader'
             - '@oro_behat_extension.isolation.doctrine_isolator'
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
         tags:
             - { name: cli.controller, priority: 700 }
 

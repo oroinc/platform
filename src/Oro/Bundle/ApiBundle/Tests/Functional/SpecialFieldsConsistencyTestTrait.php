@@ -27,8 +27,8 @@ trait SpecialFieldsConsistencyTestTrait
     {
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || 0 === strpos($entityType, 'testapi')
-            || 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE);
+            || str_starts_with($entityType, 'testapi')
+            || str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE);
     }
 
     private function checkSpecialFieldsConsistency()
@@ -37,7 +37,7 @@ trait SpecialFieldsConsistencyTestTrait
 
         $entities = $this->getEntities();
         foreach ($entities as $entity) {
-            list($entityClass, $excludedActions) = $entity;
+            [$entityClass, $excludedActions] = $entity;
             $entityType = $this->getEntityType($entityClass);
             if ($this->isSkippedEntity($entityClass, $entityType)) {
                 continue;

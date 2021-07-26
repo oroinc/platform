@@ -87,16 +87,16 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
             return $val;
         }
 
-        if (strpos($val, '%') !== false) {
+        if (str_contains($val, '%')) {
             $val = $this->resolveParameter($val);
         }
 
-        if (is_string($val) && strpos($val, '::') !== false) {
+        if (\is_string($val) && str_contains($val, '::')) {
             $val = $this->resolveStatic($val);
         }
 
-        if (is_string($val) && strpos($val, '@') !== false) {
-            $val = \str_starts_with($val, '@@') ? substr($val, 1) : $this->resolveService($val);
+        if (\is_string($val) && str_contains($val, '@')) {
+            $val = str_starts_with($val, '@@') ? substr($val, 1) : $this->resolveService($val);
         }
 
         return $val;
@@ -127,7 +127,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         foreach ($items as $item) {
             $item = trim($item, ' ');
 
-            if (\str_starts_with($item, '$') && \str_ends_with($item, '$')) {
+            if (str_starts_with($item, '$') && str_ends_with($item, '$')) {
                 $name = substr($item, 1, -1);
                 $dot = strpos($name, '.');
                 $objectName = $dot ? substr($name, 0, $dot) : $name;
@@ -137,7 +137,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
                     $propertyPath = substr($name, $dot + 1);
                     $item = $this->getPropertyAccessor()->getValue($item, $propertyPath);
                 }
-            } elseif (\str_starts_with($item, '%') && \str_ends_with($item, '%')) {
+            } elseif (str_starts_with($item, '%') && str_ends_with($item, '%')) {
                 $name = substr($item, 1, -1);
                 $item = $this->getParameter($name);
             }
@@ -262,7 +262,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function resolveService($val)
     {
-        if (strpos($val, '->') === false && preg_match('#@([\w\.]+)#', $val, $match)) {
+        if (!str_contains($val, '->') && preg_match('#@([\w\.]+)#', $val, $match)) {
             $val = $this->getService($match[1]);
         } elseif (preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match)) {
             $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : [];

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\PinPageButton;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -12,11 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 /**
  * Provides a set of steps to test navigation related to pinbar functionality.
  */
-class PinbarContext extends OroFeatureContext implements
-    OroPageObjectAware,
-    KernelAwareContext
+class PinbarContext extends OroFeatureContext implements OroPageObjectAware
 {
-    use PageObjectDictionary, KernelDictionary;
+    use PageObjectDictionary;
 
     /**
      * Pin or unpin page

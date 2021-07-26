@@ -71,7 +71,7 @@ class FileManager extends GaufretteFileManager
      */
     private function getFilenameFromPath(string $path): string
     {
-        $fileName = pathinfo(\trim($path), PATHINFO_BASENAME);
+        $fileName = pathinfo(trim($path), PATHINFO_BASENAME);
         $parametersPosition = strpos($fileName, '?');
         if ($parametersPosition) {
             $fileName = substr($fileName, 0, $parametersPosition);
@@ -89,7 +89,7 @@ class FileManager extends GaufretteFileManager
      */
     private function assertValidProtocolInPath(string $path): void
     {
-        $path = \trim($path);
+        $path = trim($path);
         $protocolDelimiter = strpos($path, '://');
         if (false !== $protocolDelimiter
             && !$this->protocolValidator->isSupportedProtocol(strtolower(substr($path, 0, $protocolDelimiter)))

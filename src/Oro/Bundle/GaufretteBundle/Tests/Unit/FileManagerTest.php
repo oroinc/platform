@@ -2299,7 +2299,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
                 @unlink($resultFile->getRealPath());
             }
         } catch (\RuntimeException $e) {
-            if (false === strpos($e->getMessage(), 'cannot be opened')) {
+            if (!str_contains($e->getMessage(), 'cannot be opened')) {
                 throw $e;
             }
             /**
@@ -2317,7 +2317,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNotEmpty($tmpFileName);
 
         $parts = explode(DIRECTORY_SEPARATOR, $tmpFileName);
-        if (0 === strpos($tmpFileName, DIRECTORY_SEPARATOR)) {
+        if (str_starts_with($tmpFileName, DIRECTORY_SEPARATOR)) {
             array_shift($parts);
         }
         foreach ($parts as $part) {

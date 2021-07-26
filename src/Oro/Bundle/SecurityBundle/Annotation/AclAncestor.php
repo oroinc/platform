@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Annotation;
 
 /**
+ * The annotation that can be used to reference another ACL annotation.
  * @Annotation
  * @Target({"METHOD", "CLASS"})
  */
@@ -25,8 +26,8 @@ class AclAncestor implements \Serializable
             return;
         }
 
-        $this->id = isset($data['value']) ? $data['value'] : null;
-        if (empty($this->id) || strpos($this->id, ' ') !== false) {
+        $this->id = $data['value'] ?? null;
+        if (empty($this->id) || str_contains($this->id, ' ')) {
             throw new \InvalidArgumentException('ACL id must not be empty or contain blank spaces.');
         }
     }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
-use Countable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -15,13 +14,17 @@ use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Manager\TagImportManager;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class ImportExportTagsSubscriber implements EventSubscriberInterface
+/**
+ * Saves tagging entities during import.
+ */
+class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface
 {
-    /** @var ServiceLink */
-    protected $tagManagerLink;
+    /** @var ContainerInterface */
+    protected $container;
 
     /** @var object[] */
     protected $pendingTaggedObjects = [];
@@ -32,9 +35,11 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     /** @var object */
     protected $importedEntity;
 
-    public function __construct(ServiceLink $tagManagerLink)
+    private ?TagImportManager $tagImportManager = null;
+
+    public function __construct(ContainerInterface $container)
     {
-        $this->tagManagerLink = $tagManagerLink;
+        $this->container = $container;
     }
 
     /**
@@ -180,7 +185,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
             )
         );
 
-        list($name, $rule) = $this->getTagImportManager()->createTagRule($event->getConvertDelimiter());
+        [$name, $rule] = $this->getTagImportManager()->createTagRule($event->getConvertDelimiter());
         $event->setRule($name, $rule);
     }
 
@@ -194,7 +199,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
                 }
 
                 $tags = $this->getTagImportManager()->getTags($entity);
-                if (($tags instanceof Countable || is_array($tags)) && count($tags)) {
+                if (($tags instanceof \Countable || is_array($tags)) && count($tags)) {
                     continue;
                 }
 
@@ -210,10 +215,21 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return TagImportManager
+     * {@inheritDoc}
      */
-    protected function getTagImportManager()
+    public static function getSubscribedServices()
     {
-        return $this->tagManagerLink->getService();
+        return [
+            'oro_tag.tag_import.manager' => TagImportManager::class
+        ];
+    }
+
+    protected function getTagImportManager(): TagImportManager
+    {
+        if (null === $this->tagImportManager) {
+            $this->tagImportManager = $this->container->get('oro_tag.tag_import.manager');
+        }
+
+        return $this->tagImportManager;
     }
 }

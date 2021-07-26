@@ -3,8 +3,8 @@ oro_behat_extension:
     OroDigitalAssetBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
       paths:
         - '@OroDigitalAssetBundle/Tests/Behat/Features'
   elements:

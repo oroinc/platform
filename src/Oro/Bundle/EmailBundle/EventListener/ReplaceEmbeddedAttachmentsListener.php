@@ -5,6 +5,9 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 
+/**
+ * The listener to replace embedded attachments in loaded email body.
+ */
 class ReplaceEmbeddedAttachmentsListener
 {
     public function replace(EmailBodyLoaded $event)
@@ -37,7 +40,8 @@ class ReplaceEmbeddedAttachmentsListener
      */
     protected function supportsAttachment(EmailAttachment $attachment)
     {
-        return $attachment->getContent()->getContentTransferEncoding() === 'base64'
-               && strpos($attachment->getContentType(), 'image/') === 0;
+        return
+            $attachment->getContent()->getContentTransferEncoding() === 'base64'
+            && str_starts_with($attachment->getContentType(), 'image/');
     }
 }

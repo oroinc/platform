@@ -50,17 +50,17 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
                 $constraintType = substr($constraintType, $delimiter + 1);
             }
             $constraintType = preg_replace('/\W+/', ' ', $constraintType);
-            if (false === strpos($constraintType, ' ')) {
-                $constraintType = ValueNormalizerUtil::humanizeClassName($constraintType, $suffix);
-            } else {
+            if (str_contains($constraintType, ' ')) {
                 $constraintType = str_replace('_', ' ', strtolower($constraintType));
                 $suffix = ' ' . strtolower($suffix);
-                if (substr($constraintType, -strlen($suffix)) !== $suffix) {
+                if (!str_ends_with($constraintType, $suffix)) {
                     $constraintType .= $suffix;
                 }
+            } else {
+                $constraintType = ValueNormalizerUtil::humanizeClassName($constraintType, $suffix);
             }
         } else {
-            $constraintType = ValueNormalizerUtil::humanizeClassName(get_class($constraint), $suffix);
+            $constraintType = ValueNormalizerUtil::humanizeClassName(\get_class($constraint), $suffix);
         }
 
         return $constraintType;

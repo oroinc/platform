@@ -120,20 +120,19 @@ services:
             - '@oro_attachment.file_manager'
             - '@oro_security.token_accessor'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preUpdate }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postUpdate }
 
     oro_attachment.listener.file_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener
         arguments:
             - '@oro_attachment.file_manager'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postRemove }
-            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postRemove }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postUpdate }
 
     oro_attachment.listener.entity_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
@@ -532,15 +531,6 @@ services:
             - '@oro_entity_config.provider.attachment'
         tags:
             - { name: layout.data_provider, alias: file_applications }
-
-    oro_attachment.image_removal.service_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        public: true
-        arguments:
-            -
-                oro_attachment.provider.image_file_names: '@oro_attachment.provider.image_file_names'
-                oro_attachment.media_cache_manager_registry: '@oro_attachment.media_cache_manager_registry'
-        tags: ['container.service_locator']
 
     oro_attachment.configurator.attachment_filter_configuration:
         class: Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration

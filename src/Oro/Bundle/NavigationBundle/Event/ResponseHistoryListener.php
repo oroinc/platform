@@ -92,8 +92,8 @@ class ResponseHistoryListener implements ServiceSubscriberInterface
         if ($result && $response->headers->has('Content-Disposition')) {
             $contentDisposition = $response->headers->get('Content-Disposition');
             $result =
-                strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE) !== 0
-                && strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_ATTACHMENT) !== 0;
+                !str_starts_with($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE)
+                && !str_starts_with($contentDisposition, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
         }
 
         return $result;

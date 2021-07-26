@@ -169,10 +169,10 @@ HELP
         $extraNames = $input->getOption('extra');
         foreach ($extraNames as $extraName) {
             $extraClassName = null;
-            if (array_key_exists($extraName, $knownExtras)) {
+            if (\array_key_exists($extraName, $knownExtras)) {
                 $extraClassName = $knownExtras[$extraName];
             } else {
-                if (false === strpos($extraName, '\\')) {
+                if (!str_contains($extraName, '\\')) {
                     throw new \InvalidArgumentException(sprintf(
                         'Unknown value "%s" for the "--extra" option.',
                         $extraName

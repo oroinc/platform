@@ -128,7 +128,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             $text = null;
         }
         if (null !== $text) {
-            if (\substr($text, -1) !== '.') {
+            if (!str_ends_with($text, '.')) {
                 $text .= '.';
             }
             if ($underlyingException !== $exception && $exception instanceof ExecutionFailedException) {
@@ -154,14 +154,14 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     {
         $isSafe = false;
         foreach ($this->safeExceptions as $class) {
-            if (\is_a($exception, $class)) {
+            if (is_a($exception, $class)) {
                 $isSafe = true;
                 break;
             }
         }
         if ($isSafe) {
             foreach ($this->safeExceptionExclusions as $exclusionClass) {
-                if (\is_a($exception, $exclusionClass)) {
+                if (is_a($exception, $exclusionClass)) {
                     $isSafe = false;
                     break;
                 }

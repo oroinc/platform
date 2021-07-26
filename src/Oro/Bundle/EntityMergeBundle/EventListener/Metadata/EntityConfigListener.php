@@ -6,6 +6,9 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
+/**
+ * The listener to build entity merge metadata.
+ */
 class EntityConfigListener
 {
     const CONFIG_MERGE_SCOPE = 'merge';
@@ -66,12 +69,12 @@ class EntityConfigListener
      */
     protected function filterInverseOptions(array $options, $definedBySourceEntity)
     {
-        $result = array();
-        $overrideOptions = array();
+        $result = [];
+        $overrideOptions = [];
 
         foreach ($options as $key => $value) {
-            if (0 === strpos($key, self::INVERSE_OPTION_PREFIX)) {
-                $key = substr($key, strlen(self::INVERSE_OPTION_PREFIX));
+            if (str_starts_with($key, self::INVERSE_OPTION_PREFIX)) {
+                $key = substr($key, \strlen(self::INVERSE_OPTION_PREFIX));
                 $overrideOptions[$key] = $value;
             } else {
                 $result[$key] = $value;

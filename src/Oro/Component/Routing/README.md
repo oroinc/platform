@@ -280,7 +280,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
      */
     protected function hasAttribute(Route $route, $placeholder)
     {
-        return false !== strpos($route->getPath(), $placeholder);
+        return str_contains($route->getPath(), $placeholder);
     }
 }
 ```

@@ -117,10 +117,10 @@ class LocalizedValueExtension extends AbstractExtension
             QueryBuilderUtil::checkIdentifier($name);
             $propertyPath = $definition[LocalizedValueProperty::DATA_NAME_KEY];
 
-            $shouldAllowEmpty = array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
+            $shouldAllowEmpty = \array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
             $joinType = $shouldAllowEmpty ? Join::LEFT_JOIN : Join::INNER_JOIN;
 
-            if (false === strpos($propertyPath, '.')) {
+            if (!str_contains($propertyPath, '.')) {
                 $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);
             }
 

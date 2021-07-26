@@ -10,19 +10,28 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager;
-use PHPUnit\Framework\TestCase;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 
-class AddCommentToRoHashManagerTest extends TestCase
+class AddCommentToRowHashManagerTest extends \PHPUnit\Framework\TestCase
 {
+    private function getManager(EntityManagerInterface $em): AddCommentToRowHashManager
+    {
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManager')
+            ->willReturn($em);
+
+        return new AddCommentToRowHashManager($doctrine);
+    }
+
     public function testAddRowHashCommentNotTable(): void
     {
         $this->expectException(SchemaException::class);
+
         $schema = new Schema();
-
         $em = $this->createMock(EntityManagerInterface::class);
-        $manager = new AddCommentToRoHashManager($em);
-
+        $manager = $this->getManager($em);
         $manager->addRowHashComment($schema);
     }
 
@@ -83,8 +92,7 @@ class AddCommentToRoHashManagerTest extends TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $manager = new AddCommentToRoHashManager($em);
-
+        $manager = $this->getManager($em);
         $manager->addRowHashComment($schema);
     }
 }

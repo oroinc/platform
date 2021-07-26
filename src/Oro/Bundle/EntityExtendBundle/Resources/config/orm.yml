@@ -5,10 +5,6 @@ services:
             - '@oro_entity_config.provider.extend'
             - !tagged_iterator oro_entity_extend.entity_metadata_builder
 
-    oro_entity_extend.link.entity_metadata_builder:
-        tags:
-            - { name: oro_service_link, service: oro_entity_extend.entity_metadata_builder }
-
     oro_entity_extend.entity_metadata_builder.relations:
         class: Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder
         arguments:
@@ -29,15 +25,15 @@ services:
     oro_entity_extend.listener.entity_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
         arguments:
-            - '@oro_entity_extend.link.entity_metadata_builder'
-            - '@oro_entity_extend.manager.multi_enum_entity'
+            - '@oro_entity_extend.entity_metadata_builder'
             - '@annotation_reader'
             - '@oro_entity_config.provider.extend'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
-            - { name: doctrine.event_listener, event: onFlush }
 
-    oro_entity_extend.manager.multi_enum_entity:
-        class: Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager
+    oro_entity_extend.listener.save_multi_enum_entity_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\SaveMultiEnumEntityListener
         arguments:
             - '@Doctrine\Inflector\Inflector'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }

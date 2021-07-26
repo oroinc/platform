@@ -123,10 +123,11 @@ services:
     oro_email.event_listener.email_user_listener:
         class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
         arguments:
-            - '@oro_email.email_websocket.processor'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 1 }
             - { name: doctrine.event_listener, event: postFlush, priority: 1 }
+            - { name: container.service_subscriber, id: oro_email.email_websocket.processor }
 
     oro_email.email.entity.batch_processor:
         class: Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor

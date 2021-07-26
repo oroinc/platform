@@ -6,6 +6,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * The base class to locate and parse configuration files.
+ */
 abstract class AbstractConfigurationProvider
 {
     /**
@@ -40,7 +43,7 @@ abstract class AbstractConfigurationProvider
                 function ($file) use ($directoriesWhiteList) {
                     foreach ($directoriesWhiteList as $allowedDirectory) {
                         if ($allowedDirectory &&
-                            strpos($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR) === 0
+                            str_starts_with($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR)
                         ) {
                             return true;
                         }

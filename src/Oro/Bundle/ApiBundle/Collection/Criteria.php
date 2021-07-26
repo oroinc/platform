@@ -140,7 +140,7 @@ class Criteria extends BaseCriteria
                 $propertyPath
             ));
         }
-        if (false === \strpos($join, '.')) {
+        if (!str_contains($join, '.')) {
             $entityClass = $this->resolveEntityClass($join);
             if (!$entityClass) {
                 throw new \InvalidArgumentException(\sprintf(

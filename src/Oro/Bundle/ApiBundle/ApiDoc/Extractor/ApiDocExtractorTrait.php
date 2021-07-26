@@ -170,7 +170,7 @@ trait ApiDocExtractorTrait
             $path = $element['annotation']->getRoute()->getPath();
 
             foreach ($resources as $resource) {
-                if (0 === \strpos($path, $resource) || $resource === $element['annotation']->getResource()) {
+                if (str_starts_with($path, $resource) || $resource === $element['annotation']->getResource()) {
                     $array[$index]['resource'] = $resource;
 
                     $hasResource = true;

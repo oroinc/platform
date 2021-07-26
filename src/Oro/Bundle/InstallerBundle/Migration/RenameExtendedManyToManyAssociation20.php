@@ -51,7 +51,7 @@ class RenameExtendedManyToManyAssociation20
     ) {
         $targetClassNames = $this->loadTargetClassNames($entityClass, $isSupportedTarget);
         foreach ($targetClassNames as $targetClassName) {
-            if (0 !== strpos($targetClassName, 'Oro\\')) {
+            if (!str_starts_with($targetClassName, 'Oro\\')) {
                 continue;
             }
 

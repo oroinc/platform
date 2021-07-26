@@ -80,10 +80,10 @@ class DoctrineHelper implements ResetInterface
      */
     public function getEntityClass($entityOrClass)
     {
-        if (is_object($entityOrClass)) {
+        if (\is_object($entityOrClass)) {
             return $this->getClass($entityOrClass);
         }
-        if (strpos($entityOrClass, ':') !== false) {
+        if (str_contains($entityOrClass, ':')) {
             if (isset($this->entityClasses[$entityOrClass])) {
                 return $this->entityClasses[$entityOrClass];
             }

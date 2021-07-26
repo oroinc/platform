@@ -51,7 +51,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         $this->entityClassResolver->expects(self::any())
             ->method('getEntityClass')
             ->willReturnCallback(function ($entityName) {
-                return 0 === strpos($entityName, 'Test:')
+                return str_starts_with($entityName, 'Test:')
                     ? 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity' . substr($entityName, 5)
                     : $entityName;
             });

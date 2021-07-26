@@ -76,7 +76,7 @@ class AbstractTextProcessor
 
     private function matchItem(string $expression, callable $valueMatcher): bool
     {
-        if (0 === strpos($expression, AbstractMatcher::OPERATOR_NOT)) {
+        if (str_starts_with($expression, AbstractMatcher::OPERATOR_NOT)) {
             return !$valueMatcher(\substr($expression, 1));
         }
 

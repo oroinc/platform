@@ -202,7 +202,7 @@ class ObjectNormalizer
             $propertyPath = $field->getPropertyPath($fieldName);
 
             if (null === $field->getAssociationQuery()
-                && false !== strpos($propertyPath, ConfigUtil::PATH_DELIMITER)
+                && str_contains($propertyPath, ConfigUtil::PATH_DELIMITER)
             ) {
                 $referenceFields[$fieldName] = ConfigUtil::explodePropertyPath($propertyPath);
                 continue;

@@ -194,7 +194,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
      */
     private function generateProxy(string $proxyDir, string $connectionClass, bool $isTestMode = false): string
     {
-        if (strpos($connectionClass, '\\') !== 0) {
+        if (!str_starts_with($connectionClass, '\\')) {
             $connectionClass = '\\' . $connectionClass;
         }
 

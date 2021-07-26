@@ -30,9 +30,9 @@ class MoneyValueTransformer implements DataTransformerInterface
             return $value;
         }
 
-        if (false !== strpos($value, '.')) {
-            list(, $decimalPart) = explode('.', $value);
-            if (strlen($decimalPart) >= MoneyValueType::TYPE_SCALE) {
+        if (str_contains($value, '.')) {
+            [, $decimalPart] = explode('.', $value);
+            if (\strlen($decimalPart) >= MoneyValueType::TYPE_SCALE) {
                 return $value;
             }
         }

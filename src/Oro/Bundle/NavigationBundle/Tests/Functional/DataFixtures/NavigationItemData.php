@@ -6,22 +6,25 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
-use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class NavigationItemData extends AbstractFixture implements DependentFixtureInterface
+class NavigationItemData extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
-    use UserUtilityTrait;
+    use ContainerAwareTrait;
 
     public const NAVIGATION_ITEM_PINBAR_1 = 'item_1';
     public const NAVIGATION_ITEM_PINBAR_2 = 'item_2';
     public const NAVIGATION_ITEM_PINBAR_3 = 'item_3';
 
-    /** @var array */
-    private static $navigationItems = [
+    public const NAVIGATION_ITEM_FAVORITE_1 = 'item_favorite_1';
+
+    public static array $navigationItems = [
         self::NAVIGATION_ITEM_PINBAR_1 => [
             'type' => 'pinbar',
-            'url' => '/admin/config/system',
+            'route' => 'oro_config_configuration_system',
             'title' => [
                 'template' => 'oro.config.menu.system_configuration.label - oro.user.menu.system_tab.label',
                 'short_template' => 'oro.config.menu.system_configuration.label',
@@ -31,7 +34,7 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
         ],
         self::NAVIGATION_ITEM_PINBAR_2 => [
             'type' => 'pinbar',
-            'url' => '/admin/user/view/1',
+            'route' => 'oro_user_index',
             'title' => [
                 'template' => '%username% - oro.ui.view - oro.user.entity_plural_label - '
                     . 'oro.user.menu.users_management.label - oro.user.menu.system_tab.label',
@@ -42,7 +45,7 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
         ],
         self::NAVIGATION_ITEM_PINBAR_3 => [
             'type' => 'pinbar',
-            'url' => '/admin/user',
+            'route' => 'oro_user_role_index',
             'title' => [
                 'template' => 'oro.user.entity_plural_label - oro.user.menu.users_management.label - '
                     . 'oro.user.menu.system_tab.label',
@@ -50,6 +53,12 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
                 'params' => [],
             ],
             'position' => 2,
+        ],
+        self::NAVIGATION_ITEM_FAVORITE_1 => [
+            'type' => 'favorite',
+            'route' => 'oro_user_role_create',
+            'title' => 'Roles',
+            'position' => 0,
         ],
     ];
 
@@ -68,15 +77,21 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
      */
     public function load(ObjectManager $manager)
     {
-        foreach (self::$navigationItems as $key => $data) {
-            $user = $this->getFirstUser($manager);
+        $user = $this->getReference(LoadUserData::USER_NAME_2);
+        $urlGenerator = $this->container->get(UrlGeneratorInterface::class);
 
+        foreach (self::$navigationItems as $key => $data) {
             $data['title'] = json_encode($data);
 
-            $entity = new NavigationItem($data + [
+            $data['url'] = $urlGenerator->generate($data['route'], ['restore' => 1]);
+            unset($data['route']);
+
+            $entity = new NavigationItem(
+                $data + [
                     'user' => $user,
-                    'organization' => $this->getReference('organization'),
-                ]);
+                    'organization' => $user->getOrganization(),
+                ]
+            );
             $entity->setType($data['type']);
 
             $this->setReference($key, $entity);

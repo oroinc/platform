@@ -15,7 +15,7 @@ class EntityDeleteAccessDeniedExceptionFactory
      */
     public function createAccessDeniedException(string $reason = 'access denied'): AccessDeniedException
     {
-        if (substr($reason, -1) !== '.') {
+        if (!str_ends_with($reason, '.')) {
             $reason .= '.';
         }
 

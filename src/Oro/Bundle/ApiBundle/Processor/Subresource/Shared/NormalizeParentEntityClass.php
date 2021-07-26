@@ -49,7 +49,7 @@ class NormalizeParentEntityClass implements ProcessorInterface
             return;
         }
 
-        if (false !== strpos($parentEntityClass, '\\')) {
+        if (str_contains($parentEntityClass, '\\')) {
             // the parent entity class is already normalized
             return;
         }

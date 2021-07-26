@@ -201,7 +201,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         $fieldName
     ) {
         // check if date part applied and start date greater than end
-        $conditionType = ($dateStartValue > $dateEndValue && strpos($fieldName, '(') !== false) ? 'orX' : 'andX';
+        $conditionType = ($dateStartValue > $dateEndValue && str_contains($fieldName, '(')) ? 'orX' : 'andX';
         $exprs = [];
 
         if (null !== $dateStartValue) {

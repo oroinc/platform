@@ -62,7 +62,7 @@ class ContentTransferEncoding extends BaseContentTransferEncoding
         // support of '7bit boundary="_av-21755293853469785109"' and '7bi tboundary' header values
         $transferEncodingString = str_replace(' ', '', $transferEncoding);
         foreach (static::$allowedTransferEncodings as $encoding) {
-            if (strpos($transferEncodingString, $encoding) === 0) {
+            if (str_starts_with($transferEncodingString, $encoding)) {
                 $this->transferEncoding = $encoding;
 
                 return $this;

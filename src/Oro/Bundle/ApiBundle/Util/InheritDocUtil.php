@@ -19,7 +19,7 @@ class InheritDocUtil
      */
     public static function hasInheritDoc(?string $text): bool
     {
-        return $text && false !== strpos($text, self::PLACEHOLDER);
+        return $text && str_contains($text, self::PLACEHOLDER);
     }
 
     /**
@@ -35,7 +35,7 @@ class InheritDocUtil
      */
     public static function hasDescriptionInheritDoc(?string $text): bool
     {
-        return $text && false !== strpos($text, self::PLACEHOLDER_DESCRIPTION);
+        return $text && str_contains($text, self::PLACEHOLDER_DESCRIPTION);
     }
 
     /**
@@ -60,7 +60,7 @@ class InheritDocUtil
         // e.g.if text is "text {@inheritdoc}" and injected text is "<p>injected</p>",
         // the result should be "text injected", not "text <p>injected</p>"
         $placeholderWithParagraph = '<p>' . $placeholder . '</p>';
-        if (false !== strpos($text, $placeholderWithParagraph)) {
+        if (str_contains($text, $placeholderWithParagraph)) {
             if (self::hasParagraphTag($inheritText)) {
                 return str_replace($placeholderWithParagraph, $inheritText, $text);
             }
@@ -73,7 +73,7 @@ class InheritDocUtil
 
     private static function hasParagraphTag(string $text): bool
     {
-        return false !== strpos($text, '<p>');
+        return str_contains($text, '<p>');
     }
 
     private static function isEnclosedByParagraphTag(string $text): bool

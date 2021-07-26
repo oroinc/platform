@@ -14,6 +14,13 @@ use Oro\Component\Layout\LayoutItemInterface;
 interface ExtensionInterface
 {
     /**
+     * Returns names of all block types.
+     *
+     * @return string[]
+     */
+    public function getTypeNames(): array;
+
+    /**
      * Returns a block type by name.
      *
      * @param string $name The name of the block type

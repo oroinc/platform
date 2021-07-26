@@ -47,7 +47,7 @@ class BuildExtensionsPass implements CompilerPassInterface
             if (!$persistent) {
                 $service = $container->getDefinition($serviceId);
                 $serviceClass = $service->getClass();
-                if (0 === strpos($serviceClass, '%')) {
+                if (str_starts_with($serviceClass, '%')) {
                     $serviceClass = $container->getParameter(substr($serviceClass, 1, -1));
                 }
                 if (!is_a($serviceClass, ResettableExtensionInterface::class, true)) {

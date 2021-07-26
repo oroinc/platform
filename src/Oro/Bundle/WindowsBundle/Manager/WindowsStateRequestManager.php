@@ -4,6 +4,9 @@ namespace Oro\Bundle\WindowsBundle\Manager;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Provides a way to manage windows state requests.
+ */
 class WindowsStateRequestManager
 {
     /** @var RequestStack */
@@ -76,7 +79,7 @@ class WindowsStateRequestManager
      */
     protected function getUrlWithContainer($url, $container, $wid)
     {
-        if (strpos($url, '_widgetContainer=') === false) {
+        if (!str_contains($url, '_widgetContainer=')) {
             $parts = parse_url($url);
             $widgetPart = '_widgetContainer=' . $container . '&_wid=' . $wid;
             if (array_key_exists('query', $parts)) {

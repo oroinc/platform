@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tools;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 
+/**
+ * Provides a set of helper methods to work with email addresses.
+ */
 class EmailAddressHelper
 {
     protected $nameSeparators = [
@@ -240,7 +243,7 @@ class EmailAddressHelper
             return false;
         }
 
-        return (strpos($emailAddress, '<') !== false);
+        return str_contains($emailAddress, '<');
     }
 
     /**

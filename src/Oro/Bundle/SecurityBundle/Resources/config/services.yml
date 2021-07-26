@@ -67,10 +67,6 @@ services:
         calls:
             - [ setBaseAclManager, [ '@oro_security.acl.base_manager' ] ]
 
-    oro_security.link.sid_manager:
-        tags:
-            - { name: oro_service_link,  service: oro_security.acl.sid_manager }
-
     security.acl.cache.doctrine.cache_impl:
         public: false
         parent: oro.cache.abstract
@@ -428,7 +424,7 @@ services:
         tags:
             - { name: kernel.cache_warmer }
 
-    oro_security.ownership_tree_subscriber:
+    oro_security.ownership_tree_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
         arguments:
             - '@oro_security.ownership_tree_provider.chain'

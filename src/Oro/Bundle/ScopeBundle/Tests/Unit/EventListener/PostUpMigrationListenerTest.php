@@ -4,7 +4,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\ScopeBundle\EventListener\PostUpMigrationListener;
-use Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager;
+use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 use Oro\Bundle\ScopeBundle\Migration\Schema\AddTriggerToRowHashColumn;
 use Oro\Bundle\ScopeBundle\Migration\Schema\UpdateScopeRowHashColumn;
 use PHPUnit\Framework\TestCase;
@@ -12,13 +12,13 @@ use PHPUnit\Framework\TestCase;
 class PostUpMigrationListenerTest extends TestCase
 {
     /**
-     * @var AddCommentToRoHashManager
+     * @var AddCommentToRowHashManager
      */
     private $manager;
 
     protected function setUp(): void
     {
-        $this->manager = $this->createMock(AddCommentToRoHashManager::class);
+        $this->manager = $this->createMock(AddCommentToRowHashManager::class);
     }
 
     public function testInstalled(): void

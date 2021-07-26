@@ -3,20 +3,31 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
-class FeatureContext extends OroFeatureContext implements KernelAwareContext
+class FeatureContext extends OroFeatureContext
 {
-    use KernelDictionary;
+    private ?ImportExportContext $importExportContext;
 
-    /**
-     * @var ImportExportContext
-     */
-    private $importExportContext;
+    private EntityAliasResolver $entityAliasResolver;
+
+    private ConfigManager $entityConfigManager;
+
+    private DoctrineHelper $doctrineHelper;
+
+    public function __construct(
+        EntityAliasResolver $entityAliasResolver,
+        ConfigManager $entityConfigManager,
+        DoctrineHelper $doctrineHelper
+    ) {
+        $this->entityAliasResolver = $entityAliasResolver;
+        $this->entityConfigManager = $entityConfigManager;
+        $this->doctrineHelper = $doctrineHelper;
+    }
 
     /**
      * @BeforeScenario
@@ -35,9 +46,8 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
      */
     public function iDownloadDataTemplateFileForExtendEntity($entityAlias)
     {
-        $className = $this->getContainer()->get('oro_entity.entity_alias_resolver')->getClassByAlias($entityAlias);
-        $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
-        $entityModel = $entityConfigManager->getConfigEntityModel($className);
+        $className = $this->entityAliasResolver->getClassByAlias($entityAlias);
+        $entityModel = $this->entityConfigManager->getConfigEntityModel($className);
 
         static::assertNotNull($entityModel, sprintf('No entity model found for class "%s"', $className));
 
@@ -53,15 +63,12 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
     public function checkIfFieldNotOrIsInDbTableByEntityClass(string $field, string $cond, string $class)
     {
         self::assertContains($cond, ['is', 'not']);
-        /** @var DoctrineHelper $dh */
-        $dh = $this->getContainer()->get('oro_entity.doctrine_helper');
-
-        $em = $dh->getEntityManager($class);
+        $em = $this->doctrineHelper->getEntityManager($class);
         $sm = $em->getConnection()->getSchemaManager();
 
         $tableName = $em->getClassMetadata($class)->getTableName();
 
-        $columns = $columns = $sm->listTableColumns($tableName);
+        $columns = $sm->listTableColumns($tableName);
 
         $columnsArray = [];
         foreach ($columns as $column) {

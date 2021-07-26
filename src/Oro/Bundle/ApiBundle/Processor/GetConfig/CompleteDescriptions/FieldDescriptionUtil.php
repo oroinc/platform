@@ -44,7 +44,7 @@ class FieldDescriptionUtil
         if ($formOptions && isset($formOptions['mapped']) && !$formOptions['mapped']) {
             $existingDescription = $field->getDescription();
             if (!empty($existingDescription)
-                && false === strpos($existingDescription, self::MODIFY_READ_ONLY_FIELD_DESCRIPTION)
+                && !str_contains($existingDescription, self::MODIFY_READ_ONLY_FIELD_DESCRIPTION)
             ) {
                 $field->setDescription($existingDescription . "\n\n" . self::MODIFY_READ_ONLY_FIELD_DESCRIPTION);
             }

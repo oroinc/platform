@@ -37,12 +37,12 @@ class ValidateEntityTypeSupported implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        if (!$entityClass || false === strpos($entityClass, '\\')) {
+        if (!$entityClass || !str_contains($entityClass, '\\')) {
             // an entity class does not exist in the context or it is not normalized
             return;
         }
 
-        if (!in_array($entityClass, $supportedEntityClasses, true)) {
+        if (!\in_array($entityClass, $supportedEntityClasses, true)) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::ENTITY_TYPE,

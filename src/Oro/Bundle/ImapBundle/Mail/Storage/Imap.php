@@ -211,7 +211,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
 
         foreach ($folders as $globalName => $data) {
             do {
-                if (!$parent || strpos($globalName, $parent) === 0) {
+                if (!$parent || str_starts_with($globalName, $parent)) {
                     // build local name based on global name
                     $lastDelimPosition = strrpos($globalName, $data['delim']);
                     if ($lastDelimPosition === false) {

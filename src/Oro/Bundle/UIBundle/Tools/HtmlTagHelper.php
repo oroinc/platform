@@ -132,7 +132,7 @@ class HtmlTagHelper implements TranslatorAwareInterface
             $config->set('CSS.Trusted', true);
 
             $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
-            if (strpos($allowedTags, '<iframe>') !== false) {
+            if (str_contains($allowedTags, '<iframe>')) {
                 $config->set('HTML.SafeIframe', true);
                 $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
             }

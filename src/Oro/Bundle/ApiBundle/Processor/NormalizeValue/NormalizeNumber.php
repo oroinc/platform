@@ -40,9 +40,9 @@ class NormalizeNumber extends AbstractProcessor
     protected function normalizeValue($value)
     {
         $normalizedSrcValue = $value;
-        if (0 === strpos($normalizedSrcValue, '.')) {
+        if (str_starts_with($normalizedSrcValue, '.')) {
             $normalizedSrcValue = '0' . $normalizedSrcValue;
-        } elseif (0 === strpos($normalizedSrcValue, '-.')) {
+        } elseif (str_starts_with($normalizedSrcValue, '-.')) {
             $normalizedSrcValue = '-0' . substr($normalizedSrcValue, 1);
         }
 

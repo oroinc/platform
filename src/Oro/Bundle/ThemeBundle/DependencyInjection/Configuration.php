@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
                     }
 
                     foreach ($value['themes'] as $themeName => $value) {
-                        if (false !== strpos($themeName, '-') && false === strpos($themeName, '_')) {
+                        if (str_contains($themeName, '-') && !str_contains($themeName, '_')) {
                             return true;
                         }
                     }

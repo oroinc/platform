@@ -248,7 +248,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
-            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($field);
+            [$fieldType, $fieldName] = Criteria::explodeFieldTypeName($field);
             QueryBuilderUtil::checkField($fieldName);
 
             // prepare query builder to apply grouping
@@ -426,13 +426,13 @@ abstract class BaseDriver implements DBALPersisterInterface
     protected function filterTextFieldValue($fieldName, $fieldValue)
     {
         // BB-7272: do not clear fields other than `all_text_*`
-        if (strpos($fieldName, 'all_text') !== 0) {
+        if (!str_starts_with($fieldName, 'all_text')) {
             return $fieldValue;
         }
 
-        if (is_string($fieldValue)) {
+        if (\is_string($fieldValue)) {
             $fieldValue = Query::clearString($fieldValue);
-        } elseif (is_array($fieldValue)) {
+        } elseif (\is_array($fieldValue)) {
             foreach ($fieldValue as $key => $value) {
                 $fieldValue[$key] = Query::clearString($value);
             }
@@ -584,12 +584,12 @@ abstract class BaseDriver implements DBALPersisterInterface
         }
 
         foreach ($selects as $select) {
-            list($type, $name) = Criteria::explodeFieldTypeName($select);
+            [$type, $name] = Criteria::explodeFieldTypeName($select);
             QueryBuilderUtil::checkIdentifier($name);
             QueryBuilderUtil::checkIdentifier($type);
 
             $joinField = $this->getJoinField($type);
-            list($joinAlias, $uniqIndex) = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
+            [$joinAlias, $uniqIndex] = $this->getJoinAttributes($name, $type, $qb->getAllAliases());
             QueryBuilderUtil::checkIdentifier($joinAlias);
             QueryBuilderUtil::checkIdentifier($uniqIndex);
 
@@ -652,7 +652,7 @@ abstract class BaseDriver implements DBALPersisterInterface
 
         if ($orderBy) {
             $direction = reset($orderBy);
-            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName(key($orderBy));
+            [$fieldType, $fieldName] = Criteria::explodeFieldTypeName(key($orderBy));
             QueryBuilderUtil::checkIdentifier($fieldType);
             $orderRelation = $fieldType . 'Fields';
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')

@@ -403,7 +403,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     {
         $key = $this->generateKey();
 
-        if (false === strpos($target, '/')) {
+        if (!str_contains($target, '/')) {
             if (null !== $this->logger) {
                 $this->logger->error('Invalid target path for WAMP server.', ['target' => $target]);
             }

@@ -32,22 +32,22 @@ class UrlUtil
         }
 
         if ($baseUrl === self::SLASH) {
-            if (self::startsWithSlash($path)) {
+            if (str_starts_with($path, self::SLASH)) {
                 return $path;
             }
 
             return $baseUrl . $path;
         }
 
-        if (self::startsWith($path, $baseUrl)) {
+        if (str_starts_with($path, $baseUrl)) {
             return self::normalizePath($path);
         }
 
-        if (!self::endsWithSlash($baseUrl)) {
+        if (!str_ends_with($baseUrl, self::SLASH)) {
             $baseUrl .= self::SLASH;
         }
 
-        if (self::startsWithSlash($path)) {
+        if (str_starts_with($path, self::SLASH)) {
             return self::normalizePath($baseUrl . substr($path, 1));
         }
 
@@ -77,7 +77,7 @@ class UrlUtil
         }
 
         if ($baseUrl === self::SLASH) {
-            if (self::startsWithSlash($path)) {
+            if (str_starts_with($path, self::SLASH)) {
                 return $path;
             }
 
@@ -88,12 +88,12 @@ class UrlUtil
             return self::SLASH;
         }
 
-        if (!self::endsWithSlash($baseUrl)) {
+        if (!str_ends_with($baseUrl, self::SLASH)) {
             $baseUrl .= self::SLASH;
         }
 
-        if (self::startsWith($path, $baseUrl)) {
-            return substr($path, strlen($baseUrl) - 1);
+        if (str_starts_with($path, $baseUrl)) {
+            return substr($path, \strlen($baseUrl) - 1);
         }
 
         return self::normalizePath($path);
@@ -124,8 +124,8 @@ class UrlUtil
             return $path1;
         }
 
-        $path1EndsWithSlash = self::endsWithSlash($path1);
-        if (self::startsWithSlash($path2)) {
+        $path1EndsWithSlash = str_ends_with($path1, self::SLASH);
+        if (str_starts_with($path2, self::SLASH)) {
             if ($path1EndsWithSlash) {
                 return $path1 . substr($path2, 1);
             }
@@ -139,24 +139,9 @@ class UrlUtil
         return $path1 . self::SLASH . $path2;
     }
 
-    private static function startsWithSlash(string $value): bool
-    {
-        return strpos($value, self::SLASH) === 0;
-    }
-
-    private static function endsWithSlash(string $value): bool
-    {
-        return substr($value, -1) === self::SLASH;
-    }
-
-    private static function startsWith(string $haystack, string $needle): bool
-    {
-        return strpos($haystack, $needle) === 0;
-    }
-
     private static function normalizePath(string $path): string
     {
-        if (!$path || self::startsWithSlash($path)) {
+        if (!$path || str_starts_with($path, self::SLASH)) {
             return $path;
         }
 

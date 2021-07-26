@@ -53,7 +53,7 @@ class NormalizeEntityClass extends AbstractProcessor
      */
     protected function isValueNormalizationRequired($value)
     {
-        return false === strpos($value, '\\');
+        return !str_contains($value, '\\');
     }
 
     /**

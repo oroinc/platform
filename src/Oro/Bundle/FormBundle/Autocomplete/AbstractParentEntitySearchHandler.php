@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
+/**
+ * The base class for search handlers to search by a parent entity.
+ */
 abstract class AbstractParentEntitySearchHandler extends SearchHandler
 {
     const DELIMITER = ';';
@@ -11,8 +14,8 @@ abstract class AbstractParentEntitySearchHandler extends SearchHandler
      */
     public function search($query, $page, $perPage, $searchById = false)
     {
-        if ($searchById && strpos($query, self::DELIMITER) !== false) {
-            list($query) = $this->explodeSearchTerm($query);
+        if ($searchById && str_contains($query, self::DELIMITER)) {
+            [$query] = $this->explodeSearchTerm($query);
         }
 
         return parent::search($query, $page, $perPage, $searchById);
@@ -23,11 +26,11 @@ abstract class AbstractParentEntitySearchHandler extends SearchHandler
      */
     protected function searchEntities($search, $firstResult, $maxResults)
     {
-        if (strpos($search, self::DELIMITER) === false) {
+        if (!str_contains($search, self::DELIMITER)) {
             return [];
         }
 
-        list($searchTerm, $entityId) = $this->explodeSearchTerm($search);
+        [$searchTerm, $entityId] = $this->explodeSearchTerm($search);
 
         $entityIds = $this->searchIds($searchTerm, $firstResult, $maxResults);
 

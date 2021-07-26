@@ -1,16 +1,21 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
+namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Inflector\Inflector;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class MultiEnumManager
+/**
+ * Ensures multi-enums are properly flushed.
+ */
+class SaveMultiEnumEntityListener
 {
     private Inflector $inflector;
 
@@ -19,19 +24,16 @@ class MultiEnumManager
         $this->inflector = $inflector;
     }
 
-    /**
-     * Handle onFlush event
-     */
-    public function handleOnFlush(OnFlushEventArgs $event)
+    public function onFlush(OnFlushEventArgs $event): void
     {
-        $em  = $event->getEntityManager();
+        $em = $event->getEntityManager();
         $uow = $em->getUnitOfWork();
+        $this->processCollections($uow->getScheduledCollectionUpdates(), $em, $uow);
+        $this->processCollections($uow->getScheduledCollectionDeletions(), $em, $uow);
+    }
 
-        $collections = array_merge(
-            $uow->getScheduledCollectionUpdates(),
-            $uow->getScheduledCollectionDeletions()
-        );
-
+    private function processCollections(array $collections, EntityManagerInterface $em, UnitOfWork $uow): void
+    {
         // check if multi-enum modifications exist
         $updates = [];
         /** @var PersistentCollection $coll */
@@ -41,12 +43,12 @@ class MultiEnumManager
                 && $mapping['isOwningSide']
                 && is_subclass_of($mapping['targetEntity'], ExtendHelper::BASE_ENUM_VALUE_CLASS)
             ) {
-                $owner         = $coll->getOwner();
-                $suffix        = $this->getSnapshotFieldMethodSuffix($mapping['fieldName']);
+                $owner = $coll->getOwner();
+                $suffix = $this->getSnapshotFieldMethodSuffix($mapping['fieldName']);
                 $snapshotValue = $this->buildSnapshotValue($coll);
                 if ($owner->{'get' . $suffix}() !== $snapshotValue) {
                     $ownerMetadata = $em->getClassMetadata(ClassUtils::getClass($owner));
-                    $updates[]     = [$ownerMetadata, $owner, 'set' . $suffix, $snapshotValue];
+                    $updates[] = [$ownerMetadata, $owner, 'set' . $suffix, $snapshotValue];
                 }
             }
         }
@@ -58,12 +60,7 @@ class MultiEnumManager
         }
     }
 
-    /**
-     * @param PersistentCollection $coll
-     *
-     * @return string|null
-     */
-    protected function buildSnapshotValue(PersistentCollection $coll)
+    private function buildSnapshotValue(PersistentCollection $coll): ?string
     {
         if ($coll->isEmpty()) {
             return null;
@@ -74,14 +71,14 @@ class MultiEnumManager
         foreach ($coll as $item) {
             $ids[] = $item->getId();
         }
-        sort($ids);
-        $snapshot = implode(',', $ids);
+        \sort($ids);
+        $snapshot = \implode(',', $ids);
 
-        if (strlen($snapshot) > ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH) {
-            $snapshot  = substr($snapshot, 0, ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH);
+        if (\strlen($snapshot) > ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH) {
+            $snapshot = \substr($snapshot, 0, ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH);
             $lastDelim = strrpos($snapshot, ',');
             if (ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH - $lastDelim - 1 < 3) {
-                $lastDelim = strrpos($snapshot, ',', -(strlen($snapshot) - $lastDelim + 1));
+                $lastDelim = strrpos($snapshot, ',', -(\strlen($snapshot) - $lastDelim + 1));
             }
             $snapshot = substr($snapshot, 0, $lastDelim + 1) . '...';
         }
@@ -89,12 +86,7 @@ class MultiEnumManager
         return $snapshot;
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return string
-     */
-    protected function getSnapshotFieldMethodSuffix($fieldName)
+    private function getSnapshotFieldMethodSuffix(string $fieldName): string
     {
         return $this->inflector->classify(ExtendHelper::getMultiEnumSnapshotFieldName($fieldName));
     }

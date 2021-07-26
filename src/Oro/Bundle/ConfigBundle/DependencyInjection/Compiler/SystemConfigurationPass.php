@@ -123,8 +123,8 @@ class SystemConfigurationPass implements CompilerPassInterface
     {
         foreach ($configSettings as &$configSetting) {
             if (isset($configSetting['value'])
-                && is_string($configSetting['value'])
-                && strpos($configSetting['value'], '@') === 0
+                && \is_string($configSetting['value'])
+                && str_starts_with($configSetting['value'], '@')
             ) {
                 $serviceId = substr($configSetting['value'], 1);
                 if ($containerBuilder->hasDefinition($serviceId)) {

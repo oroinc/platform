@@ -54,7 +54,7 @@ class FilterOrmQueryUtil
         }
 
         foreach (self::getSelectFieldFromGroupBy($qb) as $groupByField) {
-            if (strpos($groupByField, '(') !== false) {
+            if (str_contains($groupByField, '(')) {
                 return true;
             }
         }
@@ -155,7 +155,7 @@ class FilterOrmQueryUtil
     private static function getSelectFieldFromGroupByPart(QueryBuilder $qb, $groupByPart)
     {
         $expressions = [];
-        if (strpos($groupByPart, ',') !== false) {
+        if (str_contains($groupByPart, ',')) {
             $groupByParts = explode(',', $groupByPart);
             foreach ($groupByParts as $part) {
                 $expressions = array_merge($expressions, self::getSelectFieldFromGroupByPart($qb, $part));

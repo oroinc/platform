@@ -147,7 +147,7 @@ class FormCompilerPass implements CompilerPassInterface
     private function assertExistingFormRegistry(Definition $formRegistryDef, ContainerBuilder $container)
     {
         $formRegistryClass = $formRegistryDef->getClass();
-        if (0 === strpos($formRegistryClass, '%')) {
+        if (str_starts_with($formRegistryClass, '%')) {
             $formRegistryClass = $container->getParameter(substr($formRegistryClass, 1, -1));
         }
         if (FormRegistry::class !== $formRegistryClass) {

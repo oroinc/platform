@@ -22,8 +22,8 @@ trait ShortFileNameGeneratorTrait
     protected function getFilename($id)
     {
         $namespace = $this->getNamespace();
-        if ($namespace && strpos($id, $namespace) === 0) {
-            $id = substr($id, strlen($namespace));
+        if ($namespace && str_starts_with($id, $namespace)) {
+            $id = substr($id, \strlen($namespace));
         }
         $id = $this->removeSpecialChars($id);
 

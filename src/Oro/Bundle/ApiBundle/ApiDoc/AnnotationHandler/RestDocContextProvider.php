@@ -153,7 +153,7 @@ class RestDocContextProvider
         $actionType = $route->getOption(self::ACTION_TYPE_ATTRIBUTE);
         if (!$actionType) {
             $controller = self::getController($route);
-            if (self::endsWith($controller, self::ACTION_SUFFIX)) {
+            if (str_ends_with($controller, self::ACTION_SUFFIX)) {
                 $startPos = strrpos($controller, '::');
                 if (false !== $startPos) {
                     $startPos += 2;
@@ -196,10 +196,5 @@ class RestDocContextProvider
         );
 
         return new \LogicException($message);
-    }
-
-    private static function endsWith(string $haystack, string $needle): bool
-    {
-        return substr($haystack, -\strlen($needle)) === $needle;
     }
 }

@@ -4,6 +4,9 @@ namespace Oro\Component\ConfigExpression;
 
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
+/**
+ * The base class for expression assemblers.
+ */
 abstract class AbstractAssembler implements AssemblerInterface
 {
     /** @var ConfigurationPassInterface[] */
@@ -68,11 +71,11 @@ abstract class AbstractAssembler implements AssemblerInterface
      */
     protected function isExpression($configuration)
     {
-        if (!is_array($configuration) || count($configuration) !== 1) {
+        if (!\is_array($configuration) || count($configuration) !== 1) {
             return false;
         }
 
-        return strpos($this->getEntityType($configuration), '@') === 0;
+        return str_starts_with($this->getEntityType($configuration), '@');
     }
 
     /**

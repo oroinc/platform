@@ -80,7 +80,7 @@ class ReportQueryExecutor implements QueryExecutorInterface
     private function isApplicable(string $gridName): bool
     {
         foreach ($this->reportDatagridPrefixes as $prefix) {
-            if (strpos($gridName, $prefix) === 0) {
+            if (str_starts_with($gridName, $prefix)) {
                 return true;
             }
         }

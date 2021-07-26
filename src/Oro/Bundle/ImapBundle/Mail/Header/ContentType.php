@@ -59,7 +59,7 @@ class ContentType extends BaseContentType
 
         if (count($values)) {
             foreach ($values as $keyValuePair) {
-                if ($keyValuePair && strpos($keyValuePair, '=') !== false) {
+                if ($keyValuePair && str_contains($keyValuePair, '=')) {
                     [$key, $value] = explode('=', $keyValuePair, 2);
                     $value = trim($value, "'\" \t\n\r\0\x0B");
                     $header->addParameter($key, $value);

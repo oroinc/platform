@@ -176,7 +176,7 @@ class ActivityListFilter extends EntityFilter
             ->andWhere(sprintf('%s.id = %s.%s', $this->activityAlias, $this->getEntityAlias(), $entityIdField));
 
         $entityField = $this->getField($data);
-        $dateRangeField = strpos($entityField, '$') === 0 ? substr($entityField, 1) : null;
+        $dateRangeField = str_starts_with($entityField, '$') ? substr($entityField, 1) : null;
         if ($dateRangeField) {
             $data['dateRange'] = $data['filter']['data'];
             unset($data['filter']);
@@ -344,7 +344,7 @@ class ActivityListFilter extends EntityFilter
     protected function getField(array $data)
     {
         $fieldName = $this->getEntityField($data);
-        if (strpos($fieldName, '\\') === false) {
+        if (!str_contains($fieldName, '\\')) {
             return $fieldName;
         }
 

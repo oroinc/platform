@@ -124,7 +124,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
         }
 
         $entityClass = reset($arguments);
-        if (strpos($entityClass, '%') === 0) {
+        if (str_starts_with($entityClass, '%')) {
             $classParameter = substr($entityClass, 1, -1);
             $entityClass = $container->getParameter($classParameter);
         }
@@ -147,7 +147,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
         $repositoryClass = $definition->getClass();
 
         if ($repositoryClass) {
-            if (strpos($repositoryClass, '%') === 0) {
+            if (str_starts_with($repositoryClass, '%')) {
                 $classParameter = substr($repositoryClass, 1, -1);
                 $repositoryClass = $container->getParameter($classParameter);
             }

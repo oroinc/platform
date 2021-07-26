@@ -144,7 +144,7 @@ class EmailSyncCommandTest extends WebTestCase
             $email = $list[0];
             $propertyAccessor = new PropertyAccessor();
             foreach ($expectedEmailData as $propertyPath => $expectedValue) {
-                if (strpos($propertyPath, '@') !== false) {
+                if (str_contains($propertyPath, '@')) {
                     [$propertyPath, $extension] = explode('@', $propertyPath);
                     if ($extension && !extension_loaded($extension)) {
                         continue;

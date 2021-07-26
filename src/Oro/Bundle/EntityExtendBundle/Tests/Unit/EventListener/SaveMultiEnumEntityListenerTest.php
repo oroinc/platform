@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
@@ -9,12 +9,12 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
+use Oro\Bundle\EntityExtendBundle\EventListener\SaveMultiEnumEntityListener;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEntityWithEnum;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
+class SaveMultiEnumEntityListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
     private $uow;
@@ -22,8 +22,8 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var MultiEnumManager */
-    private $manager;
+    /** @var SaveMultiEnumEntityListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -34,17 +34,10 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->manager = new MultiEnumManager((new InflectorFactory())->build());
+        $this->listener = new SaveMultiEnumEntityListener((new InflectorFactory())->build());
     }
 
-    /**
-     * @param object $owner
-     * @param array  $mapping
-     * @param array  $items
-     *
-     * @return PersistentCollection
-     */
-    private function getPersistentCollection($owner, array $mapping, array $items = [])
+    private function getPersistentCollection(object $owner, array $mapping, array $items = []): PersistentCollection
     {
         $coll = new PersistentCollection(
             $this->em,
@@ -70,7 +63,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects($this->never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
     }
 
     public function testHandleOnFlushWithNothingToChange()
@@ -110,7 +103,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects($this->never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
     }
 
     public function testHandleOnFlush()
@@ -151,7 +144,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
                 $owner
             );
 
-        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
 
         $this->assertEquals(
             'val1,val2,val3',
@@ -210,7 +203,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
                 $owner
             );
 
-        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
 
         $this->assertLessThanOrEqual(
             ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,
@@ -275,7 +268,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
             ->method('recomputeSingleEntityChangeSet')
             ->with($this->identicalTo($metadata), $owner);
 
-        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
+        $this->listener->onFlush(new OnFlushEventArgs($this->em));
 
         $this->assertLessThanOrEqual(
             ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,

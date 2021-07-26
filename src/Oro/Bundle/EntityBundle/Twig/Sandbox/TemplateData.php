@@ -111,8 +111,8 @@ class TemplateData
      */
     public function getEntityVariable(string $variable)
     {
-        if (\strpos($variable, $this->entitySectionName) !== 0) {
-            if (\strpos($variable, self::PATH_SEPARATOR) === false) {
+        if (!str_starts_with($variable, $this->entitySectionName)) {
+            if (!str_contains($variable, self::PATH_SEPARATOR)) {
                 throw new \LogicException(sprintf(
                     'Expected "%s" variable, got "%s".',
                     $this->entitySectionName,
@@ -228,7 +228,7 @@ class TemplateData
     public function getVariablePath(string $computedVariablePath): string
     {
         $prefix = $this->computedSectionName . self::PATH_SEPARATOR;
-        if (\strpos($computedVariablePath, $prefix) !== 0) {
+        if (!str_starts_with($computedVariablePath, $prefix)) {
             throw new \LogicException(sprintf(
                 'The computed variable "%s" must start with "%s".',
                 $computedVariablePath,

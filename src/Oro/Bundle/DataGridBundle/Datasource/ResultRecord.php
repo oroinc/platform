@@ -58,7 +58,7 @@ class ResultRecord implements ResultRecordInterface
     {
         foreach ($this->valueContainers as $key => $data) {
             if (is_array($data)) {
-                if (strpos($name, '[') === 0) {
+                if (str_starts_with($name, '[')) {
                     $this->getPropertyAccessor()->setValue($this->valueContainers[$key], $name, $value);
                     return;
                 } else {
@@ -82,7 +82,7 @@ class ResultRecord implements ResultRecordInterface
     {
         foreach ($this->valueContainers as $data) {
             if (is_array($data)) {
-                if (strpos($name, '[') === 0) {
+                if (str_starts_with($name, '[')) {
                     return $this->getPropertyAccessor()->getValue($data, $name);
                 } elseif (array_key_exists($name, $data)) {
                     return $data[$name];

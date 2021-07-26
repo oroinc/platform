@@ -21,7 +21,7 @@ trait EntityTypeConsistencyTestTrait
     {
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || 0 === strpos($entityType, 'testapi');
+            || str_starts_with($entityType, 'testapi');
     }
 
     private function checkEntityTypeConsistency()
@@ -30,7 +30,7 @@ trait EntityTypeConsistencyTestTrait
 
         $entities = $this->getEntities();
         foreach ($entities as $entity) {
-            list($entityClass) = $entity;
+            [$entityClass] = $entity;
             $entityType = $this->getEntityType($entityClass);
             if ($this->isSkippedEntity($entityClass, $entityType)) {
                 continue;

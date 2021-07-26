@@ -141,7 +141,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
             }
             $fields = $this->getFields($where);
             foreach ($fields as $field) {
-                if (strpos($field, '.') !== false) {
+                if (str_contains($field, '.')) {
                     $data      = explode('.', $field, 2);
                     $aliases[] = $data[0];
                 }
@@ -190,7 +190,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
     {
         $condition = (string)$condition;
         foreach ($this->joinTablePaths as $alias => $field) {
-            if (strpos($field, '.') !== false) {
+            if (str_contains($field, '.')) {
                 $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
             }
         }
@@ -300,8 +300,8 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
             $joinAlias = $join->getAlias();
 
             $joinDependencies[$joinAlias] = [$join->getJoinType(), []];
-            if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
-                $data                              = explode('.', $joinTable);
+            if (!empty($joinTable) && str_contains($joinTable, '.')) {
+                $data = explode('.', $joinTable);
                 $joinDependencies[$joinAlias][1][] = $data[0];
             }
 
@@ -336,7 +336,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
             $joinCondition = $join->getCondition();
 
             $dependencies = [];
-            if ($joinCondition && strpos($joinCondition, $rootAlias . ' ') !== false) {
+            if ($joinCondition && str_contains($joinCondition, $rootAlias . ' ')) {
                 $dependencies = [$rootAlias];
             }
 

@@ -121,7 +121,7 @@ class RestDocHandler implements HandlerInterface
      */
     private function hasAttribute(Route $route, string $placeholder): bool
     {
-        return false !== strpos($route->getPath(), $placeholder);
+        return str_contains($route->getPath(), $placeholder);
     }
 
     private function getEntityClass(string $entityType): string

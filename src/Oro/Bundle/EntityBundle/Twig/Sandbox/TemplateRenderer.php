@@ -200,12 +200,12 @@ abstract class TemplateRenderer
         return \preg_replace_callback(
             '/{{\s*([\w\_\-\.]+?)\s*}}/u',
             function ($match) use ($formatExtension, $errorMessage, $data) {
-                list($result, $variable) = $match;
+                [$result, $variable] = $match;
                 $variablePath = $variable;
-                if (\strpos($variable, self::COMPUTED_PREFIX) === 0) {
+                if (str_starts_with($variable, self::COMPUTED_PREFIX)) {
                     $variablePath = $data->getVariablePath($variable);
                 }
-                if (\strpos($variablePath, self::ENTITY_PREFIX) === 0) {
+                if (str_starts_with($variablePath, self::ENTITY_PREFIX)) {
                     $lastSeparatorPos = \strrpos($variablePath, self::PATH_SEPARATOR);
                     $result = $formatExtension->getSafeFormatExpression(
                         \lcfirst($this->inflector->classify(\substr($variablePath, $lastSeparatorPos + 1))),

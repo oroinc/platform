@@ -57,7 +57,7 @@ class OroSearchExtension extends AbstractExtension
     public function trimByString($text, $searchString, $symbolCount = 400)
     {
         $searchString = $this->clearString($searchString);
-        if (strpos($searchString, ' ') !== false) {
+        if (str_contains($searchString, ' ')) {
             $stringArray = explode(' ', $searchString);
             $searchString = $stringArray[0];
         }

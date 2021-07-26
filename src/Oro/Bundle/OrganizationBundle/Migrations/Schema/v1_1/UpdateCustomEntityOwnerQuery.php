@@ -52,7 +52,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
         // prepare update queries
         $rows = $this->connection->fetchAll($query, $params, $types);
         foreach ($rows as $row) {
-            if (strpos($row['class_name'], 'Extend\\Entity\\') !== 0) {
+            if (!str_starts_with($row['class_name'], 'Extend\\Entity\\')) {
                 continue;
             }
             $data = $this->connection->convertToPHPValue($row['data'], 'array');

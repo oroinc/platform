@@ -18,14 +18,9 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
  */
 class DoctrineEventListener
 {
-    /** @var ScopeCollection */
-    private $scheduledForInsertScopes;
-
-    /** @var CacheProvider */
-    private $scopeCache;
-
-    /** @var bool */
-    private $needToResetScopeCache = false;
+    private ScopeCollection $scheduledForInsertScopes;
+    private CacheProvider $scopeCache;
+    private bool $needToResetScopeCache = false;
 
     public function __construct(ScopeCollection $scheduledForInsertScopes, CacheProvider $scopeCache)
     {
@@ -33,10 +28,8 @@ class DoctrineEventListener
         $this->scopeCache = $scopeCache;
     }
 
-    public function preFlush(PreFlushEventArgs $event)
+    public function preFlush(PreFlushEventArgs $event): void
     {
-        $em = $event->getEntityManager();
-
         if (!$this->scheduledForInsertScopes->isEmpty()) {
             $em = $event->getEntityManager();
             $scopes = $this->scheduledForInsertScopes->getAll();
@@ -47,10 +40,8 @@ class DoctrineEventListener
         }
     }
 
-    public function onFlush(OnFlushEventArgs $event)
+    public function onFlush(OnFlushEventArgs $event): void
     {
-        $em = $event->getEntityManager();
-
         if ($this->needToResetScopeCache) {
             // do nothing as we are already known that the cache should be reset
             return;
@@ -61,7 +52,7 @@ class DoctrineEventListener
         }
     }
 
-    public function postFlush()
+    public function postFlush(): void
     {
         if ($this->needToResetScopeCache) {
             $this->needToResetScopeCache = false;
@@ -69,7 +60,7 @@ class DoctrineEventListener
         }
     }
 
-    public function onClear()
+    public function onClear(): void
     {
         $this->scheduledForInsertScopes->clear();
         $this->needToResetScopeCache = false;

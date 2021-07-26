@@ -1,0 +1,11 @@
+services:
+    Oro\Bundle\UserBundle\Tests\Behat\Context\FeatureContext:
+        public: true
+        arguments:
+            - '@router'
+
+    Oro\Bundle\UserBundle\Tests\Behat\Context\UserAttachmentContext:
+        public: true
+        parent: Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentContext
+        arguments:
+            - '@oro_user.manager'

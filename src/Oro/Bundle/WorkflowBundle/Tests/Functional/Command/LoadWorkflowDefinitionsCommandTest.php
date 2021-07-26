@@ -187,7 +187,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         $found = false;
 
         foreach ($processDefinitions as $definition) {
-            if (strpos($definition->getName(), $name) !== false) {
+            if (str_contains($definition->getName(), $name)) {
                 $found = true;
                 break;
             }

@@ -3,14 +3,17 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
@@ -19,31 +22,35 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistry;
+use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BlockFactoryTest extends LayoutTestCase
 {
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
+    private $rawLayoutBuilder;
 
     /** @var DeferredLayoutManipulator */
-    protected $layoutManipulator;
+    private $layoutManipulator;
 
     /** @var LayoutRegistry */
-    protected $registry;
+    private $registry;
 
     /** @var ExpressionLanguage */
-    protected $expressionLanguage;
+    private $expressionLanguage;
 
     /** @var BlockFactory */
-    protected $blockFactory;
+    private $blockFactory;
 
     protected function setUp(): void
     {
@@ -55,6 +62,7 @@ class BlockFactoryTest extends LayoutTestCase
                     'root'                         => new Type\RootType(),
                     'header'                       => new Type\HeaderType(),
                     'logo'                         => new Type\LogoType(),
+                    'logo_with_required_title'     => new Type\LogoWithRequiredTitleType(),
                     'test_self_building_container' => new Type\TestSelfBuildingContainerType()
                 ]
             )
@@ -75,17 +83,12 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    /**
-     * @param string|null $rootId
-     *
-     * @return BlockView
-     */
-    protected function getLayoutView($rootId = null)
+    private function getLayoutView(): BlockView
     {
         $this->layoutManipulator->applyChanges($this->context, true);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
+        return $this->blockFactory->createBlockView($rawLayout, $this->context);
     }
 
     public function testSimpleLayout()
@@ -241,77 +244,67 @@ class BlockFactoryTest extends LayoutTestCase
      */
     public function testExtensions()
     {
-        $testBlockType = $this->createMock('Oro\Component\Layout\Block\Type\AbstractType');
+        $testBlockType = $this->createMock(AbstractType::class);
         $testBlockType->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
         $testBlockType->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue(BaseType::NAME));
+            ->willReturn(BaseType::NAME);
 
-        $headerLayoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $headerLayoutUpdate = $this->createMock(LayoutUpdateInterface::class);
         $headerLayoutUpdate->expects($this->once())
             ->method('updateLayout')
-            ->will(
-                $this->returnCallback(
-                    function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
-                        $layoutManipulator->add('test', 'header', 'test');
-                    }
-                )
+            ->willReturnCallback(
+                function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                    $layoutManipulator->add('test', 'header', 'test');
+                }
             );
 
-        $headerBlockTypeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $headerBlockTypeExtension = $this->createMock(BlockTypeExtensionInterface::class);
         $headerBlockTypeExtension->expects($this->any())
             ->method('getExtendedType')
-            ->will($this->returnValue('header'));
+            ->willReturn('header');
         $headerBlockTypeExtension->expects($this->once())
             ->method('configureOptions')
-            ->will(
-                $this->returnCallback(
-                    function (OptionsResolver $resolver) {
-                        $resolver->setDefaults(
-                            [
-                                'test_option_1' => '',
-                                'test_option_2' => ['background'=> 'red']
-                            ]
-                        );
-                    }
-                )
+            ->willReturnCallback(
+                function (OptionsResolver $resolver) {
+                    $resolver->setDefaults(
+                        [
+                            'test_option_1' => '',
+                            'test_option_2' => ['background' => 'red']
+                        ]
+                    );
+                }
             );
         $headerBlockTypeExtension->expects($this->once())
             ->method('buildBlock')
-            ->will(
-                $this->returnCallback(
-                    function (BlockBuilderInterface $builder, Options $options) {
-                        if ($options['test_option_1'] === 'move_logo_to_root') {
-                            $builder->getLayoutManipulator()->move('logo', 'root');
-                        }
+            ->willReturnCallback(
+                function (BlockBuilderInterface $builder, Options $options) {
+                    if ($options['test_option_1'] === 'move_logo_to_root') {
+                        $builder->getLayoutManipulator()->move('logo', 'root');
                     }
-                )
+                }
             );
         $headerBlockTypeExtension->expects($this->once())
             ->method('buildView')
-            ->will(
-                $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, Options $options) {
-                        $view->vars['attr']['block_id'] = $block->getId();
-                        if ($options['test_option_1'] === 'move_logo_to_root') {
-                            $view->vars['attr']['logo_moved'] = true;
-                        }
-                        $view->vars['attr']['background'] = $options['test_option_2']['background'];
+            ->willReturnCallback(
+                function (BlockView $view, BlockInterface $block, Options $options) {
+                    $view->vars['attr']['block_id'] = $block->getId();
+                    if ($options['test_option_1'] === 'move_logo_to_root') {
+                        $view->vars['attr']['logo_moved'] = true;
                     }
-                )
+                    $view->vars['attr']['background'] = $options['test_option_2']['background'];
+                }
             );
         $headerBlockTypeExtension->expects($this->once())
             ->method('finishView')
-            ->will(
-                $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block) {
-                        if (isset($view['test'])) {
-                            $view['test']->vars['processed_by_header_extension'] = true;
-                        }
+            ->willReturnCallback(
+                function (BlockView $view, BlockInterface $block) {
+                    if (isset($view['test'])) {
+                        $view['test']->vars['processed_by_header_extension'] = true;
                     }
-                )
+                }
             );
 
         $this->registry->addExtension(
@@ -487,5 +480,20 @@ class BlockFactoryTest extends LayoutTestCase
             ],
             $view
         );
+    }
+
+    public function testExceptionDuringResolveBlockOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve options for the block "logo". Reason: The required option "title" is missing.'
+        );
+
+        $this->context->resolve();
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo_with_required_title');
+        $this->getLayoutView();
     }
 }

@@ -65,26 +65,26 @@ class ExpandedAssociationExtractor
     {
         $result = [];
         foreach ($pathsToExpand as $path) {
-            $firstDelimiter = \strpos($path, ConfigUtil::PATH_DELIMITER);
+            $firstDelimiter = strpos($path, ConfigUtil::PATH_DELIMITER);
             if (false !== $firstDelimiter) {
-                $fieldName = \substr($path, 0, $firstDelimiter);
+                $fieldName = substr($path, 0, $firstDelimiter);
                 $resolvedPath = $this->resolveFirstLevelOfExpandedAssociation($fieldName, $config);
                 if ($resolvedPath) {
-                    $resolvedPathFirstDelimiter = \strpos($resolvedPath, ConfigUtil::PATH_DELIMITER);
+                    $resolvedPathFirstDelimiter = strpos($resolvedPath, ConfigUtil::PATH_DELIMITER);
                     if (false !== $resolvedPathFirstDelimiter) {
-                        $fieldName = \substr($resolvedPath, 0, $resolvedPathFirstDelimiter);
-                        $path = $resolvedPath . \substr($path, $firstDelimiter);
+                        $fieldName = substr($resolvedPath, 0, $resolvedPathFirstDelimiter);
+                        $path = $resolvedPath . substr($path, $firstDelimiter);
                         $firstDelimiter = $resolvedPathFirstDelimiter;
                     }
                 }
-                $result[$fieldName][] = \substr($path, $firstDelimiter + 1);
+                $result[$fieldName][] = substr($path, $firstDelimiter + 1);
             } else {
                 $resolvedPath = $this->resolveFirstLevelOfExpandedAssociation($path, $config);
                 if ($resolvedPath) {
-                    $firstDelimiter = \strpos($resolvedPath, ConfigUtil::PATH_DELIMITER);
+                    $firstDelimiter = strpos($resolvedPath, ConfigUtil::PATH_DELIMITER);
                     if (false !== $firstDelimiter) {
-                        $fieldName = \substr($resolvedPath, 0, $firstDelimiter);
-                        $result[$fieldName][] = \substr($resolvedPath, $firstDelimiter + 1);
+                        $fieldName = substr($resolvedPath, 0, $firstDelimiter);
+                        $result[$fieldName][] = substr($resolvedPath, $firstDelimiter + 1);
                     }
                 }
             }
@@ -125,7 +125,7 @@ class ExpandedAssociationExtractor
         }
 
         return
-            \is_a($targetClass, EntityIdentifier::class, true)
+            is_a($targetClass, EntityIdentifier::class, true)
             || $this->hasNotIdentifierFields($targetConfig);
     }
 

@@ -91,7 +91,7 @@ class CompleteErrors implements ProcessorInterface
     private function getMetadata(Context $context): ?EntityMetadata
     {
         $entityClass = $context->getClassName();
-        if (!$entityClass || false === strpos($entityClass, '\\')) {
+        if (!$entityClass || !str_contains($entityClass, '\\')) {
             return null;
         }
 

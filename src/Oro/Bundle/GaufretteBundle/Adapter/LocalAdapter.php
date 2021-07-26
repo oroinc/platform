@@ -43,7 +43,7 @@ class LocalAdapter extends BaseAdapter implements ListKeysAware
         /** @var \SplFileInfo $file */
         foreach ($foundFiles as $file) {
             $key = $this->computeKey($file->getPathname());
-            if (!$prefix || 0 === strpos($key, $prefix)) {
+            if (!$prefix || str_starts_with($key, $prefix)) {
                 if ($file->isDir()) {
                     $dirs[] = $key;
                 } else {

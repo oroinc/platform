@@ -5,27 +5,23 @@ namespace Oro\Bundle\AttachmentBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Listens on File lifecycle events to perform its deletion from filesystem.
  */
-class FileDeleteListener implements LoggerAwareInterface
+class FileDeleteListener
 {
-    use LoggerAwareTrait;
+    private FileManager $fileManager;
+    private LoggerInterface $logger;
 
-    /** @var FileManager */
-    private $fileManager;
-
-    public function __construct(FileManager $fileManager)
+    public function __construct(FileManager $fileManager, LoggerInterface $logger)
     {
         $this->fileManager = $fileManager;
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
-    public function postRemove(File $file, LifecycleEventArgs $args): void
+    public function postRemove(File $file): void
     {
         $this->deleteFromFilesystem((string)$file->getFilename());
     }
@@ -43,7 +39,7 @@ class FileDeleteListener implements LoggerAwareInterface
         try {
             $this->fileManager->deleteFile($filename);
         } catch (\Exception $e) {
-            $this->logger->warning(sprintf('Could not delete file "%s"', $filename), ['e' => $e]);
+            $this->logger->warning(sprintf('Could not delete file "%s"', $filename), ['exception' => $e]);
         }
     }
 }

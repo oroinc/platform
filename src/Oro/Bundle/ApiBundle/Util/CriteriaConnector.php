@@ -82,7 +82,7 @@ class CriteriaConnector
         $joins = $criteria->getJoins();
         if (!empty($joins)) {
             foreach ($joins as $join) {
-                $method = \strtolower($join->getJoinType()) . 'Join';
+                $method = strtolower($join->getJoinType()) . 'Join';
                 $qb->{$method}(
                     $join->getJoin(),
                     $join->getAlias(),
@@ -116,7 +116,7 @@ class CriteriaConnector
         foreach ($orderings as $sort => $order) {
             $hasValidAlias = false;
             foreach ($aliases as $alias) {
-                if ($sort !== $alias && 0 === \strpos($sort . '.', $alias . '.')) {
+                if ($sort !== $alias && str_starts_with($sort . '.', $alias . '.')) {
                     $hasValidAlias = true;
                     break;
                 }

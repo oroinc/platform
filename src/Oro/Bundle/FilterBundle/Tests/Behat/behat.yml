@@ -16,9 +16,9 @@ oro_behat_extension:
     OroFilterBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroSecurityBundle::ACLContext
-        - OroFilterBundle::FilterContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\FilterBundle\Tests\Behat\Context\FilterContext
       paths:
         - '@OroFilterBundle/Tests/Behat/Features'

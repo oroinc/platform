@@ -69,11 +69,11 @@ class DateTimeParser
             $value = preg_replace('#: (\d)#', ':0$1', $value);
             $date = self::parseDateTime($value, 'D, d m Y H:i:s O');
 
-            if (!$date && false !== strpos($value, ',')) {
+            if (!$date && str_contains($value, ',')) {
                 // handle case when invalid short day name given
                 $value = substr($value, strpos($value, ',') + 1);
                 $alphabeticalCharsLeft = trim(preg_replace('#[\W0-9]+#', '', $value));
-                if (strlen($alphabeticalCharsLeft) > 0) {
+                if ($alphabeticalCharsLeft) {
                     $date = self::parseDateTime(ltrim($value), 'd M Y H:i:s O');
                 }
             }

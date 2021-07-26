@@ -99,7 +99,7 @@ class FiltersStateProvider extends AbstractStateProvider
 
                 // Allows filters with special key - "__{$filterName}".
                 // Initially was added to AbstractFilterExtension::updateFilterStateEnabled() in scope of CRM-4760.
-                if (strpos($filterName, '__') === 0) {
+                if (str_starts_with($filterName, '__')) {
                     $originalFilterName = substr($filterName, 2);
                     return isset($filtersConfig[$originalFilterName]);
                 }

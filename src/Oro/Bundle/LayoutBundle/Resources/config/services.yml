@@ -141,9 +141,10 @@ services:
         arguments:
             - '@oro_layout.loader'
             - '@kernel'
+            - '@oro_layout.layout_factory_builder'
             - '@oro_layout.expression_language.compiled_cache_warmer'
         tags:
-            - { name: 'kernel.cache_warmer' }
+            - { name: kernel.cache_warmer }
 
     oro_layout.expression_language.cache:
         public: false
@@ -184,15 +185,27 @@ services:
     oro_layout.block_view_serializer.json_encoder:
         class: Symfony\Component\Serializer\Encoder\JsonEncoder
 
+    oro_layout.block_view_serializer.type_name_converter:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\TypeNameConverter
+        arguments:
+            - []
+
     oro_layout.block_view_serializer.block_view_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer
+        arguments:
+            - '@oro_layout.block_view_serializer.block_view_vars_normalizer'
+            - '@oro_layout.block_view_serializer.type_name_converter'
         tags:
             - { name: layout.block_view_serializer.normalizer }
+
+    oro_layout.block_view_serializer.block_view_vars_normalizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer
 
     oro_layout.expression_language.compiled_cache:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCache
         arguments:
             - '%oro_layout.expression_language_cache_file%'
+            - '@logger'
 
     oro_layout.block_view_serializer.expression_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer

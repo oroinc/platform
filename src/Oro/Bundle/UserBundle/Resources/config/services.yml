@@ -38,12 +38,13 @@ services:
             - '@security.token_storage'
             - '@oro_security.acl.extension_selector'
 
-    oro_user.listener.password_changed_subscriber:
-        class: Oro\Bundle\UserBundle\EventListener\PasswordChangedSubscriber
+    oro_user.listener.password_changed_listener:
+        class: Oro\Bundle\UserBundle\EventListener\PasswordChangedListener
         arguments:
             - '@oro_entity_extend.enum_value_provider'
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: prePersist}
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: preUpdate}
 
     oro_user.security.user_loader:
         class: Oro\Bundle\UserBundle\Security\UserLoader
@@ -86,10 +87,10 @@ services:
     oro_user.role.listener:
         class: Oro\Bundle\UserBundle\EventListener\RoleListener
         arguments:
-            - "@oro_security.link.sid_manager"
+            - '@oro_security.acl.sid_manager'
         tags:
-            - { name: doctrine.event_listener, event: preUpdate }
-            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\Role, event: prePersist}
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\Role, event: preUpdate}
 
     oro_user.twig.user_extension:
         class: Oro\Bundle\UserBundle\Twig\OroUserExtension

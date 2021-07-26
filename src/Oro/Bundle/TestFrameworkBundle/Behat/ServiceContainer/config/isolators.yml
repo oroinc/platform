@@ -9,7 +9,7 @@ services:
   oro_behat_extension.isolation.message_queue_isolation_subscriber:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\MessageQueueIsolationSubscriber'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     calls:
       - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
     tags:
@@ -18,7 +18,7 @@ services:
   oro_behat_extension.isolation.unix_file_cache_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixFileCacheIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
       -
         - 'doctrine'
         - 'oro_data'
@@ -32,7 +32,7 @@ services:
   oro_behat_extension.isolation.windows_file_cache_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsFileCacheIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
       -
         - 'doctrine'
         - 'oro_data'
@@ -46,63 +46,63 @@ services:
   oro_behat_extension.isolation.windows_mysql_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsMysqlIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.unix_mysql_simple_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.unix_pgsql_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixPgsqlIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.docker_pgsql_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerPgsqlIsolator
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.docker_compose_pgsql_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerComposePgsqlIsolator
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.docker_mysql_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerMysqlIsolator
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.docker_compose_mysql_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerComposeMysqlIsolator
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.kernel_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\KernelIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 120 }
 
   oro_behat_extension.isolation.inital_massage_queue_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\InitalMessageQueueIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     calls:
       - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
     tags:
@@ -111,7 +111,7 @@ services:
   oro_behat_extension.isolation.doctrine_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
       - '@oro_test.context.fixture_loader'
       - '@oro_test.alice_loader'
     tags:
@@ -120,6 +120,6 @@ services:
   oro_behat_extension.isolation.import_export:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ImportExportIsolator'
     arguments:
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 200 }

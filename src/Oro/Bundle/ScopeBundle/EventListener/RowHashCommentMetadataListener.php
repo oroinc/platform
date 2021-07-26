@@ -7,27 +7,23 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager;
+use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 
 /**
  * Added comment metadata to row_hash column
  */
 class RowHashCommentMetadataListener
 {
-    /**
-     * @var AddCommentToRoHashManager
-     */
-    protected $manager;
+    private AddCommentToRowHashManager $manager;
 
-    public function __construct(AddCommentToRoHashManager $manager)
+    public function __construct(AddCommentToRowHashManager $manager)
     {
         $this->manager = $manager;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
-        $em = $event->getEntityManager();
-        if (!$this->isPlatformSupport($em)) {
+        if (!$this->isPlatformSupport($event->getEntityManager())) {
             return;
         }
 
@@ -47,9 +43,10 @@ class RowHashCommentMetadataListener
         );
     }
 
-    protected function isPlatformSupport(EntityManagerInterface $em): bool
+    private function isPlatformSupport(EntityManagerInterface $em): bool
     {
         $platform = $em->getConnection()->getDatabasePlatform();
+
         return ($platform instanceof PostgreSqlPlatform || $platform instanceof MySqlPlatform);
     }
 }

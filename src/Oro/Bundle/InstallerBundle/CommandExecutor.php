@@ -297,11 +297,11 @@ class CommandExecutor extends AbstractCommandExecutor
     {
         if (isset($_SERVER['argv']) && php_sapi_name() === 'cli') {
             if (!$isPrefix) {
-                return in_array($command, $_SERVER['argv'], true);
+                return \in_array($command, $_SERVER['argv'], true);
             }
 
             foreach ($_SERVER['argv'] as $arg) {
-                if (is_string($arg) && strpos($arg, $command) === 0) {
+                if (\is_string($arg) && str_starts_with($arg, $command)) {
                     return true;
                 }
             }

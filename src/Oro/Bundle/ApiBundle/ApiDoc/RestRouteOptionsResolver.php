@@ -192,7 +192,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
             }
         }
 
-        if (0 !== \strpos($overridePath, '/')) {
+        if (!str_starts_with($overridePath, '/')) {
             $overridePath = '/' . $overridePath;
         }
         $overridePath = $this->resolveRoutePath($overridePath, $entityType, $associationName);
@@ -679,7 +679,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
      */
     private function hasAttribute(Route $route, $placeholder)
     {
-        return false !== \strpos($route->getPath(), $placeholder);
+        return str_contains($route->getPath(), $placeholder);
     }
 
     /**

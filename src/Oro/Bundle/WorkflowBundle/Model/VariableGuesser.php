@@ -44,7 +44,7 @@ class VariableGuesser extends AbstractGuesser
     {
         $type = $variable->getType();
         if ('entity' === $type) {
-            list($formType, $formOptions) = $this->getEntityForm($variable);
+            [$formType, $formOptions] = $this->getEntityForm($variable);
 
             return new TypeGuess($formType ?? '', $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
         }
@@ -102,7 +102,7 @@ class VariableGuesser extends AbstractGuesser
             }
 
             unset($formOptions['constraints'][$constraint]);
-            if (false === strpos($constraint, '\\')) {
+            if (!str_contains($constraint, '\\')) {
                 $constraint = sprintf('%s%s', self::DEFAULT_CONSTRAINT_NAMESPACE, $constraint);
             }
             $formOptions['constraints'][] = new $constraint($constraintOptions);

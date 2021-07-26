@@ -154,15 +154,16 @@ class JsValidationExtension extends AbstractTypeExtension
      * Gets constraint name based on object
      *
      * @param Constraint $constraint
-     * @return mixed|string
+     * @return string
      */
     protected function getConstraintName(Constraint $constraint)
     {
-        $class = get_class($constraint);
+        $class = \get_class($constraint);
         $defaultClassPrefix = 'Symfony\\Component\\Validator\\Constraints\\';
-        if (0 === strpos($class, $defaultClassPrefix)) {
+        if (str_starts_with($class, $defaultClassPrefix)) {
             return str_replace($defaultClassPrefix, '', $class);
         }
+
         return $class;
     }
 

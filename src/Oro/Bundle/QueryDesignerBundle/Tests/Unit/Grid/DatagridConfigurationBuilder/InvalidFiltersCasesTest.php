@@ -35,14 +35,12 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
             $builder->getConfiguration()->toArray();
             $this->fail('Expected "Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException" exception.');
         } catch (InvalidFiltersException $ex) {
-            if (false === strpos($ex->getMessage(), $expectedExceptionMessage)) {
-                $this->fail(
-                    sprintf(
-                        'Expected exception message "%s", but given "%s".',
-                        $expectedExceptionMessage,
-                        $ex->getMessage()
-                    )
-                );
+            if (!str_contains($ex->getMessage(), $expectedExceptionMessage)) {
+                $this->fail(sprintf(
+                    'Expected exception message "%s", but given "%s".',
+                    $expectedExceptionMessage,
+                    $ex->getMessage()
+                ));
             }
         }
     }

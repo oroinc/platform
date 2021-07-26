@@ -49,7 +49,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             $config = $resource->data[Configuration::ROOT_NODE_NAME];
-            $vendor = \strtolower(\substr($resource->bundleClass, 0, \strpos($resource->bundleClass, '\\')));
+            $vendor = strtolower(substr($resource->bundleClass, 0, strpos($resource->bundleClass, '\\')));
             $this->updateLabelsOfFunctions($config, 'converters', $vendor);
             $this->updateLabelsOfFunctions($config, 'aggregates', $vendor);
             $configs[] = $config;

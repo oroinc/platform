@@ -168,14 +168,14 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         if ($this->headerConversionRules === null || $this->backendHeader === null) {
             $this->assertEntityName();
 
-            list($headerConversionRules, $backendHeader) = $this->getEntityRulesAndBackendHeaders(
+            [$headerConversionRules, $backendHeader] = $this->getEntityRulesAndBackendHeaders(
                 $this->entityName,
                 true,
                 self::DEFAULT_SINGLE_RELATION_LEVEL,
                 self::DEFAULT_MULTIPLE_RELATION_LEVEL
             );
 
-            list($this->headerConversionRules, $this->backendHeader) = [
+            [$this->headerConversionRules, $this->backendHeader] = [
                 $this->processCollectionRegexp($headerConversionRules),
                 $backendHeader
             ];
@@ -296,7 +296,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 if ($this->fieldHelper->isRelation($field)
                     && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
                 ) {
-                    list($relationRules, $relationBackendHeaders) = $this->getRelatedEntityRulesAndBackendHeaders(
+                    [$relationRules, $relationBackendHeaders] = $this->getRelatedEntityRulesAndBackendHeaders(
                         $entityName,
                         $singleRelationDeepLevel,
                         $multipleRelationDeepLevel,
@@ -450,7 +450,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     protected function processCollectionRegexp(array $rules)
     {
         foreach ($rules as $frontendHeader => $backendHeader) {
-            if (strpos($frontendHeader, $this->collectionDelimiter) !== false) {
+            if (str_contains($frontendHeader, $this->collectionDelimiter)) {
                 $rules[$frontendHeader] = [
                     self::FRONTEND_TO_BACKEND => [
                         $frontendHeader,
@@ -620,7 +620,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
             // process and merge relation rules and backend header for relation
-            list($relationRules, $relationBackendHeaders) = $this->getEntityRulesAndBackendHeaders(
+            [$relationRules, $relationBackendHeaders] = $this->getEntityRulesAndBackendHeaders(
                 $relatedEntityName,
                 $fieldFullData,
                 $singleRelationDeepLevel - 1,

@@ -29,6 +29,20 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
+    public function getTypeNames(): array
+    {
+        $typeNames = [];
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
+            $typeNames[] = $extension->getTypeNames();
+        }
+
+        return array_unique(array_merge(...$typeNames));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType($name)
     {
         if (!is_string($name)) {

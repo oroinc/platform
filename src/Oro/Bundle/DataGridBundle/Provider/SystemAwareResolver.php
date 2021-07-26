@@ -95,11 +95,11 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        if (strpos($val, '%') !== false) {
+        if (str_contains($val, '%')) {
             $val = $this->resolveClassName($val);
         }
 
-        while (is_scalar($val) && strpos($val, '::') !== false) {
+        while (is_scalar($val) && str_contains($val, '::')) {
             $newVal = $this->resolveStatic($datagridName, $key, $val);
             if ($newVal == $val) {
                 break;
@@ -107,9 +107,8 @@ class SystemAwareResolver implements ContainerAwareInterface
             $val = $newVal;
         }
 
-        if (is_scalar($val) && strpos($val, '@') !== false) {
-            $val = $key === TwigTemplateProperty::TEMPLATE_KEY ?
-                $val : $this->resolveService($datagridName, $key, $val);
+        if (is_scalar($val) && str_contains($val, '@') && TwigTemplateProperty::TEMPLATE_KEY !== $key) {
+            $val = $this->resolveService($datagridName, $key, $val);
         }
 
         return $val;
@@ -191,7 +190,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveService($datagridName, $key, $val)
     {
-        if (strpos($val, '\@') !== false) {
+        if (str_contains($val, '\@')) {
             return str_replace('\@', '@', $val);
         }
 
@@ -204,7 +203,7 @@ class SystemAwareResolver implements ContainerAwareInterface
         $arguments = null;
         $matchedString = null;
         $lazy = false;
-        if (strpos($val, '->') !== false) {
+        if (str_contains($val, '->')) {
             if (preg_match("~{$serviceRegex}->{$methodRegex}{$argumentsRegex}~six", $val, $matches)) {
                 // Match @service->method("argument")
                 $matchedString = $matches[0];

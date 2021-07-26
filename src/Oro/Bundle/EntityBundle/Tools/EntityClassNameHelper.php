@@ -29,17 +29,17 @@ class EntityClassNameHelper
      */
     public function resolveEntityClass($entityName, $isPluralAlias = false)
     {
-        if (!empty($entityName) && false === strpos($entityName, '\\')) {
+        if (!empty($entityName) && !str_contains($entityName, '\\')) {
             if (strtolower($entityName[0]) === $entityName[0]) {
                 $entityName = $this->getEntityClassByAlias($entityName, $isPluralAlias);
             } else {
                 $className = str_replace('_', '\\', $entityName);
-                if (strpos($className, ExtendHelper::ENTITY_NAMESPACE) === 0) {
+                if (str_starts_with($className, ExtendHelper::ENTITY_NAMESPACE)) {
                     // a custom entity can contain _ in class name
                     $className = ExtendHelper::ENTITY_NAMESPACE
                         . substr($entityName, strlen(ExtendHelper::ENTITY_NAMESPACE));
                 }
-                $entityName = false === strpos($className, '\\')
+                $entityName = !str_contains($className, '\\')
                     ? $this->getEntityClassByAlias($className, $isPluralAlias)
                     : $className;
             }

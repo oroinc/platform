@@ -63,7 +63,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
         if ($pos === 0) {
             $property = substr($value, 1);
 
-            if (0 === strpos($property, '.')) {
+            if (str_starts_with($property, '.')) {
                 $property = substr($property, 1);
             } elseif ($this->prefix) {
                 $property = $this->prefix . '.' .  $property;

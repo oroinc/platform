@@ -1,0 +1,10 @@
+services:
+    Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext:
+        public: true
+        arguments:
+            - '@router'
+
+    Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\ConsoleContext:
+        public: true
+        arguments:
+            - '%kernel.project_dir%'
