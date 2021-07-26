@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
-use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Component\Testing\TempDirExtension;
@@ -44,16 +44,20 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
 
-        $config = ['oro_test' => [
-            'shared_contexts' => $this->sharedContexts,
-        ]];
+        $config = [
+            'oro_test' => [
+                'shared_contexts' => $this->sharedContexts,
+            ],
+        ];
 
         $config = $this->processConfig($config);
 
         $extension = $this->getMockBuilder(OroTestFrameworkExtension::class)
             ->onlyMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
-        $extension->expects($this->any())->method('hasValidPaths')->willReturn(true);
+        $extension->expects(self::any())
+            ->method('hasValidPaths')
+            ->willReturn(true);
         $extension->load($containerBuilder, $config);
 
         $this->updateNelmioServiceDefinitions($containerBuilder);
@@ -68,9 +72,11 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = [OroMainContext::class];
 
-        $config = ['oro_test' => [
-            'shared_contexts' => $sharedContexts,
-        ]];
+        $config = [
+            'oro_test' => [
+                'shared_contexts' => $sharedContexts,
+            ],
+        ];
 
         $config = $this->processConfig($config);
 
@@ -290,10 +296,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         );
         $kernel->getContainer()->setParameter('kernel.secret', 'secret');
 
-        $containerBuilder->set('symfony2_extension.kernel', $kernel);
-        $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
+        $containerBuilder->set('fob_symfony.kernel', $kernel);
+        $containerBuilder->set('oro_behat_extension.suite.oro_suite_generator', new OroSuiteGenerator($kernel));
         $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
-        $containerBuilder->setDefinition('symfony2_extension.context_initializer.kernel_aware', new Definition());
+        $containerBuilder->setDefinition('fob_symfony.kernel_orchestrator', new Definition());
 
         return $containerBuilder;
     }

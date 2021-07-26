@@ -38,15 +38,13 @@ oro_behat_extension:
     OroReportBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroQueryDesignerBundle::QueryDesignerContext
-        - OroFilterBundle::FilterContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
-        - OroLocaleBundle::LocalizationContext
-        - OroEmailBundle::EmailContext
-        - OroImportExportBundle::ImportExportContext:
-          - '@oro_entity.entity_alias_resolver'
-          - '@oro_importexport.processor.registry'
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
+        - Oro\Bundle\FilterBundle\Tests\Behat\Context\FilterContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
       paths:
         - '@OroReportBundle/Tests/Behat/Features'

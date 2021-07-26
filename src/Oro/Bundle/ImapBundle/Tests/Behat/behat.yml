@@ -3,8 +3,8 @@ oro_behat_extension:
     OroImapBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
       paths:
         - '@OroImapBundle/Tests/Behat/Features'
 

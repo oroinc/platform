@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Testwork\Suite\Suite;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SymfonyBundleSuite;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**

@@ -13,8 +13,6 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkContext;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -31,6 +29,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use WebDriver\Exception\NoAlertOpenError;
 use WebDriver\Exception\NoSuchElement;
@@ -50,7 +49,6 @@ use WebDriver\Exception\UnknownError;
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroPageObjectAware,
-    KernelAwareContext,
     SessionAliasProviderAwareInterface
 {
     const SKIP_WAIT_PATTERN = '/'.
@@ -59,13 +57,20 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see Schema updated flash message$'.
     '/';
 
-    use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait;
+    use AssertTrait, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait;
 
     /** @var Stopwatch */
     private $stopwatch;
 
     /** @var bool */
     private $debug = false;
+
+    private RouterInterface $router;
+
+    public function __construct(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
 
     /**
      * @BeforeScenario
@@ -683,8 +688,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iAmOnDashboard()
     {
-        $router = $this->getContainer()->get('router');
-        $this->visit($router->generate('oro_default'));
+        $this->visit($this->router->generate('oro_default'));
     }
 
     /**
@@ -706,7 +710,7 @@ class OroMainContext extends MinkContext implements
         $driver = $this->getSession()->getDriver();
         $driver->reset();
 
-        $this->visit($this->getContainer()->get('router')->generate('oro_default'));
+        $this->visit($this->router->generate('oro_default'));
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
@@ -1324,7 +1328,7 @@ JS;
     {
         $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
         $urlPath = preg_replace('/^.*\.php/', '', $urlPath);
-        $route = $this->getContainer()->get('router')->match($urlPath);
+        $route = $this->router->match($urlPath);
 
         self::assertEquals($this->getPage($page)->getRoute(), $route['_route']);
     }
@@ -1337,7 +1341,7 @@ JS;
     public function assertViewPage($page, $entityTitle)
     {
         $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
-        $route = $this->getContainer()->get('router')->match($urlPath);
+        $route = $this->router->match($urlPath);
 
         self::assertEquals($this->getPage($page . ' View')->getRoute(), $route['_route']);
 

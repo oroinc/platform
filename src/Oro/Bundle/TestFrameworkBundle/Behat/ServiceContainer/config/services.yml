@@ -78,7 +78,7 @@ services:
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
@@ -95,7 +95,7 @@ services:
     oro_test.entity_supplement:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
             - '@oro_test.reference_repository'
             - '@oro_security.owner.metadata_provider.chain'
 
@@ -106,7 +106,7 @@ services:
     oro_behat_extension.suite.oro_suite_generator:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
         tags:
             - { name: 'suite.generator', priority: 150 }
 
@@ -131,7 +131,7 @@ services:
         decorates: nelmio_alice.file_parser.default_include_processor
         arguments:
             - '@oro_test.file_parser.include_processor.inner'
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
 
     oro_test.fixture_loader.alice_combined_loader:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Loader\AliceCombinedLoader
@@ -151,38 +151,38 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
         arguments:
             - '@context.factory'
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
         tags:
             - { name: 'environment.handler', priority: 100 }
 
     oro_test.context.oro_behat_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Context\OroBehatClassResolver
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
         tags:
             - { name: 'context.class_resolver' }
 
     oro_test.processor.message_queue.base:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
 
     oro_test.processor.message_queue.dbal:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\DbalMessageQueueProcessor
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
             - '@oro_test.processor.message_queue.base'
 
     oro_test.processor.message_queue.amqp:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\AmqpMessageQueueProcessor
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
             - '@oro_test.processor.message_queue.base'
 
     oro_test.processor.message_queue:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorFacade
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
             - '@oro_test.processor.message_queue.dbal'
             - '@oro_test.processor.message_queue.amqp'
 
