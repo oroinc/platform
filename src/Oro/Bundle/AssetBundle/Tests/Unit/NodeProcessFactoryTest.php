@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AssetBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\AssetBundle\Tests\Unit;
 
 use Oro\Bundle\AssetBundle\NodeProcessFactory;
 use PHPUnit\Framework\TestCase;

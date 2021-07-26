@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax\MassDelete;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax\MassAction;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;

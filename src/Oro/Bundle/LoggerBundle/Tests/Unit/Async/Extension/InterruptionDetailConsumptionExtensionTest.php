@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\Async\Extension;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension;
 
 use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
 use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\ConfigManagerStub;

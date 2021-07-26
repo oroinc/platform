@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DataAuditBundle\Entity\Repository;
+namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
+use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditFieldRepository;
+use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WebsiteBundle\Tests\Unit\Resolver;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\UrlProvider;

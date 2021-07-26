@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\InstallerBundleTests\Unit;
+
+namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\InstallerBundle\Tests\Unit\Fixture\src\TestPackage\src\Test1Bundle\TestPackageTest1Bundle;

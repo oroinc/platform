@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Units\Utils;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\Entity\Price;

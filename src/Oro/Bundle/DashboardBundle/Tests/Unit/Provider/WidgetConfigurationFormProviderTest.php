@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\Tests\Provider;
+namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;

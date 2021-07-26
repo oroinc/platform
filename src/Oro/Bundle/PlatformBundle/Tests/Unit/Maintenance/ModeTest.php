@@ -1,8 +1,10 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Maintenance;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\Maintenance;
 
 use Lexik\Bundle\MaintenanceBundle\Drivers\DatabaseDriver;
+use Oro\Bundle\PlatformBundle\Maintenance\Events;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ModeTest extends \PHPUnit\Framework\TestCase

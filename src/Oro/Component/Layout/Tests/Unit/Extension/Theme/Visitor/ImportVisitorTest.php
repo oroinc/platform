@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Visitor;
+namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Visitor;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;

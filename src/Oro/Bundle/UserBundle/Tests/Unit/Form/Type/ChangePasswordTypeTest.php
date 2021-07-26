@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;

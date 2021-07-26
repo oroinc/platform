@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SSOBundle\Tests\Unit\Security\Core;
+namespace Oro\Bundle\SSOBundle\Tests\Unit\Security;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SSOBundle\Security\OAuthToken;

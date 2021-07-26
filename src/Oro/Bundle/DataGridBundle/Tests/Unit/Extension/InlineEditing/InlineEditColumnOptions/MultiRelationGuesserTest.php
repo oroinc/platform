@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser;
 

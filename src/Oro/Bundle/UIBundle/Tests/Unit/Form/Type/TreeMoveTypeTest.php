@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ShoppingListBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;

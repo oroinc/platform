@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Listener;
 
 use Oro\Bundle\SecurityBundle\Authentication\Listener\RememberMeListener;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\EventListener\MergeField;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\MergeField;
 
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociationListener;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\Tests\FunctionalController;
+namespace Oro\Bundle\ReportBundle\Tests\Functional\Controller;
 
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;

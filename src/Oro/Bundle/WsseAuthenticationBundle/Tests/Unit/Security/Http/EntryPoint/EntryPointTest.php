@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\WsseAuthenticationBundle\Tests\Security\Http\EntryPoint;
+namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\Security\Http\EntryPoint;
 
 use Oro\Bundle\WsseAuthenticationBundle\Security\Http\EntryPoint\WsseEntryPoint;
 use Psr\Log\LoggerInterface;

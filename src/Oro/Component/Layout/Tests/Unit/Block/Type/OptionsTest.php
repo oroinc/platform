@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Tests\Unit\Component\Layout\Block\Type;
+namespace Oro\Component\Layout\Tests\Unit\Block\Type;
 
 use Oro\Component\Layout\Block\Type\Options;
 

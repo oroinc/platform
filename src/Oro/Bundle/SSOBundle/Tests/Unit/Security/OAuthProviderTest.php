@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SSOBundle\Tests\Unit\Security\Core;
+namespace Oro\Bundle\SSOBundle\Tests\Unit\Security;
 
 use HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;

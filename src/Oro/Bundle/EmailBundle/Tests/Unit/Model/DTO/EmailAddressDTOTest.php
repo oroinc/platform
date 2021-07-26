@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\DTO;
 
 use Oro\Bundle\EmailBundle\Model\DTO\EmailAddressDTO;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;

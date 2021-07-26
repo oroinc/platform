@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Functional;
+namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Functional\Commands;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

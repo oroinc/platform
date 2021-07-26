@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\Handler;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Address;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Command;
+namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Command\Cron;
 
 use Gaufrette\File;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
