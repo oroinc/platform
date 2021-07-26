@@ -62,6 +62,8 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
                 ->setSalt('');
 
             $userManager->updateUser($user, false);
+
+            $this->setReference($userData['reference'], $user);
         }
 
         $manager->flush();
