@@ -101,6 +101,14 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
+    public function getTypeNames(): array
+    {
+        return array_keys($this->types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType($name)
     {
         if (!isset($this->types[$name])) {

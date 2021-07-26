@@ -95,6 +95,14 @@ class DependencyInjectionExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
+    public function getTypeNames(): array
+    {
+        return array_keys($this->typeServiceIds);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
