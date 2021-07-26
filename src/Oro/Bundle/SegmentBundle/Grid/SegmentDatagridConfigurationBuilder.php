@@ -42,6 +42,6 @@ class SegmentDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
      */
     public function isApplicable($gridName)
     {
-        return (strpos($gridName, Segment::GRID_PREFIX) === 0);
+        return str_starts_with($gridName, Segment::GRID_PREFIX);
     }
 }

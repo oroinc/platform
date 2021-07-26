@@ -94,7 +94,7 @@ class TargetConfigExtraBuilder
                 $extra = self::buildParentExpandRelatedEntitiesConfigExtra($extra, $associationName);
                 $hasExpandExtra = true;
             } elseif ($extra instanceof FilterFieldsConfigExtra) {
-                $fieldsExtraKey = \count($result);
+                $fieldsExtraKey = count($result);
             } elseif ($extra instanceof RootPathConfigExtra
                 || $extra instanceof FilterIdentifierFieldsConfigExtra
             ) {
@@ -255,8 +255,8 @@ class TargetConfigExtraBuilder
         $pathPrefix = $associationPath . ConfigUtil::PATH_DELIMITER;
         $pathPrefixLength = \strlen($pathPrefix);
         foreach ($extra->getExpandedEntities() as $path) {
-            if (0 === \strpos($path, $pathPrefix)) {
-                $expandedEntities[] = \substr($path, $pathPrefixLength);
+            if (str_starts_with($path, $pathPrefix)) {
+                $expandedEntities[] = substr($path, $pathPrefixLength);
             }
         }
 

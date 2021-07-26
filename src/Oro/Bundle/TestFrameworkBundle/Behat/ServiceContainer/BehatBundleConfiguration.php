@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Configuration defenition of `/Tests/Behat/behat.yml` for bundles.
+ * Configuration definition of `/Tests/Behat/behat.yml` for bundles.
  */
 class BehatBundleConfiguration implements ConfigurationInterface
 {
@@ -48,15 +48,13 @@ class BehatBundleConfiguration implements ConfigurationInterface
                                 return is_array($suite) && count($suite);
                             })
                             ->then(function ($suite) {
-                                $suite['settings'] = isset($suite['settings'])
-                                    ? $suite['settings']
-                                    : [];
+                                $suite['settings'] = $suite['settings'] ?? [];
 
                                 foreach ($suite as $key => $val) {
                                     $suiteKeys = ['enabled', 'type', 'settings'];
                                     if ('paths' === $key) {
                                         $val = array_map(function ($v) {
-                                            if ('@' === substr($v, 0, 1)) {
+                                            if (str_starts_with($v, '@')) {
                                                 $bundleName = explode('/', substr($v, 1))[0];
                                                 $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
 

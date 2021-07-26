@@ -69,7 +69,7 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
             );
         }
 
-        $filtered = \array_filter(
+        $filtered = array_filter(
             $result,
             static fn ($item) => isset($item['code'], $item['translationStatus'], $item['lastBuildDate'])
         );
@@ -82,7 +82,7 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
             );
         }
 
-        $normalized = \array_map(
+        $normalized = array_map(
             static function ($item) {
                 if (isset($item['RealCode'])) {
                     if (!isset($item['altCode'])) {
@@ -119,7 +119,7 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
         $actualFilePath = $this->normalizeFilePath($pathToSaveDownloadedArchive);
 
         try {
-            if (\file_exists($actualFilePath) && false === \unlink($actualFilePath)) {
+            if (file_exists($actualFilePath) && false === unlink($actualFilePath)) {
                 $this->throwErrorException(
                     TranslationServiceAdapterException::class,
                     'Cannot overwrite the existing file "{actual_file_path}".',
@@ -135,7 +135,7 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
             );
         }
 
-        $languageCode = \str_replace('_', '-', $languageCode);
+        $languageCode = str_replace('_', '-', $languageCode);
         $result  = $this->request('download', $languageCode, $actualFilePath);
 
         if (200 !== $result->getStatusCode()) {
@@ -254,8 +254,9 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
 
     private function getPackagesString(): string
     {
-        \sort($this->translationPackageNames);
-        return \implode(',', $this->translationPackageNames);
+        sort($this->translationPackageNames);
+
+        return implode(',', $this->translationPackageNames);
     }
 
     /**
@@ -287,8 +288,10 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
      */
     private function normalizeFilePath(string $filePath): string
     {
-        return '.zip' === \substr($filePath, -4)
-            ? $filePath
-            : $filePath . (\DIRECTORY_SEPARATOR === \substr($filePath, -1) ? 'translations' : '') . '.zip';
+        if (str_ends_with($filePath, '.zip')) {
+            return $filePath;
+        }
+
+        return $filePath . (str_ends_with($filePath, DIRECTORY_SEPARATOR) ? 'translations' : '') . '.zip';
     }
 }

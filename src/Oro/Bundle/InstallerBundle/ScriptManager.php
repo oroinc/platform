@@ -171,9 +171,10 @@ class ScriptManager
         $pathA = dirname($a['file']) . DIRECTORY_SEPARATOR;
         $pathB = dirname($b['file']) . DIRECTORY_SEPARATOR;
 
-        if (strpos($pathA, $pathB) === 0) {
+        if (str_starts_with($pathA, $pathB)) {
             return -1;
-        } elseif (strpos($pathB, $pathA) === 0) {
+        }
+        if (str_starts_with($pathB, $pathA)) {
             return 1;
         }
 

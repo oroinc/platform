@@ -19,7 +19,7 @@ class SimpleGeneratorStub implements TagGeneratorInterface
      */
     public function supports($data)
     {
-        return is_string($data) && strpos($data, 'test') !== false;
+        return \is_string($data) && str_contains($data, 'test');
     }
 
     /**

@@ -62,7 +62,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
         $path = DIRECTORY_SEPARATOR === '/'
             ? $relativeFilePath
             : str_replace('/', DIRECTORY_SEPARATOR, $relativeFilePath);
-        if (strpos($relativeFilePath, '/') === 0) {
+        if (str_starts_with($relativeFilePath, '/')) {
             $this->resource = substr($relativeFilePath, 1);
             $this->relativeFilePath = $path;
         } else {

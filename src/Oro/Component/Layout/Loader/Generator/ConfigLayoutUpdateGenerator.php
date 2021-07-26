@@ -55,20 +55,20 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             $this->normalizeActionName($actionName);
             $this->getHelper()->completeArguments($actionName, $arguments);
 
-            \array_walk(
+            array_walk(
                 $arguments,
                 static function (&$arg) {
                     $arg = var_export($arg, true);
                 }
             );
-            $call[] = \sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
-            $call[] = \implode(', ', $arguments);
+            $call[] = sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
+            $call[] = implode(', ', $arguments);
             $call[] = ');';
 
-            $body[] = \implode(' ', $call);
+            $body[] = implode(' ', $call);
         }
 
-        return \implode("\n", $body);
+        return implode("\n", $body);
     }
 
     /**
@@ -100,13 +100,13 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 throw new SyntaxException('expected array with action name as key', $actionDefinition, $path);
             }
 
-            $actionName = \key($actionDefinition);
+            $actionName = key($actionDefinition);
             $arguments  = \is_array($actionDefinition[$actionName])
                 ? $actionDefinition[$actionName] : [$actionDefinition[$actionName]];
 
-            if (0 !== \strpos($actionName, '@')) {
+            if (!str_starts_with($actionName, '@')) {
                 throw new SyntaxException(
-                    \sprintf('action name should start with "@" symbol, current name "%s"', $actionName),
+                    sprintf('action name should start with "@" symbol, current name "%s"', $actionName),
                     $actionDefinition,
                     $path
                 );
@@ -116,7 +116,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             if (!$this->getHelper()->hasMethod($actionName)) {
                 throw new SyntaxException(
-                    \sprintf('unknown action "%s", should be one of LayoutManipulatorInterface methods', $actionName),
+                    sprintf('unknown action "%s", should be one of LayoutManipulatorInterface methods', $actionName),
                     $actionDefinition,
                     $path
                 );
@@ -153,7 +153,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      */
     protected function normalizeActionName(&$actionName)
     {
-        $actionName = \substr($actionName, 1);
+        $actionName = substr($actionName, 1);
     }
 
     private function processExpressionsRecursive(array $source, ?string $path = null): void
@@ -173,7 +173,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             }
 
             if (\is_string($value) && '=' === $value[0]) {
-                $expression = \substr($value, 1);
+                $expression = substr($value, 1);
                 try {
                     $this->expressionValidator->validate($expression);
                     $this->expressionLanguageCacheWarmer->collect($expression);

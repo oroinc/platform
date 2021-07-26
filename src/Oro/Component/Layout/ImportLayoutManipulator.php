@@ -276,7 +276,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
      */
     protected function hasNamespacePlaceholder($id)
     {
-        return strpos($id, self::NAMESPACE_PLACEHOLDER) === 0 && $id !== self::ROOT_PLACEHOLDER;
+        return str_starts_with($id, self::NAMESPACE_PLACEHOLDER) && self::ROOT_PLACEHOLDER !== $id;
     }
 
     /**

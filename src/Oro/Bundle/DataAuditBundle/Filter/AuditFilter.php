@@ -198,7 +198,7 @@ class AuditFilter extends EntityFilter
      */
     protected function getClass($columnName, array $rootEntities)
     {
-        if (strpos($columnName, '+') === false) {
+        if (!str_contains($columnName, '+')) {
             return reset($rootEntities);
         }
 
@@ -216,7 +216,7 @@ class AuditFilter extends EntityFilter
     protected function getField($columnName)
     {
         [, $fieldName] = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
-        if (strpos($fieldName, '\\') === false) {
+        if (!str_contains($fieldName, '\\')) {
             return $fieldName;
         }
 

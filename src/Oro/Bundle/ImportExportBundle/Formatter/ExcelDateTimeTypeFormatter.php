@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
+/**
+ * Format Excel dates.
+ */
 class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTimeTypeConverterInterface
 {
     /**
@@ -173,7 +176,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
     {
         $dayMonthDelimiters = ['/', '.'];
         foreach ($dayMonthDelimiters as $delimiter) {
-            if (strpos($pattern, $delimiter) !== false) {
+            if (str_contains($pattern, $delimiter)) {
                 return $delimiter;
             }
         }

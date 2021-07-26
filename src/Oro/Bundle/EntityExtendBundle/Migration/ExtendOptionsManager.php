@@ -265,7 +265,7 @@ class ExtendOptionsManager
         }
 
         // a scope which name starts with '_' is a temporary and it should be removed in ExtendOptionsBuilder
-        if (!is_array($values) && strpos($scope, '_') !== 0) {
+        if (!is_array($values) && !str_starts_with($scope, '_')) {
             throw new \InvalidArgumentException(
                 sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
             );
@@ -277,7 +277,7 @@ class ExtendOptionsManager
         $this->options = array_filter($this->options, static function ($options, $key) {
             // Filter only columns with only extend options set
             if (empty($options['extend'])
-                || strpos($key, '!') === false
+                || !str_contains($key, '!')
                 || count(array_diff(array_keys($options), ['extend', '_type'])) > 0
             ) {
                 return true;

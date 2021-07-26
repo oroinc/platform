@@ -72,7 +72,7 @@ class ErrorCompleter extends AbstractErrorCompleter
             $error->setSource(ErrorSource::createByPointer($entityPath));
         } else {
             $pointer = $errorSource->getPointer();
-            if ($pointer && 0 === strpos($pointer, self::POINTER_DELIMITER . JsonApiDoc::DATA)) {
+            if ($pointer && str_starts_with($pointer, self::POINTER_DELIMITER . JsonApiDoc::DATA)) {
                 $errorSource->setPointer($entityPath . substr($pointer, \strlen(JsonApiDoc::DATA) + 1));
             } else {
                 $propertyPath = $errorSource->getPropertyPath();
@@ -80,7 +80,7 @@ class ErrorCompleter extends AbstractErrorCompleter
                     $propertyPath = str_replace(self::POINTER_DELIMITER, ConfigUtil::PATH_DELIMITER, $entityPath)
                         . ConfigUtil::PATH_DELIMITER
                         . $propertyPath;
-                    if (0 === strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                    if (str_starts_with($propertyPath, ConfigUtil::PATH_DELIMITER)) {
                         $propertyPath = substr($propertyPath, 1);
                     }
                     $errorSource->setPropertyPath($propertyPath);
@@ -203,16 +203,11 @@ class ErrorCompleter extends AbstractErrorCompleter
             return sprintf('Source: %s.', $source);
         }
 
-        if (!$this->endsWith($message, '.')) {
+        if (!str_ends_with($message, '.')) {
             $message .= '.';
         }
 
         return sprintf('%s Source: %s.', $message, $source);
-    }
-
-    private function endsWith(string $haystack, string $needle): bool
-    {
-        return substr($haystack, -\strlen($needle)) === $needle;
     }
 
     private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType): string

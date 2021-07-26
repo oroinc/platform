@@ -49,7 +49,7 @@ class ClassLoader
      */
     public function loadClass($className)
     {
-        if (0 !== strpos($className, $this->namespacePrefix)) {
+        if (!str_starts_with($className, $this->namespacePrefix)) {
             return false;
         }
 

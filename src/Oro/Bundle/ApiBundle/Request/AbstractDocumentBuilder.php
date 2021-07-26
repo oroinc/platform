@@ -606,7 +606,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         }
 
         foreach ($data as $name => $value) {
-            if ('' !== $name && false === \strpos($name, '.')) {
+            if ('' !== $name && !str_contains($name, '.')) {
                 $this->addMetaToCollectionResult($result, $name, $value);
             }
         }

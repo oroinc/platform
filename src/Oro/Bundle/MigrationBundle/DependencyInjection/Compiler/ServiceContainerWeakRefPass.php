@@ -46,7 +46,7 @@ class ServiceContainerWeakRefPass implements CompilerPassInterface
                 && !$definition->isAbstract()
                 && $id !== 'oro_migration.service_container'
             ) {
-                if (!$definition->isShared() && strpos($id, 'oro') === 0) {
+                if (!$definition->isShared() && str_starts_with($id, 'oro')) {
                     $definition->setPublic(true);
                 } else {
                     $privateServices[$id] = new ServiceClosureArgument(

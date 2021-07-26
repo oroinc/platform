@@ -272,7 +272,7 @@ YAML
                             $directoryPathToExtractTo . \DIRECTORY_SEPARATOR . "validation.$langCode.yml",
                             "'key1': tr1\n'key2': tr2"
                         );
-                        return false !== \strpos($directoryPathToExtractTo, $expectedPart);
+                        return str_contains($directoryPathToExtractTo, $expectedPart);
                     }
                 )
             );
@@ -320,7 +320,7 @@ YAML
                             $directoryPathToExtractTo . \DIRECTORY_SEPARATOR . 'validation.en_US.yml',
                             "'key1': tr1\n'key2': tr2"
                         );
-                        return false !== \strpos($directoryPathToExtractTo, $expectedPart);
+                        return str_contains($directoryPathToExtractTo, $expectedPart);
                     }
                 )
             );

@@ -111,7 +111,7 @@ abstract class AbstractDriver implements DriverInterface
     {
         $name = pathinfo($file, PATHINFO_FILENAME);
 
-        if (strpos($name, self::ELEMENT_PREFIX) === 0) {
+        if (str_starts_with($name, self::ELEMENT_PREFIX)) {
             return new VisitorCollection([new ElementDependentVisitor(substr($name, 1))]);
         }
 

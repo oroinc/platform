@@ -288,7 +288,7 @@ class ExtendHelper
                     $originalName
                 ));
             }
-            if (strpos($name, '?') !== false) {
+            if (str_contains($name, '?')) {
                 $name = hash('crc32', $originalName);
             }
         }
@@ -375,7 +375,7 @@ class ExtendHelper
      */
     public static function isCustomEntity($className)
     {
-        return strpos($className, self::ENTITY_NAMESPACE) === 0;
+        return str_starts_with($className, self::ENTITY_NAMESPACE);
     }
 
     /**
@@ -387,7 +387,7 @@ class ExtendHelper
      */
     public static function isExtendEntityProxy($className)
     {
-        return strpos($className, self::ENTITY_NAMESPACE) === 0;
+        return str_starts_with($className, self::ENTITY_NAMESPACE);
     }
 
     /**
@@ -417,7 +417,7 @@ class ExtendHelper
     {
         $parts = explode('\\', $extendClassName);
         $shortClassName = array_pop($parts);
-        if (strpos($shortClassName, 'Extend') === 0) {
+        if (str_starts_with($shortClassName, 'Extend')) {
             $shortClassName = substr($shortClassName, 6);
         }
         $proxyShortClassName = 'EX_' . array_shift($parts);
@@ -521,7 +521,7 @@ class ExtendHelper
      */
     public static function updatedPendingValue($currentVal, array $changeSet)
     {
-        list($oldVal, $newVal) = $changeSet;
+        [$oldVal, $newVal] = $changeSet;
         if (!is_array($oldVal) || !is_array($newVal) || !is_array($currentVal)) {
             return $newVal;
         }

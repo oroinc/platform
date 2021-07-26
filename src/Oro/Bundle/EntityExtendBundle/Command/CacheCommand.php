@@ -120,7 +120,7 @@ abstract class CacheCommand extends Command
 
             $kernelCacheDir   = $kernel->getCacheDir();
             $metadataCacheDir = $metadataCacheDriver->getDirectory();
-            if (strpos($metadataCacheDir, $kernelCacheDir) !== 0) {
+            if (!str_starts_with($metadataCacheDir, $kernelCacheDir)) {
                 return;
             }
 

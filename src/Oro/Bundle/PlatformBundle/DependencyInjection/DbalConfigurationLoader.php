@@ -108,7 +108,7 @@ class DbalConfigurationLoader
     {
         return
             \is_string($optionValue)
-            && \strpos($optionValue, '%') === 0;
+            && str_starts_with($optionValue, '%');
     }
 
     private static function applyCommonConfig(

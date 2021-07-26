@@ -5,6 +5,9 @@ namespace Oro\Bundle\UIBundle\Provider;
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides labels for action button groups.
+ */
 class ActionButtonGroupLabelProvider implements LabelProviderInterface
 {
     const DEFAULT_GROUP           = 'actions';
@@ -29,14 +32,14 @@ class ActionButtonGroupLabelProvider implements LabelProviderInterface
      */
     public function getLabel(array $parameters)
     {
-        $label  = self::DEFAULT_GROUP === $parameters['groupName']
+        $label = self::DEFAULT_GROUP === $parameters['groupName']
             ? self::DEFAULT_LABEL
             : sprintf(self::DEFAULT_GROUP_LABEL, $parameters['groupName']);
         $result = $this->translator->trans($label);
 
-        if (!empty($parameters['entityClass']) && false !== strpos($result, self::ENTITY_NAME_PLACEHOLDER)) {
+        if (!empty($parameters['entityClass']) && str_contains($result, self::ENTITY_NAME_PLACEHOLDER)) {
             $entityNameLabel = EntityLabelBuilder::getEntityLabelTranslationKey($parameters['entityClass']);
-            $result          = str_replace(
+            $result = str_replace(
                 self::ENTITY_NAME_PLACEHOLDER,
                 $this->translator->trans($entityNameLabel),
                 $result

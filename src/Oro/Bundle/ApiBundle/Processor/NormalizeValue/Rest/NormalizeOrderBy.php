@@ -30,12 +30,12 @@ class NormalizeOrderBy implements ProcessorInterface
         }
         if ($context->hasResult()) {
             $value = $context->getResult();
-            if (null !== $value && is_string($value)) {
+            if (null !== $value && \is_string($value)) {
                 $orderBy = [];
-                $items   = explode(',', $value);
+                $items = explode(',', $value);
                 foreach ($items as $item) {
                     $item = trim($item);
-                    if (0 === strpos($item, '-')) {
+                    if (str_starts_with($item, '-')) {
                         $orderBy[substr($item, 1)] = Criteria::DESC;
                     } else {
                         $orderBy[$item] = Criteria::ASC;

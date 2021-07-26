@@ -104,7 +104,7 @@ class CompleteErrors implements ProcessorInterface
         }
 
         $entityClass = $targetContext->getClassName();
-        if (!$entityClass || false === strpos($entityClass, '\\')) {
+        if (!$entityClass || !str_contains($entityClass, '\\')) {
             return null;
         }
 

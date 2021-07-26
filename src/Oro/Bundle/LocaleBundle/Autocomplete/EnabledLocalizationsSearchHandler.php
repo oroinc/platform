@@ -35,7 +35,7 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
      */
     protected function searchEntities($search, $firstResult, $maxResults)
     {
-        if (false === strpos($search, static::DELIMITER)) {
+        if (!str_contains($search, static::DELIMITER)) {
             return [];
         }
 

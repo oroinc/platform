@@ -91,7 +91,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
-            if (false !== strpos($actualAddress->getText(), $address)) {
+            if (str_contains($actualAddress->getText(), $address)) {
                 $actualAddress->find('css', '.item-edit-button')->click();
 
                 return;
@@ -113,7 +113,7 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
 
         /** @var NodeElement $actualAddress */
         foreach ($addresses as $actualAddress) {
-            if (false !== strpos($actualAddress->getText(), $address)) {
+            if (str_contains($actualAddress->getText(), $address)) {
                 $removeButton = $actualAddress->find('css', '.item-remove-button');
 
                 self::assertNotNull(

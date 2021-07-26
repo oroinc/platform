@@ -69,10 +69,10 @@ abstract class MaskBuilder
         $this->map = new MaskBuilderMap();
         $reflection = new \ReflectionClass(static::class);
         foreach ($reflection->getConstants() as $name => $mask) {
-            if (0 === strpos($name, 'MASK_')) {
+            if (str_starts_with($name, 'MASK_')) {
                 $this->map->permission[substr($name, 5)] = $mask;
                 $this->map->all[$name] = $mask;
-            } elseif (0 === strpos($name, 'GROUP_')) {
+            } elseif (str_starts_with($name, 'GROUP_')) {
                 $this->map->group[substr($name, 6)] = $mask;
                 $this->map->all[$name] = $mask;
             }
@@ -204,7 +204,7 @@ abstract class MaskBuilder
     {
         $reflection = new \ReflectionClass(static::class);
         foreach ($reflection->getConstants() as $name => $cMask) {
-            if (0 !== strpos($name, 'MASK_')) {
+            if (!str_starts_with($name, 'MASK_')) {
                 continue;
             }
 

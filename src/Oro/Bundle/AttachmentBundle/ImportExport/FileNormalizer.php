@@ -100,7 +100,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     private function isRelativePath(string $path): bool
     {
         return
-            false === strpos($path, '://')
+            !str_contains($path, '://')
             && !is_file($path);
     }
 }

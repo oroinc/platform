@@ -31,7 +31,7 @@ trait UrlProviderTrait
 
         //Checks if application url path is already present in generated absolute path
         //So we need only protocol part and domain (considering it is always present in $urlParts array)
-        if (isset($urlParts['path']) && strpos($absoluteUrlPath, $urlParts['path']) === 0) {
+        if (isset($urlParts['path']) && str_starts_with($absoluteUrlPath, $urlParts['path'])) {
             $url = $urlParts['scheme'] . '://' . $urlParts['host'];
             if (isset($urlParts['port'])) {
                 $url .= ':' . $urlParts['port'];

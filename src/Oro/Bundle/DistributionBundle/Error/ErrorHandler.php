@@ -16,15 +16,15 @@ class ErrorHandler extends BaseErrorHandler
     {
         if (error_reporting() !== 0) {
             // silence warning from php_network_getaddresses due to BAP-3979
-            if (strpos($message, 'php_network_getaddresses') !== false) {
+            if (str_contains($message, 'php_network_getaddresses')) {
                 return true;
             }
 
             // silence deprecation from ReflectionType::__toString()
             if (PHP_VERSION_ID >= 70400
                 && (
-                    strpos($message, 'Function ReflectionType::__toString() is deprecated') !== false
-                    || strpos($message, 'a ? b : c ? d : e') !== false
+                    str_contains($message, 'Function ReflectionType::__toString() is deprecated')
+                    || str_contains($message, 'a ? b : c ? d : e')
                 )
             ) {
                 return true;

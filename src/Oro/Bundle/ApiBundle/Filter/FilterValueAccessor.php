@@ -157,7 +157,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
 
                 $path = $item->getPath();
                 if ($path !== $group) {
-                    $path = $group . '[' . \implode('][', \explode('.', $path)) . ']';
+                    $path = $group . '[' . implode('][', explode('.', $path)) . ']';
                 }
                 $operator = $item->getOperator();
                 if ('eq' !== $operator) {
@@ -206,10 +206,10 @@ class FilterValueAccessor implements FilterValueAccessorInterface
 
     private function extractGroup(string $key): string
     {
-        $delimPos = \strpos($key, '[');
+        $delimPos = strpos($key, '[');
 
-        return false !== $delimPos && \substr($key, -1) === ']'
-            ? \substr($key, 0, $delimPos)
+        return false !== $delimPos && str_ends_with($key, ']')
+            ? substr($key, 0, $delimPos)
             : $key;
     }
 }

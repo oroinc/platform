@@ -87,11 +87,11 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $adapterNames = $this->getAdapterNames($container);
         $parameters = $container->getParameterBag()->all();
         foreach ($parameters as $paramName => $value) {
-            if (strpos($paramName, self::ADAPTER_PARAM_PREFIX) !== 0) {
+            if (!str_starts_with($paramName, self::ADAPTER_PARAM_PREFIX)) {
                 continue;
             }
-            $adapterName = substr($paramName, strlen(self::ADAPTER_PARAM_PREFIX));
-            if (!in_array($adapterName, $adapterNames, true)) {
+            $adapterName = substr($paramName, \strlen(self::ADAPTER_PARAM_PREFIX));
+            if (!\in_array($adapterName, $adapterNames, true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'The "%s" parameter name is invalid because the "%s" Gaufrette adapter does not exist.'
                     . ' Known adapters: %s.',
@@ -118,11 +118,11 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $filesystemNames = $this->getFilesystemNames($container);
         $parameters = $container->getParameterBag()->all();
         foreach ($parameters as $paramName => $value) {
-            if (strpos($paramName, self::FILESYSTEM_PARAM_PREFIX) !== 0) {
+            if (!str_starts_with($paramName, self::FILESYSTEM_PARAM_PREFIX)) {
                 continue;
             }
-            $filesystemName = substr($paramName, strlen(self::FILESYSTEM_PARAM_PREFIX));
-            if (!in_array($filesystemName, $filesystemNames, true)) {
+            $filesystemName = substr($paramName, \strlen(self::FILESYSTEM_PARAM_PREFIX));
+            if (!\in_array($filesystemName, $filesystemNames, true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'The "%s" parameter name is invalid because the "%s" Gaufrette filesystem does not exist.'
                     . ' Known filesystems: %s.',
@@ -151,14 +151,14 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
     private function configureAdapter(string $adapterName, string $configString): array
     {
         foreach ($this->configurationFactories as $key => $configurationFactory) {
-            if (strpos($configString, $key . ':') !== 0) {
+            if (!str_starts_with($configString, $key . ':')) {
                 continue;
             }
 
             return [
                 'adapters' => [
                     $adapterName => $configurationFactory->getAdapterConfiguration(
-                        substr($configString, strlen($key) + 1)
+                        substr($configString, \strlen($key) + 1)
                     )
                 ]
             ];

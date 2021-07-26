@@ -2713,7 +2713,8 @@ TEXT;
     private function normalizeValueByMetadata($value, Table $grid, $rowNumber, $columnTitle): array
     {
         $metadata = null;
-        if (($metadataPos = strpos($columnTitle, '{{')) > 0) {
+        $metadataPos = strpos($columnTitle, '{{');
+        if ($metadataPos > 0) {
             $metadata = substr($columnTitle, $metadataPos);
             $metadata = trim(str_replace(['{{', '}}'], ['{', '}'], $metadata));
             $metadata = json_decode($metadata, true);

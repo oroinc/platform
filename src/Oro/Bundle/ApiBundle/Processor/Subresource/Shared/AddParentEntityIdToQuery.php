@@ -87,7 +87,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         /** @var Parameter[] $parameters */
         $parameters = $query->getParameters();
         foreach ($parameters as $parameter) {
-            if (0 === strpos($parameter->getName(), self::PARENT_ENTITY_ID_QUERY_PARAM_NAME)) {
+            if (str_starts_with($parameter->getName(), self::PARENT_ENTITY_ID_QUERY_PARAM_NAME)) {
                 return true;
             }
         }

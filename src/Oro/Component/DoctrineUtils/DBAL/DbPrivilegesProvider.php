@@ -66,7 +66,7 @@ class DbPrivilegesProvider
 
             $db = null;
             $hostStr = $grants[2][0] ?? '';
-            if (strpos($hostStr, '.') !== false) {
+            if (str_contains($hostStr, '.')) {
                 [$db, $host] = explode('.', $grants[2][0]);
             }
             $db = trim($db, '`');

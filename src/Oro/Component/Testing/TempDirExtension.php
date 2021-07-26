@@ -49,7 +49,7 @@ trait TempDirExtension
     protected function getTempDir(string $subDir, ?bool $existence = true): string
     {
         $subDir = preg_replace('/^[\/\\\\]+(.*)/', '$1', $subDir);
-        if (0 !== strpos(strtolower($subDir), 'oro')) {
+        if (!str_starts_with(strtolower($subDir), 'oro')) {
             $subDir = 'oro_' . $subDir;
         }
 

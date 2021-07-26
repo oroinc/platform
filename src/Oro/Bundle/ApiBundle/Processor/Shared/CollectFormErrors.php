@@ -186,9 +186,7 @@ class CollectFormErrors implements ProcessorInterface
          */
         foreach ($foundErrors as [$parentForm, $error]) {
             $errorSource = $error->getSource();
-            if (null === $errorSource
-                || false === strpos($errorSource->getPropertyPath(), ConfigUtil::PATH_DELIMITER)
-            ) {
+            if (null === $errorSource || !str_contains($errorSource->getPropertyPath(), ConfigUtil::PATH_DELIMITER)) {
                 continue;
             }
             $path = ConfigUtil::explodePropertyPath($errorSource->getPropertyPath());

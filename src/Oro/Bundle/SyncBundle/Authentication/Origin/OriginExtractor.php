@@ -14,23 +14,23 @@ class OriginExtractor
         }
         $url = ltrim(trim($url), '/');
 
-        if (strpos($url, '://') === false) {
+        if (!str_contains($url, '://')) {
             // just "parse_url" will work properly
             $url = "http://{$url}";
         }
 
         $parts = parse_url($url);
 
-        if (!is_array($parts)) {
+        if (!\is_array($parts)) {
             return null;
         }
 
-        if (array_key_exists('path', $parts) && $parts['path'] == $url && strpos($parts['path'], '/') === false) {
+        if (\array_key_exists('path', $parts) && $parts['path'] == $url && !str_contains($parts['path'], '/')) {
             //just domain.com was passed
             return $parts['path'];
         }
 
-        if (!array_key_exists('host', $parts) || empty($parts['host'])) {
+        if (!\array_key_exists('host', $parts) || empty($parts['host'])) {
             return null;
         }
 

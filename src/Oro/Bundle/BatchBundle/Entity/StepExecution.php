@@ -361,7 +361,7 @@ class StepExecution
             $element = substr($element, 0, strpos($element, '.'));
         }
 
-        if (is_object($item)) {
+        if (\is_object($item)) {
             $item = [
                 'class' => ClassUtils::getClass($item),
                 'id' => method_exists($item, 'getId') ? $item->getId() : '[unknown]',

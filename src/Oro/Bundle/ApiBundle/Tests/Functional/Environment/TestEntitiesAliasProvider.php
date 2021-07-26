@@ -13,7 +13,7 @@ class TestEntitiesAliasProvider implements EntityAliasProviderInterface
      */
     public function getEntityAlias($entityClass)
     {
-        if (0 !== strpos($entityClass, 'Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity')) {
+        if (!str_starts_with($entityClass, 'Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity')) {
             return null;
         }
 

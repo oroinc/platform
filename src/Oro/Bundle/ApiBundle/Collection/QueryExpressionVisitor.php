@@ -83,7 +83,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     public function setQueryJoinMap(array $queryJoinMap): void
     {
         $this->queryJoinMap = $queryJoinMap;
-        $this->queryAliasMap = \array_flip($queryJoinMap);
+        $this->queryAliasMap = array_flip($queryJoinMap);
     }
 
     public function setQuery(QueryBuilder $query): void
@@ -219,7 +219,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
                 return $this->createSubqueryToRoot();
             } catch (\Throwable $e) {
                 throw new QueryException(
-                    \sprintf('Cannot build subquery. Reason: %s', $e->getMessage()),
+                    sprintf('Cannot build subquery. Reason: %s', $e->getMessage()),
                     $e->getCode(),
                     $e
                 );
@@ -230,7 +230,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
             return $this->createSubqueryByPath($this->getSubqueryPath($field), $disallowJoinUsage);
         } catch (\Throwable $e) {
             throw new QueryException(
-                \sprintf('Cannot build subquery for the field "%s". Reason: %s', $field, $e->getMessage()),
+                sprintf('Cannot build subquery for the field "%s". Reason: %s', $field, $e->getMessage()),
                 $e->getCode(),
                 $e
             );
@@ -244,7 +244,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     {
         $expressionType = $expr->getType();
         if (!isset($this->compositeExpressions[$expressionType])) {
-            throw new QueryException(\sprintf('Unknown composite %s.', $expr->getType()));
+            throw new QueryException(sprintf('Unknown composite %s.', $expr->getType()));
         }
 
         $processedExpressions = [];
@@ -266,9 +266,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
             throw new QueryException('No aliases are set before invoking walkComparison().');
         }
 
-        list($operator, $modifier) = \array_pad(\explode('/', $comparison->getOperator(), 2), 2, null);
+        [$operator, $modifier] = array_pad(explode('/', $comparison->getOperator(), 2), 2, null);
         if (!isset($this->comparisonExpressions[$operator])) {
-            throw new QueryException(\sprintf('Unknown comparison operator "%s".', $operator));
+            throw new QueryException(sprintf('Unknown comparison operator "%s".', $operator));
         }
 
         $field = $this->getField($comparison->getField());
@@ -276,9 +276,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
         $expression = $field;
         if ('i' === $modifier) {
-            $expression = \sprintf('LOWER(%s)', $expression);
+            $expression = sprintf('LOWER(%s)', $expression);
         } elseif ($modifier) {
-            throw new QueryException(\sprintf(
+            throw new QueryException(sprintf(
                 'Unknown modifier "%s" for comparison operator "%s".',
                 $modifier,
                 $operator
@@ -306,7 +306,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     private function getField(string $field): string
     {
         foreach ($this->queryAliases as $alias) {
-            if ($field !== $alias && 0 === \strpos($field . '.', $alias . '.')) {
+            if ($field !== $alias && str_starts_with($field . '.', $alias . '.')) {
                 return $field;
             }
         }
@@ -321,11 +321,11 @@ class QueryExpressionVisitor extends ExpressionVisitor
     private function getParameterName(string $field): string
     {
         $result = $field
-            ? \str_replace('.', '_', $field)
+            ? str_replace('.', '_', $field)
             : $this->getRootAlias();
         foreach ($this->parameters as $parameter) {
             if ($parameter->getName() === $result) {
-                $result .= '_' . \count($this->parameters);
+                $result .= '_' . count($this->parameters);
                 break;
             }
         }
@@ -342,15 +342,15 @@ class QueryExpressionVisitor extends ExpressionVisitor
     {
         $path = $field;
         $rootPrefix = $this->getRootAlias() . '.';
-        if (0 === \strpos($path, $rootPrefix)) {
-            $path = \substr($path, \strlen($rootPrefix));
+        if (str_starts_with($path, $rootPrefix)) {
+            $path = substr($path, \strlen($rootPrefix));
         } elseif (!isset($this->queryJoinMap[$path])) {
             $parentJoinAlias = $this->getParentJoinAlias($path);
             while ($parentJoinAlias && isset($this->queryAliasMap[$parentJoinAlias])) {
                 $parentJoinPath = $this->queryAliasMap[$parentJoinAlias];
                 $parentJoinAlias = $this->getParentJoinAlias($parentJoinPath);
                 if ($parentJoinAlias) {
-                    $path = \substr($parentJoinPath, 0, \strlen($parentJoinAlias) + 1) . $path;
+                    $path = substr($parentJoinPath, 0, \strlen($parentJoinAlias) + 1) . $path;
                 }
             }
         }
@@ -360,22 +360,22 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
     private function getParentJoinAlias(string $path): ?string
     {
-        $pos = \strpos($path, '.');
+        $pos = strpos($path, '.');
         if (false === $pos) {
             return null;
         }
 
-        return \substr($path, 0, $pos);
+        return substr($path, 0, $pos);
     }
 
     private function getJoinedPath(string $path): ?string
     {
         while (!isset($this->queryJoinMap[$path])) {
-            $lastDelimiter = \strrpos($path, '.');
+            $lastDelimiter = strrpos($path, '.');
             if (false === $lastDelimiter) {
                 return null;
             }
-            $path = \substr($path, 0, $lastDelimiter);
+            $path = substr($path, 0, $lastDelimiter);
         }
 
         return $path;
@@ -402,21 +402,21 @@ class QueryExpressionVisitor extends ExpressionVisitor
             return $this->createSubqueryByJoin($this->queryJoinMap[$path]);
         }
 
-        $lastDelimiter = \strrpos($path, '.');
+        $lastDelimiter = strrpos($path, '.');
         if (false === $lastDelimiter) {
             return $this->createSubqueryByRootAssociation($path);
         }
 
-        $sourceJoinedPath = \substr($path, 0, $lastDelimiter);
+        $sourceJoinedPath = substr($path, 0, $lastDelimiter);
         $joinedPath = $this->getJoinedPath($sourceJoinedPath);
         if (null === $joinedPath) {
             $parentAlias = $this->getRootAlias();
             $parentEntityClass = $this->getRootEntityClass();
-            $associationNames = \explode('.', $path);
+            $associationNames = explode('.', $path);
         } else {
             $parentAlias = $this->queryJoinMap[$joinedPath];
             $parentEntityClass = $this->getEntityClass($this->getJoin($parentAlias));
-            $associationNames = \explode('.', \substr($path, \strlen($joinedPath) + 1));
+            $associationNames = explode('.', substr($path, \strlen($joinedPath) + 1));
         }
 
         $entityClass = $parentEntityClass;
@@ -429,15 +429,15 @@ class QueryExpressionVisitor extends ExpressionVisitor
             if ($entityMetadata->hasAssociation($currentName)) {
                 $entityClass = $entityMetadata->getAssociationTargetClass($currentName);
                 $associationName = $currentName;
-            } elseif (!$allowEndsWithField || \count($associationNames) !== $i) {
-                throw new QueryException(\sprintf(
+            } elseif (!$allowEndsWithField || count($associationNames) !== $i) {
+                throw new QueryException(sprintf(
                     'The "%s" must be an association in "%s" entity.',
                     $currentName,
                     $entityClass
                 ));
             } else {
                 if (!$entityMetadata->hasField($currentName)) {
-                    throw new QueryException(\sprintf(
+                    throw new QueryException(sprintf(
                         'The "%s" must be an association or a field in "%s" entity.',
                         $currentName,
                         $entityClass
@@ -486,7 +486,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         $parentJoinAlias = $alias;
         foreach ($associationNames as $index => $associationName) {
             $joinAlias = $this->buildSubqueryJoinAlias($associationName, $index);
-            $query->innerJoin(\sprintf('%s.%s', $parentJoinAlias, $associationName), $joinAlias);
+            $query->innerJoin(sprintf('%s.%s', $parentJoinAlias, $associationName), $joinAlias);
             $parentJoinAlias = $joinAlias;
         }
         $query->select($parentJoinAlias);
@@ -502,7 +502,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         $subqueryAlias = $this->generateSubqueryAlias($associationName);
         $subquery = $this->createQueryBuilder($subqueryEntityClass, $subqueryAlias);
         $subquery->where(
-            $subquery->expr()->isMemberOf($subqueryAlias, \sprintf('%s.%s', $this->getRootAlias(), $associationName))
+            $subquery->expr()->isMemberOf($subqueryAlias, sprintf('%s.%s', $this->getRootAlias(), $associationName))
         );
 
         return $subquery;
@@ -532,25 +532,24 @@ class QueryExpressionVisitor extends ExpressionVisitor
             }
         }
 
-        throw new QueryException(\sprintf('The join "%s" does not exist in the query.', $joinAlias));
+        throw new QueryException(sprintf('The join "%s" does not exist in the query.', $joinAlias));
     }
 
     private function getEntityClass(Expr\Join $join): string
     {
         $joinExpr = $join->getJoin();
-        $pos = \strpos($joinExpr, '.');
+        $pos = strpos($joinExpr, '.');
         if (false === $pos) {
             return $this->resolveEntityClass($joinExpr);
         }
 
-        $parentEntityClass = null;
-        $parentAlias = \substr($joinExpr, 0, $pos);
+        $parentAlias = substr($joinExpr, 0, $pos);
         $parentEntityClass = $this->getRootAlias() === $parentAlias
             ? $this->getRootEntityClass()
             : $this->getEntityClass($this->getJoin($parentAlias));
 
         return $this->getClassMetadata($parentEntityClass)
-            ->getAssociationTargetClass(\substr($joinExpr, $pos + 1));
+            ->getAssociationTargetClass(substr($joinExpr, $pos + 1));
     }
 
     private function getRootAlias(): string
@@ -567,14 +566,14 @@ class QueryExpressionVisitor extends ExpressionVisitor
     {
         $this->subqueryCount++;
 
-        return \sprintf(self::SUBQUERY_ALIAS_TEMPLATE, $alias, $this->subqueryCount);
+        return sprintf(self::SUBQUERY_ALIAS_TEMPLATE, $alias, $this->subqueryCount);
     }
 
     private function buildSubqueryJoinAlias(string $fieldName, int $joinIndex): string
     {
-        return \sprintf(
+        return sprintf(
             self::SUBQUERY_ALIAS_TEMPLATE,
-            \sprintf('%s_%d', $fieldName, $joinIndex),
+            sprintf('%s_%d', $fieldName, $joinIndex),
             $this->subqueryCount
         );
     }

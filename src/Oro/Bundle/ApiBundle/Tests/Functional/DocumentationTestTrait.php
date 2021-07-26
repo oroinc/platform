@@ -69,12 +69,12 @@ trait DocumentationTestTrait
     {
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || 0 === strpos($entityType, 'testapi')
+            || str_starts_with($entityType, 'testapi')
             || (// custom entities (entities from "Extend\Entity" namespace), except enums
-                0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
+                str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE)
                 && (
-                    0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
-                    || 0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_')
+                    !str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
+                    || str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_')
                 )
             );
     }
@@ -98,7 +98,7 @@ trait DocumentationTestTrait
      */
     private function isTestField($entityClass, $fieldName)
     {
-        if (0 === strpos($fieldName, ExtendConfigDumper::DEFAULT_PREFIX)) {
+        if (str_starts_with($fieldName, ExtendConfigDumper::DEFAULT_PREFIX)) {
             return $this->isTestField(
                 $entityClass,
                 substr($fieldName, strlen(ExtendConfigDumper::DEFAULT_PREFIX))
@@ -112,7 +112,7 @@ trait DocumentationTestTrait
 
         $label = $configManager->getFieldConfig('entity', $entityClass, $fieldName)->get('label');
 
-        return 0 === strpos($label, 'extend.entity.test');
+        return str_starts_with($label, 'extend.entity.test');
     }
 
     /**
@@ -224,13 +224,7 @@ trait DocumentationTestTrait
                         $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
                     } elseif (ApiAction::UPDATE === $action && $idFieldName && $name === $idFieldName) {
                         $description = $item['description'];
-                        if (false === strpos($description, 'The required field.')) {
-                            $missingDocs[] = sprintf(
-                                'Input Field: %s. No "The required field." note. (Description: "%s")',
-                                $name,
-                                $item['description']
-                            );
-                        } else {
+                        if (str_contains($description, 'The required field.')) {
                             $description = preg_replace('#\<\/?\w+\>#', '', $description);
                             $description = trim(substr($description, 0, strpos($description, 'The required field.')));
                             if (!$description) {
@@ -241,6 +235,12 @@ trait DocumentationTestTrait
                                     $item['description']
                                 );
                             }
+                        } else {
+                            $missingDocs[] = sprintf(
+                                'Input Field: %s. No "The required field." note. (Description: "%s")',
+                                $name,
+                                $item['description']
+                            );
                         }
                     }
                 }

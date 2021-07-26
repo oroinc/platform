@@ -48,7 +48,7 @@ class NormalizeEntityClass implements ProcessorInterface
             return;
         }
 
-        if (false !== strpos($entityClass, '\\')) {
+        if (str_contains($entityClass, '\\')) {
             // the entity class is already normalized
             return;
         }

@@ -40,11 +40,11 @@ class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
         }
         $pointer = $errorSource->getPointer();
         if ($pointer) {
-            if (0 === strpos($pointer, '/' . $sectionName)) {
+            if (str_starts_with($pointer, '/' . $sectionName)) {
                 $pointer = sprintf('/%s/%s%s', $sectionName, $itemOffset, substr($pointer, \strlen($sectionName) + 1));
             } elseif ('/' . JsonApiDoc::INCLUDED !== $pointer) {
                 $includedData = $item->getIncludedData();
-                if (null !== $includedData && 0 === strpos($pointer, '/' . JsonApiDoc::INCLUDED . '/')) {
+                if (null !== $includedData && str_starts_with($pointer, '/' . JsonApiDoc::INCLUDED . '/')) {
                     $pointer = substr($pointer, \strlen(JsonApiDoc::INCLUDED) + 2);
                     $endPosOfIncludeIndex = strpos($pointer, '/');
                     if (false !== $endPosOfIncludeIndex) {

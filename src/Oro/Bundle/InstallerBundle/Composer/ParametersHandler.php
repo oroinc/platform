@@ -88,7 +88,7 @@ DOC;
                 if ($strpos) {
                     $name = substr($parameter, 0, $strpos);
                     $value = substr($parameter, $strpos + 1);
-                    if ('%' !== substr($value, 0, 1)) {
+                    if (!str_starts_with($value, '%')) {
                         $value = Yaml::parse($value);
                     }
                 } else {

@@ -76,7 +76,7 @@ class ConfigNormalizer
                         $toRemove[] = $fieldName;
                     }
                 } else {
-                    if (false === \strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                    if (!str_contains($propertyPath, ConfigUtil::PATH_DELIMITER)) {
                         $renamedFields[$propertyPath] = $fieldName;
                     }
                     if (!$field->isExcluded()) {

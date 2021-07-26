@@ -62,8 +62,9 @@ class ImageExtractor implements ContentIdExtractorInterface
      */
     protected function isImage(PartInterface $part)
     {
-        return $part->getHeaders()->has('Content-Type')
-            && strpos($part->getHeaders()->get('Content-Type')->getFieldValue(), 'image/') === 0;
+        return
+            $part->getHeaders()->has('Content-Type')
+            && str_starts_with($part->getHeaders()->get('Content-Type')->getFieldValue(), 'image/');
     }
 
     /**

@@ -11,6 +11,9 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Adds routes for activity associations.
+ */
 class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     const ROUTE_GROUP = 'activity_association';
@@ -158,6 +161,6 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     protected function hasAttribute(Route $route, $placeholder)
     {
-        return false !== strpos($route->getPath(), $placeholder);
+        return str_contains($route->getPath(), $placeholder);
     }
 }

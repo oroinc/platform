@@ -51,7 +51,7 @@ class NestedTreeFilter extends StandaloneFilter implements FieldFilterInterface
         }
 
         $path = $value->getPath();
-        if (false !== strpos($path, '.')) {
+        if (str_contains($path, '.')) {
             throw new InvalidFilterException('This filter is not supported for associations.');
         }
 

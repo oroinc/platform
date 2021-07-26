@@ -231,12 +231,12 @@ class Processor
                     // 4th match contains src attribute value
                     $srcData = $matches[4];
 
-                    if (strpos($srcData, 'data:image') === 0) {
-                        list($mime, $content) = explode(';', $srcData);
-                        list($encoding, $file) = explode(',', $content);
-                        $mime            = str_replace('data:', '', $mime);
-                        $extensions      = $this->mimeTypes->getExtensions($mime);
-                        $fileName        = sprintf('%s.%s', uniqid(), \array_shift($extensions));
+                    if (str_starts_with($srcData, 'data:image')) {
+                        [$mime, $content] = explode(';', $srcData);
+                        [$encoding, $file] = explode(',', $content);
+                        $mime = str_replace('data:', '', $mime);
+                        $extensions = $this->mimeTypes->getExtensions($mime);
+                        $fileName = sprintf('%s.%s', uniqid(), \array_shift($extensions));
                         $swiftAttachment = new \Swift_Image(
                             ContentDecoder::decode($file, $encoding),
                             $fileName,

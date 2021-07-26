@@ -327,7 +327,7 @@ class ObjectMapper extends AbstractMapper
      */
     protected function clearTextValue($fieldName, $value)
     {
-        if (strpos($fieldName, Indexer::TEXT_ALL_DATA_FIELD) === 0) {
+        if (str_starts_with($fieldName, Indexer::TEXT_ALL_DATA_FIELD)) {
             $value = $this->htmlTagHelper->stripTags((string)$value);
             $value = $this->htmlTagHelper->stripLongWords($value);
         }

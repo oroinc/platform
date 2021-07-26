@@ -144,7 +144,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->atLeastOnce())
             ->method('trans')
             ->willReturnCallback(function ($id) {
-                if (strpos($id, 'oro.htmlpurifier.messages') !== -1) {
+                if (str_contains($id, 'oro.htmlpurifier.messages')) {
                     return 'Unrecognized $CurrentToken.Serialized tag removed';
                 }
 

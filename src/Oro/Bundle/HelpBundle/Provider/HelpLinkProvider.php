@@ -158,7 +158,7 @@ class HelpLinkProvider
      */
     private function appendVersion($url)
     {
-        $delimiter = false === strpos($url, '?') ? '?' : '&';
+        $delimiter = !str_contains($url, '?') ? '?' : '&';
 
         return $url . $delimiter . 'v=' . $this->helper->getVersion();
     }

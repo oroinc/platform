@@ -62,7 +62,7 @@ class ControllerClassProvider extends PhpArrayConfigProvider
                 $controller = $this->getController($route);
             } catch (\Exception $e) {
                 $this->logger->error(
-                    \sprintf('Cannot extract controller for "%s" route.', $routeName),
+                    sprintf('Cannot extract controller for "%s" route.', $routeName),
                     ['exception' => $e]
                 );
             }
@@ -78,7 +78,7 @@ class ControllerClassProvider extends PhpArrayConfigProvider
             try {
                 $reflClass = new \ReflectionClass($className);
             } catch (\ReflectionException $e) {
-                $this->logger->error(\sprintf('Undefined controller class "%s".', $className), ['exception' => $e]);
+                $this->logger->error(sprintf('Undefined controller class "%s".', $className), ['exception' => $e]);
                 continue;
             }
             $resourcesContainer->addResource(new ReflectionClassResource($reflClass));
@@ -89,7 +89,7 @@ class ControllerClassProvider extends PhpArrayConfigProvider
 
     private function isIgnoredService(string $service): bool
     {
-        return \strpos($service, 'web_profiler.') === 0;
+        return str_starts_with($service, 'web_profiler.');
     }
 
     /**
@@ -107,7 +107,7 @@ class ControllerClassProvider extends PhpArrayConfigProvider
         }
 
         [$className, $methodName] = $this->resolveController($controller);
-        if (!\class_exists($className)) {
+        if (!class_exists($className)) {
             $className = $this->resolveControllerClass($className);
         }
 
@@ -115,8 +115,8 @@ class ControllerClassProvider extends PhpArrayConfigProvider
             return null;
         }
         if (!$methodName) {
-            if (!\method_exists($className, '__invoke')) {
-                throw new \InvalidArgumentException(\sprintf(
+            if (!method_exists($className, '__invoke')) {
+                throw new \InvalidArgumentException(sprintf(
                     'Controller class "%s" should have "__invoke" method.',
                     $className
                 ));
@@ -130,17 +130,17 @@ class ControllerClassProvider extends PhpArrayConfigProvider
     private function resolveController(string $controller): array
     {
         // check for "class::method"
-        if (false !== \strpos($controller, '::')) {
-            return \explode('::', $controller);
+        if (str_contains($controller, '::')) {
+            return explode('::', $controller);
         }
 
-        $separatorCount = \substr_count($controller, ':');
+        $separatorCount = substr_count($controller, ':');
 
         // check for "service:method" or "service"
         $className = null;
         $methodName = null;
         if (1 === $separatorCount) {
-            [$className, $methodName] = \explode(':', $controller);
+            [$className, $methodName] = explode(':', $controller);
         } elseif (0 === $separatorCount) {
             $className = $controller;
         }
@@ -151,7 +151,7 @@ class ControllerClassProvider extends PhpArrayConfigProvider
     private function resolveControllerClass(string $service): ?string
     {
         if (!$this->container->has($service)) {
-            throw new \InvalidArgumentException(\sprintf('Undefined controller service "%s".', $service));
+            throw new \InvalidArgumentException(sprintf('Undefined controller service "%s".', $service));
         }
 
         if ($this->isIgnoredService($service)) {

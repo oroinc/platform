@@ -26,10 +26,10 @@ class CommandProducedWarning extends Constraint
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
         $output = CommandOutputNormalizer::toSingleLine($commandTester);
-        if (false === \strpos($output, '[WARNING]')) {
+        if (!str_contains($output, '[WARNING]')) {
             $this->errors[] = 'The console command should display a warning message if there were any warnings.';
         }
-        if (null !== $this->expectedWarningMessage && false === \strpos($output, $this->expectedWarningMessage)) {
+        if (null !== $this->expectedWarningMessage && !str_contains($output, $this->expectedWarningMessage)) {
             $this->errors[] = \sprintf(
                 'The console command should display the warning message "%s".',
                 $this->expectedWarningMessage

@@ -50,7 +50,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         string $version,
         RequestType $requestType
     ): bool {
-        if (0 !== \strpos($dataType, self::UNIDIRECTIONAL_ASSOCIATION_PREFIX)) {
+        if (!str_starts_with($dataType, self::UNIDIRECTIONAL_ASSOCIATION_PREFIX)) {
             return false;
         }
 

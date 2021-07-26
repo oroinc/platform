@@ -33,7 +33,7 @@ class ByTemplateFiltersSorter implements FiltersSorterInterface
         foreach ($this->sortingTemplate as $prefix) {
             $toRemoveKeys = [];
             foreach ($filters as $key => $val) {
-                if (false !== strpos($key, $prefix)) {
+                if (str_contains($key, $prefix)) {
                     $sortedFilters[$key] = $val;
                     $toRemoveKeys[] = $key;
                 }

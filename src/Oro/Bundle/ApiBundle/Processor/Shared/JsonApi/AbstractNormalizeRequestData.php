@@ -131,7 +131,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             $data[JsonApiDoc::TYPE]
         );
         $entityId = $data[JsonApiDoc::ID];
-        if (false !== \strpos($entityClass, '\\')) {
+        if (str_contains($entityClass, '\\')) {
             if ($this->isAcceptableTargetClass($entityClass, $associationMetadata)) {
                 $targetMetadata = null;
                 if (null !== $associationMetadata) {

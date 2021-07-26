@@ -78,7 +78,7 @@ class NameStrategy implements NameStrategyInterface
             $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
         } elseif ($request->query->count() === 1) {
             $paramName = array_keys($request->query->all())[0];
-            if (strpos($paramName, $name) === 0) {
+            if (str_starts_with($paramName, $name)) {
                 $uniqueName = $paramName;
             }
         }

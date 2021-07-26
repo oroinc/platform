@@ -112,7 +112,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         }
 
         $expectedRows = [];
-        foreach ($table->getRows() as list($field, $text)) {
+        foreach ($table->getRows() as [$field, $text]) {
             //Keys makes possible to use multiple Body field in expected table
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
@@ -184,7 +184,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         }
 
         $expectedRows = [];
-        foreach ($table->getRows() as list($field, $text)) {
+        foreach ($table->getRows() as [$field, $text]) {
             //Keys makes possible to use multiple Body field in expected table
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
@@ -327,7 +327,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
         }
 
         $expectedContent = [];
-        foreach ($table->getRows() as list($field, $text)) {
+        foreach ($table->getRows() as [$field, $text]) {
             $expectedContent[$field] = $this->getPattern($text);
         }
 
@@ -558,7 +558,8 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
     {
         $metadata = [];
         foreach ($expectedHeaders as &$header) {
-            if (($metadataPos = strpos($header, '{{')) > 0) {
+            $metadataPos = strpos($header, '{{');
+            if ($metadataPos > 0) {
                 $headerMetadata = substr($header, $metadataPos);
                 $headerMetadata = trim(str_replace(['{{', '}}'], ['{', '}'], $headerMetadata));
                 $headerMetadata = json_decode($headerMetadata, true);

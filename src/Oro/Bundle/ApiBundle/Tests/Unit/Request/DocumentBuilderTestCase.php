@@ -33,7 +33,7 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
                     self::assertEquals($this->requestType, $requestType);
                     self::assertFalse($isArrayAllowed);
 
-                    if (false !== strpos($value, 'WithoutAlias')) {
+                    if (str_contains($value, 'WithoutAlias')) {
                         throw new EntityAliasNotFoundException($value);
                     }
 

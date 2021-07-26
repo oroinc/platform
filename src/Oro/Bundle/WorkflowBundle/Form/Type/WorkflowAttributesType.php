@@ -324,7 +324,7 @@ class WorkflowAttributesType extends AbstractType
             $attributeOptions['options']['label'] = $attribute->getLabel();
         }
 
-        if (strpos($attributeOptions['options']['label'], WorkflowTemplate::KEY_PREFIX) === 0) {
+        if (str_starts_with($attributeOptions['options']['label'], WorkflowTemplate::KEY_PREFIX)) {
             $attributeOptions['options']['translation_domain'] = $domain;
         }
 

@@ -28,7 +28,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
      */
     public function isApplicable($gridName)
     {
-        return (strpos($gridName, Report::GRID_PREFIX) === 0);
+        return str_starts_with($gridName, Report::GRID_PREFIX);
     }
 
     /**

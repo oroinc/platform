@@ -281,7 +281,7 @@ class DirectMailer extends \Swift_Mailer
         }
         $host = $this->container->get('request_stack')->getCurrentRequest()->server->get('HTTP_HOST');
         // fix local domain when wild-card vhost is used and auto-detection fails
-        if (0 === strpos($transport->getLocalDomain(), '*') && !empty($host)) {
+        if (!empty($host) && str_starts_with($transport->getLocalDomain(), '*')) {
             $transport->setLocalDomain($host);
         }
     }
