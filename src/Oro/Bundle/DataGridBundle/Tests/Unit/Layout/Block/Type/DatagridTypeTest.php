@@ -98,8 +98,10 @@ class DatagridTypeTest extends BlockTypeTestCase
 
     public function testBuildViewThrowsExceptionIfGridNameIsNotSpecified()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
-        $this->expectExceptionMessage('The required option "grid_name" is missing.');
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve options for the block "datagrid_id". Reason: The required option "grid_name" is missing.'
+        );
 
         $this->getBlockView(new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker));
     }

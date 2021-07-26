@@ -14,9 +14,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
 {
     private LayoutUpdateLoader $layoutUpdateLoader;
-
     private KernelInterface $kernel;
-
     private ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer;
 
     public function __construct(
@@ -45,9 +43,15 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
+        $this->loadLayoutUpdates();
+        $this->expressionLanguageCacheWarmer->write();
+    }
+
+    private function loadLayoutUpdates(): void
+    {
         foreach ($this->kernel->getBundles() as $bundle) {
             $finder = new Finder();
-            $layoutsDir = $bundle->getPath().'/Resources/views/layouts';
+            $layoutsDir = $bundle->getPath() . '/Resources/views/layouts';
             if (!is_dir($layoutsDir)) {
                 continue;
             }
@@ -64,6 +68,5 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
                 $this->layoutUpdateLoader->load($layoutUpdatePath);
             }
         }
-        $this->expressionLanguageCacheWarmer->write();
     }
 }

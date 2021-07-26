@@ -11,14 +11,10 @@ use Symfony\Component\Serializer\Serializer;
  */
 class BlockViewCache implements BlockViewCacheInterface
 {
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     protected $cache;
 
-    /**
-     * @var Serializer
-     */
+    /** @var Serializer */
     protected $serializer;
 
     public function __construct(CacheProvider $cacheProvider, Serializer $serializer)
@@ -48,7 +44,7 @@ class BlockViewCache implements BlockViewCacheInterface
         $value = $this->cache->fetch($hash);
 
         return false !== $value
-            ? $this->serializer->deserialize($value, BlockView::class, JsonEncoder::FORMAT)
+            ? $this->serializer->deserialize($value, BlockView::class, JsonEncoder::FORMAT, ['context_hash' => $hash])
             : null;
     }
 
