@@ -23,3 +23,20 @@ services:
             - '@oro_email.direct_mailer.decorator.inner'
             - '@oro_email.direct_mailer.cache'
             - '@oro_entity.doctrine_helper'
+
+    Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext:
+        public: true
+        arguments:
+            - '@doctrine'
+            - '@oro_email.direct_mailer'
+            - '@oro_email.manager.template_email'
+
+    Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailFeatureToggleContext:
+        public: true
+        arguments:
+            - '@oro_config.global'
+
+    Oro\Bundle\EmailBundle\Tests\Behat\Context\GoogleImapEnableContext:
+        public: true
+        arguments:
+            - '@oro_config.global'

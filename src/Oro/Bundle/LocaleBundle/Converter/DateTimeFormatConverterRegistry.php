@@ -11,13 +11,11 @@ use Symfony\Contracts\Service\ResetInterface;
 class DateTimeFormatConverterRegistry implements ResetInterface
 {
     /** @var string[] */
-    private $converterNames;
-
-    /** @var ContainerInterface */
-    private $converterContainer;
-
+    private array $converterNames;
+    private ContainerInterface $converterContainer;
     /** @var DateTimeFormatConverterInterface[]|null [name => converter, ...] */
-    private $converters;
+    private ?array $converters = null;
+    private bool $allConvertersLoaded = false;
 
     /**
      * @param string[]           $converterNames
@@ -36,11 +34,19 @@ class DateTimeFormatConverterRegistry implements ResetInterface
      */
     public function getFormatConverter(string $name): DateTimeFormatConverterInterface
     {
-        if (!\in_array($name, $this->converterNames, true)) {
+        $this->ensureConvertersInitialized();
+
+        if (!\array_key_exists($name, $this->converters)) {
             throw new \LogicException(sprintf('Format converter with name "%s" is not exist', $name));
         }
 
-        return $this->converterContainer->get($name);
+        $converter = $this->converters[$name];
+        if (null === $converter) {
+            $converter = $this->converterContainer->get($name);
+            $this->converters[$name] = $converter;
+        }
+
+        return $converter;
     }
 
     /**
@@ -50,11 +56,14 @@ class DateTimeFormatConverterRegistry implements ResetInterface
      */
     public function getFormatConverters(): array
     {
-        if (null === $this->converters) {
-            $this->converters = [];
-            foreach ($this->converterNames as $name) {
-                $this->converters[$name] = $this->converterContainer->get($name);
+        if (!$this->allConvertersLoaded) {
+            $this->ensureConvertersInitialized();
+            foreach ($this->converters as $name => $converter) {
+                if (null === $converter) {
+                    $this->converters[$name] = $this->converterContainer->get($name);
+                }
             }
+            $this->allConvertersLoaded = true;
         }
 
         return $this->converters;
@@ -66,5 +75,15 @@ class DateTimeFormatConverterRegistry implements ResetInterface
     public function reset()
     {
         $this->converters = null;
+    }
+
+    private function ensureConvertersInitialized(): void
+    {
+        if (null === $this->converters) {
+            $this->converters = [];
+            foreach ($this->converterNames as $name) {
+                $this->converters[$name] = null;
+            }
+        }
     }
 }

@@ -162,9 +162,6 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.cache.provider.permission'
 
-    Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager:
-        alias: oro_security.acl.permission_manager
-
     oro_security.acl.configurable_permission_provider:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider
         arguments:
@@ -820,9 +817,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Util\UriSecurityHelper
         arguments:
             - '%oro_security.allowed_protocols%'
-
-    Oro\Bundle\SecurityBundle\Util\UriSecurityHelper:
-        alias: oro_security.util.uri_security_helper
 
     oro_security.rest_exception_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\RestExceptionListener

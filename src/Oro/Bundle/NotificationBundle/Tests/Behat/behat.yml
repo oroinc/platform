@@ -12,10 +12,10 @@ oro_behat_extension:
     OroNotificationBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
-        - OroSecurityBundle::ACLContext
-        - OroEmailBundle::EmailContext
-        - OroDataGridBundle::GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
       paths:
         - '@OroNotificationBundle/Tests/Behat/Features'

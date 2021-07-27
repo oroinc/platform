@@ -532,15 +532,6 @@ services:
         tags:
             - { name: layout.data_provider, alias: file_applications }
 
-    oro_attachment.image_removal.service_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        public: true
-        arguments:
-            -
-                oro_attachment.provider.image_file_names: '@oro_attachment.provider.image_file_names'
-                oro_attachment.media_cache_manager_registry: '@oro_attachment.media_cache_manager_registry'
-        tags: ['container.service_locator']
-
     oro_attachment.configurator.attachment_filter_configuration:
         class: Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration
         decorates: liip_imagine.filter.configuration

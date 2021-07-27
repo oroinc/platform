@@ -134,16 +134,16 @@ oro_behat_extension:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
-        - OroUserBundle::FeatureContext
-        - OroUserBundle::UserAttachmentContext
-        - OroAttachmentBundle::AttachmentImageContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
-        - OroSecurityBundle::ACLContext
-        - OroLocaleBundle::LocalizationContext
-        - OroActivityListBundle::ActivityContext
-        - OroDataGridBundle::GridContext
-        - OroEmailBundle::EmailContext
-        - OroSearchBundle::SearchContext
+        - Oro\Bundle\UserBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\UserBundle\Tests\Behat\Context\UserAttachmentContext
+        - Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
+        - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

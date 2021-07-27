@@ -17,20 +17,12 @@ use Twig\TwigFilter;
  */
 class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?HtmlTagHelper $htmlTagHelper = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return HtmlTagHelper
-     */
-    protected function getHtmlTagHelper()
-    {
-        return $this->container->get('oro_ui.html_tag_helper');
     }
 
     /**
@@ -82,7 +74,7 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
     /**
      * Allow HTML tags all forbidden tags will be escaped
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     public function htmlEscape($string)
@@ -98,5 +90,14 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
         return [
             'oro_ui.html_tag_helper' => HtmlTagHelper::class,
         ];
+    }
+
+    private function getHtmlTagHelper(): HtmlTagHelper
+    {
+        if (null === $this->htmlTagHelper) {
+            $this->htmlTagHelper = $this->container->get('oro_ui.html_tag_helper');
+        }
+
+        return $this->htmlTagHelper;
     }
 }

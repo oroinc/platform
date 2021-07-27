@@ -244,10 +244,10 @@ oro_behat_extension:
     OroDataGridBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroUIBundle::ContextSelectorContext
-        - OroSecurityBundle::ACLContext
-        - OroConfigBundle::FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\UIBundle\Tests\Behat\Context\ContextSelectorContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
       paths:
         - '@OroDataGridBundle/Tests/Behat/Features'

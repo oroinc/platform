@@ -10,6 +10,12 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
  */
 class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    public function testGetTypeNames()
+    {
+        $extension = $this->getAbstractExtension();
+        $this->assertEquals(['test'], $extension->getTypeNames());
+    }
+
     public function testHasType()
     {
         $extension = $this->getAbstractExtension();

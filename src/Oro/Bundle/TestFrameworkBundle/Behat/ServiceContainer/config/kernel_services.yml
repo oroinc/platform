@@ -2,7 +2,7 @@ services:
     oro_test.kernel_service_factory:
         class: Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory
         public: true
-        arguments: ['@symfony2_extension.kernel']
+        arguments: ['@fob_symfony.kernel']
 
     oro_entity.entity_alias_resolver:
         class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
@@ -36,4 +36,4 @@ services:
         class: Symfony\Component\HttpKernel\Config\FileLocator
         public: true
         arguments:
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'

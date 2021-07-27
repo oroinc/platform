@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
+use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider;
 use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
@@ -26,17 +27,12 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 class NavigationItemController extends FOSRestController
 {
     /**
-     * REST GET list
-     *
-     * @param string $type
-     *
      * @ApiDoc(
      *  description="Get all Navigation items for user",
      *  resource=true
      * )
-     * @return Response
      */
-    public function getAction($type)
+    public function getAction(string $type): Response
     {
         /** @var NavigationItemsProvider $navigationItemsProvider */
         $navigationItemsProvider = $this->container->get('oro_navigation.provider.navigation_items');
@@ -50,39 +46,33 @@ class NavigationItemController extends FOSRestController
     }
 
     /**
-     * REST POST
-     *
-     * @param Request $request
-     * @param string $type
-     *
      * @ApiDoc(
      *  description="Add Navigation item",
      *  resource=true
      * )
-     * @return Response
      */
-    public function postAction(Request $request, $type)
+    public function postAction(Request $request, string $type): Response
     {
         $params = $request->request->all();
 
         if (empty($params) || empty($params['type'])) {
             return $this->handleView(
                 $this->view(
-                    array('message' => 'Wrong JSON inside POST body'),
+                    ['message' => 'Wrong JSON inside POST body'],
                     Response::HTTP_BAD_REQUEST
                 )
             );
         }
 
         $params['user'] = $this->getUser();
-        $params['url']  = $this->normalizeUrl($params['url'], $params['type']);
+        $params['url'] = $this->normalizeUrl($params['url'], $params['type']);
         $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganization();
 
-        /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
+        /** @var $entity NavigationItemInterface */
         $entity = $this->getFactory()->createItem($type, $params);
 
         if (!$entity) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
 
         $errors = $this->validate($entity);
@@ -102,12 +92,7 @@ class NavigationItemController extends FOSRestController
         );
     }
 
-    /**
-     * @param mixed $entity
-     *
-     * @return array
-     */
-    private function validate($entity): array
+    private function validate(object $entity): array
     {
         $constraintViolationList = $this->get('validator')->validate($entity);
         /** @var ConstraintViolationInterface $constraintViolation */
@@ -119,44 +104,37 @@ class NavigationItemController extends FOSRestController
     }
 
     /**
-     * REST PUT
-     *
-     * @param Request $request
-     * @param string $type
-     * @param int    $itemId Navigation item id
-     *
      * @ApiDoc(
      *  description="Update Navigation item",
      *  resource=true
      * )
-     * @return Response
      */
-    public function putIdAction(Request $request, $type, $itemId)
+    public function putIdAction(Request $request, string $type, $itemId): Response
     {
         $params = $request->request->all();
 
         if (empty($params)) {
             return $this->handleView(
                 $this->view(
-                    array('message' => 'Wrong JSON inside POST body'),
+                    ['message' => 'Wrong JSON inside POST body'],
                     Response::HTTP_BAD_REQUEST
                 )
             );
         }
 
-        /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->findItem($type, (int) $itemId);
+        /** @var $entity NavigationItemInterface */
+        $entity = $this->getFactory()->findItem($type, (int)$itemId);
 
         if (!$entity) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
 
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(array(), Response::HTTP_FORBIDDEN));
+            return $this->handleView($this->view([], Response::HTTP_FORBIDDEN));
         }
 
         if (isset($params['url']) && !empty($params['url'])) {
-            $params['url'] = $this->getStateUrl($params['url']);
+            $params['url'] = $this->normalizeUrl($params['url'], $type);
         }
 
         $entity->setValues($params);
@@ -166,67 +144,48 @@ class NavigationItemController extends FOSRestController
         $em->persist($entity);
         $em->flush();
 
-        return $this->handleView($this->view(array(), Response::HTTP_OK));
+        return $this->handleView($this->view([], Response::HTTP_OK));
     }
 
     /**
-     * REST DELETE
-     *
-     * @param string $type
-     * @param int    $itemId
-     *
      * @ApiDoc(
      *  description="Remove Navigation item",
      *  resource=true
      * )
-     * @return Response
      */
-    public function deleteIdAction($type, $itemId)
+    public function deleteIdAction(string $type, $itemId): Response
     {
-        /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->findItem($type, (int) $itemId);
+        /** @var $entity NavigationItemInterface */
+        $entity = $this->getFactory()->findItem($type, (int)$itemId);
         if (!$entity) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(array(), Response::HTTP_FORBIDDEN));
+            return $this->handleView($this->view([], Response::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager();
         $em->remove($entity);
         $em->flush();
 
-        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
     /**
      * Validate permissions on pinbar
-     *
-     * @param  AbstractUser $user
-     * @return bool
      */
-    protected function validatePermissions(AbstractUser $user)
+    protected function validatePermissions(AbstractUser $user): bool
     {
         return is_a($user, $this->getUserClass(), true) &&
             ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
     }
 
-    /**
-     * Get entity Manager
-     *
-     * @return \Doctrine\Persistence\ObjectManager
-     */
-    protected function getManager()
+    protected function getManager(): ObjectManager
     {
         return $this->getDoctrine()->getManagerForClass($this->getPinbarTabClass());
     }
 
-    /**
-     * Get entity factory
-     *
-     * @return ItemFactory
-     */
-    protected function getFactory()
+    protected function getFactory(): ItemFactory
     {
         return $this->get('oro_navigation.item.factory');
     }
@@ -236,6 +195,7 @@ class NavigationItemController extends FOSRestController
      *
      * @param string $url Original URL
      * @param string $type Navigation item type
+     *
      * @return string Normalized URL
      */
     private function normalizeUrl(string $url, string $type): string
@@ -258,26 +218,12 @@ class NavigationItemController extends FOSRestController
         return $normalizer->getNormalizedUrl($url);
     }
 
-    /**
-     * @return ObjectRepository
-     */
-    protected function getPageStateRepository()
-    {
-        return $this->getDoctrine()->getRepository('OroNavigationBundle:PageState');
-    }
-
-    /**
-     * @return string
-     */
-    protected function getPinbarTabClass()
+    protected function getPinbarTabClass(): string
     {
         return PinbarTab::class;
     }
 
-    /**
-     * @return string
-     */
-    protected function getUserClass()
+    protected function getUserClass(): string
     {
         return User::class;
     }

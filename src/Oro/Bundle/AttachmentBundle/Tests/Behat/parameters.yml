@@ -1,0 +1,11 @@
+services:
+    Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentContext:
+        abstract: true
+        arguments:
+            - '@oro_attachment.manager'
+
+    Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext:
+        public: true
+        parent: Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentContext
+        arguments:
+            - '@oro_attachment.file_manager'

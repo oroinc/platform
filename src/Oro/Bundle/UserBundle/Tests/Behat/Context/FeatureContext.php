@@ -3,21 +3,26 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Symfony\Component\Routing\RouterInterface;
 
 class FeatureContext extends OroFeatureContext implements
-    KernelAwareContext,
     FixtureLoaderAwareInterface,
     OroPageObjectAware
 {
-    use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary;
+    use FixtureLoaderDictionary, PageObjectDictionary;
+
+    private RouterInterface $router;
+
+    public function __construct(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
 
     /**
      * @var OroMainContext
@@ -41,7 +46,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iAmOnLoginPage()
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
+        $uri = $this->router->generate('oro_user_security_login');
         $this->visitPath($uri);
     }
 
@@ -52,7 +57,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iAmLoggedOut()
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_user_security_logout');
+        $uri = $this->router->generate('oro_user_security_logout');
         $this->visitPath($uri);
     }
 
@@ -133,8 +138,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function openUserViewPage($id)
     {
-        $url = $this->getContainer()
-            ->get('router')
+        $url = $this->router
             ->generate('oro_user_view', ['id' => $id]);
 
         $this->visitPath($url);

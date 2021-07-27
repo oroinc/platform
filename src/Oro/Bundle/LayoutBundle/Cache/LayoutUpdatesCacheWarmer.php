@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Cache;
 
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
+use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
@@ -14,18 +16,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
 {
     private LayoutUpdateLoader $layoutUpdateLoader;
-
     private KernelInterface $kernel;
-
+    private LayoutFactoryBuilderInterface $layoutFactoryBuilder;
     private ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer;
 
     public function __construct(
         LayoutUpdateLoader $layoutUpdateLoader,
         KernelInterface $kernel,
+        LayoutFactoryBuilderInterface $layoutFactoryBuilder,
         ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer
     ) {
         $this->layoutUpdateLoader = $layoutUpdateLoader;
         $this->kernel = $kernel;
+        $this->layoutFactoryBuilder = $layoutFactoryBuilder;
         $this->expressionLanguageCacheWarmer = $expressionLanguageCacheWarmer;
     }
 
@@ -42,9 +45,16 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
+        $this->loadLayoutUpdates();
+        $this->collectExpressionsFromBlockTypes();
+        $this->expressionLanguageCacheWarmer->write();
+    }
+
+    private function loadLayoutUpdates(): void
+    {
         foreach ($this->kernel->getBundles() as $bundle) {
             $finder = new Finder();
-            $layoutsDir = $bundle->getPath().'/Resources/views/layouts';
+            $layoutsDir = $bundle->getPath() . '/Resources/views/layouts';
             if (!is_dir($layoutsDir)) {
                 continue;
             }
@@ -61,6 +71,23 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
                 $this->layoutUpdateLoader->load($layoutUpdatePath);
             }
         }
-        $this->expressionLanguageCacheWarmer->write();
+    }
+
+    private function collectExpressionsFromBlockTypes(): void
+    {
+        $layoutRegistry = $this->layoutFactoryBuilder->getLayoutFactory()->getRegistry();
+        $typeNames = $layoutRegistry->getTypeNames();
+        foreach ($typeNames as $typeName) {
+            $type = $layoutRegistry->getType($typeName);
+            $optionsResolver = new OptionsResolver();
+            $type->configureOptions($optionsResolver);
+            $layoutRegistry->configureOptions($typeName, $optionsResolver);
+            $defaultOptions = $optionsResolver->getDefaults();
+            foreach ($defaultOptions as $value) {
+                if (\is_string($value) && $value && '=' === $value[0]) {
+                    $this->expressionLanguageCacheWarmer->collect(substr($value, 1));
+                }
+            }
+        }
     }
 }

@@ -1,0 +1,7 @@
+services:
+    Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\FeatureContext:
+        public: true
+        arguments:
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.doctrine_helper'

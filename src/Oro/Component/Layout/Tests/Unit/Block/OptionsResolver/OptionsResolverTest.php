@@ -7,10 +7,8 @@ use Symfony\Component\OptionsResolver\Options;
 
 class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OptionsResolver
-     */
-    protected $optionResolver;
+    /** @var OptionsResolver */
+    private $optionResolver;
 
     protected function setUp(): void
     {
@@ -31,6 +29,14 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->optionResolver->hasDefault('default_option'));
         $this->assertTrue($this->optionResolver->hasDefault('required_option_with_default'));
         $this->assertFalse($this->optionResolver->hasDefault('not_existing_option'));
+        $this->assertSame(
+            [
+                'default_option' => 'default_value',
+                'default_option2' => 'default_value2',
+                'required_option_with_default' => false
+            ],
+            $this->optionResolver->getDefaults()
+        );
 
         // Required
         $this->optionResolver->setRequired('required_option');

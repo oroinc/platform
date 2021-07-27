@@ -3,18 +3,18 @@ oro_behat_extension:
     OroEmailBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroNavigationBundle::FeatureContext
-        - OroNavigationBundle::PinbarContext
-        - OroEmailBundle::FeatureContext
-        - OroEmailBundle::EmailFeatureToggleContext
-        - OroFormBundle::FormContext
-        - OroUserBundle::FeatureContext
-        - OroActivityListBundle::ActivityContext
-        - OroConfigBundle::FeatureContext
-        - OroSecurityBundle::ACLContext
-        - OroEmailBundle::EmailContext
-        - OroEmailBundle::GoogleImapEnableContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\PinbarContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailFeatureToggleContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\UserBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\GoogleImapEnableContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:

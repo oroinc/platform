@@ -65,6 +65,9 @@ class EntityFallbackResolver
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
+    /** @var EntityFallbackProviderInterface[] [provider key => provider, ...] */
+    private array $loadedFallbackProviders = [];
+
     public function __construct(
         ContainerInterface $fallbackProviders,
         ConfigProvider $entityConfigProvider,
@@ -322,11 +325,18 @@ class EntityFallbackResolver
      */
     public function getFallbackProvider($key)
     {
+        if (isset($this->loadedFallbackProviders[$key])) {
+            return $this->loadedFallbackProviders[$key];
+        }
+
         if (!$this->fallbackProviders->has($key)) {
             throw new FallbackProviderNotFoundException($key);
         }
 
-        return $this->fallbackProviders->get($key);
+        $provider = $this->fallbackProviders->get($key);
+        $this->loadedFallbackProviders[$key] = $provider;
+
+        return $provider;
     }
 
     /**

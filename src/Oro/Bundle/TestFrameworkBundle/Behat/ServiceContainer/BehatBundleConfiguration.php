@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
-use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
+use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,7 +26,7 @@ class BehatBundleConfiguration implements ConfigurationInterface
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
-        $this->kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $this->kernel = $container->get(SymfonyExtension::KERNEL_ID);
     }
 
     /**

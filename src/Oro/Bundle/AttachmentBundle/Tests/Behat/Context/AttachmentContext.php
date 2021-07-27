@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Behat\Context;
 
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use GuzzleHttp\Client;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -12,7 +11,12 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class AttachmentContext extends OroFeatureContext
 {
-    use KernelDictionary;
+    private AttachmentManager $attachmentManager;
+
+    public function __construct(AttachmentManager $attachmentManager)
+    {
+        $this->attachmentManager = $attachmentManager;
+    }
 
     /**
      * Download the file using active session
@@ -44,7 +48,7 @@ abstract class AttachmentContext extends OroFeatureContext
 
     protected function getAttachmentManager(): AttachmentManager
     {
-        return $this->getContainer()->get('oro_attachment.manager');
+        return $this->attachmentManager;
     }
 
     abstract protected function assertResponseSuccess(ResponseInterface $response): void;

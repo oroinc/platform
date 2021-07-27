@@ -12,14 +12,10 @@ use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
@@ -35,16 +31,14 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->permissionManager = $this->createMock(PermissionManager::class);
         $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add(AuthorizationCheckerInterface::class, $this->authorizationChecker)
             ->add(TokenAccessorInterface::class, $this->tokenAccessor)
-            ->add(PermissionManager::class, $this->permissionManager)
-            ->add(UriSecurityHelper::class, $this->uriSecurityHelper)
+            ->add('oro_security.acl.permission_manager', $this->permissionManager)
+            ->add('oro_security.util.uri_security_helper', $this->uriSecurityHelper)
             ->getContainer($this);
 
         $this->extension = new OroSecurityExtension($container);
@@ -55,6 +49,8 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $disabledOrganization = new Organization();
         $organization = new Organization();
+        $organization->setId(1);
+        $organization->setName('org1');
 
         $organization->setEnabled(true);
 
@@ -64,11 +60,12 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn($user);
 
-        $result = self::callTwigFunction($this->extension, 'get_enabled_organizations', []);
-
-        $this->assertIsArray($result);
-        $this->assertCount(1, $result);
-        $this->assertSame($organization, $result[0]);
+        $this->assertSame(
+            [
+                ['id' => 1, 'name' => 'org1']
+            ],
+            self::callTwigFunction($this->extension, 'get_enabled_organizations', [])
+        );
     }
 
     public function testGetCurrentOrganization()
