@@ -16,26 +16,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
-    /** @var Router */
-    private $router;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var ClassAuthorizationChecker */
-    private $classAuthorizationChecker;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var array */
-    private $existingAclChecks = [];
-
-    /** @var array */
-    private $declaredRoutes = [];
+    private Router $router;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private ClassAuthorizationChecker $classAuthorizationChecker;
+    private TokenAccessorInterface $tokenAccessor;
+    private LoggerInterface $logger;
+    private array $existingAclChecks = [];
+    private array $declaredRoutes = [];
 
     public function __construct(
         Router $router,
@@ -63,18 +50,18 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     public function buildOptions(array $options): array
     {
-        if ($this->getExtraOption($options, 'isAllowed') === false) {
+        if (isset($options['extras']['isAllowed'])) {
             return $options;
         }
 
         $options['extras']['isAllowed'] = true;
 
-        if ($this->getOption($options, 'check_access') === false) {
+        if (!($options['check_access'] ?? true)) {
             return $options;
         }
 
         if ($this->skipAccessCheck($options)) {
-            $options['extras']['isAllowed'] = (bool)$this->getExtraOption($options, 'show_non_authorized', false);
+            $options['extras']['isAllowed'] = (bool)($options['extras']['show_non_authorized'] ?? false);
 
             return $options;
         }
@@ -83,7 +70,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return $options;
         }
 
-        $aclResourceId = $this->getExtraOption($options, 'acl_resource_id');
+        $aclResourceId = $options['extras']['acl_resource_id'] ?? null;
         if ($aclResourceId) {
             $options['extras']['isAllowed'] = $this->isGranted($aclResourceId);
 
@@ -92,32 +79,22 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
         $options['extras']['isAllowed'] = $this->isRouteAvailable(
             $options,
-            $this->getExtraOption($options, 'acl_policy', $options['extras']['isAllowed'])
+            $options['extras']['acl_policy'] ?? $options['extras']['isAllowed']
         );
 
         return $options;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return bool
-     */
-    private function skipAccessCheck(array $options)
+    private function skipAccessCheck(array $options): bool
     {
         return
-            !$this->getOption($options, 'check_access_not_logged_in')
+            !($options['check_access_not_logged_in'] ?? false)
             && !$this->tokenAccessor->hasUser();
     }
 
-    /**
-     * @param string $aclResourceId
-     *
-     * @return bool
-     */
-    private function isGranted($aclResourceId)
+    private function isGranted(string $aclResourceId): bool
     {
-        if (array_key_exists($aclResourceId, $this->existingAclChecks)) {
+        if (\array_key_exists($aclResourceId, $this->existingAclChecks)) {
             return $this->existingAclChecks[$aclResourceId];
         }
 
@@ -127,20 +104,14 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         return $isAllowed;
     }
 
-    /**
-     * @param array $options
-     * @param bool  $defaultValue
-     *
-     * @return bool
-     */
-    private function isRouteAvailable(array $options, $defaultValue)
+    private function isRouteAvailable(array $options, bool $defaultValue): bool
     {
         $controller = $this->getController($options);
         if (!$controller) {
             return $defaultValue;
         }
 
-        if (array_key_exists($controller, $this->existingAclChecks)) {
+        if (\array_key_exists($controller, $this->existingAclChecks)) {
             return $this->existingAclChecks[$controller];
         }
 
@@ -155,12 +126,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         return $isAllowed;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return string|null
-     */
-    private function getController(array $options)
+    private function getController(array $options): ?string
     {
         if (!empty($options['route'])) {
             return $this->getControllerByRouteName($options['route']);
@@ -172,12 +138,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         return null;
     }
 
-    /**
-     * @param string $routeName
-     *
-     * @return string|null
-     */
-    private function getControllerByRouteName($routeName)
+    private function getControllerByRouteName(string $routeName): ?string
     {
         if (!$this->declaredRoutes) {
             $generator = $this->router->getGenerator();
@@ -196,12 +157,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         return null;
     }
 
-    /**
-     * @param string $uri
-     *
-     * @return string|null
-     */
-    private function getControllerByUri($uri)
+    private function getControllerByUri(string $uri): ?string
     {
         if ('#' !== $uri) {
             try {
@@ -214,40 +170,5 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         }
 
         return null;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function getOption(array $options, $key, $default = null)
-    {
-        if (array_key_exists($key, $options)) {
-            return $options[$key];
-        }
-
-        return $default;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function getExtraOption(array $options, $key, $default = null)
-    {
-        if (array_key_exists('extras', $options)) {
-            $extras = $options['extras'];
-            if (array_key_exists($key, $extras)) {
-                return $extras[$key];
-            }
-        }
-
-        return $default;
     }
 }

@@ -27,8 +27,4 @@ This service can be used to get locale specific settings of the application, suc
 
 Locale settings uses system configuration as a source.
 
-See detailed [documentation](./Resources/doc/reference/locale-settings.md) for more details.
-
-## Formatters
-
-Please see [documentation](./Resources/doc/index.md) for more details.
+See [LocaleBundle online documentation](https://doc.oroinc.com/backend/bundles/platform/LocaleBundle/) for more information.

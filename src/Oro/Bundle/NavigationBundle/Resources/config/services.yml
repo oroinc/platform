@@ -37,8 +37,8 @@ services:
         class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
         public: true
         arguments:
-            - [] # builders
-            - ~ # service locator
+            - [] # builders. They are set by Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass
+            - ~ # service locator. It is set by Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass
             - '@oro_menu.factory'
             - '@oro_menu.array_loader'
             - '@oro_menu.manipulator'

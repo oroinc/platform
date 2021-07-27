@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ViewSwitcherBundle\Twig;
 
-use Oro\Bundle\UIBundle\Provider\UserAgent;
 use Oro\Bundle\UIBundle\Provider\UserAgentProviderInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +18,7 @@ use Twig\TwigFunction;
 class DemoMobileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     private ContainerInterface $container;
+    private ?bool $isMobile = null;
 
     public function __construct(ContainerInterface $container)
     {
@@ -26,9 +26,7 @@ class DemoMobileExtension extends AbstractExtension implements ServiceSubscriber
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -44,10 +42,13 @@ class DemoMobileExtension extends AbstractExtension implements ServiceSubscriber
      */
     public function isMobile(): bool
     {
-        $masterRequest = $this->getMasterRequest();
-        $isForceMobile = null !== $masterRequest && $masterRequest->cookies->get('demo_version') === 'mobile';
+        if (null === $this->isMobile) {
+            $masterRequest = $this->getMasterRequest();
+            $isForceMobile = null !== $masterRequest && $masterRequest->cookies->get('demo_version') === 'mobile';
+            $this->isMobile = $isForceMobile || $this->getUserAgentProvider()->getUserAgent()->isMobile();
+        }
 
-        return $isForceMobile || $this->getUserAgent()->isMobile();
+        return $this->isMobile;
     }
 
     /**
@@ -70,12 +71,9 @@ class DemoMobileExtension extends AbstractExtension implements ServiceSubscriber
         ];
     }
 
-    private function getUserAgent(): UserAgent
+    private function getUserAgentProvider(): UserAgentProviderInterface
     {
-        /** @var UserAgentProviderInterface $userAgentProvider */
-        $userAgentProvider = $this->container->get('oro_ui.user_agent_provider');
-
-        return $userAgentProvider->getUserAgent();
+        return $this->container->get('oro_ui.user_agent_provider');
     }
 
     private function getMasterRequest(): ?Request

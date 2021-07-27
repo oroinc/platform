@@ -69,6 +69,8 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     protected ContainerInterface $container;
     /** Protect extension from infinite loop during a widget rendering */
     private array $renderedWidgets = [];
+    private ?bool $isMobile = null;
+    private ?bool $isDesktop = null;
 
     public function __construct(ContainerInterface $container)
     {
@@ -499,23 +501,27 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * Check by user-agent if request was from mobile device
-     *
-     * @return bool
+     * Check by user-agent if request was from mobile device.
      */
-    public function isMobile()
+    public function isMobile(): bool
     {
-        return $this->getUserAgent()->isMobile();
+        if (null === $this->isMobile) {
+            $this->isMobile = $this->getUserAgent()->isMobile();
+        }
+
+        return $this->isMobile;
     }
 
     /**
-     * Check by user-agent if request was not from mobile device
-     *
-     * @return bool
+     * Check by user-agent if request was not from mobile device.
      */
-    public function isDesktop()
+    public function isDesktop(): bool
     {
-        return $this->getUserAgent()->isDesktop();
+        if (null === $this->isDesktop) {
+            $this->isDesktop = $this->getUserAgent()->isDesktop();
+        }
+
+        return $this->isDesktop;
     }
 
     /**
