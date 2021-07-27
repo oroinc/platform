@@ -1,9 +1,9 @@
-define([
-    'backgrid',
-    'underscore',
-    'orotranslation/js/translator'
-], function(Backgrid, _, __) {
+define(function(require) {
     'use strict';
+
+    const Backgrid = ('backgrid');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
 
     /**
      * Cell able to display many to one relation.
@@ -85,6 +85,7 @@ define([
                 html = this.ERROR_HTML;
             }
             this.$el.html(html);
+            this.setAriaAttrs();
 
             return this;
         }

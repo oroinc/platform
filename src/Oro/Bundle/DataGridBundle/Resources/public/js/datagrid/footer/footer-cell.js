@@ -1,9 +1,9 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid'
-], function(_, Backbone, Backgrid) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Backgrid = require('backgrid');
 
     /**
      * Datagrid footer cell
@@ -13,6 +13,8 @@ define([
      * @extends Backbone.View
      */
     const FooterCell = Backbone.View.extend({
+        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
+
         /** @property */
         tagName: 'th',
 
@@ -91,6 +93,7 @@ define([
                 this.$el.addClass('align-' + this.column.get('align'));
             }
 
+            this.setAriaAttrs();
             return this;
         }
     });

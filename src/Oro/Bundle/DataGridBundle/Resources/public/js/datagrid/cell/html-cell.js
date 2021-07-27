@@ -1,8 +1,8 @@
-define([
-    './string-cell',
-    'backgrid'
-], function(StringCell, Backgrid) {
+define(function(require) {
     'use strict';
+
+    const StringCell = require('./string-cell');
+    const Backgrid = require('backgrid');
 
     /**
      * Html column cell. Added missing behaviour.
@@ -33,6 +33,7 @@ define([
             const value = this.model.get(this.column.get('name'));
             const formattedValue = this.formatter.fromRaw(value);
             this.$el.html(formattedValue);
+            this.setAriaAttrs();
             return this;
         }
     });

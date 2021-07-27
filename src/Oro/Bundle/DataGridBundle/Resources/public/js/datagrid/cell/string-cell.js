@@ -1,8 +1,8 @@
-define([
-    'backgrid',
-    'orodatagrid/js/datagrid/formatter/cell-formatter'
-], function(Backgrid, CellFormatter) {
+define(function(require) {
     'use strict';
+
+    const Backgrid = require('backgrid');
+    const CellFormatter = require('orodatagrid/js/datagrid/formatter/cell-formatter');
 
     /**
      * String column cell. Added missing behaviour.
@@ -31,6 +31,7 @@ define([
             const render = StringCell.__super__.render.call(this);
 
             this.enterEditMode();
+            this.setAriaAttrs();
 
             return render;
         },
