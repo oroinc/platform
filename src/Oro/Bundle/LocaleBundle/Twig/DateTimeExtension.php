@@ -18,20 +18,12 @@ use Twig\TwigFilter;
  */
 class DateTimeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    protected ContainerInterface $container;
+    private ?DateTimeFormatterInterface $dateTimeFormatter = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return DateTimeFormatterInterface
-     */
-    protected function getDateTimeFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.date_time');
     }
 
     /**
@@ -83,12 +75,13 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function formatDateTime($date, array $options = [])
     {
-        $dateType = $this->getOption($options, 'dateType');
-        $timeType = $this->getOption($options, 'timeType');
-        $locale = $this->getOption($options, 'locale');
-        $timeZone = $this->getOption($options, 'timeZone');
-
-        return $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->format(
+            $date,
+            $options['dateType'] ?? null,
+            $options['timeType'] ?? null,
+            $options['locale'] ?? null,
+            $options['timeZone'] ?? null
+        );
     }
 
     /**
@@ -113,11 +106,12 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function formatDate($date, array $options = [])
     {
-        $dateType = $this->getOption($options, 'dateType');
-        $locale = $this->getOption($options, 'locale');
-        $timeZone = $this->getOption($options, 'timeZone', 'UTC');
-
-        return $this->getDateTimeFormatter()->formatDate($date, $dateType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->formatDate(
+            $date,
+            $options['dateType'] ?? null,
+            $options['locale'] ?? null,
+            $options['timeZone'] ?? 'UTC'
+        );
     }
 
     /**
@@ -136,11 +130,12 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function formatDay($date, array $options = [])
     {
-        $dateType = $this->getOption($options, 'dateType');
-        $locale = $this->getOption($options, 'locale');
-        $timeZone = $this->getOption($options, 'timeZone', 'UTC');
-
-        return $this->getDateTimeFormatter()->formatDay($date, $dateType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->formatDay(
+            $date,
+            $options['dateType'] ?? null,
+            $options['locale'] ?? null,
+            $options['timeZone'] ?? 'UTC'
+        );
     }
 
     /**
@@ -165,25 +160,12 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function formatTime($date, array $options = [])
     {
-        $timeType = $this->getOption($options, 'timeType');
-        $locale = $this->getOption($options, 'locale');
-        $timeZone = $this->getOption($options, 'timeZone', 'UTC');
-
-        return $this->getDateTimeFormatter()->formatTime($date, $timeType, $locale, $timeZone);
-    }
-
-    /**
-     * Gets option or default value if option not exist
-     *
-     * @param array  $options
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    protected function getOption(array $options, $name, $default = null)
-    {
-        return $options[$name] ?? $default;
+        return $this->getDateTimeFormatter()->formatTime(
+            $date,
+            $options['timeType'] ?? null,
+            $options['locale'] ?? null,
+            $options['timeZone'] ?? 'UTC'
+        );
     }
 
     /**
@@ -194,5 +176,14 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
         return [
             'oro_locale.formatter.date_time' => DateTimeFormatterInterface::class,
         ];
+    }
+
+    protected function getDateTimeFormatter(): DateTimeFormatterInterface
+    {
+        if (null === $this->dateTimeFormatter) {
+            $this->dateTimeFormatter = $this->container->get('oro_locale.formatter.date_time');
+        }
+
+        return $this->dateTimeFormatter;
     }
 }

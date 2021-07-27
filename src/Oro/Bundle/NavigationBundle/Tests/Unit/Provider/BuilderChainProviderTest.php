@@ -46,7 +46,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->factory->expects($this->once())
             ->method('createItem')
             ->with($notExistingMenuName, $options)
-            ->will($this->returnValue($topMenu));
+            ->willReturn($topMenu);
 
         $chainProvider = $this->getBuilderChainProvider(
             [$existingMenuName => ['builder1']],
@@ -56,7 +56,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($chainProvider->has($notExistingMenuName, $options));
     }
 
-    public function testGetException()
+    public function testGetWhenMenuAliasIsEmpty()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Menu alias was not set.');
@@ -65,7 +65,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $chainProvider->get('');
     }
 
-    public function testHasException()
+    public function testHasWhenMenuAliasIsEmpty()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Menu alias was not set.');
@@ -76,10 +76,8 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider aliasDataProvider
-     * @param string $alias
-     * @param string $menuName
      */
-    public function testGet($alias, $menuName)
+    public function testGet(string $alias, string $menuName)
     {
         $options = ['param' => 'value'];
 
@@ -225,13 +223,10 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         static::assertInstanceOf(ItemInterface::class, $chainProvider->get($alias, $options));
     }
 
-    /**
-     * @return array
-     */
-    public function aliasDataProvider()
+    public function aliasDataProvider(): array
     {
         return [
-            'custom alias' => ['test', 'test'],
+            'custom' => ['test', 'test'],
             'global' => ['_common_builder', 'test']
         ];
     }
@@ -244,18 +239,18 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $topMenu = $this->createMock(ItemInterface::class);
         $topMenu->expects($this->any())
             ->method('hasChildren')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $topMenu->expects($this->any())
             ->method('getDisplayChildren')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $menu = $this->createMock(ItemInterface::class);
         $menu->expects($this->any())
             ->method('hasChildren')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $menu->expects($this->any())
             ->method('getDisplayChildren')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $childOne = $this->getChildItem('child1', 5);
         $childTwo = $this->getChildItem('child2', 10);
@@ -264,16 +259,16 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 
         $menu->expects($this->any())
             ->method('getChildren')
-            ->will($this->returnValue([$childThree, $childFour, $childTwo, $childOne]));
+            ->willReturn([$childThree, $childFour, $childTwo, $childOne]);
 
         $topMenu->expects($this->any())
             ->method('getChildren')
-            ->will($this->returnValue([$menu]));
+            ->willReturn([$menu]);
 
         $this->factory->expects($this->once())
             ->method('createItem')
             ->with($menuName, $options)
-            ->will($this->returnValue($topMenu));
+            ->willReturn($topMenu);
 
         $menu->expects($this->once())
             ->method('reorderChildren')
@@ -314,14 +309,14 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
     private function getChildItem($name, $position = null)
     {
         $child = $this->createMock(ItemInterface::class);
-        $child->expects($this->exactly(1))
+        $child->expects($this->once())
             ->method('getExtra')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['position', null, $position]
-            ]));
+            ]);
         $child->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         return $child;
     }

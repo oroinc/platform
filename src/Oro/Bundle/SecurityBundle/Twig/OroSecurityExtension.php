@@ -10,7 +10,6 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -25,41 +24,14 @@ use Twig\TwigFunction;
  */
 class OroSecurityExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?PermissionManager $permissionManager = null;
+    private ?UriSecurityHelper $uriSecurityHelper = null;
+    private ?TokenAccessorInterface $tokenAccessor = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
-    {
-        return $this->container->get(AuthorizationCheckerInterface::class);
-    }
-
-    /**
-     * @return TokenAccessorInterface
-     */
-    protected function getTokenAccessor()
-    {
-        return $this->container->get(TokenAccessorInterface::class);
-    }
-
-    /**
-     * @return PermissionManager
-     */
-    protected function getPermissionManager()
-    {
-        return $this->container->get(PermissionManager::class);
-    }
-
-    private function getUriSecurityHelper(): UriSecurityHelper
-    {
-        return $this->container->get(UriSecurityHelper::class);
     }
 
     /**
@@ -87,7 +59,7 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
     /**
      * Get list with all enabled organizations for current user
      *
-     * @return Organization[]
+     * @return array [['id' => organization id, 'name' => organization  name], ...]
      */
     public function getOrganizations()
     {
@@ -96,15 +68,10 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
             return [];
         }
 
-        return $user->getOrganizations(true)->toArray();
+        return $this->formatUserOrganizations($user->getOrganizations(true)->toArray());
     }
 
-    /**
-     * Returns current organization
-     *
-     * @return Organization|null
-     */
-    public function getCurrentOrganization()
+    public function getCurrentOrganization(): ?Organization
     {
         return $this->getTokenAccessor()->getOrganization();
     }
@@ -130,15 +97,60 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
     }
 
     /**
+     * @param Organization[] $userOrganizations
+     *
+     * @return array [['id' => organization id, 'name' => organization  name], ...]
+     */
+    protected function formatUserOrganizations(array $userOrganizations): array
+    {
+        if (!$userOrganizations) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($userOrganizations as $org) {
+            $result[] = ['id' => $org->getId(), 'name' => $org->getName()];
+        }
+
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()
     {
         return [
-            AuthorizationCheckerInterface::class,
+            'oro_security.util.uri_security_helper' => UriSecurityHelper::class,
+            'oro_security.acl.permission_manager' => PermissionManager::class,
             TokenAccessorInterface::class,
-            PermissionManager::class,
-            UriSecurityHelper::class,
         ];
+    }
+
+    private function getPermissionManager(): PermissionManager
+    {
+        if (null === $this->permissionManager) {
+            $this->permissionManager = $this->container->get('oro_security.acl.permission_manager');
+        }
+
+        return $this->permissionManager;
+    }
+
+    private function getUriSecurityHelper(): UriSecurityHelper
+    {
+        if (null === $this->uriSecurityHelper) {
+            $this->uriSecurityHelper = $this->container->get('oro_security.util.uri_security_helper');
+        }
+
+        return $this->uriSecurityHelper;
+    }
+
+    private function getTokenAccessor(): TokenAccessorInterface
+    {
+        if (null === $this->tokenAccessor) {
+            $this->tokenAccessor = $this->container->get(TokenAccessorInterface::class);
+        }
+
+        return $this->tokenAccessor;
     }
 }

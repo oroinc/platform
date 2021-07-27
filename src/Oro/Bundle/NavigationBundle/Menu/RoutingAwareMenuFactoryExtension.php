@@ -11,8 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RoutingAwareMenuFactoryExtension implements ExtensionInterface
 {
-    /** @var RouterInterface */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {
@@ -31,8 +30,8 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
      */
     public function buildOptions(array $options): array
     {
-        if (!empty($options['route']) && $this->getExtraOption($options, 'isAllowed', true)) {
-            $params = $this->getOption($options, 'routeParameters', []);
+        if (!empty($options['route']) && ($options['extras']['isAllowed'] ?? true)) {
+            $params = $options['routeParameters'] ?? [];
             $referenceType = !empty($options['routeAbsolute'])
                 ? RouterInterface::ABSOLUTE_URL
                 : RouterInterface::ABSOLUTE_PATH;
@@ -46,40 +45,5 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
         }
 
         return $options;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function getOption(array $options, $key, $default = null)
-    {
-        if (array_key_exists($key, $options)) {
-            return $options[$key];
-        }
-
-        return $default;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function getExtraOption(array $options, $key, $default = null)
-    {
-        if (array_key_exists('extras', $options)) {
-            $extras = $options['extras'];
-            if (array_key_exists($key, $extras)) {
-                return $extras[$key];
-            }
-        }
-
-        return $default;
     }
 }

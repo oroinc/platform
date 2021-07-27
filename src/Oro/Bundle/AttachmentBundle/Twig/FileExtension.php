@@ -40,36 +40,13 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     private const FILES_TEMPLATE = '@OroAttachment/Twig/file.html.twig';
     private const IMAGES_TEMPLATE = '@OroAttachment/Twig/image.html.twig';
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
+    private ?AttachmentManager $attachmentManager = null;
+    private ?ConfigManager $configManager = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return AttachmentManager
-     */
-    protected function getAttachmentManager()
-    {
-        return $this->container->get(AttachmentManager::class);
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        return $this->container->get(ConfigManager::class);
-    }
-
-    /**
-     * @return ManagerRegistry
-     */
-    protected function getDoctrine()
-    {
-        return $this->container->get(ManagerRegistry::class);
     }
 
     /**
@@ -167,7 +144,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
 
         if ($file && $file->getFilename()) {
             $entityClass = ClassUtils::getRealClass($parentEntity);
-            $config = $this->getConfigManager()->getProvider('attachment')->getConfig($entityClass, $fieldName);
+            $config = $this->getConfigManager()->getFieldConfig('attachment', $entityClass, $fieldName);
 
             return $this->getResizedImageUrl($file, $config->get('width'), $config->get('height'));
         }
@@ -259,7 +236,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         $fieldName = $file->getParentEntityFieldName();
 
         if ($entityClass && $fieldName) {
-            $config = $this->getConfigManager()->getProvider('attachment')->getConfig($entityClass, $fieldName);
+            $config = $this->getConfigManager()->getFieldConfig('attachment', $entityClass, $fieldName);
             $width = $config->get('width');
             $height = $config->get('height');
         }
@@ -333,7 +310,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
      *
      * @return File
      */
-    protected function getFileById($id)
+    private function getFileById($id)
     {
         return $this->getDoctrine()->getRepository(File::class)->find($id);
     }
@@ -355,5 +332,28 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             PropertyAccessorInterface::class,
             FileTitleProviderInterface::class,
         ];
+    }
+
+    private function getAttachmentManager(): AttachmentManager
+    {
+        if (null === $this->attachmentManager) {
+            $this->attachmentManager = $this->container->get(AttachmentManager::class);
+        }
+
+        return $this->attachmentManager;
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        if (null === $this->configManager) {
+            $this->configManager = $this->container->get(ConfigManager::class);
+        }
+
+        return $this->configManager;
+    }
+
+    private function getDoctrine(): ManagerRegistry
+    {
+        return $this->container->get(ManagerRegistry::class);
     }
 }

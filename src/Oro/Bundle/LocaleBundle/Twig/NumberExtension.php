@@ -27,20 +27,12 @@ use Twig\TwigFunction;
  */
 class NumberExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?NumberFormatter $numberFormatter = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return NumberFormatter
-     */
-    protected function getNumberFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.number');
     }
 
     /**
@@ -49,22 +41,10 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     public function getFunctions()
     {
         return [
-            new TwigFunction(
-                'oro_locale_number_attribute',
-                [$this, 'getAttribute']
-            ),
-            new TwigFunction(
-                'oro_locale_number_text_attribute',
-                [$this, 'getTextAttribute']
-            ),
-            new TwigFunction(
-                'oro_locale_number_symbol',
-                [$this, 'getSymbol']
-            ),
-            new TwigFunction(
-                'oro_currency_symbol_prepend',
-                [$this, 'isCurrencySymbolPrepend']
-            )
+            new TwigFunction('oro_locale_number_attribute', [$this, 'getAttribute']),
+            new TwigFunction('oro_locale_number_text_attribute', [$this, 'getTextAttribute']),
+            new TwigFunction('oro_locale_number_symbol', [$this, 'getSymbol']),
+            new TwigFunction('oro_currency_symbol_prepend', [$this, 'isCurrencySymbolPrepend'])
         ];
     }
 
@@ -74,35 +54,13 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     public function getFilters()
     {
         return [
-            new TwigFilter(
-                'oro_format_number',
-                [$this, 'format']
-            ),
-            new TwigFilter(
-                'oro_format_currency',
-                [$this, 'formatCurrency'],
-                ['is_safe' => ['html']]
-            ),
-            new TwigFilter(
-                'oro_format_decimal',
-                [$this, 'formatDecimal']
-            ),
-            new TwigFilter(
-                'oro_format_percent',
-                [$this, 'formatPercent']
-            ),
-            new TwigFilter(
-                'oro_format_spellout',
-                [$this, 'formatSpellout']
-            ),
-            new TwigFilter(
-                'oro_format_duration',
-                [$this, 'formatDuration']
-            ),
-            new TwigFilter(
-                'oro_format_ordinal',
-                [$this, 'formatOrdinal']
-            ),
+            new TwigFilter('oro_format_number', [$this, 'format']),
+            new TwigFilter('oro_format_currency', [$this, 'formatCurrency'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_format_decimal', [$this, 'formatDecimal']),
+            new TwigFilter('oro_format_percent', [$this, 'formatPercent']),
+            new TwigFilter('oro_format_spellout', [$this, 'formatSpellout']),
+            new TwigFilter('oro_format_duration', [$this, 'formatDuration']),
+            new TwigFilter('oro_format_ordinal', [$this, 'formatOrdinal']),
         ];
     }
 
@@ -177,13 +135,14 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function format($value, $style, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->format($value, $style, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->format(
+            $value,
+            $style,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -214,14 +173,14 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function formatCurrency($value, array $options = [])
     {
-        $currency = $this->getOption($options, 'currency');
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        $formattedValue = $this->getNumberFormatter()
-            ->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+        $formattedValue = $this->getNumberFormatter()->formatCurrency(
+            $value,
+            $options['currency'] ?? null,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
 
         return strip_tags($formattedValue);
     }
@@ -253,13 +212,13 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function formatDecimal($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatDecimal($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatDecimal(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -289,13 +248,13 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function formatPercent($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatPercent($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatPercent(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -325,13 +284,13 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function formatSpellout($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatSpellout($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatSpellout(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -362,14 +321,14 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function formatDuration($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-        $default = $this->getOption($options, 'default', false);
-
-        return $this->getNumberFormatter()
-            ->formatDuration($value, $attributes, $textAttributes, $symbols, $locale, $default);
+        return $this->getNumberFormatter()->formatDuration(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null,
+            $options['default'] ?? false
+        );
     }
 
     /**
@@ -399,13 +358,13 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function formatOrdinal($value, array $options = [])
     {
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        return $this->getNumberFormatter()
-            ->formatOrdinal($value, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()->formatOrdinal(
+            $value,
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
     }
 
     /**
@@ -420,20 +379,6 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     }
 
     /**
-     * Gets option or default value if option not exist
-     *
-     * @param array  $options
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    protected function getOption(array $options, $name, $default = null)
-    {
-        return $options[$name] ?? $default;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()
@@ -441,5 +386,14 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
         return [
             'oro_locale.formatter.number' => NumberFormatter::class,
         ];
+    }
+
+    private function getNumberFormatter(): NumberFormatter
+    {
+        if (null === $this->numberFormatter) {
+            $this->numberFormatter = $this->container->get('oro_locale.formatter.number');
+        }
+
+        return $this->numberFormatter;
     }
 }
