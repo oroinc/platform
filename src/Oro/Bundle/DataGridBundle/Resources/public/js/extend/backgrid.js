@@ -105,5 +105,22 @@ define(function(require) {
         return Backgrid.callByNeed(this.column.editable(), this.column, this.model);
     };
 
+    Backgrid.Cell.prototype.setAriaAttrs = function() {
+        if (this.disposed) {
+            return;
+        }
+
+        const {collection, cid} = this.column || {};
+        let rowIndex = -1;
+
+        if (collection && collection.length) {
+            rowIndex = collection.findIndex(model => model.cid === cid);
+        }
+
+        if (rowIndex !== -1) {
+            this.$el.attr('aria-colindex', rowIndex + 1);
+        }
+    };
+
     return Backgrid;
 });

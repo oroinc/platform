@@ -5,6 +5,7 @@ define(function(require) {
     const Backgrid = require('backgrid');
     const textUtil = require('oroui/js/tools/text-util');
     const HintView = require('orodatagrid/js/app/views/hint-view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/grid-header-cell.html');
 
     /**
      * Datagrid header cell
@@ -14,20 +15,10 @@ define(function(require) {
      * @extends Backgrid.HeaderCell
      */
     const HeaderCell = Backgrid.HeaderCell.extend({
+        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
 
         /** @property */
-        template: _.template(
-            '<% if (sortable) { %>' +
-                '<a class="grid-header-cell__link" href="#" role="button" data-grid-header-cell-label>' +
-                    '<span class="grid-header-cell__label" data-grid-header-cell-text><%- label %></span>' +
-                    '<span class="sortable-icon" aria-hidden="true"></span>' +
-                '</a>' +
-            '<% } else { %>' +
-                '<span class="grid-header-cell__label-container" data-grid-header-cell-label>' +
-                    '<span class="grid-header-cell__label" data-grid-header-cell-text><%- label %></span>' +
-                '</span>' +
-            '<% } %>'
-        ),
+        template: template,
 
         /** @property {Boolean} */
         allowNoSorting: true,
@@ -63,6 +54,7 @@ define(function(require) {
             HeaderCell.__super__.initialize.call(this, options);
             this._initCellDirection(this.collection);
             this.listenTo(this.collection, 'reset', this._initCellDirection);
+            this.listenTo(this.column, 'change:direction', this.syncAriaSortAttr);
         },
 
         /**
@@ -101,6 +93,11 @@ define(function(require) {
                         direction = 'ascending';
                     }
                 }
+
+                if (this.column.get('sortable')) {
+                    this.syncAriaSortAttr(this.column, direction);
+                }
+
                 if (direction !== this.column.get('direction')) {
                     this.column.set({direction: direction});
                 }
@@ -130,6 +127,7 @@ define(function(require) {
                 label: label,
                 sortable: this.column.get('sortable')
             }));
+            this.setAriaAttrs();
 
             if (this.column.has('width')) {
                 this.$el.width(this.column.get('width'));
@@ -266,6 +264,18 @@ define(function(require) {
             delete this.hintTimeout;
             if (this.subview('hint')) {
                 this.removeSubview('hint');
+            }
+        },
+
+        /**
+         * @param {Object} column
+         * @param {null|string} direction
+         */
+        syncAriaSortAttr(column, direction) {
+            const ariaSort = direction ? direction : 'none';
+
+            if (column.cid === this.column.cid) {
+                this.$el.attr('aria-sort', ariaSort);
             }
         }
     });

@@ -14,6 +14,8 @@ define(function(require) {
      * @extends BaseView
      */
     const SelectRowCell = BaseView.extend({
+        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
+
         /** @property */
         className: 'select-row-cell renderable',
 
@@ -103,6 +105,7 @@ define(function(require) {
             this.$el.html(this.template({
                 checked: state.selected
             }));
+            this.setAriaAttrs();
             this.$checkbox = this.$el.find(this.checkboxSelector);
 
             this.$checkbox.inputWidget('isInitialized')

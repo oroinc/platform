@@ -1,11 +1,10 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid',
-    './footer/footer-row',
-    './footer/footer-cell'
-], function(_, Backbone, Backgrid, FooterRow, FooterCell) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const FooterRow = require('./footer/footer-row');
+    const FooterCell = require('./footer/footer-cell');
 
     /**
      * Datagrid footer widget
@@ -45,8 +44,7 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['themeOptions']));
-
+            _.extend(this, _.pick(options, ['themeOptions', 'gridRowsCounter']));
             this.rows = [];
             if (!options.collection) {
                 throw new TypeError('"collection" is required');
@@ -61,13 +59,16 @@ define([
             const state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
+                let ariaRowIndex = this.gridRowsCounter.getHeaderRowsCount() + this.gridRowsCounter.getTotalRowsCount();
                 _.each(state.totals, function(total, rowName) {
+                    ariaRowIndex++;
                     this.rows[this.rows.length] = new this.row({
                         columns: this.columns,
                         collection: this.filteredColumns,
                         dataCollection: this.collection,
                         footerCell: this.footerCell,
-                        rowName: rowName
+                        rowName,
+                        ariaRowIndex
                     });
                 }, this);
             }
@@ -86,6 +87,7 @@ define([
             delete this.rows;
             delete this.columns;
             delete this.filteredColumns;
+            delete this.gridRowsCounter;
             Footer.__super__.dispose.call(this);
         },
 
@@ -99,8 +101,26 @@ define([
                     this.$el.append(row.$el);
                 }, this);
             }
+            this.setAriaAttrs();
             this.delegateEvents();
             return this;
+        },
+
+        setAriaAttrs() {
+            if (this.disposed) {
+                return;
+            }
+
+            this.$el.attr('aria-hidden', this.renderable ? null : true);
+        },
+
+        /**
+         * Get a number of rendered rows in a footer
+         *
+         * @return {number}
+         */
+        getRowsCount() {
+            return this.rows.length;
         }
     });
 
