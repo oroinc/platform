@@ -26,27 +26,23 @@ class ConfigurationPass implements CompilerPassInterface
     private const THEME_CONFIG_SERVICE = 'oro_layout.theme_extension.configuration';
     private const THEME_CONFIG_EXTENSION_TAG_NAME = 'layout.theme_config_extension';
 
-    /** @var array */
-    private $servicesForServiceLocator = [];
-
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
+        $servicesForServiceLocator = [];
         $this->registerRenderers($container);
         $this->registerThemeConfigExtensions($container);
-        $this->configureLayoutExtension($container);
+        $this->configureLayoutExtension($container, $servicesForServiceLocator);
 
         // Adds services stored in servicesForServiceLocator to serviceLocator
         // which intend to be used instead of the container
         $container->getDefinition('oro_layout.layout.service_locator')
-            ->replaceArgument(0, $this->servicesForServiceLocator);
-
-        $this->servicesForServiceLocator = [];
+            ->replaceArgument(0, $servicesForServiceLocator);
     }
 
-    private function registerRenderers(ContainerBuilder $container)
+    private function registerRenderers(ContainerBuilder $container): void
     {
         $factoryBuilderDef = $container->getDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE);
         if ($container->hasDefinition(self::PHP_RENDERER_SERVICE)) {
@@ -63,7 +59,7 @@ class ConfigurationPass implements CompilerPassInterface
         }
     }
 
-    private function registerThemeConfigExtensions(ContainerBuilder $container)
+    private function registerThemeConfigExtensions(ContainerBuilder $container): void
     {
         $themeConfigurationDef = $container->getDefinition(self::THEME_CONFIG_SERVICE);
         foreach ($container->findTaggedServiceIds(self::THEME_CONFIG_EXTENSION_TAG_NAME) as $id => $attributes) {
@@ -74,16 +70,16 @@ class ConfigurationPass implements CompilerPassInterface
     /**
      * Registers block types, block type extensions and layout updates
      */
-    private function configureLayoutExtension(ContainerBuilder $container)
+    private function configureLayoutExtension(ContainerBuilder $container, array &$servicesForServiceLocator): void
     {
-        $blockTypes = $this->getBlockTypes($container);
-        $dataProviders = $this->getDataProviders($container);
+        $blockTypes = $this->getBlockTypes($container, $servicesForServiceLocator);
+        $dataProviders = $this->getDataProviders($container, $servicesForServiceLocator);
 
         $extensionDef = $container->getDefinition(self::LAYOUT_EXTENSION_SERVICE);
         $extensionDef->replaceArgument(1, $blockTypes);
-        $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container));
-        $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container));
-        $extensionDef->replaceArgument(4, $this->getContextConfigurators($container));
+        $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container, $servicesForServiceLocator));
+        $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container, $servicesForServiceLocator));
+        $extensionDef->replaceArgument(4, $this->getContextConfigurators($container, $servicesForServiceLocator));
         $extensionDef->replaceArgument(5, $dataProviders);
 
         $commandDef = $container->getDefinition(DebugCommand::class);
@@ -91,12 +87,7 @@ class ConfigurationPass implements CompilerPassInterface
         $commandDef->replaceArgument(3, array_keys($dataProviders));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getBlockTypes(ContainerBuilder $container)
+    private function getBlockTypes(ContainerBuilder $container, array &$servicesForServiceLocator): array
     {
         $types = [];
         foreach ($container->findTaggedServiceIds(self::BLOCK_TYPE_TAG_NAME) as $serviceId => $tag) {
@@ -109,18 +100,13 @@ class ConfigurationPass implements CompilerPassInterface
             $alias = $tag[0]['alias'];
             $types[$alias] = $serviceId;
 
-            $this->addServiceToServiceLocator($serviceId);
+            $servicesForServiceLocator[$serviceId] = new Reference($serviceId);
         }
 
         return $types;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getBlockTypeExtensions(ContainerBuilder $container)
+    private function getBlockTypeExtensions(ContainerBuilder $container, array &$servicesForServiceLocator): array
     {
         $typeExtensions = [];
         foreach ($container->findTaggedServiceIds(self::BLOCK_TYPE_EXTENSION_TAG_NAME) as $serviceId => $tag) {
@@ -135,7 +121,7 @@ class ConfigurationPass implements CompilerPassInterface
 
             $typeExtensions[$alias][$priority][] = $serviceId;
 
-            $this->addServiceToServiceLocator($serviceId);
+            $servicesForServiceLocator[$serviceId] = new Reference($serviceId);
         }
         foreach ($typeExtensions as $key => $items) {
             ksort($items);
@@ -145,12 +131,7 @@ class ConfigurationPass implements CompilerPassInterface
         return $typeExtensions;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getLayoutUpdates(ContainerBuilder $container)
+    private function getLayoutUpdates(ContainerBuilder $container, array &$servicesForServiceLocator): array
     {
         $layoutUpdates = [];
         foreach ($container->findTaggedServiceIds(self::LAYOUT_UPDATE_TAG_NAME) as $serviceId => $tag) {
@@ -165,7 +146,7 @@ class ConfigurationPass implements CompilerPassInterface
 
             $layoutUpdates[$id][$priority][] = $serviceId;
 
-            $this->addServiceToServiceLocator($serviceId);
+            $servicesForServiceLocator[$serviceId] = new Reference($serviceId);
         }
         foreach ($layoutUpdates as $key => $items) {
             ksort($items);
@@ -175,12 +156,7 @@ class ConfigurationPass implements CompilerPassInterface
         return $layoutUpdates;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getContextConfigurators(ContainerBuilder $container)
+    private function getContextConfigurators(ContainerBuilder $container, array &$servicesForServiceLocator): array
     {
         $configurators = [];
         foreach ($container->findTaggedServiceIds(self::CONTEXT_CONFIGURATOR_TAG_NAME) as $serviceId => $tag) {
@@ -188,7 +164,7 @@ class ConfigurationPass implements CompilerPassInterface
 
             $configurators[$priority][] = $serviceId;
 
-            $this->addServiceToServiceLocator($serviceId);
+            $servicesForServiceLocator[$serviceId] = new Reference($serviceId);
         }
         if (!empty($configurators)) {
             ksort($configurators);
@@ -198,12 +174,7 @@ class ConfigurationPass implements CompilerPassInterface
         return $configurators;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getDataProviders(ContainerBuilder $container)
+    private function getDataProviders(ContainerBuilder $container, array &$servicesForServiceLocator): array
     {
         $dataProviders = [];
         foreach ($container->findTaggedServiceIds(self::DATA_PROVIDER_TAG_NAME) as $serviceId => $tags) {
@@ -218,14 +189,9 @@ class ConfigurationPass implements CompilerPassInterface
                 $dataProviders[$alias] = $serviceId;
             }
 
-            $this->addServiceToServiceLocator($serviceId);
+            $servicesForServiceLocator[$serviceId] = new Reference($serviceId);
         }
 
         return $dataProviders;
-    }
-
-    private function addServiceToServiceLocator(string $serviceId): void
-    {
-        $this->servicesForServiceLocator[$serviceId] = new Reference($serviceId);
     }
 }

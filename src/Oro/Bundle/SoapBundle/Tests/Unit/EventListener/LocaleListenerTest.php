@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Tests\EventListener;
+namespace Oro\Bundle\SoapBundle\Tests\Unit\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\SoapBundle\EventListener\LocaleListener;

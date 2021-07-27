@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

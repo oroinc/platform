@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Model\Condition;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Model\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;

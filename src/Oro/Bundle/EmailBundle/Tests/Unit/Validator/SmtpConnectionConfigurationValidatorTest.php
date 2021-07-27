@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Validators;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;

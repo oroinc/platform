@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Form\Type\GenderType;
 use Oro\Bundle\UserBundle\Model\Gender;

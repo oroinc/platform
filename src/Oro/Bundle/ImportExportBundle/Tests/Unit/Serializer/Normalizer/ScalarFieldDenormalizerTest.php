@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\ConfigExpression;
 
 use Oro\Bundle\LayoutBundle\ConfigExpression\GetContextValue;
 use Oro\Component\ConfigExpression\ContextAccessor;

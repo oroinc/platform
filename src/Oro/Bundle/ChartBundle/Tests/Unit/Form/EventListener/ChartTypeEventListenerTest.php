@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener;
 use Symfony\Component\Form\FormEvents;

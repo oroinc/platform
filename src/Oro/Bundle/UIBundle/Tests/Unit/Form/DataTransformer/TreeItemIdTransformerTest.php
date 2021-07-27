@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ShoppingListBundle\Tests\Unit\Form\DataTransformer;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\UIBundle\Form\DataTransformer\TreeItemIdTransformer;
 

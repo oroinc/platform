@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Unit\Datagrid\Action;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Action;
 
 use Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;

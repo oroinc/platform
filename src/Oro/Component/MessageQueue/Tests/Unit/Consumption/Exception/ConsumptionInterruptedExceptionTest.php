@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
+namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Exception;
 
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
 use Oro\Component\MessageQueue\Consumption\Exception\ExceptionInterface;

@@ -11,19 +11,45 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Normalizer for layout block view
+ * Normalizer for layout block view.
  */
 class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
-    /**
-     * @var BlockView[]
-     */
+    private const ID = 'id';
+    private const BLOCK_TYPE = 'block_type';
+    private const BLOCK_PREFIXES = 'block_prefixes';
+    private const BLOCK = 'block';
+    private const BLOCKS = 'blocks';
+
+    private const DENORMALIZE_RECURSIVE_CALL = 'blockViewDenormalizeRecursiveCall';
+
+    private const DATA_KEYS = 'k';
+    private const DATA_VARS = 'v';
+    private const DATA_CHILDREN = 'c';
+    private const DATA_TYPE = 't';
+    private const DATA_VALUE = 'v';
+
+    /** @var BlockViewVarsNormalizerInterface */
+    private $varsNormalizer;
+
+    /** @var TypeNameConverter */
+    private $typeNameConverter;
+
+    /** @var BlockView[] */
     private $currentDenormalizedViews = [];
 
-    /**
-     * @var NormalizerInterface|DenormalizerInterface
-     */
+    /** @var NormalizerInterface|DenormalizerInterface */
     protected $serializer;
+
+    public function setVarsNormalizer(BlockViewVarsNormalizerInterface $varsNormalizer): void
+    {
+        $this->varsNormalizer = $varsNormalizer;
+    }
+
+    public function setTypeNameConverter(TypeNameConverter $typeNameConverter): void
+    {
+        $this->typeNameConverter = $typeNameConverter;
+    }
 
     /**
      * {@inheritdoc}
@@ -50,36 +76,42 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        /** @var BlockView $view */
-        $view = $object;
+        /** @var BlockView $object */
 
         $data = [];
 
-        if (!empty($view->vars)) {
-            $data['vars'] = $view->vars;
-            $this->unsetDefaults($data);
-
+        if (!empty($object->vars)) {
+            $dataToUnsetDefaults = ['vars' => $object->vars];
+            $this->unsetDefaults($dataToUnsetDefaults);
+            $vars = $dataToUnsetDefaults['vars'];
+            $this->varsNormalizer->normalize($vars, $context);
             array_walk_recursive(
-                $data['vars'],
+                $vars,
                 function (&$var) use ($format, $context) {
-                    if (is_object($var)) {
+                    if (\is_object($var)) {
                         if ($var instanceof BlockView) {
                             throw new UnexpectedBlockViewVarTypeException(
                                 'BlockView vars cannot contain link to another BlockView'
                             );
                         }
 
+                        $className = \get_class($var);
                         $var = [
-                            'type' => get_class($var),
-                            'value' => $this->serializer->normalize($var, $format, $context),
+                            self::DATA_TYPE => $this->typeNameConverter->getShortTypeName($className) ?? $className,
+                            self::DATA_VALUE => $this->serializer->normalize($var, $format, $context),
                         ];
                     }
                 }
             );
+            $data[self::DATA_KEYS] = [$vars[self::ID], $vars[self::BLOCK_TYPE], $vars[self::BLOCK_PREFIXES] ?? []];
+            unset($vars[self::ID], $vars[self::BLOCK_TYPE], $vars[self::BLOCK_PREFIXES]);
+            if (!empty($vars)) {
+                $data[self::DATA_VARS] = $vars;
+            }
         }
 
-        foreach ($view->children as $childId => $childView) {
-            $data['children'][] = $this->normalize($childView, $format, $context);
+        foreach ($object->children as $childView) {
+            $data[self::DATA_CHILDREN][] = $this->normalize($childView, $format, $context);
         }
 
         return $data;
@@ -90,34 +122,34 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function supportsDenormalization($data, $type, $format = null): bool
     {
-        return $type === BlockView::class;
+        return BlockView::class === $type;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
         $view = new BlockView();
-        $view->vars['id'] = $data['vars']['id'];
+        [$id, $blockType, $blockPrefixes] = $data[self::DATA_KEYS];
 
-        $recursiveCall = array_key_exists('blockViewDenormalizeRecursiveCall', $context);
+        $recursiveCall = \array_key_exists(self::DENORMALIZE_RECURSIVE_CALL, $context);
         if (!$recursiveCall) {
-            $context['blockViewDenormalizeRecursiveCall'] = true;
-            $this->currentDenormalizedViews = [
-                $view->getId() => $view
-            ];
+            $context[self::DENORMALIZE_RECURSIVE_CALL] = true;
+            $this->currentDenormalizedViews = [$id => $view];
         }
 
-        if (array_key_exists('vars', $data)) {
-            $view->vars = $data['vars'];
-            $this->denormalizeVarRecursive($view->vars, $format, $context);
-        }
+        $view->vars = $data[self::DATA_VARS] ?? [];
+        $view->vars[self::ID] = $id;
+        $view->vars[self::BLOCK_TYPE] = $blockType;
+        $view->vars[self::BLOCK_PREFIXES] = $blockPrefixes;
+        $this->denormalizeVarRecursive($view->vars, $format, $context);
         $this->populateDefaults($view);
+        $this->varsNormalizer->denormalize($view->vars, $context);
 
-        if (array_key_exists('children', $data)) {
-            foreach ($data['children'] as $childData) {
-                $childView = $this->denormalize($childData, $class, $format, $context);
+        if (\array_key_exists(self::DATA_CHILDREN, $data)) {
+            foreach ($data[self::DATA_CHILDREN] as $childData) {
+                $childView = $this->denormalize($childData, $type, $format, $context);
                 $childId = $childView->getId();
                 $childView->parent = $view;
 
@@ -136,47 +168,18 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
 
     protected function unsetDefaults(array &$data): void
     {
-        unset($data['vars']['block'], $data['vars']['blocks']);
-        if (array_key_exists('visible', $data['vars']) && $data['vars']['visible'] === true) {
-            unset($data['vars']['visible']);
-        }
-        if (array_key_exists('hidden', $data['vars']) && $data['vars']['hidden'] === false) {
-            unset($data['vars']['hidden']);
-        }
-        if (array_key_exists('attr', $data['vars']) && empty($data['vars']['attr'])) {
-            unset($data['vars']['attr']);
-        }
-        if (array_key_exists('translation_domain', $data['vars']) &&
-            $data['vars']['translation_domain'] === 'messages') {
-            unset($data['vars']['translation_domain']);
-        }
+        unset($data['vars'][self::BLOCK], $data['vars'][self::BLOCKS]);
     }
 
     protected function populateDefaults(BlockView $view): void
     {
-        if (!array_key_exists('visible', $view->vars)) {
-            $view->vars['visible'] = true;
-        }
-        if (!array_key_exists('hidden', $view->vars)) {
-            $view->vars['hidden'] = false;
-        }
-        if (!array_key_exists('attr', $view->vars)) {
-            $view->vars['attr'] = [];
-        }
-        if (!array_key_exists('translation_domain', $view->vars)) {
-            $view->vars['translation_domain'] = 'messages';
-        }
     }
 
-    /**
-     * @param BlockView           $view
-     * @param BlockViewCollection $blocks
-     */
     protected function setBlocksRecursive($view, BlockViewCollection $blocks)
     {
         $view->blocks = $blocks;
-        $view->vars['block'] = $view;
-        $view->vars['blocks'] = $blocks;
+        $view->vars[self::BLOCK] = $view;
+        $view->vars[self::BLOCKS] = $blocks;
 
         foreach ($view->children as $childView) {
             $this->setBlocksRecursive($childView, $blocks);
@@ -191,14 +194,18 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     protected function denormalizeVarRecursive(array &$var, $format, array $context)
     {
-        foreach ($var as $key => &$value) {
-            if (is_array($value)) {
-                if (array_key_exists('type', $value) && class_exists($value['type'])) {
-                    $value = $this->serializer->denormalize($value['value'], $value['type'], $format, $context);
-                } else {
-                    $this->denormalizeVarRecursive($value, $format, $context);
+        foreach ($var as &$value) {
+            if (!\is_array($value)) {
+                continue;
+            }
+            if (\array_key_exists(self::DATA_TYPE, $value)) {
+                $type = $this->typeNameConverter->getTypeName($value[self::DATA_TYPE]) ?? $value[self::DATA_TYPE];
+                if (class_exists($type)) {
+                    $value = $this->serializer->denormalize($value[self::DATA_VALUE], $type, $format, $context);
+                    continue;
                 }
             }
+            $this->denormalizeVarRecursive($value, $format, $context);
         }
     }
 }

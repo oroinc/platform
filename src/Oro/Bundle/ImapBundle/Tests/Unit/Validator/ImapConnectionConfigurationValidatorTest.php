@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Validator\Constraints;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;

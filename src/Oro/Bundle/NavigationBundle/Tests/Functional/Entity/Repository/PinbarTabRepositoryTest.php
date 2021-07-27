@@ -4,17 +4,14 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository;
+use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\NavigationItemData;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\PinbarTabData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class PinbarTabRepositoryTest extends WebTestCase
 {
-    use UserUtilityTrait;
-
-    /** @var PinbarTabRepository */
-    private $repository;
+    private PinbarTabRepository $repository;
 
     protected function setUp(): void
     {
@@ -25,18 +22,19 @@ class PinbarTabRepositoryTest extends WebTestCase
             ->get('oro_entity.doctrine_helper')
             ->getEntityRepositoryForClass(PinbarTab::class);
 
-        $this->loadFixtures([
-            PinbarTabData::class
-        ]);
+        $this->loadFixtures(
+            [
+                PinbarTabData::class,
+            ]
+        );
     }
 
     /**
-     * @dataProvider countNavigationItemsDataProvider
+     * @dataProvider countNavigationItemsWhenNoItemsDataProvider
      */
-    public function testCountNavigationItems(string $url, int $expectedCount): void
+    public function testCountNavigationItemsWhenNoItems(string $url, int $expectedCount): void
     {
-        $manager = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManagerForClass(User::class);
-        $user = $this->getFirstUser($manager);
+        $user = $this->getReference(LoadUserData::USER_NAME_2);
 
         self::assertEquals(
             $expectedCount,
@@ -44,26 +42,42 @@ class PinbarTabRepositoryTest extends WebTestCase
         );
     }
 
-    public function countNavigationItemsDataProvider(): array
+    public function countNavigationItemsWhenNoItemsDataProvider(): array
     {
         return [
             ['/sample-url', 0],
-            ['/admin/user', 1],
             ['', 0],
         ];
     }
 
+    public function testCountNavigationItems(): void
+    {
+        $user = $this->getReference(LoadUserData::USER_NAME_2);
+        $url = $this->getReference(NavigationItemData::NAVIGATION_ITEM_PINBAR_1)->getUrl();
+
+        self::assertEquals(
+            1,
+            $this->repository->countNavigationItems($url, $user, $user->getOrganization(), 'pinbar')
+        );
+    }
+
     public function testGetNavigationItems(): void
     {
-        $manager = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManagerForClass(User::class);
-        $user = $this->getFirstUser($manager);
+        $user = $this->getReference(LoadUserData::USER_NAME_2);
 
         $pinbarItems = $this->repository->getNavigationItems($user, $user->getOrganization(), 'pinbar');
 
         self::assertCount(3, $pinbarItems);
-        self::assertEquals('/admin/config/system', $pinbarItems[0]['url']);
+
+        self::assertEquals(
+            $this->getReference(NavigationItemData::NAVIGATION_ITEM_PINBAR_1)->getUrl(),
+            $pinbarItems[0]['url']
+        );
         self::assertEquals('Configuration', $pinbarItems[0]['title_rendered_short']);
-        self::assertEquals('/admin/user', $pinbarItems[2]['url']);
+        self::assertEquals(
+            $this->getReference(NavigationItemData::NAVIGATION_ITEM_PINBAR_3)->getUrl(),
+            $pinbarItems[2]['url']
+        );
         self::assertEquals('User', $pinbarItems[2]['title_rendered_short']);
     }
 
@@ -72,8 +86,7 @@ class PinbarTabRepositoryTest extends WebTestCase
      */
     public function testCountPinbarTabDuplicatedTitles(string $titleShort, int $expectedCount): void
     {
-        $manager = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManagerForClass(User::class);
-        $user = $this->getFirstUser($manager);
+        $user = $this->getReference(LoadUserData::USER_NAME_2);
 
         self::assertEquals(
             $expectedCount,

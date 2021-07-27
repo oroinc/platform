@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ReminderBundle\Tests\Unit;
+namespace Oro\Bundle\ReminderBundle\Tests\Unit\Command;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;

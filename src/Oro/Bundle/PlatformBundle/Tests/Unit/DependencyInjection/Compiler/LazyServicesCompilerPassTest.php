@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
+use Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

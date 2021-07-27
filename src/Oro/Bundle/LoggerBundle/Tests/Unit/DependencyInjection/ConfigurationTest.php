@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
