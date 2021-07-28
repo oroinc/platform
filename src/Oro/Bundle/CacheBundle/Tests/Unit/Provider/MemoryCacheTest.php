@@ -45,5 +45,11 @@ class MemoryCacheTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->memoryCache->get('key1'));
         self::assertFalse($this->memoryCache->has('key2'));
         self::assertNull($this->memoryCache->get('key2'));
+
+        $this->memoryCache->set('key1', 1);
+        self::assertTrue($this->memoryCache->has('key1'));
+        $this->memoryCache->reset();
+        self::assertFalse($this->memoryCache->has('key1'));
+        self::assertNull($this->memoryCache->get('key1'));
     }
 }

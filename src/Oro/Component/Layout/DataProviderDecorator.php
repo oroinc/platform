@@ -3,7 +3,7 @@
 namespace Oro\Component\Layout;
 
 /**
- * The data provider decorator that allows calls methods that name starts with "get", "has", "is".
+ * The data provider decorator that allows to call methods that have name starts with "get", "has", "is".
  */
 class DataProviderDecorator
 {
