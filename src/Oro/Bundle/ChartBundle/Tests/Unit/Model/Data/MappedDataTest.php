@@ -12,9 +12,7 @@ class MappedDataTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage(
-            'Neither the property "unknownProperty" nor one of the methods "getUnknownProperty()",'
-            . ' "unknownProperty()", "isUnknownProperty()", "hasUnknownProperty()", "__get()" exist'
-            .' and have public access in class "'
+            'Can\'t get a way to read the property "unknownProperty" in class "'
         );
 
         $mapping = ['label' => 'unknownProperty'];

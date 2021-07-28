@@ -137,7 +137,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     /**
      * {@inheritdoc}
      */
-    public function setEntityName($entityName)
+    public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
     }

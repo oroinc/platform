@@ -44,10 +44,14 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $this->translator
             ->expects($this->exactly(3))
             ->method('trans')
-            ->will($this->returnValueMap([
-                ['test.title', [], null, 'en', 'EN Test Title'],
-                ['test.title', [], null, 'de', 'DE Test Title'],
-            ]));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['test.title', [], null, 'en', 'EN Test Title'],
+                        ['test.title', [], null, 'de', 'DE Test Title'],
+                    ]
+                )
+            );
 
         $enLocalization = new Localization();
         $enLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'en']));
@@ -58,10 +62,14 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $this->localizationHelper
             ->expects($this->once())
             ->method('getLocalizations')
-            ->will($this->returnValue([
-                $enLocalization,
-                $deLocalization
-            ]));
+            ->will(
+                $this->returnValue(
+                    [
+                        $enLocalization,
+                        $deLocalization,
+                    ]
+                )
+            );
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
 
@@ -109,9 +117,7 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
             ->expects($this->never())
             ->method('getLocalizations');
 
-        $message = 'Neither the property "undefined_names" nor one of the methods "getUndefinedNames()",';
-        $message .= ' "undefinedNames()", "isUndefinedNames()", "hasUndefinedNames()", "__get()" exist and have public';
-        $message .= ' access in class "Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub".';
+        $message = 'Can\'t get a way to read the property "undefined_names" in class "' . MenuUpdateStub::class . '".';
 
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage($message);

@@ -3,7 +3,10 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
+use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,7 +22,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
+        $this->serializer = $this->createMock(Serializer::class);
         $this->normalizer = new CollectionNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -29,14 +32,14 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Serializer must implement');
 
-        $this->normalizer->setSerializer($this->createMock('Symfony\Component\Serializer\SerializerInterface'));
+        $this->normalizer->setSerializer($this->createMock(SerializerInterface::class));
     }
 
     public function testSupportsNormalization()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
 
-        $collection = $this->createMock('Doctrine\Common\Collections\Collection');
+        $collection = $this->createMock(Collection::class);
         $this->assertTrue($this->normalizer->supportsNormalization($collection));
     }
 
@@ -53,7 +56,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         return array(
             array('stdClass', false),
             array('ArrayCollection', true),
-            array('Doctrine\Common\Collections\ArrayCollection', true),
+            array(ArrayCollection::class, true),
             array('Doctrine\Common\Collections\ArrayCollection<Foo>', true),
             array('Doctrine\Common\Collections\ArrayCollection<Foo\Bar\Baz>', true),
             array('ArrayCollection<ArrayCollection<Foo\Bar\Baz>>', true),
@@ -91,7 +94,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->serializer->expects($this->never())->method($this->anything());
         $this->assertEquals(
             new ArrayCollection(),
-            $this->normalizer->denormalize('string', null)
+            $this->normalizer->denormalize('string', '')
         );
     }
 

@@ -427,7 +427,7 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
                 'value'     => 'test',
                 'exception' => [
                     NoSuchPropertyException::class,
-                    'Neither the property "not_exists" nor one of the methods '
+                    'Can\'t get a way to read the property "not_exists"'
                 ]
             ],
             'protected'  => [

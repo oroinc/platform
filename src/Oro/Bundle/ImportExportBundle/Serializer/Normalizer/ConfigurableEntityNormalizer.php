@@ -7,10 +7,12 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Normalized data based on entity fields config
@@ -20,16 +22,16 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
-    const FULL_MODE  = 'full';
+    const FULL_MODE = 'full';
     const SHORT_MODE = 'short';
 
-    /** @var SerializerInterface|NormalizerInterface|DenormalizerInterface */
+    /** @var SerializerInterface|ContextAwareNormalizerInterface|ContextAwareDenormalizerInterface */
     protected $serializer;
 
     /** @var FieldHelper */
     protected $fieldHelper;
 
-    /** @var DenormalizerInterface */
+    /** @var ContextAwareDenormalizerInterface */
     protected $scalarFieldDenormalizer;
 
     /** @var EventDispatcherInterface */
@@ -42,12 +44,12 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         parent::__construct([self::FULL_MODE, self::SHORT_MODE], self::FULL_MODE);
     }
 
-    public function setScalarFieldDenormalizer(DenormalizerInterface $scalarFieldDenormalizer)
+    public function setScalarFieldDenormalizer(ContextAwareDenormalizerInterface $scalarFieldDenormalizer): void
     {
         $this->scalarFieldDenormalizer = $scalarFieldDenormalizer;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -55,14 +57,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $result = $this->dispatchDenormalizeEvent(
             $data,
-            $this->createObject($class),
+            $this->createObject($type),
             Events::BEFORE_DENORMALIZE_ENTITY
         );
-        $fields = $this->fieldHelper->getFields($class, true);
+        $fields = $this->fieldHelper->getFields($type, true);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
@@ -89,7 +91,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                     }
                     $value = $this->serializer->denormalize($value, $entityClass, $format, $fieldContext);
                 } else {
-                    $fieldContext['className'] = $class;
+                    $fieldContext['className'] = $type;
                     $value = $this->tryDenormalizesValueAsScalar($field, $fieldContext, $value, $format);
                 }
             }
@@ -103,10 +105,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * Try denormalizes data back into internal representation of datatype in php
      *
-     * @param array  $fieldConfig Field configuration
-     * @param array  $context     Options available to the denormalizer
-     * @param mixed  $value       Value to convert
-     * @param string $format      Format the given data was extracted from
+     * @param array $fieldConfig Field configuration
+     * @param array $context Options available to the denormalizer
+     * @param mixed $value Value to convert
+     * @param string $format Format the given data was extracted from
      *
      * @return mixed
      */
@@ -133,24 +135,25 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      * Method can be overridden in normalizers for specific classes
      *
      * @param string $class
+     *
      * @return object
      */
-    protected function createObject($class)
+    protected function createObject(string $class)
     {
-        $reflection  = new \ReflectionClass($class);
+        $reflection = new \ReflectionClass($class);
         $constructor = $reflection->getConstructor();
 
         if ($constructor && $constructor->getNumberOfRequiredParameters() > 0) {
             return $reflection->newInstanceWithoutConstructor();
-        } else {
-            return $reflection->newInstance();
         }
+
+        return $reflection->newInstance();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
     }
@@ -160,7 +163,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      *
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getFields($entityName, true);
@@ -218,6 +221,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      * @param string $entityName
      * @param string $fieldName
      * @param array $context
+     *
      * @return bool
      */
     protected function isFieldSkippedForNormalization($entityName, $fieldName, array $context)
@@ -235,10 +239,11 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         if (is_object($data)) {
             $dataClass = ClassUtils::getClass($data);
+
             return $this->fieldHelper->hasConfig($dataClass);
         }
 
@@ -250,12 +255,13 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function setSerializer(SerializerInterface $serializer)
     {
-        if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
+        if (!$serializer instanceof ContextAwareNormalizerInterface ||
+            !$serializer instanceof ContextAwareDenormalizerInterface) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface',
-                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface'
+                    ContextAwareNormalizerInterface::class,
+                    ContextAwareDenormalizerInterface::class
                 )
             );
         }
@@ -264,6 +270,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
 
     /**
      * @param string $entityName
+     *
      * @return bool
      */
     protected function hasIdentityFields($entityName)

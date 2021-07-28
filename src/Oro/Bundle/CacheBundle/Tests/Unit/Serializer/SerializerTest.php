@@ -9,13 +9,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SerializerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCreateWithoutParameters()
+    public function testCreateWithoutParameters(): void
     {
         $serializer = new Serializer();
-        $this->assertInstanceOf(Serializer::class, $serializer);
+        self::assertInstanceOf(Serializer::class, $serializer);
     }
 
-    public function testCreateWithArrayParameters()
+    public function testCreateWithArrayParameters(): void
     {
         $normalizers = [
             $this->createMock(NormalizerInterface::class)
@@ -25,10 +25,10 @@ class SerializerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $serializer = new Serializer($normalizers, $encoders);
-        $this->assertInstanceOf(Serializer::class, $serializer);
+        self::assertInstanceOf(Serializer::class, $serializer);
     }
 
-    public function testCreateWithIteratorParameters()
+    public function testCreateWithIteratorParameters(): void
     {
         $normalizers = new \ArrayIterator([
             $this->createMock(NormalizerInterface::class)
@@ -38,16 +38,16 @@ class SerializerTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $serializer = new Serializer($normalizers, $encoders);
-        $this->assertInstanceOf(Serializer::class, $serializer);
+        self::assertInstanceOf(Serializer::class, $serializer);
     }
 
-    public function testCreateWithIteratorAggregateParameters()
+    public function testCreateWithIteratorAggregateParameters(): void
     {
         $normalizers = new RewindableGenerator([$this, 'getNormalizersGenerator'], 1);
         $encoders = new RewindableGenerator([$this, 'getEncodersGenerator'], 1);
 
         $serializer = new Serializer($normalizers, $encoders);
-        $this->assertInstanceOf(Serializer::class, $serializer);
+        self::assertInstanceOf(Serializer::class, $serializer);
     }
 
     public function getNormalizersGenerator()

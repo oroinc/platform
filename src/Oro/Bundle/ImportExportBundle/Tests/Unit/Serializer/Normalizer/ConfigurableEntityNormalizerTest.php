@@ -8,14 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -79,10 +80,10 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     public function supportDenormalizationDataProvider()
     {
         return [
-            [null, null, false, false],
-            ['test', null, false, false],
+            [null, '', false, false],
+            ['test', '', false, false],
             ['test', 'stdClass', false, false],
-            [[], null, false, false],
+            [[], '', false, false],
             [[], 'stdClass', false, false],
             [[], 'stdClass', true, true]
         ];
@@ -128,11 +129,11 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf(
             'Serializer must implement "%s" and "%s"',
-            NormalizerInterface::class,
-            DenormalizerInterface::class
+            ContextAwareNormalizerInterface::class,
+            ContextAwareDenormalizerInterface::class
         ));
 
-        $serializer = $this->createMock(\Symfony\Component\Serializer\Serializer::class);
+        $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
     }
 
@@ -193,10 +194,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
             if (isset($field['normalizedValue'])) {
                 $fieldValue = $object->$fieldName;
-                $fieldContext = $context;
-                if (isset($field['fieldContext'])) {
-                    $fieldContext = $field['fieldContext'];
-                }
+                $fieldContext = $field['fieldContext'] ?? $context;
                 $normalizedMap[] = [$fieldValue, null, $fieldContext, $field['normalizedValue']];
             }
 

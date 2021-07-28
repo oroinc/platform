@@ -4,34 +4,30 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ImportProcessor;
+use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter;
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Serializer\SerializerInterface;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy;
 
 class ImportProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImportProcessor */
-    protected $processor;
+    protected SerializerInterface|\PHPUnit\Framework\MockObject\MockObject $serializer;
 
-    /** @var SerializerInterface|MockObject */
-    protected $serializer;
+    protected Context|\PHPUnit\Framework\MockObject\MockObject $context;
 
-    /** @var Context|MockObject */
-    protected $context;
+    protected array $item = ['test' => 'test'];
 
-    /** @var array */
-    protected $item = ['test' => 'test'];
+    protected \stdClass $object;
 
-    /** @var object */
-    protected $object;
+    protected ContextAwareProcessor $processor;
 
     protected function setUp(): void
     {
         $this->object = new \stdClass();
         $this->context = $this->createMock(Context::class);
-        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMockForAbstractClass();
+        $this->serializer = $this->createMock(SerializerInterface::class);
 
         $this->processor = new class() extends ImportProcessor {
             public function xgetEntityName(): string
@@ -44,51 +40,50 @@ class ImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setImportExportContext($this->context);
     }
 
-    protected function setProcessExpects()
+    private function setProcessExpects(): void
     {
         $this->context->expects(static::once())
             ->method('getOption')
             ->with('entityName')
-            ->willReturn('\stdClass');
+            ->willReturn(\stdClass::class);
+
         $this->context->method('setValue')
             ->withConsecutive(
                 ['rawItemData', static::anything()],
                 ['itemData', $this->item]
             );
-        $this->context->expects(static::any())->method('getConfiguration')->willReturn([]);
+
+        $this->context
+            ->expects(static::any())
+            ->method('getConfiguration')
+            ->willReturn([]);
 
         $this->serializer->expects(static::once())
-            ->method('deserialize')
-            ->with($this->item, '\stdClass', null)
+            ->method('denormalize')
+            ->with($this->item, \stdClass::class, '')
             ->willReturn($this->object);
     }
 
-    public function testProcessMinimum()
+    public function testProcessMinimum(): void
     {
         $this->setProcessExpects();
 
         static::assertEquals($this->object, $this->processor->process($this->item));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->setProcessExpects();
 
         $this->context->expects(static::never())->method('addFailureException');
 
-        /** @var DataConverterInterface|MockObject $converter */
-        $converter = $this->getMockBuilder(DataConverterInterface::class)
-            ->onlyMethods(['convertToImportFormat'])
-            ->getMockForAbstractClass();
+        $converter = $this->createMock(DataConverterInterface::class);
         $converter->expects(static::once())
             ->method('convertToImportFormat')
             ->with($this->item)
             ->willReturnArgument(0);
 
-        /** @var StrategyInterface|MockObject $strategy */
-        $strategy = $this->getMockBuilder(StrategyInterface::class)
-            ->onlyMethods(['process'])
-            ->getMockForAbstractClass();
+        $strategy = $this->createMock(StrategyInterface::class);
         $strategy->expects(static::once())
             ->method('process')
             ->with($this->object)
@@ -99,15 +94,19 @@ class ImportProcessorTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($this->object, $this->processor->process($this->item));
     }
 
-    public function testSetEntityName()
+    public function testSetEntityName(): void
     {
         $entityName = 'TestEntity';
 
         $dataConverter = $this->createMock(EntityNameAwareDataConverter::class);
-        $dataConverter->expects(static::once())->method('setEntityName')->with($entityName);
+        $dataConverter->expects(static::once())
+            ->method('setEntityName')
+            ->with($entityName);
 
-        $strategy = $this->createMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy');
-        $strategy->expects(static::once())->method('setEntityName')->with($entityName);
+        $strategy = $this->createMock(EntityNameAwareStrategy::class);
+        $strategy->expects(static::once())
+            ->method('setEntityName')
+            ->with($entityName);
 
         $this->processor->setDataConverter($dataConverter);
         $this->processor->setStrategy($strategy);

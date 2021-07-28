@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\CacheBundle\Provider;
 
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * Provides functionality to cache data into a memory.
+ * Unlike {@see \Doctrine\Common\Cache\ArrayCache} and {@see \Symfony\Component\Cache\Adapter\ArrayAdapter}
+ * this class is as fast as possible.
  */
-class MemoryCache
+class MemoryCache implements ResetInterface
 {
     private array $data = [];
 
@@ -57,6 +61,14 @@ class MemoryCache
      * Deletes all cache entries.
      */
     public function deleteAll(): void
+    {
+        $this->data = [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
     {
         $this->data = [];
     }
