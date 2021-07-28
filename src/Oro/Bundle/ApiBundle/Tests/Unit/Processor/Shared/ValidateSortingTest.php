@@ -449,7 +449,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $items = explode(',', $sortBy);
         foreach ($items as $item) {
             $item = trim($item);
-            if (0 === strpos($item, '-')) {
+            if (str_starts_with($item, '-')) {
                 $orderBy[substr($item, 1)] = 'DESC';
             } else {
                 $orderBy[$item] = 'ASC';

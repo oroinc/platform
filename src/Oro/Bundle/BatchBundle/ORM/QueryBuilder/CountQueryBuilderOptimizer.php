@@ -322,7 +322,7 @@ class CountQueryBuilderOptimizer
     protected function getSelectFieldFromGroupByPart($groupByPart)
     {
         $expressions = [];
-        if (strpos($groupByPart, ',') !== false) {
+        if (str_contains($groupByPart, ',')) {
             $groupByParts = explode(',', $groupByPart);
             foreach ($groupByParts as $part) {
                 $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));

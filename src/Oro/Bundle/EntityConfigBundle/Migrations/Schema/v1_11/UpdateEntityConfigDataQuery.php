@@ -223,7 +223,7 @@ class UpdateEntityConfigDataQuery extends ParametrizedMigrationQuery
     private function createIconName($name)
     {
         foreach (self::$iconReplaceMask as $pattern => $replace) {
-            $exact = (substr($pattern, -1) === '*' ? '': '$');
+            $exact = str_ends_with($pattern, '*') ? '': '$';
             $pattern = '/' . $pattern . $exact .'/';
             $next = false;
 

@@ -85,7 +85,7 @@ class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
         return array_filter(
             $rows,
             function ($row) {
-                return strpos($row['class_name'], 'Extend\\Entity\\') !== 0;
+                return !str_starts_with($row['class_name'], 'Extend\\Entity\\');
             }
         );
     }

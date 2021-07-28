@@ -8,6 +8,9 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The translation context resolver for workflows translation keys.
+ */
 class TranslationContextResolver implements TranslationContextResolverInterface
 {
     const TRANSLATION_TEMPLATE = 'oro.workflow.translation.context.{{ template }}';
@@ -41,11 +44,12 @@ class TranslationContextResolver implements TranslationContextResolverInterface
      */
     public function resolve($id)
     {
-        if (0 !== strpos($id, KeyTemplate\WorkflowTemplate::KEY_PREFIX)) {
+        if (!str_starts_with($id, KeyTemplate\WorkflowTemplate::KEY_PREFIX)) {
             return null;
         }
 
-        if (null === ($resolvedTemplate = $this->resolveSourceByKey($id))) {
+        $resolvedTemplate = $this->resolveSourceByKey($id);
+        if (null === $resolvedTemplate) {
             return null;
         }
 

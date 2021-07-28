@@ -82,7 +82,9 @@ class EnumFilter extends BaseMultiChoiceFilter
      */
     private function resolveMetadataClass(array $metadata)
     {
-        if (array_key_exists('class', $metadata) && strpos($metadata['class'], ExtendHelper::ENTITY_NAMESPACE) === 0) {
+        if (\array_key_exists('class', $metadata)
+            && str_starts_with($metadata['class'], ExtendHelper::ENTITY_NAMESPACE)
+        ) {
             return $metadata['class'];
         }
 

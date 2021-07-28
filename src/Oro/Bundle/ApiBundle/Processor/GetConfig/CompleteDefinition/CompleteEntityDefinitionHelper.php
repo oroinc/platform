@@ -450,7 +450,7 @@ class CompleteEntityDefinitionHelper
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath();
-            if ($propertyPath && false !== \strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+            if ($propertyPath && str_contains($propertyPath, ConfigUtil::PATH_DELIMITER)) {
                 try {
                     $this->completeDependentAssociation(
                         $entityOverrideProvider,

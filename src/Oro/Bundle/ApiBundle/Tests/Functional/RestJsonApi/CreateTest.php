@@ -27,7 +27,7 @@ class CreateTest extends RestJsonApiTestCase
 
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || 0 === strpos($entityType, 'testapi')
+            || str_starts_with($entityType, 'testapi')
             || $provider->isSkippedEntity($entityClass, ApiAction::CREATE);
     }
 

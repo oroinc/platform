@@ -7,6 +7,9 @@ use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
 
+/**
+ * Fixes left join to PrimaryItem entities in optimized count query.
+ */
 class CountQueryOptimizationListener
 {
     const PRIMARY_CONDITION_PATTERN = '/%s.primary\s*=\s*(?P<value>true|1|:\w+|\?\d+)/';
@@ -64,7 +67,7 @@ class CountQueryOptimizationListener
         if ($value === 'true' || $value === '1') {
             return true;
         }
-        if (strpos($value, ':') === 0 || strpos($value, '?') === 0) {
+        if (str_starts_with($value, ':') || str_starts_with($value, '?')) {
             $param = $context->getOriginalQueryBuilder()->getParameter(substr($value, 1));
             if ($param instanceof Parameter) {
                 $paramValue = $param->getValue();

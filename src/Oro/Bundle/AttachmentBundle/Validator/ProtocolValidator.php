@@ -18,6 +18,6 @@ class ProtocolValidator implements ProtocolValidatorInterface
             || 'https' === $protocol
             || 'ftp' === $protocol
             || 'ftps' === $protocol
-            || 0 === strpos($protocol, 'ssh2.');
+            || str_starts_with($protocol, 'ssh2.');
     }
 }

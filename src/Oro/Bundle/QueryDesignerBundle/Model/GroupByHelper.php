@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Model;
 
+/**
+ * Provides a method to get fields that must appear in GROUP BY.
+ */
 class GroupByHelper
 {
     /**
@@ -90,7 +93,8 @@ class GroupByHelper
         if (!empty($parts[2])) {
             // Add alias
             return $parts[2];
-        } elseif (!$parts && strpos($select, ' ') === false) {
+        }
+        if (!$parts && !str_contains($select, ' ')) {
             // Add field itself when there is no alias
             return $select;
         }

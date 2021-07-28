@@ -22,36 +22,14 @@ use Twig\TwigFilter;
  */
 class LocalizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?LanguageCodeFormatter $languageCodeFormatter = null;
+    private ?FormattingCodeFormatter $formattingCodeFormatter = null;
+    private ?LocalizationHelper $localizationHelper = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return LanguageCodeFormatter
-     */
-    protected function getLanguageCodeFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.language_code');
-    }
-
-    /**
-     * @return FormattingCodeFormatter
-     */
-    protected function getFormattingCodeFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.formatting_code');
-    }
-
-    /**
-     * @return LocalizationHelper
-     */
-    protected function getLocalizationHelper()
-    {
-        return $this->container->get('oro_locale.helper.localization');
     }
 
     /**
@@ -60,23 +38,10 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
     public function getFilters()
     {
         return [
-            new TwigFilter(
-                'oro_language_code_title',
-                [$this, 'getLanguageTitleByCode']
-            ),
-            new TwigFilter(
-                'oro_locale_code_title',
-                [$this, 'formatLocale']
-            ),
-            new TwigFilter(
-                'oro_formatting_code_title',
-                [$this, 'getFormattingTitleByCode']
-            ),
-            new TwigFilter(
-                'localized_value',
-                [$this, 'getLocalizedValue'],
-                ['is_safe' => ['html']]
-            ),
+            new TwigFilter('oro_language_code_title', [$this, 'getLanguageTitleByCode']),
+            new TwigFilter('oro_locale_code_title', [$this, 'formatLocale']),
+            new TwigFilter('oro_formatting_code_title', [$this, 'getFormattingTitleByCode']),
+            new TwigFilter('localized_value', [$this, 'getLocalizedValue'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -110,13 +75,7 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
         return $this->getFormattingCodeFormatter()->format($code);
     }
 
-    /**
-     * @param Collection        $values
-     * @param Localization|null $localization
-     *
-     * @return string
-     */
-    public function getLocalizedValue(Collection $values, Localization $localization = null)
+    public function getLocalizedValue(Collection $values, Localization $localization = null): string
     {
         return (string)$this->getLocalizationHelper()->getLocalizedValue($values, $localization);
     }
@@ -131,5 +90,32 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
             'oro_locale.formatter.formatting_code' => FormattingCodeFormatter::class,
             'oro_locale.helper.localization' => LocalizationHelper::class,
         ];
+    }
+
+    private function getLanguageCodeFormatter(): LanguageCodeFormatter
+    {
+        if (null === $this->languageCodeFormatter) {
+            $this->languageCodeFormatter = $this->container->get('oro_locale.formatter.language_code');
+        }
+
+        return $this->languageCodeFormatter;
+    }
+
+    private function getFormattingCodeFormatter(): FormattingCodeFormatter
+    {
+        if (null === $this->formattingCodeFormatter) {
+            $this->formattingCodeFormatter = $this->container->get('oro_locale.formatter.formatting_code');
+        }
+
+        return $this->formattingCodeFormatter;
+    }
+
+    private function getLocalizationHelper(): LocalizationHelper
+    {
+        if (null === $this->localizationHelper) {
+            $this->localizationHelper = $this->container->get('oro_locale.helper.localization');
+        }
+
+        return $this->localizationHelper;
     }
 }

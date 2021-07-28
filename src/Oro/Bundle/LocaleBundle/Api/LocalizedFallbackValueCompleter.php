@@ -34,7 +34,7 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
         string $version,
         RequestType $requestType
     ): bool {
-        if (0 !== strpos($dataType, self::LOCALIZED_FALLBACK_VALUE_PREFIX)) {
+        if (!str_starts_with($dataType, self::LOCALIZED_FALLBACK_VALUE_PREFIX)) {
             return false;
         }
 

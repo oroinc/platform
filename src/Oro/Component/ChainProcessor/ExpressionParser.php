@@ -24,20 +24,20 @@ class ExpressionParser
     {
         if (\is_string($value)) {
             $operator = null;
-            if (\strpos($value, AbstractMatcher::OPERATOR_AND)) {
+            if (strpos($value, AbstractMatcher::OPERATOR_AND)) {
                 $operator = AbstractMatcher::OPERATOR_AND;
-                $value = \explode(AbstractMatcher::OPERATOR_AND, $value);
-            } elseif (\strpos($value, AbstractMatcher::OPERATOR_OR)) {
+                $value = explode(AbstractMatcher::OPERATOR_AND, $value);
+            } elseif (strpos($value, AbstractMatcher::OPERATOR_OR)) {
                 $operator = AbstractMatcher::OPERATOR_OR;
-                $value = \explode(AbstractMatcher::OPERATOR_OR, $value);
+                $value = explode(AbstractMatcher::OPERATOR_OR, $value);
             } else {
                 $value = self::normalizeValue($value);
             }
             if (null !== $operator) {
                 $items = [];
                 foreach ($value as $val) {
-                    if (0 === \strpos($val, AbstractMatcher::OPERATOR_NOT)) {
-                        $val = \substr($val, 1);
+                    if (str_starts_with($val, AbstractMatcher::OPERATOR_NOT)) {
+                        $val = substr($val, 1);
                         if (self::EXISTS_VALUE === $val) {
                             throw new \InvalidArgumentException(sprintf(
                                 'The operator "!%s" cannot be used together with "%s" operator.',
@@ -70,8 +70,8 @@ class ExpressionParser
      */
     private static function normalizeValue(string $value)
     {
-        if (0 === \strpos($value, AbstractMatcher::OPERATOR_NOT)) {
-            $value = \substr($value, 1);
+        if (str_starts_with($value, AbstractMatcher::OPERATOR_NOT)) {
+            $value = substr($value, 1);
             if (self::EXISTS_VALUE === $value) {
                 return null;
             }

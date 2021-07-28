@@ -130,7 +130,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
             throw new \UnexpectedValueException(sprintf(
                 'Expected string value for the filter "%s", given "%s".',
                 $sourceKey,
-                \is_object($value) ? \get_class($value) : \gettype($value)
+                \is_object($value) ? \get_class($value) : gettype($value)
             ));
         }
 
@@ -156,7 +156,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
             return;
         }
 
-        $matchResult = \preg_match_all(
+        $matchResult = preg_match_all(
             '/(?P<key>((?P<group>[\w\d\-\.]+)(?P<path>((\[[\w\d\-\.]*\])|(%5B[\w\d\-\.]*%5D))*)))'
             . '(?P<operator>' . $this->operatorPattern . ')'
             . '(?P<value>[^&]*)/',
@@ -167,20 +167,20 @@ class RestFilterValueAccessor extends FilterValueAccessor
 
         if (false !== $matchResult) {
             foreach ($matches as $match) {
-                $key = \rawurldecode($match['key']);
-                $group = \rawurldecode($match['group']);
-                $path = \rawurldecode($match['path']);
-                $operator = \rawurldecode($match['operator']);
+                $key = rawurldecode($match['key']);
+                $group = rawurldecode($match['group']);
+                $path = rawurldecode($match['path']);
+                $operator = rawurldecode($match['operator']);
 
                 // check if a filter is provided as "key[operator name]=value"
-                if (\substr($path, -1) === ']') {
-                    $pos = \strrpos($path, '[');
+                if (str_ends_with($path, ']')) {
+                    $pos = strrpos($path, '[');
                     if (false !== $pos) {
-                        $lastElement = \substr($path, $pos + 1, -1);
+                        $lastElement = substr($path, $pos + 1, -1);
                         if (\array_key_exists($lastElement, $this->operatorNameMap)) {
                             $operator = $lastElement;
-                            $key = \substr($key, 0, -(\strlen($path) - $pos));
-                            $path = \substr($path, 0, $pos);
+                            $key = substr($key, 0, -(\strlen($path) - $pos));
+                            $path = substr($path, 0, $pos);
                         }
                     }
                 }
@@ -189,11 +189,11 @@ class RestFilterValueAccessor extends FilterValueAccessor
                 if (empty($path)) {
                     $path = $key;
                 } else {
-                    $path = \strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => '']);
+                    $path = strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => '']);
                     $normalizedKey = $group . '[' . $path . ']';
                 }
 
-                $this->addParsed($key, $group, $normalizedKey, $path, \rawurldecode($match['value']), $operator);
+                $this->addParsed($key, $group, $normalizedKey, $path, rawurldecode($match['value']), $operator);
             }
         }
     }
@@ -208,7 +208,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
         foreach ($requestBody as $group => $val) {
             if (\is_array($val)) {
                 if ($this->isValueWithOperator($val)) {
-                    $this->addParsed($group, $group, $group, $group, \current($val), \key($val));
+                    $this->addParsed($group, $group, $group, $group, current($val), key($val));
                 } elseif (ArrayUtil::isAssoc($val)) {
                     foreach ($val as $subKey => $subValue) {
                         $paramKey = $group . '[' . $subKey . ']';
@@ -218,8 +218,8 @@ class RestFilterValueAccessor extends FilterValueAccessor
                                 $group,
                                 $paramKey,
                                 $subKey,
-                                \current($subValue),
-                                \key($subValue)
+                                current($subValue),
+                                key($subValue)
                             );
                         } else {
                             $this->addParsed($paramKey, $group, $paramKey, $subKey, $subValue);
@@ -236,11 +236,11 @@ class RestFilterValueAccessor extends FilterValueAccessor
 
     private function isValueWithOperator(array $value): bool
     {
-        if (1 !== \count($value)) {
+        if (1 !== count($value)) {
             return false;
         }
 
-        $key = \key($value);
+        $key = key($value);
 
         return
             \is_string($key)

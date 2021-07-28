@@ -9,31 +9,37 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateTimeFormatConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter;
+    private $converter1;
+
+    /** @var DateTimeFormatConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $converter2;
 
     /** @var DateTimeFormatConverterRegistry */
     private $registry;
 
     protected function setUp(): void
     {
-        $this->converter = $this->createMock(DateTimeFormatConverterInterface::class);
+        $this->converter1 = $this->createMock(DateTimeFormatConverterInterface::class);
+        $this->converter2 = $this->createMock(DateTimeFormatConverterInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add('test', $this->converter)
+            ->add('test1', $this->converter1)
+            ->add('test2', $this->converter2)
             ->getContainer($this);
 
         $this->registry = new DateTimeFormatConverterRegistry(
-            ['test'],
+            ['test1', 'test2'],
             $container
         );
     }
 
     public function testGetFormatConverter()
     {
-        $this->assertSame($this->converter, $this->registry->getFormatConverter('test'));
+        $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
+        $this->assertSame($this->converter2, $this->registry->getFormatConverter('test2'));
     }
 
-    public function testGetFormatConverterNotExistsException()
+    public function testGetFormatConverterWhenConverterNotExists()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');
@@ -41,8 +47,29 @@ class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getFormatConverter('not_existing');
     }
 
-    public function getFormatConverters()
+    public function testGetFormatConverterWhenConverterNotExistsAndExistingConverterWasRequestedBefore()
     {
-        $this->assertEquals(['test' => $this->converter], $this->registry->getFormatConverters());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');
+
+        $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
+        $this->registry->getFormatConverter('not_existing');
+    }
+
+    public function getFormatConvertersWhenNoAnyConverterWasRequestedBefore()
+    {
+        $this->assertEquals(
+            ['test1' => $this->converter1, 'test2' => $this->converter2],
+            $this->registry->getFormatConverters()
+        );
+    }
+
+    public function getFormatConvertersWhenSomeConverterWasRequestedBefore()
+    {
+        $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
+        $this->assertEquals(
+            ['test1' => $this->converter1, 'test2' => $this->converter2],
+            $this->registry->getFormatConverters()
+        );
     }
 }

@@ -33,7 +33,7 @@ class UpdateBundleVersionMigrationTest extends \PHPUnit\Framework\TestCase
         $postSqls = $queryBag->getPostQueries();
         foreach ($assertQueries as $index => $query) {
             $this->assertTrue(
-                strpos($postSqls[$index], $query) === 0,
+                str_starts_with($postSqls[$index], $query),
                 sprintf('Query index: %d. Query: %s', $index, $query)
             );
         }

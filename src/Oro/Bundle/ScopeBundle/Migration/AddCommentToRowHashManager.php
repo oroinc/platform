@@ -3,26 +3,26 @@
 namespace Oro\Bundle\ScopeBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Added comment to row_hash column from which contains the hash
  */
-class AddCommentToRoHashManager
+class AddCommentToRowHashManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     public function getRelations(): string
     {
-        $foreignKeys = $this->em->getConnection()->getSchemaManager()->listTableForeignKeys('oro_scope');
+        $foreignKeys = $this->doctrine->getManager()
+            ->getConnection()
+            ->getSchemaManager()
+            ->listTableForeignKeys('oro_scope');
 
         $relations = [];
         foreach ($foreignKeys as $key) {

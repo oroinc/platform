@@ -46,8 +46,8 @@ class Criteria extends BaseCriteria
     public static function explodeFieldTypeName($field)
     {
         $fieldType = Query::TYPE_TEXT;
-        if (strpos($field, '.') !== false) {
-            list($fieldType, $field) = explode('.', $field);
+        if (str_contains($field, '.')) {
+            [$fieldType, $field] = explode('.', $field);
         }
 
         return [$fieldType, $field];

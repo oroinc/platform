@@ -364,8 +364,8 @@ class AutoResponseManager
     protected function getFieldPaths($field, $context)
     {
         $delimiter = sprintf('.%s.', static::INDEX_PLACEHOLDER);
-        if (strpos($field, $delimiter) !== false) {
-            list($leftPart) = explode($delimiter, $field);
+        if (str_contains($field, $delimiter)) {
+            [$leftPart] = explode($delimiter, $field);
             $collection = $this->accessor->getValue($context, $leftPart);
             if (!$collection) {
                 return [];

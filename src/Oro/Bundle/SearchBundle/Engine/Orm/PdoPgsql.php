@@ -288,7 +288,7 @@ class PdoPgsql extends BaseDriver
         $query = parent::getTruncateQuery($dbPlatform, $tableName);
 
         // cascade required to perform truncate of related entities
-        if (strpos($query, ' CASCADE') === false) {
+        if (!str_contains($query, ' CASCADE')) {
             $query .= ' CASCADE';
         }
 

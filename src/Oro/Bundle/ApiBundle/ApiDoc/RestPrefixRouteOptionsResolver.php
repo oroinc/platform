@@ -40,7 +40,7 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
 
     private function hasPrefix(string $value): bool
     {
-        return false !== \strpos($value, self::PREFIX);
+        return str_contains($value, self::PREFIX);
     }
 
     /**

@@ -103,7 +103,7 @@ class OroEventManager extends ContainerAwareEventManager
                 $this->disabledListeners[$event][] = $listener;
                 $this->removeEventListener(
                     $event,
-                    strpos($hash, '_service_') === 0 ? substr($hash, strlen('_service_')) : $listener
+                    str_starts_with($hash, '_service_') ? substr($hash, \strlen('_service_')) : $listener
                 );
             }
         }

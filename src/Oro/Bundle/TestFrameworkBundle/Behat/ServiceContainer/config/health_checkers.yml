@@ -5,7 +5,7 @@ services:
       - '@oro_test.context.fixture_loader'
       - '@oro_test.alice_loader'
       - '@oro_behat_extension.isolation.doctrine_isolator'
-      - '@symfony2_extension.kernel'
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'behat_health_checker' }
 

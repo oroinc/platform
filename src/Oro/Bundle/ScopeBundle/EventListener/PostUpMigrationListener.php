@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ScopeBundle\EventListener;
 
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
-use Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager;
+use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 use Oro\Bundle\ScopeBundle\Migration\Schema\AddTriggerToRowHashColumn;
 use Oro\Bundle\ScopeBundle\Migration\Schema\UpdateScopeRowHashColumn;
 
@@ -16,7 +16,7 @@ use Oro\Bundle\ScopeBundle\Migration\Schema\UpdateScopeRowHashColumn;
 class PostUpMigrationListener
 {
     /**
-     * @var AddCommentToRoHashManager
+     * @var AddCommentToRowHashManager
      */
     protected $manager;
 
@@ -25,7 +25,7 @@ class PostUpMigrationListener
      */
     protected $installed;
 
-    public function __construct(AddCommentToRoHashManager $manager, ?string $installed)
+    public function __construct(AddCommentToRowHashManager $manager, ?string $installed)
     {
         $this->manager = $manager;
         $this->installed = (bool)$installed;

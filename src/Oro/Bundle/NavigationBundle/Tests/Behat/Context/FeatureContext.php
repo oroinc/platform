@@ -4,11 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
@@ -23,11 +21,16 @@ use Symfony\Component\DomCrawler\Crawler;
  * Provides a set of steps to test navigation related functionality.
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FeatureContext extends OroFeatureContext implements
-    OroPageObjectAware,
-    KernelAwareContext
+class FeatureContext extends OroFeatureContext implements OroPageObjectAware
 {
-    use PageObjectDictionary, KernelDictionary;
+    use PageObjectDictionary;
+
+    private ManagerRegistry $managerRegistry;
+
+    public function __construct(ManagerRegistry $managerRegistry)
+    {
+        $this->managerRegistry = $managerRegistry;
+    }
 
     /**
      * Save system configuration. It just press 'Save settings' button
@@ -159,7 +162,7 @@ class FeatureContext extends OroFeatureContext implements
     {
         $menu = $this->getMainMenu();
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        $em = $this->managerRegistry->getManager();
         $pages = $table->getColumn(0);
 
         $firstPage = array_shift($pages);
@@ -564,15 +567,13 @@ class FeatureContext extends OroFeatureContext implements
         . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
         . '0123456789%26g%255BoriginalRoute%255D%3';
 
-        /** @var Registry $doctrine */
-        $doctrine =  $this->getContainer()->get('doctrine');
         /** @var NavigationItem $navigationItem */
-        $navigationItem = $doctrine->getManagerForClass(NavigationItem::class)
+        $navigationItem = $this->managerRegistry->getManagerForClass(NavigationItem::class)
             ->getRepository(NavigationItem::class)
             ->findOneBy([]);
 
         /** @var Connection $connection */
-        $connection = $doctrine->getConnection();
+        $connection = $this->managerRegistry->getConnection();
         $connection->update(
             'oro_navigation_item',
             ['url' => $malformedUrl],

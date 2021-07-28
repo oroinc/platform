@@ -215,7 +215,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     protected function extractAndAppendKeyValue(&$array, $key, $value)
     {
-        if (false === strpos($key, '.')) {
+        if (!str_contains($key, '.')) {
             return false;
         }
 

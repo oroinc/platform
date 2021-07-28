@@ -6,6 +6,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Locates and parses workflow configuration files.
+ */
 class WorkflowConfigurationProvider
 {
     /** @var WorkflowListConfiguration */
@@ -84,7 +87,7 @@ class WorkflowConfigurationProvider
                 function ($file) use ($directories) {
                     foreach ($directories as $allowedDirectory) {
                         if ($allowedDirectory &&
-                            strpos($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR) === 0
+                            str_starts_with($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR)
                         ) {
                             return true;
                         }

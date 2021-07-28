@@ -5,6 +5,9 @@ namespace Oro\Bundle\PlatformBundle\Provider;
 use Composer\Package\PackageInterface;
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 
+/**
+ * Provides information about packages.
+ */
 class PackageProvider
 {
     const ORO_NAMESPACE = 'oro';
@@ -81,6 +84,6 @@ class PackageProvider
      */
     protected function isOroPackage(PackageInterface $package)
     {
-        return 0 === strpos($package->getName(), self::ORO_NAMESPACE . self::NAMESPACE_DELIMITER);
+        return str_starts_with($package->getName(), self::ORO_NAMESPACE . self::NAMESPACE_DELIMITER);
     }
 }

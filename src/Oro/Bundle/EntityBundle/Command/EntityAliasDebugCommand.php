@@ -59,13 +59,13 @@ HELP
             array_filter(
                 array_keys($entityAliases),
                 function ($class) {
-                    return strpos(strtolower($class), 'oro\\') === 0;
+                    return str_starts_with(strtolower($class), 'oro\\');
                 }
             ),
             array_filter(
                 array_keys($entityAliases),
                 function ($class) {
-                    return strpos(strtolower($class), 'oro\\') !== 0;
+                    return !str_starts_with(strtolower($class), 'oro\\');
                 }
             )
         );

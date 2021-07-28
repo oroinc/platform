@@ -8,6 +8,9 @@ use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
+/**
+ * Adds extended entity specifics to the loader that loads entity configs from annotations to a database.
+ */
 class ExtendConfigLoader extends ConfigLoader
 {
     /** @var int */
@@ -57,17 +60,17 @@ class ExtendConfigLoader extends ConfigLoader
         }
 
         // check for default field of oneToMany or manyToMany relation
-        if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-            $guessedName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+        if (str_starts_with($associationName, ExtendConfigDumper::DEFAULT_PREFIX)) {
+            $guessedName = substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX));
             if (!empty($guessedName) && $this->isExtendField($metadata->name, $guessedName)) {
                 return false;
             }
         }
         // check for inverse side field of oneToMany relation
         $targetClass = $metadata->getAssociationTargetClass($associationName);
-        $prefix      = strtolower(ExtendHelper::getShortClassName($targetClass)) . '_';
-        if (strpos($associationName, $prefix) === 0) {
-            $guessedName = substr($associationName, strlen($prefix));
+        $prefix = strtolower(ExtendHelper::getShortClassName($targetClass)) . '_';
+        if (str_starts_with($associationName, $prefix)) {
+            $guessedName = substr($associationName, \strlen($prefix));
             if (!empty($guessedName) && $this->isExtendField($targetClass, $guessedName)) {
                 return false;
             }

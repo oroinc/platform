@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Block\OptionsResolver;
 
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
 
@@ -13,14 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
  */
 class OptionsResolver implements Options
 {
-    /**
-     * @var BaseOptionsResolver $optionsResolver
-     */
-    protected $optionsResolver;
+    private BaseOptionsResolver $optionsResolver;
 
-    /**
-     * Instantiate Symfony option resolver.
-     */
     public function __construct()
     {
         $this->optionsResolver = new BaseOptionsResolver();
@@ -56,6 +51,24 @@ class OptionsResolver implements Options
     public function hasDefault($option)
     {
         return $this->optionsResolver->hasDefault($option);
+    }
+
+    /**
+     * @return array [name => value, ...]
+     */
+    public function getDefaults(): array
+    {
+        $reflClass = new \ReflectionClass($this->optionsResolver);
+        $defaultsProperty = ReflectionUtil::getProperty($reflClass, 'defaults');
+        if (null === $defaultsProperty) {
+            throw new \RuntimeException(sprintf(
+                'The class "%s" does not have property "defaults".',
+                $reflClass->name
+            ));
+        }
+        $defaultsProperty->setAccessible(true);
+
+        return $defaultsProperty->getValue($this->optionsResolver);
     }
 
     /**

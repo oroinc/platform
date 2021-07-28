@@ -420,16 +420,16 @@ services:
             - { name: layout.data_provider, alias: attachment_config }
 
     oro_entity_config.event_listener.deleted_attribute_relation:
-      class: Oro\Bundle\EntityConfigBundle\EventListener\DeletedAttributeRelationListener
-      arguments:
-          - '@oro_message_queue.message_producer'
-          - '@oro_entity_config.provider.deleted_attribute'
-          - '@Doctrine\Inflector\Inflector'
-      calls:
-          - [setTopic, ['oro_entity_config.attribute_was_removed_from_family']]
-      tags:
-        - { name: doctrine.event_listener, event: onFlush }
-        - { name: doctrine.event_listener, event: postFlush }
+        class: Oro\Bundle\EntityConfigBundle\EventListener\DeletedAttributeRelationListener
+        arguments:
+            - '@oro_message_queue.message_producer'
+            - '@oro_entity_config.provider.deleted_attribute'
+            - '@Doctrine\Inflector\Inflector'
+        calls:
+            - [setTopic, ['oro_entity_config.attribute_was_removed_from_family']]
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_entity_config.async.deleted_attribute_relation:
         class: Oro\Bundle\EntityConfigBundle\Async\DeletedAttributeRelationProcessor

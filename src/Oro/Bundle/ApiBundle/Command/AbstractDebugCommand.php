@@ -117,7 +117,7 @@ HELP
             return $value == (int)$value
                 ? (int)$value
                 : (float)$value;
-        } elseif (0 === strpos($value, '[') && substr($value, -1) === ']') {
+        } elseif (str_starts_with($value, '[') && str_ends_with($value, ']')) {
             return explode(',', substr($value, 1, -1));
         }
 
@@ -131,7 +131,7 @@ HELP
         }
 
         $entityClass = $entityName;
-        if (false === strpos($entityClass, '\\')) {
+        if (!str_contains($entityClass, '\\')) {
             $entityClass = ValueNormalizerUtil::convertToEntityClass(
                 $this->valueNormalizer,
                 $entityName,

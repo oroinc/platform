@@ -40,14 +40,14 @@ class OldOptionsRouteOptionsResolver implements RouteOptionsResolverInterface
         if (!$nameFromController) {
             return;
         }
-        if (\str_replace('/', '', $entryPath) === $nameFromController) {
+        if (str_replace('/', '', $entryPath) === $nameFromController) {
             return;
         }
 
-        $pos = \strrpos($entryPath, '/');
+        $pos = strrpos($entryPath, '/');
         if (false !== $pos) {
-            $pluralName = \substr($entryPath, $pos + 1);
-            $singularName = \substr($nameFromController, $pos - \substr_count($entryPath, '/') + 1);
+            $pluralName = substr($entryPath, $pos + 1);
+            $singularName = substr($nameFromController, $pos - substr_count($entryPath, '/') + 1);
         } else {
             $pluralName = $entryPath;
             $singularName = $nameFromController;
@@ -56,7 +56,7 @@ class OldOptionsRouteOptionsResolver implements RouteOptionsResolverInterface
             return;
         }
 
-        $singularPath  = \str_replace('/' . $pluralName, '/' . $singularName, $route->getPath());
+        $singularPath  = str_replace('/' . $pluralName, '/' . $singularName, $route->getPath());
         if (null === $routes->getByPath($singularPath, ['OPTIONS'])) {
             $singularRoute = $routes->cloneRoute($route);
             $singularRoute->setPath($singularPath);
@@ -78,13 +78,13 @@ class OldOptionsRouteOptionsResolver implements RouteOptionsResolverInterface
     private function getEntryPath(Route $route)
     {
         $result = $route->getPath();
-        $pos = \strpos($result, '{version}');
+        $pos = strpos($result, '{version}');
         if (false !== $pos) {
-            $result = \substr($result, $pos + 10);
+            $result = substr($result, $pos + 10);
         }
-        $pos = \strpos($result, '.{');
+        $pos = strpos($result, '.{');
         if (false !== $pos) {
-            $result = \substr($result, 0, $pos);
+            $result = substr($result, 0, $pos);
         }
 
         return $result;
@@ -99,15 +99,15 @@ class OldOptionsRouteOptionsResolver implements RouteOptionsResolverInterface
     {
         $result = $route->getDefault('_controller');
         if (!empty($result)) {
-            $pos = \strpos($result, 'Controller::');
+            $pos = strpos($result, 'Controller::');
             if (false !== $pos) {
-                $result = \substr($result, 0, $pos);
+                $result = substr($result, 0, $pos);
             }
-            $pos = \strrpos($result, '\\');
+            $pos = strrpos($result, '\\');
             if (false !== $pos) {
-                $result = \substr($result, $pos + 1);
+                $result = substr($result, $pos + 1);
             }
-            $result = \strtolower($result);
+            $result = strtolower($result);
         }
 
         return $result;

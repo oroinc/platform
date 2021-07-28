@@ -24,17 +24,12 @@ use Twig\TwigFunction;
  */
 class LocaleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?LocaleSettings $localeSettings = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    protected function getLocaleSettings(): LocaleSettings
-    {
-        return $this->container->get(LocaleSettings::class);
     }
 
     /**
@@ -151,5 +146,14 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         return [
             LocaleSettings::class,
         ];
+    }
+
+    private function getLocaleSettings(): LocaleSettings
+    {
+        if (null === $this->localeSettings) {
+            $this->localeSettings = $this->container->get(LocaleSettings::class);
+        }
+
+        return $this->localeSettings;
     }
 }

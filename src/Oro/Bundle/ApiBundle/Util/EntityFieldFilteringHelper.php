@@ -92,7 +92,7 @@ class EntityFieldFilteringHelper
         return
             $this->isCustomField($entityClass, $associationName)
             || (
-                0 === strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX)
+                str_starts_with($associationName, ExtendConfigDumper::DEFAULT_PREFIX)
                 && $this->isCustomField(
                     $entityClass,
                     substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX))

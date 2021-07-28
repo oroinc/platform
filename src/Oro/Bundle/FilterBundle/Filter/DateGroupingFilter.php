@@ -369,7 +369,7 @@ class DateGroupingFilter extends ChoiceFilter
     {
         $extraWhereClauses = '';
         foreach ($whereClauseParts as $whereClausePart) {
-            if (strpos($whereClausePart, $this->getDataFieldName()) !== false) {
+            if (str_contains($whereClausePart, $this->getDataFieldName())) {
                 $extraWhereClauses = sprintf('%s AND ( %s )', $extraWhereClauses, $whereClausePart);
             }
         }
@@ -386,9 +386,9 @@ class DateGroupingFilter extends ChoiceFilter
     {
         $extraParameters = new ArrayCollection();
 
+        /* @var Parameter $parameter */
         foreach ($parameters as $parameter) {
-            /* @var $parameter Parameter */
-            if (false !== strpos($whereClauseParts, sprintf(':%s', $parameter->getName()))) {
+            if (str_contains($whereClauseParts, sprintf(':%s', $parameter->getName()))) {
                 $extraParameters->add($parameter);
             }
         }

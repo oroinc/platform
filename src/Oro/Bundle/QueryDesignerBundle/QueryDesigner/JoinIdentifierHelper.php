@@ -218,8 +218,8 @@ class JoinIdentifierHelper
 
         $entityClass = substr(
             $joinId,
-            strlen($parentJoinId) + 1,
-            strpos($joinId, '::', strlen($parentJoinId) + 1) - strlen($parentJoinId) - 1
+            \strlen($parentJoinId) + 1,
+            strpos($joinId, '::', \strlen($parentJoinId) + 1) - \strlen($parentJoinId) - 1
         );
 
         return sprintf('%s+%s::%s', $parentJoinId, $entityClass, $joinByFieldName);
@@ -238,7 +238,7 @@ class JoinIdentifierHelper
         $lastJoinPart = $this->getLastJoinPart($columnNameOrJoinId, $startDelimiter);
         $lastDelimiter = strrpos($lastJoinPart, '::');
         if (false === $lastDelimiter) {
-            return 0 === $startDelimiter && false === strpos($lastJoinPart, '.')
+            return 0 === $startDelimiter && !str_contains($lastJoinPart, '.')
                 ? $this->rootEntity
                 : null;
         }
@@ -306,7 +306,7 @@ class JoinIdentifierHelper
     {
         return
             false === strpos($joinId, '::', $this->getStartPosition($joinId, '+'))
-            && false === strpos($this->getUnidirectionalJoinEntityName($joinId), '.');
+            && !str_contains($this->getUnidirectionalJoinEntityName($joinId), '.');
     }
 
     /**

@@ -88,8 +88,10 @@ class OutOfMemoryJobExtension extends AbstractExtension
                 }
 
                 if (self::$job &&
-                    (0 === strpos($error['message'], 'Allowed memory')
-                        || 0 === strpos($error['message'], 'Out of memory'))
+                    (
+                        str_starts_with($error['message'], 'Allowed memory')
+                        || str_starts_with($error['message'], 'Out of memory')
+                    )
                 ) {
                     self::$staticJobProcessor->failAndRedeliveryChildJob(self::$job);
                 }

@@ -29,10 +29,10 @@ class CommandProducedError extends Constraint
             $this->errors[] = 'The console command should return a non-zero return value if there were any errors.';
         }
         $output = CommandOutputNormalizer::toSingleLine($commandTester);
-        if (false === \strpos($output, '[ERROR]')) {
+        if (!str_contains($output, '[ERROR]')) {
             $this->errors[] = 'The console command should display an error message if there were any errors.';
         }
-        if (null !== $this->expectedErrorMessage && false === \strpos($output, $this->expectedErrorMessage)) {
+        if (null !== $this->expectedErrorMessage && !str_contains($output, $this->expectedErrorMessage)) {
             $this->errors[] = \sprintf(
                 'The console command should display the error message "%s".',
                 $this->expectedErrorMessage

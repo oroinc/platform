@@ -132,7 +132,7 @@ class EntityDescriptionProvider
         if ($this->isManageableEntity($entityClass)) {
             $result = $this->findFieldDescription($entityClass, $propertyPath);
         }
-        if (!$result && false === \strpos($propertyPath, '.')) {
+        if (!$result && !str_contains($propertyPath, '.')) {
             $result = $this->humanizePropertyName($propertyPath);
         }
         if ($result) {
@@ -185,7 +185,7 @@ class EntityDescriptionProvider
         if (null === $fieldInfo) {
             return null;
         }
-        list($entityClass, $propertyPath) = $fieldInfo;
+        [$entityClass, $propertyPath] = $fieldInfo;
 
         $fieldConfig = $this->getFieldConfig($entityClass, $propertyPath);
         if (null !== $fieldConfig) {
@@ -201,7 +201,7 @@ class EntityDescriptionProvider
         if (null === $fieldInfo) {
             return null;
         }
-        list($entityClass, $propertyPath) = $fieldInfo;
+        [$entityClass, $propertyPath] = $fieldInfo;
 
         $fieldConfig = $this->getFieldConfig($entityClass, $propertyPath);
         if (null !== $fieldConfig) {

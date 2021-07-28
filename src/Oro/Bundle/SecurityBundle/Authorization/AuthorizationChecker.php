@@ -57,7 +57,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         if (\is_string($attribute) && !empty($attribute) && $annotation = $this->getAnnotation($attribute)) {
             if (null === $object) {
                 $this->logger->debug(
-                    \sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
+                    sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
                 );
                 $isGranted = $this->isAccessGranted(
                     $annotation->getPermission(),
@@ -65,7 +65,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 );
             } else {
                 $this->logger->debug(
-                    \sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
+                    sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
                 );
                 $isGranted = $this->isAccessGranted(
                     $annotation->getPermission(),
@@ -79,10 +79,10 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             );
         } else {
             if (null === $object && \is_string($attribute)) {
-                $delimiter = \strpos($attribute, ';');
+                $delimiter = strpos($attribute, ';');
                 if ($delimiter) {
-                    $object = \substr($attribute, $delimiter + 1);
-                    $attribute = \substr($attribute, 0, $delimiter);
+                    $object = substr($attribute, $delimiter + 1);
+                    $attribute = substr($attribute, 0, $delimiter);
                 }
             }
 

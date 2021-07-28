@@ -3,13 +3,11 @@ oro_behat_extension:
     OroUIBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroUIBundle::DragAndDropContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroImportExportBundle::ImportExportContext:
-            - '@oro_entity.entity_alias_resolver'
-            - '@oro_importexport.processor.registry'
-        - OroEmailBundle::EmailContext
+        - Oro\Bundle\UIBundle\Tests\Behat\Context\DragAndDropContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
       paths:
         - '@OroUIBundle/Tests/Behat/Features'
 

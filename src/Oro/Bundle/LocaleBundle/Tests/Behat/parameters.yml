@@ -1,0 +1,11 @@
+services:
+    Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext:
+        public: true
+        arguments:
+            - '@doctrine'
+            - '@translator.default'
+            - '@oro_config.global'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_translation.provider.translation_domain'
+            - '@oro_translation.js_dumper'
+            - '@oro_ui.dynamic_asset_version_manager'

@@ -40,7 +40,7 @@ class StrategyValidationEventListener
                 continue;
             }
 
-            if (false === strpos($violation->getPropertyPath(), '[')) {
+            if (!str_contains($violation->getPropertyPath(), '[')) {
                 continue;
             }
 
@@ -56,7 +56,7 @@ class StrategyValidationEventListener
 
     private function replaceIndexWithKey($root, string $propertyPath): string
     {
-        if (false === strpos($propertyPath, '[')) {
+        if (!str_contains($propertyPath, '[')) {
             return $propertyPath;
         }
 
@@ -103,7 +103,7 @@ class StrategyValidationEventListener
 
     private function getLeftPosition(string $key)
     {
-        if (false === strpos($key, '[')) {
+        if (!str_contains($key, '[')) {
             return false;
         }
 
@@ -112,7 +112,7 @@ class StrategyValidationEventListener
 
     private function getRightPosition(string $key): int
     {
-        if (false === strpos($key, '[')) {
+        if (!str_contains($key, '[')) {
             return false;
         }
 

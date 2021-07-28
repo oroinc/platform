@@ -3,17 +3,15 @@ oro_behat_extension:
     OroEntityExtendBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroEmailBundle::EmailContext
-        - OroEntityExtendBundle::EntityExtendContext
-        - OroEntityExtendBundle::FeatureContext
-        - OroFormBundle::FormContext
-        - OroSecurityBundle::ACLContext
-        - OroConfigBundle::FeatureContext
-        - OroLocaleBundle::LocalizationContext
-        - OroImportExportBundle::ImportExportContext:
-            - '@oro_entity.entity_alias_resolver'
-            - '@oro_importexport.processor.registry'
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\EntityExtendContext
+        - Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
       paths:
         - '@OroEntityExtendBundle/Tests/Behat/Features'
   elements:

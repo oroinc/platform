@@ -8,6 +8,9 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
+/**
+ * The schema tool to update database schemas.
+ */
 class SaveSchemaTool extends SchemaTool
 {
     /** @var \Doctrine\ORM\EntityManagerInterface */
@@ -42,7 +45,8 @@ class SaveSchemaTool extends SchemaTool
         // enable super save mode
         foreach ($schemaDiff->changedTables as $table) {
             // does not matter how they were created, extend mechanism does not allow column/association deletion
-            $table->removedColumns = $table->removedForeignKeys = [];
+            $table->removedColumns = [];
+            $table->removedForeignKeys = [];
             $table->removedIndexes = array_filter(
                 $table->removedIndexes,
                 function ($idx) {
@@ -53,7 +57,7 @@ class SaveSchemaTool extends SchemaTool
                         $idxName = $idx;
                     }
 
-                    return strpos($idxName, ExtendDbIdentifierNameGenerator::CUSTOM_INDEX_PREFIX) === 0;
+                    return str_starts_with($idxName, ExtendDbIdentifierNameGenerator::CUSTOM_INDEX_PREFIX);
                 }
             );
         }

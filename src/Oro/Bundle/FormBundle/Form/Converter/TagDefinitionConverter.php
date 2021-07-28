@@ -9,14 +9,14 @@ class TagDefinitionConverter
 {
     /**
      * @param string $allowedElements
-     * @return string
+     * @return string[]
      */
     public function getElements($allowedElements)
     {
         $tags = [];
 
         foreach (explode(',', $allowedElements) as $allowedElement) {
-            if (false !== strpos($allowedElement, '@')) {
+            if (str_contains($allowedElement, '@')) {
                 continue;
             }
 
@@ -57,7 +57,7 @@ class TagDefinitionConverter
             }
             $tags = ['*'];
 
-            if (false === strpos($tagsConfiguration, '@')) {
+            if (!str_contains($tagsConfiguration, '@')) {
                 $tags = explode('/', $tagsConfiguration);
             }
 

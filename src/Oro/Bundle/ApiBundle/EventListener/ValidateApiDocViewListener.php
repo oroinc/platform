@@ -43,7 +43,7 @@ class ValidateApiDocViewListener
         if (\is_array($controller) && $this->isApiDocController($controller)) {
             $request = $event->getRequest();
             if (!$this->isValidView($request)) {
-                throw new NotFoundHttpException(\sprintf('Invalid API view "%s".', $this->getView($request)));
+                throw new NotFoundHttpException(sprintf('Invalid API view "%s".', $this->getView($request)));
             }
 
             $defaultView = $this->getDefaultView($request);
@@ -91,6 +91,6 @@ class ValidateApiDocViewListener
         $pathInfo = $request->getPathInfo();
         $pos = \strpos($pathInfo, $this->basePath);
 
-        return false === $pos || !\substr($pathInfo, $pos + 9);
+        return false === $pos || !substr($pathInfo, $pos + 9);
     }
 }

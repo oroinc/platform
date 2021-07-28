@@ -303,7 +303,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $selectParts = $configuration->offsetGetByPath('[source][query][select]');
         $selectIdentifierExist = false;
         foreach ($selectParts as $selectPart) {
-            if (strpos($selectPart, '.' . $expectedIdName) !== -1) {
+            if (str_contains($selectPart, '.' . $expectedIdName)) {
                 $selectIdentifierExist = true;
             }
         }

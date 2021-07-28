@@ -96,7 +96,7 @@ class FileRemovalManager implements FileRemovalManagerInterface
         foreach ($extractors as $extractor) {
             $dir = $extractor->extract($fileName);
             if ($dir) {
-                if (substr($dir, -1) !== '/') {
+                if (!str_ends_with($dir, '/')) {
                     $dir .= '/';
                 }
 

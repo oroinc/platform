@@ -116,7 +116,7 @@ class OroFeatureContext extends RawMinkContext
     {
         $fs = new Filesystem();
         try {
-            $isDir = substr($destinationPath, -1) === '/';
+            $isDir = str_ends_with($destinationPath, '/');
             $destinationPath = rtrim($destinationPath, '/');
             if ($isDir && !$fs->exists($destinationPath)) {
                 $fs->mkdir($destinationPath);

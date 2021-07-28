@@ -53,7 +53,7 @@ class ServiceLinkCompilerPass implements CompilerPassInterface
 
             $serviceId = $tag[0]['service'];
             $isOptional = false;
-            if (strpos($serviceId, '?') === 0) {
+            if (str_starts_with($serviceId, '?')) {
                 $serviceId = substr($serviceId, 1);
                 $isOptional = true;
             }

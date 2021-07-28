@@ -21,8 +21,8 @@ class DecimalToStringTransformer implements DataTransformerInterface
         }
 
         $result = (string)BigDecimal::of($value);
-        if (false !== \strpos($result, '.')) {
-            $result = \rtrim(\rtrim($result, '0'), '.');
+        if (str_contains($result, '.')) {
+            $result = rtrim(rtrim($result, '0'), '.');
         }
 
         return $result;

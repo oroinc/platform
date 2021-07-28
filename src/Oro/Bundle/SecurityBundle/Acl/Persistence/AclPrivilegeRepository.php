@@ -634,7 +634,7 @@ class AclPrivilegeRepository
         $data = [];
         /** @var AclPrivilege $privilege */
         foreach ($privileges->getIterator() as $privilege) {
-            $isRoot = false !== strpos($privilege->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+            $isRoot = str_contains($privilege->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
             $label = !$isRoot
                 ? $privilege->getIdentity()->getName()
                 : null;

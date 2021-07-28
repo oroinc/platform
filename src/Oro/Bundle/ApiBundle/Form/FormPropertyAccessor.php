@@ -80,7 +80,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
             $path = $propertyPath->getElement(0);
         }
 
-        if (!\is_string($path) || false !== \strpos($path, '.')) {
+        if (!\is_string($path) || str_contains($path, '.')) {
             $path = null;
         }
 

@@ -10,14 +10,12 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\EventListener\EmailUserListener;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EmailUserListener */
-    private $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
+    /** @var WebSocketSendProcessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $webSocketSendProcessor;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
@@ -25,9 +23,12 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
     /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
     private $uow;
 
+    /** @var EmailUserListener */
+    private $listener;
+
     protected function setUp(): void
     {
-        $this->processor = $this->createMock(WebSocketSendProcessor::class);
+        $this->webSocketSendProcessor = $this->createMock(WebSocketSendProcessor::class);
         $this->em = $this->createMock(EntityManager::class);
         $this->uow = $this->createMock(UnitOfWork::class);
 
@@ -35,7 +36,11 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->listener = new EmailUserListener($this->processor);
+        $container = TestContainerBuilder::create()
+            ->add('oro_email.email_websocket.processor', $this->webSocketSendProcessor)
+            ->getContainer($this);
+
+        $this->listener = new EmailUserListener($container);
     }
 
     public function testFlush()
@@ -66,7 +71,7 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects($this->any())
             ->method('getScheduledEntityUpdates')
             ->willReturn($emailUserArray);
-        $this->processor
+        $this->webSocketSendProcessor
             ->expects($this->once())
             ->method('send')
             ->with(

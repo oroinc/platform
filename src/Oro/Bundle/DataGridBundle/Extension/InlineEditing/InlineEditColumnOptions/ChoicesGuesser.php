@@ -9,8 +9,7 @@ use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
- * Class ChoicesGuesser
- * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions
+ * Guesses options for choice columns.
  */
 class ChoicesGuesser implements GuesserInterface
 {
@@ -60,13 +59,13 @@ class ChoicesGuesser implements GuesserInterface
                         ->getChoices($targetEntity, $keyField, $labelField, null, $translatable);
                 }
 
-                if (array_key_exists(PropertyInterface::DATA_NAME_KEY, $column)
-                    && false !== strpos($column[PropertyInterface::DATA_NAME_KEY], '_target_field')
+                if (\array_key_exists(PropertyInterface::DATA_NAME_KEY, $column)
+                    && str_contains($column[PropertyInterface::DATA_NAME_KEY], '_target_field')
                 ) {
                     $result[PropertyInterface::DATA_NAME_KEY] = $columnName.'_identity';
                 }
 
-                $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
+                $isConfiguredInlineEdit = \array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             }
         }

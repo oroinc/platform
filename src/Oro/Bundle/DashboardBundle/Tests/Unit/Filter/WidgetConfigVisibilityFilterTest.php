@@ -31,10 +31,11 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $featureChecker->expects($this->any())
             ->method('isResourceEnabled')
-            ->will($this->returnCallback(function ($resource, $resourceType) {
-                return $resourceType === 'dashboard_widgets' &&
-                    strpos($resource, 'enabled') === 0 || strpos($resource, 'widget.enabled') === 0;
-            }));
+            ->willReturnCallback(function ($resource, $resourceType) {
+                return
+                    ('dashboard_widgets' === $resourceType && str_starts_with($resource, 'enabled'))
+                    || str_starts_with($resource, 'widget.enabled');
+            });
 
         $this->widgetConfigVisibilityFilter = new WidgetConfigVisibilityFilter(
             $authorizationChecker,

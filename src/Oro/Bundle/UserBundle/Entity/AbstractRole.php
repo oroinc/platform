@@ -83,7 +83,9 @@ abstract class AbstractRole extends Role
      */
     protected function addPrefix($role)
     {
-        if ($role !== AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY && strpos($role, $this->getPrefix()) !== 0) {
+        if ($role !== AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY
+            && !str_starts_with($role, $this->getPrefix())
+        ) {
             $role = $this->getPrefix() . $role;
         }
 

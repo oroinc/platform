@@ -60,7 +60,7 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
      */
     protected function prepareThemePath($theme, $file)
     {
-        if ($theme && strpos($theme, ':') === false && strpos($theme, '/') !== 0 && strpos($theme, '@') !== 0) {
+        if ($theme && !str_contains($theme, ':') && !str_starts_with($theme, '/') && !str_starts_with($theme, '@')) {
             $directoryPath = \dirname($file);
             $absolutePath = realpath($directoryPath.'/'.$theme);
             if ($absolutePath) {

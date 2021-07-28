@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
 
 /**
+ * The annotation that is used to provide configuration of configurable entity.
  * @Annotation
  * @Target("CLASS")
  */
@@ -25,7 +26,7 @@ class Config
     public $routeCreate = '';
 
     /** @var array */
-    public $defaultValues = array();
+    public $defaultValues = [];
 
     /** @var array */
     public $routes = [];
@@ -63,11 +64,11 @@ class Config
             );
         }
 
-        $availableMode = array(
+        $availableMode = [
             ConfigModel::MODE_DEFAULT,
             ConfigModel::MODE_HIDDEN,
             ConfigModel::MODE_READONLY
-        );
+        ];
 
         if (!in_array($this->mode, $availableMode, true)) {
             throw new AnnotationException(
@@ -81,7 +82,7 @@ class Config
     protected function collectRoutes(array $data)
     {
         foreach ($data as $name => $value) {
-            if (strpos($name, 'route') !== 0 || property_exists($this, $name)) {
+            if (!str_starts_with($name, 'route') || property_exists($this, $name)) {
                 continue;
             }
 

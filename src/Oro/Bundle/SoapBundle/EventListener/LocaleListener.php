@@ -35,7 +35,7 @@ class LocaleListener implements EventSubscriberInterface
 
     protected function isApiRequest(Request $request): bool
     {
-        return strpos($request->getPathInfo(), self::API_PREFIX) === 0;
+        return str_starts_with($request->getPathInfo(), self::API_PREFIX);
     }
 
     public static function getSubscribedEvents(): array

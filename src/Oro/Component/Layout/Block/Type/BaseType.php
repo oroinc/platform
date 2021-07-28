@@ -67,16 +67,9 @@ class BaseType extends AbstractType
         }
 
         // add core variables to the block view, like id, block type and variables required for rendering engine
-        $view->vars['id']                   = $block->getId();
-        $view->vars['block_type_widget_id'] = $block->getTypeName() . '_widget';
-        $view->vars['block_type']           = $block->getTypeName();
-        $view->vars['unique_block_prefix']  = '_' . preg_replace('/[^a-z0-9\_]+/i', '_', $block->getId());
-        $view->vars['cache_key']            = sprintf(
-            '_%s_%s_%s',
-            $block->getId(),
-            $block->getTypeName(),
-            $block->getContext()->getHash()
-        );
+        $view->vars['id'] = $block->getId();
+        $view->vars['block_type'] = $block->getTypeName();
+        BlockUtils::populateComputedViewVars($view->vars, $block->getContext()->getHash());
     }
 
     /**

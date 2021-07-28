@@ -20,13 +20,11 @@ default: &default
                 640_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
-        Behat\Symfony2Extension:
+        FriendsOfBehat\SymfonyExtension:
             kernel:
-                env: 'prod'
+                environment: 'prod'
                 debug: false
-            context:
-                path_suffix: 'Tests/Behat/Features'
-                class_suffix: 'Tests\Behat\Context\FeatureContext'
+                class: AppKernel
         Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension:
             artifacts:
                 handlers:
@@ -37,16 +35,14 @@ default: &default
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
-                - OroActivityListBundle::ActivityContext
-                - OroDataGridBundle::GridContext
-                - OroFormBundle::FormContext
-                - OroSecurityBundle::ACLContext
-                - OroSearchBundle::SearchContext
-                - OroEmailBundle::EmailContext
-                - OroImportExportBundle::ImportExportContext:
-                    - '@oro_entity.entity_alias_resolver'
-                    - '@oro_importexport.processor.registry'
-                - OroAddressBundle::AddressContext
+                - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
+                - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+                - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+                - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+                - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+                - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+                - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
+                - Oro\Bundle\AddressBundle\Tests\Behat\Context\AddressContext
     suites: []
 
 chromedriver:

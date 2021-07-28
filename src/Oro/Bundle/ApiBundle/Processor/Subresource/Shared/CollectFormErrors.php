@@ -37,7 +37,7 @@ class CollectFormErrors extends BaseCollectFormErrors
 
                 if ($propertyPath === $associationName) {
                     $errorSource->setPropertyPath('');
-                } elseif (0 === \strpos($propertyPath, $associationName . ConfigUtil::PATH_DELIMITER)) {
+                } elseif (str_starts_with($propertyPath, $associationName . ConfigUtil::PATH_DELIMITER)) {
                     $errorSource->setPropertyPath(\substr($propertyPath, \strlen($associationName) + 1));
                 }
             }

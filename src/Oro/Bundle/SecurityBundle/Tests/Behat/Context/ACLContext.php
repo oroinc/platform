@@ -6,12 +6,11 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -27,17 +26,20 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ACLContext extends OroFeatureContext implements
-    OroPageObjectAware,
-    KernelAwareContext
+    OroPageObjectAware
 {
-    use PageObjectDictionary, KernelDictionary;
+    use PageObjectDictionary;
 
     /** @var OroMainContext */
     private $oroMainContext;
+
     private Inflector $inflector;
 
-    public function __construct()
+    private DoctrineHelper $doctrineHelper;
+
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
+        $this->doctrineHelper = $doctrineHelper;
         $this->inflector = (new InflectorFactory())->build();
     }
 
@@ -532,13 +534,11 @@ class ACLContext extends OroFeatureContext implements
     protected function getRole($user)
     {
         if ('administrator' === $user) {
-            return $this->getContainer()
-                ->get('oro_entity.doctrine_helper')
+            return $this->doctrineHelper
                 ->getEntityRepositoryForClass(Role::class)
                 ->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
         } elseif ('user' === $user) {
-            return $this->getContainer()
-                ->get('oro_entity.doctrine_helper')
+            return $this->doctrineHelper
                 ->getEntityRepositoryForClass(Role::class)
                 ->findOneBy(['role' => User::ROLE_DEFAULT]);
         }

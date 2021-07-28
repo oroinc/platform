@@ -42,8 +42,7 @@ services:
         class: Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector
         arguments:
             - '@property_accessor'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'
 
     oro_digital_asset.listener.file_digital_asset_changed:
         class: Oro\Bundle\DigitalAssetBundle\EventListener\FileDigitalAssetChangedListener

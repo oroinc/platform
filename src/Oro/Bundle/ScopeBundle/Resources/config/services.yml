@@ -88,6 +88,6 @@ services:
             - { name: doctrine.event_listener, event: loadClassMetadata }
 
     oro_scope.migration.add_comment_to_row_hash_manager:
-        class: Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager
+        class: Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'

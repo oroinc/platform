@@ -23,7 +23,7 @@ class TestListener implements BaseListener
         foreach ($reflection->getProperties() as $property) {
             /** @noinspection NullPointerExceptionInspection */
             if ($property->isStatic()
-                || 0 === \strpos($property->getDeclaringClass()->getName(), 'PHPUnit_')
+                || str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit_')
                 || ($property->hasType() && !$property->getType()->allowsNull())
             ) {
                 continue;

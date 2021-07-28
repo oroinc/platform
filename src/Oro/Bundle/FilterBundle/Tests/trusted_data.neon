@@ -65,6 +65,10 @@ trusted_data:
         Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder:
             createSubQueryBuilder:
                 rootEntity: true
+            buildComparisonExpr:
+                alias: true
+            buildNullValueExpr:
+                alias: true
         Oro\Bundle\FilterBundle\Filter\DateGroupingFilter:
             getUsedDates:
                 filterType: true

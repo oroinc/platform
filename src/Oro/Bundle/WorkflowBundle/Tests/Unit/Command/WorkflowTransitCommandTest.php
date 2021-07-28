@@ -123,7 +123,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $found = 0;
         foreach ($this->output->messages as $message) {
             foreach ($expectedOutput as $expected) {
-                if (strpos($message, $expected) !== false) {
+                if (str_contains($message, $expected)) {
                     $found++;
                 }
             }

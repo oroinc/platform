@@ -17,6 +17,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### UIBundle
+* Remove reset style for ordered and unordered list in `Resources/public/blank/scss/reset.scss`
+
 #### ConfigBundle
 * The DIC compiler pass `Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ListenerExcludeConfigConnectionPass`
   was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.

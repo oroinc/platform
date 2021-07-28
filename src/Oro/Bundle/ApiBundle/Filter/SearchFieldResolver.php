@@ -97,19 +97,19 @@ class SearchFieldResolver implements FieldResolverInterface
     ): ?string {
         $this->ensurePlaceholderFieldMappingsInitialized();
         foreach ($this->placeholderFieldMappings as $pattern => $searchPattern) {
-            if (!\preg_match($pattern, $fieldName, $matches)) {
+            if (!preg_match($pattern, $fieldName, $matches)) {
                 continue;
             }
 
             $searchFieldName = $searchPattern;
             $searchMappingFieldName = $searchPattern;
             foreach ($matches as $key => $val) {
-                if (\is_numeric($key)) {
+                if (is_numeric($key)) {
                     continue;
                 }
-                $placeholder = \sprintf('{%s}', $key);
-                $searchFieldName = \str_replace($placeholder, $val, $searchFieldName);
-                $searchMappingFieldName = \str_replace($placeholder, $key, $searchMappingFieldName);
+                $placeholder = sprintf('{%s}', $key);
+                $searchFieldName = str_replace($placeholder, $val, $searchFieldName);
+                $searchMappingFieldName = str_replace($placeholder, $key, $searchMappingFieldName);
             }
 
             if (!isset($this->searchFieldMappings[$searchMappingFieldName])) {
@@ -132,14 +132,14 @@ class SearchFieldResolver implements FieldResolverInterface
 
         $this->placeholderFieldMappings = [];
         foreach ($this->fieldMappings as $fieldName => $searchFieldName) {
-            if (false !== \strpos($fieldName, '(?')) {
-                $this->placeholderFieldMappings[\sprintf('#%s#', $fieldName)] = $searchFieldName;
+            if (str_contains($fieldName, '(?')) {
+                $this->placeholderFieldMappings[sprintf('#%s#', $fieldName)] = $searchFieldName;
             }
         }
     }
 
     private function createFieldNotSupportedException(string $fieldName): InvalidFilterException
     {
-        return new InvalidFilterException(\sprintf('The field "%s" is not supported.', $fieldName));
+        return new InvalidFilterException(sprintf('The field "%s" is not supported.', $fieldName));
     }
 }

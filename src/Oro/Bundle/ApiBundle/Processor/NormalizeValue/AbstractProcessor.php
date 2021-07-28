@@ -99,7 +99,7 @@ abstract class AbstractProcessor implements ProcessorInterface
     {
         $value = $context->getResult();
         if (null !== $value && $this->isValueNormalizationRequired($value)) {
-            if ($context->isRangeAllowed() && false !== strpos($value, $context->getRangeDelimiter())) {
+            if ($context->isRangeAllowed() && str_contains($value, $context->getRangeDelimiter())) {
                 $context->setResult($this->normalizeRangeValue($value, $context->getRangeDelimiter()));
             } elseif ($context->isArrayAllowed()) {
                 $context->setResult($this->normalizeArrayValue($value, $context->getArrayDelimiter()));

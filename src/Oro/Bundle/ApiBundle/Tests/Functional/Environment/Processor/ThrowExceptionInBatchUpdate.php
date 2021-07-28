@@ -36,7 +36,7 @@ class ThrowExceptionInBatchUpdate implements ProcessorInterface
         if ($this->exceptionController->getFailedGroups()) {
             if (null !== $this->stage) {
                 foreach ($this->exceptionController->getFailedGroups() as $failedGroup) {
-                    if (strpos($failedGroup, ':') === false) {
+                    if (!str_contains($failedGroup, ':')) {
                         continue;
                     }
                     [$group, $stage] = explode(':', $failedGroup);
@@ -48,7 +48,7 @@ class ThrowExceptionInBatchUpdate implements ProcessorInterface
                         ));
                     }
                 }
-            } elseif (in_array($context->getFirstGroup(), $this->exceptionController->getFailedGroups(), true)
+            } elseif (\in_array($context->getFirstGroup(), $this->exceptionController->getFailedGroups(), true)
                 && ($context->getFirstGroup() !== ApiActionGroup::NORMALIZE_RESULT || $context->getSourceGroup())
             ) {
                 throw new RuntimeException(sprintf(

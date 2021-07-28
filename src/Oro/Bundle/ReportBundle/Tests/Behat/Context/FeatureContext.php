@@ -2,17 +2,22 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Behat\Context;
 
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 
-class FeatureContext extends OroFeatureContext implements KernelAwareContext, FixtureLoaderAwareInterface
+class FeatureContext extends OroFeatureContext implements FixtureLoaderAwareInterface
 {
-    use KernelDictionary;
     use FixtureLoaderDictionary;
+
+    private ManagerRegistry $managerRegistry;
+
+    public function __construct(ManagerRegistry $managerRegistry)
+    {
+        $this->managerRegistry = $managerRegistry;
+    }
 
     /**
      * @Given /^I have a complete calendar date table from "(?P<fromYear>[\d]+)" to "(?P<toYear>[\d]+)"$/
@@ -31,9 +36,7 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Fi
 
     protected function clearCalendarDateTable()
     {
-        $em = $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(CalendarDate::class);
+        $em = $this->managerRegistry->getManagerForClass(CalendarDate::class);
 
         $repository = $em->getRepository(CalendarDate::class);
 
@@ -46,9 +49,7 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Fi
 
     protected function fillDatesFrom(\DateTime $startDate, \DateTime $endDate)
     {
-        $registry = $this->getContainer()->get('doctrine');
-
-        $manager = $registry->getManagerForClass(CalendarDate::class);
+        $manager = $this->managerRegistry->getManagerForClass(CalendarDate::class);
         $currentDates = $manager->getRepository(CalendarDate::class)->findAll();
 
         /** @var CalendarDate $date */

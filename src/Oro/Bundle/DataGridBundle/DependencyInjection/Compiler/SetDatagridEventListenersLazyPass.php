@@ -38,8 +38,8 @@ class SetDatagridEventListenersLazyPass implements CompilerPassInterface
         foreach ($eventListeners as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (isset($tag['event'])
-                    && 0 === strpos($tag['event'], 'oro_datagrid')
-                    && !in_array($tag['event'], $datagridEvents, true)
+                    && str_starts_with($tag['event'], 'oro_datagrid')
+                    && !\in_array($tag['event'], $datagridEvents, true)
                 ) {
                     $datagridEventListeners[] = $serviceId;
                 }

@@ -49,7 +49,7 @@ class Acl implements \Serializable
         }
 
         $this->id = $data['id'] ?? null;
-        if (empty($this->id) || strpos($this->id, ' ') !== false) {
+        if (empty($this->id) || str_contains($this->id, ' ')) {
             throw new \InvalidArgumentException('ACL id must not be empty or contain blank spaces.');
         }
 

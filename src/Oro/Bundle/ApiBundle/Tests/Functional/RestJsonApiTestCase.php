@@ -84,7 +84,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $filters = $parameters['filters'];
             if ($filters) {
                 $separator = '?';
-                if (false !== strpos($uri, '?')) {
+                if (str_contains($uri, '?')) {
                     $separator = '&';
                 }
                 $uri .= $separator . $filters;

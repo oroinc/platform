@@ -23,22 +23,6 @@ use Twig\TwigFilter;
 class DateTimeOrganizationExtension extends DateTimeExtension
 {
     /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        return $this->container->get('oro_config.global');
-    }
-
-    /**
-     * @return LocalizationManager
-     */
-    protected function getLocalizationManager()
-    {
-        return $this->container->get('oro_locale.manager.localization');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getFilters()
@@ -72,20 +56,22 @@ class DateTimeOrganizationExtension extends DateTimeExtension
      */
     public function formatDateTimeOrganization($date, array $options = [])
     {
-        $dateType = $this->getOption($options, 'dateType');
-        $timeType = $this->getOption($options, 'timeType');
-        $organization = $this->getOption($options, 'organization');
+        [$locale, $timeZone] = $this->getLocaleSettings($options['organization'] ?? null, $options);
 
-        [$locale, $timeZone] = $this->getLocaleSettings($organization, $options);
-
-        return $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
+        return $this->getDateTimeFormatter()->format(
+            $date,
+            $options['dateType'] ?? null,
+            $options['timeType'] ?? null,
+            $locale,
+            $timeZone
+        );
     }
 
     /**
      * @param OrganizationInterface|null $organization
      * @param array                      $options
      *
-     * @return array ['locale', 'timezone']
+     * @return array [locale, timezone]
      */
     protected function getLocaleSettings($organization, array $options)
     {
@@ -98,8 +84,8 @@ class DateTimeOrganizationExtension extends DateTimeExtension
             $locale = $this->getFormattingCode((int) $localizationId);
             $timeZone = $configManager->get('oro_locale.timezone');
         } else {
-            $locale = $this->getOption($options, 'locale');
-            $timeZone = $this->getOption($options, 'timeZone');
+            $locale = $options['locale'] ?? null;
+            $timeZone = $options['timeZone'] ?? null;
         }
 
         return [$locale, $timeZone];
@@ -128,5 +114,14 @@ class DateTimeOrganizationExtension extends DateTimeExtension
                 'oro_locale.manager.localization' => LocalizationManager::class,
             ]
         );
+    }
+    protected function getConfigManager(): ConfigManager
+    {
+        return $this->container->get('oro_config.global');
+    }
+
+    protected function getLocalizationManager(): LocalizationManager
+    {
+        return $this->container->get('oro_locale.manager.localization');
     }
 }

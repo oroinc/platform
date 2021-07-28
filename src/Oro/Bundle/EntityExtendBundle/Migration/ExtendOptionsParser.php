@@ -58,7 +58,7 @@ class ExtendOptionsParser
         $objectKeys = array_filter(
             array_keys($options),
             function ($key) {
-                return strpos($key, '_') !== 0;
+                return !str_starts_with($key, '_');
             }
         );
 
@@ -82,7 +82,7 @@ class ExtendOptionsParser
         $auxiliarySections = array_filter(
             array_keys($options),
             function ($key) {
-                return strpos($key, '_') === 0;
+                return str_starts_with($key, '_');
             }
         );
         foreach ($auxiliarySections as $sectionName) {

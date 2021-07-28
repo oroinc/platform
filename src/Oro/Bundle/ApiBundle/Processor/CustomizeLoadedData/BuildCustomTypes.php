@@ -227,7 +227,7 @@ class BuildCustomTypes implements ProcessorInterface
 
             $value = null;
             $targetPropertyPath = $field->getPropertyPath($fieldName);
-            if (false !== strpos($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
+            if (str_contains($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
                 throw new RuntimeException(sprintf(
                     'The "%s" property path is not supported.',
                     $targetPropertyPath

@@ -70,7 +70,7 @@ class MigrateNoteAssociations20
                 $relationPrefix = sprintf('manyToOne|%s|', $noteClassName);
                 $relations = $data['extend']['relation'];
                 foreach ($relations as $relationName => $relation) {
-                    if (0 !== strpos($relationName, $relationPrefix)
+                    if (!str_starts_with($relationName, $relationPrefix)
                         || !array_key_exists('owner', $relation)
                         || !$relation['owner']
                         || !array_key_exists('target_entity', $relation)
@@ -79,13 +79,13 @@ class MigrateNoteAssociations20
                     }
                     $targetClass = $relation['target_entity'];
                     $relationPrefixWithTargetClass = sprintf('%s%s|', $relationPrefix, $targetClass);
-                    if (0 !== strpos($relationName, $relationPrefixWithTargetClass)) {
+                    if (!str_starts_with($relationName, $relationPrefixWithTargetClass)) {
                         continue;
                     }
                     $val = explode('|', substr($relationName, strlen($relationPrefixWithTargetClass)));
                     $associationName = reset($val);
                     $expectedAssociationName = ExtendHelper::buildAssociationName($targetClass);
-                    if ($associationName === $expectedAssociationName || 0 !== strpos($targetClass, 'Oro\\')) {
+                    if ($associationName === $expectedAssociationName || !str_starts_with($targetClass, 'Oro\\')) {
                         continue;
                     }
                     $guessedOldTargetClass = 'OroCRM' . substr($targetClass, 3);

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ScopeBundle\Migration\Schema;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ScopeBundle\Migration\AddCommentToRoHashManager;
+use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 use Oro\Bundle\ScopeBundle\Migration\Query\AddScopeUniquenessQuery;
 use Oro\Bundle\ScopeBundle\Migration\Query\AddTriggerToRowHashQuery;
 
@@ -15,11 +15,11 @@ use Oro\Bundle\ScopeBundle\Migration\Query\AddTriggerToRowHashQuery;
 class UpdateScopeRowHashColumn implements Migration
 {
     /**
-     * @var AddCommentToRoHashManager
+     * @var AddCommentToRowHashManager
      */
     protected $manager;
 
-    public function __construct(AddCommentToRoHashManager $manager)
+    public function __construct(AddCommentToRowHashManager $manager)
     {
         $this->manager = $manager;
     }

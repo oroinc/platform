@@ -23,36 +23,14 @@ use Twig\TwigFunction;
  */
 class CurrencyExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?NumberFormatter $numberFormatter = null;
+    private ?ViewTypeProviderInterface $viewTypeProvider = null;
+    private ?CurrencyNameHelper $currencyNameHelper = null;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return NumberFormatter
-     */
-    protected function getNumberFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.number');
-    }
-
-    /**
-     * @return ViewTypeProviderInterface
-     */
-    protected function getViewTypeProvider()
-    {
-        return $this->container->get('oro_currency.provider.view_type');
-    }
-
-    /**
-     * @return CurrencyNameHelper
-     */
-    protected function getCurrencyNameHelper()
-    {
-        return $this->container->get('oro_currency.helper.currency_name');
     }
 
     /**
@@ -119,16 +97,14 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function formatPrice(Price $price, array $options = [])
     {
-        $value = $price->getValue();
-        $currency = $price->getCurrency();
-
-        $attributes = (array)$this->getOption($options, 'attributes', []);
-        $textAttributes = (array)$this->getOption($options, 'textAttributes', []);
-        $symbols = (array)$this->getOption($options, 'symbols', []);
-        $locale = $this->getOption($options, 'locale');
-
-        $formattedValue = $this->getNumberFormatter()
-            ->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+        $formattedValue = $this->getNumberFormatter()->formatCurrency(
+            $price->getValue(),
+            $price->getCurrency(),
+            (array)($options['attributes'] ?? []),
+            (array)($options['textAttributes'] ?? []),
+            (array)($options['symbols'] ?? []),
+            $options['locale'] ?? null
+        );
 
         return strip_tags($formattedValue);
     }
@@ -140,17 +116,16 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
      */
     public function getSymbolCollection()
     {
-        $currencySymbolCollection = $this->getCurrencyNameHelper()
-            ->getCurrencyChoices(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
+        $currencySymbolCollection = $this->getCurrencyNameHelper()->getCurrencyChoices(
+            ViewTypeProviderInterface::VIEW_TYPE_SYMBOL
+        );
 
-        $currencySymbolCollection = array_map(
+        return array_map(
             function ($symbol) {
                 return ['symbol' => $symbol];
             },
             array_flip($currencySymbolCollection)
         );
-
-        return $currencySymbolCollection;
     }
 
     /**
@@ -165,19 +140,6 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
     }
 
     /**
-     * Gets option or default value if option not exist
-     *
-     * @param array $options
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getOption(array $options, $name, $default = null)
-    {
-        return isset($options[$name]) ? $options[$name] : $default;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()
@@ -187,5 +149,32 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
             'oro_currency.provider.view_type' => ViewTypeProviderInterface::class,
             'oro_currency.helper.currency_name' => CurrencyNameHelper::class,
         ];
+    }
+
+    private function getNumberFormatter(): NumberFormatter
+    {
+        if (null === $this->numberFormatter) {
+            $this->numberFormatter = $this->container->get('oro_locale.formatter.number');
+        }
+
+        return $this->numberFormatter;
+    }
+
+    private function getViewTypeProvider(): ViewTypeProviderInterface
+    {
+        if (null === $this->viewTypeProvider) {
+            $this->viewTypeProvider = $this->container->get('oro_currency.provider.view_type');
+        }
+
+        return $this->viewTypeProvider;
+    }
+
+    private function getCurrencyNameHelper(): CurrencyNameHelper
+    {
+        if (null === $this->currencyNameHelper) {
+            $this->currencyNameHelper = $this->container->get('oro_currency.helper.currency_name');
+        }
+
+        return $this->currencyNameHelper;
     }
 }

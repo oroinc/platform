@@ -6,13 +6,15 @@ use Behat\Behat\Hook\Scope\AfterFeatureScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Gaufrette\File;
 use GuzzleHttp\Client;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Services\PreExportMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -22,6 +24,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -29,10 +32,9 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ImportExportContext extends OroFeatureContext implements
-    KernelAwareContext,
     OroPageObjectAware
 {
-    use KernelDictionary, PageObjectDictionary;
+    use PageObjectDictionary;
 
     /**
      * @var EntityAliasResolver
@@ -72,10 +74,36 @@ class ImportExportContext extends OroFeatureContext implements
     /** @var null|string */
     private $absoluteUrl;
 
-    public function __construct(EntityAliasResolver $aliasResolver, ProcessorRegistry $processorRegistry)
-    {
+    private RouterInterface $router;
+
+    private ConfigManager $configManager;
+
+    private FileManager $fileManager;
+
+    private Cache $cache;
+
+    private JobExecutor $jobExecutor;
+
+    private string $projectDir;
+
+    public function __construct(
+        RouterInterface $router,
+        string $projectDir,
+        EntityAliasResolver $aliasResolver,
+        ProcessorRegistry $processorRegistry,
+        ConfigManager $configManager,
+        FileManager $fileManager,
+        Cache $cache,
+        JobExecutor $jobExecutor
+    ) {
+        $this->router = $router;
+        $this->projectDir = $projectDir;
         $this->aliasResolver = $aliasResolver;
         $this->processorRegistry = $processorRegistry;
+        $this->configManager = $configManager;
+        $this->fileManager = $fileManager;
+        $this->cache = $cache;
+        $this->jobExecutor = $jobExecutor;
     }
 
     public function setAbsoluteUrl(?string $absoluteUrl): void
@@ -198,7 +226,7 @@ class ImportExportContext extends OroFeatureContext implements
         $exportButton = $this->createElement('ActiveExportTemplateButton');
         self::assertTrue($exportButton->isIsset(), "Export template link was not found");
 
-        $url = $this->locatePath($this->getContainer()->get('router')->generate(
+        $url = $this->locatePath($this->router->generate(
             'oro_importexport_export_template',
             [
                 'processorAlias' => $processor,
@@ -605,7 +633,7 @@ class ImportExportContext extends OroFeatureContext implements
     private function getAbsoluteUrl(string $path): string
     {
         if (!$this->absoluteUrl) {
-            $this->absoluteUrl = $this->getContainer()->get('oro_config.manager')->get('oro_ui.application_url');
+            $this->absoluteUrl = $this->configManager->get('oro_ui.application_url');
         }
 
         return sprintf('%s/%s', $this->absoluteUrl, ltrim($path, '/'));
@@ -613,7 +641,7 @@ class ImportExportContext extends OroFeatureContext implements
 
     private function getAbsolutePath(string $path): string
     {
-        return sprintf('%s/%s', $this->getContainer()->getParameter('kernel.project_dir'), ltrim($path, '/'));
+        return sprintf('%s/%s', $this->projectDir, ltrim($path, '/'));
     }
 
     /**
@@ -776,8 +804,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         // BAP-17638: Replace sleep to appropriate logic
         // temporary solution: find the most recent file created in import_export dir
-        $fileManager = $this->getContainer()->get('oro_importexport.file.file_manager');
-        $files = $fileManager->getFilesByPeriod();
+        $files = $this->fileManager->getFilesByPeriod();
 
         $exportFiles = array_filter($files, function (File $file) {
             return preg_match('/export_\d{4}.*.csv/', $file->getName());
@@ -790,7 +817,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         /** @var File $exportFile */
         $exportFile = reset($exportFiles);
-        $this->importFile = $fileManager->writeToTmpLocalStorage($exportFile->getName());
+        $this->importFile = $this->fileManager->writeToTmpLocalStorage($exportFile->getName());
         $this->tryImportFile();
     }
 
@@ -831,8 +858,7 @@ class ImportExportContext extends OroFeatureContext implements
     public function changeExportBatchSize(int $size): void
     {
         // oro_importexport.test.cache service is defined in ImportExportBundle/Tests/Behat/parameters.yml
-        $cache = $this->getContainer()->get('oro_importexport.test.cache');
-        $cache->save(PreExportMessageProcessor::BATCH_SIZE_KEY, $size);
+        $this->cache->save(PreExportMessageProcessor::BATCH_SIZE_KEY, $size);
     }
 
     /**
@@ -902,8 +928,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         $filePath = $this->getTempFilePath('export_');
 
-        $jobExecutor = $this->getContainer()->get('oro_importexport.job_executor');
-        $jobResult = $jobExecutor->executeJob(
+        $jobResult = $this->jobExecutor->executeJob(
             'export',
             'entity_export_to_csv',
             [

@@ -12,8 +12,8 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\ReflectionUtil;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
@@ -30,12 +30,11 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->serializer = $this->getMockForAbstractClass(SerializerInterface::class);
 
-        $serializerLink = $this->createMock(ServiceLink::class);
-        $serializerLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->serializer);
+        $container = TestContainerBuilder::create()
+            ->add('oro_workflow.serializer.process.serializer', $this->serializer)
+            ->getContainer($this);
 
-        $this->listener = new ProcessDataSerializeListener($serializerLink);
+        $this->listener = new ProcessDataSerializeListener($container);
     }
 
     /**
@@ -63,17 +62,12 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
 
     public function onFlushProvider(): array
     {
-        $stdClass = new \stdClass();
         $processJob = new ProcessJob();
         $processJob->getData()->set('key', 'value');
 
         return [
-            'string instead class' => [
-                'entities' => ['some class'],
-                'expected' => []
-            ],
             'invalid class' => [
-                'entities' => [$stdClass],
+                'entities' => [new \stdClass()],
                 'expected' => []
             ],
             'valid class' => [
@@ -81,7 +75,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
                 'expected' => [$processJob, $processJob]
             ],
             'several' => [
-                'entities' => [$processJob, $stdClass, 'str', $stdClass],
+                'entities' => [$processJob, new \stdClass(), new \stdClass()],
                 'expected' => [$processJob, $processJob]
             ],
         ];

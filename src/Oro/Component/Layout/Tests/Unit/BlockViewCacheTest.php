@@ -24,9 +24,6 @@ class BlockViewCacheTest extends LayoutTestCase
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
 
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
     protected function setUp(): void
     {
         $this->blockView = new BlockView();
@@ -34,10 +31,10 @@ class BlockViewCacheTest extends LayoutTestCase
         $this->cacheProvider = $this->createMock(CacheProvider::class);
 
         $normalizer = new ObjectNormalizer();
-        $this->serializer = new Serializer([$normalizer], [new JsonEncoder()]);
-        $normalizer->setSerializer($this->serializer);
+        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
+        $normalizer->setSerializer($serializer);
 
-        $this->blockViewCache = new BlockViewCache($this->cacheProvider, $this->serializer);
+        $this->blockViewCache = new BlockViewCache($this->cacheProvider, $serializer);
     }
 
     public function testSave()

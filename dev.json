@@ -48,10 +48,10 @@
         "symfony/lock": "~4.4.24",
         "symfony/mime": "~4.4.24",
         "symfony/monolog-bridge": "~4.4.24",
-        "symfony/options-resolver": "~4.4.24",
+        "symfony/options-resolver": "~5.3.0",
         "symfony/process": "~4.4.24",
-        "symfony/property-access": "~4.4.24",
-        "symfony/property-info": "~4.4.24",
+        "symfony/property-access": "~5.3.0",
+        "symfony/property-info": "~5.3.0",
         "symfony/proxy-manager-bridge": "~4.4.24",
         "symfony/routing": "~4.4.24",
         "symfony/security": "~4.4.24",
@@ -129,7 +129,7 @@
         "behat/mink": "~1.8.1",
         "friends-of-behat/mink-extension": "~v2.5.0",
         "behat/mink-selenium2-driver": "~1.4.0",
-        "behat/symfony2-extension": "~2.1.5",
+        "friends-of-behat/symfony-extension": "~2.2.0",
         "nelmio/alice": "~3.8.0",
         "theofidry/alice-data-fixtures": "~1.4.0",
         "phpunit/phpunit": "~9.5.1",
@@ -219,7 +219,7 @@
             "whatwg-fetch": "3.1.*"
         },
         "symfony": {
-            "require": "4.4.*"
+            "require": ">4.4,<5.4"
         },
         "branch-alias": {
             "dev-master": "5.0-dev"

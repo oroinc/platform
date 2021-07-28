@@ -78,7 +78,7 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
         foreach ($errors as $error) {
             $cause = $error->getCause();
             if ($cause instanceof ConstraintViolation
-                && 0 === strpos($cause->getPropertyPath(), 'data.price.')
+                && str_starts_with($cause->getPropertyPath(), 'data.price.')
             ) {
                 $property = ReflectionUtil::getProperty(new \ReflectionClass($cause), 'propertyPath');
                 if (null !== $property) {

@@ -88,13 +88,10 @@ class WorkflowDatagridLabelListener
         ];
         $columnAliases = $configuration->offsetGetByPath(QueryDesignerQueryConfiguration::COLUMN_ALIASES, []);
         foreach ($columnAliases as $key => $alias) {
-            if (false !== strpos($key, WorkflowStep::class . '::label')) {
+            if (str_contains($key, WorkflowStep::class . '::label')) {
                 $columns[WorkflowStep::class][] = $alias;
-                continue;
-            }
-            if (false !== strpos($key, WorkflowDefinition::class . '::label')) {
+            } elseif (str_contains($key, WorkflowDefinition::class . '::label')) {
                 $columns[WorkflowDefinition::class][] = $alias;
-                continue;
             }
         }
 
@@ -111,7 +108,7 @@ class WorkflowDatagridLabelListener
         $column = $configuration->offsetGetByPath($path);
         $column['frontend_type'] = 'html';
         $column['type'] = 'callback';
-        $column['callable'] = [$this, "trans"];
+        $column['callable'] = [$this, 'trans'];
         $column['params'] = [$columnName];
         $configuration->offsetSetByPath($path, $column);
     }

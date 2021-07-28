@@ -148,7 +148,7 @@ class ColumnsStateProvider extends AbstractStateProvider
             // Last char is flag indicating column state, rest part is a column name.
             $columnsState[substr($columnState, 0, -1)] = [
                 self::ORDER_FIELD_NAME => (int)$key,
-                self::RENDER_FIELD_NAME => substr($columnState, -1) === '1',
+                self::RENDER_FIELD_NAME => str_ends_with($columnState, '1'),
             ];
         }
 

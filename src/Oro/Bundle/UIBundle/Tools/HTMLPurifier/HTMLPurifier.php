@@ -105,7 +105,7 @@ class HTMLPurifier extends \HTMLPurifier implements TranslatorAwareInterface
             if (!$flag) {
                 continue;
             }
-            if (strpos($filter, '.') !== false) {
+            if (str_contains($filter, '.')) {
                 continue;
             }
             $class = "HTMLPurifier_Filter_$filter";
