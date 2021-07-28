@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;

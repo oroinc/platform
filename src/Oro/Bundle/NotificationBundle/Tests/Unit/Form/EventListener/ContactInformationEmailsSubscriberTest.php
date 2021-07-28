@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventListener;
+namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;

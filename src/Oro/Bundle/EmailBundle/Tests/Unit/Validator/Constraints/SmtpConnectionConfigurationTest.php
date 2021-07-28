@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Validators\Constraints;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator;

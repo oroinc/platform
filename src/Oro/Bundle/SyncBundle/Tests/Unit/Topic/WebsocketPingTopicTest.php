@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
+namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
 use Gos\Bundle\WebSocketBundle\Topic\TopicPeriodicTimer;
 use Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic;

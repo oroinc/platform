@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\CronBundle\Tests\Unit\Helper;
 
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Helper\CronHelper;

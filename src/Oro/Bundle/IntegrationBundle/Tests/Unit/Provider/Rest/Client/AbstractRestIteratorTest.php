@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
+namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client;
 
 class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
 {

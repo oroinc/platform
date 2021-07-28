@@ -9,15 +9,44 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Normalizer for parsed expressions
+ * Normalizer for parsed expressions.
  */
-class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
+class ExpressionNormalizer implements
+    NormalizerInterface,
+    DenormalizerInterface,
+    TypeNameConverterInterface
 {
+    private const SHORT_TYPE = 'e';
+
+    private const DATA_EXPRESSION = 'e';
+    private const DATA_EXTRA_VARIABLES = 'v';
+    private const DATA_NODES = 'n';
+
     private ExpressionLanguageCache $expressionLanguageCache;
 
     public function __construct(ExpressionLanguageCache $expressionLanguageCache)
     {
         $this->expressionLanguageCache = $expressionLanguageCache;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortTypeName(string $type): ?string
+    {
+        return ParsedExpression::class === $type
+            ? self::SHORT_TYPE
+            : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeName(string $shortType): ?string
+    {
+        return self::SHORT_TYPE === $shortType
+            ? ParsedExpression::class
+            : null;
     }
 
     /**
@@ -33,20 +62,26 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        /** @var ParsedExpression $parsedExpression */
-        $parsedExpression = $object;
+        /** @var ParsedExpression $object */
 
-        $expression = (string)$parsedExpression;
+        $expression = (string)$object;
         $closure = $this->expressionLanguageCache->getClosure($expression);
         if (null !== $closure) {
             return [
-                'expression' => $expression,
+                self::DATA_EXPRESSION => $expression,
+            ];
+        }
+        $closureWithExtraParams = $this->expressionLanguageCache->getClosureWithExtraParams($expression);
+        if (null !== $closureWithExtraParams) {
+            return [
+                self::DATA_EXPRESSION => $expression,
+                self::DATA_EXTRA_VARIABLES => $closureWithExtraParams->getExtraParamNames()
             ];
         }
 
         return [
-            'expression' => $expression,
-            'nodes' => serialize($parsedExpression->getNodes()),
+            self::DATA_EXPRESSION => $expression,
+            self::DATA_NODES => serialize($object->getNodes()),
         ];
     }
 
@@ -55,7 +90,7 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === ParsedExpression::class;
+        return ParsedExpression::class === $type;
     }
 
     /**
@@ -63,13 +98,14 @@ class ExpressionNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (!array_key_exists('nodes', $data)) {
-            return $this->expressionLanguageCache->getClosure($data['expression']);
+        if (\array_key_exists(self::DATA_NODES, $data)) {
+            return new SerializedParsedExpression($data[self::DATA_EXPRESSION], $data[self::DATA_NODES]);
         }
 
-        return new SerializedParsedExpression(
-            $data['expression'],
-            $data['nodes']
-        );
+        if (\array_key_exists(self::DATA_EXTRA_VARIABLES, $data)) {
+            return $this->expressionLanguageCache->getClosureWithExtraParams($data[self::DATA_EXPRESSION]);
+        }
+
+        return $this->expressionLanguageCache->getClosure($data[self::DATA_EXPRESSION]);
     }
 }

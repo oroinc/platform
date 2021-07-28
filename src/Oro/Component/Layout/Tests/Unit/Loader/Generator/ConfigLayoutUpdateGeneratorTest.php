@@ -152,6 +152,24 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
+    public function testForEmptyStringValue()
+    {
+        $data = [
+            'actions' => [
+                [
+                    '@setOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '',
+                    ],
+                ],
+            ],
+        ];
+        $this->cacheWarmer->expects($this->never())
+            ->method('collect');
+        $this->generator->generate('testClassName', new GeneratorData($data));
+    }
+
     // @codingStandardsIgnoreStart
     public function testGenerate()
     {

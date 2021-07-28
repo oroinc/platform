@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Test\Unit\Form\Handler;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

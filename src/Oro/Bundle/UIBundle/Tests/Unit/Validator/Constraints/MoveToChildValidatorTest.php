@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Validator\Constraints;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;

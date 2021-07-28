@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Filter;
+namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;

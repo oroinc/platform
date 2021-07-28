@@ -151,6 +151,8 @@ services:
             - '@oro_layout.expression_language'
             - '@filesystem'
             - '%oro_layout.expression_language_cache_file%'
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
