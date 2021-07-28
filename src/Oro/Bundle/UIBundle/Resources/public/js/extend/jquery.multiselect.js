@@ -167,20 +167,29 @@ define(function(require) {
         },
 
         /**
-         * Remove all handlers before closing menu
+         * Fully override the original method with modification.
+         * Remove elements attributes and fixed moving focus back to a toggle element.
+         * Remove all handlers before closing menu.
          * @override
          */
         close() {
+            if (this._trigger('beforeclose') === false) {
+                return;
+            }
+
             mask.hide();
             this.button.attr('aria-expanded', false);
             this.$outerTrigger.attr('aria-expanded', false);
+            this.menu.removeAttr('tabindex');
 
-            const superResult = this._superApply();
+            this.button.removeClass('ui-state-active');
 
             if (
                 this.options.preventTabOutOfContainer &&
-                ($.contains(this.menu[0], document.activeElement) ||
-                this.menu[0].isSameNode(document.activeElement))
+                (
+                    $.contains(this.menu[0], document.activeElement) ||
+                    this.menu[0].isSameNode(document.activeElement)
+                )
             ) {
                 this.button.trigger('focus');
 
@@ -190,8 +199,24 @@ define(function(require) {
                 }
             }
 
-            this.menu.removeAttr('tabindex');
-            return superResult;
+            const o = this.options;
+            let effect = o.hide;
+            let speed = this.speed;
+            let args = [];
+
+            // figure out opening effects/speeds
+            if ($.isArray(o.hide)) {
+                effect = o.hide[0];
+                speed = o.hide[1] || this.speed;
+            }
+
+            if (effect) {
+                args = [effect, speed];
+            }
+
+            $.fn.hide.apply(this.menu, args);
+            this._isOpen = false;
+            this._trigger('close');
         },
 
         /**
