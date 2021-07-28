@@ -35,7 +35,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSupportsDenormalization()
     {
-        $this->assertFalse($this->normalizer->supportsDenormalization([], new \stdClass()));
+        $this->assertFalse($this->normalizer->supportsDenormalization([], \stdClass::class));
         $this->assertTrue($this->normalizer->supportsDenormalization([], OptionValueBag::class));
     }
 

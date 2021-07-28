@@ -7,14 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
 /**
  * Normalize/denormalize FieldConfigModel instances.
  */
-class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
+class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
 {
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_INTEGER = 'integer';
@@ -22,7 +22,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     const TYPE_ENUM = 'enum';
 
     const CONFIG_TYPE = 'value_type';
-    const CONFIG_DEFAULT= 'default_value';
+    const CONFIG_DEFAULT = 'default_value';
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -46,7 +46,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof FieldConfigModel;
     }
@@ -54,7 +54,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $result = [
             'id' => $object->getId(),
@@ -76,15 +76,15 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
-        return is_array($data) && is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
+        return is_array($data) && is_a($type, FieldConfigModel::class, true);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!isset($data['entity']['id'])) {
             throw new UnexpectedValueException('Data doesn\'t contains entity id');
@@ -103,16 +103,12 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         return $fieldModel;
     }
 
-    /**
-     * @param int $entityId
-     * @return EntityConfigModel
-     */
-    protected function getEntityConfigModel($entityId)
+    protected function getEntityConfigModel(string|int $entityId): ?EntityConfigModel
     {
         return $this->registry->getManagerForClass(EntityConfigModel::class)->find(EntityConfigModel::class, $entityId);
     }
 
-    protected function updateModelConfig(FieldConfigModel $model, array $options)
+    protected function updateModelConfig(FieldConfigModel $model, array $options): void
     {
         $fieldProperties = $this->fieldTypeProvider->getFieldProperties($model->getType());
         foreach ($fieldProperties as $scope => $properties) {
@@ -124,7 +120,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
                 }
 
                 $value = $this->denormalizeFieldValue(
-                    isset($config['options']) ? $config['options'] : [],
+                    $config['options'] ?? [],
                     $options[$scope][$code],
                     $model->getType()
                 );
@@ -142,11 +138,12 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      * @param array $config
      * @param mixed $value
      * @param string $fieldType
+     *
      * @return mixed
      */
     protected function denormalizeFieldValue(array $config, $value, $fieldType)
     {
-        $type = array_key_exists(self::CONFIG_TYPE, $config) ? $config[self::CONFIG_TYPE] : null;
+        $type = $config[self::CONFIG_TYPE] ?? null;
 
         switch ($type) {
             case self::TYPE_BOOLEAN:
@@ -168,6 +165,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
     /**
      * @param mixed $value
+     *
      * @return bool
      */
     protected function normalizeBoolValue($value)
@@ -178,6 +176,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * @param mixed $value
      * @param string $type
+     *
      * @return array
      */
     protected function normalizeEnumValue($value, $type)
@@ -211,6 +210,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      * @param array $array
      * @param string $key
      * @param mixed $value
+     *
      * @return boolean
      */
     protected function extractAndAppendKeyValue(&$array, $key, $value)
@@ -240,10 +240,10 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     {
         return [
             'label' => [
-                self::CONFIG_TYPE => self::TYPE_STRING
+                self::CONFIG_TYPE => self::TYPE_STRING,
             ],
             'is_default' => [
-                self::CONFIG_TYPE => self::TYPE_BOOLEAN
+                self::CONFIG_TYPE => self::TYPE_BOOLEAN,
             ],
         ];
     }

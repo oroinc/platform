@@ -4,19 +4,17 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessTraversableNormalizer;
-use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
+use Symfony\Component\Serializer\Serializer;
 
 class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ProcessDataSerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
+    private Serializer|\PHPUnit\Framework\MockObject\MockObject $serializer;
 
-    /** @var ProcessTraversableNormalizer */
-    private $normalizer;
+    private ProcessTraversableNormalizer $normalizer;
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(ProcessDataSerializer::class);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new ProcessTraversableNormalizer();
         $this->normalizer->setSerializer($this->serializer);
@@ -25,7 +23,7 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize(iterable $data)
+    public function testNormalize(iterable $data): void
     {
         $format = 'json';
         $context = [];
@@ -37,12 +35,12 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
             $normalizeExpectations[] = [$value, $format, $context];
             $expected[$key] = json_encode($value, JSON_THROW_ON_ERROR);
         }
-        $this->serializer->expects($this->exactly(count($normalizeExpectations)))
+        $this->serializer->expects(self::exactly(count($normalizeExpectations)))
             ->method('normalize')
             ->withConsecutive(...$normalizeExpectations)
             ->willReturnOnConsecutiveCalls(...array_values($expected));
 
-        $this->assertSame($expected, $this->normalizer->normalize($data, $format, $context));
+        self::assertSame($expected, $this->normalizer->normalize($data, $format, $context));
     }
 
     public function normalizeDataProvider(): array
@@ -57,11 +55,11 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $data = [
-            'first'  => json_encode(1, JSON_THROW_ON_ERROR),
-            'second' => json_encode(2, JSON_THROW_ON_ERROR)
+            'first' => json_encode(1, JSON_THROW_ON_ERROR),
+            'second' => json_encode(2, JSON_THROW_ON_ERROR),
         ];
         $format = 'json';
         $context = [];
@@ -70,31 +68,31 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $denormalizeExpectations = [];
         foreach ($data as $key => $value) {
-            $denormalizeExpectations[] = [$value, null, $format, $context];
+            $denormalizeExpectations[] = [$value, '', $format, $context];
             $expected[$key] = json_decode($value, false, 512, JSON_THROW_ON_ERROR);
         }
-        $this->serializer->expects($this->exactly(count($denormalizeExpectations)))
+        $this->serializer->expects(self::exactly(count($denormalizeExpectations)))
             ->method('denormalize')
             ->withConsecutive(...$denormalizeExpectations)
             ->willReturnOnConsecutiveCalls(...array_values($expected));
 
-        $this->assertSame($expected, $this->normalizer->denormalize($data, null, $format, $context));
+        self::assertSame($expected, $this->normalizer->denormalize($data, '', $format, $context));
     }
 
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expected)
+    public function testSupportsNormalization($data, $expected): void
     {
-        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
+        self::assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
 
     public function supportsNormalizationDataProvider(): array
     {
         return [
-            'null'        => [null, false],
-            'scalar'      => ['scalar', false],
-            'array'       => [[], true],
+            'null' => ['', false],
+            'scalar' => ['scalar', false],
+            'array' => [[], true],
             'traversable' => [new ArrayCollection(), true],
         ];
     }
@@ -102,17 +100,17 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($data, $expected)
+    public function testSupportsDenormalization($data, $expected): void
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
+        self::assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
     public function supportsDenormalizationDataProvider(): array
     {
         return [
-            'null'   => [null, false],
+            'null' => ['', false],
             'scalar' => ['scalar', false],
-            'array'  => [[], true],
+            'array' => [[], true],
         ];
     }
 }

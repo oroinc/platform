@@ -55,7 +55,7 @@ services:
 
     # Services for ProcessData serialization
     oro_workflow.serializer.process.serializer:
-        class: Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer
+        class: Symfony\Component\Serializer\Serializer
         arguments:
           -
               - '@oro_workflow.serializer.process.normalizer.process_data'

@@ -25,7 +25,7 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testDenormalize()
     {
         $value = 'scalar';
-        $this->assertEquals($value, $this->normalizer->denormalize($value, null));
+        $this->assertEquals($value, $this->normalizer->denormalize($value, ''));
     }
 
     /**
@@ -41,7 +41,7 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupportsDenormalization($data, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
+        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
     public function supportsDataProvider()

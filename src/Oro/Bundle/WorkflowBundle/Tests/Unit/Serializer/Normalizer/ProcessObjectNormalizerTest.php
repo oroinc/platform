@@ -22,7 +22,7 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $serializedObject = base64_encode(serialize($object));
 
         $this->assertEquals(
-            array(ProcessObjectNormalizer::SERIALIZED => $serializedObject),
+            [ProcessObjectNormalizer::SERIALIZED => $serializedObject],
             $this->normalizer->normalize($object)
         );
     }
@@ -30,11 +30,12 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param mixed $data
      * @param bool $expected
+     *
      * @dataProvider denormalizeDataProvider
      */
     public function testDenormalize($data, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->denormalize($data, null));
+        $this->assertEquals($expected, $this->normalizer->denormalize($data, ''));
     }
 
     /**
@@ -45,16 +46,16 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $object = new \DateTime();
         $serializedObject = base64_encode(serialize($object));
 
-        return array(
-            'invalid value' => array(
-                'data' => array(ProcessObjectNormalizer::SERIALIZED => null),
+        return [
+            'invalid value' => [
+                'data' => [ProcessObjectNormalizer::SERIALIZED => null],
                 'expected' => null,
-            ),
-            'valid object' => array(
-                'data' => array(ProcessObjectNormalizer::SERIALIZED => $serializedObject),
+            ],
+            'valid object' => [
+                'data' => [ProcessObjectNormalizer::SERIALIZED => $serializedObject],
                 'expected' => $object,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -67,11 +68,11 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function supportsNormalizationDataProvider()
     {
-        return array(
-            'null'   => array(null, false),
-            'scalar' => array('scalar', false),
-            'object' => array(new \DateTime(), true),
-        );
+        return [
+            'null' => [null, false],
+            'scalar' => ['scalar', false],
+            'object' => [new \DateTime(), true],
+        ];
     }
 
     /**
@@ -79,16 +80,16 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupportsDenormalization($data, $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
+        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
     public function supportsDenormalizationDataProvider()
     {
-        return array(
-            'null'   => array(null, false),
-            'scalar' => array('scalar', false),
-            'array'  => array(array('key' => 'value'), false),
-            'object' => array(array(ProcessObjectNormalizer::SERIALIZED => 'serialised_data'), true),
-        );
+        return [
+            'null' => [null, false],
+            'scalar' => ['scalar', false],
+            'array' => [['key' => 'value'], false],
+            'object' => [[ProcessObjectNormalizer::SERIALIZED => 'serialised_data'], true],
+        ];
     }
 }
