@@ -52,7 +52,6 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.disposed = true;
             this.trigger('disposed');
             this.off();
             this.stopListening();

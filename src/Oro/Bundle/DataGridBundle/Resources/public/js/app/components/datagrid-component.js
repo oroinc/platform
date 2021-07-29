@@ -274,6 +274,8 @@ define(function(require) {
                     modules.StickedScrollbarPlugin = pluginModules.StickedScrollbarPlugin;
                 }
             }
+            // @todo do not commit it as it is
+            modules.AccessibilityPlugin = 'orodatagrid/js/app/plugins/grid/accessibility-plugin';
         },
 
         /**
@@ -446,7 +448,8 @@ define(function(require) {
                 'FloatingHeaderPlugin',
                 'FullscreenPlugin',
                 'DatagridSettingsPlugin',
-                'ToolbarMassActionPlugin'
+                'ToolbarMassActionPlugin',
+                'AccessibilityPlugin' // @todo
             ])).forEach(plugin => plugins.push(plugin));
 
             if (modules.StickedScrollbarPlugin) {
