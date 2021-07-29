@@ -27,7 +27,7 @@ define(function(require) {
                     } else if ($.trim($settings.find('input[id*="tenant"]').val()).length === 0) {
                         disabled = true;
                     }
-                    options._sourceElement.find('input[type=checkbox]').prop('disabled', disabled);
+                    options._sourceElement.find('input[type=checkbox]:not(:checked)').prop('disabled', disabled);
                 });
         },
 

@@ -16,7 +16,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
     public function testGetWithoutParams()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates')
         );
@@ -27,7 +27,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGet()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName
@@ -42,7 +42,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetNonSystemNoEntity()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -59,7 +59,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetNonSystemEntity()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -76,7 +76,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetSystemNonEntity()
     {
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -94,7 +94,7 @@ class EmailTemplateControllerTest extends WebTestCase
     {
         $reference = $this->getReference('emailTemplate3');
         $entityName = str_replace('\\', '_', $reference->getEntityName());
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
                 'entityName' => $entityName,
@@ -124,7 +124,7 @@ class EmailTemplateControllerTest extends WebTestCase
             ->findOneBy(['username' => 'simple_user']);
         $this->assertNotNull($user);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
@@ -153,7 +153,7 @@ class EmailTemplateControllerTest extends WebTestCase
             ->findOneBy(['username' => 'simple_user']);
         $this->assertNotNull($user);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
@@ -175,7 +175,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetCompiledEmailTemplateNoEntityFound()
     {
         $emailTemplate = $this->getReference('emailTemplate2');
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',
@@ -195,7 +195,7 @@ class EmailTemplateControllerTest extends WebTestCase
     public function testGetCompiledEmailCompileFailed()
     {
         $emailTemplate = $this->getReference(LoadEmailTemplateData::SYSTEM_FAIL_TO_COMPILE);
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_emailtemplate_compiled',

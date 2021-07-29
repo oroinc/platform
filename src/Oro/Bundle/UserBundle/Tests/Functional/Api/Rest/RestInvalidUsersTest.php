@@ -27,11 +27,10 @@ class RestInvalidUsersTest extends WebTestCase
                 'userRoles' => ['1'],
             ],
         ];
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_user'),
             $request,
-            [],
             $this->generateWsseAuthHeader($username, $key)
         );
         $result = $this->client->getResponse();

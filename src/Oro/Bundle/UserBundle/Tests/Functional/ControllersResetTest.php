@@ -87,7 +87,7 @@ class ControllersResetTest extends WebTestCase
             [
                 'username' => self::USER_NAME,
                 'frontend' => 1,
-                '_csrf_token' => $this->client->getContainer()
+                '_csrf_token' => (string) $this->client->getContainer()
                     ->get('security.csrf.token_manager')
                     ->getToken('oro-user-password-reset-request'),
             ],

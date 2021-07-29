@@ -99,14 +99,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($server['CONTENT_TYPE']);
         }
 
-        $this->client->request(
-            $method,
-            $uri,
-            $parameters,
-            [],
-            $server,
-            $content
-        );
+        $this->client->request($method, $uri, $parameters, [], $server, $content);
 
         // make sure that REST API call does not start the session
         $this->assertSessionNotStarted($method, $uri, $server);

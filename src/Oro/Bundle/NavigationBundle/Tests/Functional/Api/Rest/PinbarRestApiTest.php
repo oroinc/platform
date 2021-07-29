@@ -50,7 +50,7 @@ class PinbarRestApiTest extends AbstractRestApiTest
     {
         $pin = $this->getReference(NavigationItemData::NAVIGATION_ITEM_PINBAR_1);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_navigationitems', ['type' => 'pinbar']),
             [
@@ -59,7 +59,6 @@ class PinbarRestApiTest extends AbstractRestApiTest
                 'position' => $pin->getPosition(),
                 'type' => 'pinbar',
             ],
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
@@ -79,14 +78,13 @@ class PinbarRestApiTest extends AbstractRestApiTest
         $updatedPintab = [
             'url' => $urlGenerator->generate('oro_config_configuration_system', ['sample_key' => 'sample_value']),
         ];
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_navigationitems_id',
                 ['type' => 'pinbar', 'itemId' => $this->getItemId()]
             ),
             $updatedPintab,
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
@@ -98,10 +96,9 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         self::assertCount(0, $resultJson);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_navigationitems', ['type' => 'pinbar']),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
@@ -119,10 +116,9 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
     public function testGetPinbar(): void
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_navigationitems', ['type' => 'pinbar']),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );

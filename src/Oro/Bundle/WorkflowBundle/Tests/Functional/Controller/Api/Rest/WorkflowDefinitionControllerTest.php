@@ -23,7 +23,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     {
         $this->assertEmpty($this->getDefinition(self::TEST_DEFINITION_NAME));
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_workflow_api_rest_workflowdefinition_post'),
             array_merge_recursive(
@@ -53,7 +53,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
         $this->assertEmpty($workflow);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_workflow_api_rest_workflowdefinition_post'),
             $this->getTestConfiguration()
@@ -75,7 +75,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
         $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_workflow_api_rest_workflowdefinition_get',
@@ -100,7 +100,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $updated = $this->getTestConfiguration();
         $updated['label'] = self::TEST_DEFINITION_NAME . uniqid('test', true);
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_workflow_api_rest_workflowdefinition_put',
@@ -133,7 +133,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $config = $workflow->getDefinition()->getConfiguration();
         $this->assertCount(1, $config['transition_definitions']);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_workflow_api_rest_workflowdefinition_put',
@@ -177,7 +177,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
      */
     public function testWorkflowDefinitionDelete()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_workflow_api_rest_workflowdefinition_delete',

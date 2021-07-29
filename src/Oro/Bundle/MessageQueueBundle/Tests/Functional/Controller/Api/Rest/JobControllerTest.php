@@ -28,7 +28,7 @@ class JobControllerTest extends WebTestCase
         /** @var Job $childJob */
         $childJob = $this->getReference(LoadJobData::JOB_2);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_message_queue_job_interrupt_root_job', ['id' => $rootJob->getId()])
         );

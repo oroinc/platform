@@ -53,7 +53,7 @@ class WorkflowControllerTest extends WebTestCase
 
         $workflowItem = $this->getWorkflowItem($entity, $workflowOneName);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_workflow_delete',
@@ -80,7 +80,7 @@ class WorkflowControllerTest extends WebTestCase
         $repositoryProcess = $this->getRepository('OroWorkflowBundle:ProcessDefinition');
         $processesBefore = $repositoryProcess->findAll();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_api_workflow_deactivate',
@@ -101,7 +101,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->createWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
         $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_api_workflow_activate',
@@ -182,7 +182,7 @@ class WorkflowControllerTest extends WebTestCase
 
         $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_get',
@@ -205,7 +205,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::NO_START_STEP);
         $this->assertActiveWorkflow($testEntity, LoadWorkflowDefinitions::NO_START_STEP);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_start',
@@ -236,7 +236,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->getWorkflowManager()->activateWorkflow('test_flow_with_condition');
         $this->assertActiveWorkflow($testEntity, 'test_flow_with_condition');
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_start',
@@ -264,7 +264,7 @@ class WorkflowControllerTest extends WebTestCase
 
         $workflowItem = $this->getWorkflowItem($testEntity, LoadWorkflowDefinitions::MULTISTEP);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_transit',
@@ -287,7 +287,7 @@ class WorkflowControllerTest extends WebTestCase
 
         $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_transit',
@@ -324,7 +324,7 @@ class WorkflowControllerTest extends WebTestCase
 
         $workflowItem = $this->getWorkflowItem($testEntity, 'test_flow_transition_with_condition');
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_transit',
@@ -347,7 +347,7 @@ class WorkflowControllerTest extends WebTestCase
 
         $this->assertEquals('second_point', $workflowItemNew->getCurrentStep()->getName());
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_transit',
@@ -371,7 +371,7 @@ class WorkflowControllerTest extends WebTestCase
         string $entityClass,
         string $transitionName
     ): void {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_workflow_api_rest_workflow_start',

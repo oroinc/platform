@@ -56,7 +56,19 @@ class Client extends BaseKernelBrowser
 
         $this->setSessionCookie($server);
 
-        parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
+        if (($content === null || $content === '') && $parameters && in_array($method, ['POST', 'PATCH', 'PUT'])) {
+            $this->setServerParameter('CONTENT_TYPE', 'application/json');
+            $this->setServerParameter('HTTP_ACCEPT', 'application/json');
+
+            try {
+                $content = json_encode($parameters);
+                parent::request($method, $uri, [], $files, $server, $content, $changeHistory);
+            } finally {
+                unset($this->server['CONTENT_TYPE'], $this->server['HTTP_ACCEPT']);
+            }
+        } else {
+            parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
+        }
 
         if ($this->isHashNavigationResponse($this->response, $server)) {
             /** @var InternalRequest $internalRequest */
