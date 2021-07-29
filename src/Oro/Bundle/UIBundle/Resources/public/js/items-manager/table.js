@@ -108,7 +108,7 @@ define(function(require) {
             return this.element.find('[data-cid="' + model.cid + '"]');
         },
 
-        _onModelAdded: function(model, collection, options) {
+        _onModelAdded: function(model, collection, options = {}) {
             const newRow = this._renderModel(model);
 
             if (_.isUndefined(options.at)) {
@@ -171,7 +171,8 @@ define(function(require) {
 
         _renderCollection: function() {
             this.element.empty();
-            this.options.collection.each(this._onModelAdded, this);
+            const {collection} = this.options;
+            collection.each(model => this._onModelAdded(model, collection));
         },
 
         _renderModel: function(model) {
