@@ -10,7 +10,7 @@ class PageStateControllerTest extends WebTestCase
     /**
      * @var array
      */
-    protected static $entity;
+    protected static array $entity;
 
     protected function setUp(): void
     {
@@ -35,11 +35,10 @@ class PageStateControllerTest extends WebTestCase
             ]
         ];
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_pagestate'),
             self::$entity,
-            [],
             $this->generateWsseAuthHeader()
         );
 
@@ -67,11 +66,10 @@ class PageStateControllerTest extends WebTestCase
         self::$entity['data'] = '["test"]';
         self::$entity['pagestate']['data'] = '["test"]';
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_pagestate', ['id' => self::$entity['id']]),
             self::$entity,
-            [],
             $this->generateWsseAuthHeader()
         );
 
@@ -89,10 +87,9 @@ class PageStateControllerTest extends WebTestCase
     {
         $this->assertNotEmpty(self::$entity);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_pagestate', ['id' => self::$entity['id']]),
-            [],
             [],
             $this->generateWsseAuthHeader()
         );
@@ -115,10 +112,9 @@ class PageStateControllerTest extends WebTestCase
     {
         $entity = $this->getReference(PageStateData::PAGE_STATE_1);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_pagestate', ['id' => $entity->getId()]),
-            [],
             [],
             $this->generateWsseAuthHeader()
         );
@@ -137,10 +133,9 @@ class PageStateControllerTest extends WebTestCase
     {
         $this->assertNotEmpty(self::$entity);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_pagestate', ['id' => self::$entity['id']]),
-            [],
             [],
             $this->generateWsseAuthHeader()
         );

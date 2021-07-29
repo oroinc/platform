@@ -32,7 +32,7 @@ class RestUsersTest extends WebTestCase
                 "owner"         => "1"
             ]
         ];
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_user'),
             $request
@@ -61,7 +61,7 @@ class RestUsersTest extends WebTestCase
             ]
         ];
 
-        $this->client->request('POST', $this->getUrl('oro_api_post_user'), $request);
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_user'), $request);
         $result = $this->client->getResponse();
 
         /**
@@ -84,7 +84,7 @@ class RestUsersTest extends WebTestCase
      */
     public function testGetUsers()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_users')
         );
@@ -99,7 +99,7 @@ class RestUsersTest extends WebTestCase
      */
     public function testGetUsersFilteredByPhone()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_users', ['phone' => '123-123'])
         );
@@ -120,10 +120,9 @@ class RestUsersTest extends WebTestCase
     public function testUpdateUser($request)
     {
         //get user id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_users'),
-            ['limit' => 100]
+            $this->getUrl('oro_api_get_users', ['limit' => 100])
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -133,7 +132,7 @@ class RestUsersTest extends WebTestCase
         //update user
         $request['user']['username'] .= '_Updated';
         unset($request['user']['plainPassword']);
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_user', ['id' => $userId]),
             $request
@@ -142,7 +141,7 @@ class RestUsersTest extends WebTestCase
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         //open user by id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user', ['id' => $userId])
         );
@@ -189,7 +188,7 @@ class RestUsersTest extends WebTestCase
     {
         $request['user']['username'] .= '_Updated';
         //get user
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_user_filter',
@@ -208,7 +207,7 @@ class RestUsersTest extends WebTestCase
 
     public function testFilterUserNonExist()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_user_filter'
@@ -225,14 +224,14 @@ class RestUsersTest extends WebTestCase
      */
     public function testDeleteUser($userId)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_user', ['id' => $userId])
         );
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user', ['id' => $userId])
         );
@@ -242,7 +241,7 @@ class RestUsersTest extends WebTestCase
 
     public function testSelfDeleteUser()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_user', ['id' => 1])
         );
@@ -252,7 +251,7 @@ class RestUsersTest extends WebTestCase
 
     public function testGetUserRoles()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_roles', ['id' => 1])
         );
@@ -264,7 +263,7 @@ class RestUsersTest extends WebTestCase
 
     public function testGetUserRolesNotFound()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_roles', ['id' => 0])
         );
@@ -274,7 +273,7 @@ class RestUsersTest extends WebTestCase
 
     public function testGetUserGroups()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_groups', ['id' => 1])
         );
@@ -286,7 +285,7 @@ class RestUsersTest extends WebTestCase
 
     public function testGetUserGroupsNotFound()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_groups', ['id' => 0])
         );

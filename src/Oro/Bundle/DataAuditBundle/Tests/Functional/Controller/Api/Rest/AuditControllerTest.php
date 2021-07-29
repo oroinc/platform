@@ -30,7 +30,7 @@ class AuditControllerTest extends WebTestCase
     {
         $this->client->setServerParameters([]);
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audits'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audits'));
 
         $this->assertLastResponseStatus(401);
         $this->assertLastResponseContentTypeJson();
@@ -65,7 +65,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audits'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audits'));
 
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -117,7 +117,7 @@ class AuditControllerTest extends WebTestCase
         //guard
         $this->assertNotEmpty($audit->getId());
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
 
@@ -158,7 +158,7 @@ class AuditControllerTest extends WebTestCase
         //guard
         $this->assertNotEmpty($audit->getId());
 
-        $this->client->request('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_audit', ['id' => $audit->getId()]));
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
 
@@ -202,7 +202,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt>='.urlencode('2012-10-12T00:01+0000')
         );
@@ -246,7 +246,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt>'.urlencode('2012-10-12T00:01+0000')
         );
@@ -290,7 +290,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt<='.urlencode('2012-10-12T00:01+0000')
         );
@@ -334,7 +334,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?loggedAt<'.urlencode('2012-10-12T00:01+0000')
         );
@@ -378,7 +378,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?action=create'
         );
@@ -422,7 +422,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?action<>create'
         );
@@ -466,7 +466,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?objectClass='.TestAuditDataOwner::class
         );
@@ -510,7 +510,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?objectClass<>'.TestAuditDataOwner::class
         );
@@ -556,7 +556,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?user='.$user->getId()
         );
@@ -586,7 +586,7 @@ class AuditControllerTest extends WebTestCase
 
         $em->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_audits').'?user=0'
         );

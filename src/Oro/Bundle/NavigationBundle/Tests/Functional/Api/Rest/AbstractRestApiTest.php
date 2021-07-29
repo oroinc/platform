@@ -42,14 +42,13 @@ abstract class AbstractRestApiTest extends WebTestCase
     {
         $updatedPintab = ['position' => 100];
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_navigationitems_id',
                 ['type' => $this->getItemType(), 'itemId' => $this->getItemId()]
             ),
             $updatedPintab,
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
@@ -64,10 +63,9 @@ abstract class AbstractRestApiTest extends WebTestCase
 
     public function testGet(): void
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_navigationitems', ['type' => $this->getItemType()]),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
@@ -83,13 +81,12 @@ abstract class AbstractRestApiTest extends WebTestCase
 
     public function testDelete(): void
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_navigationitems_id',
                 ['type' => $this->getItemType(), 'itemId' => $this->getItemId()]
             ),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
@@ -101,14 +98,13 @@ abstract class AbstractRestApiTest extends WebTestCase
 
     public function testNotFound(): void
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_navigationitems_id',
                 ['type' => $this->getItemType(), 'itemId' => PHP_INT_MAX]
             ),
             ['url' => 'sample/url'],
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
@@ -117,13 +113,12 @@ abstract class AbstractRestApiTest extends WebTestCase
 
         $this->client->restart();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_navigationitems_id',
                 ['type' => $this->getItemType(), 'itemId' => PHP_INT_MAX]
             ),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
@@ -153,7 +148,7 @@ abstract class AbstractRestApiTest extends WebTestCase
         ];
 
         foreach ($requests as $requestType => $url) {
-            $this->client->request($requestType, $url);
+            $this->client->jsonRequest($requestType, $url);
 
             /** @var $result Response */
             $response = $this->client->getResponse();
@@ -178,10 +173,9 @@ abstract class AbstractRestApiTest extends WebTestCase
         ];
 
         foreach ($requests as $requestType => $url) {
-            $this->client->request(
+            $this->client->jsonRequest(
                 $requestType,
                 $url,
-                [],
                 [],
                 self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
             );
@@ -201,11 +195,10 @@ abstract class AbstractRestApiTest extends WebTestCase
 
     protected function postNavigationItem(array $parameters): array
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_navigationitems', ['type' => $this->getItemType()]),
             $parameters,
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 

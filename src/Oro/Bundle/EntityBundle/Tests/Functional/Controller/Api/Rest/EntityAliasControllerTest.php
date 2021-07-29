@@ -13,7 +13,7 @@ class EntityAliasControllerTest extends WebTestCase
 
     public function testGetAliases()
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_entity_aliases'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_entity_aliases'));
         $this->getJsonResponseContent($this->client->getResponse(), 200);
     }
 }

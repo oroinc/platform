@@ -19,13 +19,13 @@ class GridViewControllerTest extends WebTestCase
 
     public function testPostActionShouldReturn400IfSentDataAreInvalid()
     {
-        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'));
+        $this->client->jsonRequest('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'));
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 400);
     }
 
     public function testPostActionShouldReturn201IfSentDataAreValid()
     {
-        $this->client->request('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
+        $this->client->jsonRequest('POST', $this->getUrl('oro_datagrid_api_rest_gridview_post'), [
             'label' => 'view',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid',
@@ -50,7 +50,7 @@ class GridViewControllerTest extends WebTestCase
         $gridView = $this->findFirstGridView();
 
         $url = $this->getUrl('oro_datagrid_api_rest_gridview_put', ['id' => $gridView->getId()]);
-        $this->client->request('PUT', $url, [
+        $this->client->jsonRequest('PUT', $url, [
             'label' => 'view2',
             'type' => GridView::TYPE_PUBLIC,
             'grid_name' => 'testing-grid2',
@@ -86,7 +86,7 @@ class GridViewControllerTest extends WebTestCase
     {
         $id = $this->findLastGridView()->getId();
 
-        $this->client->request('DELETE', $this->getUrl('oro_datagrid_api_rest_gridview_delete', ['id' => $id]));
+        $this->client->jsonRequest('DELETE', $this->getUrl('oro_datagrid_api_rest_gridview_delete', ['id' => $id]));
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         $this->assertNull($this->findGridView($id));

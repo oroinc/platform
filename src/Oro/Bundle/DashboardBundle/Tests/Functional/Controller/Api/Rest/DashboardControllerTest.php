@@ -34,7 +34,7 @@ class DashboardControllerTest extends WebTestCase
     {
         $id = $this->dashboard->getId();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard',
@@ -46,7 +46,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard',

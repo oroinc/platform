@@ -48,7 +48,7 @@ class WidgetControllerTest extends WebTestCase
             'layoutPosition' => [2, 20]
         ];
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_dashboard_widget',
@@ -78,7 +78,7 @@ class WidgetControllerTest extends WebTestCase
 
         $widgetName = $widgetNames[0];
         $id         = $this->widget->getDashboard()->getId();
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_api_post_dashboard_widget_add_widget'
@@ -97,7 +97,7 @@ class WidgetControllerTest extends WebTestCase
      */
     public function testDelete()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard_widget',
@@ -110,7 +110,7 @@ class WidgetControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard_widget',
@@ -153,7 +153,7 @@ class WidgetControllerTest extends WebTestCase
             $dashboard = $widget->getDashboard();
         }
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_dashboard_widget_positions',

@@ -31,7 +31,7 @@ class RestPermissionsTest extends WebTestCase
 
     public function testGetPermissions()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_permissions', ['id' => $this->user->getId()])
         );
@@ -42,7 +42,7 @@ class RestPermissionsTest extends WebTestCase
 
     public function testGetPermissionsWithEntities()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_permissions', [
                 'id'       => $this->user->getId(),
@@ -53,7 +53,7 @@ class RestPermissionsTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(1, $result, "Result should contains only permissions for one entity");
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_permissions', [
                 'id'       => $this->user->getId(),

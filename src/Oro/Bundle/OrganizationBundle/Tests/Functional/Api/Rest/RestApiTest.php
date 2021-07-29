@@ -32,7 +32,7 @@ class RestApiTest extends WebTestCase
      */
     public function testCreate()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_businessunit'),
             $this->fixtureData
@@ -54,7 +54,7 @@ class RestApiTest extends WebTestCase
      */
     public function testGets($id)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_businessunits')
         );
@@ -86,7 +86,7 @@ class RestApiTest extends WebTestCase
      */
     public function testGet($id)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
@@ -116,7 +116,7 @@ class RestApiTest extends WebTestCase
     {
         $requestData = $this->fixtureData;
         $requestData['business_unit']['name'] = $requestData['business_unit']['name'] . '_updated';
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_businessunit', array('id' => $id)),
             $requestData
@@ -125,7 +125,7 @@ class RestApiTest extends WebTestCase
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // open businessUnit by id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );
@@ -142,7 +142,7 @@ class RestApiTest extends WebTestCase
      */
     public function testDelete($id)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_businessunit', array('id' => $id))
         );
@@ -150,7 +150,7 @@ class RestApiTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_businessunit', array('id' => $id))
         );

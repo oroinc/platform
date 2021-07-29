@@ -20,7 +20,7 @@ class EntityControllerTest extends WebTestCase
 
     public function testGetAction()
     {
-        $this->client->request('GET', $this->getUrl('oro_api_workflow_entity_get'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_workflow_entity_get'));
 
         $actual = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
