@@ -4,7 +4,8 @@ namespace Oro\Bundle\MicrosoftIntegrationBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox;
-use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -32,12 +33,21 @@ class EnableConfigCheckboxType extends ConfigCheckbox
     /**
      * {@inheritDoc}
      */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        parent::finishView($view, $form, $options);
+
+        if (!$this->isMicrosoftConnectionConfigured() && !$form->getData() && !$view->vars['checked']) {
+            $view->vars['disabled'] = true;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $resolver->setNormalizer('disabled', function (Options $options, $value) {
-            return $this->isMicrosoftConnectionConfigured() ? $value : true;
-        });
     }
 
     private function isMicrosoftConnectionConfigured(): bool
