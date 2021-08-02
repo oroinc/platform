@@ -8,6 +8,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Checks that the enum value matches alphabetic characters, underscores, hyphens, spaces, and numbers.
+ */
 class EnumValueValidator extends ConstraintValidator
 {
     /**
@@ -32,7 +35,7 @@ class EnumValueValidator extends ConstraintValidator
 
         $valueId = ExtendHelper::buildEnumValueId($entity['label'], false);
 
-        if (empty($valueId)) {
+        if (strlen(trim($valueId)) === 0) {
             $this->context->buildViolation($constraint->message)
                 ->atPath('[label]')
                 ->setParameters(['{{ value }}' => $entity['label']])
