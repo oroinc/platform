@@ -3,16 +3,17 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class WorkflowDefinitionControllerTest extends WebTestCase
 {
-    const TEST_DEFINITION_NAME = 'TEST_DEFINITION';
-
-    const RELATED_ENTITY = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
+    private const TEST_DEFINITION_NAME = 'TEST_DEFINITION';
+    private const RELATED_ENTITY = WorkflowAwareEntity::class;
 
     protected function setUp(): void
     {
@@ -63,7 +64,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertContains(self::TEST_DEFINITION_NAME, $result);
 
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
+        $this->assertInstanceOf(Workflow::class, $workflow);
         $this->assertEquals(self::TEST_DEFINITION_NAME, $workflow->getName());
     }
 
@@ -73,7 +74,8 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     public function testWorkflowDefinitionGet()
     {
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
+        $this->assertInstanceOf(Workflow::class, $workflow);
+        $workflowDefinition = $workflow->getDefinition();
 
         $this->client->jsonRequest(
             'GET',
@@ -84,10 +86,53 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $config = $this->getTestConfiguration();
+        $expectedWorkflowDefinitionConfiguration = $workflowDefinition->getConfiguration();
+        unset(
+            $expectedWorkflowDefinitionConfiguration['acl_message'],
+            $expectedWorkflowDefinitionConfiguration['page_template'],
+            $expectedWorkflowDefinitionConfiguration['dialog_template']
+        );
+        $transitionId = key($expectedWorkflowDefinitionConfiguration['transitions']);
+        unset(
+            $expectedWorkflowDefinitionConfiguration['transitions'][$transitionId]['acl_message'],
+            $expectedWorkflowDefinitionConfiguration['transitions'][$transitionId]['page_template'],
+            $expectedWorkflowDefinitionConfiguration['transitions'][$transitionId]['dialog_template']
+        );
+        $expectedWorkflowDefinitionSteps = [];
+        foreach ($workflowDefinition->getSteps() as $step) {
+            $expectedWorkflowDefinitionSteps[] = [
+                'id' => $step->getId(),
+                'name' => $step->getName(),
+                'label' => $step->getLabel(),
+                'step_order' => $step->getStepOrder(),
+                'final' => $step->isFinal(),
+            ];
+        }
+        $expectedResult = [
+            'name' => $workflowDefinition->getName(),
+            'label' => $workflowDefinition->getLabel(),
+            'related_entity' => $workflowDefinition->getRelatedEntity(),
+            'entity_attribute_name' => $workflowDefinition->getEntityAttributeName(),
+            'steps_display_ordered' => $workflowDefinition->isStepsDisplayOrdered(),
+            'system' => $workflowDefinition->isSystem(),
+            'active' => $workflowDefinition->isActive(),
+            'priority' => $workflowDefinition->getPriority(),
+            'configuration' => $expectedWorkflowDefinitionConfiguration,
+            'scopes' => [],
+            'steps' => $expectedWorkflowDefinitionSteps,
+            'entity_acls' => [],
+            'exclusive_active_groups' => [],
+            'exclusive_record_groups' => [],
+            'applications' => $workflowDefinition->getApplications(),
+        ];
 
-        $this->assertEquals($config['name'], $result['name']);
-        $this->assertEquals($config['entity'], $result['related_entity']);
+        $this->assertArrayHasKey('created_at', $result);
+        $this->assertArrayHasKey('updated_at', $result);
+        unset($result['created_at'], $result['updated_at']);
+
+        ArrayUtil::sortBy($expectedResult['steps'], false, 'step_order');
+        ArrayUtil::sortBy($result['steps'], false, 'step_order');
+        $this->assertSame($expectedResult, $result);
     }
 
     /**
@@ -96,7 +141,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     public function testWorkflowDefinitionPut()
     {
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
+        $this->assertInstanceOf(Workflow::class, $workflow);
 
         $updated = $this->getTestConfiguration();
         $updated['label'] = self::TEST_DEFINITION_NAME . uniqid('test', true);
@@ -113,7 +158,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertContains(self::TEST_DEFINITION_NAME, $result);
 
         $workflow = $this->getDefinition(self::TEST_DEFINITION_NAME);
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Model\Workflow', $workflow);
+        $this->assertInstanceOf(Workflow::class, $workflow);
 
         $this->assertEquals(
             WorkflowTemplate::KEY_PREFIX . '.' . $this->prepareWorkflowName(self::TEST_DEFINITION_NAME) . '.label',
@@ -163,11 +208,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertCount(1, $config['transition_definitions']);
     }
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    protected function prepareWorkflowName($name)
+    private function prepareWorkflowName(string $name): string
     {
         return preg_replace('/\s+/', '_', trim((new InflectorFactory())->build()->tableize($name)));
     }
@@ -189,10 +230,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertNull($this->getDefinition(self::TEST_DEFINITION_NAME));
     }
 
-    /**
-     * @return array
-     */
-    public function getTestConfiguration()
+    public function getTestConfiguration(): array
     {
         return [
             'steps' => [
@@ -257,12 +295,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param $name
-     *
-     * @return Workflow
-     */
-    protected function getDefinition($name)
+    private function getDefinition(string $name): ?Workflow
     {
         try {
             return $this->client->getContainer()->get('oro_workflow.manager')->getWorkflow($name);
