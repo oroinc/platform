@@ -83,7 +83,16 @@ define(function(require) {
         _bindMenuEvents() {
             const superResult = this._super();
 
-            // Remove original an event handler and attach new one based on original
+            // Fix for Firefox accidentally triggering click after focus change on space
+            // https://github.com/medialize/ally.js/issues/162
+            // https://stackoverflow.com/questions/20863515/in-firefox-changing-the-focus-in-a-keydown-event-handler-automatically-clicks-w
+            this.menu.on(`keyup${this._namespaceID}`, 'label', e => {
+                if (this._allowFireEventBySpaceButton === void 0 && e.keyCode === KEY_CODES.SPACE) {
+                    e.preventDefault();
+                }
+                delete this._allowFireEventBySpaceButton;
+            });
+            // Remove original keydown an event handler and attach new one based on original
             this.menu.undelegate('label', 'keydown.multiselect');
             this.menu.on(`keydown${this._namespaceID}`, 'label', e => {
                 switch (e.which) {
@@ -100,6 +109,9 @@ define(function(require) {
                     case KEY_CODES.ENTER:
                         e.preventDefault();
                         $(e.currentTarget).find('input').click();
+                        break;
+                    case KEY_CODES.SPACE:
+                        this._allowFireEventBySpaceButton = true;
                         break;
                     case KEY_CODES.A:
                         if (e.altKey) {
@@ -154,11 +166,9 @@ define(function(require) {
             this.$outerTrigger.attr('aria-expanded', true);
 
             if (this.options.preventTabOutOfContainer) {
-                // Remove outdated styles
-                this.labels.filter(':not(.ui-state-disabled)')
-                    .eq(0).trigger('mouseover').find('input').trigger('blur');
-                // Remove outdated class
+                // Remove outdated classes
                 this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
+                this.menu.find('.focus-visible').removeClass('focus-visible');
                 manageFocus.focusTabbable(this.menu);
             }
 
