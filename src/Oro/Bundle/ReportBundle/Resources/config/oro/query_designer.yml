@@ -28,6 +28,11 @@ query_designer:
                 - { name: Min, expr: MIN($column) }
                 - { name: Max, expr: MAX($column) }
             query_type: [report]
+        money:
+            applicable: [{type: money}]
+            functions:
+                - { name: Avg, expr: "CAST ((AVG($column)) AS DECIMAL(19, 4))"}
+            query_type: [report]
         date:
             applicable: [{type: date}, {type: datetime}]
             functions:
