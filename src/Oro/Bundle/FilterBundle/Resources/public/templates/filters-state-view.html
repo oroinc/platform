@@ -1,10 +1,13 @@
 <% if (filters.length > 0) { %>
-<button class="filters-state" type="button"><span class="fa-filter hide-text" aria-hidden="true"></span>
-    <% _.each(filters, function(filter, i) {
-        if (i > 0) {
-            %>, <%
-        }
-        %><span><%-filter.label %> <span><%-filter.hint %></span></span><%
-    }) %>
+<button class="filters-state" type="button">
+    <span class="filters-state__ellipsis">
+        <span class="fa-filter hide-text" aria-hidden="true"></span>
+        <% _.each(filters, function(filter, i) {
+            if (i > 0) {
+                %>, <%
+            }
+            %><span><%-filter.label %> <span><%-filter.hint %></span></span><%
+        }) %>
+    </span>
 </button>
 <% } %>

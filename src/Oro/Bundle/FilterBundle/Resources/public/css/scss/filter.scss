@@ -434,14 +434,20 @@
     border-width: 0;
     color: $filters-state-color;
     font-size: $filters-state-font-size;
+    font-family: $filters-state-font-size;
     padding: $filters-state-inner-offset;
     line-height: $filters-state-line-height;
     min-width: $filters-state-min-width;
     width: 100%;
-    white-space: $filters-state-white-space;
-    overflow: $filters-state-overflow;
-    text-overflow: $filters-state-text-overflow;
     cursor: $filters-state-cursor;
+
+    &__ellipsis {
+        display: block;
+        width: 100%;
+        white-space: $filters-state-white-space;
+        overflow: $filters-state-overflow;
+        text-overflow: $filters-state-text-overflow;
+    }
 
     &:focus {
         box-shadow: map.get($btn-theme, 'focus-box-shadow');
