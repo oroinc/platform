@@ -25,7 +25,11 @@ class GetAttrNode extends Node
      * @var PropertyAccessor
      */
     protected static $propertyAccessor;
-    private Inflector $inflector;
+
+    /**
+     * @var Inflector
+     */
+    private static $inflector;
 
     /**
      * @param Node $node
@@ -39,7 +43,6 @@ class GetAttrNode extends Node
             ['node' => $node, 'attribute' => $attribute, 'arguments' => $arguments],
             ['type' => $type]
         );
-        $this->inflector = (new InflectorFactory())->build();
     }
 
     public function compile(Compiler $compiler)
@@ -334,11 +337,20 @@ class GetAttrNode extends Node
      */
     protected function getSingularizeName($name)
     {
-        $singular = $this->inflector->singularize($name);
+        $singular = static::getInflector()->singularize($name);
         if ($singular === $name) {
             return $name.'Item';
         }
 
         return $singular;
+    }
+
+    private static function getInflector(): Inflector
+    {
+        if (!static::$inflector) {
+            static::$inflector = (new InflectorFactory())->build();
+        }
+
+        return static::$inflector;
     }
 }
