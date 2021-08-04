@@ -17,18 +17,18 @@ class UniqueAddressTypesValidatorTest extends ConstraintValidatorTestCase
         return new UniqueAddressTypesValidator();
     }
 
-    public function testValidateExceptionWhenInvalidArgumentType()
+    public function testValidateExceptionWhenInvalidArgumentType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
-            'Expected argument of type "array or Traversable and ArrayAccess", "boolean" given'
+            'Expected argument of type "array or Traversable and ArrayAccess", "bool" given'
         );
 
         $constraint = new UniqueAddressTypes();
         $this->validator->validate(false, $constraint);
     }
 
-    public function testValidateExceptionWhenInvalidArgumentElementType()
+    public function testValidateExceptionWhenInvalidArgumentElementType(): void
     {
         $this->expectException(ValidatorException::class);
         $this->expectExceptionMessage(
@@ -42,7 +42,7 @@ class UniqueAddressTypesValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider validAddressesDataProvider
      */
-    public function testValidateValid(array $addresses)
+    public function testValidateValid(array $addresses): void
     {
         $constraint = new UniqueAddressTypes();
         $this->validator->validate($addresses, $constraint);
@@ -83,7 +83,7 @@ class UniqueAddressTypesValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider invalidAddressesDataProvider
      */
-    public function testValidateInvalid(array $addresses, string $types)
+    public function testValidateInvalid(array $addresses, string $types): void
     {
         $constraint = new UniqueAddressTypes();
         $this->validator->validate($addresses, $constraint);

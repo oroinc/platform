@@ -13,10 +13,7 @@ use Symfony\Component\Validator\Validation;
 
 class UniqueKeyTypeTest extends TypeTestCase
 {
-    /**
-     * @var array
-     */
-    private $fields = [
+    private array $fields = [
         'First Name' => 'firstName',
         'Last Name' => 'lastName',
         'Email' => 'email',
@@ -25,7 +22,8 @@ class UniqueKeyTypeTest extends TypeTestCase
     protected function setUp(): void
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(new AnnotationReader())
+            ->enableAnnotationMapping(true)
+            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         $this->factory =
@@ -37,44 +35,44 @@ class UniqueKeyTypeTest extends TypeTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    public function testRequiredKeyChoiceOption()
+    public function testRequiredKeyChoiceOption(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The required option "key_choices" is missing.');
         $this->factory->create(UniqueKeyType::class);
     }
 
-    public function testType()
+    public function testType(): void
     {
-        $formData = array(
+        $formData = [
             'name' => 'test',
-            'key'  => array('firstName', 'lastName', 'email')
-        );
+            'key'  => ['firstName', 'lastName', 'email'],
+        ];
 
         $form = $this->factory->create(UniqueKeyType::class, null, ['key_choices' => $this->fields]);
         $form->submit($formData);
 
-        $this->assertTrue($form->isSynchronized());
-        $this->assertTrue($form->isValid());
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
     }
 
-    public function testSubmitNotValidData()
+    public function testSubmitNotValidData(): void
     {
         $form = $this->factory->create(UniqueKeyType::class, null, ['key_choices' => $this->fields]);
 
-        $formData = array(
+        $formData = [
             'name' => '',
-            'key'  => []
-        );
+            'key'  => [],
+        ];
 
         $form->submit($formData);
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($form->isSynchronized());
+        self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
     }
 
-    public function testNames()
+    public function testNames(): void
     {
         $type = new UniqueKeyType();
-        $this->assertEquals('oro_entity_extend_unique_key_type', $type->getName());
+        self::assertEquals('oro_entity_extend_unique_key_type', $type->getName());
     }
 }
