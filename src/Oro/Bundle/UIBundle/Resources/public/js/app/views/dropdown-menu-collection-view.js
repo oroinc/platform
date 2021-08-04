@@ -72,7 +72,7 @@ define(function(require) {
         ].join('')),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DropdownMenuCollectionView(options) {
             DropdownMenuCollectionView.__super__.constructor.call(this, options);

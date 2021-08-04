@@ -21,7 +21,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateGroupingView(options) {
             DateGroupingView.__super__.constructor.call(this, options);

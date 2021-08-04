@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AutocompleteResultsCollection(options) {
             AutocompleteResultsCollection.__super__.constructor.call(this, options);

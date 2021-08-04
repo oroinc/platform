@@ -11,14 +11,14 @@ define(function(require) {
         comparator: 'position',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SidebarWidgetContainerCollection(data, options) {
             SidebarWidgetContainerCollection.__super__.constructor.call(this, data, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(data, options) {
             _.extend(this, _.pick(options, ['url']));

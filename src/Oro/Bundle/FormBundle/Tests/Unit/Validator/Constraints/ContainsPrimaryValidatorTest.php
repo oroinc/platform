@@ -17,18 +17,18 @@ class ContainsPrimaryValidatorTest extends ConstraintValidatorTestCase
         return new ContainsPrimaryValidator();
     }
 
-    public function testValidateException()
+    public function testValidateException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
-            'Expected argument of type "array or Traversable and ArrayAccess", "boolean" given'
+            'Expected argument of type "array or Traversable and ArrayAccess", "bool" given'
         );
 
         $constraint = $this->createMock(Constraint::class);
         $this->validator->validate(false, $constraint);
     }
 
-    public function testShouldKeepLazyCollectionUninitialized()
+    public function testShouldKeepLazyCollectionUninitialized(): void
     {
         $collection = $this->getMockForAbstractClass(AbstractLazyCollection::class);
         $this->validator->validate($collection, $this->createMock(Constraint::class));
@@ -39,7 +39,7 @@ class ContainsPrimaryValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider validItemsDataProvider
      */
-    public function testValidateValid(array $items)
+    public function testValidateValid(array $items): void
     {
         $constraint = new ContainsPrimary();
         $this->validator->validate($items, $constraint);
@@ -72,7 +72,7 @@ class ContainsPrimaryValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider invalidItemsDataProvider
      */
-    public function testValidateInvalid(array $items)
+    public function testValidateInvalid(array $items): void
     {
         $constraint = new ContainsPrimary();
         $this->validator->validate($items, $constraint);

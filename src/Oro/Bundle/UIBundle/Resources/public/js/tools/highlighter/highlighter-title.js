@@ -11,14 +11,14 @@ define(function(require, exports, module) {
 
     const HighlighterTitle = BaseClass.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HighlighterTitle(options) {
             HighlighterTitle.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const names = _.keys(defaults);
@@ -28,7 +28,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

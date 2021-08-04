@@ -20,7 +20,7 @@ define([
         style: 'currency',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CurrencyCell(options) {
             CurrencyCell.__super__.constructor.call(this, options);

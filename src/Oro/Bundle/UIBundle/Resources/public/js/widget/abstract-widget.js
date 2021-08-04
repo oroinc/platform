@@ -63,7 +63,7 @@ define(function(require) {
         contextParameters: ['entityClass', 'entityId[id]', 'route', 'datagrid', 'group', 'fromUrl'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractWidgetView(options) {
             AbstractWidgetView.__super__.constructor.call(this, options);
@@ -895,7 +895,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getLayoutElement: function() {
             return this.widget;

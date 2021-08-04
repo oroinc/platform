@@ -56,7 +56,8 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
     protected function getFormExtensions()
     {
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping(new AnnotationReader())
+            ->enableAnnotationMapping(true)
+            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         return [new ValidatorExtension($validator)];

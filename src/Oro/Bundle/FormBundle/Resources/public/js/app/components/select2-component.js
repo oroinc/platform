@@ -18,7 +18,7 @@ define(function(require) {
         ViewType: Select2View,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2Component(options) {
             Select2Component.__super__.constructor.call(this, options);

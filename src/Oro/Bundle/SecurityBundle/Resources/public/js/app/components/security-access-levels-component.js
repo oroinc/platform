@@ -28,7 +28,7 @@ define(function(require) {
         options: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SecurityAccessLevelsComponent(options) {
             SecurityAccessLevelsComponent.__super__.constructor.call(this, options);
@@ -83,7 +83,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

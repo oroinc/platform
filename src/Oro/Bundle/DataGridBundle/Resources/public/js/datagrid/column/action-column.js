@@ -29,14 +29,14 @@ define(function(require) {
         }, Backgrid.Column.prototype.defaults),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionColumn(...attrs) {
             ActionColumn.__super__.constructor.call(this, ...attrs);
         },
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
          */
         initialize: function(attributes, options) {
             const attrs = attributes || {};

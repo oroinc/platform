@@ -82,14 +82,14 @@ define(function(require) {
      */
     const RelatedIdSelectEditorView = SelectEditorView.extend(/** @lends RelatedIdSelectEditorView.prototype */{
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RelatedIdSelectEditorView(options) {
             RelatedIdSelectEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             RelatedIdSelectEditorView.__super__.initialize.call(this, options);

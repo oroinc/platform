@@ -20,7 +20,7 @@ const AbstractShowMoreView = BaseView.extend({
     },
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     constructor: function AbstractShowMoreView(options) {
         if (this.itemSelector === null) {

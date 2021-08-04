@@ -36,7 +36,7 @@ define([
         showLabels: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageSize(options) {
             PageSize.__super__.constructor.call(this, options);

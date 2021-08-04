@@ -15,7 +15,7 @@ define(function(require) {
         activeFunctionGroupKey: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FunctionChoiceView(options) {
             FunctionChoiceView.__super__.constructor.call(this, options);

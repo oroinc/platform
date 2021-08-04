@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -41,7 +42,9 @@ class EmailTemplateControllerTest extends WebTestCase
 
     public function testGetNonSystemNoEntity()
     {
-        $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
+        /** @var EmailTemplate $template */
+        $template = $this->getReference('emailTemplate3');
+        $entityName = str_replace('\\', '_', $template->getEntityName());
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_emailtemplates', [
@@ -53,7 +56,20 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(1, $result);
+        $this->assertEquals(
+            [
+                [
+                    'id'          => $template->getId(),
+                    'name'        => $template->getName(),
+                    'is_system'   => $template->getIsSystem(),
+                    'is_editable' => $template->getIsEditable(),
+                    'content'     => $template->getContent(),
+                    'entity_name' => $template->getEntityName(),
+                    'type'        => $template->getType()
+                ]
+            ],
+            $result
+        );
     }
 
     public function testGetNonSystemEntity()

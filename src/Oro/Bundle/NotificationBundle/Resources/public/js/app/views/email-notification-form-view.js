@@ -17,7 +17,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationFormView(options) {
             _.extend(this, this.defaults, _.pick(options, 'selectors'));
@@ -26,7 +26,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateEvents: function() {
             EmailNotificationFormView.__super__.delegateEvents.call(this);

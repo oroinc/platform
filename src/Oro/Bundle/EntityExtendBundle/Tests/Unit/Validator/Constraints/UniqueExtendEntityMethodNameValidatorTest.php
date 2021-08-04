@@ -23,14 +23,12 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestCase
 {
-    const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
-    const TEST_FIELD_NAME = 'testField';
+    private const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
+    private const TEST_FIELD_NAME = 'testField';
 
-    /** @var ClassMethodNameChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $classMethodNameChecker;
+    private ClassMethodNameChecker|\PHPUnit\Framework\MockObject\MockObject $classMethodNameChecker;
 
-    /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldTypeHelper;
+    private FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject $fieldTypeHelper;
 
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
@@ -42,7 +40,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 
         parent::setUp();
 
-        $this->setPropertyPath(null);
+        $this->setPropertyPath('');
     }
 
     protected function createValidator()
@@ -70,7 +68,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
      *
      * @return FieldConfigModel
      */
-    protected function getFieldConfigModel($fieldType)
+    protected function getFieldConfigModel(string $fieldType): FieldConfigModel
     {
         $entity = new EntityConfigModel(self::TEST_CLASS_NAME);
         $field = new FieldConfigModel(self::TEST_FIELD_NAME, $fieldType);
@@ -79,7 +77,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         return $field;
     }
 
-    public function testAssertValidatingValue()
+    public function testAssertValidatingValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -92,7 +90,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->validator->validate($field, $constraint);
     }
 
-    public function testForUndefinedEntity()
+    public function testForUndefinedEntity(): void
     {
         $entity = new EntityConfigModel('Test\SomeUndefinedClass');
         $field = new FieldConfigModel('testField', 'string');
@@ -104,7 +102,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testFieldDoesNotExist()
+    public function testFieldDoesNotExist(): void
     {
         $field = $this->getFieldConfigModel('string');
         $constraint = new UniqueExtendEntityMethodName();
@@ -121,7 +119,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testGetterExists()
+    public function testGetterExists(): void
     {
         $field = $this->getFieldConfigModel('string');
         $constraint = new UniqueExtendEntityMethodName();
@@ -139,7 +137,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ->assertRaised();
     }
 
-    public function testSetterExists()
+    public function testSetterExists(): void
     {
         $field = $this->getFieldConfigModel('string');
         $constraint = new UniqueExtendEntityMethodName();
@@ -159,10 +157,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
-    public function relationTypeProvider()
+    public function relationTypeProvider(): array
     {
         return [
             ['oneToOne', 'oneToOne'],
@@ -179,9 +174,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
      * @param string $fieldType
      * @param string $relationType
      */
-    public function testRelationMethodsDoNotExist($fieldType, $relationType)
+    public function testRelationMethodsDoNotExist(string $fieldType, string $relationType): void
     {
-        $this->fieldTypeHelper->expects($this->any())
+        $this->fieldTypeHelper->expects(self::any())
             ->method('getUnderlyingType')
             ->with($fieldType)
             ->willReturn($relationType);
@@ -206,9 +201,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
      * @param string $fieldType
      * @param string $relationType
      */
-    public function testRelationMethodsExist($fieldType, $relationType)
+    public function testRelationMethodsExist(string $fieldType, string $relationType): void
     {
-        $this->fieldTypeHelper->expects($this->any())
+        $this->fieldTypeHelper->expects(self::any())
             ->method('getUnderlyingType')
             ->with($fieldType)
             ->willReturn($relationType);
@@ -231,7 +226,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ->assertRaised();
     }
 
-    public function testForUnsupportedCombinedType()
+    public function testForUnsupportedCombinedType(): void
     {
         $field = $this->getFieldConfigModel('item1||item2');
         $constraint = new UniqueExtendEntityMethodName();
@@ -245,7 +240,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseManyToOne()
+    public function testReuseManyToOne(): void
     {
         $field = $this->getFieldConfigModel('manyToOne|Source|Target|field||');
         $constraint = new UniqueExtendEntityMethodName();
@@ -258,7 +253,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseManyToManyWhenNoRelationConfig()
+    public function testReuseManyToManyWhenNoRelationConfig(): void
     {
         $field = $this->getFieldConfigModel('manyToMany|Source|Target|field||');
         $constraint = new UniqueExtendEntityMethodName();
@@ -271,7 +266,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseManyToManyWhenNoTargetFieldConfig()
+    public function testReuseManyToManyWhenNoTargetFieldConfig(): void
     {
         $field = $this->getFieldConfigModel('manyToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -294,7 +289,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseManyToManyForOwningSideRelationConfig()
+    public function testReuseManyToManyForOwningSideRelationConfig(): void
     {
         $field = $this->getFieldConfigModel('manyToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -318,7 +313,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseManyToManyWhenFieldNameEqualsToExpectedFieldName()
+    public function testReuseManyToManyWhenFieldNameEqualsToExpectedFieldName(): void
     {
         $field = $this->getFieldConfigModel('manyToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -342,7 +337,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseManyToManyWhenFieldNameNotEqualToExpectedFieldName()
+    public function testReuseManyToManyWhenFieldNameNotEqualToExpectedFieldName(): void
     {
         $field = $this->getFieldConfigModel('manyToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -369,7 +364,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             ->assertRaised();
     }
 
-    public function testReuseOneToManyWhenNoRelationConfig()
+    public function testReuseOneToManyWhenNoRelationConfig(): void
     {
         $field = $this->getFieldConfigModel('oneToMany|Source|Target|field||');
         $constraint = new UniqueExtendEntityMethodName();
@@ -382,7 +377,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseOneToManyWhenNoTargetFieldConfig()
+    public function testReuseOneToManyWhenNoTargetFieldConfig(): void
     {
         $field = $this->getFieldConfigModel('oneToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -405,7 +400,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseOneToManyForInverseSideRelationConfig()
+    public function testReuseOneToManyForInverseSideRelationConfig(): void
     {
         $field = $this->getFieldConfigModel('oneToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -429,7 +424,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseOneToManyWhenFieldNameEqualsToExpectedFieldName()
+    public function testReuseOneToManyWhenFieldNameEqualsToExpectedFieldName(): void
     {
         $field = $this->getFieldConfigModel('oneToMany|Source|Target|field||');
         $field->getEntity()->fromArray(
@@ -453,7 +448,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->assertNoViolation();
     }
 
-    public function testReuseOneToManyWhenFieldNameNotEqualToExpectedFieldName()
+    public function testReuseOneToManyWhenFieldNameNotEqualToExpectedFieldName(): void
     {
         $field = $this->getFieldConfigModel('oneToMany|Source|Target|field||');
         $field->getEntity()->fromArray(

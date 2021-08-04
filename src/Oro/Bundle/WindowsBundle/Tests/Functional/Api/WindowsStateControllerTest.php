@@ -7,26 +7,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WindowsStateControllerTest extends WebTestCase
 {
-    /**
-     * @var array
-     */
-    protected static $entity;
+    private static array $entity = [];
 
     protected function setUp(): void
     {
         $this->initClient();
     }
 
-    /**
-     * Test POST
-     */
     public function testPost()
     {
         self::$entity = [
             'data' => [
                 'position' => '0',
-                'title' => 'Some title',
-                'url' => '/path'
+                'title'    => 'Some title',
+                'url'      => '/path'
             ],
         ];
 
@@ -51,8 +45,6 @@ class WindowsStateControllerTest extends WebTestCase
     }
 
     /**
-     * Test PUT
-     *
      * @depends testPost
      */
     public function testPut()
@@ -79,8 +71,6 @@ class WindowsStateControllerTest extends WebTestCase
     }
 
     /**
-     * Test GET
-     *
      * @depends testPut
      */
     public function testGet()
@@ -101,17 +91,30 @@ class WindowsStateControllerTest extends WebTestCase
 
         $resultJson = json_decode($result->getContent(), true);
 
-        $this->assertNotEmpty($resultJson);
         $this->assertArrayHasKey('id', $resultJson[0]);
-        $this->assertArrayNotHasKey('user', $resultJson[0]);
+        $this->assertArrayHasKey('created_at', $resultJson[0]);
+        $this->assertArrayHasKey('updated_at', $resultJson[0]);
+        unset($resultJson[0]['id'], $resultJson[0]['created_at'], $resultJson[0]['updated_at']);
+        $this->assertEquals(
+            [
+                [
+                    'data'                  => [
+                        'url'      => '/path',
+                        'title'    => 'Some title',
+                        'cleanUrl' => '/path',
+                        'position' => 100
+                    ],
+                    'rendered_successfully' => false
+                ]
+            ],
+            $resultJson
+        );
     }
 
     /**
-     * Test DELETE
-     *
      * @depends testPut
      */
-    public function testDelete($itemType)
+    public function testDelete()
     {
         $this->assertNotEmpty(self::$entity);
 
@@ -129,8 +132,6 @@ class WindowsStateControllerTest extends WebTestCase
     }
 
     /**
-     * Test 404
-     *
      * @depends testDelete
      */
     public function testNotFound()
@@ -164,8 +165,6 @@ class WindowsStateControllerTest extends WebTestCase
     }
 
     /**
-     * Test Unauthorized
-     *
      * @depends testNotFound
      */
     public function testUnauthorized()
@@ -173,9 +172,9 @@ class WindowsStateControllerTest extends WebTestCase
         $this->assertNotEmpty(self::$entity);
 
         $requests = [
-            'GET' => $this->getUrl('oro_api_get_windows'),
-            'POST' => $this->getUrl('oro_api_post_windows'),
-            'PUT' => $this->getUrl('oro_api_put_windows', ['windowId' => self::$entity['id']]),
+            'GET'    => $this->getUrl('oro_api_get_windows'),
+            'POST'   => $this->getUrl('oro_api_post_windows'),
+            'PUT'    => $this->getUrl('oro_api_put_windows', ['windowId' => self::$entity['id']]),
             'DELETE' => $this->getUrl('oro_api_delete_windows', ['windowId' => self::$entity['id']]),
         ];
 
@@ -191,8 +190,6 @@ class WindowsStateControllerTest extends WebTestCase
     }
 
     /**
-     * Test Empty Body error
-     *
      * @depends testNotFound
      */
     public function testEmptyBody()
@@ -201,7 +198,7 @@ class WindowsStateControllerTest extends WebTestCase
 
         $requests = [
             'POST' => $this->getUrl('oro_api_post_windows'),
-            'PUT' => $this->getUrl('oro_api_put_windows', ['windowId' => self::$entity['id']]),
+            'PUT'  => $this->getUrl('oro_api_put_windows', ['windowId' => self::$entity['id']]),
         ];
 
         foreach ($requests as $requestType => $url) {

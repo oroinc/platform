@@ -4,8 +4,10 @@
 
     <% if (renderMode !== 'toggle-mode') { %>
         <div class="filter-action-row">
-            <button type="button" class="btn btn--action filter-update"><%- _.__("Apply") %></button>
+            <button type="button"
+                class="btn btn--action filter-update"
+                aria-label="<%- updateButtonAriaLabel %>"
+            ><%- _.__("Apply") %></button>
         </div>
     <% } %>
-
 </div>

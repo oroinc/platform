@@ -15,17 +15,17 @@ define(function(require) {
      */
     const DatagridSettingsView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         optionNames: ['viewConstructors', 'title', 'template'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
@@ -55,14 +55,14 @@ define(function(require) {
         uniqueId: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsView(options) {
             DatagridSettingsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param options
          */
         initialize: function(options) {
@@ -86,7 +86,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -123,7 +123,7 @@ define(function(require) {
 
         /**
          * Render array of views, create tabs view
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsView.__super__.render.call(this);

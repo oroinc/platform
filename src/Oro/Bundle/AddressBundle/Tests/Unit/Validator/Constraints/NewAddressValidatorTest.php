@@ -25,30 +25,30 @@ class NewAddressValidatorTest extends ConstraintValidatorTestCase
     protected function createContext()
     {
         $this->constraint = new NewAddress();
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
 
-    public function testWithInvalidConstraint()
+    public function testWithInvalidConstraint(): void
     {
         $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate(new Address(), $this->createMock(Constraint::class));
     }
 
-    public function testWithNotAddressEntity()
+    public function testWithNotAddressEntity(): void
     {
         $this->validator->validate(new \stdClass(), $this->constraint);
         $this->assertNoViolation();
     }
 
-    public function testWithNewAddressEntity()
+    public function testWithNewAddressEntity(): void
     {
         $this->validator->validate(new Address(), $this->constraint);
         $this->assertNoViolation();
     }
 
-    public function testWithNotNewAddressEntity()
+    public function testWithNotNewAddressEntity(): void
     {
         $address = new Address();
         ReflectionUtil::setId($address, 123);

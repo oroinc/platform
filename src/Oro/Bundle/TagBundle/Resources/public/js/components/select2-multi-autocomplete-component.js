@@ -9,14 +9,14 @@ define(function(require) {
         oroTagCreateGranted: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2MultiAutocompleteComponent(options) {
             Select2MultiAutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted') || this.oroTagCreateGranted;

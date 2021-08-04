@@ -6,14 +6,14 @@ define(function(require) {
 
     const WidgetDatetimeRangeView = AbstractWidgetDateRangeView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetDatetimeRangeView(options) {
             WidgetDatetimeRangeView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             WidgetDatetimeRangeView.__super__.initialize.call(this, options);

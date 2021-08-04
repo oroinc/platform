@@ -29,7 +29,7 @@ define(function(require) {
         collectionModel: PinbarCollection,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PinComponent(options) {
             PinComponent.__super__.constructor.call(this, options);
@@ -140,7 +140,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         toRemove: function(model) {
             const self = this;
@@ -169,7 +169,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         toAdd: function(model) {
             const self = this;

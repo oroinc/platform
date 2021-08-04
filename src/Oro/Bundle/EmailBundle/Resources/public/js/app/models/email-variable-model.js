@@ -29,7 +29,7 @@ define(function(require) {
         path: [],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailVariableModel(...args) {
             EmailVariableModel.__super__.constructor.apply(this, args);

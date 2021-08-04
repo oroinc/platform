@@ -12,7 +12,7 @@ define([
         model: Model,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardItemsCollection(...args) {
             DashboardItemsCollection.__super__.constructor.apply(this, args);

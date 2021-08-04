@@ -49,17 +49,15 @@ define(function(require) {
             const changeValueTypeEvent = `change ${this.criteriaValueSelectors.type}`;
 
             return {
-                'keyup input': '_onReadCriteriaInputKey',
+                // Exclude from selection an auxiliary input inside of select2 component
                 [changeValueTypeEvent]: '_onValueChanged',
-                'keydown [type="text"]': '_preventEnterProcessing',
-                'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
                 'click .disable-filter': '_onClickDisableFilter',
                 'click .choice-value': '_onClickChoiceValue'
             };
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ChoiceFilter(options) {
             ChoiceFilter.__super__.constructor.call(this, options);
@@ -97,7 +95,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -127,7 +125,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const value = _.extend({}, this.emptyValue, this.value);
@@ -147,12 +145,13 @@ define(function(require) {
                 selectedChoice: value.type,
                 selectedChoiceLabel: selectedChoiceLabel,
                 value: value.value,
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                ...this.getTemplateDataProps()
             };
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _renderCriteria: function() {
             const $filter = $(this.template(this.getTemplateData()));
@@ -197,7 +196,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getCriteriaHint: function(...args) {
             const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
@@ -233,7 +232,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.value, value.value);
@@ -242,7 +241,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             return {
@@ -252,7 +251,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         isUpdatable: function(newValue, oldValue) {
             return !tools.isEqualsLoosely(newValue, oldValue) &&
@@ -265,7 +264,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (this.isUpdatable(newValue, oldValue)) {
@@ -287,7 +286,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onValueUpdated: function(newValue, oldValue) {
             this.$(this.choiceDropdownSelector).each(function() {

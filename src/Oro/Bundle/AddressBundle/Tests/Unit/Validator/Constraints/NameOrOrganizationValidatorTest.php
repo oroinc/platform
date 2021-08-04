@@ -10,33 +10,27 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function createValidator()
     {
         return new NameOrOrganizationValidator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createContext()
     {
         $this->constraint = new NameOrOrganization();
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
 
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
-        $this->assertEquals(NameOrOrganizationValidator::class, $this->constraint->validatedBy());
+        self::assertEquals(NameOrOrganizationValidator::class, $this->constraint->validatedBy());
 
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }
 
-    public function testNotQuoteProduct()
+    public function testNotQuoteProduct(): void
     {
         $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate(new \stdClass(), $this->constraint);
@@ -47,7 +41,7 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
      *
      * @param mixed $data
      */
-    public function testValidData($data)
+    public function testValidData($data): void
     {
         $this->validator->validate($data, $this->constraint);
         $this->assertNoViolation();
@@ -58,7 +52,7 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
      *
      * @param mixed $data
      */
-    public function testInvalidData($data)
+    public function testInvalidData($data): void
     {
         $this->validator->validate($data, $this->constraint);
         $this
@@ -71,10 +65,7 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
-    public function validDataProvider()
+    public function validDataProvider(): array
     {
         return [
             'empty first name' => [
@@ -98,10 +89,7 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function invalidDataProvider()
+    public function invalidDataProvider(): array
     {
         return [
             'empty' => [

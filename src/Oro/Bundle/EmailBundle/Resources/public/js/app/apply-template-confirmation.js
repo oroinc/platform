@@ -14,7 +14,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
         className: 'modal oro-modal-danger',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailApplyTemplateModalView(options) {
             EmailApplyTemplateModalView.__super__.constructor.call(this, options);

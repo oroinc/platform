@@ -10,7 +10,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AccessLevelsCollection(...args) {
             AccessLevelsCollection.__super__.constructor.apply(this, args);

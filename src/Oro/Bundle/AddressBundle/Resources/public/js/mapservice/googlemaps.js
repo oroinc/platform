@@ -42,14 +42,14 @@ define(function(require) {
         loadingMask: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GoogleMapsView(options) {
             GoogleMapsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {},

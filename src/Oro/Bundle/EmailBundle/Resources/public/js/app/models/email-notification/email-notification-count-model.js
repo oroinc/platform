@@ -12,7 +12,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationCountModel(...args) {
             EmailNotificationCountModel.__super__.constructor.apply(this, args);

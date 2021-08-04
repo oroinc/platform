@@ -8,7 +8,7 @@ define(function(require) {
         comparator: 'order',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GridColumns(...args) {
             GridColumns.__super__.constructor.apply(this, args);

@@ -42,14 +42,14 @@ define(function(require) {
         allowDialog: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionComponentDropdownLauncher(options) {
             ActionComponentDropdownLauncher.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['allowDialog']));
@@ -65,7 +65,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = ActionComponentDropdownLauncher.__super__.getTemplateData.call(this);
@@ -74,7 +74,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             ActionComponentDropdownLauncher.__super__.render.call(this);
@@ -89,7 +89,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -172,7 +172,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disable: function() {
             this.$('[data-toggle="dropdown"]').addClass('disabled');
@@ -180,7 +180,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enable: function() {
             this.$('[data-toggle="dropdown"]').removeClass('disabled');

@@ -13,7 +13,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UnreadEmailsStateModel(attrs, options) {
             UnreadEmailsStateModel.__super__.constructor.call(this, attrs, options);

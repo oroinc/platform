@@ -18,14 +18,14 @@ define([
         confirmModal: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractGridChangeListener(...args) {
             AbstractGridChangeListener.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -49,7 +49,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getGridEvents: function() {
             const events = AbstractGridChangeListener.__super__.getGridEvents.call(this);

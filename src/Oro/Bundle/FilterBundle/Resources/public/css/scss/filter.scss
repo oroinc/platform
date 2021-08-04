@@ -2,6 +2,8 @@
 
 /* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
 
+@use 'sass:map';
+
 .filter-container {
     position: $filter-container-position;
 }
@@ -428,15 +430,30 @@
 }
 
 .filters-state {
+    background-color: transparent;
+    border-width: 0;
     color: $filters-state-color;
     font-size: $filters-state-font-size;
+    font-family: $filters-state-font-size;
     padding: $filters-state-inner-offset;
     line-height: $filters-state-line-height;
     min-width: $filters-state-min-width;
-    white-space: $filters-state-white-space;
-    overflow: $filters-state-overflow;
-    text-overflow: $filters-state-text-overflow;
+    width: 100%;
     cursor: $filters-state-cursor;
+
+    &__ellipsis {
+        display: block;
+        width: 100%;
+        white-space: $filters-state-white-space;
+        overflow: $filters-state-overflow;
+        text-overflow: $filters-state-text-overflow;
+    }
+
+    &:focus {
+        box-shadow: map.get($btn-theme, 'focus-box-shadow');
+        border-width: 0;
+        outline: 0;
+    }
 
     // Added to avoid showing Safari's hint for elements with ellipsis
     &::before {

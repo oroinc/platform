@@ -17,7 +17,7 @@ define(function(require) {
         narrowScreen: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultilineChartComponent(options) {
             MultilineChartComponent.__super__.constructor.call(this, options);

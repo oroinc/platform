@@ -18,7 +18,7 @@ define(function(require) {
         putRoute: 'oro_api_put_pagestate',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageStateModel(attrs, options) {
             PageStateModel.__super__.constructor.call(this, attrs, options);

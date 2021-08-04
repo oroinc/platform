@@ -67,7 +67,7 @@ define(function(require) {
         routeOptions: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);

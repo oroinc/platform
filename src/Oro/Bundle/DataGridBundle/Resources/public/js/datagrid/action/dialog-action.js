@@ -38,7 +38,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DialogAction(options) {
             DialogAction.__super__.constructor.call(this, options);
@@ -62,7 +62,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (!this.disposed) {
@@ -76,7 +76,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         run: function() {
             if (!this.widgetComponent) {

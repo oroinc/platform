@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ZoomControlsView(options) {
             ZoomControlsView.__super__.constructor.call(this, options);

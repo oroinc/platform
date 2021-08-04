@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailModel(...args) {
             EmailModel.__super__.constructor.apply(this, args);

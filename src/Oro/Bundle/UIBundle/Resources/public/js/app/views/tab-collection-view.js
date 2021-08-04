@@ -23,7 +23,7 @@ define(function(require, exports, module) {
         template: require('tpl-loader!oroui/templates/tab-collection-container.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TabCollectionView(options) {
             TabCollectionView.__super__.constructor.call(this, options);

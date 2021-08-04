@@ -28,14 +28,14 @@ define([
         className: 'datetime-cell',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateTimeCell(options) {
             DateTimeCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             DateTimeCell.__super__.initialize.call(this, options);

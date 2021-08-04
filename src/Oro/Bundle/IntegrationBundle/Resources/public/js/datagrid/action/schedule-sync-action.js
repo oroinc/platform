@@ -14,7 +14,7 @@ define([
      */
     const ScheduleSyncAction = AjaxAction.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ScheduleSyncAction(options) {
             ScheduleSyncAction.__super__.constructor.call(this, options);

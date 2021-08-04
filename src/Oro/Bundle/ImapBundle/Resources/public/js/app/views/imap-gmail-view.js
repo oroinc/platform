@@ -4,7 +4,7 @@ define(function(require) {
     const BaseView = require('oroimap/js/app/views/imap-view');
     const ImapGmailView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImapGmailView(options) {
             ImapGmailView.__super__.constructor.call(this, options);

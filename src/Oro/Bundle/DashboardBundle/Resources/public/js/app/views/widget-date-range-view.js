@@ -7,14 +7,14 @@ define(function(require) {
 
     const WidgetDateRangeView = AbstractWidgetDateRangeView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetDateRangeView(options) {
             WidgetDateRangeView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             WidgetDateRangeView.__super__.initialize.call(this, options);

@@ -12,7 +12,7 @@ define(function(require) {
         template: require('tpl-loader!orouser/templates/datagrid/permission/permission-readonly-view.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PermissionReadOnlyView(options) {
             PermissionReadOnlyView.__super__.constructor.call(this, options);
