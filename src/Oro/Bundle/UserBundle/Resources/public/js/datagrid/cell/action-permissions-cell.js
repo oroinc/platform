@@ -5,7 +5,7 @@ define(function(require) {
 
     const ActionPermissionsReadonlyCell = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionPermissionsReadonlyCell(options) {
             ActionPermissionsReadonlyCell.__super__.constructor.call(this, options);

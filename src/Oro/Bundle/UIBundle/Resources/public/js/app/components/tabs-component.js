@@ -53,7 +53,7 @@ define(function(require, exports, module) {
         dropdownContainerWidth: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TabsComponent(options) {
             this.updateStateOfHiddenTabs = this.updateStateOfHiddenTabs.bind(this);
@@ -61,7 +61,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             TabsComponent.__super__.initialize.call(this, options);

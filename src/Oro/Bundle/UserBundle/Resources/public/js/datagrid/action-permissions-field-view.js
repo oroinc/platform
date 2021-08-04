@@ -17,14 +17,14 @@ define(function(require) {
         permissionView: PermissionView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionPermissionsFieldView(options) {
             ActionPermissionsFieldView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ActionPermissionsFieldView.__super__.initialize.call(this, options);

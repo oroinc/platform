@@ -13,14 +13,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckboxView(...args) {
             CheckboxView.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             CheckboxView.__super__.initialize.call(this, options);
@@ -30,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onSubmit: function(e) {
             if (this.$el.find(this.options.selectors.checkbox).is(':checked')) {

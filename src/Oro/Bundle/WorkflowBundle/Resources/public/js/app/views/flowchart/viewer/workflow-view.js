@@ -36,14 +36,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartViewerWorkflowView(options) {
             FlowchartViewerWorkflowView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             FlowchartViewerWorkflowView.__super__.initialize.call(this, options);

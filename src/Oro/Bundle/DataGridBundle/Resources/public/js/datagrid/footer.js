@@ -35,14 +35,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Footer(options) {
             Footer.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['themeOptions']));
@@ -74,7 +74,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

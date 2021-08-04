@@ -46,7 +46,7 @@ define(function(require, exports, module) {
         modal: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ChangeOrganizationComponent(options) {
             ChangeOrganizationComponent.__super__.constructor.call(this, options);
@@ -61,7 +61,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const names = _.keys(defaults);

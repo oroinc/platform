@@ -43,14 +43,14 @@ define(function(require) {
         debounceWait: 500,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AutocompleteComponent(options) {
             AutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             AutocompleteComponent.__super__.initialize.call(this, options);

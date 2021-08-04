@@ -4,14 +4,14 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'undersc
 
     const ConfigurationWidget = DialogWidget.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConfigurationWidget(options) {
             ConfigurationWidget.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (typeof options.widget === 'undefined') {

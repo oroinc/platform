@@ -11,7 +11,7 @@ define(function(require) {
 
     const EmailVariableComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailVariableComponent(options) {
             EmailVariableComponent.__super__.constructor.call(this, options);

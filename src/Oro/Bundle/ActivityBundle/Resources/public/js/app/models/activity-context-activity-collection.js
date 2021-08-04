@@ -21,7 +21,7 @@ define(function(require) {
         model: ActivityContextActivityModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextActivityCollection(...args) {
             ActivityContextActivityCollection.__super__.constructor.apply(this, args);

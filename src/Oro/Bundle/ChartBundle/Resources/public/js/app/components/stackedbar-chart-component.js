@@ -17,7 +17,7 @@ define(function(require) {
         initialDatasetSize: 30,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StackedBarChartComponent(options) {
             StackedBarChartComponent.__super__.constructor.call(this, options);

@@ -17,14 +17,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2EmailRecipientsView(options) {
             Select2EmailRecipientsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');

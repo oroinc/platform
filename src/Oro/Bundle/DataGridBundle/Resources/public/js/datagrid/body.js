@@ -36,14 +36,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Body(options) {
             Body.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
@@ -55,7 +55,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -92,7 +92,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         insertView: function(model, view, ...rest) {
             Body.__super__.insertView.call(this, model, view, ...rest);
@@ -126,7 +126,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this._deferredRender();

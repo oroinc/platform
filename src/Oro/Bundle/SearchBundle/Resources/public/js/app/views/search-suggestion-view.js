@@ -53,7 +53,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SearchSuggestionView(options) {
             _.extend(this, _.pick(options, 'latency'));
@@ -63,7 +63,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const routeParameters = {

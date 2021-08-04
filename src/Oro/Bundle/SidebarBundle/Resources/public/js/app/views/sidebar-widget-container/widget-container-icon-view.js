@@ -11,7 +11,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetContainerIconView(options) {
             WidgetContainerIconView.__super__.constructor.call(this, options);

@@ -10,14 +10,14 @@ define(function(require) {
         className: 'modal oro-modal-normal widget-setup',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetSetupModalView(options) {
             WidgetSetupModalView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options.snapshot = options.snapshot || {};

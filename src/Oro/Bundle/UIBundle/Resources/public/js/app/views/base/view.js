@@ -8,7 +8,7 @@ define([
 
     const BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseView(options) {
             BaseView.__super__.constructor.call(this, options);

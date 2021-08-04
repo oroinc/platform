@@ -38,7 +38,7 @@ define(function(require) {
         /**
          * Swipe actions on mobile devices
          *
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SwipeableView(options) {
             SwipeableView.__super__.constructor.call(this, options);

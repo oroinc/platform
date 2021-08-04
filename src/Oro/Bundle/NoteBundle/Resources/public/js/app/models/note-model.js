@@ -23,7 +23,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NoteModel(attrs, options) {
             NoteModel.__super__.constructor.call(this, attrs, options);

@@ -50,14 +50,14 @@ define(function(require) {
         _requiredParametersCache: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RouteModel(attrs, options) {
             RouteModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @member {Object}
          */
         defaults: function() {

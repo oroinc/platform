@@ -12,7 +12,7 @@ define(function(require) {
      */
     const LineChartComponent = BaseChartComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function LineChartComponent(options) {
             LineChartComponent.__super__.constructor.call(this, options);

@@ -11,7 +11,7 @@ define(function(require) {
         autoSelectFoundNode: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConfigurationTreeView(options) {
             ConfigurationTreeView.__super__.constructor.call(this, options);

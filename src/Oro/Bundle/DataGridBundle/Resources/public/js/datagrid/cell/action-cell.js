@@ -110,7 +110,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionCell(options) {
             ActionCell.__super__.constructor.call(this, options);
@@ -152,7 +152,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

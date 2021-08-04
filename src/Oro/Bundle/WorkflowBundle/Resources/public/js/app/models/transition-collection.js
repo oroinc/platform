@@ -8,7 +8,7 @@ define(function(require) {
         model: TransitionModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TransitionCollection(...args) {
             TransitionCollection.__super__.constructor.apply(this, args);

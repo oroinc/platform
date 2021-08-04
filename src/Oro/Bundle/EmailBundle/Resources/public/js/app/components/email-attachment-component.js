@@ -46,14 +46,14 @@ define(function(require) {
         $popupContentEl: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailAttachmentComponent(options) {
             EmailAttachmentComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.popupCollection = new EmailAttachmentCollection(options.attachmentsAvailable || []);
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

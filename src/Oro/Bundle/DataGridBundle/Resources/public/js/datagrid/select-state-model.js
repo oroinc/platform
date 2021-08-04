@@ -11,7 +11,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectStateModel(attrs, options) {
             SelectStateModel.__super__.constructor.call(this, attrs, options);

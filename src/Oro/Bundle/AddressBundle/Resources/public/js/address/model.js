@@ -33,7 +33,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressModel(attrs, options) {
             AddressModel.__super__.constructor.call(this, attrs, options);

@@ -17,12 +17,12 @@ define(function(require, exports, module) {
         scrollBar: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         cidPrefix: 'scrollBar',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: function() {
             const listenTo = {};
@@ -33,7 +33,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ScrollBar(options, element) {
             this.element = element;
@@ -41,7 +41,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.defaults = $.extend(true, {}, $.fn[NAME].defaults, allowedConfig, options || {});

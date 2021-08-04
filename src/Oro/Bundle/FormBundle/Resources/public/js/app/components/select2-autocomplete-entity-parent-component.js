@@ -13,14 +13,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2AutocompleteEntityParentComponent(options) {
             Select2AutocompleteEntityParentComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         makeQuery: function(query) {
             return [query, this.options.configs.entityId].join(this.options.delimiter);

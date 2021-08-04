@@ -17,7 +17,7 @@ define(function(require) {
         listenToUpdatePosition: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RecentEmailsContentView(options) {
             RecentEmailsContentView.__super__.constructor.call(this, options);

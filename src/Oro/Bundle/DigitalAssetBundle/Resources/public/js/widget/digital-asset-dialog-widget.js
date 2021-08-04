@@ -38,14 +38,14 @@ define(function(require) {
         gridName: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DigitalAssetDialogWidget(options) {
             DigitalAssetDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             DigitalAssetDialogWidget.__super__.initialize.call(this, options);
@@ -71,7 +71,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initializeWidget: function(options) {
             DigitalAssetDialogWidget.__super__.initializeWidget.call(this, options);
@@ -80,7 +80,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onAdoptedFormResetClick: function(form) {
             this._onFormReset(form);
@@ -103,7 +103,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          *
          * Overrides parent method to enable JSON-only handling on content load - prevents dialog window from blanking.
          */

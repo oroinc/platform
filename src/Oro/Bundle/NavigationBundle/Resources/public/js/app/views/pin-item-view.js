@@ -18,7 +18,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PinItemView(options) {
             PinItemView.__super__.constructor.call(this, options);
@@ -69,7 +69,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         checkCurrentUrl: function() {
             const url = this.model.get('url');
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         setActiveItem: function() {
             const isUrlSame = this.checkCurrentUrl();

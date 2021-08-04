@@ -1,8 +1,10 @@
-define([
-    'jquery',
-    'underscore'
-], function($, _) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+
+    const KEYBOARD_CODES = require('oroui/js/tools/keyboard-key-codes').default;
 
     const dataFilterWrapper = {
         /**
@@ -25,10 +27,12 @@ define([
             this.setElement(this._getWrapperTemplate()({
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
-                criteriaHint: this._getCriteriaHint(),
                 canDisable: this.canDisable,
                 isEmpty: this.isEmptyValue(),
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                criteriaHint: this._getCriteriaHint(),
+                criteriaClass: this.getCriteriaExtraClass(),
+                ...this.getTemplateDataProps()
             }));
 
             this._appendFilter($filter);
@@ -44,9 +48,10 @@ define([
             });
 
             // will be automatically unbound in backbone view's undelegateEvents() method
-            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', e => {
-                if (e.keyCode === 27) {
+            this.$el.on('keydown' + this._eventNamespace(), '.dropdown-menu.filter-criteria', e => {
+                if (e.keyCode === KEYBOARD_CODES.ESCAPE) {
                     this._hideCriteria();
+                    this.focusCriteriaToggler();
                 }
             });
         },

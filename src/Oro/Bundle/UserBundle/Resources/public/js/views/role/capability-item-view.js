@@ -22,14 +22,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CapabilityItemView(options) {
             CapabilityItemView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             CapabilityItemView.__super__.render.call(this);
@@ -42,7 +42,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = CapabilityItemView.__super__.getTemplateData.call(this);

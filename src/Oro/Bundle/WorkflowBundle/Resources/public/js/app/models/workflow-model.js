@@ -41,14 +41,14 @@ define(function(require) {
         positionIncrementPx: 35,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowModel(attrs, options) {
             WorkflowModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attrs, options) {
             if (this.get('steps') === null) {

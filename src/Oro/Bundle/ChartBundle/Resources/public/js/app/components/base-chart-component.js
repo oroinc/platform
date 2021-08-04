@@ -23,7 +23,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseChartComponent(options) {
             this.debouncedUpdate = _.debounce(this.update, this.updateDelay);

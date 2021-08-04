@@ -9,7 +9,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetPickerFilterModel(attrs, options) {
             WidgetPickerFilterModel.__super__.constructor.call(this, attrs, options);

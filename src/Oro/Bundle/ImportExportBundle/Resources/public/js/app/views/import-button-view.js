@@ -36,14 +36,14 @@ define(function(require) {
         $importButton: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImportButtonsView(options) {
             ImportButtonsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

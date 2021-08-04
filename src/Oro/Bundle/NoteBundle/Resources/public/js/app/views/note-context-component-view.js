@@ -6,14 +6,14 @@ define([
 
     const ActivityContextActivityView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextActivityView(options) {
             ActivityContextActivityView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.on('render', function() {

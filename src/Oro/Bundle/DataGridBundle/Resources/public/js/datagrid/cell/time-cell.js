@@ -16,7 +16,7 @@ define([
         className: 'time-cell',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TimeCell(options) {
             TimeCell.__super__.constructor.call(this, options);

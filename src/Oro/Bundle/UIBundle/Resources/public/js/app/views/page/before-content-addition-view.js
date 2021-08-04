@@ -6,7 +6,7 @@ define(['./../base/page-region-view'
         pageItems: ['beforeContentAddition'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageBeforeContentAdditionView(options) {
             PageBeforeContentAdditionView.__super__.constructor.call(this, options);

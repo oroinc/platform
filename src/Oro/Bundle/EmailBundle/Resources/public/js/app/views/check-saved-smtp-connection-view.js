@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckSavedConnectionView(options) {
             CheckSavedConnectionView.__super__.constructor.call(this, options);

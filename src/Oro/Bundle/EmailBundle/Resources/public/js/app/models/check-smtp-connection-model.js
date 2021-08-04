@@ -13,7 +13,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckSmtpConnectionModel(...args) {
             CheckSmtpConnectionModel.__super__.constructor.apply(this, args);

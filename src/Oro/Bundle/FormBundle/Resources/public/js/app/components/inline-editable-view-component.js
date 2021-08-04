@@ -107,7 +107,7 @@ define(function(require) {
         ESCAPE_KEY_CODE: 27,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function InlineEditableViewComponent(options) {
             InlineEditableViewComponent.__super__.constructor.call(this, options);

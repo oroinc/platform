@@ -14,14 +14,14 @@ define(function(require) {
         dataProvider: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityFieldModel(...args) {
             EntityFieldModel.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attributes, options) {
             if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
@@ -32,7 +32,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         validate: function(attrs, options) {
             let error;

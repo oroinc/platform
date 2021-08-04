@@ -30,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CapabilityGroupView(options) {
             CapabilityGroupView.__super__.constructor.call(this, options);

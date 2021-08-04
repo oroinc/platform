@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartControlView(options) {
             FlowchartControlView.__super__.constructor.call(this, options);

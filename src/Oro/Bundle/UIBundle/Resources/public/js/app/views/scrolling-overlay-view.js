@@ -11,7 +11,7 @@ define(function(require) {
 
     const ScrollingOverlayView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: function() {
             const events = {};
@@ -25,7 +25,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'layout:reposition mediator': 'onLayoutReposition'
@@ -49,7 +49,7 @@ define(function(require) {
         scrollStep: SCROLL_STEP,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ScrollingOverlayView(options) {
             this._uniqKey = _.uniqueId('scrolling-overlay-');
@@ -59,7 +59,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.defaults(
@@ -75,7 +75,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             ScrollingOverlayView.__super__.render.call(this);
@@ -113,7 +113,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

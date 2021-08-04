@@ -63,7 +63,7 @@ define(function(require) {
         className: 'number-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PercentEditorView(options) {
             PercentEditorView.__super__.constructor.call(this, options);

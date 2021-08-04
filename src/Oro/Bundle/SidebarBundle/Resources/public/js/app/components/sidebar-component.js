@@ -11,14 +11,14 @@ define(function(require) {
 
     const SidebarComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SidebarComponent(options) {
             SidebarComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             SidebarComponent.__super__.initialize.call(this, options);

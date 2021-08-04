@@ -6,14 +6,14 @@ define(function(require) {
 
     const ExtendFieldFormComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExtendFieldFormComponent(options) {
             ExtendFieldFormComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             $('form select#' + options.typeId).on('change', function() {

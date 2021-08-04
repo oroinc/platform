@@ -22,14 +22,14 @@ define([
         $el: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2EmailRecipientsComponent(options) {
             Select2EmailRecipientsComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$el = options._sourceElement;

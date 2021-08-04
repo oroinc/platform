@@ -22,7 +22,7 @@ define(function(require) {
         type: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {*}
          */
         constructor: function CheckboxInputWidget(options) {
@@ -30,14 +30,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         findContainer: function() {
             return this.$el;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initializeWidget: function() {
             this._buildCustomCheckbox();
@@ -65,7 +65,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disposeWidget: function() {
             this.$el.removeClass('checkbox-view__input');

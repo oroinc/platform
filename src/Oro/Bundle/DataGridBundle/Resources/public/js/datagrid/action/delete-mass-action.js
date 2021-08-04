@@ -44,7 +44,7 @@ define([
         allowOk: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DeleteMassAction(options) {
             DeleteMassAction.__super__.constructor.call(this, options);
@@ -108,7 +108,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getConfirmContentMessage: function() {
             return this.confirmMessage;

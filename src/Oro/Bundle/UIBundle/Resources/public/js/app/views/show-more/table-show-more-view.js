@@ -7,7 +7,7 @@ const TableShowMoreView = AbstractShowMoreView.extend({
     itemSelector: 'tbody tr',
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     constructor: function TableShowMoreView(options) {
         Object.assign(this, _.pick(options, 'alwaysVisibleItems'));

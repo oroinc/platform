@@ -14,24 +14,24 @@ define(function(require) {
 
     const ColumnView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'board-column',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: require('tpl-loader!../../../../templates/board/column-view.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColumnView(options) {
             ColumnView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.cardView = options.cardView;
@@ -42,7 +42,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const column = this;
@@ -139,7 +139,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.subview('columns') && !this.readonly) {

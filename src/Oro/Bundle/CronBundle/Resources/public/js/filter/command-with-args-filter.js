@@ -5,7 +5,7 @@ define([
 
     const CommandWithArgsFilter = ChoiceFilter.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CommandWithArgsFilter(options) {
             CommandWithArgsFilter.__super__.constructor.call(this, options);

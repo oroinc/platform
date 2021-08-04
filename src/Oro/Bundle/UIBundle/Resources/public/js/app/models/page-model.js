@@ -18,7 +18,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageModel(attrs, options) {
             PageModel.__super__.constructor.call(this, attrs, options);

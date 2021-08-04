@@ -13,14 +13,14 @@ define([
      */
     const BoardDataCollection = BaseCollection.extend(/** @lends RoutingCollection.prototype */{
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BoardDataCollection(...args) {
             BoardDataCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             BoardDataCollection.__super__.initialize.call(this, models, options);

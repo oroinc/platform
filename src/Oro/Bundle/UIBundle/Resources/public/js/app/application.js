@@ -89,7 +89,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * Standard Chaplin.Layout replaced with custom page layout view
          */
         initLayout: function(options) {

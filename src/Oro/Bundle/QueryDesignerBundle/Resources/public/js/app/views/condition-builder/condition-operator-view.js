@@ -23,7 +23,7 @@ define(function(require) {
         ]),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConditionOperatorView(options) {
             ConditionOperatorView.__super__.constructor.call(this, options);

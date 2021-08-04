@@ -29,12 +29,12 @@ define(function(require) {
 
     const BoardView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'board',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: require('tpl-loader!../../../../templates/board/board-view.html'),
 
@@ -44,14 +44,14 @@ define(function(require) {
         earlyChangeTimeout: 2000,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BoardView(options) {
             BoardView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.readonly = options.readonly;
@@ -68,7 +68,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             clearInterval(this.setTrackScrollInterval);
@@ -76,7 +76,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _ensureElement: function() {
             BoardView.__super__._ensureElement.call(this);
@@ -86,7 +86,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const board = this;

@@ -118,14 +118,14 @@ define([
         _lastUrl: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RoutingCollection(...args) {
             RoutingCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             if (!options) {
@@ -218,14 +218,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         url: function() {
             return this._route.getUrl();
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         sync: function(type, self, options) {
             this.beginSync();
@@ -235,7 +235,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         parse: function(response) {
             return response.data;
@@ -253,7 +253,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         serializeExtraData: function() {
             return {
@@ -291,7 +291,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             this._route.dispose();

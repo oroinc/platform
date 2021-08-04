@@ -18,7 +18,7 @@ const MENU_ITEM_INDEX_ATTR = 'data-relative-index';
 
 const NavigationMenuView = BaseView.extend({
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     events() {
         return {
@@ -39,7 +39,7 @@ const NavigationMenuView = BaseView.extend({
     plainMenuClass: 'menu-is-plain',
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     constructor: function NavigationMenuView(options) {
         this.onMouseLeave = _.throttle(this.onMouseLeave, 100);
@@ -48,7 +48,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @param {Object} options
      */
     options: {
@@ -63,7 +63,7 @@ const NavigationMenuView = BaseView.extend({
     $lastFocusedElementInRow: null,
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @param {Object} options
      */
     initialize(options) {
@@ -103,7 +103,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     dispose() {
         if (this.disposed) {

@@ -10,7 +10,7 @@ define(function(require) {
         comparator: 'order',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StepCollection(...args) {
             StepCollection.__super__.constructor.apply(this, args);

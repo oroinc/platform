@@ -31,14 +31,14 @@ define(function(require) {
         ftid: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeSelectComponent(options) {
             AttributeSelectComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);

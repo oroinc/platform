@@ -19,7 +19,7 @@ define([
         collection: undefined,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectDataAppearanceAction(options) {
             SelectDataAppearanceAction.__super__.constructor.call(this, options);

@@ -14,14 +14,14 @@ define(function(require) {
         gridName: '',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GridViewsCollection(...args) {
             GridViewsCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['gridName']));
@@ -29,7 +29,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _prepareModel: function(attrs, options) {
             if (attrs instanceof Backbone.Model) {
@@ -41,7 +41,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         clone: function() {
             return new this.constructor(this.toJSON(), {gridName: this.gridName});

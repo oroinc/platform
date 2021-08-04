@@ -21,7 +21,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FiltersStateView(options) {
             FiltersStateView.__super__.constructor.call(this, options);
