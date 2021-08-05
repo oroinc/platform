@@ -2,18 +2,12 @@
 
 namespace Oro\Bundle\TagBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * API controller for taggable entities.
- *
- * @RouteResource("taggable")
- * @NamePrefix("oro_api_")
  */
 class TaggableController extends RestController
 {
@@ -22,11 +16,6 @@ class TaggableController extends RestController
      *
      * @param string $entity   The type of the target entity.
      * @param int    $entityId The id of the target entity.
-     *
-     * @Post(
-     *     "/tags/{entity}/{entityId}",
-     *      requirements={"entityId"="\d+"}
-     * )
      *
      * @ApiDoc(
      *      description="Sets tags to the target entity and return them",

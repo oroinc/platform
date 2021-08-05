@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -19,11 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Serve data audit api calls
- *
- * @NamePrefix("oro_api_")
+ * REST API controller for data audit.
  */
-class AuditController extends RestGetController implements ClassResourceInterface
+class AuditController extends RestGetController
 {
     /**
      * Get list of audit logs
@@ -206,7 +202,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
 
                 $fieldChunks = explode('::', $fieldData['name']);
                 if (count($fieldChunks) === 2) {
-                    list($class, $field) = $fieldChunks;
+                    [$class, $field] = $fieldChunks;
                     if (!$auditConfigProvider->getConfig($class)->is('auditable')) {
                         continue;
                     }

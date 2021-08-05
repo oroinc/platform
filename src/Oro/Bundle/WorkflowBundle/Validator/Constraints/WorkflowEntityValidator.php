@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
@@ -15,6 +16,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * Validates if entity can be changed taking into account workflow.
+ */
 class WorkflowEntityValidator extends ConstraintValidator
 {
     /** @var EntityManager */
@@ -162,7 +166,7 @@ class WorkflowEntityValidator extends ConstraintValidator
         $originalData = $unitOfWork->getOriginalEntityData($object);
 
         $class =  $this->doctrineHelper->getEntityClass($object);
-        $fieldList = $this->fieldHelper->getFields($class, true);
+        $fieldList = $this->fieldHelper->getEntityFields($class, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fieldList as $field) {
             $fieldName = $field['name'];

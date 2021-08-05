@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -13,12 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Provides an action to get all shortcuts items for user
- *
- * @RouteResource("shortcuts")
- * @NamePrefix("oro_api_")
+ * REST API controller to get shortcuts items for user.
  */
-class ShortcutsController extends FOSRestController
+class ShortcutsController extends AbstractFOSRestController
 {
     protected $uris = [];
 

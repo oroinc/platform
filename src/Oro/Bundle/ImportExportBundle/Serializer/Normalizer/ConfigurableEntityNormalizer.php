@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
@@ -64,7 +65,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $this->createObject($type),
             Events::BEFORE_DENORMALIZE_ENTITY
         );
-        $fields = $this->fieldHelper->getFields($type, true);
+        $fields = $this->fieldHelper->getEntityFields($type, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
@@ -166,7 +167,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     public function normalize($object, string $format = null, array $context = [])
     {
         $entityName = ClassUtils::getClass($object);
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         $result = $this->dispatchNormalize($object, [], $context, Events::BEFORE_NORMALIZE_ENTITY);
         foreach ($fields as $field) {
@@ -275,7 +276,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function hasIdentityFields($entityName)
     {
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {

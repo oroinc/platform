@@ -32,35 +32,3 @@ response:
                 entity_label: oro.testframework.item.entity_label
                 record_string: "item9@mail.com 0123-456900"
                 record_url: http://localhost%oro_default_prefix%search/
-    soap:
-        item:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                entityLabel: oro.testframework.item.entity_label
-                recordTitle: "item1@mail.com 0123-456100"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                entityLabel: oro.testframework.item.entity_label
-                recordTitle: "item3@mail.com 0123-456300"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                entityLabel: oro.testframework.item.entity_label
-                recordTitle: "item5@mail.com 0123-456500"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                entityLabel: oro.testframework.item.entity_label
-                recordTitle: "item7@mail.com 0123-456700"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                entityLabel: oro.testframework.item.entity_label
-                recordTitle: "item9@mail.com 0123-456900"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []

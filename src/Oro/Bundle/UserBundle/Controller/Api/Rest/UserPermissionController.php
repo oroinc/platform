@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -15,10 +13,7 @@ use Oro\Bundle\UserBundle\Entity\Manager\UserPermissionApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * API controller for user permissions.
- *
- * @RouteResource("user_permission")
- * @NamePrefix("oro_api_")
+ * REST API controller for user permissions.
  */
 class UserPermissionController extends RestGetController
 {

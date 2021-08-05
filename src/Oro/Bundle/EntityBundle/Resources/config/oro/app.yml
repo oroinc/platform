@@ -1,8 +1,3 @@
-fos_rest:
-    exception:
-        messages:
-            'Oro\Bundle\EntityBundle\Exception\RecordNotFoundException' : true
-
 doctrine:
     dbal:
         types:
@@ -39,3 +34,8 @@ doctrine:
                 concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs
                 replace:        Oro\ORM\Query\AST\Functions\String\Replace
                 cast:           Oro\ORM\Query\AST\Functions\Cast
+
+fos_rest:
+    exception:
+        messages:
+            'Oro\Bundle\EntityBundle\Exception\RecordNotFoundException' : true

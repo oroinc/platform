@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -19,12 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * API CRUD controller for Note entity.
- *
- * @RouteResource("note")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Note entity.
  */
-class NoteController extends RestController implements ClassResourceInterface
+class NoteController extends RestController
 {
     /**
      * Get notes for given entity
@@ -79,8 +72,6 @@ class NoteController extends RestController implements ClassResourceInterface
      *
      * @param int $id Note id
      *
-     * @Rest\Get(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Get note item",
      *      resource=true
@@ -97,8 +88,6 @@ class NoteController extends RestController implements ClassResourceInterface
      * Update note
      *
      * @param int $id Note item id
-     *
-     * @Rest\Put(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Update note",
@@ -130,8 +119,6 @@ class NoteController extends RestController implements ClassResourceInterface
      * Delete note
      *
      * @param int $id Note id
-     *
-     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete Note",

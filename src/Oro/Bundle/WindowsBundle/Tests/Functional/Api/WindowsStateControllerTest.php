@@ -239,7 +239,7 @@ class WindowsStateControllerTest extends WebTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
         self::assertResponseContentTypeEquals($response, 'application/json');
         self::assertEquals(
-            ['code' => 400, 'message' => 'Bad Request'],
+            ['code' => 400],
             self::jsonToArray($response->getContent())
         );
     }

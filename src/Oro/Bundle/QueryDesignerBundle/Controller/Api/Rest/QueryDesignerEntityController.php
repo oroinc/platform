@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
@@ -14,10 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("querydesigner/entity")
- * @NamePrefix("oro_api_querydesigner_")
+ * REST API controller for the query designer.
  */
-class QueryDesignerEntityController extends FOSRestController implements ClassResourceInterface
+class QueryDesignerEntityController extends AbstractFOSRestController
 {
     /**
      * Get entities with fields

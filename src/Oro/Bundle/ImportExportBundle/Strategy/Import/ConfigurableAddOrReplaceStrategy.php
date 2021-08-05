@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
@@ -238,7 +239,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $entityName = ClassUtils::getClass($entity);
         $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
         $excludedFields[] = $identifierName;
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
@@ -274,7 +275,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     protected function updateRelations($entity, array $itemData = null)
     {
         $entityName = ClassUtils::getClass($entity);
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
         $ownerFieldName = $this->databaseHelper->getOwnerFieldName($entityName);
 
         foreach ($fields as $field) {
@@ -599,7 +600,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         }
 
         $fields = array_filter(
-            $this->fieldHelper->getFields($className, true),
+            $this->fieldHelper->getEntityFields($className, EntityFieldProvider::OPTION_WITH_RELATIONS),
             function (array $field) use ($fieldName) {
                 return $field['name'] === $fieldName &&
                     $this->fieldHelper->isRelation($field) &&

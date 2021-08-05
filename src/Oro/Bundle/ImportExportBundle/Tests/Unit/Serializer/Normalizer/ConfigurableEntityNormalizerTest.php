@@ -11,7 +11,6 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormal
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
@@ -20,15 +19,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FieldHelper|MockObject
-     */
-    protected $fieldHelper;
+    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
-    /**
-     * @var ConfigurableEntityNormalizer
-     */
-    protected $normalizer;
+    private ConfigurableEntityNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -42,7 +35,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->onlyMethods(['hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'])
+            ->onlyMethods(['hasConfig', 'getConfigValue', 'getEntityFields', 'getObjectValue'])
             ->getMock();
 
         $this->normalizer = new class($this->fieldHelper) extends ConfigurableEntityNormalizer {
@@ -61,23 +54,23 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      * @param bool $hasConfig
      * @param bool $isSupported
      */
-    public function testSupportsDenormalization($data, $type, $hasConfig, $isSupported)
+    public function testSupportsDenormalization($data, $type, $hasConfig, $isSupported): void
     {
         if (is_array($data) && class_exists($type)) {
-            $this->fieldHelper->expects($this->once())
+            $this->fieldHelper->expects(self::once())
                 ->method('hasConfig')
-                ->will($this->returnValue($hasConfig));
+                ->willReturn($hasConfig);
         } else {
-            $this->fieldHelper->expects($this->never())
+            $this->fieldHelper->expects(self::never())
                 ->method('hasConfig');
         }
-        $this->assertEquals($isSupported, $this->normalizer->supportsDenormalization($data, $type));
+        self::assertEquals($isSupported, $this->normalizer->supportsDenormalization($data, $type));
     }
 
     /**
      * @return array
      */
-    public function supportDenormalizationDataProvider()
+    public function supportDenormalizationDataProvider(): array
     {
         return [
             [null, '', false, false],
@@ -95,24 +88,24 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      * @param bool $hasConfig
      * @param bool $isSupported
      */
-    public function testSupportsNormalization($data, $hasConfig, $isSupported)
+    public function testSupportsNormalization($data, $hasConfig, $isSupported): void
     {
         if (is_object($data)) {
-            $this->fieldHelper->expects($this->once())
+            $this->fieldHelper->expects(self::once())
                 ->method('hasConfig')
-                ->will($this->returnValue($hasConfig));
+                ->willReturn($hasConfig);
         } else {
-            $this->fieldHelper->expects($this->never())
+            $this->fieldHelper->expects(self::never())
                 ->method('hasConfig');
         }
 
-        $this->assertEquals($isSupported, $this->normalizer->supportsNormalization($data));
+        self::assertEquals($isSupported, $this->normalizer->supportsNormalization($data));
     }
 
     /**
      * @return array
      */
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
         return [
             [null, false, false],
@@ -124,7 +117,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetSerializerException()
+    public function testSetSerializerException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf(
@@ -137,7 +130,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setSerializer($serializer);
     }
 
-    public function testSetSerializer()
+    public function testSetSerializer(): void
     {
         $serializer = $this->createMock(Serializer::class);
         $this->normalizer->setSerializer($serializer);
@@ -152,7 +145,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      * @param array $fieldsImportConfig
      * @param array $result
      */
-    public function testNormalize($object, $context, $fields, $fieldsImportConfig, $result)
+    public function testNormalize($object, $context, $fields, $fieldsImportConfig, $result): void
     {
         $format = null;
         $entityName = get_class($object);
@@ -162,28 +155,25 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             'DateTime' => []
         ];
 
-        $this->fieldHelper->expects($this->atLeastOnce())
-            ->method('getFields')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($fieldsValueMap) {
-                        if (empty($fieldsValueMap[$className])) {
-                            return [];
-                        }
+        $this->fieldHelper->expects(self::atLeastOnce())
+            ->method('getEntityFields')
+            ->willReturnCallback(
+                function ($className) use ($fieldsValueMap) {
+                    if (empty($fieldsValueMap[$className])) {
+                        return [];
+                    }
 
-                        return $fieldsValueMap[$className];
-                    }
-                )
+                    return $fieldsValueMap[$className];
+                }
             );
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->will(
-                $this->returnCallback(
-                    function ($object, $field) {
-                        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-                        return $propertyAccessor->getValue($object, $field);
-                    }
-                )
+            ->willReturnCallback(
+                function ($object, $field) {
+                    $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+                    return $propertyAccessor->getValue($object, $field);
+                }
             );
 
         $configValueMap = [];
@@ -206,31 +196,31 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                 $configValueMap[] = [$entityName, $fieldName, $configKey, null, $configValue];
             }
         }
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getConfigValue')
-            ->will($this->returnValueMap($configValueMap));
+            ->willReturnMap($configValueMap);
         if ($hasConfigMap) {
-            $this->fieldHelper->expects($this->any())
+            $this->fieldHelper->expects(self::any())
                 ->method('hasConfig')
-                ->will($this->returnValue($hasConfigMap));
+                ->willReturn($hasConfigMap);
         }
 
         $serializer = $this->createMock(Serializer::class);
         if ($normalizedMap) {
-            $serializer->expects($this->atLeastOnce())
+            $serializer->expects(self::atLeastOnce())
                 ->method('normalize')
-                ->will($this->returnValueMap($normalizedMap));
+                ->willReturnMap($normalizedMap);
         }
         $this->normalizer->setSerializer($serializer);
 
-        $this->assertEquals($result, $this->normalizer->normalize($object, $format, $context));
+        self::assertEquals($result, $this->normalizer->normalize($object, $format, $context));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
-    public function normalizeDataProvider()
+    public function normalizeDataProvider(): array
     {
         $object = (object) [
             'fieldString' => 'string',
@@ -414,7 +404,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      * @param array $fields
      * @param object $expected
      */
-    public function testDenormalize($data, $class, $fields, $expected)
+    public function testDenormalize($data, $class, $fields, $expected): void
     {
         $context = [];
 
@@ -436,23 +426,23 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $serializer = $this->createMock(Serializer::class);
         if ($denormalizedMap) {
-            $serializer->expects($this->atLeastOnce())
+            $serializer->expects(self::atLeastOnce())
                 ->method('denormalize')
-                ->will($this->returnValueMap($denormalizedMap));
+                ->willReturnMap($denormalizedMap);
         }
         $this->normalizer->setSerializer($serializer);
 
-        $this->fieldHelper->expects($this->atLeastOnce())
-            ->method('getFields')
-            ->will($this->returnValue($fields));
+        $this->fieldHelper->expects(self::atLeastOnce())
+            ->method('getEntityFields')
+            ->willReturn($fields);
 
-        $this->assertEquals($expected, $this->normalizer->denormalize($data, $class, null, $context));
+        self::assertEquals($expected, $this->normalizer->denormalize($data, $class, null, $context));
     }
 
     /**
      * @return array
      */
-    public function denormalizeDataProvider()
+    public function denormalizeDataProvider(): array
     {
         $expected = new Stub\DenormalizationStub();
         $expected->id = 100;

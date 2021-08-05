@@ -3,19 +3,16 @@
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
 use Doctrine\Persistence\ObjectManager;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\RouteResource("dashboard")
- * @Rest\NamePrefix("oro_api_")
+ * REST API controller for dashboards.
  */
-class DashboardController extends FOSRestController implements ClassResourceInterface
+class DashboardController extends AbstractFOSRestController
 {
     /**
      * @param Dashboard $id

@@ -6,9 +6,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides max number of related entities in the specified relation name.
+ */
 class RelationCalculator implements RelationCalculatorInterface
 {
     /**
@@ -73,7 +77,10 @@ class RelationCalculator implements RelationCalculatorInterface
      */
     protected function getRelationEntityName($entityName, $fieldName)
     {
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+        );
         foreach ($fields as $field) {
             if ($field['name'] == $fieldName && $this->fieldHelper->isMultipleRelation($field)) {
                 return $field['related_entity_name'];

@@ -23,6 +23,41 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityFieldProvider
 {
+    /**
+     * Indicates whether association fields should be returned as well
+     */
+    public const OPTION_WITH_RELATIONS = 1 << 1;
+
+    /**
+     * Indicates whether virtual fields should be returned as well.
+     */
+    public const OPTION_WITH_VIRTUAL_FIELDS = 1 << 2;
+
+    /**
+     * Indicates whether details of related entity should be returned as well.
+     */
+    public const OPTION_WITH_ENTITY_DETAILS = 1 << 3;
+
+    /**
+     * Indicates whether Unidirectional association fields should be returned.
+     */
+    public const OPTION_WITH_UNIDIRECTIONAL = 1 << 4;
+
+    /**
+     * Indicates whether hidden fields should be included.
+     */
+    public const OPTION_WITH_HIDDEN_FIELDS = 1 << 5;
+
+    /**
+     * Indicates whether exclusion logic should be applied.
+     */
+    public const OPTION_APPLY_EXCLUSIONS = 1 << 6;
+
+    /**
+     * Flag means that label, plural label should be translated
+     */
+    public const OPTION_TRANSLATE = 1 << 7;
+
     /** @var EntityProvider */
     protected $entityProvider;
 
@@ -181,13 +216,8 @@ class EntityFieldProvider
     /**
      * Returns fields for the given entity
      *
-     * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations      Indicates whether association fields should be returned as well.
-     * @param bool   $withVirtualFields  Indicates whether virtual fields should be returned as well.
-     * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
-     * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
-     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
-     * @param bool   $translate          Flag means that label, plural label should be translated
+     * @param string $entityName Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param int $options Bit mask of options, see EntityFieldProvider::OPTION_*
      *
      * @return array of fields sorted by field label (relations follows fields)
      *                                   .       'name'          - field name
@@ -207,15 +237,10 @@ class EntityFieldProvider
      *                                   .       'related_entity_plural_label' - entity plural label
      *                                   .       'related_entity_icon'         - an icon associated with an entity
      */
-    public function getFields(
-        $entityName,
-        $withRelations = false,
-        $withVirtualFields = false,
-        $withEntityDetails = false,
-        $withUnidirectional = false,
-        $applyExclusions = true,
-        $translate = true
-    ) {
+    public function getEntityFields(
+        string $entityName,
+        int $options = self::OPTION_APPLY_EXCLUSIONS | self::OPTION_TRANSLATE
+    ): array {
         $className = $this->entityClassResolver->getEntityClass($entityName);
         if (!$this->isEntityAccessible($className)) {
             return [];
@@ -223,20 +248,25 @@ class EntityFieldProvider
 
         $result = [];
 
-        $this->addFields($result, $className, $applyExclusions, $translate);
+        $this->addEntityFields($result, $className, $options);
 
+        $withVirtualFields = ($options & self::OPTION_WITH_VIRTUAL_FIELDS) !== 0;
+        $applyExclusions = ($options & self::OPTION_APPLY_EXCLUSIONS) !== 0;
+        $translate = ($options & self::OPTION_TRANSLATE) !== 0;
         if ($withVirtualFields) {
             $this->addVirtualFields($result, $className, $applyExclusions, $translate);
         }
 
-        if ($withRelations) {
+        if ($options & self::OPTION_WITH_RELATIONS) {
+            $withEntityDetails = ($options & self::OPTION_WITH_ENTITY_DETAILS) !== 0;
+
             $this->addRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
 
             if ($withVirtualFields) {
                 $this->addVirtualRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
             }
 
-            if ($withUnidirectional) {
+            if ($options & self::OPTION_WITH_UNIDIRECTIONAL) {
                 $this->addUnidirectionalRelations(
                     $result,
                     $className,
@@ -254,19 +284,25 @@ class EntityFieldProvider
     /**
      * Adds entity fields to $result
      *
-     * @param array         $result
-     * @param string        $className
-     * @param bool          $applyExclusions
-     * @param bool          $translate
+     * @param array $result
+     * @param string $className
+     * @param int $options Bit mask of options, see EntityFieldProvider::OPTION_*
      */
-    protected function addFields(array &$result, $className, $applyExclusions, $translate)
+    protected function addEntityFields(array &$result, string $className, int $options): void
     {
         $metadata = $this->getMetadataFor($className);
 
         // add regular fields
-        $configs = $this->extendConfigProvider->getConfigs($className);
+        $configs = $this->extendConfigProvider
+            ->getConfigs($className, ($options & self::OPTION_WITH_HIDDEN_FIELDS) !== 0);
 
-        $configs = $this->filterConfigFields($metadata, $result, $className, $applyExclusions, $configs);
+        $configs = $this->filterConfigFields(
+            $metadata,
+            $result,
+            $className,
+            (string) (($options & self::OPTION_APPLY_EXCLUSIONS) !== 0),
+            $configs
+        );
         foreach ($configs as $fieldConfig) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
@@ -278,7 +314,7 @@ class EntityFieldProvider
                 $fieldConfigId->getFieldType(),
                 $this->getFieldLabel($metadata, $fieldName),
                 $metadata->isIdentifier($fieldName),
-                $translate
+                ($options & self::OPTION_TRANSLATE) !== 0
             );
         }
     }
@@ -287,15 +323,15 @@ class EntityFieldProvider
      * @param ClassMetadataInterface $metadata
      * @param array $result
      * @param string $className
-     * @param string $applyExclusions
+     * @param bool $applyExclusions
      * @param array $configs
-     * @return array|ConfigInterface[]
+     * @return ConfigInterface[]
      */
     protected function filterConfigFields(
         ClassMetadataInterface $metadata,
         array &$result,
         string $className,
-        string $applyExclusions,
+        bool $applyExclusions,
         array $configs
     ): array {
         return \array_filter(

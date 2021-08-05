@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -21,12 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * API CRUD controller for Segment entity.
- *
- * @RouteResource("segment")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Segment entity.
  */
-class SegmentController extends RestController implements ClassResourceInterface
+class SegmentController extends RestController
 {
     /**
      * Get entity segments.
@@ -78,8 +71,6 @@ class SegmentController extends RestController implements ClassResourceInterface
      *
      * @param int $id
      *
-     * @Rest\Delete(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Delete Segment",
      *      resource=true
@@ -101,8 +92,6 @@ class SegmentController extends RestController implements ClassResourceInterface
      * Run static segment.
      *
      * @param int $id
-     *
-     * @Rest\Post(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Run Static Segment",

@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -15,9 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The REST API resources for the activity lists.
- *
- * @RouteResource("activitylist")
- * @NamePrefix("oro_api_")
  */
 class ActivityListController extends RestController
 {
@@ -66,8 +60,6 @@ class ActivityListController extends RestController
      *
      * @param integer $entityId Entity id
      *
-     * @Rest\Get(requirements={"entityId"="\d+"})
-     *
      * @ApiDoc(
      *      description="Returns an ActivityList object",
      *      resource=true,
@@ -108,7 +100,7 @@ class ActivityListController extends RestController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getManager()
     {
@@ -116,7 +108,7 @@ class ActivityListController extends RestController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getForm()
     {
@@ -124,7 +116,7 @@ class ActivityListController extends RestController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {

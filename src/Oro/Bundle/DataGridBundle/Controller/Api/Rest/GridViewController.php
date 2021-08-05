@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -15,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * @Rest\NamePrefix("oro_datagrid_api_rest_gridview_")
+ * REST API controller for grid views.
  */
 class GridViewController extends RestController
 {
@@ -24,7 +20,6 @@ class GridViewController extends RestController
      *
      * @return Response
      *
-     * @Post("/gridviews")
      * @ApiDoc(
      *      description="Create grid view",
      *      resource=true,
@@ -49,7 +44,6 @@ class GridViewController extends RestController
      *
      * @return Response
      *
-     * @Put("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Update grid view",
      *      resource=true,
@@ -77,7 +71,6 @@ class GridViewController extends RestController
      * @param int $id
      *
      * @return Response
-     * @Delete("/gridviews/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Delete grid view",
      *      resource=true,
@@ -105,13 +98,8 @@ class GridViewController extends RestController
      * @param null $gridName
      *
      * @return Response
-     * @Post(
-     *     "/gridviews/{id}/default/{default}/gridName/{gridName}",
-     *     requirements={"id"=".+", "default"="\d+", "grid_name"=".+"},
-     *     defaults={"default"=false, "gridName"=null}
-     *)
      * @ApiDoc(
-     *      description="Set/unset grid view as default for current user",
+     *      description="Set or unset grid view as default for current user",
      *      resource=true,
      *      requirements={
      *          {"name"="id", "dataType"="string"},

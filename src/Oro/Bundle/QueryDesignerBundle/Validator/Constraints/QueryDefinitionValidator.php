@@ -74,7 +74,11 @@ class QueryDefinitionValidator extends ConstraintValidator
         foreach ($joinIdentifiers as $identifier) {
             $entityClass = $joinIdHelper->getEntityClassName($identifier);
             $fieldName = $joinIdHelper->getFieldName($identifier);
-            $joinFields = $this->fieldProvider->getFields($entityClass, true, true);
+            $joinFields = $this->fieldProvider->getEntityFields(
+                $entityClass,
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+            );
 
             // check if class is accessible
             if (!$joinFields && $entityClass !== $rootEntityClass) {

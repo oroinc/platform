@@ -1093,19 +1093,35 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Assert response content type equals
-     *
-     * @param Response $response
-     * @param string $contentType
-     * @param string $message
+     * Asserts response has the given content type.
      */
-    protected static function assertResponseContentTypeEquals(Response $response, $contentType, string $message = '')
-    {
+    protected static function assertResponseContentTypeEquals(
+        Response $response,
+        string $contentType,
+        string $message = ''
+    ): void {
         $message = $message ? $message . PHP_EOL : '';
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
         $message .= PHP_EOL . $response->headers;
+        self::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+    }
 
-        \PHPUnit\Framework\TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+    /**
+     * Asserts response contains the given content type.
+     */
+    protected static function assertResponseContentTypeContains(
+        Response $response,
+        string $contentType,
+        string $message = ''
+    ): void {
+        $message = $message ? $message . PHP_EOL : '';
+        $message .= sprintf('Failed asserting response "Content-Type" header contains "%s":', $contentType);
+        $message .= PHP_EOL . $response->headers;
+        self::assertTrue(
+            $response->headers->has('Content-Type'),
+            $message . PHP_EOL . 'The response does not have "Content-Type" header.'
+        );
+        self::assertStringContainsString($contentType, $response->headers->get('Content-Type'), $message);
     }
 
     /**

@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("addresstype")
- * @NamePrefix("oro_api_")
+ * REST API controller for address types.
  */
-class AddressTypeController extends FOSRestController implements ClassResourceInterface
+class AddressTypeController extends AbstractFOSRestController
 {
     /**
      * REST GET list

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -66,7 +65,7 @@ class MailboxController extends AbstractController
     {
         $provider = $this->get(SystemConfigurationFormProvider::class);
 
-        list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
+        [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
 
         $jsTree = $provider->getJsTree();
 
@@ -114,10 +113,7 @@ class MailboxController extends AbstractController
     }
 
     /**
-     * @Delete(
-     *      "/mailbox/delete/{id}",
-     *      name="oro_email_mailbox_delete"
-     * )
+     * @Route("/mailbox/delete/{id}", name="oro_email_mailbox_delete", methods={"DELETE"})
      * @ParamConverter(
      *      "mailbox",
      *      class="OroEmailBundle:Mailbox"

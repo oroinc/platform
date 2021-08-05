@@ -12,15 +12,13 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -29,41 +27,29 @@ use Symfony\Component\Translation\Translator;
  */
 class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigProviderMock */
-    protected $entityConfigProvider;
+    protected ConfigProviderMock $entityConfigProvider;
 
-    /** @var ConfigProviderMock */
-    protected $extendConfigProvider;
+    protected ConfigProviderMock $extendConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
-    protected $entityClassResolver;
+    protected EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject $entityClassResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualFieldProviderInterface */
-    protected $virtualFieldProvider;
+    protected VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject $virtualFieldProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualRelationProviderInterface */
-    protected $virtualRelationProvider;
+    protected VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject $virtualRelationProvider;
 
-    /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
+    protected FieldTypeHelper $fieldTypeHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $doctrine;
+    protected ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
-    protected $translator;
+    protected TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var EntityProvider */
-    protected $entityProvider;
+    protected EntityProvider $entityProvider;
 
-    /** @var EntityFieldProvider */
-    protected $provider;
+    protected EntityFieldProvider $provider;
 
-    /** @var ExclusionProviderInterface */
-    protected $exclusionProvider;
+    protected ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject $exclusionProvider;
 
-    /** @var FeatureChecker */
-    protected $featureChecker;
+    protected FeatureChecker|\PHPUnit\Framework\MockObject\MockObject $featureChecker;
 
     protected function setUp(): void
     {
@@ -72,17 +58,11 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
 
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
-        $this->entityClassResolver->expects($this->any())
+        $this->entityClassResolver->expects(self::any())
             ->method('getEntityClass')
-            ->will(
-                $this->returnCallback(
-                    function ($entityName) {
-                        return str_replace(':', '\\Entity\\', $entityName);
-                    }
-                )
-            );
+            ->willReturnCallback(static fn ($entityName) => str_replace(':', '\\Entity\\', $entityName));
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
         $this->featureChecker = $this->createMock(FeatureChecker::class);
 
@@ -120,23 +100,23 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->setExclusionProvider($this->exclusionProvider);
     }
 
-    public function testGetFieldsNoEntityConfig()
+    public function testGetFieldsNoEntityConfig(): void
     {
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
 
         $em = $this->createMock(EntityManager::class);
 
-        $this->doctrine->expects($this->any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with($entityClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $result = $this->provider->getFields($entityName);
-        $this->assertEquals([], $result);
+        $result = $this->provider->getEntityFields($entityName);
+        self::assertEquals([], $result);
     }
 
-    public function testGetFieldsWithDefaultParameters()
+    public function testGetFieldsWithDefaultParameters(): void
     {
         $config = [
             'Acme\Entity\Test' => [
@@ -151,30 +131,30 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'C',
-                        ]
+                        ],
                     ],
                     'field2' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'B',
-                        ]
+                        ],
                     ],
                     'field3' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'A',
-                        ]
+                        ],
                     ],
                     'field4' => [
                         'type' => 'string',
-                        'config' => []
+                        'config' => [],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
         $this->prepare($config);
 
-        $result = $this->provider->getFields('Acme:Test');
+        $result = $this->provider->getEntityFields('Acme:Test');
         $expected = [
             [
                 'name' => 'field3',
@@ -195,22 +175,25 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                 'name' => 'field1',
                 'type' => 'integer',
                 'label' => 'C Translated',
-                'identifier' => true
+                'identifier' => true,
             ],
         ];
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
      * @dataProvider fieldsWithRelationsExpectedDataProvider
      */
-    public function testGetFieldsWithRelations(array $expected)
+    public function testGetFieldsWithRelations(array $expected): void
     {
         $this->prepareWithRelations();
-        $result = $this->provider->getFields('Acme:Test', true);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
@@ -218,7 +201,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function fieldsWithRelationsExpectedDataProvider()
+    public function fieldsWithRelationsExpectedDataProvider(): array
     {
         return [
             [
@@ -242,35 +225,37 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-many',
                         'label' => 'Rel1 Translated',
                         'relation_type' => 'ref-many',
-                        'related_entity_name' => 'Acme\Entity\Test1'
+                        'related_entity_name' => 'Acme\Entity\Test1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider getFieldsWithRelationsAndDeepLevelDataProvider
      */
-    public function testGetFieldsWithRelationsAndDeepLevel(array $expected)
+    public function testGetFieldsWithRelationsAndDeepLevel(array $expected): void
     {
         $this->prepareWithRelations();
-        $result = $this->provider->getFields('Acme:Test', true, false, false, false, 1);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithRelationsAndDeepLevelDataProvider()
+    public function getFieldsWithRelationsAndDeepLevelDataProvider(): array
     {
         return [
             [
@@ -294,7 +279,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
@@ -303,26 +288,29 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider
      */
-    public function testGetFieldsWithRelationsAndDeepLevelAndEntityDetails(array $expected)
+    public function testGetFieldsWithRelationsAndDeepLevelAndEntityDetails(array $expected): void
     {
         $this->prepareWithRelations();
-        $result = $this->provider->getFields('Acme:Test', true, false, true, false, 1);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS
+            | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider()
+    public function getFieldsWithRelationsAndDeepLevelAndEntityDetailsDataProvider(): array
     {
         return [
             [
@@ -346,7 +334,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
@@ -358,26 +346,28 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'related_entity_plural_label' => 'Test1 Plural Label Translated',
                         'related_entity_icon' => 'fa-test1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndLastLevelRelations
      */
-    public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelations(array $expected)
+    public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelations(array $expected): void
     {
         $this->prepareWithRelations();
-        $result = $this->provider->getFields('Acme:Test', true, false, false, false, 1, true);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelations()
+    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelations(): array
     {
         return [
             [
@@ -401,7 +391,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
@@ -410,26 +400,29 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-many',
                         'related_entity_name' => 'Acme\Entity\Test1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider
      */
-    public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetails(array $expected)
+    public function testGetFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetails(array $expected): void
     {
         $this->prepareWithRelations();
-        $result = $this->provider->getFields('Acme:Test', true, false, true, false, 1, true);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS
+            | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider()
+    public function getFieldsWithRelationsAndDeepLevelAndLastLevelRelationsAndEntityDetailsDataProvider(): array
     {
         return [
             [
@@ -453,7 +446,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'C Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
@@ -465,27 +458,29 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'related_entity_plural_label' => 'Test1 Plural Label Translated',
                         'related_entity_icon' => 'fa-test1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider getFieldsWithRelationsAndDeepLevelAndWithUnidirectional
      */
-    public function testGetFieldsWithRelationsAndDeepLevelAndWithUnidirectional(array $expected)
+    public function testGetFieldsWithRelationsAndDeepLevelAndWithUnidirectional(array $expected): void
     {
         $this->prepareWithRelations();
 
-        $result = $this->provider->getFields('Acme:Test1', true, false, false, true, false);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test1',
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL
+            | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithRelationsAndDeepLevelAndWithUnidirectional()
+    public function getFieldsWithRelationsAndDeepLevelAndWithUnidirectional(): array
     {
         return [
             [
@@ -493,13 +488,13 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                     [
                         'name' => 'Test1field2',
                         'type' => 'string',
-                        'label' => 'A Translated'
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'id',
                         'type' => 'integer',
                         'label' => 'B Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel1',
@@ -514,16 +509,16 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'label' => 'UniRel1 Translated (Test22 Label Translated)',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test22',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider getFieldsWithVirtualRelationsAndEnumsDataProvider
      */
-    public function testGetFieldsWithVirtualRelationsAndEnums(array $expected)
+    public function testGetFieldsWithVirtualRelationsAndEnums(array $expected): void
     {
         $className = 'Acme\Entity\Test';
 
@@ -540,7 +535,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'Field 1',
-                        ]
+                        ],
                     ],
                 ],
                 'relations' => [
@@ -549,80 +544,78 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'ref-one',
                         'config' => [
                             'label' => 'Enum Field',
-                        ]
+                        ],
                     ],
                     'rel2' => [
                         'target_class' => 'Acme\EnumValue2',
                         'type' => 'ref-many',
                         'config' => [
                             'label' => 'Multi Enum Field',
-                        ]
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
         $this->prepare($config);
 
-        $this->virtualFieldProvider->expects($this->once())
+        $this->virtualFieldProvider->expects(self::once())
             ->method('getVirtualFields')
             ->with($className)
-            ->will($this->returnValue(['rel1', 'rel2']));
+            ->willReturn(['rel1', 'rel2']);
 
-        $this->virtualRelationProvider->expects($this->once())
+        $this->virtualRelationProvider->expects(self::once())
             ->method('getVirtualRelations')
             ->with($className)
-            ->will(
-                $this->returnValue(
-                    [
-                        'virtual_relation' => [
-                            'relation_type' => 'oneToMany',
-                            'related_entity_name' => 'OtherEntity',
-                            'query' => [
-                                'select' => ['select expression'],
-                                'join' => ['join expression']
-                            ]
-                        ]
-                    ]
-                )
+            ->willReturn(
+                [
+                    'virtual_relation' => [
+                        'relation_type' => 'oneToMany',
+                        'related_entity_name' => 'OtherEntity',
+                        'query' => [
+                            'select' => ['select expression'],
+                            'join' => ['join expression'],
+                        ],
+                    ],
+                ]
             );
-        $this->virtualFieldProvider->expects($this->exactly(2))
+        $this->virtualFieldProvider->expects(self::exactly(2))
             ->method('getVirtualFieldQuery')
-            ->will(
-                $this->returnValueMap(
+            ->willReturnMap(
+                [
                     [
+                        $className,
+                        'rel1',
                         [
-                            $className,
-                            'rel1',
-                            [
-                                'select' => [
-                                    'return_type' => 'enum',
-                                    'filter_by_id' => true
-                                ]
-                            ]
+                            'select' => [
+                                'return_type' => 'enum',
+                                'filter_by_id' => true,
+                            ],
                         ],
+                    ],
+                    [
+                        $className,
+                        'rel2',
                         [
-                            $className,
-                            'rel2',
-                            [
-                                'select' => [
-                                    'return_type' => 'multiEnum',
-                                    'filter_by_id' => true
-                                ]
-                            ]
+                            'select' => [
+                                'return_type' => 'multiEnum',
+                                'filter_by_id' => true,
+                            ],
                         ],
-                    ]
-                )
+                    ],
+                ]
             );
 
-        $result = $this->provider->getFields('Acme:Test', true, true);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+            | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
-        $this->assertEqualsCanonicalizing($expected, $result);
+        self::assertEqualsCanonicalizing($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsWithVirtualRelationsAndEnumsDataProvider()
+    public function getFieldsWithVirtualRelationsAndEnumsDataProvider(): array
     {
         return [
             [
@@ -631,29 +624,29 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'name' => 'rel1',
                         'type' => 'enum',
                         'label' => 'Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue1'
+                        'related_entity_name' => 'Acme\EnumValue1',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
                         'label' => 'Field 1 Translated',
-                        'identifier' => true
+                        'identifier' => true,
                     ],
                     [
                         'name' => 'rel2',
                         'type' => 'multiEnum',
                         'label' => 'Multi Enum Field Translated',
-                        'related_entity_name' => 'Acme\EnumValue2'
+                        'related_entity_name' => 'Acme\EnumValue2',
                     ],
                     [
                         'name' => 'virtual_relation',
                         'type' => 'oneToMany',
                         'label' => 'acme.entity.test.virtual_relation.label Translated',
                         'relation_type' => 'oneToMany',
-                        'related_entity_name' => 'OtherEntity'
-                    ]
-                ]
-            ]
+                        'related_entity_name' => 'OtherEntity',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -664,42 +657,33 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @param array $config
      */
-    protected function prepare($config)
+    protected function prepare(array $config): void
     {
         $metadata = [];
-        $fieldConfigs = [];
         foreach ($config as $entityClassName => $entityData) {
             $entityMetadata = $this->createMock(ClassMetadata::class);
-            $entityMetadata->expects($this->any())
+            $entityMetadata->expects(self::any())
                 ->method('getName')
-                ->will($this->returnValue($entityClassName));
+                ->willReturn($entityClassName);
             $metadata[$entityClassName] = $entityMetadata;
 
             $fieldNames = [];
             $fieldTypes = [];
             $fieldIdentifiers = [];
-            $configs = [];
             foreach ($entityData['fields'] as $fieldName => $fieldData) {
                 $fieldNames[] = $fieldName;
                 $fieldTypes[] = [$fieldName, $fieldData['type']];
-                $fieldIdentifiers[] = [$fieldName, isset($fieldData['identifier']) ? $fieldData['identifier'] : false];
-                $configId = new FieldConfigId('extend', $entityClassName, $fieldName, $fieldData['type']);
-                $configs[] = new Config($configId);
+                $fieldIdentifiers[] = [$fieldName, $fieldData['identifier'] ?? false];
             }
-            $fieldConfigs[$entityClassName] = $configs;
-            $entityMetadata->expects($this->any())
+            $entityMetadata->expects(self::any())
                 ->method('getFieldNames')
-                ->will($this->returnValue($fieldNames));
-            $entityMetadata->expects($this->any())
+                ->willReturn($fieldNames);
+            $entityMetadata->expects(self::any())
                 ->method('hasField')
-                ->willReturnCallback(
-                    function ($name) use ($fieldNames) {
-                        return in_array($name, $fieldNames, true);
-                    }
-                );
-            $entityMetadata->expects($this->any())
+                ->willReturnCallback(static fn ($name) => in_array($name, $fieldNames, true));
+            $entityMetadata->expects(self::any())
                 ->method('isIdentifier')
-                ->will($this->returnValueMap($fieldIdentifiers));
+                ->willReturnMap($fieldIdentifiers);
 
             $relNames = [];
             $mappings = [];
@@ -715,27 +699,23 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                     $relNames[] = $relName;
                     $relTargetClasses[] = [$relName, $relTargetClass];
                 }
-                $entityMetadata->expects($this->any())
+                $entityMetadata->expects(self::any())
                     ->method('getAssociationTargetClass')
-                    ->will($this->returnValueMap($relTargetClasses));
-                $entityMetadata->expects($this->any())
+                    ->willReturnMap($relTargetClasses);
+                $entityMetadata->expects(self::any())
                     ->method('getAssociationMappedByTargetField')
-                    ->will($this->returnValue('id'));
+                    ->willReturn('id');
             }
-            $entityMetadata->expects($this->any())
+            $entityMetadata->expects(self::any())
                 ->method('getAssociationNames')
-                ->will($this->returnValue($relNames));
-            $entityMetadata->expects($this->any())
+                ->willReturn($relNames);
+            $entityMetadata->expects(self::any())
                 ->method('hasAssociation')
-                ->willReturnCallback(
-                    function ($name) use ($relNames) {
-                        return in_array($name, $relNames, true);
-                    }
-                );
+                ->willReturnCallback(static fn ($name) => in_array($name, $relNames, true));
             if (isset($entityData['unidirectional_relations'])) {
                 foreach ($entityData['unidirectional_relations'] as $relName => $relData) {
                     $fieldTypes[] = [$relName, $relData['type']];
-                    $relData['type'] = $relData['type'] !== 'ref-one' ?:ClassMetadataInfo::MANY_TO_ONE;
+                    $relData['type'] = $relData['type'] !== 'ref-one' ?: ClassMetadataInfo::MANY_TO_ONE;
                     $relData['fieldName'] = $relName;
                     $relData['isOwningSide'] = true;
                     $relData['inversedBy'] = null;
@@ -743,44 +723,32 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                     unset($relData['config']);
                     $mappings[$relName] = $relData;
                 }
-                $entityMetadata->expects($this->any())
+                $entityMetadata->expects(self::any())
                     ->method('getAssociationMappings')
-                    ->will($this->returnValue($mappings));
+                    ->willReturn($mappings);
             }
-            $entityMetadata->expects($this->any())
+            $entityMetadata->expects(self::any())
                 ->method('isSingleValuedAssociation')
-                ->will(
-                    $this->returnCallback(
-                        function ($field) use ($mappings) {
-                            return !empty($mappings[$field]);
-                        }
-                    )
-                );
-            $entityMetadata->expects($this->any())
+                ->willReturnCallback(static fn ($field) => !empty($mappings[$field]));
+            $entityMetadata->expects(self::any())
                 ->method('getTypeOfField')
-                ->will($this->returnValueMap($fieldTypes));
+                ->willReturnMap($fieldTypes);
         }
 
         $em = $this->createMock(EntityManager::class);
 
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $em->expects($this->any())
+        $em->expects(self::any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
-        $metadataFactory->expects($this->any())
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::any())
             ->method('getMetadataFor')
-            ->will(
-                $this->returnCallback(
-                    function ($entityClassName) use (&$metadata) {
-                        return $metadata[$entityClassName];
-                    }
-                )
-            );
+            ->willReturnCallback(static fn ($entityClassName) => $metadata[$entityClassName]);
 
-        $this->doctrine->expects($this->any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
-            ->with($this->isType('string'))
-            ->will($this->returnValue($em));
+            ->with(self::isType('string'))
+            ->willReturn($em);
 
         foreach ($config as $entityClassName => $entityData) {
             if (isset($entityData['config'])) {
@@ -795,33 +763,30 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                                 $entityClassName,
                                 $fieldName,
                                 $fieldData['type'],
-                                $fieldData['config']
+                                $fieldData['config'],
+                                $fieldData['hidden'] ?? false
                             );
                             $this->extendConfigProvider->addFieldConfig(
                                 $entityClassName,
                                 $fieldName,
-                                $fieldData['type']
+                                $fieldData['type'],
+                                [],
+                                $fieldData['hidden'] ?? false
                             );
                         }
                     }
                 }
             }
         }
-        $this->translator->expects($this->any())
+        $this->translator->expects(self::any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($messageId) {
-                        return $messageId . ' Translated';
-                    }
-                )
-            );
+            ->willReturnCallback(static fn ($messageId) => $messageId . ' Translated');
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function prepareWithRelations()
+    protected function prepareWithRelations(): void
     {
         $config = [
             'Acme\Entity\Test' => [
@@ -836,23 +801,23 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'C',
-                        ]
+                        ],
                     ],
                     'field2' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'B',
-                        ]
+                        ],
                     ],
                     'field3' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'A',
-                        ]
+                        ],
                     ],
                     'field4' => [
                         'type' => 'string',
-                        'config' => []
+                        'config' => [],
                     ],
                 ],
                 'relations' => [
@@ -861,9 +826,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'ref-many',
                         'config' => [
                             'label' => 'Rel1',
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
             'Acme\Entity\Test1' => [
                 'config' => [
@@ -877,13 +842,13 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'B',
-                        ]
+                        ],
                     ],
                     'Test1field2' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'A',
-                        ]
+                        ],
                     ],
                 ],
                 'relations' => [
@@ -892,9 +857,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'ref-one',
                         'config' => [
                             'label' => 'Rel11',
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
             'Acme\Entity\Test11' => [
                 'config' => [
@@ -908,13 +873,13 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'B',
-                        ]
+                        ],
                     ],
                     'Test11field2' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'A',
-                        ]
+                        ],
                     ],
                 ],
                 'relations' => [
@@ -923,9 +888,9 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'ref-one',
                         'config' => [
                             'label' => 'Rel111',
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
             'Acme\Entity\Test111' => [
                 'config' => [
@@ -939,13 +904,13 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'B',
-                        ]
+                        ],
                     ],
                     'Test111field2' => [
                         'type' => 'string',
                         'config' => [
                             'label' => 'A',
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -961,7 +926,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'identifier' => true,
                         'config' => [
                             'label' => 'B',
-                        ]
+                        ],
                     ],
                 ],
                 'unidirectional_relations' => [
@@ -970,10 +935,10 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'ref-one',
                         'config' => [
                             'label' => 'UniRel1',
-                        ]
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
         $this->prepare($config);
     }
@@ -981,12 +946,12 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider relationsExpectedDataProvider
      */
-    public function testGetRelations(array $expected)
+    public function testGetRelations(array $expected): void
     {
         $this->prepareWithRelations();
         $result = $this->provider->getRelations('Acme:Test', true);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
@@ -994,7 +959,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function relationsExpectedDataProvider()
+    public function relationsExpectedDataProvider(): array
     {
         return [
             [
@@ -1007,24 +972,29 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                         'related_entity_name' => 'Acme\Entity\Test1',
                         'related_entity_label' => 'Test1 Label Translated',
                         'related_entity_plural_label' => 'Test1 Plural Label Translated',
-                        'related_entity_icon' => 'fa-test1'
+                        'related_entity_icon' => 'fa-test1',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     /**
-     * @param bool        $translate
-     * @param string      $fieldLabel
-     * @param string      $fieldLabelTranslated
+     * @param int $translate
+     * @param string $fieldLabel
+     * @param string $fieldLabelTranslated
      * @param string|null $locale
-     * @param int         $transCalls
+     * @param int $transCalls
      *
      * @dataProvider getTranslatedFieldsDataProvider
      */
-    public function testGetTranslatedFields($translate, $fieldLabel, $fieldLabelTranslated, $locale, $transCalls)
-    {
+    public function testGetTranslatedFields(
+        int $translate,
+        string $fieldLabel,
+        string $fieldLabelTranslated,
+        ?string $locale,
+        int $transCalls
+    ): void {
         $config = [
             'Acme\Entity\Test' => [
                 'config' => [
@@ -1036,66 +1006,99 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
                     'field1' => [
                         'type' => 'string',
                         'config' => [
-                            'label' => $fieldLabel
-                        ]
-                    ]
-                ]
-            ]
+                            'label' => $fieldLabel,
+                        ],
+                    ],
+                ],
+            ],
         ];
-        $this->translator->expects($this->exactly($transCalls))
+        $this->translator->expects(self::exactly($transCalls))
             ->method('trans')
             ->with($fieldLabel, [], null, $locale)
-            ->will($this->returnValue($fieldLabelTranslated));
+            ->willReturn($fieldLabelTranslated);
         $this->prepare($config);
 
         $this->provider->setLocale($locale);
-        $result = $this->provider->getFields('Acme:Test', false, false, false, false, true, $translate);
+        $result = $this->provider->getEntityFields(
+            'Acme:Test',
+            EntityFieldProvider::OPTION_APPLY_EXCLUSIONS | $translate
+        );
         $expected = [
             [
                 'name' => 'field1',
                 'type' => 'string',
-                'label' => $fieldLabelTranslated
-            ]
+                'label' => $fieldLabelTranslated,
+            ],
         ];
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getTranslatedFieldsDataProvider()
+    public function getTranslatedFieldsDataProvider(): array
     {
         return [
             'translated' => [
-                'translate' => true,
+                'translate' => EntityFieldProvider::OPTION_TRANSLATE,
                 'fieldLabel' => 'C',
                 'fieldLabelTranslated' => 'C Translated',
                 'locale' => 'it_IT',
-                'transCalls' => 1
+                'transCalls' => 1,
             ],
             'with translate = false' => [
-                'translate' => false,
+                'translate' => 0,
                 'fieldLabel' => 'C',
                 'fieldLabelTranslated' => 'C',
                 'locale' => null,
-                'transCalls' => 0
+                'transCalls' => 0,
             ],
             'default translation' => [
-                'translate' => true,
+                'translate' => EntityFieldProvider::OPTION_TRANSLATE,
                 'fieldLabel' => 'C',
                 'fieldLabelTranslated' => 'C Default',
                 'locale' => null,
-                'transCalls' => 1
-            ]
+                'transCalls' => 1,
+            ],
         ];
     }
 
-    public function testGetLocale()
+    public function testGetLocale(): void
     {
-        $this->assertNull($this->provider->getLocale());
+        self::assertNull($this->provider->getLocale());
 
         $this->provider->setLocale('en-US');
-        $this->assertEquals('en-US', $this->provider->getLocale());
+        self::assertEquals('en-US', $this->provider->getLocale());
+    }
+
+    public function testGetHiddenFields(): void
+    {
+        $config = [
+            'Acme\Entity\Test' => [
+                'config' => [
+                    'label' => 'Test Label',
+                    'plural_label' => 'Test Plural Label',
+                    'icon' => 'fa-test',
+                ],
+                'fields' => [
+                    'field1' => [
+                        'type' => 'string',
+                        'config' => [],
+                        'hidden' => true,
+                    ],
+                ],
+            ],
+        ];
+
+        $this->prepare($config);
+
+        $result = $this->provider->getEntityFields('Acme:Test', EntityFieldProvider::OPTION_WITH_HIDDEN_FIELDS);
+        $expected = [
+            [
+                'name' => 'field1',
+                'type' => 'string',
+                'label' => 'acme.entity.test.field1.label',
+            ],
+        ];
+
+        self::assertEquals($expected, $result);
     }
 }

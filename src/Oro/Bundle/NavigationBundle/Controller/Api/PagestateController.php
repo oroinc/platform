@@ -3,21 +3,17 @@
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\Persistence\ObjectRepository;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Oro\Bundle\NavigationBundle\Entity\PageState;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Provides REST API CRUD actions for PageState entity
- *
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for PageState entity.
  */
-class PagestateController extends FOSRestController implements ClassResourceInterface
+class PagestateController extends AbstractFOSRestController
 {
     /**
      * Get list of user's page states

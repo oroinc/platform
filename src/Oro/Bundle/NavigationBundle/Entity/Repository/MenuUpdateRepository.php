@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
@@ -25,6 +27,19 @@ class MenuUpdateRepository extends EntityRepository
         $this->queryResultCache = $queryResultCache;
     }
 
+    public function getUsedScopesByMenu(): array
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('DISTINCT IDENTITY(u.scope) as scopeId', 'u.menu');
+
+        $result = [];
+        foreach ($qb->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY) as $row) {
+            $result[$row['menu']][] = $row['scopeId'];
+        }
+
+        return $result;
+    }
+
     /**
      * @param string $menuName
      * @param array $scopeIds
@@ -33,17 +48,28 @@ class MenuUpdateRepository extends EntityRepository
      */
     public function findMenuUpdatesByScopeIds($menuName, array $scopeIds)
     {
-        $result = [];
+        $menuUpdates = [];
         $scopeIds = array_reverse($scopeIds);
+
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u')
+            ->where($qb->expr()->eq('u.menu', ':menuName'))
+            ->andWhere($qb->expr()->eq('u.scope', ':scope'))
+            ->orderBy('u.id')
+            ->setParameter('menuName', $menuName, Types::STRING);
+
         foreach ($scopeIds as $scopeId) {
-            $result[] = $this->findMenuUpdatesByScope(
-                $menuName,
-                $this->getEntityManager()->getReference(Scope::class, $scopeId)
-            );
+            $menuUpdates[] = $qb
+                ->setParameter('scope', $scopeId, Types::INTEGER)
+                ->getQuery()
+                ->getResult();
         }
 
-        if ($result) {
-            return array_merge(...$result);
+        if ($menuUpdates) {
+            $menuUpdates = array_merge(...$menuUpdates);
+            $this->loadMenuUpdateDependencies($menuUpdates);
+
+            return $menuUpdates;
         }
 
         return [];
@@ -128,5 +154,30 @@ class MenuUpdateRepository extends EntityRepository
         }
 
         return $this->queryResultCache;
+    }
+
+    /**
+     * Load and hydrate required MenuUpdate dependencies.
+     * Perform multi-step hydration optimization to decrease hydration complexity
+     *
+     * @see https://ocramius.github.io/blog/doctrine-orm-optimization-hydration/
+     */
+    protected function loadMenuUpdateDependencies(array $menuUpdates): void
+    {
+        $this->createQueryBuilder('u')
+            ->select(['PARTIAL u.{id}', 'titles'])
+            ->leftJoin('u.titles', 'titles')
+            ->where('u.id IN (:menuUpdates)')
+            ->setParameter('menuUpdates', $menuUpdates)
+            ->getQuery()
+            ->getResult();
+
+        $this->createQueryBuilder('u')
+            ->select(['PARTIAL u.{id}', 'descriptions'])
+            ->leftJoin('u.descriptions', 'descriptions')
+            ->where('u.id IN (:menuUpdates)')
+            ->setParameter('menuUpdates', $menuUpdates)
+            ->getQuery()
+            ->getResult();
     }
 }

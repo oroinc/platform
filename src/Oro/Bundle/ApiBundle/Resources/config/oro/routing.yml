@@ -21,7 +21,7 @@ oro_rest_api_item:
     path: '%oro_api.rest.prefix%{entity}/{id}'
     controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
@@ -34,7 +34,7 @@ oro_rest_api_list:
     path: '%oro_api.rest.prefix%{entity}'
     controller: Oro\Bundle\ApiBundle\Controller\RestApiController::listAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
@@ -58,7 +58,7 @@ oro_rest_api_subresource:
     path: '%oro_api.rest.prefix%{entity}/{id}/{association}'
     controller: Oro\Bundle\ApiBundle\Controller\RestApiController::subresourceAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
@@ -75,7 +75,7 @@ oro_rest_api_relationship:
     path: '%oro_api.rest.prefix%{entity}/{id}/relationships/{association}'
     controller: Oro\Bundle\ApiBundle\Controller\RestApiController::relationshipAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
