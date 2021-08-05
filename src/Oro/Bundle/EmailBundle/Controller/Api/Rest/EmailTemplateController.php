@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
@@ -20,11 +16,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
- * Controller to work with email templates.
- * Provides delete, list, compile, variables actions for email templates.
- *
- * @RouteResource("emailtemplate")
- * @NamePrefix("oro_api_")
+ * REST API controller for email templates.
  */
 class EmailTemplateController extends RestController
 {
@@ -43,7 +35,6 @@ class EmailTemplateController extends RestController
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="DELETE"
      * )
-     * @Delete(requirements={"id"="\d+"})
      *
      * @return Response
      */
@@ -81,10 +72,6 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_index")
-     * @Get("/emailtemplates/list/{entityName}/{includeNonEntity}/{includeSystemTemplates}",
-     *      requirements={"entityName"="\w+", "includeNonEntity"="\d+", "includeSystemTemplates"="\d+"},
-     *      defaults={"entityName"=null, "includeNonEntity"=false, "includeSystemTemplates"=true}
-     * )
      *
      * @return Response
      */
@@ -123,7 +110,6 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @Get("/emailtemplates/variables")
      *
      * @return Response
      */
@@ -154,9 +140,6 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @Get("/emailtemplates/compiled/{id}/{entityId}",
-     *      requirements={"id"="\d+", "entityId"="\d*"}
-     * )
      * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
      *
      * @return Response

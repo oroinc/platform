@@ -3,9 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\Persistence\ObjectManager;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
@@ -19,12 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
- * Provides API actions for managing navigation items.
- *
- * @RouteResource("navigationitems")
- * @NamePrefix("oro_api_")
+ * REST API controller to manage navigation items.
  */
-class NavigationItemController extends FOSRestController
+class NavigationItemController extends AbstractFOSRestController
 {
     /**
      * @ApiDoc(

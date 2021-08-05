@@ -14,17 +14,3 @@ response:
                 selected_data:
                     aliasOfStringValue: item1@mail.com
                     aliasOfIntegerValue: 1000
-    soap:
-        data:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: "item1@mail.com 0123-456100"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData:
-                    item:
-                        -
-                            key: aliasOfStringValue
-                            value: 'item1@mail.com'
-                        -
-                            key: aliasOfIntegerValue
-                            value: '1000'

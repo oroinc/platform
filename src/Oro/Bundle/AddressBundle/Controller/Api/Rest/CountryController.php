@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("country")
- * @NamePrefix("oro_api_")
+ * REST API controller for countries.
  */
-class CountryController extends FOSRestController
+class CountryController extends AbstractFOSRestController
 {
     /**
      * Get countries

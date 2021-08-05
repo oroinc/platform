@@ -13,11 +13,3 @@ response:
                 entity_label: oro.testframework.product.entity_label
                 record_string: "500-watt Work Light"
                 record_url: http://localhost%oro_default_prefix%search/
-    soap:
-        item:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Product
-                entityLabel: oro.testframework.product.entity_label
-                recordTitle: "500-watt Work Light"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []

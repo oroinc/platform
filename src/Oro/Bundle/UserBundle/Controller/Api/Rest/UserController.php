@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -22,11 +19,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * API CRUD controller for User entity.
- *
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for User entity.
  */
-class UserController extends RestController implements ClassResourceInterface
+class UserController extends RestController
 {
     /**
      * Get the list of users
@@ -51,14 +46,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Get the list of users",
-     *      resource=true,
-     *      filters={
-     *          {"name"="page", "dataType"="integer"},
-     *          {"name"="limit", "dataType"="integer"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_user_user_view")
      */
@@ -76,8 +67,6 @@ class UserController extends RestController implements ClassResourceInterface
      * Get user data
      *
      * @param int $id User id
-     *
-     * @Rest\Get(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Get user data",
@@ -115,8 +104,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @Rest\Put(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Update existing user",
      *      resource=true,
@@ -137,8 +124,6 @@ class UserController extends RestController implements ClassResourceInterface
      * Delete user
      *
      * @param int $id User id
-     *
-     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete user",
@@ -236,11 +221,7 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @ApiDoc(
      *      description="Get user by username or email",
-     *      resource=true,
-     *      filters={
-     *          {"name"="email", "dataType"="string"},
-     *          {"name"="username", "dataType"="string"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_user_user_view")
      */

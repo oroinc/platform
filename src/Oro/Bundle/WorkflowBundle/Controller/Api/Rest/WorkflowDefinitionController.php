@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -15,19 +14,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @Rest\NamePrefix("oro_api_workflow_definition_")
+ * REST API controller for workflow definitions.
  */
-class WorkflowDefinitionController extends FOSRestController
+class WorkflowDefinitionController extends AbstractFOSRestController
 {
     /**
      * REST GET item
      *
      * @param WorkflowDefinition $workflowDefinition
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(
      *      description="Get workflow definition",
      *      resource=true
@@ -50,10 +45,6 @@ class WorkflowDefinitionController extends FOSRestController
      * @param WorkflowDefinition $workflowDefinition
      * @param Request $request
      * @return Response
-     * @Rest\Put(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(
      *      description="Update workflow definition",
      *      resource=true
@@ -93,10 +84,6 @@ class WorkflowDefinitionController extends FOSRestController
      * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
      * @return Response
-     * @Rest\Post(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json", "workflowDefinition"=null}
-     * )
      * @ApiDoc(
      *      description="Create new workflow definition",
      *      resource=true
@@ -141,10 +128,6 @@ class WorkflowDefinitionController extends FOSRestController
      * - HTTP_NO_CONTENT (204)
      * - HTTP_FORBIDDEN (403)
      *
-     * @Rest\Delete(
-     *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Delete workflow definition")
      * @Acl(
      *      id="oro_workflow_definition_delete",

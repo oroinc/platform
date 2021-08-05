@@ -2,21 +2,16 @@
 
 namespace Oro\Bundle\WindowsBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * The controller for windows state API.
- *
- * @RouteResource("windows")
- * @NamePrefix("oro_api_")
+ * REST API controller for windows state.
  */
-class WindowsStateController extends FOSRestController
+class WindowsStateController extends AbstractFOSRestController
 {
     /**
      * REST GET list

@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
@@ -15,18 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("entity")
- * @NamePrefix("oro_api_")
+ * REST API controller for entity field metadata.
  */
-class EntityFieldController extends FOSRestController implements ClassResourceInterface
+class EntityFieldController extends AbstractFOSRestController
 {
     /**
      * Get entity fields.
      *
      * @param Request $request
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
-     *
-     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
      *
      * @QueryParam(
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",

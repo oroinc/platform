@@ -3,9 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
 use Doctrine\Persistence\ObjectManager;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -14,24 +13,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\RouteResource("dashboard_widget")
- * @Rest\NamePrefix("oro_api_")
+ * REST API controller for dashboard widgets.
  */
-class WidgetController extends FOSRestController implements ClassResourceInterface
+class WidgetController extends AbstractFOSRestController
 {
     /**
      * @param Request $request
      * @param integer $dashboardId
      * @param integer $widgetId
      *
-     * @Rest\QueryParam(
+     * @QueryParam(
      *      name="isExpanded",
      *      requirements="(1)|(0)",
      *      nullable=true,
      *      strict=true,
      *      description="Set collapse or expand"
      * )
-     * @Rest\QueryParam(
+     * @QueryParam(
      *      name="layoutPosition",
      *      nullable=true,
      *      strict=true,
@@ -110,7 +108,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      * @param Request $request
      * @param integer $dashboardId
      *
-     * @Rest\QueryParam(
+     * @QueryParam(
      *      name="layoutPositions",
      *      nullable=true,
      *      strict=true,
@@ -147,13 +145,13 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
-     * @Rest\QueryParam(
+     * @QueryParam(
      *      name="dashboardId",
      *      nullable=false,
      *      strict=true,
      *      description="Dashboard id"
      * )
-     * @Rest\QueryParam(
+     * @QueryParam(
      *      name="widgetName",
      *      nullable=false,
      *      strict=true,

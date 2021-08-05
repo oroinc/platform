@@ -94,7 +94,7 @@
         "jms/serializer-bundle": "~3.8.0",
         "knplabs/knp-menu": "~3.1.2",
         "knplabs/knp-menu-bundle": "~3.1.0",
-        "friendsofsymfony/rest-bundle": "~2.8.5",
+        "friendsofsymfony/rest-bundle": "~3.0.5",
         "friendsofsymfony/jsrouting-bundle": "2.7.*",
         "nelmio/api-doc-bundle": "2.13.3",
         "nelmio/security-bundle": "~2.10.2",

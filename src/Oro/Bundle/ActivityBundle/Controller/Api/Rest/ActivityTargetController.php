@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -13,15 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("activity_target")
- * @NamePrefix("oro_api_")
+ * REST API controller to get activity associations.
  */
 class ActivityTargetController extends RestGetController
 {
     /**
      * Get types of entities which can be associated with at least one activity type.
-     *
-     * @Get("/activities/targets")
      *
      * @ApiDoc(
      *      description="Get types of entities which can be associated with at least one activity type",
@@ -41,8 +35,6 @@ class ActivityTargetController extends RestGetController
      * Get types of activities which can be added to the specified entity type.
      *
      * @param string $entity The type of the target entity.
-     *
-     * @Get("/activities/targets/{entity}")
      *
      * @ApiDoc(
      *      description="Get types of activities which can be added to the specified entity type",
@@ -67,8 +59,6 @@ class ActivityTargetController extends RestGetController
      * @param Request $request
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
-     *
-     * @Get("/activities/targets/{entity}/{id}")
      *
      * @QueryParam(
      *      name="page",
