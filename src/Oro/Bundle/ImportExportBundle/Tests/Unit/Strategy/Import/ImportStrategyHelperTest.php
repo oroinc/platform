@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Import;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\Context;
@@ -16,6 +19,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,35 +30,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ManagerRegistry */
-    protected $managerRegistry;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ValidatorInterface */
-    protected $validator;
+    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | TranslatorInterface */
-    protected $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | FieldHelper */
-    protected $fieldHelper;
+    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigProvider */
-    protected $extendConfigProvider;
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $extendConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigurableTableDataConverter */
-    protected $configurableDataConverter;
+    private ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject $configurableDataConverter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | TokenAccessorInterface */
-    protected $tokenAccessor;
+    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | OwnerChecker */
-    protected $ownerChecker;
+    private OwnerChecker|\PHPUnit\Framework\MockObject\MockObject $ownerChecker;
 
-    /** @var ImportStrategyHelper */
-    protected $helper;
+    private ImportStrategyHelper $helper;
 
     protected function setUp(): void
     {
@@ -127,21 +121,23 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $importedEntity->excludedField = 'excluded';
         $excludedProperties = ['excludedField'];
 
-        $metadata = $this->createMock('\Doctrine\ORM\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects(self::once())
             ->method('getFieldNames')
-            ->will($this->returnValue(['fieldOne', 'excludedField']));
+            ->willReturn(['fieldOne', 'excludedField']);
 
         $metadata->expects(self::once())
             ->method('getAssociationNames')
-            ->will($this->returnValue(['fieldTwo', 'fieldThree']));
+            ->willReturn(['fieldTwo', 'fieldThree']);
 
         $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->will($this->returnValueMap([
-                [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
-                [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-            ]));
+            ->willReturnMap(
+                [
+                    [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
+                    [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
+                ]
+            );
 
         $this->fieldHelper->expects(self::exactly(3))
             ->method('setObjectValue')
@@ -154,16 +150,16 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('hasConfig')
             ->willReturn(false);
 
-        $entityManager = $this->createMock('Doctrine\ORM\EntityManager');
+        $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with(get_class($basicEntity))
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with(get_class($basicEntity))
-            ->will($this->returnValue($entityManager));
+            ->willReturn($entityManager);
 
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
     }
@@ -179,8 +175,8 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $excludedProperties = ['excludedField'];
 
         $this->fieldHelper->expects(self::once())
-            ->method('getFields')
-            ->with('stdClass', true)
+            ->method('getEntityFields')
+            ->with('stdClass', EntityFieldProvider::OPTION_WITH_RELATIONS)
             ->willReturn(
                 $this->convertFieldNamesToFieldConfigs(
                     [
@@ -195,10 +191,12 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->will($this->returnValueMap([
-                [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
-                [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-            ]));
+            ->willReturnMap(
+                [
+                    [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
+                    [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
+                ]
+            );
 
         $this->fieldHelper->expects(self::exactly(3))
             ->method('setObjectValue')
@@ -213,7 +211,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->extendConfigProvider
             ->method('getConfig')
-            ->willReturnCallback(function ($className, $fieldName) use ($importedEntity) {
+            ->willReturnCallback(function ($className, $fieldName) {
                 $configField = $this->createMock(Config::class);
                 $configField
                     ->method('is')
@@ -245,19 +243,19 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $violation = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationInterface')
+        $violation = $this->getMockBuilder(ConstraintViolationInterface::class)
             ->getMock();
         $violation->expects(self::once())
             ->method('getPropertyPath')
-            ->will($this->returnValue($path));
+            ->willReturn($path);
         $violation->expects(self::once())
             ->method('getMessage')
-            ->will($this->returnValue($error));
+            ->willReturn($error);
         $violations = array($violation);
         $this->validator->expects(self::once())
             ->method('validate')
             ->with($entity)
-            ->will($this->returnValue($violations));
+            ->willReturn($violations);
 
         self::assertEquals(array($expectedMessage), $this->helper->validateEntity($entity));
     }
@@ -290,17 +288,17 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         if (null === $prefix) {
             $context->expects(self::once())
                 ->method('getReadOffset')
-                ->will($this->returnValue(10));
+                ->willReturn(10);
             $this->translator->expects(self::once())
                 ->method('trans')
                 ->with('oro.importexport.import.error %number%', array('%number%' => 10))
-                ->will($this->returnValue('TranslatedError 10'));
+                ->willReturn('TranslatedError 10');
             $expectedPrefix = 'TranslatedError 10';
         }
 
         $context->expects(self::exactly(2))
             ->method('addError')
-            ->with($this->stringStartsWith($expectedPrefix . ' Error'));
+            ->with(self::stringStartsWith($expectedPrefix . ' Error'));
 
         $this->helper->addValidationErrors($validationErrors, $context, $prefix);
     }
@@ -530,7 +528,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
             ->with($entity)
             ->willReturn(true);
         $this->translator->expects(self::never())
-            ->method($this->anything());
+            ->method(self::anything());
 
         self::assertTrue($this->helper->checkEntityOwnerPermissions($context, $entity));
     }
@@ -583,7 +581,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $existingEntity = null;
 
         $this->fieldHelper->expects(self::once())
-            ->method('getFields')
+            ->method('getEntityFields')
             ->willReturn([
                 ['name' => 'testField']
             ]);
@@ -606,7 +604,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $existingEntity = new \stdClass();
 
         $this->fieldHelper->expects(self::once())
-            ->method('getFields')
+            ->method('getEntityFields')
             ->willReturn([
                 ['name' => 'testField']
             ]);
@@ -629,7 +627,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $existingEntity = new \stdClass();
 
         $this->fieldHelper->expects(self::once())
-            ->method('getFields')
+            ->method('getEntityFields')
             ->willReturn([
                 ['name' => 'testField']
             ]);
@@ -653,7 +651,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $existingEntity = null;
 
         $this->fieldHelper->expects(self::once())
-            ->method('getFields')
+            ->method('getEntityFields')
             ->willReturn([
                 ['name' => 'testField']
             ]);
@@ -677,7 +675,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $existingEntity = new \stdClass();
 
         $this->fieldHelper->expects(self::once())
-            ->method('getFields')
+            ->method('getEntityFields')
             ->willReturn([
                 ['name' => 'testField']
             ]);
@@ -699,9 +697,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     private function convertFieldNamesToFieldConfigs(array $fieldNames): array
     {
-        return array_map(function ($fieldName) {
-            return [ 'name' => $fieldName ];
-        }, $fieldNames);
+        return array_map(static fn ($fieldName) => ['name' => $fieldName], $fieldNames);
     }
 
     /**

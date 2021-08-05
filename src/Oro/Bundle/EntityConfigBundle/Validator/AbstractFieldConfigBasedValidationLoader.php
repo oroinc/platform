@@ -46,7 +46,7 @@ abstract class AbstractFieldConfigBasedValidationLoader extends AbstractLoader
         }
 
         $className = $metadata->getClassName();
-        $fieldsConfig = $this->fieldConfigProvider->getConfigs($className);
+        $fieldsConfig = $this->fieldConfigProvider->getConfigs($className, true);
         foreach ($fieldsConfig as $fieldConfig) {
             $this->processFieldConfig($metadata, $fieldConfig);
         }

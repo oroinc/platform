@@ -148,13 +148,13 @@ class EntityFieldSelectType extends AbstractType
      */
     protected function getData($entityName, $withRelations, $withVirtualFields, $withUnidirectional)
     {
-        $fields = $this->entityFieldProvider->getFields(
-            $entityName,
-            $withRelations,
-            $withVirtualFields,
-            true,
-            $withUnidirectional
-        );
+        $options = EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS
+            | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            | EntityFieldProvider::OPTION_TRANSLATE;
+        $options |= $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+        $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+        $options |= $withUnidirectional ? EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL : 0;
+        $fields = $this->entityFieldProvider->getEntityFields($entityName, $options);
 
         return $this->convertData($fields, $entityName, null);
     }

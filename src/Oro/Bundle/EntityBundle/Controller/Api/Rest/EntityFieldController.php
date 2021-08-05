@@ -56,15 +56,14 @@ class EntityFieldController extends AbstractFOSRestController
         $provider = $this->get('oro_entity.entity_field_provider');
 
         $statusCode = Response::HTTP_OK;
+        $options = EntityFieldProvider::OPTION_TRANSLATE;
+        $options |= $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+        $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+        $options |= $withEntityDetails ? EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS : 0;
+        $options |= $withUnidirectional ? EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL : 0;
+        $options |= $applyExclusions ? EntityFieldProvider::OPTION_APPLY_EXCLUSIONS : 0;
         try {
-            $result = $provider->getFields(
-                $entityName,
-                $withRelations,
-                $withVirtualFields,
-                $withEntityDetails,
-                $withUnidirectional,
-                $applyExclusions
-            );
+            $result = $provider->getEntityFields($entityName, $options);
         } catch (InvalidEntityException $ex) {
             $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
