@@ -39,6 +39,21 @@ class MenuUpdateRepositoryTest extends WebTestCase
         );
     }
 
+    public function testGetUsedScopesByMenu()
+    {
+        $expected = [
+            'test_menu' => [
+                $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId(),
+                $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId(),
+            ],
+            'application_menu' => [
+                $this->getReference(LoadScopeData::DEFAULT_SCOPE)->getId(),
+                $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId(),
+            ]
+        ];
+        $this->assertEqualsCanonicalizing($expected, $this->repository->getUsedScopesByMenu());
+    }
+
     /**
      * @dataProvider findMenuUpdatesByscopeReferencesDataProvider
      * @param string $menuName
