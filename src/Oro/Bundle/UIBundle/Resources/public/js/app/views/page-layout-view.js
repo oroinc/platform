@@ -209,6 +209,8 @@ define(function(require) {
                 return;
             }
 
+            this.beforeSerializeHook($form);
+
             if (url && method.toUpperCase() === 'GET') {
                 data = $form.serialize();
                 if (data) {
@@ -228,6 +230,28 @@ define(function(require) {
 
         onRefreshClick: function() {
             mediator.execute('refreshPage');
+        },
+
+        /**
+         * Hook before serialize form data
+         * @param {jQuery.Element} $form
+         */
+        beforeSerializeHook($form) {
+            this.syncDependentHiddenInput($form);
+        },
+
+        /**
+         * Prepare checkbox unchecked value for form data
+         * @param {jQuery.Element} $form
+         */
+        syncDependentHiddenInput($form) {
+            $form.find('input[type="checkbox"]').each((index, checkbox) => {
+                const checkboxHiddenField = document.querySelector(`#${checkbox.id}-hidden`);
+
+                if (checkboxHiddenField && checkbox.name === checkboxHiddenField.name) {
+                    checkboxHiddenField.disabled = checkbox.checked;
+                }
+            });
         }
     });
 
