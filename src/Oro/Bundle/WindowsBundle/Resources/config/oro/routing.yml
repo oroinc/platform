@@ -43,6 +43,7 @@ oro_api_put_windows:
         _format: json
         version: latest
     requirements:
+        windowId: \d+
         _format: json
         version: latest|v1
 
@@ -54,5 +55,6 @@ oro_api_delete_windows:
         _format: json
         version: latest
     requirements:
+        windowId: \d+
         _format: json
         version: latest|v1

@@ -31,6 +31,10 @@ oro_activity_list_api_get_list:
         _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::cgetAction'
         _format: json
         version: latest
+    requirements:
+        entityId: \d+
+        _format: json
+        version: latest|v1
 
 oro_activity_list_api_get_item:
     path: '/api/rest/{version}/activitylist/{entityId}.{_format}'
@@ -39,15 +43,8 @@ oro_activity_list_api_get_item:
         _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::getActivityListItemAction'
         _format: json
         version: latest
-
-oro_api_get_activitylists:
-    path: '/api/rest/{version}/activitylists/{entityClass}.{_format}'
-    methods: [GET]
-    defaults:
-        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::cgetAction'
-        _format: json
-        version: latest
     requirements:
+        entityId: \d+
         _format: json
         version: latest|v1
 
@@ -60,6 +57,17 @@ oro_api_get_activitylist_activity_list_item:
         version: latest
     requirements:
         entityId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_activitylists:
+    path: '/api/rest/{version}/activitylists/{entityClass}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
         _format: json
         version: latest|v1
 

@@ -17,37 +17,37 @@ oro_user_bundle_config:
 #
 
 oro_api_post_role_deprecated:
-    path:            /api/rest/{version}/role.{_format}
-    methods:         [POST]
+    path: '/api/rest/{version}/role.{_format}'
+    methods: [POST]
     defaults:
-        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::postAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::postAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        _format: json|html
+        version: latest|v1
 
 oro_api_post_user_deprecated:
-    path:            /api/rest/{version}/user.{_format}
-    methods:         [POST]
+    path: '/api/rest/{version}/user.{_format}'
+    methods: [POST]
     defaults:
-        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::postAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::postAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        _format: json|html
+        version: latest|v1
 
 oro_api_post_group_deprecated:
-    path:            /api/rest/{version}/group.{_format}
-    methods:         [POST]
+    path: '/api/rest/{version}/group.{_format}'
+    methods: [POST]
     defaults:
-        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::postAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::postAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        _format: json|html
+        version: latest|v1
 
 oro_rest_api_user_profile:
     path: '%oro_api.rest.prefix%userprofile'
@@ -129,6 +129,7 @@ oro_api_get_user_roles:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 
@@ -140,6 +141,7 @@ oro_api_get_user_groups:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 
@@ -322,6 +324,7 @@ oro_api_get_user_permissions:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 

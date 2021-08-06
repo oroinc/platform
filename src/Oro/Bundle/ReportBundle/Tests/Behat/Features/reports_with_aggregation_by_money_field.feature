@@ -43,7 +43,6 @@ Feature: Reports with aggregation by money field
       | Entity      | Group                 |
       | Report Type | Table                 |
     And add the following columns:
-      | Id         | Average |
       | MoneyField | Average |
       | Owner      | None    |
     And add the following grouping columns:
@@ -51,5 +50,5 @@ Feature: Reports with aggregation by money field
     And save and close form
     Then I should see "Report saved" flash message
     And should see following grid:
-      | Id                 | MoneyField  | Owner |
-      | 2.0000000000000000 | 61,080.8467 | Main  |
+      | MoneyField  | Owner |
+      | 61,080.8467 | Main  |

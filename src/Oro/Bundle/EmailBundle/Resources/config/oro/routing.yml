@@ -166,6 +166,7 @@ oro_api_get_emailorigin:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 
@@ -252,6 +253,7 @@ oro_api_get_email_activity_relations:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 

@@ -14,6 +14,10 @@ oro_api_comment_get_items:
         _controller: 'Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController::cgetAction'
         _format: json
         version: latest
+    requirements:
+        relationId: \d+
+        _format: json
+        version: latest|v1
 
 oro_api_comment_create_item:
     path: '/api/rest/{version}/relation/{relationClass}/{relationId}/comment.{_format}'
@@ -22,6 +26,10 @@ oro_api_comment_create_item:
         _controller: 'Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController::postAction'
         _format: json
         version: latest
+    requirements:
+        relationId: \d+
+        _format: json
+        version: latest|v1
 
 oro_api_comment_get_item:
     path: '/api/rest/{version}/comment/{id}.{_format}'
@@ -30,6 +38,10 @@ oro_api_comment_get_item:
         _controller: 'Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController::getAction'
         _format: json
         version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
 
 oro_api_comment_update_item:
     path: '/api/rest/{version}/comment/{id}.{_format}'
@@ -38,6 +50,10 @@ oro_api_comment_update_item:
         _controller: 'Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController::putAction'
         _format: json
         version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
 
 oro_api_comment_remove_attachment_item:
     path: '/api/rest/{version}/comment/{id}/removeAttachment.{_format}'
@@ -46,6 +62,10 @@ oro_api_comment_remove_attachment_item:
         _controller: 'Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController::removeAttachmentAction'
         _format: json
         version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
 
 oro_api_comment_delete_item:
     path: '/api/rest/{version}/comment/{id}.{_format}'
@@ -54,3 +74,7 @@ oro_api_comment_delete_item:
         _controller: 'Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController::deleteAction'
         _format: json
         version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
