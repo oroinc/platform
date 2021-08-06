@@ -14,6 +14,10 @@ oro_api_get_notes:
     defaults:
         _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::cgetAction'
         _format: json
+    requirements:
+        entityId: \d+
+        _format: json|html
+        version: latest|v1
 
 oro_api_get_note:
     path: '/api/rest/{version}/notes/{id}.{_format}'
@@ -21,6 +25,10 @@ oro_api_get_note:
     defaults:
         _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::getAction'
         _format: json
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
 
 oro_api_post_note:
     path: '/api/rest/{version}/notes.{_format}'
@@ -28,6 +36,9 @@ oro_api_post_note:
     defaults:
         _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::postAction'
         _format: json
+    requirements:
+        _format: json|html
+        version: latest|v1
 
 oro_api_put_note:
     path: '/api/rest/{version}/notes/{id}.{_format}'

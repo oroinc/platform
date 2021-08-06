@@ -9,26 +9,27 @@ oro_segment:
 #
 
 oro_api_get_segment_items_deprecated:
-    path:            /api/rest/{version}/segments/{entityName}/items.{_format}
-    methods:         [GET]
+    path: '/api/rest/{version}/segments/{entityName}/items.{_format}'
+    methods: [GET]
     defaults:
-        _controller: Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::getItemsAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::getItemsAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json
-        version:     latest|v1
+        _format: json
+        version: latest|v1
 
 oro_api_post_segment_run_deprecated:
-    path:            /api/rest/{version}/segments/{id}/run.{_format}
-    methods:         [POST]
+    path: '/api/rest/{version}/segments/{id}/run.{_format}'
+    methods: [POST]
     defaults:
-        _controller: Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::postRunAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::postRunAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json
-        version:     latest|v1
+        id: \d+
+        _format: json
+        version: latest|v1
 
 oro_api_options_segments:
     path: '/api/rest/{version}/segments.{_format}'

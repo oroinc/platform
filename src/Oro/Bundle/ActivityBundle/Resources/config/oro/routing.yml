@@ -119,6 +119,7 @@ oro_api_get_activity_context:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
     options:

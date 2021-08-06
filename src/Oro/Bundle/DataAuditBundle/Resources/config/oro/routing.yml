@@ -27,6 +27,7 @@ oro_api_get_audit:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 

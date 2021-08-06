@@ -15,15 +15,15 @@ oro_navigation_bundle:
 #
 
 oro_api_post_pagestate_deprecated:
-    path:            /api/rest/{version}/pagestate.{_format}
-    methods:         [POST]
+    path: '/api/rest/{version}/pagestate.{_format}'
+    methods: [POST]
     defaults:
-        _controller: Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::postAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::postAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        _format: json|html
+        version: latest|v1
 
 
 #
@@ -60,6 +60,7 @@ oro_api_put_navigationitems_id:
         _format: json
         version: latest
     requirements:
+        itemId: \d+
         _format: json
         version: latest|v1
 
@@ -71,6 +72,7 @@ oro_api_delete_navigationitems_id:
         _format: json
         version: latest
     requirements:
+        itemId: \d+
         _format: json
         version: latest|v1
 
@@ -104,6 +106,7 @@ oro_api_get_pagestate:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 
@@ -126,6 +129,7 @@ oro_api_put_pagestate:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 
@@ -137,6 +141,7 @@ oro_api_delete_pagestate:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json
         version: latest|v1
 

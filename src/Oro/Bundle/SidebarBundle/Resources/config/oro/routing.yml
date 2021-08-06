@@ -43,6 +43,7 @@ oro_api_put_sidebarwidgets:
         _format: json
         version: latest
     requirements:
+        widgetId: \d+
         _format: json
         version: latest|v1
 
@@ -54,6 +55,7 @@ oro_api_delete_sidebarwidgets:
         _format: json
         version: latest
     requirements:
+        widgetId: \d+
         _format: json
         version: latest|v1
 
@@ -87,5 +89,6 @@ oro_api_put_sidebars:
         _format: json
         version: latest
     requirements:
+        stateId: \d+
         _format: json
         version: latest|v1

@@ -70,5 +70,6 @@ oro_api_get_file:
         _format: json
         version: latest
     requirements:
+        id: \d+
         _format: json|binary
         version: latest|v1

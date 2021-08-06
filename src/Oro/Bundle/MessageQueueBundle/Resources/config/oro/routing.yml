@@ -16,5 +16,6 @@ oro_api_message_queue_job_interrupt_root_job:
         version: latest
         _format: json
     requirements:
+        id: \d+
         version: latest|v1
         _format: json
