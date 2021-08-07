@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 
 /**
  * Email Recipient
@@ -25,7 +24,6 @@ class EmailRecipient
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -33,7 +31,6 @@ class EmailRecipient
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=320)
-     * @JMS\Type("string")
      */
     protected $name;
 
@@ -41,7 +38,6 @@ class EmailRecipient
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=3)
-     * @JMS\Type("string")
      */
     protected $type;
 
@@ -50,7 +46,6 @@ class EmailRecipient
      *
      * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER")
      * @ORM\JoinColumn(name="email_address_id", referencedColumnName="id", nullable=false)
-     * @JMS\Exclude
      */
     protected $emailAddress;
 
@@ -59,7 +54,6 @@ class EmailRecipient
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="recipients")
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $email;
 

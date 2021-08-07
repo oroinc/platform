@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
-use JMS\Serializer\Annotation\Type;
-
 /**
  * Represents item of search results
  */
@@ -11,19 +9,16 @@ class Item
 {
     /**
      * @var string
-     * @Type("string")
      */
     protected $entityName;
 
     /**
      * @var string
-     * @Type("string")
      */
     protected $entityLabel;
 
     /**
      * @var int
-     * @Type("integer")
      */
     protected $recordId;
 

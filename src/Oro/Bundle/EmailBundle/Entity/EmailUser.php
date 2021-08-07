@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -54,7 +53,6 @@ class EmailUser
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -62,7 +60,6 @@ class EmailUser
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
-     * @JMS\Type("dateTime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -86,7 +83,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @JMS\Exclude
      */
     protected $owner;
 
@@ -95,7 +91,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", inversedBy="emailUsers")
      * @ORM\JoinColumn(name="mailbox_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @JMS\Exclude
      */
     protected $mailboxOwner;
 
@@ -103,7 +98,6 @@ class EmailUser
      * @var \DateTime
      *
      * @ORM\Column(name="received", type="datetime")
-     * @JMS\Type("dateTime")
      */
     protected $receivedAt;
 
@@ -111,7 +105,6 @@ class EmailUser
      * @var bool
      *
      * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     * @JMS\Type("boolean")
      */
     protected $seen = false;
 
@@ -120,7 +113,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="emailUsers")
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
-     * @JMS\Exclude
      */
     protected $origin;
 
@@ -136,7 +128,6 @@ class EmailUser
      *     joinColumns={@ORM\JoinColumn(name="email_user_id", referencedColumnName="id", onDelete="CASCADE")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="folder_id", referencedColumnName="id", onDelete="CASCADE")},
      * )
-     * @JMS\Exclude
      */
     protected $folders;
 
@@ -145,7 +136,6 @@ class EmailUser
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $email;
 

@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -80,7 +79,6 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
     EmailOwnerInterface,
@@ -97,8 +95,6 @@ class User extends ExtendUser implements
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
@@ -106,8 +102,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -143,8 +137,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -179,8 +171,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -197,8 +187,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -215,8 +203,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -233,8 +219,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -251,8 +235,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -285,8 +267,6 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="birthday", type="date", nullable=true)
-     * @JMS\Type("DateTime")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -301,8 +281,6 @@ class User extends ExtendUser implements
      * @var bool
      *
      * @ORM\Column(type="boolean")
-     * @JMS\Type("boolean")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -317,8 +295,6 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     * @JMS\Type("DateTime")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={

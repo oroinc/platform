@@ -6,7 +6,6 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 
 /**
@@ -36,7 +35,6 @@ class EmailFolder
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -44,7 +42,6 @@ class EmailFolder
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @JMS\Type("string")
      */
     protected $name;
 
@@ -52,7 +49,6 @@ class EmailFolder
      * @var string
      *
      * @ORM\Column(name="full_name", type="string", length=255)
-     * @JMS\Type("string")
      */
     protected $fullName;
 
@@ -60,7 +56,6 @@ class EmailFolder
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=10)
-     * @JMS\Type("string")
      */
     protected $type;
 
@@ -68,7 +63,6 @@ class EmailFolder
      * @var bool
      *
      * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
-     * @JMS\Type("boolean")
      */
     protected $syncEnabled = false;
 
@@ -79,7 +73,6 @@ class EmailFolder
      * @ORM\JoinColumn(
      *  name="parent_folder_id", referencedColumnName="id",
      *  nullable=true, onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $parentFolder;
 
@@ -99,7 +92,6 @@ class EmailFolder
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="folders")
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $origin;
 
@@ -133,7 +125,6 @@ class EmailFolder
      *      cascade={"persist", "remove"},
      *      orphanRemoval=true
      * )
-     * @JMS\Exclude
      */
     protected $emailUsers;
 

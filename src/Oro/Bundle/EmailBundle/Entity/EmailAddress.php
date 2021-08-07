@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 
 /**
  * Email Address
@@ -27,7 +26,6 @@ abstract class EmailAddress
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     private $id;
 
@@ -35,7 +33,6 @@ abstract class EmailAddress
      * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
-     * @JMS\Type("dateTime")
      */
     private $created;
 
@@ -43,7 +40,6 @@ abstract class EmailAddress
      * @var \DateTime
      *
      * @ORM\Column(name="updated", type="datetime")
-     * @JMS\Type("dateTime")
      */
     private $updated;
 
@@ -51,7 +47,6 @@ abstract class EmailAddress
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255)
-     * @JMS\Type("string")
      */
     private $email;
 
@@ -59,7 +54,6 @@ abstract class EmailAddress
      * @var bool
      *
      * @ORM\Column(name="has_owner", type="boolean")
-     * @JMS\Type("boolean")
      */
     private $hasOwner = false;
 
