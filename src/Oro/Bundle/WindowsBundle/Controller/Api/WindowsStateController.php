@@ -4,6 +4,7 @@ namespace Oro\Bundle\WindowsBundle\Controller\Api;
 
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -25,14 +26,21 @@ class WindowsStateController extends AbstractFOSRestController
     public function cgetAction()
     {
         $manager = $this->getWindowsStateManager();
-        if (null !== $manager) {
-            $items = $manager->getWindowsStates();
-            if ($items) {
-                return $this->handleView($this->view($items, Response::HTTP_OK));
-            }
+        if (null === $manager) {
+            return $this->handleNotFound();
         }
 
-        return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+        $items = $manager->getWindowsStates();
+        if (!$items) {
+            return $this->handleNotFound();
+        }
+
+        $serializedItems = [];
+        foreach ($items as $item) {
+            $serializedItems[] = $this->serializeWindowsState($item);
+        }
+
+        return $this->handleView($this->view($serializedItems, Response::HTTP_OK));
     }
 
     /**
@@ -48,7 +56,7 @@ class WindowsStateController extends AbstractFOSRestController
     {
         $manager = $this->getWindowsStateManager();
         if (null === $manager) {
-            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         try {
@@ -74,12 +82,12 @@ class WindowsStateController extends AbstractFOSRestController
     {
         $manager = $this->getWindowsStateManager();
         if (null === $manager) {
-            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         try {
             if (!$manager->updateWindowsState($windowId)) {
-                return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+                return $this->handleNotFound();
             }
         } catch (\InvalidArgumentException $e) {
             throw new HttpException(Response::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
@@ -103,12 +111,12 @@ class WindowsStateController extends AbstractFOSRestController
     {
         $manager = $this->getWindowsStateManager();
         if (null === $manager) {
-            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         try {
             if (!$manager->deleteWindowsState($windowId)) {
-                return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+                return $this->handleNotFound();
             }
         } catch (\InvalidArgumentException $e) {
             throw new HttpException(Response::HTTP_BAD_REQUEST, 'Wrong JSON inside POST body');
@@ -117,8 +125,24 @@ class WindowsStateController extends AbstractFOSRestController
         return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
+    protected function serializeWindowsState(AbstractWindowsState $windowsState): array
+    {
+        return [
+            'id'                    => $windowsState->getId(),
+            'data'                  => $windowsState->getData(),
+            'rendered_successfully' => $windowsState->isRenderedSuccessfully(),
+            'created_at'            => $windowsState->getCreatedAt(),
+            'updated_at'            => $windowsState->getUpdatedAt()
+        ];
+    }
+
     private function getWindowsStateManager(): ?WindowsStateManager
     {
         return $this->get('oro_windows.manager.windows_state_registry')->getManager();
+    }
+
+    private function handleNotFound(): Response
+    {
+        return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
     }
 }

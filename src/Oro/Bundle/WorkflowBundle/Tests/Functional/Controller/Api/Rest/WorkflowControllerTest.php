@@ -198,7 +198,8 @@ class WorkflowControllerTest extends WebTestCase
                     'id' => $workflowItem->getId(),
                     'workflow_name' => $workflowItem->getWorkflowName(),
                     'entity_id' => $workflowItem->getEntityId(),
-                    'entity_class' => $workflowItem->getEntityClass()
+                    'entity_class' => $workflowItem->getEntityClass(),
+                    'result' => null,
                 ]
             ],
             $result

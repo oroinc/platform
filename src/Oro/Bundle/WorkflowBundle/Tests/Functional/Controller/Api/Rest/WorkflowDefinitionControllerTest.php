@@ -132,7 +132,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         ArrayUtil::sortBy($expectedResult['steps'], false, 'step_order');
         ArrayUtil::sortBy($result['steps'], false, 'step_order');
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     /**

@@ -25,6 +25,11 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_platform.serializer.fix_skip_null_values_array_normalizer:
+        class: Oro\Bundle\PlatformBundle\Serializer\Normalizer\FixSkipNullValuesArrayNormalizer
+        tags:
+            - { name: serializer.normalizer, priority: -1000 } # run after all custom normalizers
+
     oro_platform.fix_json_status_code_error_renderer:
         class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixJsonStatusCodeErrorRenderer
         decorates: error_renderer.serializer

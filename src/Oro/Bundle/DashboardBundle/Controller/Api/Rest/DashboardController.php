@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
@@ -32,16 +32,14 @@ class DashboardController extends AbstractFOSRestController
     public function deleteAction(Dashboard $id)
     {
         $dashboard = $id;
-        $this->getEntityManager()->remove($dashboard);
-        $this->getEntityManager()->flush();
+        $em = $this->getEntityManager();
+        $em->remove($dashboard);
+        $em->flush();
 
-        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
-    /**
-     * @return ObjectManager
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getDoctrine()->getManager();
     }
