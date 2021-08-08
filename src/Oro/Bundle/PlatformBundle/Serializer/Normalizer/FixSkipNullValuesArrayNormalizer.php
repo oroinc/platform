@@ -21,14 +21,7 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface
             return $object;
         }
 
-        $result = $object;
-        foreach ($object as $key => $value) {
-            if (null === $value) {
-                unset($result[$key]);
-            }
-        }
-
-        return $result;
+        return self::removeNullValues($object);
     }
 
     /**
@@ -36,6 +29,37 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, string $format = null)
     {
-        return $data && \is_array($data) && ArrayUtil::isAssoc($data);
+        return \is_array($data) && !empty($data);
+    }
+
+    private static function removeNullValues(array $data): array
+    {
+        if (!ArrayUtil::isAssoc($data)) {
+            return self::removeNullValuesFromCollection($data);
+        }
+
+        $result = $data;
+        foreach ($data as $name => $value) {
+            if (null === $value) {
+                unset($result[$name]);
+            } elseif (\is_array($value) && !empty($value)) {
+                $result[$name] = self::removeNullValues($value);
+            }
+        }
+
+        return $result;
+    }
+
+    private static function removeNullValuesFromCollection(array $data): array
+    {
+        $result = [];
+        foreach ($data as $index => $value) {
+            if (\is_array($value) && !empty($value)) {
+                $value = self::removeNullValues($value);
+            }
+            $result[$index] = $value;
+        }
+
+        return $result;
     }
 }
