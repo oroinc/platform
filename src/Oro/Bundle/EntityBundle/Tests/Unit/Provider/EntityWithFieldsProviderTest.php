@@ -10,17 +10,18 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityProvider|\PHPUnit\Framework\MockObject\MockObject $entityProvider;
+    /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityProvider;
 
-    private EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject $fieldProvider;
+    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldProvider;
 
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    private EntityWithFieldsProvider $provider;
+    /** @var EntityWithFieldsProvider */
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
@@ -66,8 +67,10 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityFields')
             ->with(
                 $className,
-                EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
-                | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+                | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
                 | EntityFieldProvider::OPTION_TRANSLATE
             )
             ->willReturn($fields);
@@ -118,10 +121,8 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(['field1' => []]);
 
-        $entityMetadata = $this->createMock(EntityMetadata::class);
-        $entityMetadata->expects(self::once())
-            ->method('getRoutes')
-            ->willReturn(['routeName' => 'routeValue']);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routes = ['routeName' => 'routeValue'];
         $this->configManager->expects(self::once())
             ->method('getEntityMetadata')
             ->with($className)
@@ -173,8 +174,10 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityFields')
             ->with(
                 $className,
-                EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
-                | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+                | EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
                 | EntityFieldProvider::OPTION_TRANSLATE
             )
             ->willReturn($fields);
@@ -218,15 +221,14 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityFields')
             ->with(
                 $className,
-                EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
                 | EntityFieldProvider::OPTION_TRANSLATE
             )
             ->willReturn(['field1' => []]);
 
-        $entityMetadata = $this->createMock(EntityMetadata::class);
-        $entityMetadata->expects(self::once())
-            ->method('getRoutes')
-            ->willReturn(['routeName' => 'routeValue']);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routes = ['routeName' => 'routeValue'];
         $this->configManager->expects(self::once())
             ->method('getEntityMetadata')
             ->with($className)
@@ -259,7 +261,8 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityFields')
             ->with(
                 $className,
-                EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
                 | EntityFieldProvider::OPTION_TRANSLATE
             )
             ->willReturn(['field1' => []]);
