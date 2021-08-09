@@ -8,7 +8,7 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
@@ -17,40 +17,33 @@ use Symfony\Component\Routing\RouterInterface;
 
 class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     private const ROUTE_NAME = 'route_name';
-
-    /** @var DraftRedirectAction */
-    private $action;
 
     /** @var ContextAccessor */
     private $contextAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
-    private $router;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     private $configManager;
 
+    /** @var DraftRedirectAction */
+    private $action;
+
     protected function setUp(): void
     {
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->router
-            ->expects($this->any())
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->contextAccessor = new ContextAccessor();
+
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects($this->any())
             ->method('generate')
             ->willReturn(self::ROUTE_NAME);
 
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $this->configManager = $this->createMock(ConfigManager::class);
-        $this->contextAccessor = new ContextAccessor();
         $this->action = new DraftRedirectAction(
             $this->contextAccessor,
             $this->configManager,
-            $this->router
+            $router
         );
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -100,16 +93,17 @@ class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute(): void
     {
-        $this->configManager
-            ->expects($this->once())
-            ->method('getEntityMetadata')
-            ->willReturn($this->getEntity(
-                EntityMetadata::class,
-                ['routes' => ['update' => self::ROUTE_NAME]],
-                ['name' => DraftableEntityStub::class]
-            ));
+        $entityMetadata = new EntityMetadata(DraftableEntityStub::class);
+        $entityMetadata->routes = ['update' => self::ROUTE_NAME];
 
-        $context = new ActionData(['source' => $this->getEntity(DraftableEntityStub::class, ['id' => 1])]);
+        $draftableEntity = new DraftableEntityStub();
+        ReflectionUtil::setId($draftableEntity, 1);
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->willReturn($entityMetadata);
+
+        $context = new ActionData(['source' => $draftableEntity]);
         $this->action->initialize(['source' => new PropertyPath('source'), 'route' => new PropertyPath('route')]);
         $this->action->execute($context);
 

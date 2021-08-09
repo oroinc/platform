@@ -78,14 +78,12 @@ class EmailTemplateController extends RestController
     public function cgetAction($entityName = null, $includeNonEntity = false, $includeSystemTemplates = true)
     {
         if (!$entityName) {
-            return $this->handleView(
-                $this->view(null, Response::HTTP_NOT_FOUND)
-            );
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
-        /** @var $emailTemplateRepository EmailTemplateRepository */
+        /** @var EmailTemplateRepository $emailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
 
         $templates = $emailTemplateRepository
@@ -97,9 +95,12 @@ class EmailTemplateController extends RestController
                 (bool)$includeSystemTemplates
             );
 
-        return $this->handleView(
-            $this->view($templates, Response::HTTP_OK)
-        );
+        $serializedTemplates = [];
+        foreach ($templates as $template) {
+            $serializedTemplates[] = $this->serializeEmailTemplate($template);
+        }
+
+        return $this->handleView($this->view($serializedTemplates, Response::HTTP_OK));
     }
 
     /**
@@ -123,9 +124,7 @@ class EmailTemplateController extends RestController
             'entity' => $provider->getEntityVariableDefinitions()
         ];
 
-        return $this->handleView(
-            $this->view($data, Response::HTTP_OK)
-        );
+        return $this->handleView($this->view($data, Response::HTTP_OK));
     }
 
     /**
@@ -218,5 +217,20 @@ class EmailTemplateController extends RestController
     public function getFormHandler()
     {
         throw new \BadMethodCallException('FormHandler is not available.');
+    }
+
+    protected function serializeEmailTemplate(EmailTemplate $template): array
+    {
+        return [
+            'id'          => $template->getId(),
+            'name'        => $template->getName(),
+            'is_system'   => $template->getIsSystem(),
+            'is_editable' => $template->getIsEditable(),
+            'parent'      => $template->getParent(),
+            'subject'     => $template->getSubject(),
+            'content'     => $template->getContent(),
+            'entity_name' => $template->getEntityName(),
+            'type'        => $template->getType()
+        ];
     }
 }

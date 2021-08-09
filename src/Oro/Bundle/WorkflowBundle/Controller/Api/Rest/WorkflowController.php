@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -100,12 +101,7 @@ class WorkflowController extends AbstractFOSRestController
         }
 
         return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem
-                ),
-                Response::HTTP_OK
-            )
+            $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
     }
 
@@ -182,15 +178,13 @@ class WorkflowController extends AbstractFOSRestController
             return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem,
-                    'redirectUrl' => $workflowItem->getResult()->redirectUrl,
-                ),
-                Response::HTTP_OK
-            )
-        );
+        $data = ['workflowItem' => $this->serializeWorkflowItem($workflowItem)];
+        $redirectUrl = $workflowItem->getResult()->redirectUrl;
+        if ($redirectUrl) {
+            $data['redirectUrl'] = $redirectUrl;
+        }
+
+        return $this->handleView($this->view($data, Response::HTTP_OK));
     }
 
     /**
@@ -206,12 +200,7 @@ class WorkflowController extends AbstractFOSRestController
     public function getAction(WorkflowItem $workflowItem)
     {
         return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem
-                ),
-                Response::HTTP_OK
-            )
+            $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
     }
 
@@ -230,6 +219,7 @@ class WorkflowController extends AbstractFOSRestController
     public function deleteAction(WorkflowItem $workflowItem)
     {
         $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
+
         return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 
@@ -253,10 +243,10 @@ class WorkflowController extends AbstractFOSRestController
 
         return $this->handleView(
             $this->view(
-                array(
+                [
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow activated')
-                ),
+                ],
                 Response::HTTP_OK
             )
         );
@@ -282,10 +272,10 @@ class WorkflowController extends AbstractFOSRestController
 
         return $this->handleView(
             $this->view(
-                array(
+                [
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow deactivated')
-                ),
+                ],
                 Response::HTTP_OK
             )
         );
@@ -298,20 +288,25 @@ class WorkflowController extends AbstractFOSRestController
      */
     protected function handleError($message, $code)
     {
-        return $this->handleView(
-            $this->view(
-                $this->formatErrorResponse($message),
-                $code
-            )
-        );
+        return $this->handleView($this->view(['message' => $message], $code));
     }
 
     /**
-     * @param string $message
-     * @return array
+     * {@inheritDoc}
      */
-    protected function formatErrorResponse($message)
+    protected function handleView(View $view)
     {
-        return array('message' => $message);
+        $view->getContext()->setSerializeNull(true);
+
+        return parent::handleView($view);
+    }
+
+    protected function serializeWorkflowItem(?WorkflowItem $workflowItem): ?array
+    {
+        if (null === $workflowItem) {
+            return null;
+        }
+
+        return $this->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
     }
 }

@@ -90,8 +90,6 @@
         "symfony/monolog-bundle": "~3.6.0",
         "sensio/framework-extra-bundle": "5.6.*",
         "incenteev/composer-parameter-handler": "2.1.*",
-        "jms/serializer": "3.11.*",
-        "jms/serializer-bundle": "~3.8.0",
         "knplabs/knp-menu": "~3.1.2",
         "knplabs/knp-menu-bundle": "~3.1.0",
         "friendsofsymfony/rest-bundle": "~3.0.5",

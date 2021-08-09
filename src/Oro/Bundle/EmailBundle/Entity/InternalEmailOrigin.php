@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 
 /**
  * An Email Origin which can be used for emails sent by BAP
@@ -21,7 +20,6 @@ class InternalEmailOrigin extends EmailOrigin
      * @var string
      *
      * @ORM\Column(name="internal_name", type="string", length=30)
-     * @JMS\Type("string")
      */
     protected $internalName;
 

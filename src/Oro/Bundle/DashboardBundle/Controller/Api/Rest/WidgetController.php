@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -19,8 +19,8 @@ class WidgetController extends AbstractFOSRestController
 {
     /**
      * @param Request $request
-     * @param integer $dashboardId
-     * @param integer $widgetId
+     * @param int $dashboardId
+     * @param int $widgetId
      *
      * @QueryParam(
      *      name="isExpanded",
@@ -54,11 +54,11 @@ class WidgetController extends AbstractFOSRestController
         $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
 
         if (!$dashboard || !$widget) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         if (!$dashboard->hasWidget($widget)) {
-            return $this->handleView($this->view(array(), Response::HTTP_BAD_REQUEST));
+            return $this->handleBadRequest();
         }
 
         $widget->setExpanded(
@@ -71,12 +71,12 @@ class WidgetController extends AbstractFOSRestController
 
         $this->getEntityManager()->flush();
 
-        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
+        return $this->handleNoContent();
     }
 
     /**
-     * @param integer $dashboardId
-     * @param integer $widgetId
+     * @param int $dashboardId
+     * @param int $widgetId
      *
      * @ApiDoc(
      *      description="Delete dashboard widget",
@@ -91,22 +91,22 @@ class WidgetController extends AbstractFOSRestController
         $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
 
         if (!$dashboard || !$widget) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         if (!$dashboard->hasWidget($widget)) {
-            return $this->handleView($this->view(array(), Response::HTTP_BAD_REQUEST));
+            return $this->handleBadRequest();
         }
 
         $this->getDashboardManager()->remove($widget);
         $this->getEntityManager()->flush();
 
-        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
+        return $this->handleNoContent();
     }
 
     /**
      * @param Request $request
-     * @param integer $dashboardId
+     * @param int $dashboardId
      *
      * @QueryParam(
      *      name="layoutPositions",
@@ -128,20 +128,21 @@ class WidgetController extends AbstractFOSRestController
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
         if (!$dashboard) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         $layoutPositions = $request->get('layoutPositions', []);
 
         foreach ($layoutPositions as $widgetId => $layoutPosition) {
-            if ($widget = $this->getDashboardManager()->findWidgetModel($widgetId)) {
+            $widget = $this->getDashboardManager()->findWidgetModel($widgetId);
+            if ($widget) {
                 $widget->setLayoutPosition($layoutPosition);
             }
         }
 
         $this->getEntityManager()->flush();
 
-        return $this->handleView($this->view(array(), Response::HTTP_NO_CONTENT));
+        return $this->handleNoContent();
     }
 
     /**
@@ -174,29 +175,46 @@ class WidgetController extends AbstractFOSRestController
         $dashboard = $this->getDashboardManager()->findDashboardModel($dashboardId);
 
         if (!$dashboard || !$widgetName) {
-            return $this->handleView($this->view(array(), Response::HTTP_NOT_FOUND));
+            return $this->handleNotFound();
         }
 
         $widget = $this->getDashboardManager()->createWidgetModel($widgetName);
         $dashboard->addWidget($widget, $targetColumn);
         $this->getDashboardManager()->save($widget, true);
 
-        return $this->handleView($this->view($widget, Response::HTTP_OK));
+        $responseData = [
+            'id' => $widget->getId(),
+            'name' => $widget->getName(),
+            'config' => $widget->getConfig(),
+            'layout_position' => $widget->getLayoutPosition(),
+            'expanded' => $widget->isExpanded()
+        ];
+
+        return $this->handleView($this->view($responseData, Response::HTTP_OK));
     }
 
-    /**
-     * @return ObjectManager
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getDoctrine()->getManager();
     }
 
-    /**
-     * @return Manager
-     */
-    protected function getDashboardManager()
+    private function getDashboardManager(): Manager
     {
         return $this->get('oro_dashboard.manager');
+    }
+
+    private function handleNotFound(): Response
+    {
+        return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
+    }
+
+    private function handleBadRequest(): Response
+    {
+        return $this->handleView($this->view([], Response::HTTP_BAD_REQUEST));
+    }
+
+    private function handleNoContent(): Response
+    {
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 }

@@ -77,7 +77,7 @@ class UserController extends RestController
      * )
      * @AclAncestor("oro_user_user_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getAction(int $id)
     {
@@ -87,7 +87,7 @@ class UserController extends RestController
     /**
      * Create new user
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Create new user",
      *      resource=true
@@ -113,7 +113,7 @@ class UserController extends RestController
      * )
      * @AclAncestor("oro_user_user_update")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function putAction(int $id)
     {
@@ -139,7 +139,7 @@ class UserController extends RestController
      *      permission="DELETE"
      * )
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteAction(int $id)
     {
@@ -160,17 +160,23 @@ class UserController extends RestController
      * )
      * @AclAncestor("oro_user_role_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getRolesAction(int $id)
     {
+        /** @var User|null $entity */
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
             return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getUserRoles(), Response::HTTP_OK));
+        $serializedRoles = [];
+        foreach ($entity->getUserRoles() as $role) {
+            $serializedRoles[] = $this->serializeRole($role);
+        }
+
+        return $this->handleView($this->view($serializedRoles, Response::HTTP_OK));
     }
 
     /**
@@ -187,17 +193,23 @@ class UserController extends RestController
      * )
      * @AclAncestor("oro_user_group_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getGroupsAction(int $id)
     {
+        /** @var User|null $entity */
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
             return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getGroups(), Response::HTTP_OK));
+        $serializedGroups = [];
+        foreach ($entity->getGroups() as $group) {
+            $serializedGroups[] = $this->serializeGroup($group);
+        }
+
+        return $this->handleView($this->view($serializedGroups, Response::HTTP_OK));
     }
 
     /**
@@ -217,7 +229,7 @@ class UserController extends RestController
      * )
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @ApiDoc(
      *      description="Get user by username or email",
@@ -259,11 +271,7 @@ class UserController extends RestController
                 $result = [];
                 /** @var Role $role */
                 foreach ($value as $index => $role) {
-                    $result[$index] = [
-                        'id'    => $role->getId(),
-                        'role'  => $role->getRole(),
-                        'label' => $role->getLabel(),
-                    ];
+                    $result[$index] = $this->serializeRole($role);
                 }
                 $value = $result;
                 break;
@@ -271,10 +279,7 @@ class UserController extends RestController
                 $result = [];
                 /** @var Group $group */
                 foreach ($value as $index => $group) {
-                    $result[$index] = [
-                        'id'   => $group->getId(),
-                        'name' => $group->getName()
-                    ];
+                    $result[$index] = $this->serializeGroup($group);
                 }
                 $value = $result;
                 break;
@@ -337,8 +342,6 @@ class UserController extends RestController
     }
 
     /**
-     * Get entity Manager
-     *
      * @return ApiEntityManager
      */
     public function getManager()
@@ -360,5 +363,22 @@ class UserController extends RestController
     public function getFormHandler()
     {
         return $this->get('oro_user.form.handler.user.api');
+    }
+
+    private function serializeRole(Role $role): array
+    {
+        return [
+            'id'    => $role->getId(),
+            'role'  => $role->getRole(),
+            'label' => $role->getLabel()
+        ];
+    }
+
+    private function serializeGroup(Group $group): array
+    {
+        return [
+            'id'   => $group->getId(),
+            'name' => $group->getName()
+        ];
     }
 }

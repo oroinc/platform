@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Model\ExtendRole;
 
@@ -35,7 +34,6 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class Role extends ExtendRole implements \Serializable
 {
@@ -47,8 +45,6 @@ class Role extends ExtendRole implements \Serializable
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
@@ -56,8 +52,6 @@ class Role extends ExtendRole implements \Serializable
      * @var string
      *
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $role;
 
@@ -65,8 +59,6 @@ class Role extends ExtendRole implements \Serializable
      * @var string
      *
      * @ORM\Column(type="string", length=30)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $label;
 
@@ -202,9 +194,9 @@ class Role extends ExtendRole implements \Serializable
     public function unserialize($serialized)
     {
         if (property_exists($this, 'organization')) {
-            list($this->id, $this->role, $this->label, $this->organization) = unserialize($serialized);
+            [$this->id, $this->role, $this->label, $this->organization] = unserialize($serialized);
         } else {
-            list($this->id, $this->role, $this->label) = unserialize($serialized);
+            [$this->id, $this->role, $this->label] = unserialize($serialized);
         }
     }
 }

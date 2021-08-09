@@ -52,9 +52,6 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $objectManager */
-        $objectManager = $this->createMock(ObjectManager::class);
-
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -64,7 +61,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $this->manager = new ActivityContextApiEntityManager(
-            $objectManager,
+            $this->createMock(ObjectManager::class),
             $this->configManager,
             $this->router,
             $this->entityAliasResolver,
@@ -78,25 +75,20 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
         $this->manager->setEntityClassNameHelper($this->entityClassNameHelper);
 
-        /** @var EntitySerializer|\PHPUnit\Framework\MockObject\MockObject $entitySerializer */
         $entitySerializer = $this->createMock(EntitySerializer::class);
         $this->manager->setEntitySerializer($entitySerializer);
     }
 
     /**
      * @dataProvider getActivityContextWhenNotActivityDataProvider
-     *
-     * @param null|object $entity
      */
-    public function testGetActivityContextWhenNotActivity($entity): void
+    public function testGetActivityContextWhenNotActivity(?object $entity): void
     {
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->willReturn($entity);
 
-        $this->configManager
-            ->expects(self::never())
+        $this->configManager->expects(self::never())
             ->method('getProvider');
 
         $result = $this->manager->getActivityContext(TestActivity::class, 1);
@@ -114,19 +106,18 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActivityContextWhenNotGranted(): void
     {
-        $this->doctrineHelper
-            ->expects(self::once())
-            ->method('getEntity')
-            ->willReturn($activity = $this->getActivity([$target = $this->getTarget(1)]));
+        $target = $this->getTarget(1);
 
-        $this->configManager
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntity')
+            ->willReturn($this->getActivity([$target]));
+
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('entity')
-            ->willReturn($configProvider = $this->createMock(ConfigProvider::class));
+            ->willReturn($this->createMock(ConfigProvider::class));
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', $target)
             ->willReturn(false);
@@ -139,19 +130,14 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     private function getActivity(array $targets): ActivityInterface
     {
         $activity = $this->createMock(TestActivity::class);
-        $activity
+        $activity->expects(self::any())
             ->method('getActivityTargets')
             ->willReturn($targets);
 
         return $activity;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return object
-     */
-    private function getTarget(int $id)
+    private function getTarget(int $id): object
     {
         return new class($id) {
             protected $id;
@@ -170,27 +156,25 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActivityContextWhenFeatureNotEnabled(): void
     {
-        $this->doctrineHelper
-            ->expects(self::once())
-            ->method('getEntity')
-            ->willReturn($activity = $this->getActivity([$target = $this->getTarget(1)]));
+        $target = $this->getTarget(1);
 
-        $this->configManager
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntity')
+            ->willReturn($this->getActivity([$target]));
+
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('entity')
-            ->willReturn($configProvider = $this->createMock(ConfigProvider::class));
+            ->willReturn($this->createMock(ConfigProvider::class));
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', $target)
             ->willReturn(true);
 
-        $this->featureChecker
-            ->expects(self::once())
+        $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
-            ->with(\get_class($target), 'entities')
+            ->with(get_class($target), 'entities')
             ->willReturn(false);
 
         $result = $this->manager->getActivityContext(TestActivity::class, 1);
@@ -207,10 +191,8 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->mockBuildItem();
 
-        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher
-            ->expects(self::atLeastOnce())
+        $eventDispatcher->expects(self::atLeastOnce())
             ->method('dispatch')
             ->with(self::isInstanceOf(PrepareContextTitleEvent::class), PrepareContextTitleEvent::EVENT_NAME);
 
@@ -222,55 +204,46 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     private function mockCheckers(array $targets): void
     {
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
-            ->willReturn($activity = $this->getActivity($targets));
+            ->willReturn($this->getActivity($targets));
 
-        $this->authorizationChecker
-            ->expects(self::atLeastOnce())
+        $this->authorizationChecker->expects(self::atLeastOnce())
             ->method('isGranted')
             ->willReturn(true);
 
-        $this->featureChecker
-            ->expects(self::atLeastOnce())
+        $this->featureChecker->expects(self::atLeastOnce())
             ->method('isResourceEnabled')
             ->willReturn(true);
     }
 
     private function mockBuildItem(): void
     {
-        $this->configManager
-            ->expects(self::once())
+        $config = $this->createMock(ConfigInterface::class);
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('entity')
-            ->willReturn($configProvider = $this->createMock(ConfigProvider::class));
-
-        $configProvider
-            ->expects(self::atLeastOnce())
+            ->willReturn($configProvider);
+        $configProvider->expects(self::atLeastOnce())
             ->method('getConfig')
-            ->willReturn($config = $this->createMock(ConfigInterface::class));
-
-        $config
-            ->expects(self::atLeastOnce())
+            ->willReturn($config);
+        $config->expects(self::atLeastOnce())
             ->method('get')
             ->with('icon')
-            ->willReturn($icon = 'sample-icon');
+            ->willReturn('sample-icon');
 
-        $this->entityClassNameHelper
-            ->expects(self::atLeastOnce())
+        $this->entityClassNameHelper->expects(self::atLeastOnce())
             ->method('getUrlSafeClassName')
-            ->willReturn($urlSafeClassName = 'sample-safe-name');
+            ->willReturn('sample-safe-name');
 
-        $this->entityNameResolver
-            ->expects(self::atLeastOnce())
+        $this->entityNameResolver->expects(self::atLeastOnce())
             ->method('getName')
             ->willReturnCallback(function ($target) {
                 return 'sample-name-' . $target->getId();
             });
 
-        $this->entityAliasResolver
-            ->expects(self::atLeastOnce())
+        $this->entityAliasResolver->expects(self::atLeastOnce())
             ->method('getPluralAlias')
             ->willReturn('sample-alias-plural');
 
@@ -279,25 +252,18 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     private function mockGetContextLink(): void
     {
-        $this->configManager
-            ->expects(self::atLeastOnce())
+        $route = 'sample-route';
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routeView = $route;
+
+        $this->configManager->expects(self::atLeastOnce())
             ->method('getEntityMetadata')
-            ->willReturnOnConsecutiveCalls(
-                $metadata = $this->createMock(EntityMetadata::class),
-                null
-            );
+            ->willReturnOnConsecutiveCalls($entityMetadata, null);
 
-        $metadata
-            ->expects(self::atLeastOnce())
-            ->method('getRoute')
-            ->with('view', true)
-            ->willReturn($route = 'sample-route');
-
-        $this->router
-            ->expects(self::atLeastOnce())
+        $this->router->expects(self::atLeastOnce())
             ->method('generate')
             ->with($route)
-            ->willReturn($link = 'sample-url');
+            ->willReturn('sample-url');
     }
 
     public function getActivityContextDataProvider(): array

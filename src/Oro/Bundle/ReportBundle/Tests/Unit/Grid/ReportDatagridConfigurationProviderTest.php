@@ -383,13 +383,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         self::assertEquals($expectedConfiguration, $configuration);
     }
 
-    /**
-     * @param string $gridName
-     * @param Report $report
-     *
-     * @return DatagridConfiguration
-     */
-    private function buildConfiguration($gridName, Report $report)
+    private function buildConfiguration(string $gridName, Report $report): DatagridConfiguration
     {
         $this->builder->setGridName($gridName);
         $this->builder->setSource($report);
@@ -398,9 +392,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function prepareMetadata()
+    private function prepareMetadata(): ClassMetadata
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $em = $this->createMock(EntityManagerInterface::class);
@@ -436,7 +430,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     /**
      * Initialises repository to return expected report entity
      */
-    private function prepareRepository(Report $report)
+    private function prepareRepository(Report $report): void
     {
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
@@ -447,14 +441,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($repository);
     }
 
-    /**
-     * @param string $viewRoute
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getEntityMetadata($viewRoute)
+    private function getEntityMetadata(string $viewRoute): EntityMetadata
     {
-        $entityMetadata = $this->createMock(EntityMetadata::class);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = $viewRoute;
 
         return $entityMetadata;

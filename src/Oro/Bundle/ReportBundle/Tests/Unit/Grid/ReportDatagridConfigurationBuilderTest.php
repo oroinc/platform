@@ -91,25 +91,23 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockClassMetadata([]);
 
-        $this->configManager
+        $this->configManager->expects($this->any())
             ->method('getEntityMetadata')
-            ->with($entity = \stdClass::class)
+            ->with(\stdClass::class)
             ->willReturn(null);
 
+        $report = $this->getReportEntity(\stdClass::class, $this->getSimpleDefinition());
         $this->builder->setGridName($gridName = 'sample-grid');
-        $this->builder->setSource(
-            $report = $this->getReportEntity(\stdClass::class, $this->getSimpleDefinition())
-        );
+        $this->builder->setSource($report);
 
-        $this->dateGroupingBuilder
-            ->expects($this->once())
+        $this->dateGroupingBuilder->expects($this->once())
             ->method('applyDateGroupingFilterIfRequired')
             ->with($this->isInstanceOf(DatagridConfiguration::class), $report);
 
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    private function mockClassMetadata(array $identifiers): ClassMetadata
+    private function mockClassMetadata(array $identifiers): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $em = $this->createMock(EntityManagerInterface::class);
@@ -122,8 +120,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $metadata->expects($this->any())
             ->method('getIdentifier')
             ->willReturn($identifiers);
-
-        return $metadata;
     }
 
     private function getSimpleDefinition(): array
@@ -166,24 +162,22 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->mockEntityMetadata('');
 
-        $this->builder->setGridName($gridName = 'sample-grid');
-        $this->builder->setSource(
-            $report = $this->getReportEntity(\stdClass::class, $this->getSimpleDefinition())
-        );
+        $gridName = 'sample-grid';
+        $this->builder->setGridName($gridName);
+        $this->builder->setSource($this->getReportEntity(\stdClass::class, $this->getSimpleDefinition()));
 
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    private function mockEntityMetadata(string $viewRoute): EntityMetadata
+    private function mockEntityMetadata(string $viewRoute): void
     {
-        $this->configManager
-            ->method('getEntityMetadata')
-            ->with($entity = \stdClass::class)
-            ->willReturn($entityMetadata = $this->createMock(EntityMetadata::class));
-
+        $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = $viewRoute;
 
-        return $entityMetadata;
+        $this->configManager->expects($this->any())
+            ->method('getEntityMetadata')
+            ->with(\stdClass::class)
+            ->willReturn($entityMetadata);
     }
 
     /**
@@ -195,10 +189,9 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->mockEntityMetadata('sample_route');
 
-        $this->builder->setGridName($gridName = 'sample-grid');
-        $this->builder->setSource(
-            $report = $this->getReportEntity(\stdClass::class, $this->getSimpleDefinition())
-        );
+        $gridName = 'sample-grid';
+        $this->builder->setGridName($gridName);
+        $this->builder->setSource($this->getReportEntity(\stdClass::class, $this->getSimpleDefinition()));
 
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
@@ -217,10 +210,9 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->mockEntityMetadata('sample_route');
 
-        $this->builder->setGridName($gridName = 'sample-grid');
-        $this->builder->setSource(
-            $report = $this->getReportEntity(\stdClass::class, $this->getSimpleDefinition())
-        );
+        $gridName = 'sample-grid';
+        $this->builder->setGridName($gridName);
+        $this->builder->setSource($this->getReportEntity(\stdClass::class, $this->getSimpleDefinition()));
 
         $this->assertEquals($this->getExpectedConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }

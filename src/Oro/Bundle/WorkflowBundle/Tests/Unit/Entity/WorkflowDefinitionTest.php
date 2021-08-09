@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer as JMS;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -19,19 +18,12 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    /**
-     * @var WorkflowDefinition
-     */
-    protected $workflowDefinition;
+    /** @var WorkflowDefinition */
+    private $workflowDefinition;
 
     protected function setUp(): void
     {
         $this->workflowDefinition = new WorkflowDefinition();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->workflowDefinition);
     }
 
     public function testGetVirtualAttributes()
@@ -330,29 +322,5 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
             $configuration[WorkflowConfiguration::NODE_DISABLE_OPERATIONS],
             $this->workflowDefinition->getDisabledOperations()
         );
-    }
-
-    public function testExcludeRestrictionsField()
-    {
-        $this->markTestSkipped('Skipped while not updated "jms/serializer" to >= 3.2');
-
-        $step = new WorkflowStep();
-        $step->setName('step');
-
-        $restriction          = new WorkflowRestriction();
-        $restrictionAttribute = 'test attribute';
-        $restriction->setStep($step)->setAttribute($restrictionAttribute);
-
-        $definitionName = 'Definition name';
-        $this->workflowDefinition->setName($definitionName);
-        $this->workflowDefinition->setRestrictions([$restriction]);
-
-        $serializer  = JMS\SerializerBuilder::create()->build();
-        $jsonContent = $serializer->serialize($this->workflowDefinition, 'json');
-
-        $this->assertJson($jsonContent);
-        static::assertStringNotContainsString('restrictions', $jsonContent);
-        static::assertStringNotContainsString($restrictionAttribute, $jsonContent);
-        static::assertStringContainsString($definitionName, $jsonContent);
     }
 }

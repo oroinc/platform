@@ -295,6 +295,18 @@ class ApiEntityManager
     }
 
     /**
+     * Serializes the given entities.
+     */
+    public function serializeEntities(array $entities): array
+    {
+        return $this->entitySerializer->serializeEntities(
+            $entities,
+            $this->class,
+            $this->getCachedSerializationConfig()
+        );
+    }
+
+    /**
      * @param object $entity
      *
      * @throws AccessDeniedException if access to the given entity is denied

@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
@@ -26,7 +25,6 @@ class EmailThread
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -34,7 +32,6 @@ class EmailThread
      * @var ArrayCollection|Email[] $emails
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="thread", cascade={"persist", "remove"}, orphanRemoval=true)
-     * @JMS\Exclude
      */
     protected $emails;
 
@@ -43,7 +40,6 @@ class EmailThread
      *
      * @ORM\ManyToOne(targetEntity="Email")
      * @ORM\JoinColumn(name="last_unseen_email_id", referencedColumnName="id", nullable=true)
-     * @JMS\Exclude
      */
     protected $lastUnseenEmail;
 
@@ -51,7 +47,6 @@ class EmailThread
      * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
-     * @JMS\Type("dateTime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={

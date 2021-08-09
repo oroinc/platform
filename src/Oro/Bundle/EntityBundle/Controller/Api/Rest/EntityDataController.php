@@ -41,9 +41,8 @@ class EntityDataController extends AbstractFOSRestController
             $statusCode = !empty($data) ? Response::HTTP_OK : Response::HTTP_NO_CONTENT;
             $view = $this->view($data, $statusCode);
         }
-        $response = parent::handleView($view);
 
-        return $response;
+        return $this->handleView($view);
     }
 
     /**

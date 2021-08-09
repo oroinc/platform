@@ -170,20 +170,24 @@ abstract class OroKernel extends Kernel
         foreach ($bundles as $bundle) {
             $kernel = false;
             $priority = 0;
+            $optional = false;
 
             if (\is_array($bundle)) {
                 $class = $bundle['name'];
-                $kernel = isset($bundle['kernel']) && $bundle['kernel'];
-                $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
+                $kernel = $bundle['kernel'] ?? false;
+                $priority = (int)($bundle['priority'] ?? 0);
+                $optional = $bundle['optional'] ?? false;
             } else {
                 $class = $bundle;
             }
 
-            $result[$class] = [
-                'name'     => $class,
-                'kernel'   => $kernel,
-                'priority' => $priority
-            ];
+            if (!$optional || class_exists($class)) {
+                $result[$class] = [
+                    'name'     => $class,
+                    'kernel'   => $kernel,
+                    'priority' => $priority
+                ];
+            }
         }
 
         return $result;
@@ -197,8 +201,8 @@ abstract class OroKernel extends Kernel
      */
     public function compareBundles($a, $b)
     {
-        $p1 = (int)$a['priority'];
-        $p2 = (int)$b['priority'];
+        $p1 = (int)($a['priority'] ?? 0);
+        $p2 = (int)($b['priority'] ?? 0);
         if ($p1 === $p2) {
             // bundles with the same priority are sorted alphabetically
             return strcasecmp((string)$a['name'], (string)$b['name']);

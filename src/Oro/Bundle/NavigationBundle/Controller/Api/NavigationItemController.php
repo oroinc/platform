@@ -35,9 +35,7 @@ class NavigationItemController extends AbstractFOSRestController
 
         $items = $navigationItemsProvider->getNavigationItems($this->getUser(), $organization, $type);
 
-        return $this->handleView(
-            $this->view($items, \is_array($items) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
-        );
+        return $this->handleView($this->view($items, Response::HTTP_OK));
     }
 
     /**
@@ -63,7 +61,7 @@ class NavigationItemController extends AbstractFOSRestController
         $params['url'] = $this->normalizeUrl($params['url'], $params['type']);
         $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganization();
 
-        /** @var $entity NavigationItemInterface */
+        /** @var NavigationItemInterface $entity */
         $entity = $this->getFactory()->createItem($type, $params);
 
         if (!$entity) {
@@ -78,7 +76,6 @@ class NavigationItemController extends AbstractFOSRestController
         }
 
         $em = $this->getManager();
-
         $em->persist($entity);
         $em->flush();
 
@@ -117,7 +114,7 @@ class NavigationItemController extends AbstractFOSRestController
             );
         }
 
-        /** @var $entity NavigationItemInterface */
+        /** @var NavigationItemInterface $entity */
         $entity = $this->getFactory()->findItem($type, (int)$itemId);
 
         if (!$entity) {
@@ -135,7 +132,6 @@ class NavigationItemController extends AbstractFOSRestController
         $entity->setValues($params);
 
         $em = $this->getManager();
-
         $em->persist($entity);
         $em->flush();
 
@@ -150,7 +146,7 @@ class NavigationItemController extends AbstractFOSRestController
      */
     public function deleteIdAction(string $type, $itemId): Response
     {
-        /** @var $entity NavigationItemInterface */
+        /** @var NavigationItemInterface $entity */
         $entity = $this->getFactory()->findItem($type, (int)$itemId);
         if (!$entity) {
             return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
@@ -171,8 +167,9 @@ class NavigationItemController extends AbstractFOSRestController
      */
     protected function validatePermissions(AbstractUser $user): bool
     {
-        return is_a($user, $this->getUserClass(), true) &&
-            ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
+        return
+            is_a($user, $this->getUserClass(), true)
+            && ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
     }
 
     protected function getManager(): ObjectManager

@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -32,7 +33,13 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      */
     public function getAction(WorkflowDefinition $workflowDefinition)
     {
-        return $this->handleView($this->view($workflowDefinition, Response::HTTP_OK));
+        $config = $this->getWorkflowDefinitionSerializationConfig();
+        $entitySerializer = $this->get('oro_workflow.rest_api.entity_serializer');
+        $data = $entitySerializer->serializeEntities([$workflowDefinition], WorkflowDefinition::class, $config);
+
+        return $this->handleView(
+            $this->view($this->updateWorkflowDefinitionSerializedData($data[0], ''), Response::HTTP_OK)
+        );
     }
 
     /**
@@ -148,6 +155,55 @@ class WorkflowDefinitionController extends AbstractFOSRestController
 
             return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         }
+    }
+
+    protected function getWorkflowDefinitionSerializationConfig(): array
+    {
+        return [
+            'fields' => [
+                'entityAcls' => null,
+                'scopes' => null,
+                'steps' => null,
+                'restrictions' => ['exclude' => true]
+            ]
+        ];
+    }
+
+    /**
+     * Converts field names to snake case and remove items with NULL value.
+     */
+    protected function updateWorkflowDefinitionSerializedData(array $data, string $path): array
+    {
+        $result = [];
+        $pathPrefix = $path;
+        if ('' !== $path) {
+            $pathPrefix .= '.';
+        }
+        foreach ($data as $name => $value) {
+            if (null === $value) {
+                continue;
+            }
+            if (\is_array($value)) {
+                if (ArrayUtil::isAssoc($value)) {
+                    $value = $this->updateWorkflowDefinitionSerializedData($value, $pathPrefix . $name);
+                } else {
+                    $rows = [];
+                    foreach ($value as $k => $v) {
+                        if (\is_array($v)) {
+                            $v = $this->updateWorkflowDefinitionSerializedData($v, $pathPrefix . $name);
+                        }
+                        $rows[$k] = $v;
+                    }
+                    $value = $rows;
+                }
+            }
+            if ('configuration' !== $path) {
+                $name = strtolower(preg_replace('/[A-Z]+/', '_\\0', $name));
+            }
+            $result[$name] = $value;
+        }
+
+        return $result;
     }
 
     /**

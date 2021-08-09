@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\ORM\EntityManager;
-use Metadata\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -16,6 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
@@ -149,10 +149,11 @@ class ConfigManager
     public function getFieldMetadata($className, $fieldName)
     {
         $metadata = $this->getEntityMetadata($className);
+        if (null === $metadata) {
+            return null;
+        }
 
-        return $metadata && isset($metadata->propertyMetadata[$fieldName])
-            ? $metadata->propertyMetadata[$fieldName]
-            : null;
+        return $metadata->fieldMetadata[$fieldName] ?? null;
     }
 
     /**

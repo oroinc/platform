@@ -56,7 +56,7 @@ class WidgetController extends AbstractController
             }
         );
 
-        /* @var $translationHelper TransitionTranslationHelper */
+        /* @var TransitionTranslationHelper $translationHelper */
         $translationHelper = $this->get(TransitionTranslationHelper::class);
 
         return [
