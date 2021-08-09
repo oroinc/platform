@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -62,7 +61,6 @@ class Email extends ExtendEmail
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -70,7 +68,6 @@ class Email extends ExtendEmail
      * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
-     * @JMS\Type("dateTime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -87,7 +84,6 @@ class Email extends ExtendEmail
      * Max length is 998 see RFC 2822, section 2.1.1 (https://tools.ietf.org/html/rfc2822#section-2.1.1)
      *
      * @ORM\Column(name="subject", type="string", length=998)
-     * @JMS\Type("string")
      */
     protected $subject;
 
@@ -95,7 +91,6 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="from_name", type="string", length=320)
-     * @JMS\Type("string")
      */
     protected $fromName;
 
@@ -104,7 +99,6 @@ class Email extends ExtendEmail
      *
      * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER", cascade={"persist"})
      * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
-     * @JMS\Exclude
      */
     protected $fromEmailAddress;
 
@@ -120,7 +114,6 @@ class Email extends ExtendEmail
      * @var \DateTime
      *
      * @ORM\Column(name="sent", type="datetime")
-     * @JMS\Type("DateTime")
      */
     protected $sentAt;
 
@@ -128,7 +121,6 @@ class Email extends ExtendEmail
      * @var integer
      *
      * @ORM\Column(name="importance", type="integer")
-     * @JMS\Type("integer")
      */
     protected $importance;
 
@@ -136,7 +128,6 @@ class Email extends ExtendEmail
      * @var \DateTime
      *
      * @ORM\Column(name="internaldate", type="datetime")
-     * @JMS\Type("DateTime")
      */
     protected $internalDate;
 
@@ -144,7 +135,6 @@ class Email extends ExtendEmail
      * @var bool
      *
      * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
-     * @JMS\Type("boolean")
      */
     protected $head = true;
 
@@ -152,7 +142,6 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="message_id", type="string", length=255)
-     * @JMS\Type("string")
      */
     protected $messageId;
 
@@ -160,7 +149,6 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="multi_message_id", type="text", nullable=true)
-     * @JMS\Type("string")
      */
     protected $multiMessageId;
 
@@ -168,7 +156,6 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="x_message_id", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
      */
     protected $xMessageId;
 
@@ -177,7 +164,6 @@ class Email extends ExtendEmail
      *
      * @ORM\ManyToOne(targetEntity="EmailThread", inversedBy="emails", fetch="EAGER")
      * @ORM\JoinColumn(name="thread_id", referencedColumnName="id", nullable=true)
-     * @JMS\Exclude
      */
     protected $thread;
 
@@ -185,7 +171,6 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="x_thread_id", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
      */
     protected $xThreadId;
 
@@ -193,7 +178,6 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="refs", type="text", nullable=true)
-     * @JMS\Type("string")
      */
     protected $refs;
 
@@ -202,7 +186,6 @@ class Email extends ExtendEmail
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailBody", inversedBy="email", cascade={"persist"})
      * @ORM\JoinColumn(name="email_body_id", referencedColumnName="id", onDelete="SET NULL")
-     * @JMS\Exclude
      */
     protected $emailBody;
 
@@ -211,7 +194,6 @@ class Email extends ExtendEmail
      *
      * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
      *      cascade={"remove"}, orphanRemoval=true)
-     * @JMS\Exclude
      */
     protected $emailUsers;
 

@@ -25,6 +25,24 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_platform.serializer.fix_skip_null_values_array_normalizer:
+        class: Oro\Bundle\PlatformBundle\Serializer\Normalizer\FixSkipNullValuesArrayNormalizer
+        tags:
+            - { name: serializer.normalizer, priority: -1000 } # run after all custom normalizers
+
+    oro_platform.fix_json_status_code_error_renderer:
+        class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixJsonStatusCodeErrorRenderer
+        decorates: error_renderer.serializer
+        arguments:
+            - '@oro_platform.fix_json_status_code_error_renderer.inner'
+            - ['application/json', 'application/x-json']
+
+    oro_platform.fos_rest.fix_message_flatten_exception_normalizer:
+        class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixMessageFlattenExceptionNormalizer
+        decorates: fos_rest.serializer.flatten_exception_normalizer
+        arguments:
+            - '@oro_platform.fos_rest.fix_message_flatten_exception_normalizer.inner'
+
     oro_platform.service_link.service_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator
         arguments:

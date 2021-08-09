@@ -8,6 +8,7 @@ define(function(require, exports, module) {
     const loadModules = require('oroui/js/app/services/load-modules');
     const mapFilterModuleName = require('orofilter/js/map-filter-module-name');
     let FiltersManager = require('orofilter/js/collection-filters-manager');
+    const FiltersNavigationComponent = require('orofilter/js/filters-navigation-component.js').default;
     const FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
     let config = require('module-config').default(module.id);
     const cachedFilters = {};
@@ -60,7 +61,7 @@ define(function(require, exports, module) {
                 methods.combineOptions.call(this),
                 _.pick(this, 'collection'),
                 _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
-                    'useFiltersStateAnimationOnInit'),
+                    'useFiltersStateAnimationOnInit', 'enableFiltersNavigation'),
                 this.metadata.options.filtersManager
             );
 
@@ -101,6 +102,13 @@ define(function(require, exports, module) {
 
             this.grid.filterManager = filtersList;
             this.grid.trigger('filterManager:connected');
+
+            const {enableFiltersNavigation = true} = options;
+            if (enableFiltersNavigation) {
+                this.grid.filtersNavigationComponent = new FiltersNavigationComponent({
+                    filters: options.filters
+                });
+            }
 
             this.deferred.resolve(filtersList);
         },

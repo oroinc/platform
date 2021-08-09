@@ -11,10 +11,3 @@ response:
                 entity_label: "oro.testframework.item.entity_label"
                 record_string: "item5@mail.com 0123-456500"
                 record_url: http://localhost%oro_default_prefix%search/
-    soap:
-        data:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: "item5@mail.com 0123-456500"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []

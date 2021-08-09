@@ -10,7 +10,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailTranslationView(options) {
             EmailTranslationView.__super__.constructor.call(this, options);

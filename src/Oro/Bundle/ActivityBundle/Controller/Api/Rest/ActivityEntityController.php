@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityApiEntityManager;
 use Oro\Bundle\ActivityBundle\Exception\InvalidArgumentException;
@@ -17,10 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * API CRUD controller for activity entities.
- *
- * @RouteResource("activity_relation")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for activity entities.
  */
 class ActivityEntityController extends RestController
 {
@@ -30,11 +22,6 @@ class ActivityEntityController extends RestController
      * @param Request $request
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
-     *
-     * @Get(
-     *     "/activities/{activity}/{id}/relations",
-     *      requirements={"id"="\d+"}
-     * )
      *
      * @QueryParam(
      *      name="page",
@@ -75,11 +62,6 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Post(
-     *     "/activities/{activity}/{id}/relations",
-     *      requirements={"id"="\d+"}
-     * )
-     *
      * @ApiDoc(
      *      description="Adds an association between an activity and a target entity",
      *      resource=true
@@ -102,11 +84,6 @@ class ActivityEntityController extends RestController
      * @param int    $id       The id of the activity entity.
      * @param string $entity   The type of the target entity.
      * @param mixed  $entityId The id of the target entity.
-     *
-     * @Delete(
-     *     "/activities/{activity}/{id}/{entity}/{entityId}",
-     *      requirements={"id"="\d+"}
-     * )
      *
      * @ApiDoc(
      *      description="Deletes an association between an activity and a target entity",

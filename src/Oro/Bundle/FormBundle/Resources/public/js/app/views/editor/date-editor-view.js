@@ -99,7 +99,7 @@ define(function(require) {
         format: datetimeFormatter.getBackendDateFormat(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateEditorView(options) {
             DateEditorView.__super__.constructor.call(this, options);

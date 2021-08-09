@@ -4,7 +4,6 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 
 use Composer\Repository\InstalledFilesystemRepository;
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
-use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
 class LocalRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,11 +15,10 @@ class LocalRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
         $repository = $factory->getLocalRepository();
         $this->assertInstanceOf(InstalledFilesystemRepository::class, $repository);
 
-        $packages = $repository->getCanonicalPackages();
-        $this->assertCount(2, $repository->getCanonicalPackages());
-
-        $this->assertEquals(OroPlatformBundle::PACKAGE_NAME, $packages[0]->getName());
-        $this->assertEquals('oro/crm', $packages[1]->getName());
+        $canonicalPackages = $repository->getCanonicalPackages();
+        $this->assertCount(2, $canonicalPackages);
+        $this->assertEquals('oro/platform', $canonicalPackages[0]->getName());
+        $this->assertEquals('oro/crm', $canonicalPackages[1]->getName());
     }
 
     public function testGetRepositoryWhenFileDoesNotExist()

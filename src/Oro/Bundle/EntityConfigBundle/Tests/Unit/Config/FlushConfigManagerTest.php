@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\ORM\EntityManager;
-use Metadata\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
@@ -17,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;

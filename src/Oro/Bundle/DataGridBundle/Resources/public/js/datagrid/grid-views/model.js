@@ -44,7 +44,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GridViewsModel(attrs, options) {
             GridViewsModel.__super__.constructor.call(this, attrs, options);

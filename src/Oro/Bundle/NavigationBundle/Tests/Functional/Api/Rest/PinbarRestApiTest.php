@@ -68,8 +68,10 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         $resultJson = json_decode($result->getContent(), true);
 
-        self::assertArrayHasKey('message', $resultJson);
-        self::assertEquals('This pin already exists', $resultJson['message']);
+        self::assertEquals(
+            ['message' => 'This pin already exists'],
+            $resultJson
+        );
     }
 
     public function testPutWhenPinWithUrl(): void
@@ -104,13 +106,32 @@ class PinbarRestApiTest extends AbstractRestApiTest
         );
 
         $resultJson = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertNotEmpty($resultJson);
-        self::assertContains(
-            $urlGenerator->generate(
-                'oro_config_configuration_system',
-                ['restore' => 1, 'sample_key' => 'sample_value']
-            ),
-            array_column($resultJson, 'url', 'id')
+        $expectedUrl = $urlGenerator->generate(
+            'oro_config_configuration_system',
+            ['restore' => 1, 'sample_key' => 'sample_value']
+        );
+        $data = [];
+        foreach ($resultJson as $item) {
+            if ($item['url'] === $expectedUrl) {
+                $data = $item;
+                break;
+            }
+        }
+        $this->assertNotEmpty($data);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('parent_id', $data);
+        unset($data['id'], $data['parent_id']);
+        self::assertEquals(
+            [
+                'url'                  => $expectedUrl,
+                'title'                => '{"type":"pinbar","route":"oro_config_configuration_system","title":{'
+                    . '"template":"oro.config.menu.system_configuration.label - oro.user.menu.system_tab.label",'
+                    . '"short_template":"oro.config.menu.system_configuration.label","params":[]},"position":0}',
+                'type'                 => 'pinbar',
+                'title_rendered'       => 'Configuration - System',
+                'title_rendered_short' => 'Configuration'
+            ],
+            $data
         );
     }
 
@@ -127,10 +148,22 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
         $resultJson = json_decode($result->getContent(), true);
-        self::assertNotEmpty($resultJson);
-        self::assertArrayHasKey('id', $resultJson[0]);
-        self::assertArrayHasKey('title_rendered', $resultJson[0]);
-        self::assertArrayHasKey('title_rendered_short', $resultJson[0]);
+        $this->assertArrayHasKey('id', $resultJson[0]);
+        $this->assertArrayHasKey('parent_id', $resultJson[0]);
+        unset($resultJson[0]['id'], $resultJson[0]['parent_id']);
+        $urlGenerator = self::getContainer()->get(UrlGeneratorInterface::class);
+        self::assertEquals(
+            [
+                'url'                  => $urlGenerator->generate('oro_config_configuration_system', ['restore' => 1]),
+                'title'                => '{"type":"pinbar","route":"oro_config_configuration_system","title":{'
+                    . '"template":"oro.config.menu.system_configuration.label - oro.user.menu.system_tab.label",'
+                    . '"short_template":"oro.config.menu.system_configuration.label","params":[]},"position":0}',
+                'type'                 => 'pinbar',
+                'title_rendered'       => 'Configuration - System',
+                'title_rendered_short' => 'Configuration'
+            ],
+            $resultJson[0]
+        );
     }
 
     private function getQueryPath(): string

@@ -15,20 +15,11 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $attributeTypeRegistry;
+    private AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject $attributeTypeRegistry;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $attributeConfigProvider;
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $attributeConfigProvider;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $configManager;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
     protected function setUp(): void
     {
@@ -36,10 +27,16 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
+        parent::setUp();
+    }
+
+    protected function createContext()
+    {
         $this->constraint = new AttributeConfiguration();
-        $this->context = $this->createContext();
-        $this->validator = $this->createValidator();
-        $this->validator->initialize($this->context);
+        $this->propertyPath = '';
+        $this->value = null;
+
+        return parent::createContext();
     }
 
     /**
@@ -54,7 +51,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testValidateWithWrongValue()
+    public function testValidateWithWrongValue(): void
     {
         $this->attributeConfigProvider->expects($this->never())
             ->method('getConfig');
@@ -67,7 +64,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateEntityIsAttributeFalse()
+    public function testValidateEntityIsAttributeFalse(): void
     {
         $className = 'ClassName';
         $entity = new EntityConfigModel($className);
@@ -92,7 +89,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateWhenFieldConfigNotAttribute()
+    public function testValidateWhenFieldConfigNotAttribute(): void
     {
         $className = 'ClassName';
         $entity = new EntityConfigModel($className);
@@ -119,7 +116,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateWithoutViolations()
+    public function testValidateWithoutViolations(): void
     {
         $className = 'ClassName';
         $entity = new EntityConfigModel($className);
@@ -155,13 +152,14 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ]);
 
         $this->validator->validate($value, $this->constraint);
+
         $this->assertNoViolation();
     }
 
     /**
      * @dataProvider validateDataProvider
      */
-    public function testValidate(array $options, array $expectedViolationParams)
+    public function testValidate(array $options, array $expectedViolationParams): void
     {
         $fieldType = 'fieldType';
         $className = 'ClassName';
@@ -197,6 +195,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ->willReturnMap($options);
 
         $this->validator->validate($value, $this->constraint);
+
         $expectedViolationParams['{{ type }}'] = $fieldType;
         $this->buildViolation($this->constraint->message)
             ->atPath('')
@@ -205,10 +204,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
             'when filterable violation' => [
@@ -244,7 +240,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testValidateMultiple()
+    public function testValidateMultiple(): void
     {
         $fieldType = 'fieldType';
         $className = 'ClassName';
@@ -285,7 +281,7 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ]);
 
         $this->validator->validate($value, $this->constraint);
-        $expectedViolationParam['{{ type }}'] = $fieldType;
+
         $this->buildViolation($this->constraint->message)
             ->atPath('')
             ->setInvalidValue(null)

@@ -36,7 +36,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SidebarView(options) {
             this.updatedWidgetsPosition = _.debounce(this.updatedWidgetsPosition.bind(this), 20);
@@ -44,7 +44,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.model.isMaximized()) {
@@ -68,7 +68,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = SidebarView.__super__.getTemplateData.call(this);
@@ -79,7 +79,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const isMaximized = this.model.isMaximized();
@@ -136,7 +136,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initItemView: function(model) {
             const subview = SidebarView.__super__.initItemView.call(this, model);
@@ -148,7 +148,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         removeViewForItem: function(item) {
             const subview = this.subview('itemView:' + item.cid);
@@ -249,7 +249,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

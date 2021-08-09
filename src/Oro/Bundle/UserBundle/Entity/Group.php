@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -46,7 +45,6 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class Group extends ExtendGroup
 {
@@ -54,15 +52,11 @@ class Group extends ExtendGroup
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *  defaultValues={
      *    "importexport"={

@@ -26,6 +26,10 @@ The current file describes significant changes in the code that may affect the u
 
 #### EntityBundle
 * The service `oro_entity.abstract_entity_manager` was removed.
+* `Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getFields()` was removed,
+  use `Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getEntityFields()` instead.
+* `Oro\Bundle\EntityBundle\Helper\FieldHelper::getFields()` was removed,
+  use `Oro\Bundle\EntityBundle\Helper\FieldHelper::getEntityFields()` instead.
 
 #### EntityMergeBundle
 * The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.

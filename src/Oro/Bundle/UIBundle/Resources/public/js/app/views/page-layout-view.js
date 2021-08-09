@@ -9,9 +9,33 @@ define(function(require) {
     const utils = Chaplin.utils;
 
     const PageLayoutView = Chaplin.Layout.extend({
-        events: {
-            'submit form': 'onSubmit',
-            'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
+        _controllerIsReady: false,
+
+        events() {
+            const events = {};
+
+            if (this._controllerIsReady) {
+                Object.assign(events, {
+                    'submit form': 'onSubmit',
+                    'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
+                });
+
+                if (this.settings.routeLinks) {
+                    // extracted from `startLinkRouting` Chaplin's method
+                    Object.assign(events, {
+                        [`click ${this.settings.routeLinks}`]: 'openLink'
+                    });
+                }
+            }
+
+            if (!this.settings.routeLinks) {
+                // in case route links is turned of -- prevent navigation on empty hash
+                Object.assign(events, {
+                    'click a[href="#"]': event => event.preventDefault()
+                });
+            }
+
+            return events;
         },
 
         listen: {
@@ -20,21 +44,20 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageLayoutView(options) {
             PageLayoutView.__super__.constructor.call(this, options);
 
-            if (!this.settings.routeLinks) {
-                // in case route links is turned of -- prevent navigation on empty hash
-                this.delegate('click', 'a[href="#"]', function(event) {
-                    event.preventDefault();
-                });
-            }
+            this.listenToOnce(mediator, 'page:update', () => {
+                this._controllerIsReady = true;
+                // re-delegate event handlers once controller is ready to process navigation actions
+                this.delegateEvents();
+            });
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this.$el.attr({'data-layout': 'separate'});
@@ -94,6 +117,18 @@ define(function(require) {
                 }
             }
         },
+
+        /**
+         * Overloaded original Chaplin's method,
+         * Click link handler now described in events list and available only when controller is ready
+         */
+        startLinkRouting() {},
+
+        /**
+         * Overloaded original Chaplin's method,
+         * Click link handler now described in events list and available only when controller is ready
+         */
+        stopLinkRouting() {},
 
         /**
          * Fixes issues
@@ -209,6 +244,8 @@ define(function(require) {
                 return;
             }
 
+            this.beforeSerializeHook($form);
+
             if (url && method.toUpperCase() === 'GET') {
                 data = $form.serialize();
                 if (data) {
@@ -228,6 +265,28 @@ define(function(require) {
 
         onRefreshClick: function() {
             mediator.execute('refreshPage');
+        },
+
+        /**
+         * Hook before serialize form data
+         * @param {jQuery.Element} $form
+         */
+        beforeSerializeHook($form) {
+            this.syncDependentHiddenInput($form);
+        },
+
+        /**
+         * Prepare checkbox unchecked value for form data
+         * @param {jQuery.Element} $form
+         */
+        syncDependentHiddenInput($form) {
+            $form.find('input[type="checkbox"]').each((index, checkbox) => {
+                const checkboxHiddenField = document.querySelector(`#${checkbox.id}-hidden`);
+
+                if (checkboxHiddenField && checkbox.name === checkboxHiddenField.name) {
+                    checkboxHiddenField.disabled = checkbox.checked;
+                }
+            });
         }
     });
 

@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -27,7 +27,9 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
  * The base class for REST API controllers that implement GET HTTP method.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
+abstract class RestGetController extends AbstractFOSRestController implements
+    EntityManagerAwareInterface,
+    RestApiReadInterface
 {
     const ITEMS_PER_PAGE = 10;
 
@@ -270,7 +272,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $criteria = Criteria::create();
 
         foreach ($filters as $filterName => $data) {
-            list($operator, $value) = $data;
+            [$operator, $value] = $data;
 
             $normaliser = isset($normalisers[$filterName]) ? $normalisers[$filterName] : false;
             if ($normaliser) {

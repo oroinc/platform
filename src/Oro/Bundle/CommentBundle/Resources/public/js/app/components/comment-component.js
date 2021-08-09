@@ -13,14 +13,14 @@ define(function(require) {
 
     const CommentComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CommentComponent(options) {
             CommentComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = options || {};

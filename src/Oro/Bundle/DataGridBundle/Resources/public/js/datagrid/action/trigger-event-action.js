@@ -15,14 +15,14 @@ define([
      */
     const TriggerEventAction = ModelAction.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TriggerEventAction(options) {
             TriggerEventAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         execute: function() {
             const scope = this.datagrid.getGridScope();

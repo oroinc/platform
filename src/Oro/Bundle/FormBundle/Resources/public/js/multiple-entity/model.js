@@ -18,7 +18,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityModel(attrs, options) {
             EntityModel.__super__.constructor.call(this, attrs, options);

@@ -21,7 +21,7 @@ define([
         deferredRender: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageRegionView(options) {
             PageRegionView.__super__.constructor.call(this, options);

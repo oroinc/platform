@@ -4,22 +4,16 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Driver;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver;
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAnnotationTests;
 
 class AnnotationDriverTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadMetadataForClass()
     {
-        $reader = new AnnotationReader();
-        $driver = new AnnotationDriver($reader);
+        $driver = new AnnotationDriver(new AnnotationReader());
 
-        /** @var EntityMetadata $metadata */
-        $metadata = $driver->loadMetadataForClass(
-            new \ReflectionClass('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAnnotationTests')
-        );
+        $metadata = $driver->loadMetadataForClass(new \ReflectionClass(EntityForAnnotationTests::class));
 
-        $this->assertTrue($metadata->configurable);
         $this->assertEquals('test_route_name', $metadata->routeName);
         $this->assertEquals('test_route_view', $metadata->routeView);
         $this->assertEquals('test_route_create', $metadata->routeCreate);
@@ -36,15 +30,13 @@ class AnnotationDriverTest extends \PHPUnit\Framework\TestCase
             $metadata->defaultValues
         );
 
-        $this->assertCount(2, $metadata->propertyMetadata);
-        /** @var FieldMetadata $nameFieldMetadata */
-        $idFieldMetadata = $metadata->propertyMetadata['id'];
+        $this->assertCount(2, $metadata->fieldMetadata);
+        $idFieldMetadata = $metadata->fieldMetadata['id'];
         $this->assertEquals('id', $idFieldMetadata->name);
         $this->assertNull($idFieldMetadata->mode);
         $this->assertNull($idFieldMetadata->defaultValues);
 
-        /** @var FieldMetadata $nameFieldMetadata */
-        $nameFieldMetadata = $metadata->propertyMetadata['name'];
+        $nameFieldMetadata = $metadata->fieldMetadata['name'];
 
         $this->assertEquals('name', $nameFieldMetadata->name);
         $this->assertEquals('default', $nameFieldMetadata->mode);
@@ -60,13 +52,9 @@ class AnnotationDriverTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadMetadataForClassForNonConfigurableEntity()
     {
-        $reader = new AnnotationReader();
-        $driver = new AnnotationDriver($reader);
+        $driver = new AnnotationDriver(new AnnotationReader());
 
-        /** @var EntityMetadata $metadata */
-        $metadata = $driver->loadMetadataForClass(
-            new \ReflectionClass('\stdClass')
-        );
+        $metadata = $driver->loadMetadataForClass(new \ReflectionClass(\stdClass::class));
 
         $this->assertNull($metadata);
     }

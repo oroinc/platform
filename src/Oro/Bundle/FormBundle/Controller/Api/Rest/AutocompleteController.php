@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
@@ -12,9 +12,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * Autocomplete search API resource.
+ * REST API controller for autocomplete functionality.
  */
-class AutocompleteController extends FOSRestController
+class AutocompleteController extends AbstractFOSRestController
 {
     /**
      * @ApiDoc(

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -73,7 +74,10 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     public function getFieldHeaderWithRelation($entityClassName, $initialFieldName, $isSearchingIdentityField = false)
     {
         $expectedFields = [$initialFieldName];
-        $fields = $this->fieldHelper->getFields($entityClassName, true);
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityClassName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
         $dotPosition = strpos($initialFieldName, '.');
         if ($dotPosition && $this->attributeConfigHelper) {
@@ -206,7 +210,10 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel = 0
     ) {
         // get fields data
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
         $rules = [];
         $defaultOrder = self::DEFAULT_ORDER;
@@ -268,7 +275,10 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $multipleRelationDeepLevel = 0
     ) {
         // get fields data
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields(
+            $entityName,
+            EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
 
         $rules = [];
         $backendHeaders = [];

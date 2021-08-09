@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -24,10 +24,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * REST API Workflow controller
- * @Rest\NamePrefix("oro_api_workflow_")
+ * REST API controller for workflows.
  */
-class WorkflowController extends FOSRestController
+class WorkflowController extends AbstractFOSRestController
 {
     /**
      * Returns:
@@ -37,11 +36,6 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Post(
-     *      "/api/rest/{version}/workflow/start/{workflowName}/{transitionName}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Start workflow for entity from transition", resource=true)
      *
      * @param string $workflowName
@@ -107,12 +101,7 @@ class WorkflowController extends FOSRestController
         }
 
         return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem
-                ),
-                Response::HTTP_OK
-            )
+            $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
     }
 
@@ -166,11 +155,6 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Post(
-     *      "/api/rest/{version}/workflow/transit/{workflowItemId}/{transitionName}",
-     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Perform transition for workflow item", resource=true)
      *
@@ -194,26 +178,19 @@ class WorkflowController extends FOSRestController
             return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem,
-                    'redirectUrl' => $workflowItem->getResult()->redirectUrl,
-                ),
-                Response::HTTP_OK
-            )
-        );
+        $data = ['workflowItem' => $this->serializeWorkflowItem($workflowItem)];
+        $redirectUrl = $workflowItem->getResult()->redirectUrl;
+        if ($redirectUrl) {
+            $data['redirectUrl'] = $redirectUrl;
+        }
+
+        return $this->handleView($this->view($data, Response::HTTP_OK));
     }
 
     /**
      * Returns
      * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
      *
-     * @Rest\Get(
-     *      "/api/rest/{version}/workflow/{workflowItemId}",
-     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Get workflow item", resource=true)
      *
@@ -223,12 +200,7 @@ class WorkflowController extends FOSRestController
     public function getAction(WorkflowItem $workflowItem)
     {
         return $this->handleView(
-            $this->view(
-                array(
-                    'workflowItem' => $workflowItem
-                ),
-                Response::HTTP_OK
-            )
+            $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
     }
 
@@ -238,11 +210,6 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_NO_CONTENT (204)
      *
-     * @Rest\Delete(
-     *      "/api/rest/{version}/workflow/{workflowItemId}",
-     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Delete workflow item", resource=true)
      *
@@ -252,6 +219,7 @@ class WorkflowController extends FOSRestController
     public function deleteAction(WorkflowItem $workflowItem)
     {
         $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
+
         return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 
@@ -261,11 +229,6 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (200)
      *
-     * @Rest\Post(
-     *      "/api/rest/{version}/workflow/activate/{workflowDefinition}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Activate workflow", resource=true)
      *
      * @param WorkflowDefinition $workflowDefinition
@@ -280,10 +243,10 @@ class WorkflowController extends FOSRestController
 
         return $this->handleView(
             $this->view(
-                array(
+                [
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow activated')
-                ),
+                ],
                 Response::HTTP_OK
             )
         );
@@ -295,11 +258,6 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (204)
      *
-     * @Rest\Post(
-     *      "/api/rest/{version}/workflow/deactivate/{workflowDefinition}",
-     *      requirements={"version"="latest|v1"},
-     *      defaults={"version"="latest", "_format"="json"}
-     * )
      * @ApiDoc(description="Deactivate workflow", resource=true)
      *
      * @param WorkflowDefinition $workflowDefinition
@@ -314,10 +272,10 @@ class WorkflowController extends FOSRestController
 
         return $this->handleView(
             $this->view(
-                array(
+                [
                     'successful' => true,
                     'message' => $this->get('translator')->trans('Workflow deactivated')
-                ),
+                ],
                 Response::HTTP_OK
             )
         );
@@ -330,20 +288,25 @@ class WorkflowController extends FOSRestController
      */
     protected function handleError($message, $code)
     {
-        return $this->handleView(
-            $this->view(
-                $this->formatErrorResponse($message),
-                $code
-            )
-        );
+        return $this->handleView($this->view(['message' => $message], $code));
     }
 
     /**
-     * @param string $message
-     * @return array
+     * {@inheritDoc}
      */
-    protected function formatErrorResponse($message)
+    protected function handleView(View $view)
     {
-        return array('message' => $message);
+        $view->getContext()->setSerializeNull(true);
+
+        return parent::handleView($view);
+    }
+
+    protected function serializeWorkflowItem(?WorkflowItem $workflowItem): ?array
+    {
+        if (null === $workflowItem) {
+            return null;
+        }
+
+        return $this->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
     }
 }

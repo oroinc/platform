@@ -34,7 +34,7 @@ define([
         backUrlParameter: 'back',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ModelAction(options) {
             ModelAction.__super__.constructor.call(this, options);

@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CommentsNoDataView(options) {
             CommentsNoDataView.__super__.constructor.call(this, options);

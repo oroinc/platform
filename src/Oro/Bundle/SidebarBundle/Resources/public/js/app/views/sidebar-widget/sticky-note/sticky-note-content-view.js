@@ -10,14 +10,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StickyNoteContentView(options) {
             StickyNoteContentView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const settings = this.model.get('settings') || {};

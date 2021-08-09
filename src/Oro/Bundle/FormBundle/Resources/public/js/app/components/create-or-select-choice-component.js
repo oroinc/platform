@@ -32,7 +32,7 @@ define(function(require) {
         disabledEditForm: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CreateOrSelectChoiceComponent(options) {
             CreateOrSelectChoiceComponent.__super__.constructor.call(this, options);

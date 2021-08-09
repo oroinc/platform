@@ -20,7 +20,7 @@ define(function(require) {
         template: require('tpl-loader!../templates/tag-list.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TagView(options) {
             TagView.__super__.constructor.call(this, options);

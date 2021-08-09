@@ -40,14 +40,14 @@ define(function(require) {
         loadedMetadata: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ChoiceTreeFilter(options) {
             ChoiceTreeFilter.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ChoiceTreeFilter.__super__.initialize.call(this, options);
@@ -84,7 +84,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _initSelect2Component: function() {
             if (!this.loadedMetadata) {
@@ -141,7 +141,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             return {
@@ -159,7 +159,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getCriteriaHint: function(...args) {
             const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();

@@ -12,7 +12,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateValidationMessageHandlerView(options) {
             DateValidationMessageHandlerView.__super__.constructor.call(this, options);

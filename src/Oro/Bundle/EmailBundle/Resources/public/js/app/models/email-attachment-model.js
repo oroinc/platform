@@ -22,7 +22,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailAttachmentModel(...args) {
             EmailAttachmentModel.__super__.constructor.apply(this, args);

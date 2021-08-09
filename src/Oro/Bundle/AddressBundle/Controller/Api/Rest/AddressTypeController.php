@@ -2,19 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\AddressBundle\Entity\AddressType;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("addresstype")
- * @NamePrefix("oro_api_")
+ * REST API controller for address types.
  */
-class AddressTypeController extends FOSRestController implements ClassResourceInterface
+class AddressTypeController extends RestGetController
 {
     /**
      * REST GET list
@@ -27,11 +22,7 @@ class AddressTypeController extends FOSRestController implements ClassResourceIn
      */
     public function cgetAction()
     {
-        $items = $this->getDoctrine()->getRepository('OroAddressBundle:AddressType')->findAll();
-
-        return $this->handleView(
-            $this->view($items, is_array($items) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
-        );
+        return $this->handleGetListRequest(1, PHP_INT_MAX);
     }
 
     /**
@@ -47,15 +38,15 @@ class AddressTypeController extends FOSRestController implements ClassResourceIn
      */
     public function getAction($name)
     {
-        if (!$name) {
-            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
-        }
+        return $this->handleGetRequest($name);
+    }
 
-        /** @var $item AddressType */
-        $item = $this->getDoctrine()->getRepository('OroAddressBundle:AddressType')->find($name);
 
-        return $this->handleView(
-            $this->view($item, is_object($item) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
-        );
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        return $this->get('oro_address.api.manager.address_type');
     }
 }

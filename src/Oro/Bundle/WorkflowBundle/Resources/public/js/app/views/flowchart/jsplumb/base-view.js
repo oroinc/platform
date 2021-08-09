@@ -5,7 +5,7 @@ define(function(require) {
 
     const FlowchartJsPlumbBaseView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartJsPlumbBaseView(options) {
             FlowchartJsPlumbBaseView.__super__.constructor.call(this, options);

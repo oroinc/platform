@@ -73,14 +73,14 @@ define(function(require) {
 
     const EmbeddedFormWatcher = Backbone.View.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmbeddedFormWatcher(options) {
             EmbeddedFormWatcher.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!_.isObject(options)) {

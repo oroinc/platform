@@ -8,14 +8,14 @@ define(function(require) {
         optionNames: BaseView.prototype.optionNames.concat(['wid']),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TransitionErrorView(options) {
             TransitionErrorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             widgetManager.getWidgetInstance(this.wid, function(widget) {

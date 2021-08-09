@@ -19,7 +19,7 @@ define(function(require) {
         group_title: __('oro.ui.unload_message.group_title'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UnloadMessagesGroup(options) {
             if (options.single) {

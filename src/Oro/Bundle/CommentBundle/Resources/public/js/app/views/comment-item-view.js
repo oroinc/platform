@@ -29,7 +29,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CommentItemView(options) {
             CommentItemView.__super__.constructor.call(this, options);

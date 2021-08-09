@@ -9,7 +9,7 @@ define(function(require) {
 
     const SegmentConditionView = AbstractConditionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SegmentConditionView(options) {
             SegmentConditionView.__super__.constructor.call(this, options);

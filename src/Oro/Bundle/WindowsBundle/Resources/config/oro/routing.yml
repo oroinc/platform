@@ -1,9 +1,60 @@
-oro_windows_api:
-    resource: Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController
-    type: rest
-    prefix: api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
+#
+# OLD REST API ROUTES
+#
+
+oro_api_cget_windows:
+    path: '/api/rest/{version}/windows.{_format}'
+    methods: [GET]
     defaults:
+        _controller: 'Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController::cgetAction'
+        _format: json
         version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_windows:
+    path: '/api/rest/{version}/windows.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_post_windows:
+    path: '/api/rest/{version}/windows.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_windows:
+    path: '/api/rest/{version}/windows/{windowId}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        windowId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_windows:
+    path: '/api/rest/{version}/windows/{windowId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        windowId: \d+
+        _format: json
+        version: latest|v1

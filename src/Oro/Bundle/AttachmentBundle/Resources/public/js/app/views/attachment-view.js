@@ -11,7 +11,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttachmentView(options) {
             AttachmentView.__super__.constructor.call(this, options);

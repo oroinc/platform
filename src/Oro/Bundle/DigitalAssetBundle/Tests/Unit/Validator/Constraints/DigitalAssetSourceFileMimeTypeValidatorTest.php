@@ -111,10 +111,11 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
     public function testValidateWhenImage(): void
     {
+        $imageMimeType = 'image/type';
         $file = $this->createMock(ComponentFile::class);
         $file->expects($this->any())
             ->method('getMimeType')
-            ->willReturn($imageMimeType = 'image/type');
+            ->willReturn($imageMimeType);
 
         $sourceFile = $this->createMock(File::class);
         $sourceFile->expects($this->any())
@@ -139,8 +140,9 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
     public function testValidateWhenPersistentCollection(): void
     {
+        $entityManager = $this->createMock(EntityManager::class);
         $childFiles = new PersistentCollection(
-            $entityManager = $this->createMock(EntityManager::class),
+            $entityManager,
             $this->createMock(ClassMetadata::class),
             new ArrayCollection()
         );
@@ -167,8 +169,10 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
      *
      * @return DigitalAsset
      */
-    private function mockDigitalAsset(Collection $childFiles, $uploadedFile): DigitalAsset
+    private function mockDigitalAsset(Collection $childFiles, ComponentFile $uploadedFile): DigitalAsset
     {
+        $fileMimeType = 'file/type';
+
         $sourceFile = $this->createMock(File::class);
         $sourceFile->expects($this->any())
             ->method('getFile')
@@ -176,7 +180,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
         $uploadedFile->expects($this->any())
             ->method('getMimeType')
-            ->willReturn($fileMimeType = 'file/type');
+            ->willReturn($fileMimeType);
 
         $this->mimeTypeChecker->expects($this->any())
             ->method('isImageMimeType')
@@ -229,7 +233,8 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
     private function mockChildFiles(): Collection
     {
-        $childFiles = new ArrayCollection([$childFile = $this->createMock(File::class)]);
+        $childFile = $this->createMock(File::class);
+        $childFiles = new ArrayCollection([$childFile]);
         $childFile->expects($this->any())
             ->method('getParentEntityClass')
             ->willReturn(self::SAMPLE_CLASS);
@@ -259,10 +264,12 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
     private function mockFieldConfigModel(string $type): void
     {
+        $fieldConfigModel = $this->createMock(FieldConfigModel::class);
+
         $this->entityConfigManager->expects($this->once())
             ->method('getConfigFieldModel')
             ->with(self::SAMPLE_CLASS, self::SAMPLE_FIELD)
-            ->willReturn($fieldConfigModel = $this->createMock(FieldConfigModel::class));
+            ->willReturn($fieldConfigModel);
 
         $fieldConfigModel->expects($this->once())
             ->method('getType')
@@ -315,12 +322,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
         $this->entityConfigManager->expects($this->any())
             ->method('getEntityMetadata')
-            ->willReturn($entityMetadata = $this->createMock(EntityMetadata::class));
-
-        $entityMetadata->expects($this->once())
-            ->method('hasRoute')
-            ->with('view', true)
-            ->willReturn(false);
+            ->willReturn(new EntityMetadata(\stdClass::class));
 
         $constraint = new DigitalAssetSourceFileMimeType();
         $this->validator->validate($digitalAsset, $constraint);
@@ -343,6 +345,12 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
         $uploadedFile = $this->createMock(UploadedFile::class);
         $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile);
 
+        $viewRoute = 'sample-route';
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routeView = $viewRoute;
+
+        $entityUrl = '/sample/url';
+
         $this->mockFieldConfigModel('image');
 
         $uploadedFile->expects($this->once())
@@ -351,22 +359,12 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
         $this->entityConfigManager->expects($this->any())
             ->method('getEntityMetadata')
-            ->willReturn($entityMetadata = $this->createMock(EntityMetadata::class));
-
-        $entityMetadata->expects($this->once())
-            ->method('hasRoute')
-            ->with('view', true)
-            ->willReturn(true);
-
-        $entityMetadata->expects($this->once())
-            ->method('getRoute')
-            ->with('view')
-            ->willReturn($viewRoute = 'sample-route');
+            ->willReturn($entityMetadata);
 
         $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with($viewRoute, ['id' => self::SAMPLE_ID])
-            ->willReturn($entityUrl = '/sample/url');
+            ->willReturn($entityUrl);
 
         $constraint = new DigitalAssetSourceFileMimeType();
         $this->validator->validate($digitalAsset, $constraint);

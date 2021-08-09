@@ -11,7 +11,7 @@ define([
      */
     const SelectCellRadioEditor = Backgrid.SelectCellEditor.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         tagName: 'ul',
 
@@ -19,7 +19,7 @@ define([
         className: 'radio-ul',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: _.template('<li><input id="<%- this.model.cid + \'_\' + this.cid + \'_\' + value %>" ' +
             'name="<%- this.model.cid + \'_\' + this.cid %>" type="radio" value="<%- value %>" ' +
@@ -27,14 +27,14 @@ define([
             '<%- text %></label></li>', null, {variable: null}),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectCellRadioEditor(options) {
             SelectCellRadioEditor.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         save: function() {
             const model = this.model;

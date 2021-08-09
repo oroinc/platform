@@ -21,7 +21,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EditMassAction(options) {
             EditMassAction.__super__.constructor.call(this, options);

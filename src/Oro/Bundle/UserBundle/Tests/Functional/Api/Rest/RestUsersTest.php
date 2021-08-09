@@ -14,22 +14,19 @@ class RestUsersTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
     }
 
-    /**
-     * @return array
-     */
-    public function testCreateUser()
+    public function testCreateUser(): array
     {
         $request = [
-            "user" => [
-                "username"      => 'user_' . mt_rand(),
-                "email"         => 'test_' . mt_rand() . '@test.com',
-                "phone"         => '123-123',
-                "enabled"       => '1',
-                "plainPassword" => '1231231q',
-                "firstName"     => "firstName",
-                "lastName"      => "lastName",
-                "userRoles"     => ["3"],
-                "owner"         => "1"
+            'user' => [
+                'username'      => 'user_' . mt_rand(),
+                'email'         => 'test_' . mt_rand() . '@test.com',
+                'phone'         => '123-123',
+                'enabled'       => '1',
+                'plainPassword' => '1231231q',
+                'firstName'     => 'firstName',
+                'lastName'      => 'lastName',
+                'userRoles'     => ['3'],
+                'owner'         => '1'
             ]
         ];
         $this->client->jsonRequest(
@@ -46,16 +43,14 @@ class RestUsersTest extends WebTestCase
     /**
      * Test validation.
      * Wrong request - "plainPassword" is NOT specified.
-     *
-     * @return array
      */
-    public function testCreateUserFailed()
+    public function testCreateUserFailed(): array
     {
         $request = [
             'user' => [
                 'username'  => 'user_' . mt_rand(),
-                'firstName' => "firstName",
-                'lastName'  => "lastName",
+                'firstName' => 'firstName',
+                'lastName'  => 'lastName',
                 'email'     => 'test_' . mt_rand() . '@test . com',
                 'enabled'   => '1'
             ]
@@ -112,12 +107,8 @@ class RestUsersTest extends WebTestCase
 
     /**
      * @depends testCreateUser
-     *
-     * @param array $request
-     *
-     * @return int
      */
-    public function testUpdateUser($request)
+    public function testUpdateUser(array $request): int
     {
         //get user id
         $this->client->jsonRequest(
@@ -155,13 +146,8 @@ class RestUsersTest extends WebTestCase
 
     /**
      * Check created user
-     *
-     * @return int
-     *
-     * @param  array $result
-     * @param  array $request
      */
-    protected function assertEqualsUser($request, $result)
+    protected function assertEqualsUser(array $request, array $result): int
     {
         $flag = 1;
         foreach ($result as $key => $object) {
@@ -179,12 +165,10 @@ class RestUsersTest extends WebTestCase
     }
 
     /**
-     * @param array $request
-     *
      * @depends testCreateUser
      * @depends testUpdateUser
      */
-    public function testFilterUser($request)
+    public function testFilterUser(array $request)
     {
         $request['user']['username'] .= '_Updated';
         //get user
@@ -219,10 +203,8 @@ class RestUsersTest extends WebTestCase
 
     /**
      * @depends testUpdateUser
-     *
-     * @param int $userId
      */
-    public function testDeleteUser($userId)
+    public function testDeleteUser(int $userId)
     {
         $this->client->jsonRequest(
             'DELETE',

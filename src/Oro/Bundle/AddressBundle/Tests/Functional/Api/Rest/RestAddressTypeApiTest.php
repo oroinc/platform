@@ -8,7 +8,7 @@ class RestAddressTypeApiTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
     }
 
     /**
@@ -33,12 +33,25 @@ class RestAddressTypeApiTest extends WebTestCase
         foreach ($expected as $addressType) {
             $this->client->jsonRequest(
                 'GET',
-                $this->getUrl('oro_api_get_addresstype', array('name' => $addressType['name']))
+                $this->getUrl('oro_api_get_addresstype', ['name' => $addressType['name']])
             );
 
             $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-            $this->assertNotEmpty($result);
             $this->assertEquals($addressType, $result);
         }
+
+        $this->client->jsonRequest(
+            'GET',
+            $this->getUrl('oro_api_get_addresstype', ['name' => 'shipping'])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEquals(
+            [
+                'name'  => 'shipping',
+                'label' => 'Shipping'
+            ],
+            $result
+        );
     }
 }

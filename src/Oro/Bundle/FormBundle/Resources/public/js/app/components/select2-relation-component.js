@@ -5,7 +5,7 @@ define(function(require) {
 
     const Select2RelationComponent = Select2Component.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2RelationComponent(options) {
             Select2RelationComponent.__super__.constructor.call(this, options);

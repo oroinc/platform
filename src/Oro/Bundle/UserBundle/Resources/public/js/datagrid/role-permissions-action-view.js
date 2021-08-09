@@ -32,14 +32,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RolePermissionsActionView(options) {
             RolePermissionsActionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['accessLevels', 'action']));

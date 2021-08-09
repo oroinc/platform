@@ -41,14 +41,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function LoadMoreCollection(models, options) {
             LoadMoreCollection.__super__.constructor.call(this, models, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             LoadMoreCollection.__super__.initialize.call(this, models, options);
@@ -57,7 +57,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         parse: function(response) {
             if (!this.disposed) {
@@ -97,7 +97,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         reset: function(...args) {
             this._route.set(this.limitPropertyName, this.initialLimit, {silent: true});
@@ -106,7 +106,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onAdd: function() {
             // ignore add events during syncing
@@ -120,7 +120,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onRemove: function() {
             // ignore remove events during syncing

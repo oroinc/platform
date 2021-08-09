@@ -29,14 +29,14 @@ define(function(require) {
         showLoading: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HiddenRedirectComponent(options) {
             HiddenRedirectComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.element = options._sourceElement;
@@ -133,7 +133,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed || !this.element) {

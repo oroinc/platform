@@ -20,7 +20,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
         ),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ButtonsWidgetView(options) {
             ButtonsWidgetView.__super__.constructor.call(this, options);

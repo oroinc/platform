@@ -14,14 +14,14 @@ define(function(require) {
      */
     const WidgetPickerComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetPickerComponent(options) {
             WidgetPickerComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this._createViews(options);

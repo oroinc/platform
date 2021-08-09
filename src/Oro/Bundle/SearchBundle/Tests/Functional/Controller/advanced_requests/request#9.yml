@@ -13,13 +13,3 @@ response:
                 record_url: http://localhost%oro_default_prefix%search/
                 selected_data:
                     stringValue: item1@mail.com
-    soap:
-        data:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: "item1@mail.com 0123-456100"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData:
-                    item:
-                        key: stringValue
-                        value: item1@mail.com

@@ -7,14 +7,14 @@ define(function(require) {
         _initialAccessLevel: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PermissionModel(attrs, options) {
             PermissionModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attrs, options) {
             this._initialAccessLevel = this.get('access_level');

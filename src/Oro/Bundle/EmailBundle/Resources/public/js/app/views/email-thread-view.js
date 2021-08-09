@@ -31,14 +31,14 @@ define(function(require) {
         actionPanelSelector: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailTreadView(options) {
             EmailTreadView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['actionPanelSelector']));
@@ -51,7 +51,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.$actionPanel) {
@@ -62,7 +62,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             if (this.actionPanelSelector) {

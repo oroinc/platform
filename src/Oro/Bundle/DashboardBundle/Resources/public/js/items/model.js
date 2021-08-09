@@ -17,7 +17,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardItemsModel(attrs, options) {
             DashboardItemsModel.__super__.constructor.call(this, attrs, options);

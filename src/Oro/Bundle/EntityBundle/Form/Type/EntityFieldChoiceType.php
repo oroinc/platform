@@ -141,12 +141,12 @@ class EntityFieldChoiceType extends AbstractType
         if (null === $this->itemsCache) {
             $this->itemsCache = [];
 
-            $fields = $this->entityFieldProvider->getFields(
-                $entityName,
-                $withRelations,
-                $withVirtualFields,
-                true
-            );
+            $options = EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS
+                | EntityFieldProvider::OPTION_TRANSLATE
+                | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS;
+            $options |= $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+            $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+            $fields = $this->entityFieldProvider->getEntityFields($entityName, $options);
             foreach ($fields as $field) {
                 $fieldName = $field['name'];
                 unset($field['name']);

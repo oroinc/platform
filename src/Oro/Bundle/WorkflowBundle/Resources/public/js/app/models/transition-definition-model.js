@@ -13,14 +13,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TransitionDefinitionModel(attrs, options) {
             TransitionDefinitionModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             if (this.get('preactions') === null) {

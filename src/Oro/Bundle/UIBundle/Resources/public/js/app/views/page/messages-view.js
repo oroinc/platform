@@ -35,14 +35,14 @@ define(function(require, exports, module) {
         route: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageMessagesView(options) {
             PageMessagesView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.initializeMessenger) {
@@ -78,7 +78,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             _.each(this.messages, function(message) {
@@ -95,7 +95,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         onPageUpdate: function(pageData, actionArgs, jqXHR, promises) {
             if (this.disposed) {

@@ -23,7 +23,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
     protected function createContext()
     {
         $this->constraint = new ScheduleIntervalsIntersection();
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
@@ -33,7 +33,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
      *
      * @return ScheduleIntervalInterface[]
      */
-    private function normalizeCollection(array $collection)
+    private function normalizeCollection(array $collection): array
     {
         $collection = array_map(function ($dates) {
             return $this->normalizeSingleDateData($dates);
@@ -47,7 +47,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
      *
      * @return ScheduleIntervalInterface
      */
-    private function normalizeSingleDateData(array $dates)
+    private function normalizeSingleDateData(array $dates): ScheduleIntervalInterface
     {
         $start = (null === $dates[0]) ? null : new \DateTime($dates[0]);
         $end = (null === $dates[1]) ? null : new \DateTime($dates[1]);
@@ -62,7 +62,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
     /**
      * @dataProvider validateSuccessDataProvider
      */
-    public function testValidateSuccess(array $collection)
+    public function testValidateSuccess(array $collection): void
     {
         $collection = $this->normalizeCollection($collection);
         $holder = (new ScheduleIntervalsHolderStub())->setSchedules($collection);
@@ -75,10 +75,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
-    public function validateSuccessDataProvider()
+    public function validateSuccessDataProvider(): array
     {
         return [
             'without intersections'                                        => [
@@ -122,7 +119,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
     /**
      * @dataProvider validateFailDataProvider
      */
-    public function testValidateFail(array $collection)
+    public function testValidateFail(array $collection): void
     {
         $collection = $this->normalizeCollection($collection);
         $holder = (new ScheduleIntervalsHolderStub())->setSchedules($collection);
@@ -137,10 +134,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
             ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
-    public function validateFailDataProvider()
+    public function validateFailDataProvider(): array
     {
         return [
             'without intersections, left = null and right = null' => [
@@ -202,7 +196,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
         ];
     }
 
-    public function testNotPriceListScheduleValue()
+    public function testNotPriceListScheduleValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->validator->validate(12, new ScheduleIntervalsIntersection());

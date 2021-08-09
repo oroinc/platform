@@ -31,14 +31,23 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), $constraint);
     }
 
-    public function testValidateForValidValue()
+    /**
+     * @dataProvider validateForValidValueDataProvider
+     */
+    public function testValidateForValidValue(string $label)
     {
-        $value = (new EnumValue())->setId('valId')->setLabel('valLabel');
-
+        $value = (new EnumValue())->setLabel($label);
         $constraint = new Constraints\EnumValue();
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function validateForValidValueDataProvider(): \Generator
+    {
+        yield ['label' => 'valLabel'];
+        yield ['label' => '0\''];
+        yield ['label' => '0'];
     }
 
     public function testValidateEmptyValue()
@@ -62,16 +71,24 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateForInvalidValue()
+    /**
+     * @dataProvider validateForInvalidValueDataProvider
+     */
+    public function testValidateForInvalidValue($label)
     {
-        $value = (new EnumValue())->setLabel('+');
-
+        $value = (new EnumValue())->setLabel($label);
         $constraint = new Constraints\EnumValue();
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation($constraint->message)
-            ->setParameter('{{ value }}', '+')
+            ->setParameter('{{ value }}', $label)
             ->atPath('property.path[label]')
             ->assertRaised();
+    }
+
+    public function validateForInvalidValueDataProvider(): \Generator
+    {
+        yield ['label' => '+'];
+        yield ['label' => ' '];
     }
 }

@@ -12,14 +12,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatePickerTabsView(options) {
             DatePickerTabsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['data', 'template']));
@@ -27,7 +27,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const data = this.getTemplateData();
@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {*}
          */
         getTemplateData: function() {

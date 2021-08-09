@@ -18,7 +18,7 @@ define([
         formatter: new CellFormatter(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RelationCell(options) {
             RelationCell.__super__.constructor.call(this, options);

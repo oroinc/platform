@@ -12,7 +12,7 @@ define(function(require) {
         labelSelector: '[data-purpose=label]',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColumnFormView(options) {
             ColumnFormView.__super__.constructor.call(this, options);

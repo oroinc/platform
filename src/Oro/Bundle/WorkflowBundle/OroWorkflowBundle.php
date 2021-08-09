@@ -24,6 +24,7 @@ class OroWorkflowBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new Compiler\DebugWorkflowItemSerializerPass());
         $container->addCompilerPass(new Compiler\AddWorkflowValidationLoaderCompilerPass());
         $container->addCompilerPass(new RegisterListenersPass(
             'oro_workflow.changes.event.dispatcher',

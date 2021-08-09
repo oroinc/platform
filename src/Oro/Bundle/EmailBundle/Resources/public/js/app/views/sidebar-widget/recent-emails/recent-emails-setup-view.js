@@ -16,14 +16,14 @@ define(function(require) {
         foldersData: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RecentEmailsContentView(options) {
             RecentEmailsContentView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             RecentEmailsContentView.__super__.initialize.call(this, options);

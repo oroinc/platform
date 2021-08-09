@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -16,12 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * API CRUD controller for BusinessUnit entity.
- *
- * @RouteResource("businessunit")
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for BusinessUnit entity.
  */
-class BusinessUnitController extends RestController implements ClassResourceInterface
+class BusinessUnitController extends RestController
 {
     /**
      * REST GET list
@@ -40,11 +33,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * )
      * @ApiDoc(
      *      description="Get all business units items",
-     *      resource=true,
-     *      filters={
-     *          {"name"="page", "dataType"="integer"},
-     *          {"name"="limit", "dataType"="integer"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_business_unit_view")
      * @param Request $request
@@ -77,8 +66,6 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      *
      * @param int $id Business unit item id
      *
-     * @Rest\Put(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Update business unit",
      *      resource=true
@@ -95,8 +82,6 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * REST GET item
      *
      * @param int $id
-     *
-     * @Rest\Get(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Get business unit item",
@@ -155,8 +140,6 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      *
      * @param int $id
      *
-     * @Rest\Delete(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Delete business unit",
      *      resource=true
@@ -175,7 +158,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getManager()
     {
@@ -183,7 +166,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getForm()
     {
@@ -191,7 +174,7 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {

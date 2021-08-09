@@ -35,14 +35,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExportAction(options) {
             ExportAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * {@inheritdoc}
+         * @inheritdoc
          */
         initialize: function(options) {
             this.route = 'oro_datagrid_export_action';
@@ -57,7 +57,7 @@ define([
         },
 
         /**
-         * {@inheritdoc}
+         * @inheritdoc
          */
         createLauncher: function(options) {
             const launcher = ExportAction.__super__.createLauncher.call(this, options);
@@ -78,14 +78,14 @@ define([
         },
 
         /**
-         * {@inheritdoc}
+         * @inheritdoc
          */
         getActionParameters: function() {
             return _.extend({format: this.actionKey}, this.collection.getFetchData());
         },
 
         /**
-         * {@inheritdoc}
+         * @inheritdoc
          */
         _onAjaxError: function(jqXHR) {
             mediator.execute('showFlashMessage', 'error', this.messages.fail);

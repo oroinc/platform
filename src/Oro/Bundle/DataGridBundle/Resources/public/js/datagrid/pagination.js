@@ -48,7 +48,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Pagination(options) {
             Pagination.__super__.constructor.call(this, options);

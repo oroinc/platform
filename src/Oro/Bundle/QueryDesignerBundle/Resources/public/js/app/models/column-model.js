@@ -14,7 +14,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GroupingModel(...args) {
             GroupingModel.__super__.constructor.apply(this, args);

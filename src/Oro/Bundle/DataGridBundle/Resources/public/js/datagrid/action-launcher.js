@@ -106,7 +106,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionLauncher(options) {
             ActionLauncher.__super__.constructor.call(this, options);
@@ -154,7 +154,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

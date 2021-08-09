@@ -40,14 +40,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageMainMenuView(options) {
             PageMainMenuView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             // Array of search callback, that match route to menu item

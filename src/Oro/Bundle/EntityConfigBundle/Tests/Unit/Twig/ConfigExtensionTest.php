@@ -88,15 +88,13 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|null $inputScope
-     *
      * @dataProvider getFieldConfigDataProvider
      */
-    public function testGetFieldConfig($inputScope)
+    public function testGetFieldConfig(?string $inputScope)
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
-        $config    = array('key' => 'value');
+        $config = ['key' => 'value'];
 
         $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
 
@@ -140,16 +138,16 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $actualConfig);
     }
 
-    public function getFieldConfigDataProvider()
+    public function getFieldConfigDataProvider(): array
     {
-        return array(
-            'default scope'   => array(
-                'inputScope'    => null,
-            ),
-            'specified scope' => array(
-                'inputScope'    => 'test',
-            ),
-        );
+        return [
+            'default scope'   => [
+                'inputScope' => null
+            ],
+            'specified scope' => [
+                'inputScope' => 'test'
+            ]
+        ];
     }
 
     public function testGetFieldConfigValueForNullClassName()
@@ -180,16 +178,14 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|null $inputScope
-     *
      * @dataProvider getFieldConfigValueDataProvider
      */
-    public function testGetFieldConfigValue($inputScope)
+    public function testGetFieldConfigValue(?string $inputScope)
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
-        $attrName  = 'attrName';
-        $config    = array('key' => 'value');
+        $attrName = 'attrName';
+        $config = ['key' => 'value'];
 
         $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
 
@@ -234,16 +230,16 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $actualConfig);
     }
 
-    public function getFieldConfigValueDataProvider()
+    public function getFieldConfigValueDataProvider(): array
     {
-        return array(
-            'default scope'   => array(
-                'inputScope'    => null,
-            ),
-            'specified scope' => array(
-                'inputScope'    => 'test',
-            ),
-        );
+        return [
+            'default scope'   => [
+                'inputScope' => null
+            ],
+            'specified scope' => [
+                'inputScope' => 'test'
+            ]
+        ];
     }
 
     public function testGetClassConfigForNullClassName()
@@ -255,15 +251,12 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string      $expectedScope
-     * @param string|null $inputScope
-     *
      * @dataProvider getClassConfigDataProvider
      */
-    public function testGetClassConfig($expectedScope, $inputScope)
+    public function testGetClassConfig(string $expectedScope, ?string $inputScope)
     {
         $className = 'Test\Entity';
-        $config    = array('key' => 'value');
+        $config = ['key' => 'value'];
 
         $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
         $configEntity->expects($this->any())
@@ -294,18 +287,18 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $actualConfig);
     }
 
-    public function getClassConfigDataProvider()
+    public function getClassConfigDataProvider(): array
     {
-        return array(
-            'default scope'   => array(
+        return [
+            'default scope'   => [
                 'expectedScope' => 'entity',
-                'inputScope'    => null,
-            ),
-            'specified scope' => array(
+                'inputScope'    => null
+            ],
+            'specified scope' => [
                 'expectedScope' => 'test',
-                'inputScope'    => 'test',
-            ),
-        );
+                'inputScope'    => 'test'
+            ]
+        ];
     }
 
     public function testGetClassConfigValueNoConfig()
@@ -334,7 +327,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClassConfigValue()
     {
-        $className         = 'Test\Entity';
+        $className = 'Test\Entity';
         $configEntityScope = new Config(new EntityConfigId('entity', $className));
         $configEntityScope->set('test', 'entity_val');
         $configAnotherScope = new Config(new EntityConfigId('another', $className));
@@ -406,11 +399,8 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $viewRoute = 'route_view';
 
-        $metadata = $this->createMock(EntityMetadata::class);
-        $metadata->expects($this->once())
-            ->method('getRoute')
-            ->with('view', false)
-            ->willReturn($viewRoute);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routeView = $viewRoute;
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -419,7 +409,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getEntityMetadata')
             ->with($className)
-            ->willReturn($metadata);
+            ->willReturn($entityMetadata);
 
         $this->assertSame(
             $viewRoute,
@@ -432,11 +422,8 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $createRoute = 'route_create';
 
-        $metadata = $this->createMock(EntityMetadata::class);
-        $metadata->expects($this->once())
-            ->method('getRoute')
-            ->with('create', $strict = true)
-            ->willReturn($createRoute);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->routeCreate = $createRoute;
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -445,11 +432,11 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getEntityMetadata')
             ->with($className)
-            ->willReturn($metadata);
+            ->willReturn($entityMetadata);
 
         $this->assertSame(
             $createRoute,
-            self::callTwigFunction($this->extension, 'oro_entity_route', [$className, 'create', $strict])
+            self::callTwigFunction($this->extension, 'oro_entity_route', [$className, 'create', true])
         );
     }
 
@@ -479,7 +466,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClassMetadataValueNoAttr()
     {
-        $className         = 'Test\Entity';
+        $className = 'Test\Entity';
         $configEntityScope = new Config(new EntityConfigId('entity', $className));
         $configEntityScope->set('test', 'entity_val');
         $configAnotherScope = new Config(new EntityConfigId('another', $className));
@@ -499,12 +486,10 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Entity';
         $attrName = 'routeView';
-        $attrVal  = 'test_route';
+        $attrVal = 'test_route';
 
-        $metadata = $this->createMock(EntityMetadata::class);
-        $reflection = new \ReflectionClass($metadata);
-        $routeViewProp = $reflection->getProperty($attrName);
-        $routeViewProp->setValue($metadata, $attrVal);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
+        $entityMetadata->{$attrName} = $attrVal;
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -513,7 +498,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->exactly(2))
             ->method('getEntityMetadata')
             ->with($className)
-            ->willReturn($metadata);
+            ->willReturn($entityMetadata);
 
         $this->assertSame(
             $attrVal,

@@ -12,6 +12,7 @@ $field-size: 40px;
     height: 0;
     margin: 0;
     white-space: nowrap;
+    background-color: transparent;
 
     &::after {
         content: '';
@@ -21,7 +22,7 @@ $field-size: 40px;
         left: $floating-validation-message-after-left;
         margin-top: -6px;
         border-style: solid;
-        border-color: $floating-validation-message-after-left;
+        border-color: $floating-validation-message-after-color;
         border-width: 6px 4px 0;
     }
 

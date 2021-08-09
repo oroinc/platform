@@ -5,7 +5,6 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -92,8 +91,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
      * @ORM\JoinColumn(name="language_id", referencedColumnName="id", nullable=false, onDelete="RESTRICT")
-     *
-     * @Serializer\MaxDepth(1)
      */
     protected $language;
 
@@ -116,8 +113,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      *
      * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     *
-     * @Serializer\MaxDepth(3)
      */
     protected $parentLocalization;
 
@@ -125,8 +120,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      * @var Collection|Localization[]
      *
      * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
-     *
-     * @Serializer\MaxDepth(3)
      */
     protected $childLocalizations;
 

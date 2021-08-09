@@ -5,7 +5,7 @@ define(function(require) {
 
     const HistoryStateModel = BaseModel.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HistoryStateModel(attrs, options) {
             HistoryStateModel.__super__.constructor.call(this, attrs, options);

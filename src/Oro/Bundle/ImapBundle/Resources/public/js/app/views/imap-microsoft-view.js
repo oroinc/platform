@@ -4,14 +4,14 @@ define(function(require) {
     const BaseView = require('oroimap/js/app/views/imap-view');
     const ImapMicrosoftView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImapMicrosoftView(options) {
             ImapMicrosoftView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getData: function() {
             const data = ImapMicrosoftView.__super__.getData.call(this);

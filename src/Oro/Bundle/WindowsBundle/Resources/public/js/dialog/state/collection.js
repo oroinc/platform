@@ -15,7 +15,7 @@ define(['backbone', './model'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WindowsCollection(...args) {
             WindowsCollection.__super__.constructor.apply(this, args);

@@ -18,14 +18,14 @@ define(function(require) {
         observedModel: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HistoryNavigationComponent(options) {
             HistoryNavigationComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (options.observedModel instanceof StatefulModel === false) {

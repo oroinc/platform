@@ -23,7 +23,6 @@ trait UpdatedAtAwareTrait
 
     /**
      * @var bool
-     * @JMS\Serializer\Annotation\Type("boolean")
      */
     protected $updatedAtSet;
 

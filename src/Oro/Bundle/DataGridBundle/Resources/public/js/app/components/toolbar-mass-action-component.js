@@ -17,14 +17,14 @@ define(function(require) {
         grid: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ToolbarMassActionComponent(options) {
             ToolbarMassActionComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['collection', 'actions', 'grid']));
@@ -60,7 +60,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

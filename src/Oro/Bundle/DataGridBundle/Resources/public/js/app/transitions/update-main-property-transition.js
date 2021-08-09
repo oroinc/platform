@@ -17,7 +17,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         start: function() {
             const transition = this;

@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\ReminderBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @NamePrefix("oro_api_")
+ * REST API controller to update reminders.
  */
-class ReminderController extends FOSRestController implements ClassResourceInterface
+class ReminderController extends AbstractFOSRestController
 {
     /**
      * Update reminder, set shown status

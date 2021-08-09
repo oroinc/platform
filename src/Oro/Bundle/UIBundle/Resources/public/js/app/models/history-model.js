@@ -13,14 +13,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HistoryModel(attrs, options) {
             HistoryModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attrs, options) {
             this.options = _.defaults({}, options, {

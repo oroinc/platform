@@ -73,7 +73,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Row(options) {
             _.extend(this, _.pick(options, ['rowClassName', 'themeOptions', 'template', 'columns']));
@@ -81,7 +81,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             // itemView function is called as new this.itemView
@@ -232,7 +232,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

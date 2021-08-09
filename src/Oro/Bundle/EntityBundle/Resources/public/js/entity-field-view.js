@@ -20,14 +20,14 @@ define(['underscore', 'backbone'
         util: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityFeildView(options) {
             EntityFeildView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);

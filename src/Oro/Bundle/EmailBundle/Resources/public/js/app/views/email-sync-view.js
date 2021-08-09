@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailSyncView(options) {
             EmailSyncView.__super__.constructor.call(this, options);

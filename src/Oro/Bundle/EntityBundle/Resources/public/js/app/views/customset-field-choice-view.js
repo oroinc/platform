@@ -14,14 +14,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CustomsetFieldChoiceView(options) {
             CustomsetFieldChoiceView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);

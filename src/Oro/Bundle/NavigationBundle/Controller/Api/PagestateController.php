@@ -2,22 +2,19 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
-use Doctrine\Persistence\ObjectRepository;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Oro\Bundle\NavigationBundle\Entity\PageState;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Provides REST API CRUD actions for PageState entity
- *
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for PageState entity.
  */
-class PagestateController extends FOSRestController implements ClassResourceInterface
+class PagestateController extends AbstractFOSRestController
 {
     /**
      * Get list of user's page states
@@ -29,14 +26,14 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     public function cgetAction()
     {
-        return $this->handleView(
-            $this->view(
-                $this->getPageStateRepository()->findBy(
-                    array('user' => $this->getUser())
-                ),
-                Response::HTTP_OK
-            )
-        );
+        $entities = $this->getPageStateRepository()->findBy(['user' => $this->getUser()]);
+
+        $serializedEntities = [];
+        foreach ($entities as $entity) {
+            $serializedEntities[] = $this->serializeEntity($entity);
+        }
+
+        return $this->handleView($this->view($serializedEntities, Response::HTTP_OK));
     }
 
     /**
@@ -56,11 +53,12 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     public function getAction($id)
     {
-        if (!$entity = $this->getEntity($id)) {
-            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
+        $entity = $this->getEntity($id);
+        if (null === $entity) {
+            return $this->handleNotFound();
         }
 
-        return $this->handleView($this->view($entity, Response::HTTP_OK));
+        return $this->handleView($this->view($this->serializeEntity($entity), Response::HTTP_OK));
     }
 
     /**
@@ -104,8 +102,9 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     public function putAction($id)
     {
-        if (!$entity = $this->getEntity($id)) {
-            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
+        $entity = $this->getEntity($id);
+        if (!$entity) {
+            return $this->handleNotFound();
         }
 
         $view = $this->get('oro_navigation.form.handler.pagestate')->process($entity)
@@ -132,8 +131,9 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     public function deleteAction($id)
     {
-        if (!$entity = $this->getEntity($id)) {
-            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
+        $entity = $this->getEntity($id);
+        if (!$entity) {
+            return $this->handleNotFound();
         }
 
         $this->getManager()->remove($entity);
@@ -154,68 +154,61 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     public function getCheckidAction()
     {
-        $entity = $this->getPageStateRepository()
-            ->findOneByPageHash(
-                AbstractPageState::generateHash($this->get('request_stack')->getCurrentRequest()->get('pageId'))
-            );
+        $entity = $this->getPageStateRepository()->findOneByPageHash(
+            AbstractPageState::generateHash($this->get('request_stack')->getCurrentRequest()->get('pageId'))
+        );
 
         return $this->handleView($this->view($this->getState($entity), Response::HTTP_OK));
     }
 
-    /**
-     * Get entity Manager
-     *
-     * @return \Doctrine\Persistence\ObjectManager
-     */
-    protected function getManager()
+    protected function getManager(): EntityManagerInterface
     {
         return $this->getDoctrine()->getManagerForClass($this->getPageStateClass());
     }
 
-    /**
-     * @return ObjectRepository
-     */
-    protected function getPageStateRepository()
+    protected function getPageStateRepository(): EntityRepository
     {
         return $this->getManager()->getRepository($this->getPageStateClass());
     }
 
-    /**
-     * @return string
-     */
-    protected function getPageStateClass()
+    protected function getPageStateClass(): string
     {
         return PageState::class;
     }
 
-    /**
-     * Get entity by id
-     *
-     * @param int $id
-     * @return AbstractPageState
-     */
-    protected function getEntity($id)
+    protected function getEntity(int $id): ?AbstractPageState
     {
-        return $this->getPageStateRepository()->findOneBy([
-            'id' => (int) $id,
-            'user' => $this->getUser(),
-        ]);
+        return $this->getPageStateRepository()->findOneBy(['id' => $id, 'user' => $this->getUser()]);
+    }
+
+    protected function serializeEntity(AbstractPageState $entity): array
+    {
+        return [
+            'id'         => $entity->getId(),
+            'page_id'    => $entity->getPageId(),
+            'page_hash'  => $entity->getPageHash(),
+            'data'       => $entity->getData(),
+            'created_at' => $entity->getCreatedAt(),
+            'updated_at' => $entity->getUpdatedAt()
+        ];
     }
 
     /**
      * Get State for Backbone model
-     *
-     * @param  AbstractPageState $entity
-     * @return array
      */
-    protected function getState(AbstractPageState $entity = null)
+    protected function getState(?AbstractPageState $entity): array
     {
-        return array(
+        return [
             'id' => $entity ? $entity->getId() : null,
-            'pagestate' => array(
+            'pagestate' => [
                 'data'   => $entity ? $entity->getData() : '',
                 'pageId' => $entity ? $entity->getPageId() : ''
-            )
-        );
+            ]
+        ];
+    }
+
+    private function handleNotFound(): Response
+    {
+        return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
     }
 }

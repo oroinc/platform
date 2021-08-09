@@ -17,11 +17,9 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $entityConfigProvider;
 
-    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldProvider;
+    private \PHPUnit\Framework\MockObject\MockObject|EntityFieldProvider $fieldProvider;
 
     protected function createValidator(): QueryDefinitionValidator
     {
@@ -122,8 +120,12 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->willReturn(true);
 
         $this->fieldProvider->expects(self::exactly(3))
-            ->method('getFields')
-            ->with($rootEntityClass, true, true)
+            ->method('getEntityFields')
+            ->with(
+                $rootEntityClass,
+                EntityFieldProvider::OPTION_WITH_RELATIONS
+                | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS
+            )
             ->willReturn([
                 ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
                 ['name' => 'name', 'type' => 'string', 'label' => 'Name']
@@ -153,11 +155,13 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
+        $options = EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS;
         $this->fieldProvider->expects(self::exactly(2))
-            ->method('getFields')
+            ->method('getEntityFields')
             ->withConsecutive(
-                [$rootEntityClass, true, true],
-                ['Acme\ParentEntity', true, true]
+                [$rootEntityClass, $options],
+                ['Acme\ParentEntity', $options]
             )
             ->willReturnOnConsecutiveCalls(
                 [
@@ -190,11 +194,13 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
+        $options = EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS;
         $this->fieldProvider->expects(self::exactly(2))
-            ->method('getFields')
+            ->method('getEntityFields')
             ->withConsecutive(
-                [$rootEntityClass, true, true],
-                ['Acme\ParentNonSupportedEntity', true, true]
+                [$rootEntityClass, $options],
+                ['Acme\ParentNonSupportedEntity', $options]
             )
             ->willReturnOnConsecutiveCalls(
                 [
@@ -228,11 +234,13 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
+        $options = EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS;
         $this->fieldProvider->expects(self::exactly(2))
-            ->method('getFields')
+            ->method('getEntityFields')
             ->withConsecutive(
-                [$rootEntityClass, true, true],
-                ['Acme\ParentEntity', true, true]
+                [$rootEntityClass, $options],
+                ['Acme\ParentEntity', $options]
             )
             ->willReturnOnConsecutiveCalls(
                 [
@@ -267,11 +275,13 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
+        $options = EntityFieldProvider::OPTION_WITH_RELATIONS
+            | EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS;
         $this->fieldProvider->expects(self::exactly(2))
-            ->method('getFields')
+            ->method('getEntityFields')
             ->withConsecutive(
-                [$rootEntityClass, true, true],
-                ['Acme\ParentEntity', true, true]
+                [$rootEntityClass, $options],
+                ['Acme\ParentEntity', $options]
             )
             ->willReturnOnConsecutiveCalls(
                 [

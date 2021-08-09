@@ -56,7 +56,7 @@ define(function(require, exports, module) {
         currentDirection: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SortingDropdown(options) {
             SortingDropdown.__super__.constructor.call(this, options);

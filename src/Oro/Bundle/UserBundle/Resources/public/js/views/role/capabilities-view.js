@@ -17,7 +17,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RoleCapabilitiesView(options) {
             RoleCapabilitiesView.__super__.constructor.call(this, options);
