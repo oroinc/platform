@@ -51,6 +51,11 @@ final class ClassGenerator
         ;
     }
 
+    public function printSkipNamespace(): string
+    {
+        return $this->printer->printClass($this->classType, $this->namespace);
+    }
+
     public function addUse(string $name, string $alias = null, string &$aliasOut = null): self
     {
         if (null === $this->namespace) {
