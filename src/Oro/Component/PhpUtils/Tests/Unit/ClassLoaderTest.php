@@ -6,53 +6,43 @@ use Oro\Component\PhpUtils\ClassLoader;
 
 class ClassLoaderTest extends \PHPUnit\Framework\TestCase
 {
+    private function getClassLoader(string $namespacePrefix = 'PhpUtilsTestNamespace\\'): ClassLoader
+    {
+        return new ClassLoader(
+            $namespacePrefix,
+            __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
+        );
+    }
+
     public function testLoadClass()
     {
         $className = 'PhpUtilsTestNamespace\Foo';
-        $loader = new ClassLoader(
-            'PhpUtilsTestNamespace\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
-        );
+        $loader = $this->getClassLoader();
         self::assertTrue($loader->loadClass($className), 'loader->loadClass() result');
         self::assertTrue(class_exists($className), 'class_exists() after loader->loadClass()');
     }
 
     public function testLoadNonexistentClass()
     {
-        $className = 'PhpUtilsTestNamespace\Bar';
-        $loader = new ClassLoader(
-            'PhpUtilsTestNamespace\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
-        );
-        self::assertFalse($loader->loadClass($className));
+        $loader = $this->getClassLoader();
+        self::assertFalse($loader->loadClass('PhpUtilsTestNamespace\Bar'));
     }
 
     public function testLoadClassFromNotRegisteredNamespace()
     {
-        $className = 'AnotherTestNamespace\Foo';
-        $loader = new ClassLoader(
-            'PhpUtilsTestNamespace\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
-        );
-        self::assertFalse($loader->loadClass($className));
+        $loader = $this->getClassLoader();
+        self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
     public function testLoadClassWhenNamespaceIsNotEqualToDirectory()
     {
-        $className = 'AnotherTestNamespace\Foo';
-        $loader = new ClassLoader(
-            'AnotherTestNamespace\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
-        );
-        self::assertFalse($loader->loadClass($className));
+        $loader = $this->getClassLoader('AnotherTestNamespace\\');
+        self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
     public function testRegister()
     {
-        $loader = new ClassLoader(
-            'PhpUtilsTestNamespace\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures'
-        );
+        $loader = $this->getClassLoader();
         $loader->register();
         self::assertTrue(class_exists('PhpUtilsTestNamespace\Baz'), 'class_exists after loader->register()');
     }
