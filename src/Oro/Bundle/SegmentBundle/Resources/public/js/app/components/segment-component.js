@@ -62,14 +62,14 @@ define(function(require) {
         columnFormView: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SegmentComponent(options) {
             SegmentComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const providerPromise = EntityStructureDataProvider.createDataProvider({}, this);
@@ -202,7 +202,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

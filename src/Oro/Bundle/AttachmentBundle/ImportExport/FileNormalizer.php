@@ -6,22 +6,20 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\GaufretteBundle\FileManager;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
 /**
  * The normalizer for attached files.
  */
-class FileNormalizer implements DenormalizerInterface, NormalizerInterface
+class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
 {
-    /** @var AttachmentManager */
-    private $attachmentManager;
+    private AttachmentManager $attachmentManager;
 
-    /** @var FileManager */
-    private $fileManager;
+    private FileManager $fileManager;
 
     public function __construct(
         AttachmentManager $attachmentManager,
@@ -34,7 +32,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return File::class === $type;
     }
@@ -42,7 +40,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof File;
     }
@@ -50,7 +48,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         return $this->createFileEntity($data['uri'] ?? '', $data['uuid'] ?? '');
     }
@@ -60,7 +58,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
      *
      * @param File $object
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $fileUrl = null;
         // It is impossible to generate URL for a file without ID.
@@ -74,7 +72,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 
         return [
             'uuid' => $object->getUuid(),
-            'uri'  => $fileUrl
+            'uri' => $fileUrl,
         ];
     }
 

@@ -3,16 +3,13 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
  * Provides methods to generate method names for extended relations.
  */
 class AssociationNameGenerator
 {
-    private static ?Inflector $inflector = null;
-
     /**
      * Converts a string into a "class-name-like" name, e.g. 'first_name' to 'FirstName'.
      *
@@ -22,10 +19,7 @@ class AssociationNameGenerator
      */
     public static function classify($string)
     {
-        if (null === self::$inflector) {
-            self::$inflector = (new InflectorFactory())->build();
-        }
-        return self::$inflector->classify(null === $string ? '' : $string);
+        return InflectorFactory::create()->classify(null === $string ? '' : $string);
     }
 
     /**

@@ -12,22 +12,22 @@ define(function(require) {
      */
     const DatagridSettingsListView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'dropdown-menu',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="datagrid-settings-select-all"]': 'onSelectAll',
@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change:renderable collection': 'onRenderableChange',
@@ -45,14 +45,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsListView(options) {
             DatagridSettingsListView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             DatagridSettingsListView.__super__.initialize.call(this, options);
@@ -63,7 +63,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsListView.__super__.render.call(this);
@@ -85,10 +85,26 @@ define(function(require) {
             const hasChanged = Boolean(_.find(models, function(model) {
                 return model.get('renderable') !== model.get('metadata').renderable;
             }));
+            const actions = [{
+                $el: this.$('[data-role="datagrid-settings-select-all"]'),
+                toApply: !hasUnrenderable
+            }, {
+                $el: this.$('[data-role="datagrid-settings-unselect-all"]'),
+                toApply: !hasRenderable
+            }, {
+                $el: this.$('[data-role="datagrid-settings-reset"]'),
+                toApply: !hasChanged
+            }];
 
-            this.$('[data-role="datagrid-settings-select-all"]').toggleClass('disabled', !hasUnrenderable);
-            this.$('[data-role="datagrid-settings-unselect-all"]').toggleClass('disabled', !hasRenderable);
-            this.$('[data-role="datagrid-settings-reset"]').toggleClass('disabled', !hasChanged);
+            for (const {$el, toApply} of actions) {
+                $el.toggleClass('disabled', toApply);
+
+                if ($el.is(':button')) {
+                    $el.attr('disabled', toApply);
+                } else {
+                    $el.attr('aria-disabled', toApply);
+                }
+            }
 
             this.toggleWholeSelectButtons(hasUnrenderable);
         },

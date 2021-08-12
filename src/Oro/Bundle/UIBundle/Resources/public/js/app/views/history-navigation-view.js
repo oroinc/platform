@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HistoryNavigationView(options) {
             HistoryNavigationView.__super__.constructor.call(this, options);

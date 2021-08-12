@@ -13,14 +13,14 @@ define(function(require) {
         template: require('tpl-loader!oroemail/templates/email-notification/email-notification-icon-view.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationCountView(options) {
             EmailNotificationCountView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = EmailNotificationCountView.__super__.getTemplateData.call(this);

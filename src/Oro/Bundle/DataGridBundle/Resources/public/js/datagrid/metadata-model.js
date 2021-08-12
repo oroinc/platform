@@ -19,7 +19,7 @@ define(['backbone'], function(Backbone) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MetadataModel(attrs, options) {
             MetadataModel.__super__.constructor.call(this, attrs, options);

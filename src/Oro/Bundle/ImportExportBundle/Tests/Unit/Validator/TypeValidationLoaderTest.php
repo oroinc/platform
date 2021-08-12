@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ImportExportBundle\Validator\IdentityValidationLoader;
 use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -24,7 +23,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var IdentityValidationLoader */
+    /** @var TypeValidationLoader */
     private $loader;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
@@ -91,7 +90,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->fieldConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
-            ->with($className)
+            ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['invalidProperty' => 'integer']));
 
         $this->loader->loadClassMetadata($classMetaData);
@@ -114,7 +113,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->fieldConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
-            ->with($className)
+            ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer']));
 
         $extendConfigFieldMock = $this->createMock(ConfigInterface::class);
@@ -150,7 +149,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->fieldConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
-            ->with($className)
+            ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer']));
 
         $extendConfigFieldMock = $this->createMock(ConfigInterface::class);
@@ -189,7 +188,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->fieldConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
-            ->with($className)
+            ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer'], ['id' => ['excluded' => true]]));
 
         $this->extendConfigProvider
@@ -216,7 +215,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->fieldConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
-            ->with($className)
+            ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer']));
 
         $extendConfigFieldMock = $this->createMock(ConfigInterface::class);

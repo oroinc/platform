@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -18,10 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * The api controller for the email related functionality.
- *
- * @RouteResource("email")
- * @NamePrefix("oro_api_")
+ * REST API controller for the email related functionality.
  */
 class EmailController extends RestController
 {
@@ -75,8 +68,6 @@ class EmailController extends RestController
      *
      * @param string $id
      *
-     * @Get("/emails/{id}", requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Get email",
      *      resource=true
@@ -93,8 +84,6 @@ class EmailController extends RestController
      * Update email.
      *
      * @param int $id The id of the email
-     *
-     * @Rest\Put(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Update email",

@@ -18,14 +18,14 @@ define(function(require) {
         formatter: new CellFormatter(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StringCell(options) {
             StringCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const render = StringCell.__super__.render.call(this);
@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
@@ -46,7 +46,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         exitEditMode: function() {
             if (!this.isEditableColumn()) {

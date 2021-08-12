@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -17,10 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("translation")
- * @NamePrefix("oro_api_")
+ * REST API controller for translations.
  */
-class TranslationController extends FOSRestController
+class TranslationController extends AbstractFOSRestController
 {
     /**
      * Get translations.
@@ -110,7 +106,6 @@ class TranslationController extends FOSRestController
      *
      * @return Response
      *
-     * @Patch("translations/{locale}/{domain}/{key}/patch")
      * @AclAncestor("oro_translation_language_translate")
      */
     public function patchAction($locale, $domain, $key)

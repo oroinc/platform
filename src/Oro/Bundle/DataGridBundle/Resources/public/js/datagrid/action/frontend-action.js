@@ -13,14 +13,14 @@ define([
      */
     const FrontendAction = ModelAction.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FrontendAction(options) {
             FrontendAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         execute: function() {
             mediator.trigger('datagrid:frontend:execute:' + this.datagrid.name, this);

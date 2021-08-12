@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -13,12 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Provides an action to get all shortcuts items for user
- *
- * @RouteResource("shortcuts")
- * @NamePrefix("oro_api_")
+ * REST API controller to get shortcuts items for user.
  */
-class ShortcutsController extends FOSRestController
+class ShortcutsController extends AbstractFOSRestController
 {
     protected $uris = [];
 
@@ -35,7 +30,7 @@ class ShortcutsController extends FOSRestController
      */
     public function getAction($query)
     {
-        /** @var $provider BuilderChainProvider */
+        /** @var BuilderChainProvider $provider */
         $provider = $this->container->get('oro_menu.builder_chain');
         /**
          * merging shortcuts and application menu
@@ -44,25 +39,17 @@ class ShortcutsController extends FOSRestController
         $menuItems = $provider->get('application_menu');
         $result = array_merge($this->getResults($shortcuts, $query), $this->getResults($menuItems, $query));
 
-        return $this->handleView(
-            $this->view($result, is_array($result) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
-        );
+        return $this->handleView($this->view($result, Response::HTTP_OK));
     }
 
-    /**
-     * @param ItemInterface $items
-     * @param $query
-     *
-     * @return array
-     */
-    protected function getResults(ItemInterface $items, $query)
+    protected function getResults(ItemInterface $items, string $query): array
     {
-        /** @var $translator TranslatorInterface */
+        /** @var TranslatorInterface $translator */
         $translator = $this->get('translator');
         $itemIterator = new RecursiveItemIterator($items);
         $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
         $result = [];
-        /** @var $item ItemInterface */
+        /** @var ItemInterface $item */
         foreach ($iterator as $item) {
             if ($this->isItemAllowed($item)) {
                 $key = $translator->trans($item->getLabel());
@@ -76,12 +63,7 @@ class ShortcutsController extends FOSRestController
         return $result;
     }
 
-    /**
-     * @param $item ItemInterface
-     *
-     * @return array
-     */
-    protected function getData($item)
+    protected function getData(ItemInterface $item): array
     {
         $data = ['url' => $item->getUri()];
 
@@ -93,12 +75,7 @@ class ShortcutsController extends FOSRestController
         return $data;
     }
 
-    /**
-     * @param ItemInterface $item
-     *
-     * @return bool
-     */
-    protected function isItemAllowed(ItemInterface $item)
+    protected function isItemAllowed(ItemInterface $item): bool
     {
         return (
             $item->getExtra('isAllowed')

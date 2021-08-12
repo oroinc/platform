@@ -20,14 +20,14 @@ define(function(require) {
         buttonManager: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ButtonWidgetAction(options) {
             ButtonWidgetAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ButtonWidgetAction.__super__.initialize.call(this, options);
@@ -36,7 +36,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         run: function() {
             this.buttonManager.execute();

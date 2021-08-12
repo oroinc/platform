@@ -77,14 +77,14 @@ define(function(require) {
         within: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function InlineEditorErrorHolderView(options) {
             InlineEditorErrorHolderView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!options.within) {

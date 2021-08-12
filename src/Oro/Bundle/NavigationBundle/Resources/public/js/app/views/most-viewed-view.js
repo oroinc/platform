@@ -9,7 +9,7 @@ define(function(require) {
         dataItems: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MostViewedView(options) {
             MostViewedView.__super__.constructor.call(this, options);

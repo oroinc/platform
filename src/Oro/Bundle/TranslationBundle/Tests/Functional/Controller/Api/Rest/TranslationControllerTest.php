@@ -33,13 +33,12 @@ class TranslationControllerTest extends WebTestCase
 
     public function testGetListWithTotalCount()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_translations',
                 ['domain' => 'validators']
             ),
-            [],
             [],
             ['HTTP_X-Include' => 'totalCount']
         );
@@ -57,7 +56,7 @@ class TranslationControllerTest extends WebTestCase
 
     public function testGetListWithoutTotalCount()
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_translations', ['domain' => 'validators']));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_translations', ['domain' => 'validators']));
 
         $response = $this->client->getResponse();
         $result = $this->getJsonResponseContent($response, 200);
@@ -79,17 +78,14 @@ class TranslationControllerTest extends WebTestCase
      */
     public function testPatchAction($inputValue, $expectedValue, $expectedStatus)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'PATCH',
             $this->getUrl('oro_api_patch_translation', [
                 'locale' => LoadLanguages::LANGUAGE1,
                 'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
                 'key' => LoadTranslations::TRANSLATION1,
             ]),
-            [],
-            [],
-            [],
-            json_encode(['value' => $inputValue])
+            ['value' => $inputValue]
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

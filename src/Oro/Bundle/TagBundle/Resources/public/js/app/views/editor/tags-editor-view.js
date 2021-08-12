@@ -83,14 +83,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TagsEditorView(options) {
             TagsEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             TagsEditorView.__super__.initialize.call(this, options);

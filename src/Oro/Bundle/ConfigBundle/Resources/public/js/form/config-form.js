@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConfigForm(options) {
             ConfigForm.__super__.constructor.call(this, options);

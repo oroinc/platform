@@ -286,7 +286,7 @@ abstract class AbstractScopeManager
             unset($this->changedSettings[$entityId][$name]);
         }
 
-        $settings = SettingsConverter::convertToSettings($config);
+        $settings = $this->normalizeSettings(SettingsConverter::convertToSettings($config));
         $this->cache->save($this->getCacheKey($entity, $entityId), $settings);
 
         $em->detach($config);

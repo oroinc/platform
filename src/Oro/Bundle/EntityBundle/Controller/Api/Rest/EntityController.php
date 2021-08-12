@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
@@ -15,10 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("entity")
- * @NamePrefix("oro_api_")
+ * REST API controller for entity metadata.
  */
-class EntityController extends FOSRestController implements ClassResourceInterface
+class EntityController extends AbstractFOSRestController
 {
     /**
      * Get entities.

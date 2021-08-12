@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -18,11 +14,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Provides REST API actions for File entity.
- *
- * @RouteResource("file")
- * @NamePrefix("oro_api_")
  */
-class FileController extends RestGetController implements ClassResourceInterface
+class FileController extends RestGetController
 {
     /**
      * Get file.
@@ -31,10 +24,6 @@ class FileController extends RestGetController implements ClassResourceInterface
      * @param int $id
      * @param string $_format
      *
-     * @Get(
-     *      "/files/{id}",
-     *      requirements={"_format"="json|binary"}
-     * )
      * @ApiDoc(
      *      description="Get file",
      *      resource=true

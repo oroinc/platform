@@ -14,7 +14,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function InnerPageModel(data, options) {
             InnerPageModel.__super__.constructor.call(this, data, options);

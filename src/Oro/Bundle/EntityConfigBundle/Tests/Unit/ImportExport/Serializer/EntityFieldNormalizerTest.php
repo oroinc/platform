@@ -86,7 +86,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $this->expectExceptionMessage("Data doesn't contains entity id");
 
-        $this->normalizer->denormalize($data, null);
+        $this->normalizer->denormalize($data, '');
     }
 
     /**
@@ -113,7 +113,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
     {
         /* @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $objectManager */
-        $objectManager = $this->createMock('Doctrine\Persistence\ObjectManager');
+        $objectManager = $this->createMock(ObjectManager::class);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -283,7 +283,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
                     'class' => 'testClass1',
                     'configModel' => [
                         'id' => 11,
-                        'class' => 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
+                        'class' => EntityConfigModel::class,
                         'object' => $this->getEntityConfigModel(1, 'className1'),
                     ],
                     'fieldType' => [

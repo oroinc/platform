@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SidebarBundle\Entity\AbstractWidget;
@@ -14,12 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * The controller to manage sidebar widgets.
- *
- * @RouteResource("sidebarwidgets")
- * @NamePrefix("oro_api_")
+ * REST API controller to manage sidebar widgets.
  */
-class WidgetController extends FOSRestController
+class WidgetController extends AbstractFOSRestController
 {
     const SIDEBAR_WIDGET_FEATURE_NAME = 'sidebar_widgets';
 

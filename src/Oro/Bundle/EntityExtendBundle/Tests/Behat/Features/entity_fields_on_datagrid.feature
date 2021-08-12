@@ -3,7 +3,7 @@
 
 Feature: Entity Fields on Datagrid
   In order to ensure that entity fields columns are loaded properly when enabled after being disabled
-  As an Administator
+  As an Administrator
   I need to disable entity field column, then enable and check that it is loaded
 
   Scenario: Create Custom Entity Field

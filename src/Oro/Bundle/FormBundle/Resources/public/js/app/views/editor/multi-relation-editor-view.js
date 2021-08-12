@@ -70,7 +70,7 @@ define(function(require) {
         className: 'multi-relation-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiRelationEditorView(options) {
             MultiRelationEditorView.__super__.constructor.call(this, options);

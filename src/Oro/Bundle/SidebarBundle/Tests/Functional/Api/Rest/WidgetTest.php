@@ -27,7 +27,7 @@ class WidgetTest extends WebTestCase
      */
     public function testGetInitialWidget($position)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
@@ -41,19 +41,16 @@ class WidgetTest extends WebTestCase
      */
     public function testPostWidget($position)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_sidebarwidgets'),
-            array(),
-            array(),
-            array(),
-            json_encode($position)
+            $position
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $this->assertGreaterThan(0, $result['id']);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
@@ -69,7 +66,7 @@ class WidgetTest extends WebTestCase
     public function testPutWidget($position)
     {
         // get sidebar id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
@@ -78,19 +75,16 @@ class WidgetTest extends WebTestCase
         $position = array_merge(array('id' => reset($actualResult)['id']), $position);
         $this->assertNotEquals($position, $actualResult);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_sidebarwidgets', array('widgetId' =>  $position['id'])),
-            array(),
-            array(),
-            array(),
-            json_encode($position)
+            $position
         );
 
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
@@ -107,7 +101,7 @@ class WidgetTest extends WebTestCase
     public function testDelete($position)
     {
         // get sidebar widget id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );
@@ -116,14 +110,14 @@ class WidgetTest extends WebTestCase
         $position = array_merge(array('id' => reset($actualResult)['id']), $position);
 
         // delete sidebar widget by id
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_sidebarwidgets', array('widgetId' => $position['id']))
         );
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // get sidebar widget
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
         );

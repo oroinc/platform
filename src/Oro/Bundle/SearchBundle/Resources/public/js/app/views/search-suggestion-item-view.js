@@ -18,7 +18,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SearchSuggestionItemView(options) {
             SearchSuggestionItemView.__super__.constructor.call(this, options);

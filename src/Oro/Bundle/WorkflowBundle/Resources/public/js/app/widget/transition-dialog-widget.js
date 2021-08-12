@@ -14,7 +14,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TransitionDialogWidget(options) {
             TransitionDialogWidget.__super__.constructor.call(this, options);

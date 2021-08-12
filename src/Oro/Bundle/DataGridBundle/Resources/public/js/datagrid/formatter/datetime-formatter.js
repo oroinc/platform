@@ -23,7 +23,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
         type: 'dateTime',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         fromRaw: function(rawData) {
             if (rawData === null || rawData === '') {
@@ -35,7 +35,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         toRaw: function(formattedData) {
             if (formattedData === null || formattedData === '') {

@@ -92,7 +92,7 @@ define(function(require) {
         configuration: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractAction(options) {
             AbstractAction.__super__.constructor.call(this, options);
@@ -130,7 +130,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

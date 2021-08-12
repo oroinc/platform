@@ -28,14 +28,14 @@ define(function(require) {
         component: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ViewportComponent(options) {
             ViewportComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.extend({}, this.options, _.pick(options, ['viewport', 'component']));
@@ -58,7 +58,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

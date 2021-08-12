@@ -15,7 +15,7 @@ define(function(require) {
         style: 'currency',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         fromRaw: function(rawData) {
             if (rawData === void 0 || rawData === null || rawData === '') {

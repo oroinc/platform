@@ -7,7 +7,7 @@ define(function(require) {
 
     const DateTimeValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateTimeValidationMessageHandlerView(options) {
             DateTimeValidationMessageHandlerView.__super__.constructor.call(this, options);

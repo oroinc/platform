@@ -41,14 +41,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityConditionView(options) {
             ActivityConditionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ActivityConditionView.__super__.initialize.call(this, options);

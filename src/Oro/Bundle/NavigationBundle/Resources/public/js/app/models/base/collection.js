@@ -9,7 +9,7 @@ define(function(require) {
         model: BaseNavigationModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseNavigationItemCollection(...args) {
             BaseNavigationItemCollection.__super__.constructor.apply(this, args);

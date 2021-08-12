@@ -21,14 +21,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColumnFormListener(...args) {
             ColumnFormListener.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!_.has(options, 'selectors')) {
@@ -51,7 +51,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         setDatagridAndSubscribe: function() {
             ColumnFormListener.__super__.setDatagridAndSubscribe.call(this);
@@ -75,7 +75,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _processValue: function(id, model) {
             id = String(id);
@@ -133,7 +133,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _clearState: function() {
             this.set('included', []);
@@ -141,7 +141,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _synchronizeState: function() {
             const included = this.get('included');
@@ -210,14 +210,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _hasChanges: function() {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

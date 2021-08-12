@@ -15,8 +15,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
-    private $fields = [
+    private array $fields = [
         'ScalarEntity' => [
             [
                 'name' => 'created',
@@ -123,8 +122,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array */
-    private $config = [
+    private array $config = [
         'ScalarEntity' => [
             'id' => [
                 'order' => 10
@@ -200,8 +198,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array */
-    private $relations = [
+    private array $relations = [
         'DictionaryEntity' => [
             'dictionaryScalarEntities' => 2,
         ],
@@ -212,20 +209,15 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var ConfigurableTableDataConverter */
-    private $converter;
+    private ConfigurableTableDataConverter $converter;
 
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
+    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
-    /** @var RelationCalculator|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationCalculator;
+    private RelationCalculator|\PHPUnit\Framework\MockObject\MockObject $relationCalculator;
 
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
+    private LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings;
 
-    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigHelper;
+    private AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject $attributeConfigHelper;
 
     protected function setUp(): void
     {
@@ -239,7 +231,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->onlyMethods(['getConfigValue', 'getFields', 'processRelationAsScalar', 'setLocale'])
+            ->onlyMethods(['getConfigValue', 'getEntityFields', 'processRelationAsScalar', 'setLocale'])
             ->getMock();
 
         $this->relationCalculator = $this->createMock(RelationCalculator::class);
@@ -254,7 +246,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->converter->setAttributeConfigHelper($this->attributeConfigHelper);
     }
 
-    public function testAssertEntityName()
+    public function testAssertEntityName(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Entity class for data converter is not specified');
@@ -424,12 +416,12 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider exportDataProvider
      */
-    public function testExport(string $entityName, array $input, array $expected)
+    public function testExport(string $entityName, array $input, array $expected): void
     {
         $this->prepareFieldHelper();
         $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
-        $this->assertSame($expected, $this->converter->convertToExportFormat($input));
+        self::assertSame($expected, $this->converter->convertToExportFormat($input));
     }
 
     /**
@@ -566,17 +558,17 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider importDataProvider
      */
-    public function testImport(string $entityName, array $input, array $expected)
+    public function testImport(string $entityName, array $input, array $expected): void
     {
         $this->prepareFieldHelper();
         $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
-        $this->assertSame($expected, $this->converter->convertToImportFormat($input));
+        self::assertSame($expected, $this->converter->convertToImportFormat($input));
     }
 
-    public function testGetFieldHeaderWithRelation()
+    public function testGetFieldHeaderWithRelation(): void
     {
-        $this->attributeConfigHelper->expects($this->any())
+        $this->attributeConfigHelper->expects(self::any())
             ->method('isFieldAttribute')
             ->willReturn(true);
 
@@ -584,13 +576,13 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->prepareFieldHelper();
         $this->prepareRelationCalculator();
         $simpleFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', $fieldName);
-        $this->assertEquals($simpleFieldValue, ucfirst($fieldName));
+        self::assertEquals($simpleFieldValue, ucfirst($fieldName));
 
         $relationFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', 'fullScalar');
-        $this->assertEquals('Full Scalar Entity Name', $relationFieldValue);
+        self::assertEquals('Full Scalar Entity Name', $relationFieldValue);
 
         $fieldName = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', 'innerRelation.name');
-        $this->assertEquals('Inner Relation Name', $fieldName);
+        self::assertEquals('Inner Relation Name', $fieldName);
     }
 
     /**
@@ -601,14 +593,14 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ?string $locale,
         int $expectedCallsToGetLocale,
         int $translateUsingLocaleCalls
-    ) {
+    ): void {
         $this->converter->setTranslateUsingLocale($translateUsingLocale);
 
-        $this->localeSettings->expects($this->exactly($expectedCallsToGetLocale))
+        $this->localeSettings->expects(self::exactly($expectedCallsToGetLocale))
             ->method('getLanguage')
             ->willReturn($locale);
 
-        $this->fieldHelper->expects($this->exactly($translateUsingLocaleCalls))
+        $this->fieldHelper->expects(self::exactly($translateUsingLocaleCalls))
             ->method('setLocale')
             ->with($locale);
 
@@ -637,24 +629,24 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function prepareFieldHelper()
+    private function prepareFieldHelper(): void
     {
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getConfigValue')
             ->willReturnCallback(function ($entityName, $fieldName, $parameter, $default = null) {
                 return $this->config[$entityName][$fieldName][$parameter] ?? $default;
             });
-        $this->fieldHelper->expects($this->any())
-            ->method('getFields')
-            ->with($this->isType('string'), true)
+        $this->fieldHelper->expects(self::any())
+            ->method('getEntityFields')
+            ->with(self::isType('string'), true)
             ->willReturnCallback(function ($entityName) {
                 return $this->fields[$entityName] ?? [];
             });
     }
 
-    private function prepareRelationCalculator()
+    private function prepareRelationCalculator(): void
     {
-        $this->relationCalculator->expects($this->any())
+        $this->relationCalculator->expects(self::any())
             ->method('getMaxRelatedEntities')
             ->willReturnCallback(function ($entityName, $fieldName) {
                 return $this->relations[$entityName][$fieldName] ?? 0;

@@ -19,7 +19,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiCheckboxView(options) {
             MultiCheckboxView.__super__.constructor.call(this, options);

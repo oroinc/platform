@@ -124,15 +124,13 @@ class EntityWithFieldsProvider
         $withRoutes = false
     ) {
         $currentClassName = $entity['name'];
-        $entity['fields'] = $this->fieldProvider->getFields(
-            $currentClassName,
-            $withRelations,
-            $withVirtualFields,
-            false,
-            $withUnidirectional,
-            $applyExclusions,
-            $translate
-        );
+        $options = $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+        $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+        $options |= $withUnidirectional ? EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL : 0;
+        $options |= $applyExclusions ? EntityFieldProvider::OPTION_APPLY_EXCLUSIONS : 0;
+        $options |= $translate ? EntityFieldProvider::OPTION_TRANSLATE : 0;
+
+        $entity['fields'] = $this->fieldProvider->getEntityFields($currentClassName, $options);
         if ($withRoutes) {
             $entity['routes'] = $this->getAvailableRoutes($currentClassName);
         }

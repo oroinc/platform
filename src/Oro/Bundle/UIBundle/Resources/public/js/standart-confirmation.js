@@ -24,7 +24,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StandartConfirmationView(options) {
             StandartConfirmationView.__super__.constructor.call(this, options);

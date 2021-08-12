@@ -27,7 +27,7 @@ define(function(require) {
         keepElement: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FooterCell(options) {
             FooterCell.__super__.constructor.call(this, options);

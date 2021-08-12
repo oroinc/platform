@@ -16,7 +16,7 @@ class SidebarTest extends WebTestCase
      */
     public function testGetInitialPositions($position)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
@@ -31,19 +31,16 @@ class SidebarTest extends WebTestCase
      */
     public function testPostPosition($position)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_sidebars'),
-            array(),
-            array(),
-            array(),
-            json_encode($position)
+            $position
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $this->assertGreaterThan(0, $result['id']);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
@@ -59,7 +56,7 @@ class SidebarTest extends WebTestCase
     public function testPutPositions($position)
     {
         // get sidebar id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
@@ -68,19 +65,16 @@ class SidebarTest extends WebTestCase
         $position = array_merge(array('id' => $actualResult['id']), $position);
         $this->assertNotEquals($position, $actualResult);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_sidebars', array('stateId' =>  $position['id'])),
-            array(),
-            array(),
-            array(),
-            json_encode($position)
+            $position
         );
 
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );

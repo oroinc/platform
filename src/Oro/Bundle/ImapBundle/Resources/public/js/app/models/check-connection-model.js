@@ -10,7 +10,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckConnectionModel(...args) {
             CheckConnectionModel.__super__.constructor.apply(this, args);

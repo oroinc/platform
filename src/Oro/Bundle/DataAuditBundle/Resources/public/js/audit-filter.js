@@ -41,7 +41,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AuditFilter(options) {
             AuditFilter.__super__.constructor.call(this, options);

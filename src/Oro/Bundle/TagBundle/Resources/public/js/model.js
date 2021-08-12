@@ -16,7 +16,7 @@ define(['backbone'], function(Backbone) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TagModel(attrs, options) {
             TagModel.__super__.constructor.call(this, attrs, options);

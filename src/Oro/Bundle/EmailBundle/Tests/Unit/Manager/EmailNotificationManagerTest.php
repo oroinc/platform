@@ -49,12 +49,10 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->willReturn('oro_email_email_reply');
 
-        $metadata = $this->createMock(EntityMetadata::class);
-
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('getEntityMetadata')
-            ->willReturn($metadata);
+            ->willReturn(new EntityMetadata(\stdClass::class));
 
         $this->emailNotificationManager = new EmailNotificationManager(
             $em,

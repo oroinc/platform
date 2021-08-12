@@ -15,7 +15,7 @@ define([
      */
     const MergeMassAction = MassAction.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MergeMassAction(options) {
             MergeMassAction.__super__.constructor.call(this, options);

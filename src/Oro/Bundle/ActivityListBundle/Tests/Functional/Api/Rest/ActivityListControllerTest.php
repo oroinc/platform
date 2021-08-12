@@ -18,7 +18,7 @@ class ActivityListControllerTest extends WebTestCase
 
     public function testGetList()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_activity_list_api_get_list',
@@ -49,7 +49,7 @@ class ActivityListControllerTest extends WebTestCase
             ->getQuery()
             ->getSingleScalarResult();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_activitylist_activity_list_item',
@@ -70,7 +70,7 @@ class ActivityListControllerTest extends WebTestCase
 
     public function testGetActivityListActivityListOption()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_activitylist_activity_list_option')
         );

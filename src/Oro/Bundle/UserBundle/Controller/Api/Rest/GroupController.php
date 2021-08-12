@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -14,11 +11,9 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * API CRUD controller for Group entity.
- *
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Group entity.
  */
-class GroupController extends RestController implements ClassResourceInterface
+class GroupController extends RestController
 {
     /**
      * Get the list of groups
@@ -56,8 +51,6 @@ class GroupController extends RestController implements ClassResourceInterface
      *
      * @param int $id Group id
      *
-     * @Rest\Get(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Get group data",
      *      resource=true,
@@ -93,8 +86,6 @@ class GroupController extends RestController implements ClassResourceInterface
      *
      * @param int $id Group id
      *
-     * @Rest\Put(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Update existing group",
      *      resource=true,
@@ -114,8 +105,6 @@ class GroupController extends RestController implements ClassResourceInterface
      * Delete group
      *
      * @param int $id Group id
-     *
-     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete group",

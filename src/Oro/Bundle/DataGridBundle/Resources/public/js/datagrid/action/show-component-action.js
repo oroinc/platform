@@ -8,14 +8,14 @@ define(function(require) {
         launcher: ActionComponentDropDownLauncher,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ShowComponentAction(options) {
             ShowComponentAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         execute: function() {
             // do nothing

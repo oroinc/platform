@@ -7,14 +7,14 @@ define(function(require) {
 
     const BidirectionalOnlyForExtendedComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BidirectionalOnlyForExtendedComponent(options) {
             BidirectionalOnlyForExtendedComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const targetEntityField = $('[data-name="field__target-entity"]');

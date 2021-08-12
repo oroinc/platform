@@ -1,3 +1,0 @@
-oro_message_queue_bundle_job_api:
-    resource: "@OroMessageQueueBundle/Controller/Api/Rest/JobController.php"
-    type: rest

@@ -17,7 +17,7 @@ class TaggableControllerTest extends WebTestCase
             'oro_api_post_taggable',
             ['entity' => 'user', 'entityId' => 1]
         );
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $url,
             [

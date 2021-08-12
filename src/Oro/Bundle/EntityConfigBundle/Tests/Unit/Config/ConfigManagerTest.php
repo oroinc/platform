@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
-use Metadata\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
@@ -18,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
@@ -114,7 +114,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $metadata = $this->getEntityMetadata(self::ENTITY_CLASS);
         $idFieldMetadata = $this->getFieldMetadata(self::ENTITY_CLASS, 'id');
-        $metadata->addPropertyMetadata($idFieldMetadata);
+        $metadata->addFieldMetadata($idFieldMetadata);
 
         $this->metadataFactory->expects($this->exactly(2))
             ->method('getMetadataForClass')
@@ -124,7 +124,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->configManager->getFieldMetadata(self::ENTITY_CLASS, 'undefinedField'));
 
         $this->assertSame(
-            $metadata->propertyMetadata['id'],
+            $metadata->fieldMetadata['id'],
             $this->configManager->getFieldMetadata(self::ENTITY_CLASS, 'id')
         );
     }
@@ -1162,7 +1162,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             $metadata = $this->getEntityMetadata(self::ENTITY_CLASS);
             $idFieldMetadata = $this->getFieldMetadata(self::ENTITY_CLASS, 'id');
             $idFieldMetadata->defaultValues['entity'] = ['translatable' => 'labelVal', 'other' => 'otherVal'];
-            $metadata->addPropertyMetadata($idFieldMetadata);
+            $metadata->addFieldMetadata($idFieldMetadata);
             if (null !== $metadataMode) {
                 $idFieldMetadata->mode = $metadataMode;
             }
@@ -1569,7 +1569,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
                 'other2'        => 'otherVal2',
             ]
         );
-        $metadata->addPropertyMetadata($idFieldMetadata);
+        $metadata->addFieldMetadata($idFieldMetadata);
 
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
@@ -1633,7 +1633,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
                 'other2'        => 'otherVal2',
             ]
         );
-        $metadata->addPropertyMetadata($idFieldMetadata);
+        $metadata->addFieldMetadata($idFieldMetadata);
 
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
@@ -1697,7 +1697,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
                 'other2'        => 'otherVal2',
             ]
         );
-        $metadata->addPropertyMetadata($idFieldMetadata);
+        $metadata->addFieldMetadata($idFieldMetadata);
 
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')

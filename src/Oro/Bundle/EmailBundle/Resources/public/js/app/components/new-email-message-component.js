@@ -10,14 +10,14 @@ define(function(require, exports, module) {
         onNewEmailDebounced: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NewEmailMessageComponent(options) {
             NewEmailMessageComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const channel = config.wsChannel;

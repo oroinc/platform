@@ -17,7 +17,7 @@ class ConfigurationControllerTest extends WebTestCase
      */
     public function testGetList()
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_configurations'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_configurations'));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertNotEmpty($result);
@@ -33,10 +33,9 @@ class ConfigurationControllerTest extends WebTestCase
     public function testGet(array $sections)
     {
         foreach ($sections as $sectionPath) {
-            $this->client->request(
+            $this->client->jsonRequest(
                 'GET',
                 $this->getUrl('oro_api_get_configuration', ['path' => $sectionPath]),
-                [],
                 [],
                 $this->generateWsseAuthHeader()
             );

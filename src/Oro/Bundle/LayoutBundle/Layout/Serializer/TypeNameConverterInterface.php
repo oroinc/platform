@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Serializer;
 
 /**
- * This interface should be implemented be normalizers that can convert type name to short type name and vise versa.
+ * This interface should be implemented bу normalizers that can convert type name to short type name and vise versa.
  */
 interface TypeNameConverterInterface
 {

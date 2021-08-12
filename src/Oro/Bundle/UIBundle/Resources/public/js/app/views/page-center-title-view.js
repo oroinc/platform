@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageCenterTitleView(options) {
             PageCenterTitleView.__super__.constructor.call(this, options);

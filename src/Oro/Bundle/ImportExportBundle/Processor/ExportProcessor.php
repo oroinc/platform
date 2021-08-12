@@ -16,36 +16,27 @@ use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
  */
 class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
 {
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
+    protected ?ContextInterface $context = null;
+
+    protected ?SerializerInterface $serializer = null;
 
     /**
-     * @var SerializerInterface
+     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface|QueryBuilderAwareInterface|null
      */
-    protected $serializer;
+    protected ?DataConverterInterface $dataConverter = null;
 
-    /**
-     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface|QueryBuilderAwareInterface
-     */
-    protected $dataConverter;
-
-    /**
-     * @var string
-     */
-    protected $entityName;
+    protected string $entityName = '';
 
     /**
      * Processes entity to export format
      *
-     * @param mixed $object
-     * @return array
+     * {@inheritdoc}
+     *
      * @throws RuntimeException
      */
-    public function process($object)
+    public function process($item)
     {
-        if (! $this->serializer) {
+        if (!$this->serializer) {
             throw new RuntimeException('Serializer must be injected.');
         }
 
@@ -53,7 +44,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         $context = $this->context->getConfiguration();
 
         $data = $this->serializer->encode(
-            $this->serializer->normalize($object, $format, $context),
+            $this->serializer->normalize($item, $format, $context),
             $format,
             $context
         );
@@ -61,13 +52,14 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         if ($this->dataConverter) {
             $data = $this->dataConverter->convertToExportFormat($data);
         }
+
         return $data;
     }
 
     /**
      * @throws InvalidConfigurationException
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function setImportExportContext(ContextInterface $context): void
     {
         $this->context = $context;
 
@@ -90,12 +82,12 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         }
     }
 
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }
 
-    public function setDataConverter(DataConverterInterface $dataConverter)
+    public function setDataConverter(DataConverterInterface $dataConverter): void
     {
         $this->dataConverter = $dataConverter;
     }
@@ -103,7 +95,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
     /**
      * {@inheritdoc}
      */
-    public function setEntityName($entityName)
+    public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
 

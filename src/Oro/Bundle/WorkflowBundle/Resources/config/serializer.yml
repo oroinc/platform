@@ -1,4 +1,19 @@
 services:
+    oro_workflow.rest_api.entity_serializer:
+        alias: oro_soap.entity_serializer
+        public: true
+
+    oro_workflow.workflow_item_serializer:
+        class: Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\WorkflowItemSerializer
+        public: true
+        arguments:
+            - '@oro_workflow.workflow_result_object_serializer'
+
+    oro_workflow.workflow_result_object_serializer:
+        class: Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\EntityWorkflowResultObjectSerializer
+        arguments:
+            - '@oro_entity.doctrine_helper'
+
     # Services for WorkflowData serialization
     oro_workflow.serializer.data.serializer:
         class: Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer
@@ -41,21 +56,9 @@ services:
         tags:
             - { name: oro_workflow.attribute_normalizer }
 
-    oro_workflow.serializer.handler.workflow_result:
-        class: Oro\Bundle\WorkflowBundle\Serializer\Handler\WorkflowResultHandler
-        arguments:
-            - '@oro_entity.doctrine_helper'
-        tags:
-            -
-              name: jms_serializer.handler
-              method: workflowResultToJson
-              type: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
-              format: json
-              direction: serialization
-
     # Services for ProcessData serialization
     oro_workflow.serializer.process.serializer:
-        class: Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer
+        class: Symfony\Component\Serializer\Serializer
         arguments:
           -
               - '@oro_workflow.serializer.process.normalizer.process_data'

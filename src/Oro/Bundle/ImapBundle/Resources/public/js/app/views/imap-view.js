@@ -28,7 +28,7 @@ define(function(require) {
         email: '',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImapView(options) {
             ImapView.__super__.constructor.call(this, options);
@@ -66,7 +66,7 @@ define(function(require) {
         /**
          * Forces separate layout initialization for imap views
          *
-         * @inheritDoc
+         * @inheritdoc
          */
         hasOwnLayout: function() {
             return true;

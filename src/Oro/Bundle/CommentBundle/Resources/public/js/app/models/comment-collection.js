@@ -8,7 +8,7 @@ define(function(require) {
         model: CommentModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         routeDefaults: {
             routeName: 'oro_api_comment_get_items',
@@ -18,7 +18,7 @@ define(function(require) {
         comparator: 'createdAt',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CommentCollection(...args) {
             CommentCollection.__super__.constructor.apply(this, args);

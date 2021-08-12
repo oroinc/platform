@@ -23,14 +23,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartContainerView(options) {
             FlowchartContainerView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.zoomableOptions = _.defaults(_.result(options, 'zoomableOptions', {}), this.zoomableDefaults);

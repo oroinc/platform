@@ -6,20 +6,70 @@ oro_attachment_bundle:
     type:         annotation
     prefix:       /
 
-oro_attachment_bundle_api:
-    resource: "@OroAttachmentBundle/Controller/Api/Rest/AttachmentController.php"
-    type: rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-    defaults:
-        version:  latest
 
-oro_attachment_bundle_file_api:
-    resource: "@OroAttachmentBundle/Controller/Api/Rest/FileController.php"
-    type: rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
+#
+# DEPRECATED OLD REST API ROUTES
+#
+
+oro_api_options_attachments:
+    path: '/api/rest/{version}/attachments.{_format}'
+    methods: [OPTIONS]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\AttachmentController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json|html
+        version: latest|v1
+
+oro_api_options_files:
+    path: '/api/rest/{version}/files.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\FileController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json|html
+        version: latest|v1
+
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_attachment:
+    path: '/api/rest/{version}/attachments/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\AttachmentController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
+
+oro_api_delete_attachment:
+    path: '/api/rest/{version}/attachments/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\AttachmentController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
+
+oro_api_get_file:
+    path: '/api/rest/{version}/files/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\FileController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|binary
+        version: latest|v1

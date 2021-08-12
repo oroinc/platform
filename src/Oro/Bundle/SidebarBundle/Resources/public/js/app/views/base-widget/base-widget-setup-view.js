@@ -17,14 +17,14 @@ define(function(require) {
         validation: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseSetupView(options) {
             BaseSetupView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             BaseSetupView.__super__.render.call(this);

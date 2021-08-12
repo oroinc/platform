@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
 
     const CheckboxView = BaseView.extend({
@@ -12,41 +11,30 @@ define(function(require) {
             }
         },
 
+        events: {
+            'change input[type="checkbox"]': 'onChange'
+        },
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckboxView(...args) {
             CheckboxView.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             CheckboxView.__super__.initialize.call(this, options);
 
-            this.options = _.defaults(options || {}, this.options);
-            this.$el.closest('form').on('submit' + this.eventNamespace(), this._onSubmit.bind(this));
+            this.options = Object.assign({}, this.options, options);
         },
 
-        /**
-         * @inheritDoc
-         */
-        _onSubmit: function(e) {
-            if (this.$el.find(this.options.selectors.checkbox).is(':checked')) {
-                this.$el.find(this.options.selectors.hiddenInput).prop('disabled', true);
-            } else {
-                this.$el.find(this.options.selectors.hiddenInput).prop('disabled', false);
-            }
-        },
+        onChange() {
+            const {checkbox, hiddenInput} = this.options.selectors;
 
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
-            this.$el.closest('form').off(this.eventNamespace());
-            CheckboxView.__super__.dispose.call(this);
+            this.$(hiddenInput).prop('disabled', this.$(checkbox).is(':checked'));
         }
     });
 

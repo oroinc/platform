@@ -23,7 +23,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ClearableInputWidgetView(options) {
             ClearableInputWidgetView.__super__.constructor.call(this, options);
@@ -41,7 +41,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         widgetFunction: function() {
             this.render();
@@ -57,7 +57,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         findContainer: function() {
             return this.$el;

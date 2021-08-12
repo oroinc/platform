@@ -19,14 +19,14 @@ define(function(require) {
         commentCount: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailItemView(options) {
             EmailItemView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this._deferredRender();

@@ -72,7 +72,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         /** @var BlockView $object */
 
@@ -117,7 +117,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return BlockView::class === $type;
     }
@@ -125,7 +125,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $view = new BlockView();
         [$id, $blockType, $blockPrefixes] = $data[self::DATA_KEYS];

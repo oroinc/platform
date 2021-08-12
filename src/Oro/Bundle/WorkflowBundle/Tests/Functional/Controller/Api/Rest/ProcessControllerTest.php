@@ -27,7 +27,7 @@ class ProcessControllerTest extends WebTestCase
         $this->assertTrue($definition->isEnabled());
 
         // deactivate process
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_api_process_deactivate',
@@ -42,7 +42,7 @@ class ProcessControllerTest extends WebTestCase
         $this->assertFalse($definition->isEnabled());
 
         // activate process
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_api_process_activate',

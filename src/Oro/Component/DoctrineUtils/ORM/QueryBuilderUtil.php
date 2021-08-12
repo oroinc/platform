@@ -408,7 +408,7 @@ class QueryBuilderUtil
      * Query safe replacement for sprintf
      *
      * @param string $format
-     * @param array ...$args
+     * @param string|int|float|bool ...$args
      * @return string
      * @throws \InvalidArgumentException
      */

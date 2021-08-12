@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SidebarBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Exclude;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
+ * The base class for sidebar widgets.
  * @ORM\MappedSuperclass
  */
 class AbstractWidget
@@ -66,7 +66,6 @@ class AbstractWidget
 
     /**
      * @var AbstractUser
-     * @Exclude
      */
     protected $user;
 

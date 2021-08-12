@@ -12,14 +12,14 @@ define(function(require) {
         ]),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressBookWidgetComponent(options) {
             AddressBookWidgetComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             AddressBookWidgetComponent.__super__.initialize.call(this, options);

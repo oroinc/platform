@@ -9,14 +9,14 @@ define(function(require) {
 
     const StatefulModel = BaseModel.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StatefulModel(attrs, options) {
             StatefulModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attrs, options) {
             const historyOptions = {};

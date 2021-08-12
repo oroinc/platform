@@ -12,7 +12,7 @@ define(function(require, exports, module) {
         deferred: $.Deferred(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {(target?: any) => JQueryPromise<T>}
          */
         initialize: function() {

@@ -29,7 +29,7 @@ define(function(require) {
         limitDecimals: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NumberInputWidgetView(options) {
             NumberInputWidgetView.__super__.constructor.call(this, options);

@@ -11,8 +11,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private Translator|\PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
@@ -28,7 +27,7 @@ class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
     /**
      * Test for case: $value has folder with type Sent
      */
-    public function testValueWithFolderSentOnRootLevel()
+    public function testValueWithFolderSentOnRootLevel(): void
     {
         $this->translator->expects($this->never())
             ->method('trans');
@@ -48,7 +47,7 @@ class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
     /**
      * Test for case: $value is not EmailOrigin
      */
-    public function testValueIsNotEmailOrigin()
+    public function testValueIsNotEmailOrigin(): void
     {
         $this->translator->expects($this->never())
             ->method('trans');
@@ -64,7 +63,7 @@ class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
     /**
      * Test for case: $value has folder with type "Inbox" which has folder with type "Sent"
      */
-    public function testValueWithFolderSentInFolderInbox()
+    public function testValueWithFolderSentInFolderInbox(): void
     {
         $this->translator->expects($this->never())
             ->method('trans');
@@ -88,7 +87,7 @@ class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
     /**
      * Test for case: $value is EmailOrigin but does not have folder with type "Sent"
      */
-    public function testValueWithoutFolderSent()
+    public function testValueWithoutFolderSent(): void
     {
         $folderInbox = new EmailFolder();
         $folderInbox->setType('inbox');
@@ -100,7 +99,7 @@ class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation($constraint->message)
-            ->setParameter('%button%', null)
+            ->setParameter('%button%', '')
             ->assertRaised();
     }
 }

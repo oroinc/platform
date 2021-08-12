@@ -12,14 +12,14 @@ define([
         model: EntityModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function multipleEntityCollection(...args) {
             multipleEntityCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             this.on('change:isDefault', this.onIsDefaultChange, this);

@@ -17,14 +17,14 @@ define([
         selector: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ChangeEditableCellListener(...args) {
             ChangeEditableCellListener.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!_.has(options, 'selector')) {
@@ -40,7 +40,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         setDatagridAndSubscribe: function() {
             ChangeEditableCellListener.__super__.setDatagridAndSubscribe.call(this);
@@ -52,7 +52,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onModelEdited: function(e, model) {
             const changes = model.changed;
@@ -95,14 +95,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _clearState: function() {
             this.set('changeset', {});
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _synchronizeState: function() {
             $(this.selector).val(JSON.stringify(this.get('changeset')));
@@ -123,7 +123,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _restoreState: function() {
             let changeset = {};
@@ -138,7 +138,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _hasChanges: function() {
             return !_.isEmpty(this.get('changeset'));

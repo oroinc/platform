@@ -11,7 +11,7 @@ define(['backbone', './model'
         model: TagModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TagCollection(...args) {
             TagCollection.__super__.constructor.apply(this, args);

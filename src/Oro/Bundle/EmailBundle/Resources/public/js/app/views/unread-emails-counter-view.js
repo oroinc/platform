@@ -13,14 +13,14 @@ define(function(require) {
         template: _.template('<%=(count < 100 ? count : "99+") %>'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UnreadEmailsCounterView(options) {
             UnreadEmailsCounterView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.model = UnreadEmailsStateHolder.getModel();

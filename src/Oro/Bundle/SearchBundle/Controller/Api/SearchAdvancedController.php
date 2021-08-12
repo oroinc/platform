@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
@@ -13,12 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Provide advanced search api method
- *
- * @RouteResource("search_advanced")
- * @NamePrefix("oro_api_")
+ * REST API controller for advanced search.
  */
-class SearchAdvancedController extends FOSRestController
+class SearchAdvancedController extends AbstractFOSRestController
 {
     /**
      * Get advanced search result.

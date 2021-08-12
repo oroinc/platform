@@ -8,7 +8,7 @@ define(function(require) {
 
     const AbstractTransition = BaseClass.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractTransition(options) {
             AbstractTransition.__super__.constructor.call(this, options);

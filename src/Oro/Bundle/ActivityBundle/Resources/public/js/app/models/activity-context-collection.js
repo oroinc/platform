@@ -8,7 +8,7 @@ define(function(require) {
         model: ActivityContextModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextCollection(...args) {
             ActivityContextCollection.__super__.constructor.apply(this, args);

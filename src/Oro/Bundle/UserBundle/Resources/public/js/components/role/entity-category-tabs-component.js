@@ -20,7 +20,7 @@ define(function(require, exports, module) {
         changesByCategory: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityCategoryTabsComponent(options) {
             EntityCategoryTabsComponent.__super__.constructor.call(this, options);

@@ -25,14 +25,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailTemplateEditorView(options) {
             EmailTemplateEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             EmailTemplateEditorView.__super__.initialize.call(this, options);

@@ -3,12 +3,30 @@ oro_config:
     type:         annotation
     prefix:       /config
 
-oro_config_api:
-    resource: "@OroConfigBundle/Resources/config/oro/routing_api.yml"
-    type: rest
-    prefix: api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format: json
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_configurations:
+    path: '/api/rest/{version}/configuration.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\ConfigBundle\Controller\Api\Rest\ConfigurationController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_configuration:
+    path: '/api/rest/{version}/configuration/{path}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\ConfigBundle\Controller\Api\Rest\ConfigurationController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        path: '[\w\-]+[\w\-\/]*'
+        _format: json
+        version: latest|v1

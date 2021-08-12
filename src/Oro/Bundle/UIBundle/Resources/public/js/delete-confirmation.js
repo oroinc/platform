@@ -37,7 +37,7 @@ define(function(require) {
         okButtonClass: config.okButtonClass,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DeleteConfirmationView(options) {
             DeleteConfirmationView.__super__.constructor.call(this, options);

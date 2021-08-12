@@ -80,7 +80,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiCheckboxEditorView(options) {
             MultiCheckboxEditorView.__super__.constructor.call(this, options);

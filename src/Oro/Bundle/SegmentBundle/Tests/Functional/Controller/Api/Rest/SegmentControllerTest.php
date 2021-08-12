@@ -25,7 +25,7 @@ class SegmentControllerTest extends WebTestCase
 
     public function testGetItemsForDefaultAclPermissions()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_segment_items', ['entityName' => str_replace('\\', '_', BusinessUnit::class)])
         );
@@ -51,7 +51,7 @@ class SegmentControllerTest extends WebTestCase
             ]
         );
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_segment_items', ['entityName' => str_replace('\\', '_', BusinessUnit::class)])
         );
@@ -76,7 +76,7 @@ class SegmentControllerTest extends WebTestCase
             ]
         );
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_segment_items', ['entityName' => str_replace('\\', '_', BusinessUnit::class)])
         );

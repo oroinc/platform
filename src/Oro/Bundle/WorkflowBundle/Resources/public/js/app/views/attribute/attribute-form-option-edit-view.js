@@ -32,14 +32,14 @@ define(function(require) {
         requiredOptions: ['workflow', 'entityFieldsProvider'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeFormOptionEditView(options) {
             AttributeFormOptionEditView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};

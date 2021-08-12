@@ -13,7 +13,7 @@ define(function(require) {
      */
     const ImportDialogWidget = BaseDialogView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImportDialogWidget(options) {
             ImportDialogWidget.__super__.constructor.call(this, options);

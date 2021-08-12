@@ -8,7 +8,7 @@ define(function(require) {
         optionNames: BaseComponent.prototype.optionNames.concat(['gridName']),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardNavigationComponent(options) {
             DashboardNavigationComponent.__super__.constructor.call(this, options);

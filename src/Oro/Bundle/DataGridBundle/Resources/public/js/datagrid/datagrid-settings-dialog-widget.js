@@ -49,14 +49,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsDialogWidget(options) {
             DatagridSettingsDialogWidget.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param options
          */
         initialize: function(options) {
@@ -71,7 +71,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this.viewOptions._sourceElement = this.$el;

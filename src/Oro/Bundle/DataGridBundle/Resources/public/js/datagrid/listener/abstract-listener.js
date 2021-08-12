@@ -20,7 +20,7 @@ define([
         dataField: 'id',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractListener(...args) {
             AbstractListener.__super__.constructor.apply(this, args);
@@ -53,7 +53,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

@@ -4,20 +4,17 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Processor;
 
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\ImportProcessorTest;
 use Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
 {
-    /** @var StepExecutionAwareImportProcessor */
-    protected $processor;
+    protected ContextAwareProcessor $processor;
 
-    /** @var MockObject|StepExecution */
-    protected $stepExecution;
+    private StepExecution|\PHPUnit\Framework\MockObject\MockObject $stepExecution;
 
-    /** @var MockObject|ContextRegistry */
-    protected $contextRegistry;
+    private ContextRegistry|\PHPUnit\Framework\MockObject\MockObject $contextRegistry;
 
     protected function setUp(): void
     {

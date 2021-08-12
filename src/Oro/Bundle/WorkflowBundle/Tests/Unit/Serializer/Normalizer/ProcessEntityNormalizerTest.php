@@ -10,52 +10,48 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessEntityNormalizer;
-use Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer\Stub\Entity;
+use Symfony\Component\Serializer\Serializer;
 
 class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
 
-    /** @var ProcessDataSerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
+    private Serializer|\PHPUnit\Framework\MockObject\MockObject $serializer;
 
-    /** @var ProcessEntityNormalizer */
-    private $normalizer;
+    private ProcessEntityNormalizer $normalizer;
 
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->serializer = $this->createMock(ProcessDataSerializer::class);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new ProcessEntityNormalizer($this->registry, $this->doctrineHelper);
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    public function testNormalizeExistingEntity()
+    public function testNormalizeExistingEntity(): void
     {
         $entity = new Entity();
         $entityId = 1;
         $format = 'json';
         $context = ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_CREATE)];
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->willReturn($entityId);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['className' => get_class($entity), 'entityId' => $entityId],
             $this->normalizer->normalize($entity, $format, $context)
         );
     }
 
-    public function testNormalizeDeletedEntity()
+    public function testNormalizeDeletedEntity(): void
     {
         $entity = new Entity();
         $entity->first = 1;
@@ -64,41 +60,41 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $context = ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)];
 
         $this->prepareMetadata(get_class($entity), ['first', 'second']);
-        $this->serializer->expects($this->any())
+        $this->serializer->expects(self::any())
             ->method('normalize')
-            ->with($this->isType('int'), $format, $context)
-            ->will($this->returnArgument(0));
+            ->with(self::isType('int'), $format, $context)
+            ->will(self::returnArgument(0));
 
-        $this->assertEquals(
+        self::assertEquals(
             ['className' => get_class($entity), 'entityData' => ['first' => 1, 'second' => 2]],
             $this->normalizer->normalize($entity, $format, $context)
         );
     }
 
-    public function testDenormalizeExistingEntity()
+    public function testDenormalizeExistingEntity(): void
     {
         $entity = new Entity();
         $entityId = 1;
         $className = get_class($entity);
 
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('find')
             ->with($className, $entityId)
             ->willReturn($entity);
 
-        $this->registry->expects($this->any())
+        $this->registry->expects(self::any())
             ->method('getManagerForClass')
             ->with($className)
             ->willReturn($entityManager);
 
-        $this->assertEquals(
+        self::assertEquals(
             $entity,
-            $this->normalizer->denormalize(['className' => $className, 'entityId' => $entityId], null)
+            $this->normalizer->denormalize(['className' => $className, 'entityId' => $entityId], '')
         );
     }
 
-    public function testDenormalizeDeletedEntity()
+    public function testDenormalizeDeletedEntity(): void
     {
         $entity = new Entity();
         $entity->first = 1;
@@ -108,43 +104,50 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $context = ['processJob' => $this->createProcessJob(ProcessTrigger::EVENT_DELETE)];
 
         $this->prepareMetadata(get_class($entity), ['first', 'second']);
-        $this->serializer->expects($this->any())
+        $this->serializer->expects(self::any())
             ->method('denormalize')
-            ->with($this->isType('int'), null, $format, $context)
-            ->will($this->returnArgument(0));
+            ->with(self::isType('int'), '', $format, $context)
+            ->will(self::returnArgument(0));
 
         $normalizedData = ['className' => $className, 'entityData' => ['first' => 1, 'second' => 2]];
-        $this->assertEquals($entity, $this->normalizer->denormalize($normalizedData, null, $format, $context));
+        self::assertEquals(
+            $entity,
+            $this->normalizer->denormalize($normalizedData, '', $format, $context)
+        );
     }
 
     private function prepareMetadata(string $className, array $fieldNames): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects($this->any())
+        $metadata->expects(self::any())
             ->method('getFieldNames')
             ->willReturn($fieldNames);
-        $metadata->expects($this->any())
+        $metadata->expects(self::any())
             ->method('getFieldValue')
-            ->willReturnCallback(function ($entity, $field) {
-                return $entity->{$field};
-            });
-        $metadata->expects($this->any())
+            ->willReturnCallback(
+                function ($entity, $field) {
+                    return $entity->{$field};
+                }
+            );
+        $metadata->expects(self::any())
             ->method('getReflectionClass')
             ->willReturn(new \ReflectionClass($className));
-        $metadata->expects($this->any())
+        $metadata->expects(self::any())
             ->method('getReflectionProperty')
-            ->with($this->isType('string'))
-            ->willReturnCallback(function ($name) use ($className) {
-                return new \ReflectionProperty($className, $name);
-            });
+            ->with(self::isType('string'))
+            ->willReturnCallback(
+                function ($name) use ($className) {
+                    return new \ReflectionProperty($className, $name);
+                }
+            );
 
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())
+        $entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->with($className)
             ->willReturn($metadata);
 
-        $this->registry->expects($this->any())
+        $this->registry->expects(self::any())
             ->method('getManagerForClass')
             ->with($className)
             ->willReturn($entityManager);
@@ -153,25 +156,25 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, bool $expected)
+    public function testSupportsNormalization($data, bool $expected): void
     {
         if (is_object($data)) {
-            $this->doctrineHelper->expects($this->once())
+            $this->doctrineHelper->expects(self::once())
                 ->method('isManageableEntity')
                 ->with($data)
                 ->willReturn($data instanceof \stdClass);
         } else {
-            $this->doctrineHelper->expects($this->never())
+            $this->doctrineHelper->expects(self::never())
                 ->method('isManageableEntity');
         }
 
-        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
+        self::assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
 
     public function supportsNormalizationDataProvider(): array
     {
         return [
-            'null'   => [null, false],
+            'null' => [null, false],
             'scalar' => ['scalar', false],
             'object' => [new \DateTime(), false],
             'entity' => [new \stdClass(), true],
@@ -181,15 +184,15 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($data, bool $expected)
+    public function testSupportsDenormalization($data, bool $expected): void
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
+        self::assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
     public function supportsDenormalizationDataProvider(): array
     {
         return [
-            'null'   => [null, false],
+            'null' => [null, false],
             'scalar' => ['scalar', false],
             'object' => [['serialized_data'], false],
             'entity' => [['className' => 'stdClass', 'entityData' => []], true],

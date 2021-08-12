@@ -15,7 +15,7 @@ define(function(require) {
         el: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeGroupTabContentComponent(options) {
             AttributeGroupTabContentComponent.__super__.constructor.call(this, options);

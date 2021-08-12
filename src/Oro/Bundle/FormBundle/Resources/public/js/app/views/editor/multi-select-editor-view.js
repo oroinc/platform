@@ -64,14 +64,14 @@ define(function(require) {
         className: 'multi-select-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiSelectEditorView(options) {
             MultiSelectEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options.ignore_value_field_name = true;

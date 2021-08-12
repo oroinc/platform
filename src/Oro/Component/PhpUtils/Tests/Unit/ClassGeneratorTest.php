@@ -15,21 +15,21 @@ class ClassGeneratorTest extends TestCase
     {
         $cg = new ClassGenerator();
 
-        static::assertEquals("{\n}", $cg->print());
+        self::assertEquals("{\n}", $cg->print());
     }
 
     public function testConstructWithoutNamespace(): void
     {
         $cg = new ClassGenerator('Test');
 
-        static::assertEquals("class Test\n{\n}\n", $cg->print());
+        self::assertEquals("class Test\n{\n}\n", $cg->print());
     }
 
     public function testConstructWithNamespace(): void
     {
         $cg = new ClassGenerator('Space\Test');
 
-        static::assertEquals("namespace Space;\n\nclass Test\n{\n}\n", $cg->print());
+        self::assertEquals("namespace Space;\n\nclass Test\n{\n}\n", $cg->print());
     }
 
     public function testAddUseWithNamespace(): void
@@ -37,7 +37,7 @@ class ClassGeneratorTest extends TestCase
         $cg = new ClassGenerator('Space\Test');
         $cg->addUse('Something\Useful');
 
-        static::assertEquals("namespace Space;\n\nuse Something\Useful;\n\nclass Test\n{\n}\n", $cg->print());
+        self::assertEquals("namespace Space;\n\nuse Something\Useful;\n\nclass Test\n{\n}\n", $cg->print());
     }
 
     public function testAddUseWithoutNamespaceProducesException(): void
@@ -57,7 +57,7 @@ class ClassGeneratorTest extends TestCase
         $namespace->addClass('Test');
         $expectedCode = (new PsrPrinter())->printNamespace($namespace);
 
-        static::assertEquals($expectedCode, $cg->print());
+        self::assertEquals($expectedCode, $cg->print());
     }
 
     public function testPrintWithoutNamespace(): void
@@ -67,7 +67,19 @@ class ClassGeneratorTest extends TestCase
         $classType = new ClassType('Test');
         $expectedCode = (new PsrPrinter())->printClass($classType);
 
-        static::assertEquals($expectedCode, $cg->print());
+        self::assertEquals($expectedCode, $cg->print());
+    }
+
+    public function testShouldBePossibleToPrintWithoutNamespace(): void
+    {
+        $cg = new ClassGenerator('Space\Test');
+
+        $classType = new ClassType('Test');
+        $namespace = new PhpNamespace('Space');
+        $namespace->addClass('Test');
+        $expectedCode = (new PsrPrinter())->printClass($classType, $namespace);
+
+        self::assertEquals($expectedCode, $cg->print(true));
     }
 
     public function testCloneWithNamespace(): void
@@ -76,9 +88,9 @@ class ClassGeneratorTest extends TestCase
         $cg1->addMethod('someMethod')->addBody('return "test";');
         $cg2 = clone $cg1;
 
-        static::assertNotSame($cg1->getNamespace(), $cg2->getNamespace());
-        static::assertNotSame($cg1->getNamespace()->getClasses(), $cg2->getNamespace()->getClasses());
-        static::assertEquals($cg1->print(), $cg2->print());
+        self::assertNotSame($cg1->getNamespace(), $cg2->getNamespace());
+        self::assertNotSame($cg1->getNamespace()->getClasses(), $cg2->getNamespace()->getClasses());
+        self::assertEquals($cg1->print(), $cg2->print());
     }
 
     public function testCloneWithoutNamespace(): void
@@ -87,7 +99,7 @@ class ClassGeneratorTest extends TestCase
         $cg1->addMethod('someMethod')->addBody('return "test";');
         $cg2 = clone $cg1;
 
-        static::assertNull($cg2->getNamespace());
-        static::assertEquals($cg1->print(), $cg2->print());
+        self::assertNull($cg2->getNamespace());
+        self::assertEquals($cg1->print(), $cg2->print());
     }
 }

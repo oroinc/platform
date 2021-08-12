@@ -16,7 +16,7 @@ define(function(require) {
         ]),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultipleEntityComponent(options) {
             MultipleEntityComponent.__super__.constructor.call(this, options);

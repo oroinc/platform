@@ -21,14 +21,14 @@ define(function(require) {
         $button: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ButtonComponent(options) {
             ButtonComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ButtonComponent.__super__.initialize.call(this, options);

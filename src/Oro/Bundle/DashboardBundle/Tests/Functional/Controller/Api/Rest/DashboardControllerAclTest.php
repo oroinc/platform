@@ -27,7 +27,7 @@ class DashboardControllerAclTest extends WebTestCase
 
         $this->assertNotNull($dashboard);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard',
@@ -35,7 +35,6 @@ class DashboardControllerAclTest extends WebTestCase
                     'id' => $dashboard->getId()
                 ]
             ),
-            [],
             [],
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );

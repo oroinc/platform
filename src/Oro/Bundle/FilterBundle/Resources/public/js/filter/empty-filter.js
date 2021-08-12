@@ -57,14 +57,14 @@ define([
         caret: '<span class="caret" aria-hidden="true"></span>',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmptyFilter(options) {
             EmptyFilter.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const opts = _.pick(options || {}, 'caret');
@@ -238,7 +238,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         isEmptyValue: function() {
             if (this.isEmptyType(this.value.type)) {

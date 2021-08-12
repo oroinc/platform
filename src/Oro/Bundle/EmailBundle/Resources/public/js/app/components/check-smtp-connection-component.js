@@ -10,7 +10,7 @@ define(function(require) {
 
     const CheckSmtpConnectionComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckSmtpConnectionComponent(options) {
             CheckSmtpConnectionComponent.__super__.constructor.call(this, options);

@@ -288,15 +288,16 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 The common route can be registered in `routing.yml` file, for example:
 
 ``` yaml
-acme_dictionary_api:
-    resource: "@AcmeProductBundle/Controller/Api/Rest/DictionaryController.php"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+acme_api_get_dictionary_values:
+    path: '/api/rest/{version}/{dictionary}.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Acme\Bundle\ProductBundle\Controller\Api\Rest\DictionaryController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
     options:
         group: dictionary_entity
 ```

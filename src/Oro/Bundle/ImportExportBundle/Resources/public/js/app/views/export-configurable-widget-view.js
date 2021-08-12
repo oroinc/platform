@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExportConfigurableWidgetView(options) {
             ExportConfigurableWidgetView.__super__.constructor.call(this, options);
