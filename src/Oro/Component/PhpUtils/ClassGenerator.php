@@ -22,9 +22,7 @@ use Nette\PhpGenerator\PsrPrinter;
 final class ClassGenerator
 {
     private ?PhpNamespace $namespace = null;
-
     private ClassType $classType;
-
     private PsrPrinter $printer;
 
     public function __construct(?string $classname = null)
@@ -43,12 +41,11 @@ final class ClassGenerator
         $this->printer = new PsrPrinter();
     }
 
-    public function print(): string
+    public function print(bool $skipNamespace = false): string
     {
-        return $this->namespace
+        return $this->namespace && !$skipNamespace
             ? $this->printer->printNamespace($this->namespace)
-            : $this->printer->printClass($this->classType)
-        ;
+            : $this->printer->printClass($this->classType, $this->namespace);
     }
 
     public function addUse(string $name, string $alias = null, string &$aliasOut = null): self

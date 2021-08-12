@@ -4,17 +4,18 @@ namespace Oro\Component\PhpUtils;
 
 /**
  * A simple and fast implementation of the class loader
- * that can be used to map one namespace to one path.
+ * that can be used to map one namespace to one file contains all classes from this namespace.
  */
-class ClassLoader
+class OneFileClassLoader
 {
     private string $namespacePrefix;
-    private string $path;
+    private string $filePath;
+    private static array $isFileLoaded = [];
 
-    public function __construct(string $namespacePrefix, string $path)
+    public function __construct(string $namespacePrefix, string $filePath)
     {
         $this->namespacePrefix = $namespacePrefix;
-        $this->path = $path . DIRECTORY_SEPARATOR;
+        $this->filePath = $filePath;
     }
 
     /**
@@ -42,11 +43,13 @@ class ClassLoader
             return false;
         }
 
-        $file = $this->path . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
-        if (false === @include $file) {
-            return false;
+        if (!isset(self::$isFileLoaded[$this->namespacePrefix])) {
+            self::$isFileLoaded[$this->namespacePrefix] = true;
+            if (false === @include $this->filePath) {
+                return false;
+            }
         }
 
-        return true;
+        return class_exists($className, false);
     }
 }
