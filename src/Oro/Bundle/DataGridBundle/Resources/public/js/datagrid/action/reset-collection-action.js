@@ -16,7 +16,7 @@ define([
         collection: undefined,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ResetCollectionAction(options) {
             ResetCollectionAction.__super__.constructor.call(this, options);

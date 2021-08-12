@@ -18,7 +18,7 @@ define(function(require) {
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MoveActionView(options) {
             MoveActionView.__super__.constructor.call(this, options);

@@ -97,7 +97,7 @@ define(function(require) {
         keyType: 'string',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectEditorView(options) {
             SelectEditorView.__super__.constructor.call(this, options);

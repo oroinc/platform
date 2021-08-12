@@ -334,7 +334,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     public function supportsDenormalizationDataProvider(): array
     {
         return [
-            [null, false],
+            ['', false],
             ['string', false],
             ['DateTime', false],
             [WorkflowData::class, true],

@@ -27,18 +27,18 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
     protected function createContext()
     {
         $this->constraint = new ValidRegion();
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
 
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
         $this->assertEquals(ValidRegionValidator::class, $this->constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }
 
-    public function testAddressWithoutCountry()
+    public function testAddressWithoutCountry(): void
     {
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry(null);
@@ -47,7 +47,7 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testAddressWithoutRegion()
+    public function testAddressWithoutRegion(): void
     {
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($this->createMock(Country::class));
@@ -56,7 +56,7 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidRegion()
+    public function testValidRegion(): void
     {
         $country = $this->createMock(Country::class);
         $region = $this->createMock(Region::class);
@@ -77,7 +77,7 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidRegion()
+    public function testInvalidRegion(): void
     {
         $country = $this->createMock(Country::class);
         $region = $this->createMock(Region::class);

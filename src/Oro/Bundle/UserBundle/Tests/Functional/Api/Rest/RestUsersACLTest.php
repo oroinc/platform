@@ -29,11 +29,10 @@ class RestUsersACLTest extends WebTestCase
             )
         );
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_user'),
             $request,
-            array(),
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
@@ -43,11 +42,10 @@ class RestUsersACLTest extends WebTestCase
     public function testGetUsers()
     {
         //get user id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_users'),
-            array('limit' => 100),
-            array(),
+            $this->getUrl('oro_api_get_users', ['limit' => 100]),
+            [],
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
@@ -57,10 +55,9 @@ class RestUsersACLTest extends WebTestCase
     public function testGetUser()
     {
         //open user by id
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user', array('id' => self::DEFAULT_USER_ID)),
-            array(),
             array(),
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
@@ -81,11 +78,10 @@ class RestUsersACLTest extends WebTestCase
             )
         );
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_user', array('id' => self::DEFAULT_USER_ID)),
             $request,
-            array(),
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
@@ -94,10 +90,9 @@ class RestUsersACLTest extends WebTestCase
 
     public function testDeleteUser()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_user', array('id' => self::DEFAULT_USER_ID)),
-            array(),
             array(),
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );

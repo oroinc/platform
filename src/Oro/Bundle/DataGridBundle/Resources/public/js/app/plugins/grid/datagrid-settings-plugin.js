@@ -12,7 +12,7 @@ define(function(require, exports, module) {
     let config = require('module-config').default(module.id);
     config = _.extend({
         icon: 'cog',
-        wrapperClassName: 'datagrid-settings dropleft',
+        wrapperClassName: `datagrid-settings ${_.isRTL() ? 'dropright' : 'dropleft'}`,
         label: __('oro.datagrid.settings.title'),
         ariaLabel: __('oro.datagrid.settings.title_aria_label')
     }, config);

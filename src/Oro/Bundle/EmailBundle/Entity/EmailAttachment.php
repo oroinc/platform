@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
@@ -24,7 +23,6 @@ class EmailAttachment implements FileExtensionInterface
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -32,7 +30,6 @@ class EmailAttachment implements FileExtensionInterface
      * @var string
      *
      * @ORM\Column(name="file_name", type="string", length=255)
-     * @JMS\Type("string")
      */
     protected $fileName;
 
@@ -40,7 +37,6 @@ class EmailAttachment implements FileExtensionInterface
      * @var string
      *
      * @ORM\Column(name="content_type", type="string", length=100)
-     * @JMS\Type("string")
      */
     protected $contentType;
 
@@ -49,7 +45,6 @@ class EmailAttachment implements FileExtensionInterface
      *
      * @ORM\OneToOne(targetEntity="EmailAttachmentContent", mappedBy="emailAttachment",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
-     * @JMS\Exclude
      */
     protected $attachmentContent;
 
@@ -58,7 +53,6 @@ class EmailAttachment implements FileExtensionInterface
      *
      * @ORM\ManyToOne(targetEntity="EmailBody", inversedBy="attachments")
      * @ORM\JoinColumn(name="body_id", referencedColumnName="id", onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $emailBody;
 
@@ -67,7 +61,6 @@ class EmailAttachment implements FileExtensionInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     * @JMS\Exclude
      */
     protected $file;
 
@@ -75,7 +68,6 @@ class EmailAttachment implements FileExtensionInterface
      * @var string
      *
      * @ORM\Column(name="embedded_content_id", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
      */
     protected $embeddedContentId;
 

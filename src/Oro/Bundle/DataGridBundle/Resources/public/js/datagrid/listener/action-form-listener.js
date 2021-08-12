@@ -12,14 +12,14 @@ define([
      */
     const ActionFormListener = AbstractListener.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionFormListener(...args) {
             ActionFormListener.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             mediator.on('datagrid:frontend:execute:' + options.gridName, this.onFrontAction, this);
@@ -62,7 +62,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _processValue: function(id, model) {
             // it's not being used

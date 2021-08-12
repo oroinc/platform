@@ -2,28 +2,18 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 
-use Oro\Bundle\DistributionBundle\OroKernel;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
 
 class OroKernelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OroKernel|OroKernelStub
-     */
-    protected $kernel;
+    private OroKernelStub $kernel;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->kernel = new OroKernelStub('env', false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         $this->removeDir($this->kernel->getCacheDir());
@@ -37,7 +27,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         }
 
         $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
@@ -55,7 +45,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider bundleList
      */
-    public function testCompareBundles($bundles, $expects)
+    public function testCompareBundles(array $bundles, array $expects)
     {
         uasort($bundles, [$this->kernel, 'compareBundles']);
         $id = 0;
@@ -103,7 +93,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
                 [
                     ['name' => 'AcmeLastBundle', 'priority' => 100],
                     ['name' => 'OroSomeBundle', 'priority' => 30],
-                    ['name' => 'AcmeTestBundle', 'priority' => 1],
+                    ['name' => 'AcmeTestBundle'],
                     ['name' => 'OroAnotherBundle', 'priority' => 30],
                     ['name' => 'AcmeDemoBundle', 'priority' => 100],
                 ],
@@ -129,15 +119,13 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function bundlesDataProvider()
+    public function bundlesDataProvider(): array
     {
         return [
             [
                 [
                     new BundleStub('Acme\Bundle\TestBundle\AcmeSimplifiedBundle'),
+                    new BundleStub(BundleStub::class), // installed optional bundle
                     new BundleStub('Acme\Bundle\TestBundle\AcmeDuplicateBundle'),
                     new BundleStub('Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle'),
                     new BundleStub('Acme\Bundle\TestBundle\AcmeRegisteredBundle'),
@@ -148,7 +136,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBootDeploymentWitoutParameters()
+    public function testBootDeploymentWithoutParameters()
     {
         $this->kernel->setAppDir('application/app1-without-parameters');
         $this->kernel->boot();

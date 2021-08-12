@@ -12,7 +12,7 @@ define([
         sorting: 'DESC',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NotesCollection(...args) {
             NotesCollection.__super__.constructor.apply(this, args);

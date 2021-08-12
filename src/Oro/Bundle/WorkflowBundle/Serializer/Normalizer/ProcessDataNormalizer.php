@@ -24,7 +24,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         /** @var ProcessData $object */
         $processJob = $this->getProcessJob($context);
@@ -43,10 +43,10 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $denormalizedData = $this->serializer->denormalize($data, '', $format, $context);
-        $denormalizedData = $denormalizedData ?: array();
+        $denormalizedData = $denormalizedData ?: [];
 
         return new ProcessData($denormalizedData);
     }
@@ -62,7 +62,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return $this->supportsClass($type);
     }
@@ -75,9 +75,6 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
      */
     protected function supportsClass($class)
     {
-        $processDataClass = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
-
-        return $processDataClass == $class ||
-               is_string($class) && class_exists($class) && in_array($processDataClass, class_parents($class));
+        return is_a($class, ProcessData::class, true);
     }
 }

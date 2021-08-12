@@ -9,7 +9,7 @@ define(function(require) {
         ViewType: Select2AutocompleteView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2TreeAutocompleteComponent(options) {
             Select2TreeAutocompleteComponent.__super__.constructor.call(this, options);

@@ -40,7 +40,7 @@ define(function(require) {
         active: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function LoadingBarView(options) {
             LoadingBarView.__super__.constructor.call(this, options);

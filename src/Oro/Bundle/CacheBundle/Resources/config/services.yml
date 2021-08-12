@@ -21,19 +21,6 @@ services:
         calls:
             - [ setNamespace, [ 'oro_serializer_cache' ] ]
 
-    oro_cache.jms_serializer:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'jms_serializer_cache' ] ]
-
-    oro_cache.jms_serializer_adapter:
-        public: false
-        class: 'Metadata\Cache\DoctrineCacheAdapter'
-        arguments:
-            - 'jms_serializer_cache'
-            - '@oro_cache.jms_serializer'
-
     oro_cache.action.handler.invalidate_scheduled:
         class: 'Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler'
         public: true

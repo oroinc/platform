@@ -11,7 +11,7 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
 {
-    const TEST_GRID_NAME = 'test';
+    private const TEST_GRID_NAME = 'test';
 
     public function testConfiguration()
     {
@@ -22,7 +22,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         );
         $configManager = $this->createMock(ConfigManager::class);
 
-        $entityMetadata = $this->createMock(EntityMetadata::class);
+        $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = 'route';
 
         $configManager->expects($this->once())
@@ -81,12 +81,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @param null $route
-     *
-     * @return array
-     */
-    public function getExpectedDefinition($route = null)
+    private function getExpectedDefinition(string $route = null): array
     {
         $definition = [
             'name'    => self::TEST_GRID_NAME,

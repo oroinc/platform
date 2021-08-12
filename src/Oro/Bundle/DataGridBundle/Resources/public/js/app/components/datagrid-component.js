@@ -44,14 +44,14 @@ define(function(require) {
         changeAppearanceEnabled: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DataGridComponent(options) {
             DataGridComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.pluginManager = new PluginManager(this);

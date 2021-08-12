@@ -9,7 +9,7 @@ class ProcessObjectNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         return array(self::SERIALIZED => base64_encode(serialize($object)));
     }
@@ -17,7 +17,7 @@ class ProcessObjectNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $value = $data[self::SERIALIZED];
 
@@ -45,7 +45,7 @@ class ProcessObjectNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return is_array($data) && !empty($data[self::SERIALIZED]);
     }

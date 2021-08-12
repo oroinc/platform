@@ -12,7 +12,7 @@ define(function(require) {
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CollapseActionView(options) {
             CollapseActionView.__super__.constructor.call(this, options);

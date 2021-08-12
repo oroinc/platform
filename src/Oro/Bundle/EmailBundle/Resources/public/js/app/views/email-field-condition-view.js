@@ -11,14 +11,14 @@ define(function(require) {
         entityData: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailFieldConditionView(options) {
             EmailFieldConditionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.entityData = options.entityData;

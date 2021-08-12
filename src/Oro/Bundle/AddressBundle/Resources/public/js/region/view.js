@@ -27,7 +27,7 @@ define(function(require, exports, module) {
         switchState: config.switchState,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressRegionView(options) {
             AddressRegionView.__super__.constructor.call(this, options);

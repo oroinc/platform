@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,13 +29,8 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->serializer = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Serializer\ProcessDataSerializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new ProcessDataNormalizer($this->doctrineHelper);
         $this->normalizer->setSerializer($this->serializer);
@@ -121,13 +118,13 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
             'no process job' => array(
                 'object'    => new ProcessData(array('data' => new \stdClass())),
                 'context'   => array(),
-                'exception' => '\LogicException',
+                'exception' => \LogicException::class,
                 'message'   => 'Process job is not defined',
             ),
             'invalid process job' => array(
                 'object'    => new ProcessData(array('data' => new \stdClass())),
                 'context'   => array('processJob' => new \stdClass()),
-                'exception' => '\LogicException',
+                'exception' => \LogicException::class,
                 'message'   => 'Invalid process job entity',
             ),
         );
@@ -136,7 +133,7 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testDenormalize()
     {
         $data = array('data' => new \stdClass(), 'old' => 1, 'new' => 2);
-        $class = 'Oro\Bundle\WorkflowBundle\Model\ProcessData';
+        $class = ProcessData::class;
         $format = 'json';
         $context = array('processJob' => new ProcessJob());
         $denormalizedData = array('denormalized', 'data');
@@ -180,10 +177,10 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     public function supportsDenormalizationDataProvider()
     {
         return array(
-            'null'        => array(null, false),
+            'null'        => array('', false),
             'string'      => array('string', false),
             'dateTime'    => array('DateTime', false),
-            'processData' => array('Oro\Bundle\WorkflowBundle\Model\ProcessData', true),
+            'processData' => array(ProcessData::class, true),
             'stdClass'    => array('stdClass', false),
         );
     }

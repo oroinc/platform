@@ -16,7 +16,7 @@ class EmailControllerWithNonAdminEmailsTest extends WebTestCase
     public function testCget()
     {
         $url = $this->getUrl('oro_api_get_emails');
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
 
         $emails = $this->getJsonResponseContent($this->client->getResponse(), 200);
 

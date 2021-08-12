@@ -6,7 +6,7 @@ define(function(require) {
 
     const ActivityContextComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextComponent(options) {
             ActivityContextComponent.__super__.constructor.call(this, options);

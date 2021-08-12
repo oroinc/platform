@@ -26,7 +26,7 @@ define([
         formatter: new PhoneFormatter(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PhoneCell(options) {
             PhoneCell.__super__.constructor.call(this, options);

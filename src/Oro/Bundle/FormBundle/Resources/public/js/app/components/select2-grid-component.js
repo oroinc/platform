@@ -6,7 +6,7 @@ define(function(require) {
 
     const Select2GridComponent = Select2Component.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2GridComponent(options) {
             Select2GridComponent.__super__.constructor.call(this, options);

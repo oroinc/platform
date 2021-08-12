@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -15,6 +16,7 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -146,7 +148,7 @@ class ImportStrategyHelper
         $itemData = null
     ): bool {
         $entityName = ClassUtils::getClass($entity);
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
         $action = $existingEntity ? 'EDIT' : 'CREATE';
         $checkEntity = $existingEntity ?: new ObjectIdentity('entity', $entityName);
         $isValid = true;
@@ -333,7 +335,7 @@ class ImportStrategyHelper
     }
 
     /**
-     * @return mixed|null
+     * @return AbstractUser|null
      */
     public function getLoggedUser()
     {
@@ -370,9 +372,9 @@ class ImportStrategyHelper
          * that mustn't be changed by import/export
          */
         if ($this->extendConfigProvider->hasConfig($entityClassName)) {
-            $properties = $this->fieldHelper->getFields(
+            $properties = $this->fieldHelper->getEntityFields(
                 $entityClassName,
-                true
+                EntityFieldProvider::OPTION_WITH_RELATIONS
             );
 
             return array_column($properties, 'name');
@@ -408,7 +410,7 @@ class ImportStrategyHelper
     protected function verifyClass($basicEntity, $importedEntity): string
     {
         $basicEntityClass = ClassUtils::getClass($basicEntity);
-        if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
+        if ($basicEntityClass !== ClassUtils::getClass($importedEntity)) {
             throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
         }
 

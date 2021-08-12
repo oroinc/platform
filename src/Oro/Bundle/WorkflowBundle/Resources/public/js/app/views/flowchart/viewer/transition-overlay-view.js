@@ -7,7 +7,7 @@ define(function(require) {
         template: require('tpl-loader!oroworkflow/templates/flowchart/viewer/transition.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartViewerTransitionOverlayView(options) {
             FlowchartViewerTransitionOverlayView.__super__.constructor.call(this, options);

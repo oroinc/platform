@@ -116,7 +116,7 @@ define(function(require) {
 
         /**
          * Method is overloaded to support raw data
-         * @inheritDoc
+         * @inheritdoc
          */
         modelId: function(attrs) {
             let id;
@@ -131,7 +131,7 @@ define(function(require) {
 
         /**
          * Method is overloaded to replace model creating process
-         * @inheritDoc
+         * @inheritdoc
          */
         _prepareModel: function(attrs, options) {
             if (this._isModel(attrs)) {
@@ -149,7 +149,7 @@ define(function(require) {
 
         /**
          * Method is overloaded to relieve models from registry
-         * @inheritDoc
+         * @inheritdoc
          */
         remove: function(models, options) {
             EntityCollection.__super__.remove.call(this, models, options);
@@ -162,7 +162,7 @@ define(function(require) {
 
         /**
          * Method is overloaded to handle model dispose event and cleanup reference
-         * @inheritDoc
+         * @inheritdoc
          */
         _onModelEvent: function(event, model, collection, options) {
             if (event === 'dispose' && !this.disposed) {

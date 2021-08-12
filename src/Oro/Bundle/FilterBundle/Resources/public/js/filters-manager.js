@@ -60,7 +60,7 @@ define(function(require, exports, module) {
          *  Is used in template for render additional html
          * @property {String} 'collapse-mode' | 'toggle-mode'
          */
-        renderMode: '',
+        renderMode: 'dropdown-mode',
 
         /**
          * Add filter button hint
@@ -154,7 +154,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'filters:update mediator': '_onChangeFilterSelect',
@@ -162,7 +162,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FiltersManager(options) {
             FiltersManager.__super__.constructor.call(this, options);
@@ -231,6 +231,17 @@ define(function(require, exports, module) {
                 this.subview('filters-state', filtersStateView);
                 this.listenTo(filtersStateView, 'clicked', function() {
                     this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
+
+                    const filter = Object.values(this.filters)
+                        .find(filter => {
+                            return filter.visible &&
+                                   filter.enabled &&
+                                   filter.getCriteriaSelector().attr('tabindex') !== '-1';
+                        });
+
+                    if (filter && $.contains(filtersStateView.el, document.activeElement)) {
+                        filter.getCriteriaSelector().trigger('focus');
+                    }
                 });
             }
 
@@ -242,7 +253,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             if (!_.isEmpty(this.filters)) {
@@ -290,9 +301,9 @@ define(function(require, exports, module) {
                 const option = filterSelector.find(`option[value="${filter.name}"]`);
 
                 if (filter.visible && option.hasClass('hidden')) {
-                    option.removeClass('hidden');
+                    option.removeClass('hidden').removeAttr('disabled');
                 } else if (!filter.visible && !option.hasClass('hidden')) {
-                    option.addClass('hidden');
+                    option.addClass('hidden').attr('disabled', true);
                 }
             });
 
@@ -308,7 +319,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -771,7 +782,7 @@ define(function(require, exports, module) {
         _createButtonReset: function() {
             return $(
                 '<div class="ui-multiselect-footer">' +
-                    '<a href="#" class="ui-multiselect-reset" data-role="reset-filters">' +
+                    '<a href="#" class="ui-multiselect-reset" role="button" data-role="reset-filters">' +
                         '<i class="fa-refresh"></i>' + this.multiselectResetButtonLabel + '' +
                     '</a>' +
                 '</div>'

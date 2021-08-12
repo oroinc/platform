@@ -25,14 +25,14 @@ define(function(require) {
         fieldItemView: ReadonlyFieldView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionPermissionsReadonlyRowView(options) {
             ActionPermissionsReadonlyRowView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ActionPermissionsReadonlyRowView.__super__.initialize.call(this, options);

@@ -12,7 +12,7 @@ define(function(require) {
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExpandActionView(options) {
             ExpandActionView.__super__.constructor.call(this, options);

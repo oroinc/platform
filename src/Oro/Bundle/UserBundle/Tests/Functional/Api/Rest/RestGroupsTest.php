@@ -23,7 +23,7 @@ class RestGroupsTest extends WebTestCase
             )
         );
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_group'),
             $request
@@ -41,7 +41,7 @@ class RestGroupsTest extends WebTestCase
      */
     public function testGetGroups($request)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_groups')
         );
@@ -69,7 +69,7 @@ class RestGroupsTest extends WebTestCase
     public function testUpdateGroup($request, $group)
     {
         $request['group']['name'] .= '_updated';
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl('oro_api_put_group', array('id' => $group['id'])),
             $request
@@ -77,7 +77,7 @@ class RestGroupsTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_group', array('id' => $group['id']))
         );
@@ -95,14 +95,14 @@ class RestGroupsTest extends WebTestCase
      */
     public function testDeleteGroup($group)
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_group', array('id' => $group['id']))
         );
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_group', array('id' => $group['id']))
         );

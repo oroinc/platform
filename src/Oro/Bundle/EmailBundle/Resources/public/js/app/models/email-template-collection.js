@@ -23,14 +23,14 @@ define(function(require) {
         model: EmailTemplateModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailTemplateCollection(...args) {
             EmailTemplateCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['route', 'routeId', 'includeNonEntity', 'includeSystemTemplates']));

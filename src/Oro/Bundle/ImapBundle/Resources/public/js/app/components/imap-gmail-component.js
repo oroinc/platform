@@ -27,14 +27,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImapGmailComponent(options) {
             ImapGmailComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ImapGmailComponent.__super__.initialize.call(this, options);
@@ -126,7 +126,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         prepareDataForForm: function(values) {
             const data = {

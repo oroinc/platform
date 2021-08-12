@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
@@ -24,7 +23,6 @@ class AbstractPageState
 
     /**
      * @var AbstractUser $user
-     * @Serializer\Exclude()
      */
     protected $user;
 

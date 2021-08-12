@@ -3,20 +3,18 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
-abstract class AbstractContextModeAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+abstract class AbstractContextModeAwareNormalizer implements
+    ContextAwareNormalizerInterface,
+    ContextAwareDenormalizerInterface
 {
-    /**
-     * @var array
-     */
-    protected $availableModes = array();
+    protected array $availableModes = [];
 
-    /**
-     * @var string
-     */
-    protected $defaultMode = null;
+    protected ?string $defaultMode = null;
 
-    public function __construct(array $availableModes, $defaultMode = null)
+    public function __construct(array $availableModes, ?string $defaultMode = null)
     {
         $this->setAvailableModes($availableModes);
         if (null !== $defaultMode) {
@@ -27,13 +25,9 @@ abstract class AbstractContextModeAwareNormalizer implements NormalizerInterface
     /**
      * Normalization depends on mode
      *
-     * @param mixed $object
-     * @param mixed $format
-     * @param array $context
-     * @return array
-     * @throws RuntimeException
+     * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         $mode = $this->getMode($context);
         $method = 'normalize' . ucfirst($mode);
@@ -46,60 +40,61 @@ abstract class AbstractContextModeAwareNormalizer implements NormalizerInterface
     /**
      * Denormalization depends on mode
      *
-     * @param mixed $data
-     * @param string $class
-     * @param mixed $format
-     * @param array $context
-     * @return mixed
-     * @throws RuntimeException
+     * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $mode = $this->getMode($context);
         $method = 'denormalize' . ucfirst($mode);
         if (method_exists($this, $method)) {
-            return $this->$method($data, $class, $format, $context);
+            return $this->$method($data, $type, $format, $context);
         }
         throw new RuntimeException(sprintf('Denormalization with mode "%s" is not supported', $mode));
     }
 
     /**
      * @param array $context
-     * @return string
+     *
+     * @return string|null
      * @throws RuntimeException
      */
-    protected function getMode(array $context)
+    protected function getMode(array $context): ?string
     {
-        $mode = isset($context['mode']) ? $context['mode'] : $this->defaultMode;
-        if (!in_array($mode, $this->availableModes)) {
+        $mode = $context['mode'] ?? $this->defaultMode;
+        if (!in_array($mode, $this->availableModes, true)) {
             throw new RuntimeException(sprintf('Mode "%s" is not supported', $mode));
         }
+
         return $mode;
     }
 
     /**
      * @param array $modes
+     *
      * @return AbstractContextModeAwareNormalizer
      * @throws RuntimeException
      */
-    protected function setAvailableModes(array $modes)
+    protected function setAvailableModes(array $modes): self
     {
         if (!$modes) {
-            throw new RuntimeException(sprintf('Modes must an array with at least one element', $modes));
+            throw new RuntimeException('Modes must be an array with at least one element');
         }
+
         $this->availableModes = $modes;
         $this->setDefaultMode(reset($modes));
+
         return $this;
     }
 
     /**
      * @param string $mode
+     *
      * @return AbstractContextModeAwareNormalizer
      * @throws RuntimeException
      */
-    protected function setDefaultMode($mode)
+    protected function setDefaultMode(string $mode): self
     {
-        if (!in_array($mode, $this->availableModes)) {
+        if (!in_array($mode, $this->availableModes, true)) {
             throw new RuntimeException(
                 sprintf(
                     'Mode "%s" is not supported, available modes are "%s"',
@@ -109,6 +104,7 @@ abstract class AbstractContextModeAwareNormalizer implements NormalizerInterface
             );
         }
         $this->defaultMode = $mode;
+
         return $this;
     }
 }

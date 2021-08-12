@@ -28,7 +28,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2AutocompleteView(options) {
             Select2AutocompleteView.__super__.constructor.call(this, options);

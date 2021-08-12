@@ -43,7 +43,7 @@ define(function(require) {
         template: require('tpl-loader!oroform/templates/floating-error-message.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractValidationMessageHandlerView(options) {
             AbstractValidationMessageHandlerView.__super__.constructor.call(this, options);

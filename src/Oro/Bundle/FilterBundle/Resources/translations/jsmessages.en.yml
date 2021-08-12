@@ -15,6 +15,7 @@
 "Filter criteria": "Filter criteria"
 oro:
     filter:
+        by: Filter By
         reset.label: Clear All Filters
         wrapper:
             reset:
@@ -61,6 +62,18 @@ oro:
                 quarter.tooltip: Number of the quarter of year (1 - 4)
                 dayofyear.tooltip: Number of the day in year (1 - 366)
                 year.tooltip: Gregorian year, starting from 1 AD
+            start_field:
+                aria_label: '{{ label }} filter from date value'
+            end_field:
+                aria_label: '{{ label }} filter to date value'
+        datetime:
+            start_field:
+                aria_label: '{{ label }} filter from time value'
+            end_field:
+                aria_label: '{{ label }} filter to time value'
+        select:
+            options_list:
+                aria_label: '{{ label }} filter values'
         embedded:
             choice:
                 field_to_value: field value
@@ -87,3 +100,14 @@ oro:
         filter_reset: Reset
         no_found: 'No matches found'
         clear: '{0} Clear search field|[1,Inf[ Clear filter "{{ label }}"'
+        input_field:
+            aria_label: '{{ label }} filter value'
+        range_fields:
+            start_field:
+                aria_label: '{{ label }} filter from value'
+            end_field:
+                aria_label: '{{ label }} filter to value'
+        select_field:
+            aria_label: '{{ label }} condition'
+        updateButton:
+            aria_label: 'Apply {{ label }}'

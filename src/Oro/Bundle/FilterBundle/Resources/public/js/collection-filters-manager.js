@@ -15,7 +15,7 @@ define([
      */
     const CollectionFiltersManager = FiltersManager.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CollectionFiltersManager(options) {
             CollectionFiltersManager.__super__.constructor.call(this, options);

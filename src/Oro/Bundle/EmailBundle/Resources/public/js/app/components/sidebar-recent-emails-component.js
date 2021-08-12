@@ -24,7 +24,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SidebarRecentEmailsComponent(options) {
             SidebarRecentEmailsComponent.__super__.constructor.call(this, options);

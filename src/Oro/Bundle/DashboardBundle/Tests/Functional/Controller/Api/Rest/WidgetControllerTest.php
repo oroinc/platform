@@ -11,31 +11,23 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class WidgetControllerTest extends WebTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    /** @var EntityManager */
+    private $em;
 
-    /**
-     * @var Widget
-     */
-    protected $widget;
+    /** @var Widget */
+    private $widget;
 
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
+    /** @var ConfigProvider */
+    private $configProvider;
 
-    /**
-     * @var Manager
-     */
-    protected $dashboardManager;
+    /** @var Manager */
+    private $dashboardManager;
 
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->em               = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->configProvider   = $this->getContainer()->get('oro_dashboard.config_provider');
+        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->configProvider = $this->getContainer()->get('oro_dashboard.config_provider');
         $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
 
         $this->widget = $this->createWidget();
@@ -48,7 +40,7 @@ class WidgetControllerTest extends WebTestCase
             'layoutPosition' => [2, 20]
         ];
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_dashboard_widget',
@@ -77,19 +69,28 @@ class WidgetControllerTest extends WebTestCase
         $widgetNames = array_keys($widgets);
 
         $widgetName = $widgetNames[0];
-        $id         = $this->widget->getDashboard()->getId();
-        $this->client->request(
+        $id = $this->widget->getDashboard()->getId();
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl(
                 'oro_api_post_dashboard_widget_add_widget'
             ),
-            array('dashboardId' => $id, 'widgetName' => $widgetName)
+            ['dashboardId' => $id, 'widgetName' => $widgetName]
         );
 
         $content = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertEquals($this->configProvider->getWidgetConfig($widgetName), $content['config']);
-        $this->assertEquals($widgetName, $content['name']);
+        $this->assertArrayHasKey('id', $content);
+        unset($content['id']);
+        $this->assertEquals(
+            [
+                'name'            => $widgetName,
+                'config'          => $this->configProvider->getWidgetConfig($widgetName),
+                'layout_position' => [0, 0],
+                'expanded'        => true
+            ],
+            $content
+        );
     }
 
     /**
@@ -97,7 +98,7 @@ class WidgetControllerTest extends WebTestCase
      */
     public function testDelete()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard_widget',
@@ -110,7 +111,7 @@ class WidgetControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard_widget',
@@ -125,13 +126,11 @@ class WidgetControllerTest extends WebTestCase
     }
 
     /**
-     * @param array $widgetsData
-     * @param array $expectedPositions
-     *
      * @dataProvider widgetsProvider
      */
-    public function testPositions($widgetsData, $expectedPositions)
+    public function testPositions(array $widgetsData, array $expectedPositions)
     {
+        $widgets = [];
         foreach ($widgetsData as $widgetData) {
             $widgets[] = $this->createWidget(
                 $widgetData['name'],
@@ -140,7 +139,7 @@ class WidgetControllerTest extends WebTestCase
         }
 
         $dashboard = null;
-        $data      = ['layoutPositions' => []];
+        $data = ['layoutPositions' => []];
         foreach ($widgets as $widget) {
             /* @var Widget $widget */
             $data['layoutPositions'][$widget->getId()] = array_map(
@@ -153,7 +152,7 @@ class WidgetControllerTest extends WebTestCase
             $dashboard = $widget->getDashboard();
         }
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_dashboard_widget_positions',
@@ -176,10 +175,7 @@ class WidgetControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function widgetsProvider()
+    public function widgetsProvider(): array
     {
         return [
             'multiple' => [
@@ -203,12 +199,7 @@ class WidgetControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param array  $layoutPositions
-     * @return Widget
-     */
-    protected function createWidget($name = 'quick_launchpad', array $layoutPositions = [1, 1])
+    private function createWidget(string $name = 'quick_launchpad', array $layoutPositions = [1, 1]): Widget
     {
         $dashboard = new Dashboard();
         $dashboard->setName('main');

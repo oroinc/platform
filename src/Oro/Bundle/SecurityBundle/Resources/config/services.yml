@@ -818,11 +818,6 @@ services:
         arguments:
             - '%oro_security.allowed_protocols%'
 
-    oro_security.rest_exception_listener:
-        class: Oro\Bundle\SecurityBundle\EventListener\RestExceptionListener
-        decorates: fos_rest.exception_listener
-        parent: fos_rest.exception_listener
-
     oro_security.error_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\ErrorListener
         decorates: exception_listener

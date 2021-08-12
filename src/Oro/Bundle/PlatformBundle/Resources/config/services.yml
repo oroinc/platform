@@ -1,8 +1,6 @@
 parameters:
     oro_platform.composer.installed_json: '%kernel.project_dir%/vendor/composer/installed.json'
 
-    jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
-
     oro_platform.collector.template: '@@OroPlatform/Collector/platform.html.twig'
 
 services:
@@ -18,12 +16,23 @@ services:
     Psr\Http\Message\ResponseFactoryInterface:
         alias: oro_platform.psr7.http_factory
 
-    jms_serializer.twig_extension.serializer:
-        class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
-        arguments:
-            - '@oro_platform.twig.service_locator'
+    oro_platform.serializer.fix_skip_null_values_array_normalizer:
+        class: Oro\Bundle\PlatformBundle\Serializer\Normalizer\FixSkipNullValuesArrayNormalizer
         tags:
-            - { name: twig.extension }
+            - { name: serializer.normalizer, priority: -1000 } # run after all custom normalizers
+
+    oro_platform.fix_json_status_code_error_renderer:
+        class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixJsonStatusCodeErrorRenderer
+        decorates: error_renderer.serializer
+        arguments:
+            - '@oro_platform.fix_json_status_code_error_renderer.inner'
+            - ['application/json', 'application/x-json']
+
+    oro_platform.fos_rest.fix_message_flatten_exception_normalizer:
+        class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixMessageFlattenExceptionNormalizer
+        decorates: fos_rest.serializer.flatten_exception_normalizer
+        arguments:
+            - '@oro_platform.fos_rest.fix_message_flatten_exception_normalizer.inner'
 
     oro_platform.service_link.service_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator

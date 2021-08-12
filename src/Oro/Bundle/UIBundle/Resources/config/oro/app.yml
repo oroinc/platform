@@ -10,7 +10,3 @@ liip_imagine:
             filters:
                 thumbnail:    { size: [16, 16], mode: outbound }
                 strip:        ~
-
-fos_rest:
-    exception:
-        exception_controller: 'Oro\Bundle\UIBundle\Controller\ExceptionController::showAction'

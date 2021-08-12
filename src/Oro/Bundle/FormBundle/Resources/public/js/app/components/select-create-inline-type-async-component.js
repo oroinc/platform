@@ -8,7 +8,7 @@ define(function(require) {
         ViewConstructor: SelectCreateInlineTypeAsyncView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectCreateInlineTypeAsyncComponent(options) {
             SelectCreateInlineTypeAsyncComponent.__super__.constructor.call(this, options);

@@ -4,22 +4,20 @@ namespace Oro\Bundle\EntityBundle\ImportExport\Serializer;
 
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
 /**
  * Serializer implementation for EntityFieldFallbackValue class
  */
-class EntityFieldFallbackValueNormalizer implements NormalizerInterface, DenormalizerInterface
+class EntityFieldFallbackValueNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
 {
     public const VIRTUAL_FIELD_NAME = 'value';
 
-    /** @var EntityFallbackResolver */
-    private $fallbackResolver;
+    private EntityFallbackResolver $fallbackResolver;
 
-    /** @var LocaleSettings */
-    private $localeSettings;
+    private LocaleSettings $localeSettings;
 
     public function __construct(EntityFallbackResolver $fallbackResolver, LocaleSettings $localeSettings)
     {
@@ -32,7 +30,7 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
      *
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof EntityFieldFallbackValue) {
             return null;
@@ -44,7 +42,7 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $object = new EntityFieldFallbackValue();
         if (is_array($data) && array_key_exists(self::VIRTUAL_FIELD_NAME, $data)) {
@@ -69,7 +67,7 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return is_a($type, EntityFieldFallbackValue::class, true);
     }
@@ -77,7 +75,7 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof EntityFieldFallbackValue;
     }
@@ -86,6 +84,7 @@ class EntityFieldFallbackValueNormalizer implements NormalizerInterface, Denorma
      * @param mixed $value
      * @param string $parentEntityName
      * @param string $fieldName
+     *
      * @return mixed
      */
     private function parseScalarValue($value, string $parentEntityName, string $fieldName)

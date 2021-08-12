@@ -3,8 +3,8 @@
 <% } else { %>
     <ul class="nav nav-tabs nav-tabs-oro">
         <% _.each(tabs, function (tab, i) { %>
-        <li <% if (i === 0) { %>class="active"<% } %> >
-            <a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a>
+        <li class="nav-item">
+            <a class="nav-link <%= tab.name %><% if (i === 0) { %> active<% } %>" href="#<%= tab.name %><%= suffix %>" role="button"><%= tab.label %></a>
         </li>
         <% }); %>
     </ul>

@@ -191,7 +191,7 @@ class ConfigController extends AbstractController
         $fields = [];
         if ($id) {
             $className = $this->getRoutingHelper()->resolveEntityClass($id);
-            $entityFields = $this->getEntityFieldProvider()->getFields($className);
+            $entityFields = $this->getEntityFieldProvider()->getEntityFields($className);
             foreach ($entityFields as $field) {
                 if (!\in_array(
                     $field['type'],

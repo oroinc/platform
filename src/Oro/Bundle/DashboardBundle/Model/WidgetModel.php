@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 
 /**
- * @JMS\ExclusionPolicy("ALL")
+ * Represents dashboard widget.
  */
 class WidgetModel implements EntityModelInterface
 {
@@ -17,8 +16,6 @@ class WidgetModel implements EntityModelInterface
     protected $entity;
 
     /**
-     * @JMS\Expose
-     *
      * @var array
      */
     protected $config;
@@ -60,9 +57,6 @@ class WidgetModel implements EntityModelInterface
     }
 
     /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("id")
-     *
      * @return int
      */
     public function getId()
@@ -81,9 +75,6 @@ class WidgetModel implements EntityModelInterface
     }
 
     /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("name")
-     *
      * @return string
      */
     public function getName()
@@ -103,9 +94,6 @@ class WidgetModel implements EntityModelInterface
     }
 
     /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("layout_position")
-     *
      * @return array
      */
     public function getLayoutPosition()
@@ -125,9 +113,6 @@ class WidgetModel implements EntityModelInterface
     }
 
     /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("expanded")
-     *
      * @return bool
      */
     public function isExpanded()

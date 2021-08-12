@@ -34,14 +34,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DigitalAssetChooseFormView(options) {
             DigitalAssetChooseFormView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             DigitalAssetChooseFormView.__super__.initialize.call(this, options);

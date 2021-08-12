@@ -61,3 +61,17 @@ doctrine:
                 query_cache_driver:
                     type: service
                     id:   doctrine.query.cache.config
+
+fos_rest:
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+    view:
+        failed_validation: HTTP_BAD_REQUEST
+        formats:
+            json: true
+            xml: false
+    format_listener:
+        rules:
+            - { path: '^/api/rest', priorities: [ json ], fallback_format: json, prefer_extension: false }
+            - { path: '^/', stop: true }

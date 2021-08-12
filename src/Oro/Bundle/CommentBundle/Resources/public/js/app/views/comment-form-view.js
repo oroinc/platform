@@ -34,7 +34,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CommentFormView(options) {
             CommentFormView.__super__.constructor.call(this, options);

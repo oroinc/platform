@@ -18,7 +18,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailEditorComponent(options) {
             EmailEditorComponent.__super__.constructor.call(this, options);

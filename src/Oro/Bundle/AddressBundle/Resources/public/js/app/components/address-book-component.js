@@ -14,14 +14,14 @@ define(function(require) {
         isAddressHtmlFormatted: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressBookComponent(options) {
             AddressBookComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             this._createAddressBook();

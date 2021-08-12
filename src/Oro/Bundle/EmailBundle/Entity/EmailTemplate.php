@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Model\ExtendEmailTemplate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -47,7 +46,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterface
 {
@@ -60,8 +58,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
@@ -69,8 +65,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var boolean
      *
      * @ORM\Column(name="isSystem", type="boolean")
-     * @JMS\Type("boolean")
-     * @JMS\Expose
      */
     protected $isSystem;
 
@@ -78,8 +72,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var boolean
      *
      * @ORM\Column(name="isEditable", type="boolean")
-     * @JMS\Type("boolean")
-     * @JMS\Expose
      */
     protected $isEditable;
 
@@ -87,8 +79,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $name;
 
@@ -104,8 +94,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var integer
      *
      * @ORM\Column(name="parent", type="integer", nullable=true)
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $parent;
 
@@ -113,8 +101,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var string
      *
      * @ORM\Column(name="subject", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $subject;
 
@@ -122,8 +108,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $content;
 
@@ -131,8 +115,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var string
      *
      * @ORM\Column(name="entityName", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $entityName;
 
@@ -144,8 +126,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=20)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $type = 'html';
 

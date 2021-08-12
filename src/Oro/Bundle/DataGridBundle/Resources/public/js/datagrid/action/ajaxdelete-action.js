@@ -32,7 +32,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AjaxdeleteAction(options) {
             AjaxdeleteAction.__super__.constructor.call(this, options);

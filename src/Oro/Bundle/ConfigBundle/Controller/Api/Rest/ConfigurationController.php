@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -13,17 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * REST API Configuration controller
- *
- * @RouteResource("configuration")
- * @NamePrefix("oro_api_")
+ * REST API controller for system configuration.
  */
-class ConfigurationController extends FOSRestController
+class ConfigurationController extends AbstractFOSRestController
 {
     /**
      * Get the list of all configuration sections
      *
-     * @Get("/configuration")
      * @ApiDoc(
      *      description="Get the list of all configuration sections",
      *      resource=true
@@ -49,9 +42,6 @@ class ConfigurationController extends FOSRestController
      * @param Request $request
      * @param string $path The configuration section path. For example: look-and-feel/grid
      *
-     * @Get("/configuration/{path}",
-     *      requirements={"path"="[\w\-]+[\w\-\/]*"}
-     * )
      * @ApiDoc(
      *      description="Get all configuration data of the specified section",
      *      resource=true,

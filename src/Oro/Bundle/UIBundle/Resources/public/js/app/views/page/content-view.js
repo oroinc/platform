@@ -37,7 +37,7 @@ define([
 
     const PageContentView = PageRegionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageContentView(options) {
             PageContentView.__super__.constructor.call(this, options);

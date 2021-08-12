@@ -93,14 +93,14 @@ define(function(require) {
         DEFAULT_TEXT_PROPERTY: 'text',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RelatedIdRelationEditorView(options) {
             RelatedIdRelationEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             RelatedIdRelationEditorView.__super__.initialize.call(this, options);

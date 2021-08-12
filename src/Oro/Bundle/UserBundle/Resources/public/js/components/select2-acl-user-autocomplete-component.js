@@ -6,14 +6,14 @@ define(function(require) {
 
     const Select2AclUserAutocompleteComponent = Select2Component.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2AclUserAutocompleteComponent(options) {
             Select2AclUserAutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             let params = {

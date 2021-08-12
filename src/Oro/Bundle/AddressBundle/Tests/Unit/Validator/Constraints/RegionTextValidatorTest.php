@@ -25,18 +25,18 @@ class RegionTextValidatorTest extends ConstraintValidatorTestCase
     protected function createContext()
     {
         $this->constraint = new RegionText();
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
 
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
         $this->assertEquals(RegionTextValidator::class, $this->constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }
 
-    public function testAddressWithoutCountry()
+    public function testAddressWithoutCountry(): void
     {
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry(null);
@@ -45,7 +45,7 @@ class RegionTextValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testAddressWithoutCountryAndAddressDoesNotHaveRegionText()
+    public function testAddressWithoutCountryAndAddressDoesNotHaveRegionText(): void
     {
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry(null);
@@ -54,7 +54,7 @@ class RegionTextValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testAddressWithCountryThatDoesNotHaveRegions()
+    public function testAddressWithCountryThatDoesNotHaveRegions(): void
     {
         $country = $this->createMock(Country::class);
         $country->expects($this->once())
@@ -68,7 +68,7 @@ class RegionTextValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testAddressWithCountryThatHasRegions()
+    public function testAddressWithCountryThatHasRegions(): void
     {
         $country = $this->createMock(Country::class);
         $country->expects($this->once())
@@ -85,7 +85,7 @@ class RegionTextValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testAddressWithCountryThatHasRegionsAndAddressDoesNotHaveRegionText()
+    public function testAddressWithCountryThatHasRegionsAndAddressDoesNotHaveRegionText(): void
     {
         $country = $this->createMock(Country::class);
         $country->expects($this->never())

@@ -17,14 +17,14 @@ define(function(require) {
         selectSubTree: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SubTreeActionView(options) {
             SubTreeActionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             SubTreeActionView.__super__.initialize.call(this, options);

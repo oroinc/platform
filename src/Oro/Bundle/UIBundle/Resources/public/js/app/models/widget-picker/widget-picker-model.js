@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetPickerModel(attrs, options) {
             WidgetPickerModel.__super__.constructor.call(this, attrs, options);

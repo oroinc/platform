@@ -12,14 +12,14 @@ define(function(require) {
         typeName: 'favorite',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FavoriteComponent(options) {
             FavoriteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _createSubViews: function() {
             this._createButtonView();

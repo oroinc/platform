@@ -17,7 +17,7 @@ define(function(require) {
      */
     const FlowChartComponent = PieChartComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowChartComponent(options) {
             FlowChartComponent.__super__.constructor.call(this, options);

@@ -19,14 +19,14 @@ define([
         model: RegionModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressRegionCollection(...args) {
             AddressRegionCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             this.options = _.extend({}, this.defaultOptions, options);

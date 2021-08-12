@@ -42,14 +42,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityListModel(...args) {
             ActivityListModel.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(...args) {
             this.once('change:contentHTML', function() {

@@ -28,7 +28,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function createValidator()
     {
@@ -36,13 +36,13 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function createContext()
     {
         $this->constraint = new NotLessThanOriginalValue(['scope' => 'extend', 'option' => 'length']);
 
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
@@ -72,7 +72,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         return $form;
     }
 
-    public function testTryToValidateOnWrongConstraint()
+    public function testTryToValidateOnWrongConstraint(): void
     {
         $constraint = $this->createMock(Constraint::class);
 
@@ -88,14 +88,14 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('1', $constraint);
     }
 
-    public function testValidateWithNullValue()
+    public function testValidateWithNullValue(): void
     {
         $this->validator->validate(null, $this->constraint);
 
         $this->assertNoViolation();
     }
 
-    public function testTryToValidateWithWrongContextObject()
+    public function testTryToValidateWithWrongContextObject(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -110,7 +110,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('12', $this->constraint);
     }
 
-    public function testTryToValidateWithFormWithoutConfigModelOption()
+    public function testTryToValidateWithFormWithoutConfigModelOption(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Validator should be used only with ConfigType root form');
@@ -119,7 +119,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('12', $this->constraint);
     }
 
-    public function testTryToValidateWithWrongFieldConfigModel()
+    public function testTryToValidateWithWrongFieldConfigModel(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -134,7 +134,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('12', $this->constraint);
     }
 
-    public function testValidateWithFieldConfigModelWithEmptyId()
+    public function testValidateWithFieldConfigModelWithEmptyId(): void
     {
         $configModel = new FieldConfigModel();
 
@@ -144,7 +144,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateWithFieldConfigModelWithoutOptions()
+    public function testValidateWithFieldConfigModelWithoutOptions(): void
     {
         $configModel = $this->getModel(1);
 
@@ -154,7 +154,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateWithBiggerValue()
+    public function testValidateWithBiggerValue(): void
     {
         $configModel = $this->getModel(1);
         $configModel->fromArray('extend', ['length' => '10']);
@@ -165,7 +165,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateWithEqualValue()
+    public function testValidateWithEqualValue(): void
     {
         $configModel = $this->getModel(1);
         $configModel->fromArray('extend', ['length' => '12']);
@@ -176,7 +176,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateWithLessValue()
+    public function testValidateWithLessValue(): void
     {
         $configModel = $this->getModel(1);
         $configModel->fromArray('extend', ['length' => '20']);
@@ -190,7 +190,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidateWithLessValueWhenFieldStateIsNew()
+    public function testValidateWithLessValueWhenFieldStateIsNew(): void
     {
         $configModel = $this->getModel(1);
         $configModel->fromArray('extend', ['length' => '20', 'state' => 'New']);

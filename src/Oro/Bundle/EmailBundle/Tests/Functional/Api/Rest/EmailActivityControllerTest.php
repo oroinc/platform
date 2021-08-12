@@ -27,14 +27,14 @@ class EmailActivityControllerTest extends WebTestCase
 
     public function testGetEntities()
     {
-        $this->client->request('GET', $this->baseUrl . '?messageId=email1@orocrm-pro.func-test');
+        $this->client->jsonRequest('GET', $this->baseUrl . '?messageId=email1@orocrm-pro.func-test');
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(3, $entities);
     }
 
     public function testGetEntitiesSeveralFilters()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->baseUrl . '?from=test1@example.com&to=test2@example.com&bcc=test4@example.com'
         );
@@ -44,17 +44,16 @@ class EmailActivityControllerTest extends WebTestCase
 
     public function testGetEntitiesToFilterShouldWorkForToCcBcc()
     {
-        $this->client->request('GET', $this->baseUrl . '?to=test3@example.com');
+        $this->client->jsonRequest('GET', $this->baseUrl . '?to=test3@example.com');
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(1, $entities);
     }
 
     public function testGetEntitiesWithPaging()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->baseUrl . '?messageId=email1@orocrm-pro.func-test&page=2&limit=2',
-            [],
             [],
             ['HTTP_X-Include' => 'totalCount']
         );
@@ -66,19 +65,19 @@ class EmailActivityControllerTest extends WebTestCase
 
     public function testGetEntitiesNoFilters()
     {
-        $this->client->request('GET', $this->baseUrl);
+        $this->client->jsonRequest('GET', $this->baseUrl);
         $this->getJsonResponseContent($this->client->getResponse(), 404);
     }
 
     public function testGetEntitiesMoreThanOneEmailFound()
     {
-        $this->client->request('GET', $this->baseUrl . '?from=test1@example.com');
+        $this->client->jsonRequest('GET', $this->baseUrl . '?from=test1@example.com');
         $this->getJsonResponseContent($this->client->getResponse(), 404);
     }
 
     public function testGetActivityTypes()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_activity_types')
         );
@@ -89,7 +88,7 @@ class EmailActivityControllerTest extends WebTestCase
 
     public function testGetActivityTargetTypes()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_activity_target_types', ['activity' => 'emails'])
         );

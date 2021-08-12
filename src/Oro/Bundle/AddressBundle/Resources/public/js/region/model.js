@@ -16,7 +16,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressRegionModel(attrs, options) {
             AddressRegionModel.__super__.constructor.call(this, attrs, options);

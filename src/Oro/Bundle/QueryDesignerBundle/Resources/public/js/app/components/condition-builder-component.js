@@ -12,14 +12,14 @@ define(function(require) {
         fieldsRelatedCriteria: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConditionBuilderComponent(options) {
             ConditionBuilderComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, 'fieldsRelatedCriteria'));

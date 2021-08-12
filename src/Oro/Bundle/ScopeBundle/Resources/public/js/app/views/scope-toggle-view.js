@@ -32,7 +32,7 @@ define(function(require) {
         $scopeFields: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ScopeToggleView(options) {
             ScopeToggleView.__super__.constructor.call(this, options);

@@ -9,7 +9,7 @@ define(function(require) {
 
     const CheckConnectionComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CheckConnectionComponent(options) {
             CheckConnectionComponent.__super__.constructor.call(this, options);

@@ -42,6 +42,10 @@ oro:
                 Max:
                     name: Max
                     hint: Maximum value
+            money:
+                Avg:
+                    name: Average
+                    hint: Average of values
             date:
                 Count:
                     name: Count

@@ -17,14 +17,14 @@ define(function(require) {
         ]),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImportValidateView(options) {
             ImportValidateView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ImportValidateView.__super__.initialize.call(this, options);

@@ -8,7 +8,7 @@ define(function(require) {
         util: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2EntityFieldComponent(options) {
             Select2EntityFieldComponent.__super__.constructor.call(this, options);

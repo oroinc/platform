@@ -11,7 +11,7 @@ const InlineShowMoreView = AbstractShowMoreView.extend({
     },
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     constructor: function InlineShowMoreView(options) {
         InlineShowMoreView.__super__.constructor.call(this, options);

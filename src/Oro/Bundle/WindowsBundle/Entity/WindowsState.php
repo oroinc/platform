@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WindowsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,7 +19,6 @@ class WindowsState extends AbstractWindowsState
      *
      * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @Serializer\Exclude()
      */
     protected $user;
 

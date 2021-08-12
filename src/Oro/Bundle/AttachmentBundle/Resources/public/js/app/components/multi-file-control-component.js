@@ -31,14 +31,14 @@ define(function(require) {
         $addItemButton: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiFileControlComponent(options) {
             MultiFileControlComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);

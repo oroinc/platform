@@ -9,7 +9,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function OrganizationSwitchView(options) {
             OrganizationSwitchView.__super__.constructor.call(this, options);

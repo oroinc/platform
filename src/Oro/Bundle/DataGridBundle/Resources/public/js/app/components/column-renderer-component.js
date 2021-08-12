@@ -16,21 +16,21 @@ define(function(Chaplin) {
         columns: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColumnRendererComponent(options) {
             ColumnRendererComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ColumnRendererComponent.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

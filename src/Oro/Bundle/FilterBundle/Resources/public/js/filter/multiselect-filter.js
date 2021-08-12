@@ -42,14 +42,14 @@ define(function(require) {
         minimumDropdownWidth: 120,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiSelectFilter(options) {
             MultiSelectFilter.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (_.isUndefined(this.emptyValue)) {
@@ -61,7 +61,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onSelectChange: function(e) {
             MultiSelectFilter.__super__._onSelectChange.call(this, e);
@@ -133,7 +133,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getCriteriaHint: function(...args) {
             const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
@@ -143,7 +143,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatRawValue(value) {
             const formatted = MultiSelectFilter.__super__._formatRawValue.call(this, value);
@@ -176,7 +176,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _isDOMValueChanged: function() {
             const thisDOMValue = this._readDOMValue();

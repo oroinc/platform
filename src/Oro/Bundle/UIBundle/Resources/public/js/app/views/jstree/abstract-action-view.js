@@ -17,21 +17,21 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="jstree-action"]': 'onClick'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractActionView(options) {
             AbstractActionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
@@ -39,7 +39,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const $el = $(this.options.template(this.options));
@@ -53,7 +53,7 @@ define(function(require) {
         onClick: function() {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

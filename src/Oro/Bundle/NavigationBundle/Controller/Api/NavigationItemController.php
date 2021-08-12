@@ -3,9 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\Persistence\ObjectManager;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
@@ -19,12 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
- * Provides API actions for managing navigation items.
- *
- * @RouteResource("navigationitems")
- * @NamePrefix("oro_api_")
+ * REST API controller to manage navigation items.
  */
-class NavigationItemController extends FOSRestController
+class NavigationItemController extends AbstractFOSRestController
 {
     /**
      * @ApiDoc(
@@ -40,9 +35,7 @@ class NavigationItemController extends FOSRestController
 
         $items = $navigationItemsProvider->getNavigationItems($this->getUser(), $organization, $type);
 
-        return $this->handleView(
-            $this->view($items, \is_array($items) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND)
-        );
+        return $this->handleView($this->view($items, Response::HTTP_OK));
     }
 
     /**
@@ -68,7 +61,7 @@ class NavigationItemController extends FOSRestController
         $params['url'] = $this->normalizeUrl($params['url'], $params['type']);
         $params['organization'] = $this->container->get('security.token_storage')->getToken()->getOrganization();
 
-        /** @var $entity NavigationItemInterface */
+        /** @var NavigationItemInterface $entity */
         $entity = $this->getFactory()->createItem($type, $params);
 
         if (!$entity) {
@@ -83,7 +76,6 @@ class NavigationItemController extends FOSRestController
         }
 
         $em = $this->getManager();
-
         $em->persist($entity);
         $em->flush();
 
@@ -122,7 +114,7 @@ class NavigationItemController extends FOSRestController
             );
         }
 
-        /** @var $entity NavigationItemInterface */
+        /** @var NavigationItemInterface $entity */
         $entity = $this->getFactory()->findItem($type, (int)$itemId);
 
         if (!$entity) {
@@ -140,7 +132,6 @@ class NavigationItemController extends FOSRestController
         $entity->setValues($params);
 
         $em = $this->getManager();
-
         $em->persist($entity);
         $em->flush();
 
@@ -155,7 +146,7 @@ class NavigationItemController extends FOSRestController
      */
     public function deleteIdAction(string $type, $itemId): Response
     {
-        /** @var $entity NavigationItemInterface */
+        /** @var NavigationItemInterface $entity */
         $entity = $this->getFactory()->findItem($type, (int)$itemId);
         if (!$entity) {
             return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
@@ -176,8 +167,9 @@ class NavigationItemController extends FOSRestController
      */
     protected function validatePermissions(AbstractUser $user): bool
     {
-        return is_a($user, $this->getUserClass(), true) &&
-            ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
+        return
+            is_a($user, $this->getUserClass(), true)
+            && ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
     }
 
     protected function getManager(): ObjectManager

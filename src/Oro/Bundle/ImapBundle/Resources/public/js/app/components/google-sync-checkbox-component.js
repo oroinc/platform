@@ -14,14 +14,14 @@ define(function(require) {
         scopes: ['https://mail.google.com/'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GoogleSyncCheckbox(options) {
             GoogleSyncCheckbox.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$clientIdElement = options._sourceElement

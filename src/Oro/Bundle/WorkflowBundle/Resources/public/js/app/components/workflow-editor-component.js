@@ -31,7 +31,7 @@ define(function(require) {
         FlowchartWorkflowView: FlowchartEditorWorkflowView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'requestAddTransition model': 'addNewStepTransition',
@@ -48,14 +48,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowEditorComponent(options) {
             WorkflowEditorComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const providerOptions = {
@@ -84,7 +84,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initManagementView: function($el) {
             this.workflowManagementView = new WorkflowManagementView({

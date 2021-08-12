@@ -20,14 +20,14 @@ define(function(require) {
         countModel: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationComponent(options) {
             EmailNotificationComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['countModel']));

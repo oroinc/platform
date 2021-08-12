@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
 
 class PrimaryItemCollectionNormalizer extends CollectionNormalizer
 {
-    const PRIMARY_ITEM_TYPE = 'Oro\Bundle\FormBundle\Entity\PrimaryItem';
+    const PRIMARY_ITEM_TYPE = PrimaryItem::class;
 
     /**
      * Returned normalized data where first element is primary
@@ -19,7 +19,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      * @param array $context
      * @return array
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         $result = array();
 
@@ -40,14 +40,15 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      * Denormalizes and sets primary to first element
      *
      * @param mixed $data
-     * @param string $class
+     * @param string $type
      * @param null $format
      * @param array $context
+     *
      * @return ArrayCollection
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $result = parent::denormalize($data, $class, $format, $context);
+        $result = parent::denormalize($data, $type, $format, $context);
         $primary = true;
         /** @var $item PrimaryItem */
         foreach ($result as $item) {
@@ -60,7 +61,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = array())
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         if ($data instanceof Collection && !$data->isEmpty()) {
             foreach ($data as $item) {
@@ -76,7 +77,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array())
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = array()): bool
     {
         $itemType = $this->getItemType($type);
         if ($itemType && class_exists($itemType)) {

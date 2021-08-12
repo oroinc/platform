@@ -33,38 +33,27 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class OwnerValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    private $doctrine;
+    private \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
+    private \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    private $tokenAccessor;
+    private \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProviderInterface */
-    private $ownerTreeProvider;
+    private \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProviderInterface $ownerTreeProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclVoter */
-    private $aclVoter;
+    private \PHPUnit\Framework\MockObject\MockObject|AclVoter $aclVoter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
-    private $aclGroupProvider;
+    private \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $aclGroupProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager */
-    private $businessUnitManager;
+    private \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager $businessUnitManager;
 
-    /** @var Entity */
-    private $testEntity;
+    private Entity $testEntity;
 
-    /** @var User */
-    private $currentUser;
+    private User $currentUser;
 
-    /** @var Organization */
-    private $currentOrg;
+    private Organization $currentOrg;
 
     protected function setUp(): void
     {
@@ -129,7 +118,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     protected function createContext()
     {
         $this->constraint = new Owner();
-        $this->propertyPath = null;
+        $this->propertyPath = '';
 
         return parent::createContext();
     }
@@ -139,7 +128,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
      *
      * @return User
      */
-    private function createUser($id)
+    private function createUser($id): User
     {
         $user = new User();
         $user->setId($id);
@@ -152,7 +141,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
      *
      * @return BusinessUnit
      */
-    private function createBusinessUnit($id)
+    private function createBusinessUnit($id): BusinessUnit
     {
         $businessUnit = new BusinessUnit();
         $businessUnit->setId($id);
@@ -165,7 +154,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
      *
      * @return Organization
      */
-    private function createOrganization($id)
+    private function createOrganization($id): Organization
     {
         $organization = new Organization();
         $organization->setId($id);
@@ -206,7 +195,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     /**
      * @param int $accessLevel
      */
-    private function expectAddOneShotIsGrantedObserver($accessLevel)
+    private function expectAddOneShotIsGrantedObserver($accessLevel): void
     {
         $this->aclVoter->expects(self::once())
             ->method('addOneShotIsGrantedObserver')
@@ -215,7 +204,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             });
     }
 
-    private function expectGetUserOrganizationIds(array $organizationIds)
+    private function expectGetUserOrganizationIds(array $organizationIds): void
     {
         $ownerTree = $this->createMock(OwnerTreeInterface::class);
         $ownerTree->expects(self::once())
@@ -226,13 +215,13 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($ownerTree);
     }
 
-    public function testValidateForInvalidConstraintType()
+    public function testValidateForInvalidConstraintType(): void
     {
         $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate($this->testEntity, $this->createMock(Constraint::class));
     }
 
-    public function testValidateForNull()
+    public function testValidateForNull(): void
     {
         $this->doctrine->expects(self::never())
             ->method('getManagerForClass');
@@ -241,7 +230,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateForNotManageableEntity()
+    public function testValidateForNotManageableEntity(): void
     {
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
@@ -254,7 +243,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateForNonAclProtectedEntity()
+    public function testValidateForNonAclProtectedEntity(): void
     {
         $ownershipMetadata = new OwnershipMetadata();
 
@@ -271,7 +260,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidWithNullOwner()
+    public function testValidWithNullOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -304,7 +293,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidWithNotChangedOwner()
+    public function testValidWithNotChangedOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -337,7 +326,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidBecauseAccessDenied()
+    public function testInvalidBecauseAccessDenied(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -377,7 +366,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidExistingEntityWithUserOwner()
+    public function testValidExistingEntityWithUserOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -416,7 +405,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidExistingEntityWithBusinessUnitOwner()
+    public function testValidExistingEntityWithBusinessUnitOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -455,7 +444,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidExistingEntityWithOrganizationOwner()
+    public function testValidExistingEntityWithOrganizationOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -491,7 +480,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidExistingEntityWithUserOwner()
+    public function testInvalidExistingEntityWithUserOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -533,7 +522,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidExistingEntityWithBusinessUnitOwner()
+    public function testInvalidExistingEntityWithBusinessUnitOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -575,7 +564,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidExistingEntityWithOrganizationOwner()
+    public function testInvalidExistingEntityWithOrganizationOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -614,7 +603,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidNewEntityWithUserOwner()
+    public function testValidNewEntityWithUserOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -652,7 +641,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidNewEntityWithBusinessUnitOwner()
+    public function testValidNewEntityWithBusinessUnitOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -690,7 +679,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidNewEntityWithOrganizationOwner()
+    public function testValidNewEntityWithOrganizationOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -725,7 +714,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidNewEntityWithUserOwner()
+    public function testInvalidNewEntityWithUserOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -766,7 +755,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidNewEntityWithBusinessUnitOwner()
+    public function testInvalidNewEntityWithBusinessUnitOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -807,7 +796,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidNewEntityWithOrganizationOwner()
+    public function testInvalidNewEntityWithOrganizationOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -845,7 +834,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidNewEntityWithNewUserOwner()
+    public function testValidNewEntityWithNewUserOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -889,7 +878,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidNewEntityWithNewBusinessUnitOwner()
+    public function testValidNewEntityWithNewBusinessUnitOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -933,7 +922,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidNewEntityWithNewOrganizationOwner()
+    public function testValidNewEntityWithNewOrganizationOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('ORGANIZATION');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -970,7 +959,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidNewEntityWithNewUserOwner()
+    public function testInvalidNewEntityWithNewUserOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('USER');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -1017,7 +1006,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidNewEntityWithNewBusinessUnitOwner()
+    public function testInvalidNewEntityWithNewBusinessUnitOwner(): void
     {
         $ownershipMetadata = $this->createOwnershipMetadata('BUSINESS_UNIT');
         $entityMetadata = $this->createMock(ClassMetadata::class);
@@ -1064,7 +1053,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidNewEntityWithBusinessUnitOwnerAndWithoutUserInToken()
+    public function testValidNewEntityWithBusinessUnitOwnerAndWithoutUserInToken(): void
     {
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $tokenAccessor->expects(self::any())

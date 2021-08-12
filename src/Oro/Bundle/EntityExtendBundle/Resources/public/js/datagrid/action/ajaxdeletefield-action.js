@@ -30,7 +30,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AjaxdeletefieldAction(options) {
             AjaxdeletefieldAction.__super__.constructor.call(this, options);

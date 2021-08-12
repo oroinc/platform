@@ -9,14 +9,14 @@ define(function(require) {
         dataItems: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HistoryView(options) {
             HistoryView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.dataItems = options.dataItems || 'history';

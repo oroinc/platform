@@ -50,7 +50,7 @@ class PinbarRestApiTest extends AbstractRestApiTest
     {
         $pin = $this->getReference(NavigationItemData::NAVIGATION_ITEM_PINBAR_1);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $this->getUrl('oro_api_post_navigationitems', ['type' => 'pinbar']),
             [
@@ -59,7 +59,6 @@ class PinbarRestApiTest extends AbstractRestApiTest
                 'position' => $pin->getPosition(),
                 'type' => 'pinbar',
             ],
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
@@ -69,8 +68,10 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         $resultJson = json_decode($result->getContent(), true);
 
-        self::assertArrayHasKey('message', $resultJson);
-        self::assertEquals('This pin already exists', $resultJson['message']);
+        self::assertEquals(
+            ['message' => 'This pin already exists'],
+            $resultJson
+        );
     }
 
     public function testPutWhenPinWithUrl(): void
@@ -79,14 +80,13 @@ class PinbarRestApiTest extends AbstractRestApiTest
         $updatedPintab = [
             'url' => $urlGenerator->generate('oro_config_configuration_system', ['sample_key' => 'sample_value']),
         ];
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
                 'oro_api_put_navigationitems_id',
                 ['type' => 'pinbar', 'itemId' => $this->getItemId()]
             ),
             $updatedPintab,
-            [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
@@ -98,31 +98,48 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         self::assertCount(0, $resultJson);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_navigationitems', ['type' => 'pinbar']),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
         $resultJson = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertNotEmpty($resultJson);
-        self::assertContains(
-            $urlGenerator->generate(
-                'oro_config_configuration_system',
-                ['restore' => 1, 'sample_key' => 'sample_value']
-            ),
-            array_column($resultJson, 'url', 'id')
+        $expectedUrl = $urlGenerator->generate(
+            'oro_config_configuration_system',
+            ['restore' => 1, 'sample_key' => 'sample_value']
+        );
+        $data = [];
+        foreach ($resultJson as $item) {
+            if ($item['url'] === $expectedUrl) {
+                $data = $item;
+                break;
+            }
+        }
+        $this->assertNotEmpty($data);
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('parent_id', $data);
+        unset($data['id'], $data['parent_id']);
+        self::assertEquals(
+            [
+                'url'                  => $expectedUrl,
+                'title'                => '{"type":"pinbar","route":"oro_config_configuration_system","title":{'
+                    . '"template":"oro.config.menu.system_configuration.label - oro.user.menu.system_tab.label",'
+                    . '"short_template":"oro.config.menu.system_configuration.label","params":[]},"position":0}',
+                'type'                 => 'pinbar',
+                'title_rendered'       => 'Configuration - System',
+                'title_rendered_short' => 'Configuration'
+            ],
+            $data
         );
     }
 
     public function testGetPinbar(): void
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_navigationitems', ['type' => 'pinbar']),
-            [],
             [],
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
@@ -131,10 +148,22 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
         $resultJson = json_decode($result->getContent(), true);
-        self::assertNotEmpty($resultJson);
-        self::assertArrayHasKey('id', $resultJson[0]);
-        self::assertArrayHasKey('title_rendered', $resultJson[0]);
-        self::assertArrayHasKey('title_rendered_short', $resultJson[0]);
+        $this->assertArrayHasKey('id', $resultJson[0]);
+        $this->assertArrayHasKey('parent_id', $resultJson[0]);
+        unset($resultJson[0]['id'], $resultJson[0]['parent_id']);
+        $urlGenerator = self::getContainer()->get(UrlGeneratorInterface::class);
+        self::assertEquals(
+            [
+                'url'                  => $urlGenerator->generate('oro_config_configuration_system', ['restore' => 1]),
+                'title'                => '{"type":"pinbar","route":"oro_config_configuration_system","title":{'
+                    . '"template":"oro.config.menu.system_configuration.label - oro.user.menu.system_tab.label",'
+                    . '"short_template":"oro.config.menu.system_configuration.label","params":[]},"position":0}',
+                'type'                 => 'pinbar',
+                'title_rendered'       => 'Configuration - System',
+                'title_rendered_short' => 'Configuration'
+            ],
+            $resultJson[0]
+        );
     }
 
     private function getQueryPath(): string

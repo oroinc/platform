@@ -4,8 +4,8 @@ namespace Oro\Bundle\MicrosoftIntegrationBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * The checkbox form type to enable/disable synchronization with Microsoft Azure Application.
@@ -30,14 +30,17 @@ class EnableConfigCheckboxType extends ConfigCheckbox
     }
 
     /**
-     * {@inheritDoc}
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        parent::configureOptions($resolver);
-        $resolver->setNormalizer('disabled', function (Options $options, $value) {
-            return $this->isMicrosoftConnectionConfigured() ? $value : true;
-        });
+        parent::finishView($view, $form, $options);
+
+        if (!$this->isMicrosoftConnectionConfigured() && !$form->getData() && !$view->vars['checked']) {
+            $view->vars['disabled'] = true;
+        }
     }
 
     private function isMicrosoftConnectionConfigured(): bool

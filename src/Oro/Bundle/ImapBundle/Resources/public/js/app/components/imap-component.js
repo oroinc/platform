@@ -24,7 +24,7 @@ define(function(require) {
         errorMessages: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImapComponent(options) {
             ImapComponent.__super__.constructor.call(this, options);

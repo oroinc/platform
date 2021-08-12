@@ -21,7 +21,7 @@ class ActivityListRoleControllerTest extends WebTestCase
     public function testGetListForUserWithOutPermissions()
     {
         $this->markTestSkipped("Test skipped. User wssi do not work. Test entity ACL do not work.");
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_activity_list_api_get_list',

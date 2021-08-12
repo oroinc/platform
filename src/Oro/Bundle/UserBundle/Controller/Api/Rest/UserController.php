@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -22,11 +19,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * API CRUD controller for User entity.
- *
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for User entity.
  */
-class UserController extends RestController implements ClassResourceInterface
+class UserController extends RestController
 {
     /**
      * Get the list of users
@@ -51,14 +46,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Get the list of users",
-     *      resource=true,
-     *      filters={
-     *          {"name"="page", "dataType"="integer"},
-     *          {"name"="limit", "dataType"="integer"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_user_user_view")
      */
@@ -77,8 +68,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @Rest\Get(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Get user data",
      *      resource=true,
@@ -88,7 +77,7 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_user_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getAction(int $id)
     {
@@ -98,7 +87,7 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * Create new user
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Create new user",
      *      resource=true
@@ -115,8 +104,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @Rest\Put(requirements={"id"="\d+"})
-     *
      * @ApiDoc(
      *      description="Update existing user",
      *      resource=true,
@@ -126,7 +113,7 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_user_update")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function putAction(int $id)
     {
@@ -137,8 +124,6 @@ class UserController extends RestController implements ClassResourceInterface
      * Delete user
      *
      * @param int $id User id
-     *
-     * @Rest\Delete(requirements={"id"="\d+"})
      *
      * @ApiDoc(
      *      description="Delete user",
@@ -154,7 +139,7 @@ class UserController extends RestController implements ClassResourceInterface
      *      permission="DELETE"
      * )
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteAction(int $id)
     {
@@ -175,17 +160,23 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_role_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getRolesAction(int $id)
     {
+        /** @var User|null $entity */
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
             return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getUserRoles(), Response::HTTP_OK));
+        $serializedRoles = [];
+        foreach ($entity->getUserRoles() as $role) {
+            $serializedRoles[] = $this->serializeRole($role);
+        }
+
+        return $this->handleView($this->view($serializedRoles, Response::HTTP_OK));
     }
 
     /**
@@ -202,17 +193,23 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      * @AclAncestor("oro_user_group_view")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getGroupsAction(int $id)
     {
+        /** @var User|null $entity */
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
             return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getGroups(), Response::HTTP_OK));
+        $serializedGroups = [];
+        foreach ($entity->getGroups() as $group) {
+            $serializedGroups[] = $this->serializeGroup($group);
+        }
+
+        return $this->handleView($this->view($serializedGroups, Response::HTTP_OK));
     }
 
     /**
@@ -232,15 +229,11 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @ApiDoc(
      *      description="Get user by username or email",
-     *      resource=true,
-     *      filters={
-     *          {"name"="email", "dataType"="string"},
-     *          {"name"="username", "dataType"="string"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_user_user_view")
      */
@@ -278,11 +271,7 @@ class UserController extends RestController implements ClassResourceInterface
                 $result = [];
                 /** @var Role $role */
                 foreach ($value as $index => $role) {
-                    $result[$index] = [
-                        'id'    => $role->getId(),
-                        'role'  => $role->getRole(),
-                        'label' => $role->getLabel(),
-                    ];
+                    $result[$index] = $this->serializeRole($role);
                 }
                 $value = $result;
                 break;
@@ -290,10 +279,7 @@ class UserController extends RestController implements ClassResourceInterface
                 $result = [];
                 /** @var Group $group */
                 foreach ($value as $index => $group) {
-                    $result[$index] = [
-                        'id'   => $group->getId(),
-                        'name' => $group->getName()
-                    ];
+                    $result[$index] = $this->serializeGroup($group);
                 }
                 $value = $result;
                 break;
@@ -356,8 +342,6 @@ class UserController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Get entity Manager
-     *
      * @return ApiEntityManager
      */
     public function getManager()
@@ -379,5 +363,22 @@ class UserController extends RestController implements ClassResourceInterface
     public function getFormHandler()
     {
         return $this->get('oro_user.form.handler.user.api');
+    }
+
+    private function serializeRole(Role $role): array
+    {
+        return [
+            'id'    => $role->getId(),
+            'role'  => $role->getRole(),
+            'label' => $role->getLabel()
+        ];
+    }
+
+    private function serializeGroup(Group $group): array
+    {
+        return [
+            'id'   => $group->getId(),
+            'name' => $group->getName()
+        ];
     }
 }
