@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
+/**
+ * Can get and set object parameters based only on parameter names.
+ */
 class FieldAccessor
 {
-    private static ?Inflector $inflector = null;
-
     /**
      * Gets the value of the field of the entity
      *
@@ -18,7 +18,7 @@ class FieldAccessor
      */
     public static function getValue($entity, $fieldName)
     {
-        return $entity->{'get' . self::getInflector()->classify($fieldName)}();
+        return $entity->{'get' . InflectorFactory::create()->classify($fieldName)}();
     }
 
     /**
@@ -30,7 +30,7 @@ class FieldAccessor
      */
     public static function setValue($entity, $fieldName, $value)
     {
-        $entity->{'set' . self::getInflector()->classify($fieldName)}($value);
+        $entity->{'set' . InflectorFactory::create()->classify($fieldName)}($value);
     }
 
     /**
@@ -42,7 +42,7 @@ class FieldAccessor
      */
     public static function addValue($entity, $fieldName, $relatedEntity)
     {
-        $entity->{'add' . self::getInflector()->classify($fieldName)}($relatedEntity);
+        $entity->{'add' . InflectorFactory::create()->classify($fieldName)}($relatedEntity);
     }
 
     /**
@@ -54,7 +54,7 @@ class FieldAccessor
      */
     public static function removeValue($entity, $fieldName, $relatedEntity)
     {
-        $entity->{'remove' . self::getInflector()->classify($fieldName)}($relatedEntity);
+        $entity->{'remove' . InflectorFactory::create()->classify($fieldName)}($relatedEntity);
     }
 
     /**
@@ -66,14 +66,6 @@ class FieldAccessor
      */
     public static function hasGetter($entity, $fieldName)
     {
-        return method_exists($entity, 'get' . self::getInflector()->classify($fieldName));
-    }
-
-    private static function getInflector(): Inflector
-    {
-        if (null === self::$inflector) {
-            self::$inflector = (new InflectorFactory())->build();
-        }
-        return self::$inflector;
+        return method_exists($entity, 'get' . InflectorFactory::create()->classify($fieldName));
     }
 }
