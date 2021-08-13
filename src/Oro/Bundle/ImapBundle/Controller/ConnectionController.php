@@ -91,12 +91,8 @@ class ConnectionController extends AbstractController
         return new JsonResponse($response);
     }
 
-    private function getOrganization(?int $id): ?Organization
+    private function getOrganization(int $id): ?Organization
     {
-        if (!$id) {
-            return null;
-        }
-
         return $this->getEntityManager(Organization::class)->find(Organization::class, $id);
     }
 
@@ -195,7 +191,9 @@ class ConnectionController extends AbstractController
                 $emailFolders = $manager->getFolders();
                 $origin->setFolders($emailFolders);
 
-                $organization = $this->getOrganization($organizationId);
+                $organization = $organizationId
+                    ? $this->getOrganization($organizationId)
+                    : null;
                 if ($entity === 'user') {
                     $response['imap']['folders'] = $this->getFoldersViewForUserMailBox(
                         $origin,
