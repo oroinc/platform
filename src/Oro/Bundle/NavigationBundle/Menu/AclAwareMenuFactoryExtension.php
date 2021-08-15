@@ -6,9 +6,10 @@ use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -16,22 +17,25 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
-    private Router $router;
+    private UrlMatcherInterface $urlMatcher;
+    private ControllerClassProvider $controllerClassProvider;
     private AuthorizationCheckerInterface $authorizationChecker;
     private ClassAuthorizationChecker $classAuthorizationChecker;
     private TokenAccessorInterface $tokenAccessor;
     private LoggerInterface $logger;
-    private array $existingAclChecks = [];
-    private array $declaredRoutes = [];
+    private array $aclCheckCache = [];
+    private array $controllerAclCheckCache = [];
 
     public function __construct(
-        Router $router,
+        UrlMatcherInterface $urlMatcher,
+        ControllerClassProvider $controllerClassProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         ClassAuthorizationChecker $classAuthorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         LoggerInterface $logger
     ) {
-        $this->router = $router;
+        $this->urlMatcher = $urlMatcher;
+        $this->controllerClassProvider = $controllerClassProvider;
         $this->authorizationChecker = $authorizationChecker;
         $this->classAuthorizationChecker = $classAuthorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
@@ -94,12 +98,12 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
     private function isGranted(string $aclResourceId): bool
     {
-        if (\array_key_exists($aclResourceId, $this->existingAclChecks)) {
-            return $this->existingAclChecks[$aclResourceId];
+        if (isset($this->aclCheckCache[$aclResourceId])) {
+            return $this->aclCheckCache[$aclResourceId];
         }
 
         $isAllowed = $this->authorizationChecker->isGranted($aclResourceId);
-        $this->existingAclChecks[$aclResourceId] = $isAllowed;
+        $this->aclCheckCache[$aclResourceId] = $isAllowed;
 
         return $isAllowed;
     }
@@ -107,26 +111,23 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     private function isRouteAvailable(array $options, bool $defaultValue): bool
     {
         $controller = $this->getController($options);
-        if (!$controller) {
+        if (null === $controller) {
             return $defaultValue;
         }
 
-        if (\array_key_exists($controller, $this->existingAclChecks)) {
-            return $this->existingAclChecks[$controller];
+        [$class, $method] = $controller;
+
+        if (isset($this->controllerAclCheckCache[$class][$method])) {
+            return $this->controllerAclCheckCache[$class][$method];
         }
 
-        $parts = explode('::', $controller);
-        if (count($parts) !== 2) {
-            return $defaultValue;
-        }
-
-        $isAllowed = $this->classAuthorizationChecker->isClassMethodGranted($parts[0], $parts[1]);
-        $this->existingAclChecks[$controller] = $isAllowed;
+        $isAllowed = $this->classAuthorizationChecker->isClassMethodGranted($class, $method);
+        $this->controllerAclCheckCache[$class][$method] = $isAllowed;
 
         return $isAllowed;
     }
 
-    private function getController(array $options): ?string
+    private function getController(array $options): ?array
     {
         if (!empty($options['route'])) {
             return $this->getControllerByRouteName($options['route']);
@@ -138,32 +139,18 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         return null;
     }
 
-    private function getControllerByRouteName(string $routeName): ?string
+    private function getControllerByRouteName(string $routeName): ?array
     {
-        if (!$this->declaredRoutes) {
-            $generator = $this->router->getGenerator();
-
-            $reflectionClass = new \ReflectionClass($generator);
-            $property = $reflectionClass->getProperty('compiledRoutes');
-            $property->setAccessible(true);
-
-            $this->declaredRoutes = $property->getValue($generator);
-        }
-
-        if (!empty($this->declaredRoutes[$routeName][1]['_controller'])) {
-            return $this->declaredRoutes[$routeName][1]['_controller'];
-        }
-
-        return null;
+        return $this->controllerClassProvider->getControllers()[$routeName] ?? null;
     }
 
-    private function getControllerByUri(string $uri): ?string
+    private function getControllerByUri(string $uri): ?array
     {
         if ('#' !== $uri) {
             try {
-                $route = $this->router->match($uri);
+                $route = $this->urlMatcher->match($uri);
 
-                return $route['_controller'];
+                return explode('::', $route['_controller']);
             } catch (RoutingException $e) {
                 $this->logger->debug($e->getMessage(), ['pathinfo' => $uri]);
             }
