@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Behat\Context;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Psr\Http\Message\ResponseInterface;
@@ -23,21 +21,6 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
     /** @var string[] */
     private $rememberedFilenames = [];
 
-    private FileManager $attachmentFileManager;
-
-    public function __construct(AttachmentManager $attachmentManager, FileManager $attachmentFileManager)
-    {
-        $this->attachmentFileManager = $attachmentFileManager;
-
-        parent::__construct($attachmentManager);
-    }
-
-    /**
-     * @param $entity
-     * @param string $attachmentField
-     *
-     * @return string
-     */
     public function getResizeAttachmentUrl($entity, string $attachmentField): string
     {
         $attachment = $this->getAttachmentByEntity($entity, $attachmentField);
@@ -169,7 +152,7 @@ JS;
 
     private function countFilesInAttachmentFilesystem(string $extension = ''): int
     {
-        $files = $this->attachmentFileManager->findFiles();
+        $files = $this->getAppContainer()->get('oro_attachment.file_manager')->findFiles();
         if ($extension) {
             $resultFiles = [];
             $pattern = sprintf('*.%s', ltrim($extension, '.'));

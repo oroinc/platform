@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
 /**
@@ -11,13 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
  */
 class EmailFeatureToggleContext extends OroFeatureContext
 {
-    private ConfigManager $configManager;
-
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
-
     /**
      * @When /^(?:|I )enable Email feature$/
      */
@@ -41,7 +33,8 @@ class EmailFeatureToggleContext extends OroFeatureContext
      */
     protected function setFeatureState($state, $section, $name)
     {
-        $this->configManager->set(sprintf('%s.%s', $section, $name), $state ? 1 : 0);
-        $this->configManager->flush();
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        $configManager->set(sprintf('%s.%s', $section, $name), $state ? 1 : 0);
+        $configManager->flush();
     }
 }

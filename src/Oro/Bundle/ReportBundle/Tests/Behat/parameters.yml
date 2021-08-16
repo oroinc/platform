@@ -1,5 +1,0 @@
-services:
-    Oro\Bundle\ReportBundle\Tests\Behat\Context\FeatureContext:
-        public: true
-        arguments:
-            - '@doctrine'

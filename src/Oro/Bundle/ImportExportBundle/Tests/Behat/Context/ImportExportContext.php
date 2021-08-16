@@ -6,16 +6,10 @@ use Behat\Behat\Hook\Scope\AfterFeatureScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Doctrine\Common\Cache\Cache;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Gaufrette\File;
 use GuzzleHttp\Client;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Services\PreExportMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
@@ -24,87 +18,36 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\ExpectationFailedException;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ImportExportContext extends OroFeatureContext implements
-    OroPageObjectAware
+class ImportExportContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
-    /**
-     * @var EntityAliasResolver
-     */
-    private $aliasResolver;
+    private ?OroMainContext $oroMainContext = null;
 
-    /**
-     * @var ProcessorRegistry
-     */
-    private $processorRegistry;
-
-    /**
-     * @var OroMainContext
-     */
-    private $oroMainContext;
-
-    /**
-     * @var EmailContext
-     */
-    private $emailContext;
+    private ?EmailContext $emailContext = null;
 
     /**
      * @var string Path to saved template
      */
-    protected $template;
+    protected string $template = '';
 
     /**
      * @var string Path to import file
      */
-    protected $importFile;
+    protected string $importFile = '';
 
     /**
      * @var string[] Paths to exported files
      */
-    protected static $exportFiles = [];
+    protected static array $exportFiles = [];
 
-    /** @var null|string */
-    private $absoluteUrl;
-
-    private RouterInterface $router;
-
-    private ConfigManager $configManager;
-
-    private FileManager $fileManager;
-
-    private Cache $cache;
-
-    private JobExecutor $jobExecutor;
-
-    private string $projectDir;
-
-    public function __construct(
-        RouterInterface $router,
-        string $projectDir,
-        EntityAliasResolver $aliasResolver,
-        ProcessorRegistry $processorRegistry,
-        ConfigManager $configManager,
-        FileManager $fileManager,
-        Cache $cache,
-        JobExecutor $jobExecutor
-    ) {
-        $this->router = $router;
-        $this->projectDir = $projectDir;
-        $this->aliasResolver = $aliasResolver;
-        $this->processorRegistry = $processorRegistry;
-        $this->configManager = $configManager;
-        $this->fileManager = $fileManager;
-        $this->cache = $cache;
-        $this->jobExecutor = $jobExecutor;
-    }
+    private ?string $absoluteUrl = null;
 
     public function setAbsoluteUrl(?string $absoluteUrl): void
     {
@@ -193,8 +136,12 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function downloadTemplateFile($entity, $processorName = null)
     {
-        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
-        $processors = $this->processorRegistry->getProcessorAliasesByEntity('export_template', $entityClass);
+        $entityClass = $this->getAppContainer()
+            ->get('oro_entity.entity_alias_resolver')
+            ->getClassByAlias($this->convertEntityNameToAlias($entity));
+        $processors = $this->getAppContainer()
+            ->get('oro_importexport.processor.registry')
+            ->getProcessorAliasesByEntity('export_template', $entityClass);
 
         if (!$processorName) {
             self::assertCount(
@@ -226,7 +173,7 @@ class ImportExportContext extends OroFeatureContext implements
         $exportButton = $this->createElement('ActiveExportTemplateButton');
         self::assertTrue($exportButton->isIsset(), "Export template link was not found");
 
-        $url = $this->locatePath($this->router->generate(
+        $url = $this->locatePath($this->getAppContainer()->get('router')->generate(
             'oro_importexport_export_template',
             [
                 'processorAlias' => $processor,
@@ -633,7 +580,7 @@ class ImportExportContext extends OroFeatureContext implements
     private function getAbsoluteUrl(string $path): string
     {
         if (!$this->absoluteUrl) {
-            $this->absoluteUrl = $this->configManager->get('oro_ui.application_url');
+            $this->absoluteUrl = $this->getAppContainer()->get('oro_config.manager')->get('oro_ui.application_url');
         }
 
         return sprintf('%s/%s', $this->absoluteUrl, ltrim($path, '/'));
@@ -641,7 +588,7 @@ class ImportExportContext extends OroFeatureContext implements
 
     private function getAbsolutePath(string $path): string
     {
-        return sprintf('%s/%s', $this->projectDir, ltrim($path, '/'));
+        return sprintf('%s/%s', $this->getAppContainer()->getParameter('kernel.project_dir'), ltrim($path, '/'));
     }
 
     /**
@@ -804,7 +751,8 @@ class ImportExportContext extends OroFeatureContext implements
 
         // BAP-17638: Replace sleep to appropriate logic
         // temporary solution: find the most recent file created in import_export dir
-        $files = $this->fileManager->getFilesByPeriod();
+        $fileManager = $this->getAppContainer()->get('oro_importexport.file.file_manager');
+        $files = $fileManager->getFilesByPeriod();
 
         $exportFiles = array_filter($files, function (File $file) {
             return preg_match('/export_\d{4}.*.csv/', $file->getName());
@@ -817,7 +765,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         /** @var File $exportFile */
         $exportFile = reset($exportFiles);
-        $this->importFile = $this->fileManager->writeToTmpLocalStorage($exportFile->getName());
+        $this->importFile = $fileManager->writeToTmpLocalStorage($exportFile->getName());
         $this->tryImportFile();
     }
 
@@ -858,7 +806,8 @@ class ImportExportContext extends OroFeatureContext implements
     public function changeExportBatchSize(int $size): void
     {
         // oro_importexport.test.cache service is defined in ImportExportBundle/Tests/Behat/parameters.yml
-        $this->cache->save(PreExportMessageProcessor::BATCH_SIZE_KEY, $size);
+        $cache = $this->getAppContainer()->get('oro_importexport.test.cache');
+        $cache->save(PreExportMessageProcessor::BATCH_SIZE_KEY, $size);
     }
 
     /**
@@ -914,10 +863,14 @@ class ImportExportContext extends OroFeatureContext implements
      */
     private function performExportForEntity($entity, $processorName = null)
     {
-        $entityClass = $this->aliasResolver->getClassByAlias($this->convertEntityNameToAlias($entity));
+        $entityClass = $this->getAppContainer()
+            ->get('oro_entity.entity_alias_resolver')
+            ->getClassByAlias($this->convertEntityNameToAlias($entity));
 
         if (!$processorName) {
-            $processors = $this->processorRegistry->getProcessorAliasesByEntity('export', $entityClass);
+            $processors = $this->getAppContainer()
+                ->get('oro_importexport.processor.registry')
+                ->getProcessorAliasesByEntity('export', $entityClass);
             self::assertCount(1, $processors, sprintf(
                 'Too many processors ("%s") for export "%s" entity',
                 implode(', ', $processors),
@@ -928,7 +881,8 @@ class ImportExportContext extends OroFeatureContext implements
 
         $filePath = $this->getTempFilePath('export_');
 
-        $jobResult = $this->jobExecutor->executeJob(
+        $jobExecutor = $this->getAppContainer()->get('oro_importexport.job_executor');
+        $jobResult = $jobExecutor->executeJob(
             'export',
             'entity_export_to_csv',
             [
