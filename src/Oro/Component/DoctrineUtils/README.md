@@ -88,11 +88,7 @@ class AppBundle extends Bundle
 {
     public function __construct(KernelInterface $kernel)
     {
-        $loader = new ClassLoader(
-            AddTransactionWatcherCompilerPass::CONNECTION_PROXY_NAMESPACE . '\\',
-            AddTransactionWatcherCompilerPass::getConnectionProxyRootDir($kernel->getCacheDir())
-        );
-        $loader->register();
+        TransactionWatcherConfigurator::registerConnectionProxies($kernel->getCacheDir());
     }
 
     public function build(ContainerBuilder $container)

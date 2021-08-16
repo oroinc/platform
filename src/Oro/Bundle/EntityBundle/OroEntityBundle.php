@@ -8,6 +8,7 @@ use Oro\Component\DependencyInjection\Compiler\InverseTaggedIteratorCompilerPass
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherConfigurator;
 use Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
@@ -32,12 +33,7 @@ class OroEntityBundle extends Bundle
         );
         $loader->register();
 
-        // register connection proxy class that supports the transaction watcher
-        $loader = new ClassLoader(
-            AddTransactionWatcherCompilerPass::CONNECTION_PROXY_NAMESPACE . '\\',
-            AddTransactionWatcherCompilerPass::getConnectionProxyRootDir($kernel->getCacheDir())
-        );
-        $loader->register();
+        TransactionWatcherConfigurator::registerConnectionProxies($kernel->getCacheDir());
     }
 
     /**
