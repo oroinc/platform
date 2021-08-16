@@ -1,12 +1,24 @@
 import {Events} from 'backbone';
 
 class TableCellIterator {
+    /**
+     * @param {jQuery} $table
+     */
     constructor($table) {
+        if ($table === void 0 || !($table[0] instanceof HTMLElement)) {
+            throw new Error('Option "$table" is required');
+        }
+
         this.$table = $table;
         this.setCurrentCell($table.find('[aria-colindex]:first'));
     }
 
     setCurrentCell($cell) {
+        // Set a new cell only if it is a child of current iterable table
+        if (!this.$table[0].contains($cell[0])) {
+            return this;
+        }
+
         const {_$cell} = this;
         this._$cell = $cell;
         this.trigger('change:current', $cell, _$cell);
@@ -27,22 +39,6 @@ class TableCellIterator {
 
     get rowindex() {
         return Number(this.$row.attr('aria-rowindex'));
-    }
-
-    get isFirstInRow() {
-        return this.$row.find('[aria-colindex]:first').is(this.$cell);
-    }
-
-    get isLastInRow() {
-        return this.$row.find('[aria-colindex]:last').is(this.$cell);
-    }
-
-    get isFirstRow() {
-        return this.$table.find('[aria-rowindex]:first').is(this.$row);
-    }
-
-    get isLastRow() {
-        return this.$table.find('[aria-rowindex]:last').is(this.$row);
     }
 
     prev() {

@@ -1,5 +1,6 @@
 import BasePlugin from 'oroui/js/app/plugins/base/plugin';
 import TableCellIterator from 'orodatagrid/js/datagrid/table-cell-iterator';
+import $ from 'jquery';
 
 const delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
@@ -22,11 +23,24 @@ const AccessibilityPlugin = BasePlugin.extend({
     initialize(main, options) {
         this.listenTo(this.main, {
             'content:update'() {
+                if (!this.enabled) {
+                    return;
+                }
                 if (!this.$table.find(this.iterator.$cell).length) {
                     // in case current cell is not available
                     this._resetCurrent();
                 }
                 this._updateAttributes();
+            },
+            'grid-cell:enter-edit-mode'() {
+                this.disable();
+            },
+            'grid-cell:exit-edit-mode'(cell) {
+                this.enable();
+
+                if (!cell.disposed) {
+                    this.iterator.setCurrentCell(cell.$el);
+                }
             },
             enable: this.enable,
             disable: this.disable
@@ -51,14 +65,16 @@ const AccessibilityPlugin = BasePlugin.extend({
     },
 
     enable() {
-        if (!this.$table) {
+        if (this.$table === void 0 || this.$table.length === 0) {
             // can not be enabled without table
             return;
         }
 
         this.iterator = new TableCellIterator(this.$table);
         this.listenTo(this.iterator, 'change:current', () => {
-            this.iterator.$cell.focus();
+            if ($.contains(this.$table[0], document.activeElement)) {
+                this.iterator.$cell.focus();
+            }
             this._updateAttributes();
         });
 
@@ -100,7 +116,13 @@ const AccessibilityPlugin = BasePlugin.extend({
     },
 
     onFocusin(e) {
+        // Focus is still be inside of a table
+        if ($.contains(e.currentTarget, document.activeElement)) {
+            return;
+        }
+
         const $target = this.$table.find(e.target);
+        // Make the cell in focus as current if it was not a current
         if ($target.is('[aria-colindex]') && !$target.is(this.iterator.$cell)) {
             this.iterator.setCurrentCell($target);
         }
@@ -155,12 +177,16 @@ const AccessibilityPlugin = BasePlugin.extend({
                 e.preventDefault();
                 break;
             case 'PageDown':
-                // @todo
                 e.preventDefault();
+                if (!this.main.disposed && this.main.collection.hasNext()) {
+                    this.main.collection.getNextPage();
+                }
                 break;
             case 'PageUp':
-                // @todo
                 e.preventDefault();
+                if (!this.main.disposed && this.main.collection.hasPrevious()) {
+                    this.main.collection.getPreviousPage();
+                }
                 break;
         }
     },

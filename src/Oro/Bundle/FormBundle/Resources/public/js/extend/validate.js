@@ -376,6 +376,9 @@ define(function(require, exports, module) {
         },
 
         isPristine: function(element) {
+            if (this.pristineValues === void 0) {
+                return false;
+            }
             return this.pristineValues[element.name] === element.value;
         },
 
