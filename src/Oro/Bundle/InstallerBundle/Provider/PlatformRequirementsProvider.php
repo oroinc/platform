@@ -12,6 +12,7 @@ use Oro\Bundle\AttachmentBundle\Exception\ProcessorsException;
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsVersionException;
 use Oro\Bundle\AttachmentBundle\ProcessorHelper;
 use Oro\Bundle\AttachmentBundle\ProcessorVersionChecker;
+use Oro\Bundle\DistributionBundle\OroKernel;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Process\Process;
@@ -26,7 +27,7 @@ use Symfony\Requirements\RequirementCollection;
  */
 class PlatformRequirementsProvider extends AbstractRequirementsProvider
 {
-    public const REQUIRED_PHP_VERSION = '8.0';
+    public const REQUIRED_PHP_VERSION = OroKernel::REQUIRED_PHP_VERSION;
 
     public const REQUIRED_GD_VERSION = '2.0';
 

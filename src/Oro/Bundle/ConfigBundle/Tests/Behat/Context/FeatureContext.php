@@ -6,7 +6,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField;
@@ -24,13 +23,6 @@ class FeatureContext extends OroFeatureContext implements
     OroPageObjectAware
 {
     use FixtureLoaderDictionary, PageObjectDictionary, AllowedColorsMapping;
-
-    private ConfigManager $configManager;
-
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
 
     /**
      * Follow link on sidebar in configuration menu
@@ -274,11 +266,12 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function enableConfigOptions(TableNode $table): void
     {
+        $configManager = $this->getAppContainer()->get('oro_config.global');
         foreach ($table->getRows() as $row) {
-            $this->configManager->set($row[0], true);
+            $configManager->set($row[0], true);
         }
 
-        $this->configManager->flush();
+        $configManager->flush();
     }
 
     /**
@@ -288,7 +281,8 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function setConfigurationProperty($key, $value)
     {
-        $this->configManager->set($key, $value);
-        $this->configManager->flush();
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        $configManager->set($key, $value);
+        $configManager->flush();
     }
 }

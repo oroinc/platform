@@ -14,9 +14,11 @@ use Symfony\Component\Filesystem\Filesystem;
  * Basic feature context which may be used as parent class for other contexts.
  * Provides assert and spin functions.
  */
-class OroFeatureContext extends RawMinkContext
+class OroFeatureContext extends RawMinkContext implements AppKernelAwareInterface
 {
-    use AssertTrait, SpinTrait;
+    use AssertTrait;
+    use SpinTrait;
+    use AppKernelAwareTrait;
 
     public function waitForAjax()
     {

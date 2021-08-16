@@ -5,6 +5,7 @@ namespace Oro\Component\DoctrineUtils\DependencyInjection;
 use Doctrine\DBAL\Connection;
 use Oro\Component\DoctrineUtils\DBAL\ChainTransactionWatcher;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
+use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherConfigurator;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
 use Oro\Component\Testing\Doctrine\PersistentConnection;
 use Symfony\Component\DependencyInjection\Alias;
@@ -20,8 +21,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddTransactionWatcherCompilerPass implements CompilerPassInterface
 {
-    public const CONNECTION_PROXY_NAMESPACE = 'OroDoctrineConnection';
-
     private const CONNECTION_PROXY_CLASS = 'ConnectionProxy';
 
     /** @var string */
@@ -85,14 +84,6 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
             'setTransactionWatcher',
             [new Reference($watcherServiceId)]
         );
-    }
-
-    /**
-     * Gets the root directory where the connection proxy should be stored.
-     */
-    public static function getConnectionProxyRootDir(string $cacheDir): string
-    {
-        return $cacheDir . DIRECTORY_SEPARATOR . 'oro_entities';
     }
 
     /**
@@ -200,7 +191,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
 
         $transactionWatcherInterface = '\\' . TransactionWatcherInterface::class;
         $transactionWatcherAwareInterface = '\\' . TransactionWatcherAwareInterface::class;
-        $proxyNamespace = self::CONNECTION_PROXY_NAMESPACE;
+        $proxyNamespace = TransactionWatcherConfigurator::CONNECTION_PROXY_NAMESPACE;
         $proxyClass = self::CONNECTION_PROXY_CLASS . '_' . md5($connectionClass);
         $proxyFile = $proxyDir . DIRECTORY_SEPARATOR . $proxyClass . '.php';
         $startNestingLevel = 1;
@@ -301,9 +292,9 @@ PHP
     private function getProxyDir(ContainerBuilder $container): string
     {
         return
-            self::getConnectionProxyRootDir($container->getParameter('kernel.cache_dir'))
+            TransactionWatcherConfigurator::getConnectionProxyRootDir($container->getParameter('kernel.cache_dir'))
             . DIRECTORY_SEPARATOR
-            . self::CONNECTION_PROXY_NAMESPACE;
+            . TransactionWatcherConfigurator::CONNECTION_PROXY_NAMESPACE;
     }
 
     /**

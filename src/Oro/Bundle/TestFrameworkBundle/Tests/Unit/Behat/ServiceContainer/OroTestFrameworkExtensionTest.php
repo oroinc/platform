@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
+use Behat\Behat\Context\Initializer\ContextInitializer;
+use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer;
+use Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\ContextServiceEnvironmentHandler;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
@@ -16,6 +20,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Yaml\Yaml;
 
@@ -23,11 +28,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $tempDir;
+    private string $tempDir;
 
-    /** @var array */
-    private $sharedContexts = [OroMainContext::class];
+    private array $sharedContexts = [OroMainContext::class];
 
     protected function setUp(): void
     {
@@ -39,8 +42,11 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processBundleAutoloadProvider
      */
-    public function testProcessBundleAutoload(array $suiteConfig, array $bundlesConfig, array $expectedSuiteConfig)
-    {
+    public function testProcessBundleAutoload(
+        array $suiteConfig,
+        array $bundlesConfig,
+        array $expectedSuiteConfig
+    ): void {
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
 
@@ -53,7 +59,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $config = $this->processConfig($config);
 
         $extension = $this->getMockBuilder(OroTestFrameworkExtension::class)
-            ->onlyMethods(['hasValidPaths', 'hasDirectory'])
+            ->onlyMethods(['hasValidPaths'])
             ->getMock();
         $extension->expects(self::any())
             ->method('hasValidPaths')
@@ -64,10 +70,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension->process($containerBuilder);
 
-        $this->assertEquals($expectedSuiteConfig, $containerBuilder->getParameter('suite.configurations'));
+        self::assertEquals($expectedSuiteConfig, $containerBuilder->getParameter('suite.configurations'));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = [OroMainContext::class];
@@ -83,13 +89,13 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $config);
 
-        $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
+        self::assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
     }
 
-    public function testGetConfigKey()
+    public function testGetConfigKey(): void
     {
         $extension = new OroTestFrameworkExtension();
-        $this->assertEquals('oro_test', $extension->getConfigKey());
+        self::assertEquals('oro_test', $extension->getConfigKey());
     }
 
     public function processBundleAutoloadProvider(): array
@@ -190,7 +196,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExceptionForElementsWithSameName()
+    public function testExceptionForElementsWithSameName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Configuration with "MyElement" key is already defined');
@@ -199,20 +205,22 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_behat_extension' => [
                 'elements' => [
                     'MyElement' => [
-                        'class' => '\My\Element\MyElement'
+                        'class' => '\My\Element\MyElement',
                     ],
                 ],
             ],
         ];
-        $configExtension = ['oro_test' => [
-            'shared_contexts' => $this->sharedContexts,
-        ]];
+        $configExtension = [
+            'oro_test' => [
+                'shared_contexts' => $this->sharedContexts,
+            ],
+        ];
         file_put_contents($this->tempDir . '/bundle1/Tests/Behat/behat.yml', Yaml::dump($config));
         file_put_contents($this->tempDir . '/bundle2/Tests/Behat/behat.yml', Yaml::dump($config));
 
         $bundlesConfig = [
             ['name' => 'OroBundle1', 'path' => $this->tempDir . '/bundle1'],
-            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2']
+            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2'],
         ];
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
@@ -222,13 +230,13 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->process($containerBuilder);
     }
 
-    public function testMergeElements()
+    public function testMergeElements(): void
     {
         $config1 = [
             'oro_behat_extension' => [
                 'elements' => [
                     'MyElement1' => [
-                        'class' => '\My\Element\MyElement'
+                        'class' => '\My\Element\MyElement',
                     ],
                 ],
             ],
@@ -237,20 +245,22 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_behat_extension' => [
                 'elements' => [
                     'MyElement2' => [
-                        'class' => '\My\Element\MyElement'
+                        'class' => '\My\Element\MyElement',
                     ],
                 ],
             ],
         ];
-        $configExtension = ['oro_test' => [
-            'shared_contexts' => $this->sharedContexts,
-        ]];
+        $configExtension = [
+            'oro_test' => [
+                'shared_contexts' => $this->sharedContexts,
+            ],
+        ];
         file_put_contents($this->tempDir . '/bundle1/Tests/Behat/behat.yml', Yaml::dump($config1));
         file_put_contents($this->tempDir . '/bundle2/Tests/Behat/behat.yml', Yaml::dump($config2));
 
         $bundlesConfig = [
             ['name' => 'OroBundle1', 'path' => $this->tempDir . '/bundle1'],
-            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2']
+            ['name' => 'OroBundle2', 'path' => $this->tempDir . '/bundle2'],
         ];
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
@@ -333,5 +343,63 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $processor = new Processor();
 
         return $processor->process($tree->buildTree(), $config);
+    }
+
+    public function testProcessContextInitializers(): void
+    {
+        $containerBuilder = $this->getContainerBuilder([]);
+        $containerBuilder->setParameter('suite.configurations', []);
+
+        $className = $this->getMockClass(ContextInitializer::class);
+        $contextInitializerDef = new Definition($this->getMockClass(ContextInitializer::class));
+        $contextInitializerDef->addTag(ContextExtension::INITIALIZER_TAG);
+        $containerBuilder->setDefinition($className, $contextInitializerDef);
+
+        $envHandlerId = 'oro_test.environment.handler.context_service_environment_handler';
+        $envHandlerDef = new Definition(ContextServiceEnvironmentHandler::class);
+        $containerBuilder->setDefinition($envHandlerId, $envHandlerDef);
+
+        $config = $this->processConfig(['oro_test' => ['shared_contexts' => $this->sharedContexts]]);
+
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $config);
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
+        $extension->process($containerBuilder);
+
+        self::assertEquals(
+            [
+                ['registerContextInitializer', [new Reference($className)]],
+                ['registerContextInitializer', [new Reference('oro_behat_page_object_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_behat_session_alias_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_behat_browser_tab_manager_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_behat_fixture_loader_initializer')]],
+                ['registerContextInitializer', [new Reference('oro_test.processor.message_queue_initializer')]],
+                ['registerContextInitializer', [new Reference(AppKernelInitializer::class)]],
+            ],
+            $containerBuilder->getDefinition($envHandlerId)
+                ->getMethodCalls()
+        );
+    }
+
+    public function testProcessResolveClassPass(): void
+    {
+        $containerBuilder = $this->getContainerBuilder([]);
+        $containerBuilder->setParameter('suite.configurations', []);
+
+        $sampleServiceDef = new Definition(\stdClass::class);
+        $containerBuilder->setDefinition(\stdClass::class, $sampleServiceDef);
+
+        $config = $this->processConfig(['oro_test' => ['shared_contexts' => $this->sharedContexts]]);
+
+        $extension = new OroTestFrameworkExtension();
+        $extension->load($containerBuilder, $config);
+
+        $this->updateNelmioServiceDefinitions($containerBuilder);
+
+        $extension->process($containerBuilder);
+
+        self::assertEquals(\stdClass::class, $containerBuilder->getDefinition(\stdClass::class)->getClass());
     }
 }

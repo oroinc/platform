@@ -6,6 +6,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
         arguments:
             - '@router.default'
+            - '@oro_ui.controller_class_provider'
             - '@security.authorization_checker'
             - '@oro_security.class_authorization_checker'
             - '@oro_security.token_accessor'

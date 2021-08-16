@@ -3,20 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\MinkExtension\Context\RawMinkContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\AppKernelAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\AppKernelAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-class ConsoleContext extends RawMinkContext
+class ConsoleContext extends RawMinkContext implements AppKernelAwareInterface
 {
     use AssertTrait;
-
-    private string $projectDir;
-
-    public function __construct(string $projectDir)
-    {
-        $this->projectDir = $projectDir;
-    }
+    use AppKernelAwareTrait;
 
     /**
      * Runs Symfony console command
@@ -68,6 +64,8 @@ class ConsoleContext extends RawMinkContext
         $phpPath = $phpFinder->find();
         self::assertNotFalse($phpPath, 'The PHP executable cannot be found');
 
+        $projectDir = realpath($this->getAppContainer()->getParameter('kernel.project_dir'));
+
         $process = Process::fromShellCommandline(
             sprintf(
                 '%s bin/console %s %s',
@@ -75,7 +73,7 @@ class ConsoleContext extends RawMinkContext
                 $command,
                 $args
             ),
-            $this->projectDir
+            $projectDir
         );
         $process->run();
 

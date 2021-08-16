@@ -10,7 +10,6 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -25,23 +24,13 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ACLContext extends OroFeatureContext implements
-    OroPageObjectAware
+class ACLContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
-    /** @var OroMainContext */
-    private $oroMainContext;
+    private ?OroMainContext $oroMainContext = null;
 
-    private Inflector $inflector;
-
-    private DoctrineHelper $doctrineHelper;
-
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->inflector = (new InflectorFactory())->build();
-    }
+    private ?Inflector $inflector = null;
 
     /**
      * @BeforeScenario
@@ -88,7 +77,7 @@ class ACLContext extends OroFeatureContext implements
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntities = array_map(function ($element) {
-            return trim(ucfirst($this->inflector->singularize($element)));
+            return trim(ucfirst($this->getInflector()->singularize($element)));
         }, explode(',', $entity));
 
         $this->loginAsAdmin();
@@ -123,7 +112,7 @@ class ACLContext extends OroFeatureContext implements
 
         foreach ($table->getRows() as $row) {
             $action = $row[0];
-            $singularizedEntity = trim(ucfirst($this->inflector->singularize($row[1])));
+            $singularizedEntity = trim(ucfirst($this->getInflector()->singularize($row[1])));
             $accessLevel = $row[2];
             $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
         }
@@ -179,7 +168,7 @@ class ACLContext extends OroFeatureContext implements
         $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
-        $singularizedEntity = ucfirst($this->inflector->singularize($entity));
+        $singularizedEntity = ucfirst($this->getInflector()->singularize($entity));
         $this->loginAsAdmin();
 
         $userRoleForm = $this->openRoleEditForm($role);
@@ -534,11 +523,13 @@ class ACLContext extends OroFeatureContext implements
     protected function getRole($user)
     {
         if ('administrator' === $user) {
-            return $this->doctrineHelper
+            return $this->getAppContainer()
+                ->get('oro_entity.doctrine_helper')
                 ->getEntityRepositoryForClass(Role::class)
                 ->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
         } elseif ('user' === $user) {
-            return $this->doctrineHelper
+            return $this->getAppContainer()
+                ->get('oro_entity.doctrine_helper')
                 ->getEntityRepositoryForClass(Role::class)
                 ->findOneBy(['role' => User::ROLE_DEFAULT]);
         }
@@ -563,5 +554,10 @@ class ACLContext extends OroFeatureContext implements
     protected function getRoleEditFormElement()
     {
         return $this->elementFactory->createElement('UserRoleForm');
+    }
+
+    private function getInflector(): Inflector
+    {
+        return $this->inflector ?: ($this->inflector = (new InflectorFactory())->build());
     }
 }

@@ -1,11 +1,8 @@
 services:
-    Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentContext:
-        abstract: true
-        arguments:
-            - '@oro_attachment.manager'
+  oro_attachment.behat.provider.image_file_names:
+    alias: oro_attachment.provider.image_file_names
+    public: true
 
-    Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext:
-        public: true
-        parent: Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentContext
-        arguments:
-            - '@oro_attachment.file_manager'
+  oro_attachment.behat.media_cache_manager_registry:
+    alias: oro_attachment.media_cache_manager_registry
+    public: true
