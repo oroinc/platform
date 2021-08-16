@@ -7,23 +7,18 @@ use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 
 class TreeUtilsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * Test group tree
-     *
-     * @return GroupNodeDefinition
-     */
-    protected static function getTestGroup()
+    protected static function getTestGroup(): GroupNodeDefinition
     {
-        $node1 = new GroupNodeDefinition('node1', array(), array());
+        $node1 = new GroupNodeDefinition('node1', [], []);
         $node1->setLevel(1);
         $node1->setPriority(20);
-        $node2 = new GroupNodeDefinition('node2', array(), array());
+        $node2 = new GroupNodeDefinition('node2', [], []);
         $node2->setLevel(2);
-        $node3 = new GroupNodeDefinition('node3', array(), array($node2));
+        $node3 = new GroupNodeDefinition('node3', [], [$node2]);
         $node3->setLevel(1);
         $node3->setPriority(10);
 
-        $root = new GroupNodeDefinition('node4', array(), array($node1, $node3));
+        $root = new GroupNodeDefinition('node4', [], [$node1, $node3]);
         $root->setLevel(0);
 
         return $root;
@@ -65,9 +60,7 @@ class TreeUtilsTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConfigKey()
     {
-        $this->assertEquals(
-            'root.name',
-            TreeUtils::getConfigKey('root', 'name')
-        );
+        $this->assertEquals('root.name', TreeUtils::getConfigKey('root', 'name'));
+        $this->assertEquals('root__name', TreeUtils::getConfigKey('root', 'name', '__'));
     }
 }

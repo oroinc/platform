@@ -61,13 +61,14 @@ class UserScopeManager extends AbstractScopeManager
     }
 
     /**
-     * @param User $entity
-     *
      * {@inheritdoc}
      */
     protected function getScopeEntityIdValue($entity)
     {
-        return $entity->getId();
+        if ($entity instanceof User) {
+            return $entity->getId();
+        }
+        throw new \LogicException(sprintf('"%s" is not supported.', \get_class($entity)));
     }
 
     /**
