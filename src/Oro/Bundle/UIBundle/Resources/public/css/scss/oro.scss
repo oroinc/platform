@@ -558,16 +558,18 @@ label.radio.error {
         border: none;
     }
 
+    .controls-line-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
     .add-list-item {
         margin-left: 183px;
     }
 
     .row-oro.oro-multiselect-holder {
         margin: 0 0 $content-padding-small;
-    }
-
-    .btn-icon {
-        height: auto;
     }
 
     .enum-value-collection & {
