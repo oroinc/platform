@@ -271,7 +271,7 @@ class ConfigManager
         $this->resetMemoryCache();
 
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
-        $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
+        $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->resolveIdentifier($scopeIdentifier));
         $this->eventDispatcher->dispatch($event, ConfigUpdateEvent::EVENT_NAME);
 
         return $changeSet;
