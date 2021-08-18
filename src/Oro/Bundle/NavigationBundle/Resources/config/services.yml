@@ -339,7 +339,6 @@ services:
         arguments:
             - '@oro_menu.builder_chain'
             - '@knp_menu.matcher'
-            - '@router'
         tags:
             - { name: oro_breadcrumbs.provider, priority: -255 }
 

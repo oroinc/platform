@@ -6,50 +6,34 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OptionsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var FormProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formProvider;
-
     /** @var OptionsHelper */
-    protected $helper;
+    private $helper;
 
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->router = $this->createMock(Router::class);
-        $this->router->expects(self::any())->method('generate')->willReturn('generated-url');
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->expects(self::any())
+            ->method('generate')
+            ->willReturn('generated-url');
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects(self::any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($id, $parameters) {
                 $parameters = implode('_', $parameters);
                 return sprintf('[trans]%s[%s][/trans]', $id, $parameters);
             });
 
-        $this->formProvider = $this->createMock(FormProvider::class);
-        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-
         $this->helper = new OptionsHelper(
-            $this->router,
-            $this->translator,
-            $this->formProvider,
-            $this->htmlTagHelper
+            $urlGenerator,
+            $translator,
+            $this->createMock(FormProvider::class),
+            $this->createMock(HtmlTagHelper::class)
         );
     }
 
@@ -62,11 +46,9 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getFrontendOptionsProvider()
+    public function getFrontendOptionsProvider(): array
     {
         $defaultData = [
             'options' => [
@@ -205,17 +187,15 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $label
-     * @param array $templateData
-     *
-     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getButton($label, array $templateData)
+    private function getButton(string $label, array $templateData): ButtonInterface
     {
         $button = $this->createMock(ButtonInterface::class);
-        $button->expects($this->any())->method('getTemplateData')->willReturn($templateData);
-        $button->expects($this->any())->method('getLabel')->willReturn($label);
+        $button->expects($this->any())
+            ->method('getTemplateData')
+            ->willReturn($templateData);
+        $button->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($label);
 
         return $button;
     }

@@ -7,42 +7,39 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
     /** @var Controller|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationControllerMock;
+    private $translationControllerMock;
 
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    protected $routerMock;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $languageProvider;
+    private $languageProvider;
 
     /** @var JsTranslationDumper */
-    protected $dumper;
+    private $dumper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->translationControllerMock = $this->createMock(Controller::class);
-        $this->routerMock = $this->createMock(Router::class);
+        $this->router = $this->createMock(RouterInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->dumper = new JsTranslationDumper(
             $this->translationControllerMock,
-            $this->routerMock,
+            $this->router,
             [],
             '',
             $this->languageProvider
@@ -62,7 +59,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn($routeMock);
 
-        $this->routerMock->expects($this->once())
+        $this->router->expects($this->once())
             ->method('getRouteCollection')
             ->willReturn($routeCollectionMock);
 
@@ -93,7 +90,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn($routeMock);
 
-        $this->routerMock->expects($this->once())
+        $this->router->expects($this->once())
             ->method('getRouteCollection')
             ->willReturn($routeCollectionMock);
 

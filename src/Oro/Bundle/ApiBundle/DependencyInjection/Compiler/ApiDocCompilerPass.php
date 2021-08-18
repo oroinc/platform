@@ -28,9 +28,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_DOC_ANNOTATION_HANDLER_SERVICE        = 'oro_api.rest.api_doc_annotation_handler';
     private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    private const API_DOC_SIMPLE_FORMATTER_SERVICE          = 'nelmio_api_doc.formatter.simple_formatter';
-    private const API_DOC_MARKDOWN_FORMATTER_SERVICE        = 'nelmio_api_doc.formatter.markdown_formatter';
-    private const API_DOC_SWAGGER_FORMATTER_SERVICE         = 'nelmio_api_doc.formatter.swagger_formatter';
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
@@ -144,7 +141,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private function configureApiDocExtractor(ContainerBuilder $container)
     {
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
-        $apiDocExtractorDef->setPublic(true);
         $apiDocExtractorDef->setClass(
             $this->getNewApiDocExtractorClass($apiDocExtractorDef->getClass())
         );
@@ -227,11 +223,6 @@ class ApiDocCompilerPass implements CompilerPassInterface
         foreach ($htmlFormatters as $htmlFormatter) {
             $container->getDefinition($htmlFormatter)->addMethodCall('setViews', [$views]);
         }
-
-        // make other formatter services public as it is required for "api:doc:dump" and "api:swagger:dump" commands
-        $container->getDefinition(self::API_DOC_SIMPLE_FORMATTER_SERVICE)->setPublic(true);
-        $container->getDefinition(self::API_DOC_MARKDOWN_FORMATTER_SERVICE)->setPublic(true);
-        $container->getDefinition(self::API_DOC_SWAGGER_FORMATTER_SERVICE)->setPublic(true);
     }
 
     private function configureApiDocDataTypeConverter(ContainerBuilder $container)

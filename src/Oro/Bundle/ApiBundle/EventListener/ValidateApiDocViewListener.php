@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
-use Nelmio\ApiDocBundle\Controller\ApiDocController;
 use Oro\Bundle\ApiBundle\Controller\RestApiDocController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -58,15 +57,7 @@ class ValidateApiDocViewListener
 
     protected function isApiDocController(array $controller): bool
     {
-        $controllerClass = $controller[0];
-        if ($controllerClass instanceof RestApiDocController) {
-            return true;
-        }
-        if ($controllerClass instanceof ApiDocController) {
-            return 'indexAction' === $controller[1];
-        }
-
-        return false;
+        return $controller[0] instanceof RestApiDocController;
     }
 
     protected function isValidView(Request $request): bool

@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -17,8 +17,8 @@ class OptionsHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var Router */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var FormProvider */
     protected $formProvider;
@@ -27,13 +27,13 @@ class OptionsHelper
     protected $htmlTagHelper;
 
     public function __construct(
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         TranslatorInterface $translator,
         FormProvider $formProvider,
         HtmlTagHelper $htmlTagHelper
     ) {
-        $this->router       = $router;
-        $this->translator   = $translator;
+        $this->urlGenerator = $urlGenerator;
+        $this->translator = $translator;
         $this->formProvider = $formProvider;
         $this->htmlTagHelper = $htmlTagHelper;
     }
@@ -73,7 +73,7 @@ class OptionsHelper
     protected function createOptions(ButtonInterface $button)
     {
         $data = $this->normalizeTemplateData($button->getTemplateData());
-        $executionUrl = $this->router->generate($data['executionRoute'], $data['routeParams']);
+        $executionUrl = $this->urlGenerator->generate($data['executionRoute'], $data['routeParams']);
 
         $frontendOptions = $data['frontendOptions'];
 
@@ -92,7 +92,7 @@ class OptionsHelper
                 $this->formProvider->createTokenData($button->getOperation(), $button->getData());
         }
         if ($data['hasForm']) {
-            $dialogUrl = $this->router->generate($data['dialogRoute'], $data['routeParams']);
+            $dialogUrl = $this->urlGenerator->generate($data['dialogRoute'], $data['routeParams']);
 
             $options = array_merge(
                 $options,

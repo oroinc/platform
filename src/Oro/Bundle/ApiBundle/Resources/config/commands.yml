@@ -64,15 +64,3 @@ services:
             - '@oro_entity.delete_handler_registry'
         tags:
             - { name: console.command }
-
-    Nelmio\ApiDocBundle\Command\DumpCommand:
-        calls:
-            - [setContainer, ['@service_container']]
-        tags:
-            - { name: console.command, command: 'api:doc:dump' }
-
-    Nelmio\ApiDocBundle\Command\SwaggerDumpCommand:
-        calls:
-            - [setContainer, ['@service_container']]
-        tags:
-            - { name: console.command, command: 'api:swagger:dump' }

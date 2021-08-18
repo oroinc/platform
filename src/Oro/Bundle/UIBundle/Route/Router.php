@@ -3,12 +3,15 @@
 namespace Oro\Bundle\UIBundle\Route;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides a set of methods that help processing redirects in CRUD controllers.
+ */
 class Router
 {
     const ACTION_PARAMETER     = 'input_action';
@@ -18,8 +21,8 @@ class Router
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var SymfonyRouter */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
@@ -29,11 +32,11 @@ class Router
 
     public function __construct(
         RequestStack $requestStack,
-        SymfonyRouter $router,
+        UrlGeneratorInterface $urlGenerator,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->requestStack = $requestStack;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->authorizationChecker = $authorizationChecker;
 
         $this->propertyAccessor = new PropertyAccessor();
@@ -84,12 +87,8 @@ class Router
             throw new \InvalidArgumentException('The "route" attribute must be defined.');
         }
 
-        $params = isset($routeData['parameters'])
-            ? $routeData['parameters']
-            : [];
-
         return new RedirectResponse(
-            $this->router->generate($routeData['route'], $params)
+            $this->urlGenerator->generate($routeData['route'], $routeData['parameters'] ?? [])
         );
     }
 
@@ -116,7 +115,7 @@ class Router
             $routeName = $this->parseRouteName($rawRouteData);
             $routeParams = $this->parseRouteParams($rawRouteData, $context);
             $routeParams = $this->mergeRequestQueryParams($routeParams);
-            $redirectUrl = $this->router->generate($routeName, $routeParams);
+            $redirectUrl = $this->urlGenerator->generate($routeName, $routeParams);
         }
         return new RedirectResponse($redirectUrl);
     }
@@ -148,32 +147,6 @@ class Router
         }
 
         return $result;
-    }
-
-    /**
-     * Parses data for routing based on JSON string.
-     *
-     * @param string $rawRouteData JSON string with keys "route" (required) and "params" (optional).
-     * @param array|object|null $context
-     * @return array An array with keys "route" and "parameters".
-     */
-    protected function parseRouteData($rawRouteData, $context)
-    {
-        $arrayData = json_decode($rawRouteData, true);
-
-        /**
-         * Default route should be used in case of no input_action in request
-         */
-        if (!is_array($arrayData)) {
-            return [
-                'route' => $this->requestStack->getCurrentRequest()->getRequestUri()
-            ];
-        }
-
-        return [
-            'route' => $this->parseRouteName($arrayData),
-            'params' => $this->parseRouteParams($arrayData, $context),
-        ];
     }
 
     /**
