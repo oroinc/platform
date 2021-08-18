@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
@@ -16,7 +17,8 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -33,19 +35,25 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EmailRepository::class);
-        $em = $this->createMock(EntityManager::class);
+
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getRepository')
+            ->with(Email::class)
             ->willReturn($this->repository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Email::class)
+            ->willReturn($em);
 
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
 
-        $translator = $this->createMock(TranslatorInterface::class);
         $htmlTagHelper = new HtmlTagHelper($htmlTagProvider, '');
-        $htmlTagHelper->setTranslator($translator);
+        $htmlTagHelper->setTranslator($this->createMock(TranslatorInterface::class));
 
-        $router = $this->createMock(Router::class);
-        $router->expects($this->any())
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->expects($this->any())
             ->method('generate')
             ->willReturn('oro_email_email_reply');
 
@@ -55,9 +63,9 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new EntityMetadata(\stdClass::class));
 
         $this->emailNotificationManager = new EmailNotificationManager(
-            $em,
+            $doctrine,
             $htmlTagHelper,
-            $router,
+            $urlGenerator,
             $configManager
         );
     }
@@ -149,7 +157,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
         $emailBody->setTextBody($values['getBodyContent']);
 
         $email = new Email();
-        $email->setId($values['getId']);
+        ReflectionUtil::setId($email, $values['getId']);
         $email->setSubject($values['getSubject']);
         $email->setFromName($values['getFromName']);
 

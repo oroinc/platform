@@ -10,13 +10,13 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Generates one-time link to impersonate a user.
@@ -27,14 +27,14 @@ class ImpersonateUserCommand extends Command
     protected static $defaultName = 'oro:user:impersonate';
 
     private ManagerRegistry $registry;
-    private Router $router;
+    private UrlGeneratorInterface $urlGenerator;
     private ConfigManager $configManager;
     private UserManager $userManager;
     private DateTimeFormatterInterface $dateTimeFormatter;
 
     public function __construct(
         ManagerRegistry $registry,
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         ConfigManager $configManager,
         UserManager $userManager,
         DateTimeFormatterInterface $dateTimeFormatter
@@ -42,7 +42,7 @@ class ImpersonateUserCommand extends Command
         parent::__construct();
 
         $this->registry = $registry;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
         $this->userManager = $userManager;
         $this->dateTimeFormatter = $dateTimeFormatter;
@@ -184,7 +184,7 @@ HELP
     {
         $applicationUrl = $this->configManager->get('oro_ui.application_url');
 
-        return $applicationUrl . $this->router->generate(
+        return $applicationUrl . $this->urlGenerator->generate(
             $route,
             [
                 ImpersonationAuthenticator::TOKEN_PARAMETER => $token,

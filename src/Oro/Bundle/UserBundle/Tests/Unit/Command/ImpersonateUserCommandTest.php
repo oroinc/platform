@@ -12,8 +12,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\Testing\Command\CommandTestingTrait;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,14 +21,14 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
 
     private const USERNAME = 'someuser';
 
-    /** @var ImpersonateUserCommand */
-    private $command;
-
-    /** @var UserManager */
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
-    /** @var ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $managerRegistry;
+
+    /** @var ImpersonateUserCommand */
+    private $command;
 
     public function testSuccessfulExecuteReturnsZeroAndSuggestsURL()
     {
@@ -95,7 +95,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->command = new ImpersonateUserCommand(
             $this->managerRegistry,
-            $this->createMock(Router::class),
+            $this->createMock(UrlGeneratorInterface::class),
             $this->createMock(ConfigManager::class),
             $this->userManager,
             $this->createMock(DateTimeFormatterInterface::class)

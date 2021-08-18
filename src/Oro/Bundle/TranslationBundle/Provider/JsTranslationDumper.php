@@ -6,8 +6,8 @@ use Oro\Bundle\TranslationBundle\Controller\Controller;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Dump js translations to appropriate files
@@ -28,18 +28,15 @@ class JsTranslationDumper implements LoggerAwareInterface
     /** @var LanguageProvider */
     protected $languageProvider;
 
-    /**
-     * @var Router
-     */
+    /** @var RouterInterface */
     protected $router;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     protected $jsTranslationRoute;
 
     /**
      * @param Controller       $translationController
-     * @param Router           $router
+     * @param RouterInterface  $router
      * @param array            $translationDomains
      * @param string           $kernelProjectDir
      * @param LanguageProvider $languageProvider
@@ -47,7 +44,7 @@ class JsTranslationDumper implements LoggerAwareInterface
      */
     public function __construct(
         Controller $translationController,
-        Router $router,
+        RouterInterface $router,
         $translationDomains,
         $kernelProjectDir,
         LanguageProvider $languageProvider,

@@ -7,7 +7,6 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Symfony\Component\Routing\Router;
 
 class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,9 +15,6 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 
     /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
     private $matcher;
-
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
 
     /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $provider;
@@ -29,11 +25,10 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->matcher = $this->createMock(Matcher::class);
-        $this->router = $this->createMock(Router::class);
         $this->provider = $this->createMock(BuilderChainProvider::class);
         $this->factory = $this->createMock(MenuFactory::class);
 
-        $this->manager = new BreadcrumbManager($this->provider, $this->matcher, $this->router);
+        $this->manager = new BreadcrumbManager($this->provider, $this->matcher);
     }
 
     public function testGetBreadcrumbs()
