@@ -603,7 +603,13 @@ abstract class BaseDriver implements DBALPersisterInterface
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
                 ->setParameter($param, $name);
 
-            $qb->addSelect(sprintf('%s.value as %s', $joinAlias, str_replace('.', self::SPECIAL_SEPARATOR, $name)));
+            $qb->addSelect(
+                QueryBuilderUtil::sprintf(
+                    '%s.value as %s',
+                    $joinAlias,
+                    str_replace('.', self::SPECIAL_SEPARATOR, $name)
+                )
+            );
         }
     }
 
