@@ -924,7 +924,7 @@ services:
         class: Oro\Bundle\EmailBundle\Manager\EmailNotificationManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_ui.html_tag_helper'
             - '@router'
             - '@oro_entity_config.config_manager'
@@ -1110,17 +1110,17 @@ services:
         class: Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener
         arguments:
             - '@router'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareEmailItemDataEvent }
+            - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareResultItem }
 
     oro_email.listener.prepare_context_title_listener:
         class: Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener
         arguments:
             - '@router'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro_activity.context_title, method: prepareEmailContextTitleEvent }
+            - { name: kernel.event_listener, event: oro_activity.context_title, method: prepareContextTitle }
 
     oro_email.listener.activity_list_pre_query_build_listener:
         class: Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener

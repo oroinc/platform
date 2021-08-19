@@ -13,7 +13,3 @@ framework:
 
     annotations:
         cache: php_array
-
-jms_serializer:
-    metadata:
-        cache: oro_cache.jms_serializer_adapter

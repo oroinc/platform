@@ -80,7 +80,7 @@ services:
         arguments:
             - '@router'
             - '@oro_search.mapper'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity_config.config_manager'
             - '@translator'

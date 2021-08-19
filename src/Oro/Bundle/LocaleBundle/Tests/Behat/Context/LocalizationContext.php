@@ -2,72 +2,41 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Behat\Context;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
-use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LocalizationContext extends OroFeatureContext
 {
-    private ManagerRegistry $managerRegistry;
-
-    private Translator $translator;
-
-    private ConfigManager $globalScopeManager;
-
-    private DoctrineHelper $doctrineHelper;
-
-    private TranslationDomainProvider $translationDomainProvider;
-
-    private JsTranslationDumper $jsTranslationDumper;
-
-    private DynamicAssetVersionManager $dynamicAssetVersionManager;
-
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        Translator $translator,
-        ConfigManager $globalScopeManager,
-        DoctrineHelper $doctrineHelper,
-        TranslationDomainProvider $translationDomainProvider,
-        JsTranslationDumper $jsTranslationDumper,
-        DynamicAssetVersionManager $dynamicAssetVersionManager
-    ) {
-        $this->managerRegistry = $managerRegistry;
-        $this->translator = $translator;
-        $this->globalScopeManager = $globalScopeManager;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->translationDomainProvider = $translationDomainProvider;
-        $this->jsTranslationDumper = $jsTranslationDumper;
-        $this->dynamicAssetVersionManager = $dynamicAssetVersionManager;
-    }
-
     /**
      * @Given I enable the existing localizations
      */
     public function loadFixtures()
     {
+        $container = $this->getAppContainer();
+
+        /* @var ConfigManager $configManager */
+        $configManager = $container->get('oro_config.global');
+
         /* @var Localization[] $localizations */
-        $localizations = $this->doctrineHelper
+        $localizations = $container
+            ->get('oro_entity.doctrine_helper')
             ->getEntityRepository(Localization::class)
             ->findAll();
 
-        $this->globalScopeManager->set(
+        $configManager->set(
             'oro_locale.enabled_localizations',
             array_map(function (Localization $item) {
                 return $item->getId();
             }, $localizations)
         );
-        $this->globalScopeManager->flush();
+        $configManager->flush();
 
-        $this->translationDomainProvider->clearCache();
-        $this->translator->rebuildCache();
-        $this->jsTranslationDumper->dumpTranslations();
-        $this->dynamicAssetVersionManager->updateAssetVersion('translations');
+        $container->get('oro_translation.provider.translation_domain')->clearCache();
+        $container->get('translator.default')->rebuildCache();
+        $container->get('oro_translation.js_dumper')->dumpTranslations();
+        $container->get('oro_ui.dynamic_asset_version_manager')->updateAssetVersion('translations');
     }
 
     /**
@@ -77,20 +46,25 @@ class LocalizationContext extends OroFeatureContext
      */
     public function selectLocalization($localizationName)
     {
-        $localization = $this->managerRegistry->getManagerForClass(Localization::class)
+        /** @var ContainerInterface $container */
+        $container = $this->getAppContainer();
+
+        $localization = $container->get('doctrine')->getManagerForClass(Localization::class)
             ->getRepository(Localization::class)
             ->findOneBy(['name' => $localizationName]);
 
-        $this->globalScopeManager->set(
+        /** @var ConfigManager $configManager */
+        $configManager = $container->get('oro_config.global');
+        $configManager->set(
             'oro_locale.enabled_localizations',
             array_unique(
                 array_merge(
-                    $this->globalScopeManager->get('oro_locale.enabled_localizations'),
+                    $configManager->get('oro_locale.enabled_localizations'),
                     [$localization->getId()]
                 )
             )
         );
-        $this->globalScopeManager->set('oro_locale.default_localization', $localization->getId());
-        $this->globalScopeManager->flush();
+        $configManager->set('oro_locale.default_localization', $localization->getId());
+        $configManager->flush();
     }
 }

@@ -8,46 +8,35 @@ use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Router|MockObject
-     */
-    private $router;
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
 
-    /**
-     * @var ConfigManager|MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var FileManager|MockObject
-     */
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
-    /**
-     * @var ManagerRegistry|MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var ImportExportResultSummarizer
-     */
-    private $summirizer;
+    /** @var ImportExportResultSummarizer */
+    private $summarizer;
 
     protected function setUp(): void
     {
-        $this->router = $this->createMock(Router::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->fileManager = $this->createMock(FileManager::class);
         $this->registry = $this->createMock(ManagerRegistry::class);
 
-        $this->summirizer = new ImportExportResultSummarizer(
-            $this->router,
+        $this->summarizer = new ImportExportResultSummarizer(
+            $this->urlGenerator,
             $this->configManager,
             $this->fileManager,
             $this->registry
@@ -92,7 +81,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $childJob2->setData($result);
         $job->addChildJob($childJob2);
 
-        $result = $this->summirizer->getSummaryResultForNotification($job, 'import.csv');
+        $result = $this->summarizer->getSummaryResultForNotification($job, 'import.csv');
 
         $this->assertEquals($expectedData, $result);
     }
@@ -140,7 +129,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $childJob2->setData($data);
         $job->addChildJob($childJob2);
 
-        $this->router->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with(
                 $this->equalTo('oro_importexport_job_error_log'),
@@ -153,7 +142,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
             ->with('oro_ui.application_url')
             ->willReturn('http://127.0.0.1');
 
-        $result = $this->summirizer->getSummaryResultForNotification($job, 'import.csv');
+        $result = $this->summarizer->getSummaryResultForNotification($job, 'import.csv');
 
         $this->assertEquals($expectedData, $result);
     }
@@ -186,9 +175,9 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.json')
-            ->willReturn(json_encode(['Tests error in import.']));
+            ->willReturn(json_encode(['Tests error in import.'], JSON_THROW_ON_ERROR));
 
-        $summary = $this->summirizer->getErrorLog($job);
+        $summary = $this->summarizer->getErrorLog($job);
 
         $this->assertEquals("Tests error in import.\nLog file of job id: \"2\" was not found.\n", $summary);
     }
@@ -227,7 +216,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         ]);
         $chunkJob->setData([]);
 
-        $result = $this->summirizer->processSummaryExportResultForNotification($rootJob, 'export_result');
+        $result = $this->summarizer->processSummaryExportResultForNotification($rootJob, 'export_result');
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -258,14 +247,14 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $childJob->setData([]);
         $chunkJob->setData([]);
 
-        $result = $this->summirizer->processSummaryExportResultForNotification($rootJob, 'export_result');
+        $result = $this->summarizer->processSummaryExportResultForNotification($rootJob, 'export_result');
 
         $this->assertEquals($expectedResult, $result);
     }
 
     private function assertUrlCalls(int $jobId = 1)
     {
-        $this->router->expects($this->exactly(2))
+        $this->urlGenerator->expects($this->exactly(2))
             ->method('generate')
             ->withConsecutive(
                 ['oro_importexport_export_download', ['jobId' => $jobId]],

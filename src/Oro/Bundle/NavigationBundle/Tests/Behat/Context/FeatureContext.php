@@ -6,7 +6,6 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
@@ -24,13 +23,6 @@ use Symfony\Component\DomCrawler\Crawler;
 class FeatureContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
-
-    private ManagerRegistry $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
-    }
 
     /**
      * Save system configuration. It just press 'Save settings' button
@@ -162,7 +154,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     {
         $menu = $this->getMainMenu();
         /** @var EntityManager $em */
-        $em = $this->managerRegistry->getManager();
+        $em = $this->getAppContainer()->get('doctrine')->getManager();
         $pages = $table->getColumn(0);
 
         $firstPage = array_shift($pages);
@@ -567,13 +559,14 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
         . '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'
         . '0123456789%26g%255BoriginalRoute%255D%3';
 
+        $doctrine =  $this->getAppContainer()->get('doctrine');
         /** @var NavigationItem $navigationItem */
-        $navigationItem = $this->managerRegistry->getManagerForClass(NavigationItem::class)
+        $navigationItem = $doctrine->getManagerForClass(NavigationItem::class)
             ->getRepository(NavigationItem::class)
             ->findOneBy([]);
 
         /** @var Connection $connection */
-        $connection = $this->managerRegistry->getConnection();
+        $connection = $doctrine->getConnection();
         $connection->update(
             'oro_navigation_item',
             ['url' => $malformedUrl],

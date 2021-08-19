@@ -1,5 +1,0 @@
-services:
-    Oro\Bundle\ApiBundle\Tests\Behat\Context\ApiContext:
-        public: true
-        arguments:
-            - '@oro_config.global'

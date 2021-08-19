@@ -12,15 +12,3 @@ services:
         public: true
         calls:
             - [setCache, ['@oro_importexport.test.cache']]
-
-    Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext:
-        public: true
-        arguments:
-            - '@router'
-            - '%kernel.project_dir%'
-            - '@oro_entity.entity_alias_resolver'
-            - '@oro_importexport.processor.registry'
-            - '@oro_config.manager'
-            - '@oro_importexport.file.file_manager'
-            - '@oro_importexport.test.cache'
-            - '@oro_importexport.job_executor'

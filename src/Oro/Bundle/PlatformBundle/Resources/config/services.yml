@@ -1,8 +1,6 @@
 parameters:
     oro_platform.composer.installed_json: '%kernel.project_dir%/vendor/composer/installed.json'
 
-    jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
-
     oro_platform.collector.template: '@@OroPlatform/Collector/platform.html.twig'
 
 services:
@@ -17,13 +15,6 @@ services:
         alias: oro_platform.psr7.http_factory
     Psr\Http\Message\ResponseFactoryInterface:
         alias: oro_platform.psr7.http_factory
-
-    jms_serializer.twig_extension.serializer:
-        class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
-        arguments:
-            - '@oro_platform.twig.service_locator'
-        tags:
-            - { name: twig.extension }
 
     oro_platform.serializer.fix_skip_null_values_array_normalizer:
         class: Oro\Bundle\PlatformBundle\Serializer\Normalizer\FixSkipNullValuesArrayNormalizer

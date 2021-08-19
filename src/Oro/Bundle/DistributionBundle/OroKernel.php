@@ -5,7 +5,6 @@ namespace Oro\Bundle\DistributionBundle;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
-use Oro\Bundle\InstallerBundle\Provider\PlatformRequirementsProvider;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
@@ -31,6 +30,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class OroKernel extends Kernel
 {
+    public const REQUIRED_PHP_VERSION = '8.0';
+
     /** @var string|null */
     private $warmupDir;
 
@@ -170,20 +171,24 @@ abstract class OroKernel extends Kernel
         foreach ($bundles as $bundle) {
             $kernel = false;
             $priority = 0;
+            $optional = false;
 
             if (\is_array($bundle)) {
                 $class = $bundle['name'];
-                $kernel = isset($bundle['kernel']) && $bundle['kernel'];
-                $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
+                $kernel = $bundle['kernel'] ?? false;
+                $priority = (int)($bundle['priority'] ?? 0);
+                $optional = $bundle['optional'] ?? false;
             } else {
                 $class = $bundle;
             }
 
-            $result[$class] = [
-                'name'     => $class,
-                'kernel'   => $kernel,
-                'priority' => $priority
-            ];
+            if (!$optional || class_exists($class)) {
+                $result[$class] = [
+                    'name'     => $class,
+                    'kernel'   => $kernel,
+                    'priority' => $priority
+                ];
+            }
         }
 
         return $result;
@@ -197,8 +202,8 @@ abstract class OroKernel extends Kernel
      */
     public function compareBundles($a, $b)
     {
-        $p1 = (int)$a['priority'];
-        $p2 = (int)$b['priority'];
+        $p1 = (int)($a['priority'] ?? 0);
+        $p2 = (int)($b['priority'] ?? 0);
         if ($p1 === $p2) {
             // bundles with the same priority are sorted alphabetically
             return strcasecmp((string)$a['name'], (string)$b['name']);
@@ -210,17 +215,14 @@ abstract class OroKernel extends Kernel
 
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.ExitExpression)
      */
     public function boot()
     {
         $phpVersion = phpversion();
-
-        if (!version_compare($phpVersion, PlatformRequirementsProvider::REQUIRED_PHP_VERSION, '>=')) {
+        if (!version_compare($phpVersion, self::REQUIRED_PHP_VERSION, '>=')) {
             throw new \RuntimeException(sprintf(
                 'PHP version must be at least %s (%s is installed)',
-                PlatformRequirementsProvider::REQUIRED_PHP_VERSION,
+                self::REQUIRED_PHP_VERSION,
                 $phpVersion
             ));
         }

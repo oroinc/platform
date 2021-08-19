@@ -15,7 +15,7 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @dbIsolationPerTest
@@ -261,7 +261,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
     }
 
     /**
-     * @return Router
+     * @return RouterInterface
      */
     private function getRouter()
     {

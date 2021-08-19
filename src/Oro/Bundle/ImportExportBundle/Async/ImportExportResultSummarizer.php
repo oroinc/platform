@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Prepared import and export data by forming a single structure for future use
@@ -22,9 +22,9 @@ class ImportExportResultSummarizer
     const TEMPLATE_IMPORT_ERROR = 'import_error';
 
     /**
-     * @var Router
+     * @var UrlGeneratorInterface
      */
-    protected $router;
+    protected $urlGenerator;
 
     /**
      * @var ConfigManager
@@ -42,12 +42,12 @@ class ImportExportResultSummarizer
     protected $registry;
 
     public function __construct(
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         ConfigManager $configManager,
         FileManager $fileManager,
         ManagerRegistry $registry
     ) {
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
         $this->fileManager = $fileManager;
         $this->registry = $registry;
@@ -127,10 +127,9 @@ class ImportExportResultSummarizer
      */
     protected function getDownloadErrorLogUrl($jobId)
     {
-        $url = $this->configManager->get('oro_ui.application_url') .
-            $this->router->generate('oro_importexport_job_error_log', ['jobId' => $jobId]);
-
-        return $url;
+        return
+            $this->configManager->get('oro_ui.application_url')
+            . $this->urlGenerator->generate('oro_importexport_job_error_log', ['jobId' => $jobId]);
     }
 
     /**
@@ -143,7 +142,7 @@ class ImportExportResultSummarizer
         return sprintf(
             '%s%s',
             $this->configManager->get('oro_ui.application_url'),
-            $this->router->generate('oro_importexport_export_download', ['jobId' => $jobId])
+            $this->urlGenerator->generate('oro_importexport_export_download', ['jobId' => $jobId])
         );
     }
 

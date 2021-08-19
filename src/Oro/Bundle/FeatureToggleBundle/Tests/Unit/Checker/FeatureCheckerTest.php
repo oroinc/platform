@@ -6,6 +6,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Voter;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -20,11 +21,6 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         $this->configurationManager = $this->createMock(ConfigurationManager::class);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->configurationManager);
-    }
-
     public function testInvalidArgumentException()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -35,14 +31,14 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetVoters()
     {
-        $this->configurationManager->expects(static::any())
+        $this->configurationManager->expects(self::any())
             ->method('get')
             ->willReturnArgument(2);
 
         $checker = new FeatureChecker($this->configurationManager);
 
         $voter = $this->createMock(VoterInterface::class);
-        $voter->expects(static::once())
+        $voter->expects(self::once())
             ->method('vote');
 
         $checker->setVoters([$voter]);
@@ -52,20 +48,12 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider strategyDataProvider
-     *
-     * @param string $strategy
-     * @param array $voters
-     * @param string $configNode
-     * @param object|int $scopeIdentifier
-     * @param bool $allowIfAllAbstainDecisions
-     * @param bool $allowIfEqualGrantedDeniedDecisions
-     * @param bool $expected
      */
     public function testIsFeatureEnabledStrategies(
         string $strategy,
         array $voters,
         string $configNode,
-        $scopeIdentifier,
+        object|int $scopeIdentifier,
         bool $allowIfAllAbstainDecisions,
         bool $allowIfEqualGrantedDeniedDecisions,
         bool $expected
@@ -91,20 +79,12 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider strategyDataProvider
-     *
-     * @param string $strategy
-     * @param array $voters
-     * @param string $configNode
-     * @param object|int $scopeIdentifier
-     * @param bool $allowIfAllAbstainDecisions
-     * @param bool $allowIfEqualGrantedDeniedDecisions
-     * @param bool $expected
      */
     public function testIsResourceEnabledStrategies(
         string $strategy,
         array $voters,
         string $configNode,
-        $scopeIdentifier,
+        object|int $scopeIdentifier,
         bool $allowIfAllAbstainDecisions,
         bool $allowIfEqualGrantedDeniedDecisions,
         bool $expected
@@ -134,10 +114,9 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function strategyDataProvider()
+    public function strategyDataProvider(): array
     {
         return [
             // cover cache key generator case with objects
@@ -337,7 +316,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testResetCache()
     {
-        $this->configurationManager->expects(static::any())
+        $this->configurationManager->expects(self::any())
             ->method('get')
             ->withConsecutive(
                 ['feature1', 'strategy', FeatureChecker::STRATEGY_UNANIMOUS],
@@ -345,19 +324,12 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnArgument(2);
 
-        $checker = new class($this->configurationManager) extends FeatureChecker {
-            public function xgetFeaturesStates(): array
-            {
-                return $this->featuresStates;
-            }
-        };
-
-        static::assertFalse($checker->isFeatureEnabled('feature1'));
-        static::assertNotEmpty($checker->xgetFeaturesStates());
+        $checker = new FeatureChecker($this->configurationManager);
+        self::assertFalse($checker->isFeatureEnabled('feature1'));
+        self::assertNotEmpty(ReflectionUtil::getPropertyValue($checker, 'featuresStates'));
 
         $checker->resetCache();
-
-        static::assertEmpty($checker->xgetFeaturesStates());
+        self::assertEmpty(ReflectionUtil::getPropertyValue($checker, 'featuresStates'));
     }
 
     /**
@@ -368,7 +340,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         $this->configurationManager->expects($this->any())
             ->method('getResourcesByType')
             ->with($resourceType)
-            ->will($this->returnValue($resources));
+            ->willReturn($resources);
 
         $this->configurationManager->expects($this->any())
             ->method('get')
@@ -378,7 +350,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResources, $featureChecker->getDisabledResourcesByType($resourceType));
     }
 
-    public function getDisabledResourcesByTypeProvider()
+    public function getDisabledResourcesByTypeProvider(): array
     {
         return [
             [
@@ -392,8 +364,8 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 new Voter([
-                    'feature1' => Voter::FEATURE_ENABLED,
-                    'feature2' => Voter::FEATURE_ENABLED,
+                    'feature1' => VoterInterface::FEATURE_ENABLED,
+                    'feature2' => VoterInterface::FEATURE_ENABLED,
                 ]),
                 [],
             ],
@@ -408,8 +380,8 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 new Voter([
-                    'feature1' => Voter::FEATURE_ENABLED,
-                    'feature2' => Voter::FEATURE_DISABLED,
+                    'feature1' => VoterInterface::FEATURE_ENABLED,
+                    'feature2' => VoterInterface::FEATURE_DISABLED,
                 ]),
                 [
                     'resource2',
@@ -426,8 +398,8 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 new Voter([
-                    'feature1' => Voter::FEATURE_DISABLED,
-                    'feature2' => Voter::FEATURE_DISABLED,
+                    'feature1' => VoterInterface::FEATURE_DISABLED,
+                    'feature2' => VoterInterface::FEATURE_DISABLED,
                 ]),
                 [
                     'resource',
@@ -449,13 +421,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($checker->isFeatureEnabled('feature1'));
     }
 
-    /**
-     * @param int $enabled
-     * @param int $disabled
-     * @param int $abstains
-     * @return array
-     */
-    protected function getVoters($enabled, $disabled, $abstains)
+    private function getVoters(int $enabled, int $disabled, int $abstains): array
     {
         $voters = [];
 
@@ -472,16 +438,12 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         return $voters;
     }
 
-    /**
-     * @param int $vote
-     * @return VoterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getVoter($vote)
+    private function getVoter(int $vote): VoterInterface
     {
         $voter = $this->createMock(VoterInterface::class);
         $voter->expects($this->any())
             ->method('vote')
-            ->will($this->returnValue($vote));
+            ->willReturn($vote);
 
         return $voter;
     }

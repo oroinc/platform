@@ -2,62 +2,44 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Designed to extend data that presents in search results
+ * Extends data that presents in search results.
  */
 class PrepareResultItemListener
 {
-    /** @var Router */
-    protected $router;
+    private UrlGeneratorInterface $urlGenerator;
+    private ObjectMapper $mapper;
+    private ManagerRegistry $doctrine;
+    private EntityNameResolver $entityNameResolver;
+    private ConfigManager $configManager;
+    private TranslatorInterface $translator;
 
-    /** @var ObjectMapper */
-    protected $mapper;
-
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /**
-     * Constructor
-     */
     public function __construct(
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         ObjectMapper $mapper,
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         EntityNameResolver $entityNameResolver,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->mapper = $mapper;
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->entityNameResolver = $entityNameResolver;
         $this->configManager = $configManager;
         $this->translator = $translator;
     }
 
-    /**
-     * Process event
-     */
-    public function process(PrepareResultItemEvent $event)
+    public function process(PrepareResultItemEvent $event): void
     {
         $entity = $event->getEntity();
         $item = $event->getResultItem();
@@ -77,87 +59,57 @@ class PrepareResultItemListener
         }
     }
 
-    /**
-     * Get url for entity
-     *
-     * @param object     $entity
-     * @param ResultItem $item
-     *
-     * @return string
-     */
-    protected function getEntityUrl($entity, $item)
+    private function getEntityUrl(?object $entity, ResultItem $item): string
     {
-        $name = $item->getEntityName();
+        $className = $item->getEntityName();
+        if (!$this->mapper->getEntityMapParameter($className, 'route')) {
+            return '';
+        }
 
-        $entityMeta = $this->em->getClassMetadata($name);
-        $identifierField = $entityMeta->getSingleIdentifierFieldName($entityMeta);
+        $routeParameters = $this->mapper->getEntityMapParameter($className, 'route');
+        $routeData = [];
 
-        if ($this->mapper->getEntityMapParameter($name, 'route')) {
-            $routeParameters = $this->mapper->getEntityMapParameter($name, 'route');
-            $routeData = [];
+        if (!empty($routeParameters['parameters'])) {
+            /**
+             * NOTE: possible to generate url without entity object if only identifier field needed
+             */
+            $em = $this->doctrine->getManagerForClass($className);
+            $identifierField = $em->getClassMetadata($className)->getSingleIdentifierFieldName();
+            $idKey = array_search($identifierField, $routeParameters['parameters'], true);
+            $needToHaveEntity = $idKey === false || count($routeParameters['parameters']) > 1;
 
-            if ($this->isParametersDefined($routeParameters)) {
-                /**
-                 * NOTE: possible to generate url without entity object if only identifier field needed
-                 */
-                $idKey = array_search($identifierField, $routeParameters['parameters'], true);
-                $needToHaveEntity = $idKey === false || count($routeParameters['parameters']) > 1;
-
-                if (!$entity && $needToHaveEntity) {
-                    $entity = $this->em->getRepository($name)->find($item->getRecordId());
-                }
-
-                foreach ($routeParameters['parameters'] as $parameter => $field) {
-                    if ($entity) {
-                        if (substr_count($field, '@') === 2) {
-                            $routeData[$parameter] = str_replace('@', '', $field);
-                        } else {
-                            $routeData[$parameter] = $this->mapper->getFieldValue($entity, $field);
-                        }
-                    } else {
-                        $routeData[$parameter] = $item->getRecordId();
-                    }
-                }
+            if (!$entity && $needToHaveEntity) {
+                $entity = $em->find($className, $item->getRecordId());
             }
 
-            return $this->router->generate(
-                $routeParameters['name'],
-                $routeData,
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
+            foreach ($routeParameters['parameters'] as $parameter => $field) {
+                if ($entity) {
+                    if (substr_count($field, '@') === 2) {
+                        $routeData[$parameter] = str_replace('@', '', $field);
+                    } else {
+                        $routeData[$parameter] = $this->mapper->getFieldValue($entity, $field);
+                    }
+                } else {
+                    $routeData[$parameter] = $item->getRecordId();
+                }
+            }
         }
 
-        return '';
+        return $this->urlGenerator->generate(
+            $routeParameters['name'],
+            $routeData,
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 
-    /**
-     * Get entity string
-     *
-     * @param object     $entity
-     * @param ResultItem $item
-     *
-     * @return string
-     */
-    protected function getEntityTitle($entity, $item)
+    private function getEntityTitle(?object $entity, ResultItem $item): string
     {
-        $name = $item->getEntityName();
-
-        if (!$entity) {
-            $entity = $this->em->getRepository($name)->find($item->getRecordId());
+        if (null === $entity) {
+            $className = $item->getEntityName();
+            $entity = $this->doctrine->getManagerForClass($className)
+                ->find($className, $item->getRecordId());
         }
 
-        return $this->entityNameResolver->getName($entity);
-    }
-
-    /**
-     * Check if route parameters defined and not empty
-     *
-     * @param array $data
-     *
-     * @return bool
-     */
-    protected function isParametersDefined(array $data)
-    {
-        return isset($data['parameters']) && count($data['parameters']);
+        return $this->entityNameResolver->getName($entity) ?? '';
     }
 }

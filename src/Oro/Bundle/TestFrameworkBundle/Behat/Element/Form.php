@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
  * Form element implementation
@@ -25,7 +25,7 @@ class Form extends Element
             $this->getDriver()->switchToIFrame($this->options['embedded-id']);
         }
         foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
+            [$label, $value] = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $value = self::normalizeValue($value);
 
@@ -91,7 +91,7 @@ class Form extends Element
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
+            [$label, $value] = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
             self::assertNotNull($field, sprintf('Field `%s` not found', $label));
@@ -273,7 +273,7 @@ class Form extends Element
             $classes = preg_split('/\s+/', (string)$sndParent->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
 
             if (in_array('control-group-collection', $classes, true)) {
-                $elementName = (new InflectorFactory())->build()->singularize(trim($label->getText())).'Collection';
+                $elementName = InflectorFactory::create()->singularize(trim($label->getText())).'Collection';
                 $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
 
                 return $this->elementFactory->wrapElement($elementName, $sndParent);
