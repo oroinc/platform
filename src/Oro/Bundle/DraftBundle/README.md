@@ -20,4 +20,4 @@ OroDraftBundle allows to edit and publish a version of a Draftable entity record
     - Delete All Drafts
     - Publish Drafts
 
-Please see [online documentation](https://doc.oroinc.com/backend/bundles/platform/DraftBundle/) for more details.
+Please see [online documentation](https://doc.oroinc.com/bundles/platform/DraftBundle/) for more details.
