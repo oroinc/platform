@@ -474,7 +474,7 @@ must be removed.
 ### Added
 
 #### AttachmentBundle
-* Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](https://doc.oroinc.com/backend/bundles/platform/AttachmentBundle/).
+* Added *MultiImage* and *MultiField* field types to Entity Manager. Read more in [documentation](https://doc.oroinc.com/bundles/platform/AttachmentBundle/).
 
 ### Removed
 * `*.class` parameters for all entities were removed from the dependency injection container.
@@ -502,7 +502,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
   Use the `method` attribute of the `oro_reminder.send_processor` DIC tag instead.
 
 #### RequireJsBundle
-* The bundle was completely removed, see [tips](https://doc.oroinc.com/backend/bundles/platform/AssetBundle/#migration-from-requirejs-to-jsmodules) how to migrate to Webpack builder
+* The bundle was completely removed, see [tips](https://doc.oroinc.com/bundles/platform/AssetBundle/#migration-from-requirejs-to-jsmodules) how to migrate to Webpack builder
 
 #### UIBundle
 * The `getName()` method was removed from `Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface`.
@@ -590,7 +590,7 @@ instead of `'%oro_email.email.entity.class%'` (in service definitions, datagrid 
 * The priority of `oro_api.post_validate_form` processor was changed from `-97` to `-80`.
 
 #### AssetBundle
-* The new feature, Hot Module Replacement (HMR or Hot Reload) enabled for SCSS. To enable HMR for custom CSS links, please [follow the documentation](https://doc.oroinc.com/backend/bundles/platform/AssetBundle/).
+* The new feature, Hot Module Replacement (HMR or Hot Reload) enabled for SCSS. To enable HMR for custom CSS links, please [follow the documentation](https://doc.oroinc.com/bundles/platform/AssetBundle/).
 
 #### NavigationBundle
 * The service `kernel.listener.nav_history_response` was renamed to `oro_navigation.event_listener.navigation_history`.
