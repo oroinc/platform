@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
-use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
  * Provides a set of static methods to build entity related translation keys.
  */
 class EntityLabelBuilder
 {
-    private static ?Inflector $inflector = null;
-
     /**
      * Returns the translation key for entity label.
      *
@@ -97,12 +94,8 @@ class EntityLabelBuilder
     {
         $parts = self::explodeClassName($className);
 
-        if (null === self::$inflector) {
-            self::$inflector = (new InflectorFactory())->build();
-        }
-
         if ($fieldName) {
-            $parts[] = self::$inflector->tableize($fieldName);
+            $parts[] = InflectorFactory::create()->tableize($fieldName);
             $parts[] = $propertyName;
         } else {
             $parts[] = 'entity_' . $propertyName;

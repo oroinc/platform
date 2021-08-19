@@ -147,20 +147,13 @@ services:
             - '@oro_test.fixture_loader.alice_combined_loader'
             - '@file_locator'
 
-    oro_test.environment.handler.feature_environment_handler:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
+    oro_test.environment.handler.context_service_environment_handler:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\ContextServiceEnvironmentHandler
         arguments:
+            - '@service_container'
             - '@context.factory'
-            - '@fob_symfony.kernel'
         tags:
-            - { name: 'environment.handler', priority: 100 }
-
-    oro_test.context.oro_behat_class_resolver:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\OroBehatClassResolver
-        arguments:
-            - '@fob_symfony.kernel'
-        tags:
-            - { name: 'context.class_resolver' }
+            - { name: 'environment.handler', priority: 256 }
 
     oro_test.processor.message_queue.base:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
@@ -190,5 +183,11 @@ services:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInitializer'
         calls:
             - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
+        tags:
+            - { name: 'context.initializer' }
+
+    Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer:
+        arguments:
+            - '@fob_symfony.kernel'
         tags:
             - { name: 'context.initializer' }

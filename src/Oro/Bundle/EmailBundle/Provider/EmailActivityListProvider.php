@@ -29,9 +29,9 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -56,8 +56,8 @@ class EmailActivityListProvider implements
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var Router */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -89,7 +89,7 @@ class EmailActivityListProvider implements
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver,
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
         HtmlTagHelper $htmlTagHelper,
@@ -101,7 +101,7 @@ class EmailActivityListProvider implements
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityNameResolver = $entityNameResolver;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
         $this->emailThreadProvider = $emailThreadProvider;
         $this->htmlTagHelper = $htmlTagHelper;
@@ -519,7 +519,7 @@ class EmailActivityListProvider implements
         if (null !== $route && $this->authorizationChecker->isGranted('VIEW', $owner)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
             try {
-                $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
+                $data['ownerLink'] = $this->urlGenerator->generate($route, ['id' => $id]);
             } catch (RouteNotFoundException $e) {
                 // Do not set owner link if route is not found.
             }

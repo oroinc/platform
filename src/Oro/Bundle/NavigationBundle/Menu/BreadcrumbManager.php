@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
-use Symfony\Component\Routing\Router;
 
 /**
  * Provides breadcrumbs by the menu helps to find menu items
@@ -23,16 +22,10 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
      */
     protected $provider;
 
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    public function __construct(MenuProviderInterface $provider, Matcher $matcher, Router $router)
+    public function __construct(MenuProviderInterface $provider, Matcher $matcher)
     {
         $this->matcher = $matcher;
         $this->provider = $provider;
-        $this->router = $router;
     }
 
     /** {@inheritdoc} */

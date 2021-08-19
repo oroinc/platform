@@ -156,7 +156,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             [
                 $greetingKey => ['old' => 'old value', 'new' => 'updated value']
             ],
-            'user'
+            'user',
+            $idValue
         );
 
         $loadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, $idValue);
@@ -229,6 +230,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects($this->any())
             ->method('resolveIdentifier')
             ->willReturn($idValue);
+
         $this->userScopeManager->expects($this->exactly(2))
             ->method('getSettingValue')
             ->willReturnMap([
@@ -244,7 +246,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
                 $greetingKey => ['old' => 'old value', 'new' => 'updated value'],
                 $levelKey    => ['old' => 2000, 'new' => 20]
             ],
-            'user'
+            'user',
+            $idValue
         );
 
         $greetingOldValueLoadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, $idValue);

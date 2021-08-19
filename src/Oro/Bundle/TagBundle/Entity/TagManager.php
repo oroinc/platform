@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -42,19 +42,19 @@ class TagManager
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var Router */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var array */
     protected $storage = [];
 
     /**
      * @param EntityManager                 $em
-     * @param string                        $tagClass     - FQCN
-     * @param string                        $taggingClass - FQCN
+     * @param string                        $tagClass
+     * @param string                        $taggingClass
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param TokenAccessorInterface        $tokenAccessor
-     * @param Router                        $router
+     * @param UrlGeneratorInterface         $urlGenerator
      */
     public function __construct(
         EntityManager $em,
@@ -62,14 +62,14 @@ class TagManager
         $taggingClass,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        Router $router
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->em = $em;
         $this->tagClass = $tagClass;
         $this->taggingClass = $taggingClass;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -268,7 +268,7 @@ class TagManager
                     $entry,
                     [
                         'id'    => $tag->getId(),
-                        'url'   => $this->router->generate('oro_tag_search', ['id' => $tag->getId()]),
+                        'url'   => $this->urlGenerator->generate('oro_tag_search', ['id' => $tag->getId()]),
                         'owner' => false
                     ]
                 );

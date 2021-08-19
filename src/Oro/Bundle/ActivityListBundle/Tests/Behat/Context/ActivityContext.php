@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -13,7 +12,7 @@ use Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ActivityContext extends OroFeatureContext implements OroPageObjectAware, SnippetAcceptingContext
+class ActivityContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 

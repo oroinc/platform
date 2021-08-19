@@ -18,6 +18,10 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        if (!interface_exists('JMS\Serializer\SerializerInterface')) {
+            self::markTestSkipped('"jms/serializer" is not installed');
+        }
+
         $this->serializer = $this->createMock(SerializerInterface::class);
 
         $container = self::getContainerBuilder()

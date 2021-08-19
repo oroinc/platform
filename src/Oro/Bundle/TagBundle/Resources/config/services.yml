@@ -114,15 +114,23 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tags-report }
 
+    oro_tag.grid.tags_column_guesser:
+        class: Oro\Bundle\TagBundle\Grid\InlineEditing\InlineEditColumnOptions\TagsGuesser
+        arguments:
+            - '@oro_entity.routing_helper'
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
+
     oro_tag.grid.tags_extension:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension
         arguments:
             - '@oro_tag.tag.manager'
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
-            - '@oro_entity.routing_helper'
             - '@security.authorization_checker'
             - '@security.token_storage'
+            - '@oro_datagrid.inline_editing_configurator'
         calls:
             - [addUnsupportedGridPrefix, ['oro_report']]
             - [addUnsupportedGridPrefix, ['oro_segment']]

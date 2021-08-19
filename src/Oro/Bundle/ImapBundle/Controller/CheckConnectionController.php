@@ -23,7 +23,7 @@ class CheckConnectionController extends AbstractController
             $form = $this->getConnectionManager()->getCheckConnectionForm($request, $formParentName);
             $response = [
                 'html' => $this->renderView(
-                    'OroImapBundle:Connection:checkAuthorized.html.twig',
+                    '@OroImap/Connection/checkAuthorized.html.twig',
                     ['form' => $form->createView()]
                 )
             ];

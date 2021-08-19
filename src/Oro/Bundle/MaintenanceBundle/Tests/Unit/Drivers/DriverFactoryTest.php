@@ -15,12 +15,17 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
     }
 
+    private function getDriverFactory(array $options): DriverFactory
+    {
+        return new DriverFactory($this->translator, $options);
+    }
+
     /**
      * @dataProvider getDriverDataProvider
      */
     public function testGetDriver(array $options): void
     {
-        $factory = new DriverFactory($this->translator, $options);
+        $factory = $this->getDriverFactory($options);
 
         $driver = $factory->getDriver();
 
@@ -50,5 +55,15 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    public function testGetDriverShouldReturnExistingInstanceOfDriver(): void
+    {
+        $factory = $this->getDriverFactory(['options'=> ['file_path' => 'file/path']]);
+
+        $driver = $factory->getDriver();
+
+        // test that a new instance of the driver is not created each time the driver is requested
+        self::assertSame($driver, $factory->getDriver());
     }
 }

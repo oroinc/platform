@@ -4,30 +4,12 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
 class FeatureContext extends OroFeatureContext
 {
-    private ?ImportExportContext $importExportContext;
-
-    private EntityAliasResolver $entityAliasResolver;
-
-    private ConfigManager $entityConfigManager;
-
-    private DoctrineHelper $doctrineHelper;
-
-    public function __construct(
-        EntityAliasResolver $entityAliasResolver,
-        ConfigManager $entityConfigManager,
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->entityAliasResolver = $entityAliasResolver;
-        $this->entityConfigManager = $entityConfigManager;
-        $this->doctrineHelper = $doctrineHelper;
-    }
+    private ?ImportExportContext $importExportContext = null;
 
     /**
      * @BeforeScenario
@@ -46,8 +28,9 @@ class FeatureContext extends OroFeatureContext
      */
     public function iDownloadDataTemplateFileForExtendEntity($entityAlias)
     {
-        $className = $this->entityAliasResolver->getClassByAlias($entityAlias);
-        $entityModel = $this->entityConfigManager->getConfigEntityModel($className);
+        $className = $this->getAppContainer()->get('oro_entity.entity_alias_resolver')->getClassByAlias($entityAlias);
+        $entityConfigManager = $this->getAppContainer()->get('oro_entity_config.config_manager');
+        $entityModel = $entityConfigManager->getConfigEntityModel($className);
 
         static::assertNotNull($entityModel, sprintf('No entity model found for class "%s"', $className));
 
@@ -63,7 +46,10 @@ class FeatureContext extends OroFeatureContext
     public function checkIfFieldNotOrIsInDbTableByEntityClass(string $field, string $cond, string $class)
     {
         self::assertContains($cond, ['is', 'not']);
-        $em = $this->doctrineHelper->getEntityManager($class);
+        /** @var DoctrineHelper $dh */
+        $dh = $this->getAppContainer()->get('oro_entity.doctrine_helper');
+
+        $em = $dh->getEntityManager($class);
         $sm = $em->getConnection()->getSchemaManager();
 
         $tableName = $em->getClassMetadata($class)->getTableName();
