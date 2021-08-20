@@ -13,7 +13,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class LanguageProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private LanguageRepository$repository;
+    private LanguageRepository $repository;
     private AclHelper $aclHelper;
     private LanguageProvider $provider;
 

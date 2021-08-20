@@ -18,10 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AddLanguageTypeTest extends FormIntegrationTestCase
 {
     protected AddLanguageType $formType;
-    protected LanguageRepository$repository;
+    protected LanguageRepository $repository;
     protected LocaleSettings $localeSettings;
     protected TranslationMetricsProviderInterface $translationStatisticProvider;
-    protected TranslatorInterface$translator;
+    protected TranslatorInterface $translator;
 
     protected function setUp(): void
     {
