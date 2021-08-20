@@ -13,9 +13,11 @@ use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Locales;
 
+/**
+ * Creates localizations: default, en and the one specified during installation.
+ */
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     use ContainerAwareTrait;
@@ -139,16 +141,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     protected function isSupportedLocale($locale)
     {
         return Locales::exists($locale);
-    }
-
-    /**
-     * @param string $language
-     *
-     * @return bool
-     */
-    protected function isSupportedLanguage($language)
-    {
-        return Languages::exists($language);
     }
 
     /**
