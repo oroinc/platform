@@ -36,6 +36,10 @@ class OroLocaleExtension extends Extension
         $loader->load('cache.yml');
         $loader->load('services_api.yml');
         $loader->load('commands.yml');
+
+        if ($container->getParameter('kernel.environment') === 'test') {
+            $loader->load('services_test.yml');
+        }
     }
 
     /**

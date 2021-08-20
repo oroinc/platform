@@ -7,3 +7,8 @@ services:
     tests.security.acl.cache.doctrine:
         alias: security.acl.cache.doctrine
         public: true
+
+    oro_security.tests.tools.regular_fields_sanitizer:
+        parent: oro_security.tools.regular_fields_sanitizer
+        decorates: oro_security.tools.regular_fields_sanitizer
+        public: true

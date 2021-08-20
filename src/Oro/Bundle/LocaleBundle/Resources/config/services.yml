@@ -452,3 +452,17 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_action.condition, alias: is_default_language }
+
+    oro_locale.provider.localized_fallback_value_field:
+        class: Oro\Bundle\LocaleBundle\Provider\LocalizedFallbackValueFieldsProvider
+        arguments:
+            - '@doctrine'
+
+    oro_locale.tools.localized_fields_sanitizer:
+        class: Oro\Bundle\LocaleBundle\Tools\LocalizedFieldsSanitizer
+        arguments:
+            - '@doctrine'
+            - '@oro_ui.html_tag_helper'
+            - '@oro_locale.provider.localized_fallback_value_field'
+        tags:
+            - { name: oro_security.fields_sanitizer }
