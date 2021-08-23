@@ -242,6 +242,7 @@ services:
                         content: {default: ''}
                         src: ~
                         media: ~
+                        disabled: ~
                         scoped: {default: false}
                         crossorigin: ~
             - [setName, ['style']]

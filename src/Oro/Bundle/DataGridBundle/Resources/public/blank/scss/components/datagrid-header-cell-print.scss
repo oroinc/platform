@@ -1,0 +1,11 @@
+/* @theme: blank; */
+
+.grid-header-cell {
+    &.action-column {
+        &:empty {
+            &::before {
+                display: none;
+            }
+        }
+    }
+}

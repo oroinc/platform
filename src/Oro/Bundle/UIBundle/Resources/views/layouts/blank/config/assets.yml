@@ -39,3 +39,12 @@ stylebook_styles:
         - 'bundles/oroui/blank/scss/settings/global-settings.scss'
         - 'bundles/oroui/blank/scss/variables/page-main-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-container-config.scss'
+
+print_styles:
+    inputs:
+        - 'bundles/oroui/blank/scss/settings/global-settings-print.scss'
+        - 'bundles/oroui/blank/scss/variables/base-print-config.scss'
+        - 'bundles/oroui/blank/scss/variables/page-content-print-config.scss'
+        - 'bundles/oroui/blank/scss/variables/logo-print-config.scss'
+        - 'bundles/oroui/blank/scss/styles-print.scss'
+    output: 'css/styles-print.css'

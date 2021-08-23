@@ -9,10 +9,3 @@
         padding: $page-header-inner-inner-offset;
     }
 }
-
-@include breakpoint('print') {
-    .page-header {
-        // stylelint-disable-next-line declaration-no-important
-        display: none !important;
-    }
-}

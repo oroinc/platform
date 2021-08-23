@@ -6,10 +6,3 @@
     border: 0 $page-footer-border-style;
     border-width: $page-footer-border-width;
 }
-
-@include breakpoint('print') {
-    .page-footer {
-        // stylelint-disable-next-line declaration-no-important
-        display: none !important;
-    }
-}

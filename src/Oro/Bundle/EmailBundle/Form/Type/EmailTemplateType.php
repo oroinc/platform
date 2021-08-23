@@ -155,6 +155,7 @@ class EmailTemplateType extends AbstractType
             'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
             'relative_urls' => true,
             'forced_root_block' => '',
+            'entity_encoding' => 'raw',
         ];
     }
 }
