@@ -209,13 +209,21 @@
 {% endblock %}
 
 {% block style_widget %}
-    {% set attr = attr|merge({
-        type: type,
-    }) %}
+    {% if type is defined %}
+        {% set attr = attr|merge({
+            type: type,
+        }) %}
+    {% endif %}
 
     {% if media is defined %}
         {% set attr = attr|merge({
             media: media
+        }) %}
+    {% endif %}
+
+    {% if disabled is defined %}
+        {% set attr = attr|merge({
+            disabled: 'disabled'
         }) %}
     {% endif %}
 
