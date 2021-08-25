@@ -12,9 +12,6 @@ services:
             - '@oro_entity_extend.enum_value_provider'
             - '@oro_user.manager.mailer_processor_link'
 
-    Oro\Bundle\UserBundle\Entity\UserManager:
-        alias: oro_user.manager
-
     oro_user.manager.mailer_processor_link:
         tags:
             - { name: oro_service_link, service: oro_user.mailer.processor }

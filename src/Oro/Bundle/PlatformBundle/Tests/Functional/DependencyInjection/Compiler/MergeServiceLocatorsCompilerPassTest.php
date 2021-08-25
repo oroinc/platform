@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler;
 
+use Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjection;
 use Oro\Bundle\PlatformBundle\Tests\Functional\DependencyInjection\Compiler\Stub\TestServiceLocatorInjectionInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -75,6 +76,7 @@ class MergeServiceLocatorsCompilerPassTest extends WebTestCase
         }
 
         $id = 'oro_platform.tests.merge_service_locators.base';
+        /** @var TestServiceLocatorInjection $service */
         $service = self::getContainer()->get($id);
         if ($service->getContainer() === $serviceLocator) {
             throw $this->getServiceLocatorNotEqualsException(

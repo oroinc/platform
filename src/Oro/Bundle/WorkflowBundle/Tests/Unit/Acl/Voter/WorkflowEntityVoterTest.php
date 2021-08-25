@@ -24,41 +24,40 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
 {
     private const SUPPORTED_CLASS = User::class;
 
-    /** @var WorkflowEntityVoter */
-    private $voter;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
     private $workflowRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowPermissionRegistry */
-    private $permissionRegistry;
+    /** @var WorkflowEntityVoter */
+    private $voter;
 
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
-        $this->permissionRegistry = new WorkflowPermissionRegistry($this->doctrineHelper, $this->workflowRegistry);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_workflow.permission_registry', $this->permissionRegistry)
+            ->add(
+                'oro_workflow.permission_registry',
+                new WorkflowPermissionRegistry($this->doctrineHelper, $this->workflowRegistry)
+            )
             ->getContainer($this);
 
         $this->voter = new WorkflowEntityVoter($this->doctrineHelper, $container);
     }
 
     /**
-     * @param int $expected
-     * @param object $object
-     * @param array $attributes
-     * @param bool $updatable
-     * @param bool $deletable
      * @dataProvider voteDataProvider
      */
-    public function testVote($expected, $object, array $attributes = [], $updatable = true, $deletable = true)
-    {
+    public function testVote(
+        int $expected,
+        object|string|null $object,
+        array $attributes = [],
+        bool $updatable = true,
+        bool $deletable = true
+    ) {
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity(self::SUPPORTED_CLASS);
 
@@ -91,7 +90,7 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function voteDataProvider()
+    public function voteDataProvider(): array
     {
         return [
             'empty object' => [
@@ -199,48 +198,35 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $entityAcls
-     * @param string|null $entityClass
-     * @param int|null $entityIdentifier
-     * @param array $aclIdentities
-     */
     protected function setRegistryRepositories(
         array $entityAcls = [],
-        $entityClass = null,
-        $entityIdentifier = null,
+        ?string $entityClass = null,
+        ?int $entityIdentifier = null,
         array $aclIdentities = []
     ) {
         $entityAclRepository =$this->createMock(WorkflowEntityAclRepository::class);
         $entityAclRepository->expects($this->any())
             ->method('getWorkflowEntityAcls')
-            ->will($this->returnValue($entityAcls));
+            ->willReturn($entityAcls);
 
         $aclIdentityRepository = $this->createMock(WorkflowEntityAclIdentityRepository::class);
         if ($entityClass && $entityIdentifier) {
             $aclIdentityRepository->expects($this->any())
                 ->method('findByClassAndIdentifierAndActiveWorkflows')
                 ->with($entityClass, $entityIdentifier)
-                ->will($this->returnValue($aclIdentities));
+                ->willReturn($aclIdentities);
         }
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with($this->isType('string'))
-            ->will(
-                $this->returnCallback(
-                    function ($entity) use ($entityAclRepository, $aclIdentityRepository) {
-                        switch ($entity) {
-                            case 'OroWorkflowBundle:WorkflowEntityAcl':
-                                return $entityAclRepository;
-                            case 'OroWorkflowBundle:WorkflowEntityAclIdentity':
-                                return $aclIdentityRepository;
-                            default:
-                                return null;
-                        }
-                    }
-                )
-            );
+            ->willReturnCallback(function ($entity) use ($entityAclRepository, $aclIdentityRepository) {
+                return match ($entity) {
+                    'OroWorkflowBundle:WorkflowEntityAcl' => $entityAclRepository,
+                    'OroWorkflowBundle:WorkflowEntityAclIdentity' => $aclIdentityRepository,
+                    default => null
+                };
+            });
 
         $workflow = $this->createMock(Workflow::class);
 

@@ -320,11 +320,12 @@ services:
         class: Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_config.manager'
+            - '@Psr\Container\ContainerInterface'
         calls:
             - [setClassName, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_config.manager }
 
     oro_locale.provider.localization_choices:
         class: Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider

@@ -5,27 +5,34 @@ namespace Oro\Bundle\WorkflowBundle\Acl\Voter;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Prevents editing of non active workflow definitions.
+ * Prevents editing of active workflow definitions.
  */
-class WorkflowEditVoter extends Voter
+class WorkflowEditVoter implements VoterInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function supports($attribute, $subject)
+    public function vote(TokenInterface $token, $subject, array $attributes)
     {
-        return BasicPermission::EDIT === $attribute && $subject instanceof WorkflowDefinition;
-    }
+        if (!$subject instanceof WorkflowDefinition) {
+            return self::ACCESS_ABSTAIN;
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
-    {
-        /* @var $subject WorkflowDefinition */
-        return !$subject->isActive();
+        $vote = self::ACCESS_ABSTAIN;
+        foreach ($attributes as $attribute) {
+            if (BasicPermission::EDIT !== $attribute) {
+                continue;
+            }
+
+            $vote = self::ACCESS_DENIED;
+            if (!$subject->isActive()) {
+                return self::ACCESS_GRANTED;
+            }
+        }
+
+        return $vote;
     }
 }

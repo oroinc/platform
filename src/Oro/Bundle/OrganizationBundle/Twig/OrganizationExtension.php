@@ -41,7 +41,7 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
      */
     protected function getOwnerAccessor()
     {
-        return $this->container->get(EntityOwnerAccessor::class);
+        return $this->container->get('oro_security.owner.entity_owner_accessor');
     }
 
     /**
@@ -49,7 +49,7 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
      */
     protected function getBusinessUnitManager()
     {
-        return $this->container->get(BusinessUnitManager::class);
+        return $this->container->get('oro_organization.business_unit_manager');
     }
 
     /**
@@ -124,8 +124,8 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
     {
         return [
             ConfigManager::class,
-            EntityOwnerAccessor::class,
-            BusinessUnitManager::class,
+            'oro_security.owner.entity_owner_accessor' => EntityOwnerAccessor::class,
+            'oro_organization.business_unit_manager' => BusinessUnitManager::class,
         ];
     }
 }

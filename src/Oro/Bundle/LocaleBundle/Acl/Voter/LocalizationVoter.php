@@ -8,50 +8,63 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Prevents removal of the default localization and the last localization that exists in the system.
  */
-class LocalizationVoter extends AbstractEntityVoter
+class LocalizationVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @var array
-     */
+    /** {@inheritDoc} */
     protected $supportedAttributes = [BasicPermission::DELETE];
 
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
+    private ContainerInterface $container;
+
+    public function __construct(DoctrineHelper $doctrineHelper, ContainerInterface $container)
     {
         parent::__construct($doctrineHelper);
-        $this->configManager = $configManager;
+        $this->container = $container;
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_config.manager' => ConfigManager::class
+        ];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        $id = (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
-        if ($id == $identifier || $this->isLastLocalization()) {
-            return self::ACCESS_DENIED;
-        }
-
-        return self::ACCESS_ABSTAIN;
+        return $this->getDefaultLocalizationId() === $identifier || $this->isLastLocalization()
+            ? self::ACCESS_DENIED
+            : self::ACCESS_ABSTAIN;
     }
 
-    /**
-     * @return bool
-     */
-    protected function isLastLocalization()
+    private function getDefaultLocalizationId(): int
     {
-        /** @var LocalizationRepository $repository */
-        $repository = $this->doctrineHelper->getEntityRepository($this->className);
+        return (int)$this->getConfigManager()->get(
+            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION)
+        );
+    }
 
-        $localizationsCount = $repository->getLocalizationsCount();
-        return $localizationsCount <= 1;
+    private function isLastLocalization(): bool
+    {
+        return $this->getLocalizationRepository()->getLocalizationsCount() <= 1;
+    }
+
+    private function getLocalizationRepository(): LocalizationRepository
+    {
+        return $this->doctrineHelper->getEntityRepository($this->className);
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        return $this->container->get('oro_config.manager');
     }
 }

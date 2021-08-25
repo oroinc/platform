@@ -12,12 +12,7 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
  */
 class EntityClassResolverUtil
 {
-    /**
-     * @param object $object
-     *
-     * @return string
-     */
-    public static function getEntityClass($object): string
+    public static function getEntityClass(object $object): string
     {
         if ($object instanceof FieldVote) {
             $object = $object->getDomainObject();

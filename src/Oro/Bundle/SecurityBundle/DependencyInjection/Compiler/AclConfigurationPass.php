@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -43,12 +44,13 @@ class AclConfigurationPass implements CompilerPassInterface
         $extensions = [];
         $taggedServices = $container->findTaggedServiceIds('oro_security.acl.extension');
         foreach ($taggedServices as $id => $tags) {
-            $extensions[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
+            $extensions[$this->getPriorityAttribute($tags[0])][$id] = new Reference($id);
         }
         $extensions = $this->inverseSortByPriorityAndFlatten($extensions);
 
         $container->getDefinition('oro_security.acl.extension_selector')
-            ->setArgument(0, $extensions);
+            ->setArgument(0, array_keys($extensions))
+            ->setArgument(1, ServiceLocatorTagPass::register($container, $extensions));
     }
 
     private function configureDefaultAclProvider(ContainerBuilder $container): void
