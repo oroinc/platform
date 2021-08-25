@@ -35,13 +35,17 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getFormConstraintsDataProvider
+     *
+     * @param FormInterface $formView
+     * @param array $expectGetMetadata
+     * @param array $expectedConstraints
      */
     public function testGetFormConstraints(
         FormInterface $formView,
-        $expectGetMetadata = false,
-        $expectedConstraints = []
-    ) {
-        $this->constraintConverter->expects($this->exactly(count($expectedConstraints)))
+        array $expectGetMetadata = [],
+        array $expectedConstraints = []
+    ): void {
+        $this->constraintConverter->expects(self::exactly(count($expectedConstraints)))
             ->method('convertConstraint')
             ->willReturnArgument(0);
 
@@ -53,19 +57,24 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
                 $propertyMetadata->constraints = $constraints;
                 $classMetadata->properties[$property] = $propertyMetadata;
             }
-            $this->metadataFactory->expects($this->once())
+            $this->metadataFactory->expects(self::once())
                 ->method('getMetadataFor')
                 ->with($expectGetMetadata['value'])
                 ->willReturn($classMetadata);
         }
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConstraints,
             $this->constraintsProvider->getFormConstraints($formView)
         );
     }
 
-    public function getFormConstraintsDataProvider()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
+    public function getFormConstraintsDataProvider(): array
     {
         return [
             'not_mapped' => [
@@ -161,18 +170,37 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
                     $this->createConstraint('NotBlank', ['Default']),
                 ]
             ],
+            'entity_class' => [
+                'formView' => $this->createForm(
+                    'email',
+                    null,
+                    [
+                        'name' => 'email',
+                        'constraints' => [$this->createConstraint('NotBlank', ['Default'])]
+                    ],
+                    $this->createForm('user', null, ['entity_class' => 'stdClass'])
+                ),
+                'expectGetMetadataFor' => [
+                    'value' => 'stdClass',
+                    'propertyConstraints' => [
+                        'email' => [$this->createConstraint('Email', ['Default'])],
+                        'username' => [$this->createConstraint('NotBlank', ['Default'])],
+                    ]
+                ],
+                'expectedConstraints' => [
+                    $this->createConstraint('Email', ['Default']),
+                    $this->createConstraint('NotBlank', ['Default']),
+                ],
+            ],
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $dataClass
-     * @param array $options
-     * @param FormInterface $parent
-     * @return FormInterface
-     */
-    private function createForm($name, $dataClass = null, array $options = [], FormInterface $parent = null)
-    {
+    private function createForm(
+        string $name,
+        string $dataClass = null,
+        array $options = [],
+        FormInterface $parent = null
+    ): FormInterface {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $config = new FormConfigBuilder($name, $dataClass, $eventDispatcher, $options);
@@ -183,13 +211,7 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @param string $name
-     * @param array $groups
-     * @param array $options
-     * @return Constraint
-     */
-    private function createConstraint($name, array $groups, array $options = [])
+    private function createConstraint(string $name, array $groups, array $options = []): Constraint
     {
         $className = 'Symfony\\Component\\Validator\\Constraints\\' . $name;
 
