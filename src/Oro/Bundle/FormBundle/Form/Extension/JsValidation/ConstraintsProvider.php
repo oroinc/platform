@@ -102,9 +102,10 @@ class ConstraintsProvider implements ConstraintsProviderInterface
     protected function extractMetadataPropertiesConstraints(FormInterface $form)
     {
         $constraints = [];
-        if ($form->getConfig()->getDataClass()) {
+        $dataClass = $form->getConfig()->getDataClass() ?: $form->getConfig()->getOption('entity_class');
+        if ($dataClass) {
             /** @var ClassMetadata $metadata */
-            $metadata = $this->metadataFactory->getMetadataFor($form->getConfig()->getDataClass());
+            $metadata = $this->metadataFactory->getMetadataFor($dataClass);
             $constraints = $metadata->properties;
         }
         $errorMapping = $form->getConfig()->getOption('error_mapping');

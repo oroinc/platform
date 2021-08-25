@@ -6,8 +6,6 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -36,15 +34,10 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $container = TestContainerBuilder::create()
-            ->add('object_identity_factory', $this->objectIdentityFactory)
-            ->add('annotation_provider', $this->annotationProvider)
-            ->getContainer($this);
-
         $this->classAuthorizationChecker = new ClassAuthorizationChecker(
             $this->authorizationChecker,
-            new ServiceLink($container, 'object_identity_factory'),
-            new ServiceLink($container, 'annotation_provider'),
+            $this->objectIdentityFactory,
+            $this->annotationProvider,
             $this->logger
         );
     }

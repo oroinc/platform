@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
@@ -47,10 +46,8 @@ class EmbedFormController extends AbstractController
 
         $isInline = $request->query->getBoolean('inline');
 
-        /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
         $formManager = $this->get(EmbeddedFormManager::class);
-        $form        = $formManager->createForm($formEntity->getFormType());
+        $form = $formManager->createForm($formEntity->getFormType());
 
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             $dataClass = $form->getConfig()->getOption('data_class');
@@ -92,6 +89,7 @@ class EmbedFormController extends AbstractController
                     $accessor->getValue($formEntity, $formEntityConfig->get('owner_field_name'))
                 );
             }
+            $em = $this->get('doctrine')->getManagerForClass(get_class($entity));
             $em->persist($entity);
             $em->flush();
 
@@ -182,7 +180,6 @@ class EmbedFormController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                'doctrine.orm.entity_manager' => EntityManager::class,
                 EmbeddedFormManager::class,
                 EventDispatcherInterface::class,
                 EmbedFormLayoutManager::class,

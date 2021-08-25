@@ -5,13 +5,11 @@ namespace Oro\Bundle\SecurityBundle;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\DecorateAuthorizationCheckerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SessionPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SetFirewallExceptionListenerPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SetPublicForDecoratedAuthorizationCheckerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationFormLoginFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationHttpBasicFactory;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
@@ -19,8 +17,6 @@ use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -57,15 +53,6 @@ class OroSecurityBundle extends Bundle
             $container->moveCompilerPassBefore(
                 RemoveAclSchemaListenerPass::class,
                 RegisterEventListenersAndSubscribersPass::class
-            );
-            $container->addCompilerPass(new DecorateAuthorizationCheckerPass());
-            $container->moveCompilerPassBefore(
-                DecorateAuthorizationCheckerPass::class,
-                LoggerChannelPass::class
-            );
-            $container->addCompilerPass(
-                new SetPublicForDecoratedAuthorizationCheckerPass(),
-                PassConfig::TYPE_BEFORE_REMOVING
             );
         }
 

@@ -7,27 +7,25 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Component\Testing\ReflectionUtil;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var LocalizationRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    private $repository;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var LocalizationVoter */
-    protected $voter;
+    private $voter;
 
     protected function setUp(): void
     {
@@ -36,35 +34,31 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->willReturnCallback(
-                function ($object) {
-                    return method_exists($object, 'getId') ? $object->getId() : null;
-                }
-            );
+            ->willReturnCallback(function ($object) {
+                return method_exists($object, 'getId') ? $object->getId() : null;
+            });
 
         $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->voter = new LocalizationVoter($this->doctrineHelper, $this->configManager);
+        $container = TestContainerBuilder::create()
+            ->add('oro_config.manager', $this->configManager)
+            ->getContainer($this);
+
+        $this->voter = new LocalizationVoter($this->doctrineHelper, $container);
         $this->voter->setClassName(Localization::class);
     }
 
     /**
      * @dataProvider voteDataProvider
-     *
-     * @param int $count
-     * @param int $defaultLocalization
-     * @param object $object
-     * @param string $attribute
-     * @param int $expected
      */
-    public function testVote($count, $defaultLocalization, $object, $attribute, $expected)
+    public function testVote(?int $count, int $defaultLocalization, object $object, string $attribute, int $expected)
     {
-        $this->doctrineHelper
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with(Localization::class)
             ->willReturn($this->repository);
 
-        $this->repository
+        $this->repository->expects($this->any())
             ->method('getLocalizationsCount')
             ->willReturn($count);
         $this->configManager->method('get')->willReturn($defaultLocalization);
@@ -75,12 +69,13 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function voteDataProvider()
+    public function voteDataProvider(): array
     {
-        $localization = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 42]);
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, 42);
+
+        $item = new Item();
+        ReflectionUtil::setId($item, 42);
 
         return [
             'abstain when not supported attribute' => [
@@ -93,14 +88,14 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
             'abstain when not supported class' => [
                 'count' => null,
                 'default_localization' => 1,
-                'object' => $this->getEntity('Oro\Bundle\TestFrameworkBundle\Entity\Item', ['id' => 42]),
+                'object' => $item,
                 'attribute' => 'DELETE',
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
             ],
             'abstain when new entity' => [
                 'count' => null,
                 'default_localization' => 1,
-                'object' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization'),
+                'object' => new Localization(),
                 'attribute' => 'DELETE',
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
             ],

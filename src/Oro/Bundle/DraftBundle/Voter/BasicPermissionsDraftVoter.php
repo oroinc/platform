@@ -8,7 +8,9 @@ use Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Responsible for granting access to draft entities. Includes special rights for the draft owner.
@@ -25,14 +27,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  *
  * Virtual permissions are more important than any permissions.
  */
-class BasicPermissionsDraftVoter extends AbstractEntityVoter
+class BasicPermissionsDraftVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
     private const PERMISSION_CREATE = 'CREATE_DRAFT';
     private const PERMISSION_PUBLISH = 'PUBLISH_DRAFT';
 
-    /**
-     * @var array
-     */
+    /** {@inheritDoc} */
     protected $supportedAttributes = [
         BasicPermission::VIEW,
         BasicPermission::EDIT,
@@ -41,25 +41,36 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         self::PERMISSION_PUBLISH
     ];
 
-    /**
-     * @var DraftPermissionHelper
-     */
-    private $draftPermissionHelper;
-
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private ContainerInterface $container;
+    private ?DraftPermissionHelper $draftPermissionHelper = null;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        DraftPermissionHelper $draftPermissionHelper,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        ContainerInterface $container
     ) {
-        $this->draftPermissionHelper = $draftPermissionHelper;
-        $this->authorizationChecker = $authorizationChecker;
-
         parent::__construct($doctrineHelper);
+        $this->authorizationChecker = $authorizationChecker;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_draft.helper.draft_permission_helper' => DraftPermissionHelper::class
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function supportsClass($class): bool
+    {
+        return is_a($class, DraftableInterface::class, true);
     }
 
     /**
@@ -99,17 +110,17 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
 
     private function checkBasicPermission(DraftableInterface $object, string $attribute): int
     {
-        if ($this->draftPermissionHelper->isUserOwned($object)) {
+        if ($this->getDraftPermissionHelper()->isUserOwned($object)) {
             return self::ACCESS_GRANTED;
         }
-        $draftGlobalPermission = $this->draftPermissionHelper->generateGlobalPermission($attribute);
+        $draftGlobalPermission = $this->getDraftPermissionHelper()->generateGlobalPermission($attribute);
 
         return $this->isGranted($object, $draftGlobalPermission);
     }
 
     private function checkDeletePermission(DraftableInterface $object, string $attribute): int
     {
-        $permission = $this->draftPermissionHelper->generatePermissions($object, $attribute);
+        $permission = $this->getDraftPermissionHelper()->generatePermissions($object, $attribute);
 
         return $this->isGranted($object, $permission);
     }
@@ -117,7 +128,7 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
     private function checkSourcePermission(DraftableInterface $object, string $attribute): int
     {
         $source = $object->getDraftSource();
-        $permissions = $this->draftPermissionHelper->generatePermissions($object, BasicPermission::VIEW);
+        $permissions = $this->getDraftPermissionHelper()->generatePermissions($object, BasicPermission::VIEW);
 
         return $this->isGranted($source, $attribute) | $this->isGranted($object, $permissions);
     }
@@ -129,13 +140,12 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
             : self::ACCESS_DENIED;
     }
 
-    /**
-     * @param string $class
-     *
-     * @return bool
-     */
-    protected function supportsClass($class): bool
+    private function getDraftPermissionHelper(): DraftPermissionHelper
     {
-        return is_a($class, DraftableInterface::class, true);
+        if (null === $this->draftPermissionHelper) {
+            $this->draftPermissionHelper = $this->container->get('oro_draft.helper.draft_permission_helper');
+        }
+
+        return $this->draftPermissionHelper;
     }
 }

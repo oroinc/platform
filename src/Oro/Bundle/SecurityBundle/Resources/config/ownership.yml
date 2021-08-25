@@ -11,9 +11,6 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
             - '@Doctrine\Inflector\Inflector'
 
-    Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor:
-        alias: oro_security.owner.entity_owner_accessor
-
     oro_security.owner.entity_owner_accessor.link:
         tags:
             - { name: oro_service_link, service: oro_security.owner.entity_owner_accessor }

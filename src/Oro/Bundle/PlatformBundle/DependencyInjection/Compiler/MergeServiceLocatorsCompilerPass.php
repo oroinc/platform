@@ -106,13 +106,7 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
         return $locators;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param mixed            $argument
-     *
-     * @return Definition|null
-     */
-    private function getArgumentServiceLocatorDefinition(ContainerBuilder $container, $argument): ?Definition
+    private function getArgumentServiceLocatorDefinition(ContainerBuilder $container, mixed $argument): ?Definition
     {
         if (!$argument instanceof Reference) {
             return null;

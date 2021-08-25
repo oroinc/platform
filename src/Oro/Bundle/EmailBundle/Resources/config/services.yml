@@ -852,9 +852,10 @@ services:
         class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
         arguments:
             - '@security.authorization_checker'
-            - '@oro_email.mailbox.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_email.mailbox.manager }
 
     oro_email.entity_alias_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider

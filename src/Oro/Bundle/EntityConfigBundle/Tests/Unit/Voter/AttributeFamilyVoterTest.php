@@ -6,9 +6,10 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,7 +25,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     private $doctrineHelper;
 
     /** @var AttributeFamilyManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $familyManager;
+    private $attributeFamilyManager;
 
     /** @var AttributeFamilyVoter */
     private $voter;
@@ -32,22 +33,21 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->attributeFamilyManager = $this->createMock(AttributeFamilyManager::class);
 
-        $this->familyManager = $this->getMockBuilder(AttributeFamilyManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = TestContainerBuilder::create()
+            ->add('oro_entity_config.manager.attribute_family_manager', $this->attributeFamilyManager)
+            ->getContainer($this);
 
-        $this->voter = new AttributeFamilyVoter($this->doctrineHelper, $this->familyManager);
+        $this->voter = new AttributeFamilyVoter($this->doctrineHelper, $container);
         $this->voter->setClassName(AttributeFamily::class);
     }
 
     public function testVoteWithNotSupportedClass()
     {
         $this->assertEquals(
-            AbstractEntityVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, new \stdClass, ['delete'])
         );
     }
@@ -55,7 +55,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     public function testVoteWithNotSupportedAttribute()
     {
         $this->assertEquals(
-            AbstractEntityVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, new \stdClass, ['view'])
         );
     }
@@ -72,13 +72,13 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
             ->with($attributeFamily, false)
             ->willReturn(self::FAMILY_ID);
 
-        $this->familyManager->expects($this->once())
+        $this->attributeFamilyManager->expects($this->once())
             ->method('isAttributeFamilyDeletable')
             ->with(self::FAMILY_ID)
             ->willReturn(false);
 
         $this->assertEquals(
-            AbstractEntityVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->token, $attributeFamily, ['delete'])
         );
     }
@@ -95,13 +95,13 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
             ->with($attributeFamily, false)
             ->willReturn(self::FAMILY_ID);
 
-        $this->familyManager->expects($this->once())
+        $this->attributeFamilyManager->expects($this->once())
             ->method('isAttributeFamilyDeletable')
             ->with(self::FAMILY_ID)
             ->willReturn(true);
 
         $this->assertEquals(
-            AbstractEntityVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, $attributeFamily, ['delete'])
         );
     }
