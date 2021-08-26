@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -16,25 +17,22 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class AclExtensionSelector implements ResetInterface
 {
-    /** @var AclExtensionInterface[] [extension key => extension, ...] */
-    private $extensions;
+    private array $extensionNames;
+    private ContainerInterface $extensionContainer;
+    private ObjectIdAccessor $objectIdAccessor;
 
-    /** @var ObjectIdAccessor */
-    private $objectIdAccessor;
-
+    /** @var AclExtensionInterface[]|null [ACL extension key => ACL extension, ...] */
+    private ?array $extensions = null;
     /** @var array [cache key => ACL extension or NULL, ...] */
     private $localCache = [];
 
-    /**
-     * @param AclExtensionInterface[] $extensions
-     * @param ObjectIdAccessor        $objectIdAccessor
-     */
-    public function __construct(array $extensions, ObjectIdAccessor $objectIdAccessor)
-    {
-        $this->extensions = [];
-        foreach ($extensions as $extension) {
-            $this->extensions[$extension->getExtensionKey()] = $extension;
-        }
+    public function __construct(
+        array $extensionNames,
+        ContainerInterface $extensionContainer,
+        ObjectIdAccessor $objectIdAccessor
+    ) {
+        $this->extensionNames = $extensionNames;
+        $this->extensionContainer = $extensionContainer;
         $this->objectIdAccessor = $objectIdAccessor;
     }
 
@@ -55,11 +53,7 @@ class AclExtensionSelector implements ResetInterface
      */
     public function selectByExtensionKey($extensionKey)
     {
-        if (!isset($this->extensions[$extensionKey])) {
-            return null;
-        }
-
-        return $this->extensions[$extensionKey];
+        return $this->all()[$extensionKey] ?? null;
     }
 
     /**
@@ -113,12 +107,21 @@ class AclExtensionSelector implements ResetInterface
     }
 
     /**
-     * Gets all ACL extension
+     * Gets all ACL extensions.
      *
-     * @return AclExtensionInterface[]
+     * @return AclExtensionInterface[] [ACL extension key => ACL extension, ...]
      */
     public function all()
     {
+        if (null === $this->extensions) {
+            $this->extensions = [];
+            foreach ($this->extensionNames as $name) {
+                /** @var AclExtensionInterface $extension */
+                $extension = $this->extensionContainer->get($name);
+                $this->extensions[$extension->getExtensionKey()] = $extension;
+            }
+        }
+
         return $this->extensions;
     }
 
@@ -167,7 +170,8 @@ class AclExtensionSelector implements ResetInterface
      */
     private function findExtension($type, $id)
     {
-        foreach ($this->extensions as $extension) {
+        $extensions = $this->all();
+        foreach ($extensions as $extension) {
             if ($extension->supports($type, $id)) {
                 return $extension;
             }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
 /**
@@ -11,19 +10,14 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
  */
 class GoogleImapEnableContext extends OroFeatureContext
 {
-    private ConfigManager $configManager;
-
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
 
     /**
      * @Given /^(?:|I )enable Google IMAP$/
      */
     public function setConfigurationProperty()
     {
-        $this->configManager->set('oro_imap.enable_google_imap', true);
-        $this->configManager->flush();
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        $configManager->set('oro_imap.enable_google_imap', true);
+        $configManager->flush();
     }
 }

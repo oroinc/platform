@@ -1,39 +1,35 @@
 services:
+    _defaults:
+        public: true
+
     oro_test.kernel_service_factory:
         class: Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory
-        public: true
         arguments: ['@fob_symfony.kernel']
 
     oro_entity.entity_alias_resolver:
         class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
-        public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_entity.entity_alias_resolver']
 
     oro_security.owner.metadata_provider.chain:
         class: Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
-        public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_security.owner.metadata_provider.chain']
 
     oro_config.global:
         class: Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
-        public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_config.global']
 
     property_accessor:
         class: Symfony\Component\PropertyAccess\PropertyAccessor
-        public: true
 
     doctrine.orm.entity_manager:
         class: Doctrine\ORM\EntityManager
-        public: true
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['doctrine.orm.entity_manager']
 
     file_locator:
         class: Symfony\Component\HttpKernel\Config\FileLocator
-        public: true
         arguments:
             - '@fob_symfony.kernel'

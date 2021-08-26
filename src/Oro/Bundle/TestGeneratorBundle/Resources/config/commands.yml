@@ -1,7 +1,0 @@
-services:
-    Oro\Bundle\TestGeneratorBundle\Command\CreateTestCommand:
-        public: false
-        arguments:
-            - '@oro_test_generator.test_type_service_locator'
-        tags:
-            - { name: console.command }

@@ -9,20 +9,12 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
-use Symfony\Component\Routing\RouterInterface;
 
 class FeatureContext extends OroFeatureContext implements
     FixtureLoaderAwareInterface,
     OroPageObjectAware
 {
     use FixtureLoaderDictionary, PageObjectDictionary;
-
-    private RouterInterface $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
-    }
 
     /**
      * @var OroMainContext
@@ -46,7 +38,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iAmOnLoginPage()
     {
-        $uri = $this->router->generate('oro_user_security_login');
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_security_login');
         $this->visitPath($uri);
     }
 
@@ -57,7 +49,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iAmLoggedOut()
     {
-        $uri = $this->router->generate('oro_user_security_logout');
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_security_logout');
         $this->visitPath($uri);
     }
 
@@ -138,7 +130,8 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function openUserViewPage($id)
     {
-        $url = $this->router
+        $url = $this->getAppContainer()
+            ->get('router')
             ->generate('oro_user_view', ['id' => $id]);
 
         $this->visitPath($url);

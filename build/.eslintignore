@@ -1,5 +1,6 @@
 **/.bin/**
 **/node_modules/**
+**/api-doc-bundle/**
 **/public/lib/**
 **/public/*/vendors/**
 **/Karma/lib/**

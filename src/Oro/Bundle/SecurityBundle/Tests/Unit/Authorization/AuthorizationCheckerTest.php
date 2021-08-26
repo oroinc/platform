@@ -6,8 +6,6 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -37,16 +35,10 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $container = TestContainerBuilder::create()
-            ->add('authorization_checker', $this->innerAuthorizationChecker)
-            ->add('object_identity_factory', $this->objectIdentityFactory)
-            ->add('annotation_provider', $this->annotationProvider)
-            ->getContainer($this);
-
         $this->authorizationChecker = new AuthorizationChecker(
-            new ServiceLink($container, 'authorization_checker'),
-            new ServiceLink($container, 'object_identity_factory'),
-            new ServiceLink($container, 'annotation_provider'),
+            $this->innerAuthorizationChecker,
+            $this->objectIdentityFactory,
+            $this->annotationProvider,
             $this->logger
         );
     }

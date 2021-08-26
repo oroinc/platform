@@ -6,20 +6,18 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $annotationProvider;
 
     /** @var RequestAuthorizationChecker */
@@ -31,15 +29,10 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
 
-        $container = TestContainerBuilder::create()
-            ->add('entity_class_resolver', $this->entityClassResolver)
-            ->add('annotation_provider', $this->annotationProvider)
-            ->getContainer($this);
-
         $this->requestAuthorizationChecker = new RequestAuthorizationChecker(
             $this->authorizationChecker,
-            new ServiceLink($container, 'entity_class_resolver'),
-            new ServiceLink($container, 'annotation_provider')
+            $this->entityClassResolver,
+            $this->annotationProvider
         );
     }
 
@@ -51,15 +44,15 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotation')
             ->with('OroTestBundle', 'testAction')
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->entityClassResolver->expects($this->once())
             ->method('isEntity')
             ->with('OroTestBundle:Test')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
             ->with('OroTestBundle:Test')
-            ->will($this->returnValue('Oro\Bundle\TestBundle\Entity\Test'));
+            ->willReturn('Oro\Bundle\TestBundle\Entity\Test');
 
         $returnAcl = $this->requestAuthorizationChecker->getRequestAcl($request, true);
         $this->assertNotNull($returnAcl);
@@ -83,7 +76,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isRequestObjectIsGrantedProvider
      */
-    public function testIsRequestObjectIsGranted($requestController, $isGrant, $result)
+    public function testIsRequestObjectIsGranted(string $requestController, bool $isGrant, int $result)
     {
         $object = new \stdClass();
         $request = new Request();
@@ -93,19 +86,19 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         );
         $this->annotationProvider->expects($this->any())
             ->method('findAnnotation')
-            ->will($this->returnValue($acl));
+            ->willReturn($acl);
         $this->entityClassResolver->expects($this->any())
             ->method('isEntity')
             ->with('OroTestBundle:Test')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
             ->with('OroTestBundle:Test')
-            ->will($this->returnValue('\stdClass'));
+            ->willReturn(\stdClass::class);
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($object))
-            ->will($this->returnValue($isGrant));
+            ->willReturn($isGrant);
 
         $this->assertEquals(
             $result,
@@ -113,7 +106,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isRequestObjectIsGrantedProvider()
+    public function isRequestObjectIsGrantedProvider(): array
     {
         return [
             ['testBundle::testAction', true, 1],

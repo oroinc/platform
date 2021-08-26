@@ -8,7 +8,6 @@ use Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor as BaseExtractor;
 use Nelmio\ApiDocBundle\Util\DocCommentExtractor;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetectorAwareInterface;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -36,7 +35,6 @@ class CachingApiDocExtractor extends BaseExtractor implements
      * @param RouterInterface      $router
      * @param Reader               $reader
      * @param DocCommentExtractor  $commentExtractor
-     * @param ControllerNameParser $controllerNameParser
      * @param array                $handlers
      * @param array                $annotationsProviders
      * @param string               $cacheFile
@@ -47,7 +45,6 @@ class CachingApiDocExtractor extends BaseExtractor implements
         RouterInterface $router,
         Reader $reader,
         DocCommentExtractor $commentExtractor,
-        ControllerNameParser $controllerNameParser,
         array $handlers,
         array $annotationsProviders,
         $cacheFile,
@@ -58,7 +55,6 @@ class CachingApiDocExtractor extends BaseExtractor implements
             $router,
             $reader,
             $commentExtractor,
-            $controllerNameParser,
             $handlers,
             $annotationsProviders,
             $cacheFile,

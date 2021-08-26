@@ -8,25 +8,25 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 class OroNavigationBundle implements Migration, ContainerAwareInterface
 {
-    /** @var Router */
-    protected $router;
+    /** @var UrlMatcherInterface */
+    private $urlMatcher;
 
     /** @var EntityManagerInterface */
-    protected $em;
+    private $em;
 
     /**
      * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        $this->router = $container->get('router');
-        $this->em     = $container->get('doctrine.orm.entity_manager');
+        $this->urlMatcher = $container->get('router');
+        $this->em = $container->get('doctrine.orm.entity_manager');
     }
 
     /**
@@ -48,7 +48,7 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
     /**
      * Update navigation history with route names and parameters
      */
-    protected function updateNavigationHistory(QueryBag $queries)
+    private function updateNavigationHistory(QueryBag $queries): void
     {
         $queryBuilder = $this->em
             ->getRepository('OroNavigationBundle:NavigationHistoryItem')
@@ -59,10 +59,10 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
 
         foreach ($paginator as $navItem) {
             try {
-                $url       = str_replace('index_dev.php/', '', $navItem['url']);
-                $routeData = $this->router->match($url);
-                $entityId  = isset($routeData['id']) ? (int)$routeData['id'] : null;
-                $route     = $routeData['_route'];
+                $url = str_replace('index_dev.php/', '', $navItem['url']);
+                $routeData = $this->urlMatcher->match($url);
+                $entityId = isset($routeData['id']) ? (int)$routeData['id'] : null;
+                $route = $routeData['_route'];
 
                 unset($routeData['_controller'], $routeData['id'], $routeData['_route']);
 

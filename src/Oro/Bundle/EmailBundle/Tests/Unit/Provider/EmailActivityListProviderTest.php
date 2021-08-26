@@ -26,45 +26,45 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var EmailActivityListProvider */
-    private $emailActivityListProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityNameResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $router;
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MailboxProcessStorage|\PHPUnit\Framework\MockObject\MockObject */
     private $mailboxProcessStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ActivityAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $activityAssociationHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var CommentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $commentAssociationHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
+
+    /** @var EmailActivityListProvider */
+    private $emailActivityListProvider;
 
     protected function setUp(): void
     {
@@ -72,8 +72,8 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
-        $this->router = $this->createMock(Router::class);
         $this->configManager  = $this->createMock(ConfigManager::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $emailThreadProvider = $this->createMock(EmailThreadProvider::class);
         $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->mailboxProcessStorage = $this->createMock(MailboxProcessStorage::class);
@@ -84,7 +84,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->emailActivityListProvider = new EmailActivityListProvider(
             $this->doctrineHelper,
             $this->entityNameResolver,
-            $this->router,
+            $this->urlGenerator,
             $this->configManager,
             $emailThreadProvider,
             $htmlTagHelper,
@@ -246,7 +246,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isGranted')
             ->willReturn(true);
 
-        $this->router->expects($this->any())
+        $this->urlGenerator->expects($this->any())
             ->method('generate')
             ->willReturn('test/user/link/1');
 

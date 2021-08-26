@@ -3,11 +3,10 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentContext;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext;
-use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,15 +16,6 @@ class UserAttachmentContext extends AttachmentContext
 
     /** @var AttachmentImageContext */
     private $attachmentImageContext;
-
-    private BaseUserManager $userManager;
-
-    public function __construct(AttachmentManager $attachmentManager, BaseUserManager $userManager)
-    {
-        $this->userManager = $userManager;
-
-        parent::__construct($attachmentManager);
-    }
 
     /**
      * @BeforeScenario
@@ -75,19 +65,23 @@ class UserAttachmentContext extends AttachmentContext
 
     private function getUser(string $username): User
     {
+        /** @var UserManager $userManager */
+        $userManager = $this->getAppContainer()->get('oro_user.manager');
         /** @var User $user */
-        $user = $this->userManager->findUserByUsername($username);
+        $user = $userManager->findUserByUsername($username);
 
         self::assertNotNull($user, sprintf('Could not find user with username "%s".', $username));
-        $this->userManager->reloadUser($user);
+        $userManager->reloadUser($user);
 
         return $user;
     }
 
     protected function assertResponseSuccess(ResponseInterface $response): void
     {
+        $attachmentManager = $this->getAppContainer()->get('oro_attachment.manager');
+
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        self::assertTrue($this->getAttachmentManager()->isImageType($response->getHeader('Content-Type')[0]));
+        self::assertTrue($attachmentManager->isImageType($response->getHeader('Content-Type')[0]));
     }
 
     protected function assertResponseFail(ResponseInterface $response): void

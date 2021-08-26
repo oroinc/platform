@@ -289,7 +289,6 @@
             "Oro\\Bundle\\SyncBundle\\": "src/Oro/Bundle/SyncBundle",
             "Oro\\Bundle\\TagBundle\\": "src/Oro/Bundle/TagBundle",
             "Oro\\Bundle\\TestFrameworkBundle\\": "src/Oro/Bundle/TestFrameworkBundle",
-            "Oro\\Bundle\\TestGeneratorBundle\\": "src/Oro/Bundle/TestGeneratorBundle",
             "Oro\\Bundle\\ThemeBundle\\": "src/Oro/Bundle/ThemeBundle",
             "Oro\\Bundle\\TranslationBundle\\": "src/Oro/Bundle/TranslationBundle",
             "Oro\\Bundle\\UIBundle\\": "src/Oro/Bundle/UIBundle",

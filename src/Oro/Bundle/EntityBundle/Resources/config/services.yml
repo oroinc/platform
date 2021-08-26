@@ -111,6 +111,7 @@ services:
         public: true
         arguments:
             - '@router'
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.custom-entity-grid, method: onBuildBefore }
 

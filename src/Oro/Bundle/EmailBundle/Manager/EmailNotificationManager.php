@@ -2,42 +2,41 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class EmailNotificationManager
- * @package Oro\Bundle\EmailBundle\Manager
+ * Provides information about new emails.
  */
 class EmailNotificationManager
 {
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /** @var Router */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EntityManager */
-    protected $em;
-
     public function __construct(
-        EntityManager $entityManager,
+        ManagerRegistry $doctrine,
         HtmlTagHelper $htmlTagHelper,
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         ConfigManager $configManager
     ) {
-        $this->em = $entityManager;
+        $this->doctrine = $doctrine;
         $this->htmlTagHelper = $htmlTagHelper;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
     }
 
@@ -51,15 +50,12 @@ class EmailNotificationManager
      */
     public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
     {
-        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
-            $user,
-            $organization,
-            $maxEmailsDisplay,
-            $folderId
-        );
+        $emails = $this->doctrine->getManagerForClass(Email::class)
+            ->getRepository(Email::class)
+            ->getNewEmails($user, $organization, $maxEmailsDisplay, $folderId);
 
         $emailsData = [];
-        /** @var $email Email */
+        /** @var Email $email */
         foreach ($emails as $emailUser) {
             $email = $emailUser->getEmail();
             $bodyContent = '';
@@ -70,9 +66,9 @@ class EmailNotificationManager
 
             $emailId = $email->getId();
             $emailsData[] = [
-                'replyRoute' => $this->router->generate('oro_email_email_reply', ['id' => $emailId]),
-                'replyAllRoute' => $this->router->generate('oro_email_email_reply_all', ['id' => $emailId]),
-                'forwardRoute' => $this->router->generate('oro_email_email_forward', ['id' => $emailId]),
+                'replyRoute' => $this->urlGenerator->generate('oro_email_email_reply', ['id' => $emailId]),
+                'replyAllRoute' => $this->urlGenerator->generate('oro_email_email_reply_all', ['id' => $emailId]),
+                'forwardRoute' => $this->urlGenerator->generate('oro_email_email_forward', ['id' => $emailId]),
                 'id' => $emailId,
                 'seen' => $emailUser->isSeen(),
                 'subject' => $this->htmlTagHelper->purify($email->getSubject()),
@@ -96,7 +92,9 @@ class EmailNotificationManager
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization, $folderId);
+        return $this->doctrine->getManagerForClass(Email::class)
+            ->getRepository(Email::class)
+            ->getCountNewEmails($user, $organization, $folderId);
     }
 
     /**
@@ -110,9 +108,8 @@ class EmailNotificationManager
         if ($email->getFromEmailAddress() && $email->getFromEmailAddress()->getOwner()) {
             $className = $email->getFromEmailAddress()->getOwner()->getClass();
             $routeName = $this->configManager->getEntityMetadata($className)->getRoute('view', false);
-            $path = null;
             try {
-                $path = $this->router->generate(
+                $path = $this->urlGenerator->generate(
                     $routeName,
                     ['id' => $email->getFromEmailAddress()->getOwner()->getId()]
                 );

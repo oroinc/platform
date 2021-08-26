@@ -36,7 +36,7 @@ abstract class AbstractScopeManager
         ConfigBag $configBag
     ) {
         $this->doctrine = $doctrine;
-        $this->cache    = $cache;
+        $this->cache = $cache;
         $this->eventDispatcher = $eventDispatcher;
         $this->configBag = $configBag;
     }
@@ -248,11 +248,11 @@ abstract class AbstractScopeManager
         $entity   = $this->getScopedEntityName();
         $entityId = $this->resolveIdentifier($scopeIdentifier);
 
-        $em = $this->doctrine->getManagerForClass('Oro\Bundle\ConfigBundle\Entity\Config');
+        $em = $this->doctrine->getManagerForClass(Config::class);
 
         /** @var Config $config */
         $config = $em
-            ->getRepository('Oro\Bundle\ConfigBundle\Entity\Config')
+            ->getRepository(Config::class)
             ->findByEntity($entity, $entityId);
         if (null === $config) {
             $config = new Config();
@@ -431,8 +431,8 @@ abstract class AbstractScopeManager
      */
     protected function loadStoredSettings($entityId)
     {
-        $config = $this->doctrine->getManagerForClass('Oro\Bundle\ConfigBundle\Entity\Config')
-            ->getRepository('Oro\Bundle\ConfigBundle\Entity\Config')
+        $config = $this->doctrine->getManagerForClass(Config::class)
+            ->getRepository(Config::class)
             ->findByEntity($this->getScopedEntityName(), $entityId);
 
         if (null === $config) {
@@ -500,18 +500,17 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * @param null|int|object $identifier
+     * @param object|int|null $identifier
+     *
      * @return int|null
      */
     public function resolveIdentifier($identifier)
     {
-        if (is_object($identifier)) {
-            $identifier = $this->getScopeIdFromEntity($identifier);
-        } elseif (null === $identifier) {
-            $identifier = $this->getScopeId();
+        if (\is_object($identifier)) {
+            return $this->getScopeIdFromEntity($identifier);
         }
 
-        return $identifier;
+        return $identifier ?? $this->getScopeId();
     }
 
     protected function resetCache(): void

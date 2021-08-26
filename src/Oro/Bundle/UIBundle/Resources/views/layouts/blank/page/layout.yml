@@ -31,6 +31,11 @@ layout:
                     blockType: style
                     options:
                         src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
+                print_styles:
+                    blockType: style
+                    options:
+                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"], "print_styles"))'
+                        media: 'print'
                 body:
                     blockType: body
                 wrapper:
@@ -67,6 +72,7 @@ layout:
                         meta_viewport: ~
                         theme_icon: ~
                         styles: ~
+                        print_styles: ~
                     body:
                         wrapper:
                             skip_to_content: ~

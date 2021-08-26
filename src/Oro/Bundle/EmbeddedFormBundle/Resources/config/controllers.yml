@@ -8,11 +8,9 @@ services:
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_entity_config.provider.ownership, key: Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider }
-            - { name: container.service_subscriber, id: doctrine.orm.entity_manager }
 
     Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: doctrine.orm.entity_manager }

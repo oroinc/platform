@@ -25,6 +25,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class TestHelper
@@ -64,13 +65,19 @@ class TestHelper
             ->getMock();
         $actionMetadataProvider->expects($this->testCase->any())
             ->method('isKnownAction')
-            ->will($this->testCase->returnValue(true));
+            ->willReturn(true);
+
+        $container = TestContainerBuilder::create()
+            ->add('action_acl_extension', new ActionAclExtension($actionMetadataProvider))
+            ->add(
+                'entity_acl_extension',
+                $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor, $decisionMaker)
+            )
+            ->getContainer($this->testCase);
 
         return new AclExtensionSelector(
-            [
-                new ActionAclExtension($actionMetadataProvider),
-                $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor, $decisionMaker)
-            ],
+            ['action_acl_extension', 'entity_acl_extension'],
+            $container,
             $idAccessor
         );
     }
@@ -120,7 +127,7 @@ class TestHelper
 
         $treeProviderMock->expects($this->testCase->any())
             ->method('getTree')
-            ->will($this->testCase->returnValue($ownerTree));
+            ->willReturn($ownerTree);
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
@@ -137,40 +144,40 @@ class TestHelper
             ->getMock();
         $config->expects($this->testCase->any())
             ->method('getEntityNamespaces')
-            ->will($this->testCase->returnValue([
+            ->willReturn([
                 'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
-            ]));
+            ]);
 
         $em = $this->testCase->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
         $em->expects($this->testCase->any())
-            ->method('getConfiguration')->will($this->testCase->returnValue($config));
+            ->method('getConfiguration')->willReturn($config);
 
         $doctrine = $this->testCase->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->testCase->any())
             ->method('getManagers')
-            ->will($this->testCase->returnValue(['default' => $em]));
+            ->willReturn(['default' => $em]);
         $doctrine->expects($this->testCase->any())
             ->method('getManagerForClass')
-            ->will($this->testCase->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
         $doctrine->expects($this->testCase->any())
             ->method('getManager')
             ->with($this->testCase->equalTo('default'))
-            ->will($this->testCase->returnValue($em));
+            ->willReturn($em);
         $doctrine->expects($this->testCase->any())
             ->method('getAliasNamespace')
-            ->will($this->testCase->returnValueMap([
+            ->willReturnMap([
                 ['Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'],
-            ]));
+            ]);
 
         $entityMetadataProvider = $this->testCase->getMockBuilder(EntitySecurityMetadataProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
         $entityMetadataProvider->expects($this->testCase->any())
             ->method('isProtectedEntity')
-            ->will($this->testCase->returnValue(true));
+            ->willReturn(true);
         $fieldAclExtension = $this->testCase->getMockBuilder(FieldAclExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -223,7 +230,7 @@ class TestHelper
 
         $treeProviderMock->expects($this->testCase->any())
             ->method('getTree')
-            ->will($this->testCase->returnValue($ownerTree));
+            ->willReturn($ownerTree);
 
         $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build());
 
@@ -242,35 +249,35 @@ class TestHelper
             ->getMock();
         $config->expects($this->testCase->any())
             ->method('getEntityNamespaces')
-            ->will($this->testCase->returnValue([
+            ->willReturn([
                 'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
-            ]));
+            ]);
 
         $em = $this->testCase->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
         $em->expects($this->testCase->any())
             ->method('getConfiguration')
-            ->will($this->testCase->returnValue($config));
+            ->willReturn($config);
 
         $doctrine = $this->testCase->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->testCase->any())
             ->method('getManagers')
-            ->will($this->testCase->returnValue(['default' => $em]));
+            ->willReturn(['default' => $em]);
         $doctrine->expects($this->testCase->any())
             ->method('getManagerForClass')
-            ->will($this->testCase->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
         $doctrine->expects($this->testCase->any())
             ->method('getManager')
             ->with($this->testCase->equalTo('default'))
-            ->will($this->testCase->returnValue($em));
+            ->willReturn($em);
         $doctrine->expects($this->testCase->any())
             ->method('getAliasNamespace')
-            ->will($this->testCase->returnValueMap([
+            ->willReturnMap([
                 ['Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity']
-            ]));
+            ]);
 
         $entityMetadataProvider = $this->testCase->getMockBuilder(EntitySecurityMetadataProvider::class)
             ->disableOriginalConstructor()

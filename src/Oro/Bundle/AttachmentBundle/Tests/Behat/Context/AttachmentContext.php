@@ -11,13 +11,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class AttachmentContext extends OroFeatureContext
 {
-    private AttachmentManager $attachmentManager;
-
-    public function __construct(AttachmentManager $attachmentManager)
-    {
-        $this->attachmentManager = $attachmentManager;
-    }
-
     /**
      * Download the file using active session
      */
@@ -48,7 +41,7 @@ abstract class AttachmentContext extends OroFeatureContext
 
     protected function getAttachmentManager(): AttachmentManager
     {
-        return $this->attachmentManager;
+        return $this->getAppContainer()->get('oro_attachment.manager');
     }
 
     abstract protected function assertResponseSuccess(ResponseInterface $response): void;

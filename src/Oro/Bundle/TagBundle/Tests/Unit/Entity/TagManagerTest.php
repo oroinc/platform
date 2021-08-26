@@ -13,7 +13,7 @@ use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable as TaggableStub;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TagManagerTest extends \PHPUnit\Framework\TestCase
@@ -35,8 +35,8 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
 
     /** @var User|\PHPUnit\Framework\MockObject\MockObject */
     private $user;
@@ -49,7 +49,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->router = $this->createMock(Router::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
         $this->user = $this->getUser(self::TEST_USER_ID);
 
@@ -59,7 +59,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
             Tagging::class,
             $this->authorizationChecker,
             $this->tokenAccessor,
-            $this->router
+            $this->urlGenerator
         );
     }
 
@@ -252,7 +252,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(self::TEST_USER_ID);
 
-        $this->router->expects($this->exactly(2))
+        $this->urlGenerator->expects($this->exactly(2))
             ->method('generate');
 
         $repo = $this->createMock(TagRepository::class);
@@ -289,7 +289,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(self::TEST_USER_ID);
 
-        $this->router->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate');
 
         $this->manager->getPreparedArray($resource, $this->tagForPreparing());

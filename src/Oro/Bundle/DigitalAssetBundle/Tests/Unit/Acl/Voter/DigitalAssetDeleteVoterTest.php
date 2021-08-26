@@ -8,6 +8,7 @@ use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\DigitalAssetStub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class DigitalAssetDeleteVoterTest extends TestCase
 {
@@ -17,9 +18,6 @@ class DigitalAssetDeleteVoterTest extends TestCase
     /** @var DigitalAssetDeleteVoter */
     private $voter;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);
@@ -30,7 +28,7 @@ class DigitalAssetDeleteVoterTest extends TestCase
     public function testVoteWithUnsupportedObject(): void
     {
         $this->assertEquals(
-            DigitalAssetDeleteVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, new \stdClass(), [])
         );
     }
@@ -38,7 +36,7 @@ class DigitalAssetDeleteVoterTest extends TestCase
     public function testVoteWithUnsupportedAttribute(): void
     {
         $this->assertEquals(
-            DigitalAssetDeleteVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, new DigitalAsset(), ['ATTR'])
         );
     }
@@ -48,7 +46,7 @@ class DigitalAssetDeleteVoterTest extends TestCase
         $subject = new DigitalAssetStub();
         $subject->childFiles = new ArrayCollection([]);
         $this->assertEquals(
-            DigitalAssetDeleteVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, $subject, ['DELETE'])
         );
     }
@@ -58,7 +56,7 @@ class DigitalAssetDeleteVoterTest extends TestCase
         $subject = new DigitalAssetStub();
         $subject->childFiles = new ArrayCollection(['existing_child']);
         $this->assertEquals(
-            DigitalAssetDeleteVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->token, $subject, ['DELETE'])
         );
     }

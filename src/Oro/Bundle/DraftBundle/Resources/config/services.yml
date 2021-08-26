@@ -57,10 +57,11 @@ services:
         class: Oro\Bundle\DraftBundle\Voter\BasicPermissionsDraftVoter
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_draft.helper.draft_permission_helper'
             - '@security.authorization_checker'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_draft.helper.draft_permission_helper }
 
     oro_draft.voter.acl_voter:
         class: Oro\Bundle\DraftBundle\Voter\AclVoter

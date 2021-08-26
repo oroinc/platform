@@ -3,10 +3,10 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Route;
 
 use Oro\Bundle\UIBundle\Route\Router;
-use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -21,8 +21,8 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     private $requestQuery;
 
-    /** @var SymfonyRouter|\PHPUnit\Framework\MockObject\MockObject */
-    private $symfonyRouter;
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
@@ -41,9 +41,10 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->symfonyRouter = $this->createMock(SymfonyRouter::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->router = new Router($requestStack, $this->symfonyRouter, $this->authorizationChecker);
+
+        $this->router = new Router($requestStack, $this->urlGenerator, $this->authorizationChecker);
     }
 
     public function testSaveAndStayRedirectAfterSave()
@@ -54,7 +55,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn(Router::ACTION_SAVE_AND_STAY);
 
-        $this->symfonyRouter->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->willReturn($testUrl);
 
@@ -80,7 +81,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn(Router::ACTION_SAVE_AND_STAY);
 
-        $this->symfonyRouter->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->willReturn($testUrl);
 
@@ -112,7 +113,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn(Router::ACTION_SAVE_AND_STAY);
 
-        $this->symfonyRouter->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->willReturnCallback(function ($name) use (&$testUrl1, &$testUrl2) {
                 if ($name === 'test_route1') {
@@ -155,7 +156,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn(Router::ACTION_SAVE_CLOSE);
 
-        $this->symfonyRouter->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->willReturn($testUrl);
 
@@ -269,7 +270,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($data['queryParameters']);
 
         $expectedUrl = 'http://expected.com';
-        $this->symfonyRouter->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with($expected['route'], $expected['parameters'])
             ->willReturn($expectedUrl);

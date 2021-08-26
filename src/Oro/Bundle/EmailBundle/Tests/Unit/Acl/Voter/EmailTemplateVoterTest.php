@@ -5,22 +5,17 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 use Oro\Bundle\EmailBundle\Acl\Voter\EmailTemplateVoter;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var EmailTemplateVoter */
     private $voter;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -36,15 +31,14 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
     {
         $template = new EmailTemplate();
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($template, false)
             ->willReturn(1);
 
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
-            EmailTemplateVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($token, $template, $attributes)
         );
     }
@@ -56,15 +50,14 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
     {
         $object = new \stdClass();
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($object, false)
             ->willReturn(1);
 
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
-            EmailTemplateVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($token, $object, $attributes)
         );
     }
@@ -77,15 +70,14 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
         $template = new EmailTemplate();
         $template->setIsSystem(false);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($template, false)
             ->willReturn(1);
 
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
-            EmailTemplateVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($token, $template, $attributes)
         );
     }
@@ -98,23 +90,19 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
         $template = new EmailTemplate();
         $template->setIsSystem(true);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($template, false)
             ->willReturn(2);
 
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
-            EmailTemplateVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($token, $template, $attributes)
         );
     }
 
-    /**
-     * @return array
-     */
-    public function supportedAttributesDataProvider()
+    public function supportedAttributesDataProvider(): array
     {
         return [
             [['DELETE']],
@@ -122,10 +110,7 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function unsupportedAttributesDataProvider()
+    public function unsupportedAttributesDataProvider(): array
     {
         return [
             [['VIEW']],

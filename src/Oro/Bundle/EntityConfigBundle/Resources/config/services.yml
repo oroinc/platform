@@ -300,11 +300,12 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.manager.attribute_family_manager'
+            - '@Psr\Container\ContainerInterface'
         calls:
             - [setClassName, ['Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily']]
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_entity_config.manager.attribute_family_manager }
 
     oro_entity_config.form.extension.attribute_family:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension

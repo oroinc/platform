@@ -7,3 +7,7 @@ styles:
         - 'bundles/orodatagrid/blank/scss/variables/more-bar-holder-config.scss'
 
         - 'bundles/orodatagrid/blank/scss/styles.scss'
+
+print_styles:
+    inputs:
+        - 'bundles/orodatagrid/blank/scss/styles-print.scss'

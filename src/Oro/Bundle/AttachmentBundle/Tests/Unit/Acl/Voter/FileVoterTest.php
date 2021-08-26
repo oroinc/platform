@@ -8,8 +8,7 @@ use Oro\Bundle\AttachmentBundle\Acl\Voter\FileVoter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -19,8 +18,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 class FileVoterTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     private const PARENT_ENTITY_CLASS = \stdClass::class;
     private const PARENT_ENTITY_ID = 1;
     private const PARENT_ENTITY_FIELD_NAME = 'sampleField';
@@ -28,6 +25,9 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
+
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
     /** @var FileAccessControlChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $fileAccessControlChecker;
@@ -38,35 +38,27 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
     /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $currentApplicationProvider;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
+    /** @var TokenInterface */
+    private $token;
 
     /** @var FileVoter */
     private $voter;
 
-    /** @var TokenInterface */
-    private $token;
-
     protected function setUp(): void
     {
-        $this->currentApplicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
-        $this->fileApplicationsProvider = $this->createMock(FileApplicationsProvider::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->fileAccessControlChecker = $this->createMock(FileAccessControlChecker::class);
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->fileApplicationsProvider = $this->createMock(FileApplicationsProvider::class);
+        $this->currentApplicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 
-        $this->voter = new FileVoter(
-            $this->doctrineHelper,
-            $this->fileAccessControlChecker,
-            $this->fileApplicationsProvider,
-            $this->currentApplicationProvider,
-            $this->authorizationChecker,
-            $this->tokenAccessor
-        );
+        $container = TestContainerBuilder::create()
+            ->add('oro_attachment.acl.file_access_control_checker', $this->fileAccessControlChecker)
+            ->add('oro_attachment.provider.file_applications', $this->fileApplicationsProvider)
+            ->add('oro_action.provider.current_application', $this->currentApplicationProvider)
+            ->getContainer($this);
+
+        $this->voter = new FileVoter($this->doctrineHelper, $this->authorizationChecker, $container);
 
         $this->voter->setClassName(File::class);
 
@@ -83,12 +75,8 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param array $attributes
-     * @param object $subject
-     * @param int $expectedResult
      */
-    public function testVoteWhenUnsupported(array $attributes, $subject, int $expectedResult): void
+    public function testVoteWhenUnsupported(array $attributes, object $subject, int $expectedResult): void
     {
         self::assertSame(
             $expectedResult,
@@ -119,16 +107,18 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     public function testVoteWhenNotFound(): void
     {
-        $this->mockDoctrineHelper();
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
 
-        $this->doctrineHelper
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->with(File::class, self::FILE_ID)
             ->willReturn(null);
 
         self::assertSame(
             VoterInterface::ACCESS_ABSTAIN,
-            $this->voter->vote($this->token, $file = new File(), ['VIEW'])
+            $this->voter->vote($this->token, new File(), ['VIEW'])
         );
     }
 
@@ -137,14 +127,21 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
      */
     public function testVoteWhenNotCoveredByAcl(string $attribute): void
     {
-        $this->mockDoctrineHelper();
+        $file = new File();
 
-        $this->doctrineHelper
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
+
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->with(File::class, self::FILE_ID)
-            ->willReturn($file = new File());
+            ->willReturn($file);
 
-        $this->mockCoveredByAcl($file, false);
+        $this->fileAccessControlChecker->expects(self::once())
+            ->method('isCoveredByAcl')
+            ->with($file)
+            ->willReturn(false);
 
         self::assertSame(
             VoterInterface::ACCESS_ABSTAIN,
@@ -157,36 +154,27 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         return [
             ['attribute' => 'VIEW'],
             ['attribute' => 'EDIT'],
-            ['attribute' => 'DELETE'],
+            ['attribute' => 'DELETE']
         ];
-    }
-
-    private function mockDoctrineHelper(): void
-    {
-        $this->doctrineHelper
-            ->method('getSingleEntityIdentifier')
-            ->willReturn(self::FILE_ID);
-    }
-
-    private function mockCoveredByAcl(File $file, bool $isCoveredByAcl): void
-    {
-        $this->fileAccessControlChecker
-            ->expects(self::once())
-            ->method('isCoveredByAcl')
-            ->with($file)
-            ->willReturn($isCoveredByAcl);
     }
 
     public function testVoteWhenNoParentEntityClass(): void
     {
-        $this->mockDoctrineHelper();
+        $file = new File();
 
-        $this->doctrineHelper
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
+
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->with(File::class, self::FILE_ID)
-            ->willReturn($file = new File());
+            ->willReturn($file);
 
-        $this->mockCoveredByAcl($file, true);
+        $this->fileAccessControlChecker->expects(self::once())
+            ->method('isCoveredByAcl')
+            ->with($file)
+            ->willReturn(true);
 
         self::assertSame(
             VoterInterface::ACCESS_DENIED,
@@ -196,16 +184,31 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     public function testVoteWhenNotAllowedApp(): void
     {
-        $this->mockDoctrineHelper();
+        $file = $this->getFile();
+        $allowedApplications = ['sample_app1', 'sample_app2'];
 
-        $this->doctrineHelper
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
+
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->with(File::class, self::FILE_ID)
-            ->willReturn($file = $this->getFile());
+            ->willReturn($file);
 
-        $this->mockCoveredByAcl($file, true);
+        $this->fileAccessControlChecker->expects(self::once())
+            ->method('isCoveredByAcl')
+            ->with($file)
+            ->willReturn(true);
 
-        $this->mockAllowedApps($file, false);
+        $this->fileApplicationsProvider->expects(self::once())
+            ->method('getFileApplications')
+            ->with($file)
+            ->willReturn($allowedApplications);
+        $this->currentApplicationProvider->expects(self::once())
+            ->method('isApplicationsValid')
+            ->with($allowedApplications)
+            ->willReturn(false);
 
         self::assertSame(
             VoterInterface::ACCESS_DENIED,
@@ -215,18 +218,33 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
     public function testVoteWhenNoParentEntity(): void
     {
-        $this->doctrineHelper
+        $file = $this->getFile();
+        $allowedApplications = ['sample_app1', 'sample_app2'];
+
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntity')
             ->willReturnMap([
-                [File::class, self::FILE_ID, $file = $this->getFile()],
+                [File::class, self::FILE_ID, $file],
                 [self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_ID, null],
             ]);
 
-        $this->mockDoctrineHelper();
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
 
-        $this->mockCoveredByAcl($file, true);
+        $this->fileAccessControlChecker->expects(self::once())
+            ->method('isCoveredByAcl')
+            ->with($file)
+            ->willReturn(true);
 
-        $this->mockAllowedApps($file, true);
+        $this->fileApplicationsProvider->expects(self::once())
+            ->method('getFileApplications')
+            ->with($file)
+            ->willReturn($allowedApplications);
+        $this->currentApplicationProvider->expects(self::once())
+            ->method('isApplicationsValid')
+            ->with($allowedApplications)
+            ->willReturn(true);
 
         self::assertSame(
             VoterInterface::ACCESS_DENIED,
@@ -234,40 +252,39 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockAllowedApps(File $file, bool $isAllowed): void
-    {
-        $this->fileApplicationsProvider
-            ->expects(self::once())
-            ->method('getFileApplications')
-            ->with($file)
-            ->willReturn($apps = ['sample_app1', 'sample_app2']);
-
-        $this->currentApplicationProvider
-            ->expects(self::once())
-            ->method('isApplicationsValid')
-            ->with($apps)
-            ->willReturn($isAllowed);
-    }
-
     public function testVoteWhenViewOwnFile(): void
     {
-        $this->doctrineHelper
+        $file = $this->getFile();
+        $allowedApplications = ['sample_app1', 'sample_app2'];
+
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntity')
             ->willReturnMap([
-                [File::class, self::FILE_ID, $file = $this->getFile()],
+                [File::class, self::FILE_ID, $file],
                 [self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_ID, $parentEntity = new \stdClass()],
             ]);
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->token->expects(self::once())
             ->method('getUser')
             ->willReturn($parentEntity);
 
-        $this->mockDoctrineHelper();
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
 
-        $this->mockCoveredByAcl($file, true);
+        $this->fileAccessControlChecker->expects(self::once())
+            ->method('isCoveredByAcl')
+            ->with($file)
+            ->willReturn(true);
 
-        $this->mockAllowedApps($file, true);
+        $this->fileApplicationsProvider->expects(self::once())
+            ->method('getFileApplications')
+            ->with($file)
+            ->willReturn($allowedApplications);
+        $this->currentApplicationProvider->expects(self::once())
+            ->method('isApplicationsValid')
+            ->with($allowedApplications)
+            ->willReturn(true);
 
         self::assertSame(
             VoterInterface::ACCESS_GRANTED,
@@ -280,26 +297,39 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
      */
     public function testVote(bool $isGranted, int $expectedResult): void
     {
-        $this->mockDoctrineHelper();
+        $file = $this->getFile();
+        $allowedApplications = ['sample_app1', 'sample_app2'];
 
-        $this->doctrineHelper
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(self::FILE_ID);
+
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntity')
             ->willReturnMap([
-                [File::class, self::FILE_ID, $file = $this->getFile()],
+                [File::class, self::FILE_ID, $file],
                 [self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_ID, $parentEntity = new \stdClass()],
             ]);
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->token->expects(self::once())
             ->method('getUser')
             ->willReturn(new \stdClass());
 
-        $this->mockCoveredByAcl($file = $this->getFile(), true);
+        $this->fileAccessControlChecker->expects(self::once())
+            ->method('isCoveredByAcl')
+            ->with($file)
+            ->willReturn(true);
 
-        $this->mockAllowedApps($file, true);
+        $this->fileApplicationsProvider->expects(self::once())
+            ->method('getFileApplications')
+            ->with($file)
+            ->willReturn($allowedApplications);
+        $this->currentApplicationProvider->expects(self::once())
+            ->method('isApplicationsValid')
+            ->with($allowedApplications)
+            ->willReturn(true);
 
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', $parentEntity)
             ->willReturn($isGranted);
@@ -313,14 +343,8 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
     public function voteDataProvider(): array
     {
         return [
-            [
-                'isGranted' => true,
-                'expectedResult' => VoterInterface::ACCESS_GRANTED,
-            ],
-            [
-                'isGranted' => false,
-                'expectedResult' => VoterInterface::ACCESS_DENIED,
-            ],
+            ['isGranted' => true, 'expectedResult' => VoterInterface::ACCESS_GRANTED],
+            ['isGranted' => false, 'expectedResult' => VoterInterface::ACCESS_DENIED]
         ];
     }
 
