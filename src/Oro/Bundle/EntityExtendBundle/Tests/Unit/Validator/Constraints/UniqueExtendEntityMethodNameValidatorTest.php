@@ -9,8 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
@@ -23,15 +23,13 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestCase
 {
-    private const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
     private const TEST_FIELD_NAME = 'testField';
 
-    private ClassMethodNameChecker|\PHPUnit\Framework\MockObject\MockObject $classMethodNameChecker;
+    /** @var ClassMethodNameChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $classMethodNameChecker;
 
-    private FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject $fieldTypeHelper;
-
-    /** @var UniqueExtendEntityFieldValidator */
-    protected $validator;
+    /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldTypeHelper;
 
     protected function setUp(): void
     {
@@ -43,12 +41,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->setPropertyPath('');
     }
 
-    protected function createValidator()
+    protected function createValidator(): UniqueExtendEntityMethodNameValidator
     {
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
-
-        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         return new UniqueExtendEntityMethodNameValidator(
@@ -70,7 +65,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
      */
     protected function getFieldConfigModel(string $fieldType): FieldConfigModel
     {
-        $entity = new EntityConfigModel(self::TEST_CLASS_NAME);
+        $entity = new EntityConfigModel(TestEntity::class);
         $field = new FieldConfigModel(self::TEST_FIELD_NAME, $fieldType);
         $entity->addField($field);
 
@@ -110,8 +105,8 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->classMethodNameChecker->expects(self::exactly(2))
             ->method('getMethods')
             ->willReturnMap([
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$getters, []],
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$setters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$getters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$setters, []],
             ]);
 
         $this->validator->validate($field, $constraint);
@@ -126,7 +121,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 
         $this->classMethodNameChecker->expects(self::once())
             ->method('getMethods')
-            ->with(self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$getters)
+            ->with(self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$getters)
             ->willReturn(['get']);
 
         $this->validator->validate($field, $constraint);
@@ -145,8 +140,8 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->classMethodNameChecker->expects(self::exactly(2))
             ->method('getMethods')
             ->willReturnMap([
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$getters, []],
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$setters, ['set']],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$getters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$setters, ['set']],
             ]);
 
         $this->validator->validate($field, $constraint);
@@ -171,8 +166,6 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 
     /**
      * @dataProvider relationTypeProvider
-     * @param string $fieldType
-     * @param string $relationType
      */
     public function testRelationMethodsDoNotExist(string $fieldType, string $relationType): void
     {
@@ -186,9 +179,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->classMethodNameChecker->expects(self::exactly(3))
             ->method('getMethods')
             ->willReturnMap([
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$getters, []],
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$setters, []],
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$relationMethods, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$getters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$setters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$relationMethods, []],
             ]);
 
         $this->validator->validate($field, $constraint);
@@ -198,8 +191,6 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 
     /**
      * @dataProvider relationTypeProvider
-     * @param string $fieldType
-     * @param string $relationType
      */
     public function testRelationMethodsExist(string $fieldType, string $relationType): void
     {
@@ -213,9 +204,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         $this->classMethodNameChecker->expects(self::exactly(3))
             ->method('getMethods')
             ->willReturnMap([
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$getters, []],
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$setters, []],
-                [self::TEST_FIELD_NAME, self::TEST_CLASS_NAME, ClassMethodNameChecker::$relationMethods, ['add']],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$getters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$setters, []],
+                [self::TEST_FIELD_NAME, TestEntity::class, ClassMethodNameChecker::$relationMethods, ['add']],
             ]);
 
         $this->validator->validate($field, $constraint);
@@ -298,7 +289,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
                 'relation' => [
                     'manyToMany|Source|Target|field' => [
                         'owner'    => true,
-                        'field_id' => new FieldConfigId('extend', self::TEST_CLASS_NAME, self::TEST_FIELD_NAME)
+                        'field_id' => new FieldConfigId('extend', TestEntity::class, self::TEST_FIELD_NAME)
                     ]
                 ]
             ]
@@ -322,7 +313,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
                 'relation' => [
                     'manyToMany|Source|Target|field' => [
                         'owner'    => false,
-                        'field_id' => new FieldConfigId('extend', self::TEST_CLASS_NAME, self::TEST_FIELD_NAME)
+                        'field_id' => new FieldConfigId('extend', TestEntity::class, self::TEST_FIELD_NAME)
                     ]
                 ]
             ]
@@ -346,7 +337,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
                 'relation' => [
                     'manyToMany|Source|Target|field' => [
                         'owner'    => false,
-                        'field_id' => new FieldConfigId('extend', self::TEST_CLASS_NAME, 'expectedField')
+                        'field_id' => new FieldConfigId('extend', TestEntity::class, 'expectedField')
                     ]
                 ]
             ]
@@ -409,7 +400,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
                 'relation' => [
                     'oneToMany|Source|Target|field' => [
                         'owner'    => false,
-                        'field_id' => new FieldConfigId('extend', self::TEST_CLASS_NAME, self::TEST_FIELD_NAME)
+                        'field_id' => new FieldConfigId('extend', TestEntity::class, self::TEST_FIELD_NAME)
                     ]
                 ]
             ]
@@ -433,7 +424,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
                 'relation' => [
                     'oneToMany|Source|Target|field' => [
                         'owner'    => true,
-                        'field_id' => new FieldConfigId('extend', self::TEST_CLASS_NAME, self::TEST_FIELD_NAME)
+                        'field_id' => new FieldConfigId('extend', TestEntity::class, self::TEST_FIELD_NAME)
                     ]
                 ]
             ]
@@ -457,7 +448,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
                 'relation' => [
                     'oneToMany|Source|Target|field' => [
                         'owner'    => true,
-                        'field_id' => new FieldConfigId('extend', self::TEST_CLASS_NAME, 'expectedField')
+                        'field_id' => new FieldConfigId('extend', TestEntity::class, 'expectedField')
                     ]
                 ]
             ]

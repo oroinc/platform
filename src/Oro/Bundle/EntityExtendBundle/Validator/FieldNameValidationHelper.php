@@ -177,14 +177,10 @@ class FieldNameValidationHelper
     }
 
     /**
-     * Normalizes a field name.
+     * Normalizes the given field name.
      * The normalized name is lower cased and unessential symbols, like _, are removed.
-     *
-     * @param string $fieldName
-     *
-     * @return string
      */
-    public function normalizeFieldName($fieldName)
+    public function normalizeFieldName(string $fieldName): string
     {
         return strtolower($this->inflector->classify($fieldName));
     }
