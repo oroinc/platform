@@ -65,25 +65,22 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * Put in cache empty ACL object for the given OID
+     * Puts an empty ACL object into the cache for the given OID.
      *
      * @param ObjectIdentityInterface     $oid
      * @param SecurityIdentityInterface[] $sids
      */
-    public function cacheEmptyAcl(ObjectIdentityInterface $oid, array $sids)
+    public function cacheEmptyAcl(ObjectIdentityInterface $oid, array $sids): void
     {
-        $this->cache->putInCacheBySids(new Acl(0, $oid, $this->permissionGrantingStrategy, [], false), $sids);
+        $this->cache->putInCacheBySids($this->createEmptyAcl($oid), $sids);
     }
 
     /**
-     * Checks whether the given ACL is empty
-     *
-     * @param AclInterface $acl
-     * @return bool
+     * Checks whether the given ACL is empty.
      */
-    public function isEmptyAcl(AclInterface $acl)
+    public function isEmptyAcl(AclInterface $acl): bool
     {
-        return method_exists($acl, 'getId') && $acl->getId() === 0;
+        return method_exists($acl, 'getId') && $acl->getId() === self::EMPTY_ACL_ID;
     }
 
     /**
