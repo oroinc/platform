@@ -9,13 +9,13 @@ use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface;
 class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainDictionaryValueListProvider */
-    protected $chainProvider;
+    private $chainProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider1;
+    private $provider1;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider2;
+    private $provider2;
 
     protected function setUp(): void
     {
@@ -73,7 +73,7 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetValueListQueryBuilder()
     {
         $class = 'Test\Class';
-        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $this->provider1->expects($this->once())
             ->method('supports')
@@ -112,7 +112,7 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->chainProvider->getSupportedEntityClasses());
     }
 
-    public function entityProvider()
+    public function entityProvider(): array
     {
         return [
             [

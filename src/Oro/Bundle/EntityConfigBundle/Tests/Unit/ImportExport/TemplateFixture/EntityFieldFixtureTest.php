@@ -8,28 +8,21 @@ use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
 class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
+    private const CLASS_NAME = FieldConfigModel::class;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
-    protected $fieldTypeProvider;
+    /** @var FieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldTypeProvider;
 
     /** @var EntityFieldFixture */
-    protected $fixture;
+    private $fixture;
 
     protected function setUp(): void
     {
-        $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
         $this->fieldTypeProvider->expects($this->never())
             ->method('getSupportedRelationTypes');
 
         $this->fixture = new EntityFieldFixture($this->fieldTypeProvider);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->fixture, $this->fieldTypeProvider);
     }
 
     public function testGetEntityClass()
@@ -50,18 +43,13 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
 
         $data = $this->fixture->getData();
 
-        $this->assertInstanceOf('\ArrayIterator', $data);
+        $this->assertInstanceOf(\ArrayIterator::class, $data);
     }
 
     /**
      * @dataProvider fillEntityDataDataProvider
-     *
-     * @param string $type
-     * @param object $entity
-     * @param array $properties
-     * @param object $expected
      */
-    public function testFillEntityData($type, $entity, array $properties, $expected)
+    public function testFillEntityData(string $type, object $entity, array $properties, object $expected)
     {
         $this->fieldTypeProvider->expects($entity instanceof FieldConfigModel ? $this->once() : $this->never())
             ->method('getFieldProperties')
@@ -73,10 +61,7 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $entity);
     }
 
-    /**
-     * @return array
-     */
-    public function fillEntityDataDataProvider()
+    public function fillEntityDataDataProvider(): array
     {
         $type = 'test';
 
@@ -155,12 +140,7 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string|null $type
-     * @param array $data
-     * @return FieldConfigModel
-     */
-    protected function createFieldConfigModel($type = null, array $data = [])
+    private function createFieldConfigModel(string $type = null, array $data = []): FieldConfigModel
     {
         $entity = new FieldConfigModel();
 

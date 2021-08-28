@@ -17,22 +17,14 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            [
-                'Oro\Bundle\ImapBundle\Entity',
-                'Oro\Bundle\EmailBundle\Entity',
-            ]
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            ['Oro\Bundle\ImapBundle\Entity', 'Oro\Bundle\EmailBundle\Entity']
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
+        ]);
     }
 
     public function testGetFoldersByOriginQueryBuilder()

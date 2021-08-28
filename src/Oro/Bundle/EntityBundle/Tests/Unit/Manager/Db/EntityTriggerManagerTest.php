@@ -5,30 +5,21 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Manager\Db;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql;
 
 class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityTriggerManager
-     */
+    /** @var EntityTriggerManager */
     private $testable;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $testEntityClass = 'testEntity';
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
     protected function setUp(): void
@@ -39,10 +30,12 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
 
         $em = $this->createMock(EntityManager::class);
 
-        $em->method('getConnection')
+        $em->expects($this->any())
+            ->method('getConnection')
             ->willReturn($this->connection);
 
-        $this->doctrineHelper->method('getEntityManagerForClass')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
             ->with($this->testEntityClass)
             ->willReturn($em);
 
@@ -57,18 +50,14 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->connection->expects($this->once())
             ->method('getParams')
-            ->willReturn([
-                'driver' => 'driverName'
-            ]);
+            ->willReturn(['driver' => 'driverName']);
 
         $this->testable->disable();
     }
 
     public function testAddingDriver()
     {
-        /** @var DatabaseDriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver */
         $driver = $this->createMock(PdoMysql::class);
-
         $driver->expects($this->once())
             ->method('getName')
             ->willReturn('driverName');
@@ -77,9 +66,7 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->connection->expects($this->once())
             ->method('getParams')
-            ->willReturn([
-                'driver' => 'driverName'
-            ]);
+            ->willReturn(['driver' => 'driverName']);
 
         $driver->expects($this->once())
             ->method('setEntityClass')

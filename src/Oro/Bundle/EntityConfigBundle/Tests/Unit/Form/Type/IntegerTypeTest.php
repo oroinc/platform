@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType as BaseIntegerType;
 class IntegerTypeTest extends AbstractConfigTypeTestCase
 {
     /** @var IntegerType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {

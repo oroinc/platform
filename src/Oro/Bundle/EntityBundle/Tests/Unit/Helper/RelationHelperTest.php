@@ -9,14 +9,11 @@ use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 class RelationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $relationProvider;
+    private $relationProvider;
 
     /** @var RelationHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->relationProvider = $this->createMock(VirtualRelationProviderInterface::class);
@@ -28,10 +25,10 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->relationProvider->expects($this->any())
             ->method('getVirtualRelations')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [Stub\Entity1::class, $this->getRelations()],
                 [Stub\Entity2::class, []],
-            ]));
+            ]);
 
         $this->assertTrue($this->helper->hasVirtualRelations(Stub\Entity1::class));
         $this->assertFalse($this->helper->hasVirtualRelations(Stub\Entity2::class));
@@ -83,7 +80,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getRelations(): array
+    private function getRelations(): array
     {
         return [
             'r1' => [],

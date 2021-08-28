@@ -23,11 +23,9 @@ class ImapEmailRepositoryTest extends OrmTestCase
             new AnnotationReader(),
             ['Oro\Bundle\ImapBundle\Entity', 'Oro\Bundle\EmailBundle\Entity']
         ));
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
+        ]);
     }
 
     public function testGetEmailsByUidsQueryBuilder()

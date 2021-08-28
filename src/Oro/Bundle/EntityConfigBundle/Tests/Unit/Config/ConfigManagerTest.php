@@ -16,6 +16,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
@@ -24,7 +26,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -37,19 +39,19 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY_CLASS = DemoEntity::class;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
     private $modelManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigCache|\PHPUnit\Framework\MockObject\MockObject */
     private $configCache;
 
     /** @var ConfigManager */
@@ -62,7 +64,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getScope')
             ->willReturn('entity');
 
-        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->metadataFactory = $this->createMock(MetadataFactory::class);
         $this->modelManager = $this->createMock(ConfigModelManager::class);
         $this->configCache = $this->createMock(ConfigCache::class);
@@ -262,7 +264,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConfigNoDatabase()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')
@@ -272,7 +274,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConfigForNotConfigurable()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')
@@ -386,12 +388,10 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         if ($configId instanceof FieldConfigId) {
             $this->configCache->expects($this->exactly(2))
                 ->method('getConfigurable')
-                ->willReturnMap(
-                    [
-                        [$configId->getClassName(), null, true],
-                        [$configId->getClassName(), $configId->getFieldName(), true],
-                    ]
-                );
+                ->willReturnMap([
+                    [$configId->getClassName(), null, true],
+                    [$configId->getClassName(), $configId->getFieldName(), true],
+                ]);
             $this->configCache->expects($this->once())
                 ->method('getFieldConfig')
                 ->with($configId->getScope(), $configId->getClassName(), $configId->getFieldName())
@@ -694,23 +694,19 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         if ($className) {
             $this->modelManager->expects($this->any())
                 ->method('getFieldModel')
-                ->willReturnMap(
-                    [
-                        [$className, 'f1', $fieldModels[0]],
-                        [$className, 'f2', $fieldModels[1]],
-                        [$className, 'hiddenField', $fieldModels[2]],
-                    ]
-                );
+                ->willReturnMap([
+                    [$className, 'f1', $fieldModels[0]],
+                    [$className, 'f2', $fieldModels[1]],
+                    [$className, 'hiddenField', $fieldModels[2]],
+                ]);
         } else {
             $this->modelManager->expects($this->any())
                 ->method('getEntityModel')
-                ->willReturnMap(
-                    [
-                        ['EntityClass1', $models[0]],
-                        ['EntityClass2', $models[1]],
-                        ['HiddenEntity', $models[2]],
-                    ]
-                );
+                ->willReturnMap([
+                    ['EntityClass1', $models[0]],
+                    ['EntityClass2', $models[1]],
+                    ['HiddenEntity', $models[2]],
+                ]);
         }
 
         $result = $this->configManager->getConfigs($scope, $className, $withHidden);
@@ -1371,7 +1367,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), Events::UPDATE_ENTITY);
+            ->with(self::anything(), Events::UPDATE_ENTITY);
 
         $expectedConfig = $this->getConfig(
             $configId,
@@ -1507,7 +1503,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), Events::UPDATE_ENTITY);
+            ->with(self::anything(), Events::UPDATE_ENTITY);
         $extendConfig = $this->getConfig(new EntityConfigId('extend', self::ENTITY_CLASS));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->createMock(ConfigProvider::class);

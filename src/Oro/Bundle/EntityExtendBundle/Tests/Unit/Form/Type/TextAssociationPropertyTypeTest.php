@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -9,16 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
-        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         return new TextAssociationPropertyType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
@@ -40,17 +39,5 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
             TextType::class,
             $this->getFormType()->getParent()
         );
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDisabledFormView()
-    {
-        return [
-            'disabled' => true,
-            'attr'     => [],
-            'value'    => null
-        ];
     }
 }

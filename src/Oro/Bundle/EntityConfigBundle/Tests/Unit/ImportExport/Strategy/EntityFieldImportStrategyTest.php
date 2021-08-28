@@ -43,9 +43,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
     private $context;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);

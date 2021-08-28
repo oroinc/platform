@@ -32,14 +32,11 @@ class MultiEnumFilterTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
+        ));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
         ]);

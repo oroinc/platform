@@ -345,14 +345,11 @@ class SegmentFilterTest extends OrmTestCase
      */
     private function getEntityManager()
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
-        );
-
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
+        ));
         $em->getConfiguration()->setEntityNamespaces([
             'OroSegmentBundle' => 'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
         ]);

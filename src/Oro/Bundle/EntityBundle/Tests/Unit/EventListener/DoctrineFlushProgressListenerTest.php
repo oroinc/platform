@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\EventListener\DoctrineFlushProgressListener;
 class DoctrineFlushProgressListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineFlushProgressListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

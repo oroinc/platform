@@ -23,36 +23,32 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityMetadataHelper;
+    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
-    protected $extendOptionsManager;
+    private $extendOptionsManager;
 
     /** @var ExtendOptionsParser */
-    protected $extendOptionsParser;
+    private $extendOptionsParser;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
     protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
+            ]);
         $this->extendOptionsManager = new ExtendOptionsManager();
 
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('hasConfig')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
         $entityExtendConfigurationProvider->expects(self::any())
@@ -112,13 +108,11 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityMetadataHelper->expects($this->exactly(3))
             ->method('isEntityClassContainsColumn')
-            ->willReturnMap(
-                [
-                    ['Acme\AcmeBundle\Entity\Entity1', 'ref_column1', true],
-                    ['Acme\AcmeBundle\Entity\Entity1', 'ref_column2', true],
-                    ['Acme\AcmeBundle\Entity\Entity1', 'configurable_column1', true],
-                ]
-            );
+            ->willReturnMap([
+                ['Acme\AcmeBundle\Entity\Entity1', 'ref_column1', true],
+                ['Acme\AcmeBundle\Entity\Entity1', 'ref_column2', true],
+                ['Acme\AcmeBundle\Entity\Entity1', 'configurable_column1', true],
+            ]);
 
         $schema = new ExtendSchema(
             $this->extendOptionsManager,
@@ -260,7 +254,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function assertSchemaTypes(Schema $schema)
+    private function assertSchemaTypes(Schema $schema)
     {
         foreach ($schema->getTables() as $table) {
             $this->assertInstanceOf(
@@ -276,7 +270,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    protected function assertSchemaSql(Schema $schema, array $expectedSql)
+    private function assertSchemaSql(Schema $schema, array $expectedSql)
     {
         $sql = $schema->toSql(new MySqlPlatform());
         foreach ($sql as &$el) {
@@ -289,7 +283,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedSql, $sql);
     }
 
-    protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
+    private function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
         $extendOptions = $schema->getExtendOptions();
         $extendOptions = $this->extendOptionsParser->parseOptions($extendOptions);

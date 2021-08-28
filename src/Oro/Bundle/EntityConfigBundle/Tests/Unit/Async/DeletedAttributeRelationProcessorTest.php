@@ -17,33 +17,23 @@ use Psr\Log\LoggerInterface;
 
 class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'SomeClass';
+    private const ENTITY_CLASS = 'SomeClass';
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /**
-     * @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $deletedAttributeProvider;
+    /** @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $deletedAttributeProvider;
 
-    /**
-     * @var DeletedAttributeRelationProcessor
-     */
-    protected $processor;
+    /** @var DeletedAttributeRelationProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->deletedAttributeProvider = $this->createMock(DeletedAttributeProviderInterface::class);
 
@@ -56,7 +46,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithoutAttributeFamilyId()
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
         $message->expects($this->any())
             ->method('getBody')
@@ -67,7 +56,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Invalid message: key "attributeFamilyId" is missing.');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process($message, $session);
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
@@ -77,7 +65,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $attributeFamilyId = 1;
 
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
         $message->expects($this->any())
             ->method('getBody')
@@ -87,7 +74,11 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ]));
 
         $attributeFamily = $this->getAttributeFamily($attributeFamilyId);
-        $entityManager = $this->getEntityManagerMock($attributeFamily);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
+            ->with($attributeFamily->getEntityClass())
+            ->willReturn($entityManager);
         $entityManager->expects($this->once())
             ->method('beginTransaction');
         $entityManager->expects($this->never())
@@ -95,7 +86,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->once())
             ->method('rollback');
 
-        /** @var DeadlockException $exception */
         $exception = $this->createMock(DeadlockException::class);
 
         $this->deletedAttributeProvider->expects($this->once())
@@ -110,7 +100,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
                 ['exception' => $exception]
             );
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process(
             $message,
@@ -123,7 +112,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $attributeFamilyId = 1;
 
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
         $message->expects($this->any())
             ->method('getBody')
@@ -133,7 +121,11 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ]));
 
         $attributeFamily = $this->getAttributeFamily($attributeFamilyId);
-        $entityManager = $this->getEntityManagerMock($attributeFamily);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
+            ->with($attributeFamily->getEntityClass())
+            ->willReturn($entityManager);
         $entityManager->expects($this->once())
             ->method('beginTransaction');
         $entityManager->expects($this->never())
@@ -155,7 +147,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
                 ['exception' => $exception]
             );
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process(
             $message,
@@ -168,7 +159,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $attributeFamilyId = 1;
 
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
         $message->expects($this->any())
             ->method('getBody')
@@ -178,7 +168,11 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ]));
 
         $attributeFamily = $this->getAttributeFamily($attributeFamilyId);
-        $entityManager = $this->getEntityManagerMock($attributeFamily);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
+            ->with($attributeFamily->getEntityClass())
+            ->willReturn($entityManager);
         $entityManager->expects($this->once())
             ->method('beginTransaction');
         $entityManager->expects($this->once())
@@ -193,7 +187,6 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects($this->never())
             ->method('error');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process(
             $message,
@@ -202,18 +195,12 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    /**
-     * @param int $attributeFamilyId
-     * @return AttributeFamily
-     */
-    protected function getAttributeFamily($attributeFamilyId)
+    private function getAttributeFamily(int $attributeFamilyId): AttributeFamily
     {
         $attributeFamily = new AttributeFamily();
         $attributeFamily->setEntityClass(self::ENTITY_CLASS);
 
-        $repository = $this->getMockBuilder(AttributeFamilyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(AttributeFamilyRepository::class);
         $repository->expects($this->any())
             ->method('find')
             ->with($attributeFamilyId)
@@ -224,21 +211,5 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($repository);
 
         return $attributeFamily;
-    }
-
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityManagerMock(AttributeFamily $attributeFamily)
-    {
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityManagerForClass')
-            ->with($attributeFamily->getEntityClass())
-            ->willReturn($entityManager);
-
-        return $entityManager;
     }
 }

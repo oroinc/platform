@@ -15,13 +15,11 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 {
-    /**
-     * @var AttributeRenderRegistry
-     */
-    protected $attributeRenderRegistry;
+    /** @var AttributeRenderRegistry */
+    private $attributeRenderRegistry;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {

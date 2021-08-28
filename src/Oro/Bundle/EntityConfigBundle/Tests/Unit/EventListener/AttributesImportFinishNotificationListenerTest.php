@@ -16,23 +16,21 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
 {
     use EntityTrait;
 
-    const ENTITY_ID = 27;
+    private const ENTITY_ID = 27;
 
-    /**
-     * @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $topicSender;
+    /** @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $topicSender;
 
-    /**
-     * @var AttributesImportFinishNotificationListener
-     */
-    protected $attributesImportFinishNotificationListener;
+    /** @var AttributesImportFinishNotificationListener */
+    private $attributesImportFinishNotificationListener;
 
     protected function setUp(): void
     {
         $this->topicSender = $this->createMock(AttributesImportTopicSender::class);
-        $this->attributesImportFinishNotificationListener =
-            new AttributesImportFinishNotificationListener($this->topicSender);
+
+        $this->attributesImportFinishNotificationListener = new AttributesImportFinishNotificationListener(
+            $this->topicSender
+        );
     }
 
     public function testOnAfterAttributesImportWhenNotIsSuccessful()
@@ -42,8 +40,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
         $jobExecution = $this->getEntity(JobExecution::class);
         $event = new AfterJobExecutionEvent($jobExecution, $jobResult);
 
-        $this->topicSender
-            ->expects($this->never())
+        $this->topicSender->expects($this->never())
             ->method('send');
 
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
@@ -58,8 +55,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
         ]);
         $event = new AfterJobExecutionEvent($jobExecution, $jobResult);
 
-        $this->topicSender
-            ->expects($this->never())
+        $this->topicSender->expects($this->never())
             ->method('send');
 
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
@@ -81,8 +77,7 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
         ]);
         $event = new AfterJobExecutionEvent($jobExecution, $jobResult);
 
-        $this->topicSender
-            ->expects($this->once())
+        $this->topicSender->expects($this->once())
             ->method('send')
             ->with(self::ENTITY_ID);
 

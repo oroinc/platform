@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EntityTypeTest extends FormIntegrationTestCase
 {
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {

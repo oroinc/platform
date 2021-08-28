@@ -5,13 +5,12 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Configuration;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
-use PHPUnit\Framework\TestCase;
 
-class AttributeImportExportConfigurationProviderTest extends TestCase
+class AttributeImportExportConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet()
     {
-        static::assertEquals(
+        self::assertEquals(
             new ImportExportConfiguration([
                 ImportExportConfiguration::FIELD_ENTITY_CLASS => FieldConfigModel::class,
                 ImportExportConfiguration::FIELD_IMPORT_JOB_NAME => 'attribute_import_from_csv',

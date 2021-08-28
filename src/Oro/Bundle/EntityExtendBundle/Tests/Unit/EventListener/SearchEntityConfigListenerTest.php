@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
@@ -13,71 +12,45 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 
 class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS = 'Test\Class';
-    const TEST_FIELD = 'testField';
+    private const TEST_CLASS = 'Test\Class';
+    private const TEST_FIELD = 'testField';
 
-    /** @var SearchMappingProvider|MockObject */
-    protected $searchMappingProvider;
+    /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $searchMappingProvider;
 
-    /** @var IndexerInterface|MockObject */
-    protected $searchIndexer;
+    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $searchIndexer;
 
-    /** @var ConfigManager|MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var SearchEntityConfigListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {
-        $this->searchMappingProvider = $this->getMockBuilder(SearchMappingProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->searchMappingProvider = $this->createMock(SearchMappingProvider::class);
         $this->searchIndexer = $this->createMock(IndexerInterface::class);
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->listener = new class(
+        $this->listener = new SearchEntityConfigListener(
             $this->searchMappingProvider,
             $this->searchIndexer
-        ) extends SearchEntityConfigListener {
-            public function xgetClassNames(): array
-            {
-                return $this->classNames;
-            }
-        };
+        );
     }
 
-    /**
-     * @param string $scope
-     * @param array  $values
-     *
-     * @return ConfigInterface
-     */
-    protected function getEntityConfig($scope, array $values = [])
+    private function getClassNames(SearchEntityConfigListener $listener): array
     {
-        $configId = new EntityConfigId($scope, self::TEST_CLASS);
-        $config = new Config($configId);
-        $config->setValues($values);
-
-        return $config;
+        return ReflectionUtil::getPropertyValue($listener, 'classNames');
     }
 
-    /**
-     * @param string $scope
-     * @param array  $values
-     *
-     * @return ConfigInterface
-     */
-    protected function getFieldConfig($scope, array $values = [])
+    private function getFieldConfig(string $scope, array $values = []): ConfigInterface
     {
-        $configId = new FieldConfigId($scope, self::TEST_CLASS, self::TEST_FIELD);
-        $config = new Config($configId);
+        $config = new Config(new FieldConfigId($scope, self::TEST_CLASS, self::TEST_FIELD));
         $config->setValues($values);
 
         return $config;
@@ -110,7 +83,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
 
-        self::assertEmpty($this->listener->xgetClassNames());
+        self::assertEmpty($this->getClassNames($this->listener));
     }
 
     public function testShouldRunReindexOnlyOnceWhenSeveralFieldsRequiredReindex()
@@ -151,7 +124,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
 
-        self::assertEmpty($this->listener->xgetClassNames());
+        self::assertEmpty($this->getClassNames($this->listener));
     }
 
     public function testShouldRunReindexForEachTypeOfEntityWhenItsFieldsRequiredReindex()
@@ -192,7 +165,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
 
-        self::assertEmpty($this->listener->xgetClassNames());
+        self::assertEmpty($this->getClassNames($this->listener));
     }
 
     public function testShouldNotReindexForEntityNotHavingSearchConfigSingleEntity()
@@ -213,13 +186,15 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->with('Test\Class')
             ->willReturn([]);
 
-        $this->searchMappingProvider->expects(self::never())->method('clearCache');
-        $this->searchIndexer->expects(self::never())->method('reindex');
+        $this->searchMappingProvider->expects(self::never())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::never())
+            ->method('reindex');
 
         $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
 
-        self::assertEmpty($this->listener->xgetClassNames());
+        self::assertEmpty($this->getClassNames($this->listener));
     }
 
     public function testShouldNotReindexForEntityNotHavingSearchConfigMultipleEntities()
@@ -260,7 +235,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
 
-        self::assertEmpty($this->listener->xgetClassNames());
+        self::assertEmpty($this->getClassNames($this->listener));
     }
 
     public function testShouldIgnoreFieldWhenSearchableFlagIsChangedButFieldIsNotInActiveState()
@@ -276,13 +251,15 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($searchConfig))
             ->willReturn(['searchable' => [false, true]]);
 
-        $this->searchMappingProvider->expects(self::never())->method('clearCache');
-        $this->searchIndexer->expects(self::never())->method('reindex');
+        $this->searchMappingProvider->expects(self::never())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::never())
+            ->method('reindex');
 
         $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
 
-        self::assertEmpty($this->listener->xgetClassNames());
+        self::assertEmpty($this->getClassNames($this->listener));
     }
 
     public function testShouldIgnoreFieldDoesNotHaveSearchConfig()
@@ -291,9 +268,12 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             'extend' => $this->getFieldConfig('extend', ['state' => ExtendScope::STATE_ACTIVE])
         ];
 
-        $this->configManager->expects(self::never())->method('getConfigChangeSet');
-        $this->searchMappingProvider->expects(self::never())->method('clearCache');
-        $this->searchIndexer->expects(self::never())->method('reindex');
+        $this->configManager->expects(self::never())
+            ->method('getConfigChangeSet');
+        $this->searchMappingProvider->expects(self::never())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::never())
+            ->method('reindex');
 
         $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
@@ -312,8 +292,10 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($searchConfig))
             ->willReturn([]);
 
-        $this->searchMappingProvider->expects(self::never())->method('clearCache');
-        $this->searchIndexer->expects(self::never())->method('reindex');
+        $this->searchMappingProvider->expects(self::never())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::never())
+            ->method('reindex');
 
         $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
@@ -331,8 +313,10 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($searchConfig))
             ->willReturn(['searchable' => [false, true]]);
 
-        $this->searchMappingProvider->expects(self::never())->method('clearCache');
-        $this->searchIndexer->expects(self::never())->method('reindex');
+        $this->searchMappingProvider->expects(self::never())
+            ->method('clearCache');
+        $this->searchIndexer->expects(self::never())
+            ->method('reindex');
 
         $this->listener->preFlush(new PreFlushConfigEvent($configs, $this->configManager));
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));

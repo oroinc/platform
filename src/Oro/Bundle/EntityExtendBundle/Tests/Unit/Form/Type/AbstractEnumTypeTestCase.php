@@ -23,10 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
     protected function setUp(): void
@@ -73,7 +73,10 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         );
         $this->expectFormWillReturnData($parentForm, $parentFormData);
 
-        $event = $this->getFormEventMock2($form);
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
@@ -94,7 +97,10 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         );
         $this->expectFormWillReturnData($parentForm, null);
 
-        $event = $this->getFormEventMock2($form);
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
@@ -114,7 +120,10 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ]
         );
 
-        $event = $this->getFormEventMock2($form);
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
@@ -153,11 +162,13 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->method('getPropertyPath')
             ->willReturn('value'); // name of property TestEntity::$value
 
-        $event = $this->getFormEventMock2($form);
-
         $this->doctrine->expects($this->never())
             ->method('anything');
 
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->never())
             ->method('setData');
 
@@ -197,8 +208,10 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
         $this->setExpectationsForLoadDefaultEnumValues($enumValueClassName, ['val1']);
 
-        $event = $this->getFormEventMock2($form);
-
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->once())
             ->method('setData')
             ->with('val1');
@@ -240,13 +253,15 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->method('getPropertyPath')
             ->willReturn('value');
 
-        $event = $this->getFormEventMock2($form);
-
         $this->setExpectationsForLoadDefaultEnumValues(
             $enumValueClassName,
             ['val1', 'val2']
         );
 
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
+            ->method('getForm')
+            ->willReturn($form);
         $event->expects($this->once())
             ->method('setData')
             ->with(['val1', 'val2']);
@@ -279,7 +294,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         require_once(realpath(__DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $fileName));
         $enumConfig = new Config(new EntityConfigId('enum', $enumValueClassName));
         $enumConfig->set('multiple', $multiple);
-        $enumConfigProvider = $this->getConfigProviderMock();
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
@@ -337,33 +352,6 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormEventMock2($form)
-    {
-        $event = $this->getMockBuilder(FormEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form);
-
-        return $event;
-    }
-
-    /**
      * @param mixed                                         $entity
      * @param \PHPUnit\Framework\MockObject\MockObject|null $form
      *
@@ -383,9 +371,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->method('getData')
             ->willReturn($entity);
 
-        $event = $this->getMockBuilder(FormEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getForm')
             ->willReturn($form);
@@ -453,15 +439,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->willReturnMap($optionsValueMap);
     }
 
-    /**
-     * @param string $enumValueClassName
-     * @param array  $defaultValues
-     */
-    protected function setExpectationsForLoadDefaultEnumValues($enumValueClassName, array $defaultValues)
+    protected function setExpectationsForLoadDefaultEnumValues(string $enumValueClassName, array $defaultValues)
     {
-        $repo = $this->getMockBuilder(EnumValueRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EnumValueRepository::class);
         $repo->expects($this->once())
             ->method('getDefaultValues')
             ->willReturn($defaultValues);

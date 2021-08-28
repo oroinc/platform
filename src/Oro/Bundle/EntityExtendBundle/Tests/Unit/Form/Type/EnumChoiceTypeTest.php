@@ -11,7 +11,7 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 {
     /** @var EnumChoiceType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {
