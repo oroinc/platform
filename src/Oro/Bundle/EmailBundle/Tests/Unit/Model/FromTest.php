@@ -13,10 +13,8 @@ class FromTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateWithSingleEmailAddress(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Message $message */
         $message = $this->createMock(\Swift_Message::class);
-        $message
-            ->expects($this->once())
+        $message->expects($this->once())
             ->method('setFrom')
             ->with(self::EMAIL_ADDRESS);
 
@@ -27,10 +25,8 @@ class FromTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateWithSingleEmailAddressAndName(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Message $message */
         $message = $this->createMock(\Swift_Message::class);
-        $message
-            ->expects($this->once())
+        $message->expects($this->once())
             ->method('setFrom')
             ->with(self::EMAIL_ADDRESS, self::NAME);
 
@@ -41,10 +37,8 @@ class FromTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateWithMultipleEmailAddresses(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Message $message */
         $message = $this->createMock(\Swift_Message::class);
-        $message
-            ->expects($this->once())
+        $message->expects($this->once())
             ->method('setFrom')
             ->with([self::EMAIL_ADDRESS, self::OTHER_EMAIL_ADDRESS]);
 
@@ -55,10 +49,8 @@ class FromTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateWithMultipleEmailAddressesAndNames(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Message $message */
         $message = $this->createMock(\Swift_Message::class);
-        $message
-            ->expects($this->once())
+        $message->expects($this->once())
             ->method('setFrom')
             ->with([
                 self::EMAIL_ADDRESS => self::NAME,

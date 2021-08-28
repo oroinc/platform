@@ -60,7 +60,6 @@ class NotEmptyEmailTemplateTranslationSubjectValidatorTest extends ConstraintVal
 
     public function testValidateEmptySubject()
     {
-        /** @var EmailTemplateTranslation $value */
         $value = new EmailTemplateTranslation();
         $value->setSubject('');
         $value->setSubjectFallback(false);
@@ -78,7 +77,6 @@ class NotEmptyEmailTemplateTranslationSubjectValidatorTest extends ConstraintVal
 
     public function testValidateEmptySubjectWithFallback()
     {
-        /** @var EmailTemplateTranslation $value */
         $value = new EmailTemplateTranslation();
         $value->setSubject('');
         $value->setSubjectFallback(true);
@@ -91,7 +89,6 @@ class NotEmptyEmailTemplateTranslationSubjectValidatorTest extends ConstraintVal
 
     public function testValidateNonEmptySubject()
     {
-        /** @var EmailTemplateTranslation $value */
         $value = new EmailTemplateTranslation();
         $value->setSubject('Test');
         $value->setSubjectFallback(false);
@@ -104,7 +101,6 @@ class NotEmptyEmailTemplateTranslationSubjectValidatorTest extends ConstraintVal
 
     public function testValidateNonEmptySubjectWithFallback()
     {
-        /** @var EmailTemplateTranslation $value */
         $value = new EmailTemplateTranslation();
         $value->setSubject('Test');
         $value->setSubjectFallback(true);

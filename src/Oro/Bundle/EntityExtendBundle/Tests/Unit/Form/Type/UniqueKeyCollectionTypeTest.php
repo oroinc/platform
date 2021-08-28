@@ -65,7 +65,7 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
         $config = $this->createMock(ConfigInterface::class);
         $config->expects($this->exactly(3))
             ->method('get')
-            ->with($this->equalTo('label'))
+            ->with('label')
             ->willReturn('label');
 
         $this->provider->expects($this->exactly(3))

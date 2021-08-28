@@ -61,9 +61,9 @@ class EntityTypeTest extends FormIntegrationTestCase
 
     public function testType()
     {
-        $formData = array(
+        $formData = [
             'className' => 'NewEntityClassName'
-        );
+        ];
 
         $form = $this->factory->create(EntityType::class);
         $form->submit($formData);

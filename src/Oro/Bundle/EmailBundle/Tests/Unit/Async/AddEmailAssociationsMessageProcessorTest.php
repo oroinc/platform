@@ -35,7 +35,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $message->setBody(json_encode([
             'targetClass' => 'class',
             'targetId' => 123,
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
@@ -59,7 +59,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $message->setBody(json_encode([
             'emailIds' => [],
             'targetId' => 123,
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
@@ -83,7 +83,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $message->setBody(json_encode([
             'emailIds' => [],
             'targetClass' => 'class',
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
@@ -103,7 +103,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('critical');
         $logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Sent "2" messages'));
+            ->with('Sent "2" messages');
 
         $producer = $this->createMock(MessageProducerInterface::class);
         $producer->expects($this->exactly(2))
@@ -136,7 +136,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         ];
 
         $message = new Message();
-        $message->setBody(json_encode($body));
+        $message->setBody(json_encode($body, JSON_THROW_ON_ERROR));
         $message->setMessageId('message-id');
 
         $jobRunner = $this->createMock(JobRunner::class);

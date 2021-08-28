@@ -7,9 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
 class EmailOwnerAwareStub implements EmailOwnerAwareInterface
 {
-    /**
-     * @var EmailOwnerInterface
-     */
+    /** @var EmailOwnerInterface */
     private $emailOwner;
 
     public function __construct(EmailOwnerInterface $emailOwner)
@@ -18,7 +16,7 @@ class EmailOwnerAwareStub implements EmailOwnerAwareInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEmailOwner(): EmailOwnerInterface
     {

@@ -66,7 +66,7 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteWithoutTemplateEntity(): void
     {
-        $this->expectException(\Doctrine\ORM\EntityNotFoundException::class);
+        $this->expectException(EntityNotFoundException::class);
         $this->localizedTemplateProvider->expects($this->once())
             ->method('getAggregated')
             ->willThrowException(new EntityNotFoundException());
@@ -117,12 +117,8 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executeOptionsDataProvider
-     *
-     * @param array $options
-     * @param string|object $recipient
-     * @param array $expected
      */
-    public function testExecute(array $options, $recipient, array $expected): void
+    public function testExecute(array $options, string $recipient, array $expected): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
@@ -209,7 +205,6 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                 ],
-                'de',
             ],
             'simple with name' => [
                 [
@@ -225,7 +220,6 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                 ],
-                'de',
             ]
         ];
     }

@@ -79,14 +79,14 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->metadata->expects($this->once())
             ->method('getFieldMapping')
-            ->with($this->equalTo($field))
+            ->with($field)
             ->willReturn(['type' => $type]);
         $this->metadata->expects($this->once())
             ->method('setIdGeneratorType')
-            ->with($this->equalTo(ClassMetadata::GENERATOR_TYPE_IDENTITY));
+            ->with(ClassMetadata::GENERATOR_TYPE_IDENTITY);
         $this->metadata->expects($this->once())
             ->method('setIdGenerator')
-            ->with($this->equalTo($generator));
+            ->with($generator);
 
         $this->listener->loadClassMetadata($this->event);
     }

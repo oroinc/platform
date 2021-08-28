@@ -14,7 +14,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class ImapEmailRepositoryTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {

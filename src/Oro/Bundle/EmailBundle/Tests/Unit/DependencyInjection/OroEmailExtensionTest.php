@@ -27,15 +27,11 @@ class OroEmailExtensionTest extends ExtensionTestCase
     public function testPrepend(array $securityConfig, array $expectedSecurityConfig): void
     {
         $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
-
-        $containerBuilder
-            ->expects($this->once())
+        $containerBuilder->expects($this->once())
             ->method('getExtensionConfig')
             ->with('nelmio_security')
             ->willReturn($securityConfig);
-
-        $containerBuilder
-            ->expects($this->once())
+        $containerBuilder->expects($this->once())
             ->method('setExtensionConfig')
             ->with('nelmio_security')
             ->willReturn($expectedSecurityConfig);

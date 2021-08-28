@@ -15,53 +15,47 @@ class SyncEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new SyncEmailMessageProcessor(
-            $this->createImapEmailSynchronizerMock(),
-            $this->createLoggerMock()
+            $this->createMock(ImapEmailSynchronizer::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldRejectMessageIfInvalidMessage()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
-        $synchronizer = $this->createImapEmailSynchronizerMock();
+        $synchronizer = $this->createMock(ImapEmailSynchronizer::class);
 
         $message = new Message();
-        $message->setBody(json_encode(['key' => 'value']));
+        $message->setBody(json_encode(['key' => 'value'], JSON_THROW_ON_ERROR));
 
         $processor = new SyncEmailMessageProcessor($synchronizer, $logger);
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldExecuteSyncOriginsWithIds()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
-            ->method('critical')
-        ;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('critical');
 
-        $synchronizer = $this->createImapEmailSynchronizerMock();
-        $synchronizer
-            ->expects($this->once())
+        $synchronizer = $this->createMock(ImapEmailSynchronizer::class);
+        $synchronizer->expects($this->once())
             ->method('syncOrigins')
-            ->with($this->identicalTo([1]))
-        ;
+            ->with($this->identicalTo([1]));
 
         $message = new Message();
-        $message->setBody(json_encode(['id' => 1]));
+        $message->setBody(json_encode(['id' => 1], JSON_THROW_ON_ERROR));
 
         $processor = new SyncEmailMessageProcessor($synchronizer, $logger);
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -72,29 +66,5 @@ class SyncEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             [Topics::SYNC_EMAIL],
             SyncEmailMessageProcessor::getSubscribedTopics()
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ImapEmailSynchronizer
-     */
-    private function createImapEmailSynchronizerMock()
-    {
-        return $this->createMock(ImapEmailSynchronizer::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

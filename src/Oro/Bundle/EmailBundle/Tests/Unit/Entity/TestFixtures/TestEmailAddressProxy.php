@@ -7,9 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
 class TestEmailAddressProxy extends OriginalEmailAddress
 {
-    /**
-     * @var EmailOwnerInterface
-     */
+    /** @var EmailOwnerInterface */
     private $owner;
 
     public function __construct(EmailOwnerInterface $owner = null)

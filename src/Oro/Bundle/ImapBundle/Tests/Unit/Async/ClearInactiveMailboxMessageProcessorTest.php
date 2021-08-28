@@ -17,9 +17,9 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
     public function testCouldBeConstructedWithRequiredAttributes()
     {
         new ClearInactiveMailboxMessageProcessor(
-            $this->createImapClearManagerMock(),
-            $this->createJobRunnerMock(),
-            $this->createLoggerMock()
+            $this->createMock(ImapClearManager::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
@@ -34,59 +34,25 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
 
     public function testShouldRunJob()
     {
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $clearManager = $this->createImapClearManagerMock();
-        $clearManager
-            ->expects($this->once())
+        $clearManager = $this->createMock(ImapClearManager::class);
+        $clearManager->expects($this->once())
             ->method('setLogger')
-            ->with($logger)
-        ;
+            ->with($logger);
 
         $message = new Message();
         $message->setMessageId('12345');
         $message->setBody(JSON::encode([]));
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runUnique')
-            ->with('12345', 'oro.imap.clear_inactive_mailbox')
-        ;
+            ->with('12345', 'oro.imap.clear_inactive_mailbox');
 
         $processor = new ClearInactiveMailboxMessageProcessor($clearManager, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | ImapClearManager
-     */
-    private function createImapClearManagerMock()
-    {
-        return $this->getMockBuilder(ImapClearManager::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->getMockBuilder(JobRunner::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    protected function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

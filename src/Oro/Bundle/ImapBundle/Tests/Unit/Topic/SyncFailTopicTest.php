@@ -17,22 +17,22 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var ClientManipulator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $clientManipulator;
+    private $clientManipulator;
 
     /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $conn;
+    private $conn;
 
     /** @var Topic|\PHPUnit\Framework\MockObject\MockObject */
-    protected $topic;
+    private $topic;
 
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $parameterBag;
+    private $parameterBag;
 
     /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    private $request;
 
     /** @var SyncFailTopic */
-    protected $syncFailTopic;
+    private $syncFailTopic;
 
     protected function setUp(): void
     {

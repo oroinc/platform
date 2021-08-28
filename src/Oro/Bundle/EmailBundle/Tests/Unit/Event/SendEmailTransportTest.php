@@ -9,12 +9,8 @@ class SendEmailTransportTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOrigin $emailOrigin */
-        $emailOrigin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
-            ->disableOriginalConstructor()->getMock();
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Transport_EsmtpTransport $transport */
-        $transport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
-            ->disableOriginalConstructor()->getMock();
+        $emailOrigin = $this->createMock(EmailOrigin::class);
+        $transport = $this->createMock(\Swift_Transport_EsmtpTransport::class);
 
         $sendEmailTransport = new SendEmailTransport($emailOrigin, $transport);
 

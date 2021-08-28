@@ -46,7 +46,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['default' => 'service.default']);
         $this->doctrine->expects($this->once())
             ->method('getManager')
-            ->with($this->equalTo('default'))
+            ->with('default')
             ->willReturn($em);
 
         $this->assertEquals(
@@ -78,7 +78,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['default' => 'service.default']);
         $this->doctrine->expects($this->once())
             ->method('getManager')
-            ->with($this->equalTo('default'))
+            ->with('default')
             ->willReturn($em);
 
         $this->assertEquals(
@@ -112,7 +112,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['default' => 'service.default']);
         $this->doctrine->expects($this->once())
             ->method('getManager')
-            ->with($this->equalTo('default'))
+            ->with('default')
             ->willReturn($em);
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -168,7 +168,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['default' => 'service.default']);
         $this->doctrine->expects($this->once())
             ->method('getManager')
-            ->with($this->equalTo('default'))
+            ->with('default')
             ->willReturn($em);
 
         $this->assertEquals(
@@ -220,7 +220,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['default' => 'service.default']);
         $this->doctrine->expects($this->once())
             ->method('getManager')
-            ->with($this->equalTo('default'))
+            ->with('default')
             ->willReturn($em);
 
         $this->assertTrue($this->helper->isEntityClassContainsColumn(TestEntity::class, 'test_column1'));

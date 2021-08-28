@@ -135,7 +135,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $sync->expects($this->once())
             ->method('doSyncOrigin')
             ->with($origin, $this->isInstanceOf(SynchronizationProcessorSettings::class))
-            ->will($this->throwException(new ORMException()));
+            ->willThrowException(new ORMException());
         $sync->expects($this->never())
             ->method('createSynchronizationProcessor');
 
@@ -254,7 +254,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $processor->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($origin))
-            ->will($this->throwException(new \Exception()));
+            ->willThrowException(new \Exception());
 
         $sync->callDoSyncOrigin($origin);
     }
@@ -300,7 +300,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $processor->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($origin))
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
 
         $sync->callDoSyncOrigin($origin);
     }
@@ -308,7 +308,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider changeOriginSyncStateProvider
      */
-    public function testChangeOriginSyncState($syncCode, $hasSynchronizedAt)
+    public function testChangeOriginSyncState(int $syncCode, bool $hasSynchronizedAt)
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $origin = new TestEmailOrigin(123);

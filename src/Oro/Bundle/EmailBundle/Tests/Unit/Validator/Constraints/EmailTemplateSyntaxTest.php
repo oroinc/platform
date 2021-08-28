@@ -8,16 +8,11 @@ use Symfony\Component\Validator\Constraint;
 class EmailTemplateSyntaxTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailTemplateSyntax */
-    protected $constraint;
+    private $constraint;
 
     protected function setUp(): void
     {
         $this->constraint = new EmailTemplateSyntax();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->constraint);
     }
 
     public function testConfiguration()

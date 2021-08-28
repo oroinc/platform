@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
+use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsAwareInterface;
@@ -256,7 +257,7 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
         $transport->expects($this->once())
             ->method('send')
             ->with($this->identicalTo($message), $this->identicalTo($failedRecipients))
-            ->will($this->throwException(new \Exception('test failure')));
+            ->willThrowException(new \Exception('test failure'));
         $transport->expects($this->once())
             ->method('stop');
 
@@ -305,7 +306,7 @@ class DirectMailerTest extends \PHPUnit\Framework\TestCase
 
     public function testRegisterPlugin()
     {
-        $this->expectException(\Oro\Bundle\EmailBundle\Exception\NotSupportedException::class);
+        $this->expectException(NotSupportedException::class);
         $plugin = $this->createMock(\Swift_Events_EventListener::class);
         $this->mailer->registerPlugin($plugin);
     }

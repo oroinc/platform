@@ -21,9 +21,9 @@ use Twig\Error\SyntaxError;
 
 class EmailTemplateSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
-    private const TEST_SUBJECT       = '{{entity.subject}}';
+    private const TEST_SUBJECT = '{{entity.subject}}';
     private const TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
-    private const TEST_CONTENT       = '{{entity.content}}';
+    private const TEST_CONTENT = '{{entity.content}}';
 
     /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
     private $emailRenderer;

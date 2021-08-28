@@ -408,7 +408,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         }
         $this->configCache->expects($this->once())
             ->method('saveConfig')
-            ->with($this->equalTo($expectedConfig));
+            ->with($expectedConfig);
         if ($configId instanceof FieldConfigId) {
             $this->modelManager->expects($this->never())
                 ->method('getEntityModel');

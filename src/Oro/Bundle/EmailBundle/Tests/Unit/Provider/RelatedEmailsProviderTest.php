@@ -12,9 +12,8 @@ use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Stub\CustomerStub;
 use Oro\Bundle\EmailBundle\Tests\Unit\Stub\OrderStub;
 use Oro\Bundle\EmailBundle\Tests\Unit\Stub\UserStub;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -27,12 +26,6 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
-
-    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameFormatter;
-
-    /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressHelper;
 
     /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $emailRecipientsHelper;
@@ -50,8 +43,6 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->nameFormatter = $this->createMock(NameFormatter::class);
-        $this->emailAddressHelper = $this->createMock(EmailAddressHelper::class);
         $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
         $this->entityFieldProvider = $this->createMock(EntityFieldProvider::class);
         $this->emailAttributeProvider = $this->createMock(EmailAttributeProvider::class);
@@ -66,26 +57,17 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $object
-     * @param int $depth
-     * @param bool $ignoreAcl
-     * @param Organization $organization
-     * @param bool $isObjectAllowedForOrganization
-     * @param bool $viewGranted
-     * @param object $tokenUser
-     * @param Recipient[] $expected
-     *
      * @dataProvider getRecipientsSkippingRecipientsCalculationDataProvider
      */
     public function testGetRecipientsSkippingRecipientsCalculation(
-        $object,
-        $depth,
-        $ignoreAcl,
-        $organization,
-        $isObjectAllowedForOrganization,
-        $viewGranted,
-        $tokenUser,
-        $expected
+        object $object,
+        ?int $depth,
+        bool $ignoreAcl,
+        Organization $organization,
+        bool $isObjectAllowedForOrganization,
+        bool $viewGranted,
+        object $tokenUser,
+        array $expected
     ) {
         $this->emailRecipientsHelper->expects(self::any())
             ->method('isObjectAllowedForOrganization')
@@ -119,10 +101,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getRecipientsSkippingRecipientsCalculationDataProvider()
+    public function getRecipientsSkippingRecipientsCalculationDataProvider(): array
     {
         $object = new \stdClass();
 
@@ -171,31 +150,20 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $object
-     * @param int $depth
-     * @param bool $ignoreAcl
-     * @param Organization $organization
-     * @param array $relations
-     * @param array $attributes
-     * @param array $attributesFromRelations
-     * @param array $emailsFromAttributes
-     * @param array $recipientsFromEmails
-     * @param Recipient[] $expected
-     *
      * @dataProvider getRecipientsDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function testGetRecipients(
-        $object,
-        $depth,
-        $ignoreAcl,
-        $organization,
-        $relations,
-        $attributes,
-        $attributesFromRelations,
-        $emailsFromAttributes,
-        $recipientsFromEmails,
-        $expected
+        object$object,
+        int $depth,
+        bool $ignoreAcl,
+        Organization $organization,
+        array $relations,
+        array $attributes,
+        array $attributesFromRelations,
+        array $emailsFromAttributes,
+        array $recipientsFromEmails,
+        array $expected
     ) {
         $this->emailRecipientsHelper->expects(self::once())
             ->method('isObjectAllowedForOrganization')
@@ -239,10 +207,9 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getRecipientsDataProvider()
+    public function getRecipientsDataProvider(): array
     {
         $object = new \stdClass();
 
@@ -277,24 +244,14 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                     '"John Doe" <admin@example.com>|Oro\Bundle\UserBundle\Entity\User|ORO' => new Recipient(
                         'admin@example.com',
                         '"John Doe" <admin@example.com>',
-                        new RecipientEntity(
-                            'Oro\Bundle\UserBundle\Entity\User',
-                            1,
-                            'John Doe (User)',
-                            'ORO'
-                        )
+                        new RecipientEntity(User::class, 1, 'John Doe (User)', 'ORO')
                     )
                 ],
                 'expected' => [
                     '"John Doe" <admin@example.com>|Oro\Bundle\UserBundle\Entity\User|ORO' => new Recipient(
                         'admin@example.com',
                         '"John Doe" <admin@example.com>',
-                        new RecipientEntity(
-                            'Oro\Bundle\UserBundle\Entity\User',
-                            1,
-                            'John Doe (User)',
-                            'ORO'
-                        )
+                        new RecipientEntity(User::class, 1, 'John Doe (User)', 'ORO')
                     )
                 ],
             ],
@@ -309,7 +266,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'ref-one',
                         'label' => 'Owner',
                         'relation_type' => 'ref-one',
-                        'related_entity_name' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                        'related_entity_name' => BusinessUnit::class,
                     ],
                 ],
                 'attributes' => [
@@ -324,24 +281,14 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                     '"John Doe" <admin@example.com>|Oro\Bundle\UserBundle\Entity\User|ORO' => new Recipient(
                         'admin@example.com',
                         '"John Doe" <admin@example.com>',
-                        new RecipientEntity(
-                            'Oro\Bundle\UserBundle\Entity\User',
-                            1,
-                            'John Doe (User)',
-                            'ORO'
-                        )
+                        new RecipientEntity(User::class, 1, 'John Doe (User)', 'ORO')
                     )
                 ],
                 'expected' => [
                     '"John Doe" <admin@example.com>|Oro\Bundle\UserBundle\Entity\User|ORO' => new Recipient(
                         'admin@example.com',
                         '"John Doe" <admin@example.com>',
-                        new RecipientEntity(
-                            'Oro\Bundle\UserBundle\Entity\User',
-                            1,
-                            'John Doe (User)',
-                            'ORO'
-                        )
+                        new RecipientEntity(User::class, 1, 'John Doe (User)', 'ORO')
                     )
                 ],
             ],
@@ -366,14 +313,14 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'type' => 'ref-one',
                 'label' => 'User',
                 'relation_type' => 'ref-one',
-                'related_entity_name' => 'Oro\Bundle\EmailBundle\Tests\Unit\Stub\UserStub',
+                'related_entity_name' => UserStub::class,
             ],
             'customer' => [
                 'name' => 'customer',
                 'type' => 'ref-one',
                 'label' => 'Customer',
                 'relation_type' => 'ref-one',
-                'related_entity_name' => 'Oro\Bundle\EmailBundle\Tests\Unit\Stub\CustomerStub',
+                'related_entity_name' => CustomerStub::class,
             ],
         ];
         $customerRelations = [
@@ -382,7 +329,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'type' => 'ref-one',
                 'label' => 'User',
                 'relation_type' => 'ref-one',
-                'related_entity_name' => 'Oro\Bundle\EmailBundle\Tests\Unit\Stub\UserStub',
+                'related_entity_name' => UserStub::class,
             ],
         ];
         $orderAttributes = [
@@ -404,7 +351,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'admin@example.com',
                 '"John Doe" <admin@example.com>',
                 new RecipientEntity(
-                    'Oro\Bundle\UserBundle\Entity\User',
+                    User::class,
                     1,
                     'John Doe (User)',
                     'ORO'
@@ -416,7 +363,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'customer@example.com',
                 '"Sam Smith" <customer@example.com>',
                 new RecipientEntity(
-                    'Oro\Bundle\UserBundle\Entity\User',
+                    User::class,
                     1,
                     'Sam Smith (User)',
                     'ORO'
@@ -428,7 +375,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'admin@example.com',
                 '"John Doe" <admin@example.com>',
                 new RecipientEntity(
-                    'Oro\Bundle\UserBundle\Entity\User',
+                    User::class,
                     1,
                     'John Doe (User)',
                     'ORO'
@@ -438,7 +385,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'customer@example.com',
                 '"Sam Smith" <customer@example.com>',
                 new RecipientEntity(
-                    'Oro\Bundle\UserBundle\Entity\User',
+                    User::class,
                     1,
                     'Sam Smith (User)',
                     'ORO'
@@ -520,7 +467,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
                 'admin@example.com',
                 '"John Doe" <admin@example.com>',
                 new RecipientEntity(
-                    'Oro\Bundle\UserBundle\Entity\User',
+                    User::class,
                     1,
                     'John Doe (User)',
                     'ORO'

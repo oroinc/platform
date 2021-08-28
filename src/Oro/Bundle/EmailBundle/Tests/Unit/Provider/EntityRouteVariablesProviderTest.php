@@ -13,29 +13,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_ENTITY_NAME        = TestEntityForVariableProvider::class;
+    private const TEST_ENTITY_NAME = TestEntityForVariableProvider::class;
     private const TEST_EXTEND_ENTITY_NAME = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
 
     /** @var EntityRouteVariablesProvider */
     private $provider;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
     protected function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
         $this->provider = new EntityRouteVariablesProvider(
-            $this->translator,
+            $translator,
             $this->configManager
         );
     }
@@ -104,7 +101,6 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetVariableProcessors(string $entityClass, array $expected)
     {
-        $entityMetadata = null;
         $config = new Config(
             new EntityConfigId('extend', self::TEST_ENTITY_NAME),
             ['is_extend' => true]
@@ -132,10 +128,7 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getVariableProcessors($entityClass));
     }
 
-    /**
-     * @return array
-     */
-    public function variableProcessorsDataProvider()
+    public function variableProcessorsDataProvider(): array
     {
         $entityData = [
             'url.index' => [

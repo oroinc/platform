@@ -37,7 +37,7 @@ class TestTemplateStub extends Template
     /**
      * {@inheritdoc}
      */
-    protected function doDisplay(array $context, array $blocks = array())
+    protected function doDisplay(array $context, array $blocks = [])
     {
         echo $this->template;
     }

@@ -10,7 +10,7 @@ class ImapConnectionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTargets()
     {
-        static::assertSame(
+        self::assertSame(
             Constraint::CLASS_CONSTRAINT,
             (new ImapConnectionConfiguration())->getTargets()
         );
@@ -18,7 +18,7 @@ class ImapConnectionConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testValidatedBy()
     {
-        static::assertSame(
+        self::assertSame(
             ImapConnectionConfigurationValidator::class,
             (new ImapConnectionConfiguration())->validatedBy()
         );

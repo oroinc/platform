@@ -8,26 +8,19 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
 {
     private const RECIPIENT_USER_ID = 7;
-    use EntityTrait;
 
-    /**
-     * @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject */
     private $emailTemplateManager;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var TemplateEmailMessageSender
-     */
+    /** @var TemplateEmailMessageSender */
     private $sender;
 
     protected function setUp(): void
@@ -36,6 +29,14 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->sender = new TemplateEmailMessageSender($this->emailTemplateManager, $this->doctrineHelper);
+    }
+
+    private function getUser(int $id): User
+    {
+        $user = new User();
+        ReflectionUtil::setId($user, $id);
+
+        return $user;
     }
 
     /**
@@ -90,11 +91,10 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
             'recipientUserId' => self::RECIPIENT_USER_ID
         ];
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityReference')
             ->with(User::class, self::RECIPIENT_USER_ID)
-            ->willReturn($this->getEntity(User::class, ['id' => self::RECIPIENT_USER_ID]));
+            ->willReturn($this->getUser(self::RECIPIENT_USER_ID));
 
         self::assertTrue($this->sender->isTranslatable($message));
     }
@@ -118,16 +118,14 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
             'recipientUserId' => self::RECIPIENT_USER_ID
         ];
 
-        $user = $this->getEntity(User::class, ['id' => self::RECIPIENT_USER_ID]);
+        $user = $this->getUser(self::RECIPIENT_USER_ID);
 
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityReference')
             ->with(User::class, self::RECIPIENT_USER_ID)
             ->willReturn($user);
 
-        $this->emailTemplateManager
-            ->expects($this->once())
+        $this->emailTemplateManager->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
                 From::emailAddress('from@mail.com', 'From Name'),
@@ -156,10 +154,9 @@ class TemplateEmailMessageSenderTest extends \PHPUnit\Framework\TestCase
             'recipientUserId' => self::RECIPIENT_USER_ID
         ];
 
-        $user = $this->getEntity(User::class, ['id' => self::RECIPIENT_USER_ID]);
+        $user = $this->getUser(self::RECIPIENT_USER_ID);
 
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityReference')
             ->with(User::class, self::RECIPIENT_USER_ID)
             ->willReturn($user);

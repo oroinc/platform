@@ -177,13 +177,13 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         $sampleQuery = $this->createSearchQuery();
         $sampleQuery->value('product');
 
-        return array(
-            'one word + DEFAULT_MATCH' => array('product', SearchQueryMatch::DEFAULT_MATCH, 'product'),
-            'one word + SUBSTRING_MATCH' => array('product', SearchQueryMatch::SUBSTRING_MATCH, 'product'),
-            'two words + DEFAULT_MATCH' => array('my product', SearchQueryMatch::DEFAULT_MATCH, '"my product"'),
-            'two words + SUBSTRING_MATCH' => array('my product', SearchQueryMatch::SUBSTRING_MATCH, '"my product"'),
-            'SearchQuery as value + DEFAULT_MATCH' => array($sampleQuery, SearchQueryMatch::DEFAULT_MATCH, 'product'),
-        );
+        return [
+            'one word + DEFAULT_MATCH' => ['product', SearchQueryMatch::DEFAULT_MATCH, 'product'],
+            'one word + SUBSTRING_MATCH' => ['product', SearchQueryMatch::SUBSTRING_MATCH, 'product'],
+            'two words + DEFAULT_MATCH' => ['my product', SearchQueryMatch::DEFAULT_MATCH, '"my product"'],
+            'two words + SUBSTRING_MATCH' => ['my product', SearchQueryMatch::SUBSTRING_MATCH, '"my product"'],
+            'SearchQuery as value + DEFAULT_MATCH' => [$sampleQuery, SearchQueryMatch::DEFAULT_MATCH, 'product'],
+        ];
     }
 
     public function itemProvider()
@@ -191,38 +191,38 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         $sampleQuery = $this->createSearchQuery();
         $sampleQuery->value('product');
 
-        return array(
-            'one word + DEFAULT_MATCH' => array(
+        return [
+            'one word + DEFAULT_MATCH' => [
                 'subject',
                 'product',
                 SearchQueryMatch::DEFAULT_MATCH,
                 'SUBJECT product'
-            ),
-            'one word + SUBSTRING_MATCH' => array(
+            ],
+            'one word + SUBSTRING_MATCH' => [
                 'subject',
                 'product',
                 SearchQueryMatch::SUBSTRING_MATCH,
                 'SUBJECT product'
-            ),
-            'two words + DEFAULT_MATCH' => array(
+            ],
+            'two words + DEFAULT_MATCH' => [
                 'subject',
                 'my product',
                 SearchQueryMatch::DEFAULT_MATCH,
                 'SUBJECT "my product"'
-            ),
-            'two words + SUBSTRING_MATCH' => array(
+            ],
+            'two words + SUBSTRING_MATCH' => [
                 'subject',
                 'my product',
                 SearchQueryMatch::SUBSTRING_MATCH,
                 'SUBJECT "my product"'
-            ),
-            'SearchQuery as value + DEFAULT_MATCH' => array(
+            ],
+            'SearchQuery as value + DEFAULT_MATCH' => [
                 'subject',
                 $sampleQuery,
                 SearchQueryMatch::DEFAULT_MATCH,
                 'SUBJECT product'
-            ),
-        );
+            ],
+        ];
     }
 
     private function createSearchQuery()

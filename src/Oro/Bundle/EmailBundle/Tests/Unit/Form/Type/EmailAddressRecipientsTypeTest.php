@@ -22,7 +22,7 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
         $this->configManager->expects($this->any())
             ->method('get')
             ->with('oro_email.minimum_input_length')
-                ->willReturn(2);
+            ->willReturn(2);
 
         parent::setUp();
     }

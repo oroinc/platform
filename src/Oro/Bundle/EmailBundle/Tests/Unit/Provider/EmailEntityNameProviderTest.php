@@ -104,7 +104,8 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     public function testUnsupportedFormat()
     {
         $owner = $this->createMock(EmailOwnerInterface::class);
-        $owner->expects($this->never())->method('getEmailFields');
+        $owner->expects($this->never())
+            ->method('getEmailFields');
 
         $this->assertFalse($this->provider->getName('email1', 'en', $owner));
     }

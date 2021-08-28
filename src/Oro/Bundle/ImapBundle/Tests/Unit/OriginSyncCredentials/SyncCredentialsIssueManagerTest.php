@@ -11,14 +11,14 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SyncCredentialsIssueManager */
-    private $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var WrongCredentialsOriginsDriverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $credentialsDriver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
+
+    /** @var SyncCredentialsIssueManager */
+    private $manager;
 
     protected function setUp(): void
     {

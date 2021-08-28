@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Processor;
 
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\GenericHeader;
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Component\Testing\ReflectionUtil;
 
 class ContentProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Part|\PHPUnit\Framework\MockObject\MockObject */
     private $part;
 
     /** @var ContentProcessor */
@@ -16,53 +20,45 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->part = $this->getMockBuilder('Laminas\Mail\Storage\Part')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->part = $this->createMock(Part::class);
 
         $this->processor = new ContentProcessor();
     }
     public function testGetPartContentType()
     {
-        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $headers = $this->createMock(Headers::class);
         $headers->expects($this->once())
             ->method('has')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue(true));
+            ->with('Content-Type')
+            ->willReturn(true);
 
         $this->part->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
+            ->willReturn($headers);
 
         $header = new \stdClass();
 
-        $this->part
-            ->expects($this->once())
+        $this->part->expects($this->once())
             ->method('getHeader')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue($header));
+            ->with('Content-Type')
+            ->willReturn($header);
 
         $result = ReflectionUtil::callMethod($this->processor, 'getPartContentType', [$this->part]);
 
-        $this->assertTrue($header === $result);
+        $this->assertSame($header, $result);
     }
 
     public function testGetPartContentTypeWithNoContentTypeHeader()
     {
-        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $this->createMock(Headers::class);
         $headers->expects($this->once())
             ->method('has')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue(false));
+            ->with('Content-Type')
+            ->willReturn(false);
 
         $this->part->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
+            ->willReturn($headers);
 
         $result = ReflectionUtil::callMethod($this->processor, 'getPartContentType', [$this->part]);
 
@@ -81,65 +77,50 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
         $decodedValue
     ) {
         // Content-Type header
-        $contentTypeHeader = $this->getMockBuilder('Laminas\Mail\Header\ContentType')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contentTypeHeader = $this->createMock(ContentType::class);
         if ($contentType !== null) {
             $contentTypeHeader->expects($this->once())
                 ->method('getType')
-                ->will($this->returnValue($contentType));
+                ->willReturn($contentType);
             $contentTypeHeader->expects($this->once())
                 ->method('getParameter')
-                ->with($this->equalTo('charset'))
-                ->will($this->returnValue($contentCharset));
+                ->with('charset')
+                ->willReturn($contentCharset);
             $contentTypeHeader->expects($this->any())
                 ->method('getParameters')
                 ->willReturn([]);
         }
 
         // Content-Transfer-Encoding header
-        $contentTransferEncodingHeader = $this->getMockBuilder('Laminas\Mail\Header\GenericHeader')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contentTransferEncodingHeader = $this->createMock(GenericHeader::class);
         if ($contentTransferEncoding !== null) {
             $contentTransferEncodingHeader->expects($this->once())
                 ->method('getFieldValue')
-                ->will($this->returnValue($contentTransferEncoding));
+                ->willReturn($contentTransferEncoding);
         }
 
         // Headers object
-        $headers = $this->getMockBuilder('Laminas\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $headers = $this->createMock(Headers::class);
         $headers->expects($this->any())
             ->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', $contentType !== null],
-                        ['Content-Transfer-Encoding', $contentTransferEncoding !== null],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Content-Type', $contentType !== null],
+                ['Content-Transfer-Encoding', $contentTransferEncoding !== null],
+            ]);
 
         // Part object
         $this->part->expects($this->any())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
-        $this->part
-            ->expects($this->any())
+            ->willReturn($headers);
+        $this->part->expects($this->any())
             ->method('getHeader')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', null, $contentTypeHeader],
-                        ['Content-Transfer-Encoding', null, $contentTransferEncodingHeader],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Content-Type', null, $contentTypeHeader],
+                ['Content-Transfer-Encoding', null, $contentTransferEncodingHeader],
+            ]);
         $this->part->expects($this->once())
             ->method('getContent')
-            ->will($this->returnValue($contentValue));
+            ->willReturn($contentValue);
 
         $result = ReflectionUtil::callMethod($this->processor, 'extractContent', [$this->part]);
 
@@ -147,10 +128,7 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($decodedValue, $result->getDecodedContent());
     }
 
-    /**
-     * @return array[]
-     */
-    public static function extractContentProvider()
+    public static function extractContentProvider(): array
     {
         return [
             '7bit' => [

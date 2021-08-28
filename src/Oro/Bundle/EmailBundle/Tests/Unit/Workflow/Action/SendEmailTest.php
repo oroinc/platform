@@ -12,83 +12,71 @@ use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendEmailTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextAccessor|MockObject */
-    protected $contextAccessor;
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
 
-    /** @var Processor|MockObject */
-    protected $emailProcessor;
+    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailProcessor;
 
-    /** @var EntityNameResolver|MockObject */
-    protected $entityNameResolver;
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
 
-    /** @var EventDispatcher|MockObject */
-    protected $dispatcher;
+    /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailOriginHelper;
 
-    /** @var EmailOriginHelper|MockObject */
-    protected $emailOriginHelper;
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var SendEmail */
-    protected $action;
-
-    /** @var LoggerInterface|MockObject */
-    protected $logger;
+    private $action;
 
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
         $this->emailProcessor = $this->createMock(Processor::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
-        $this->dispatcher = $this->createMock(EventDispatcher::class);
         $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
+        $this->dispatcher = $this->createMock(EventDispatcher::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->action = new class(
+        $this->action = new SendEmail(
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
             $this->entityNameResolver,
             $this->emailOriginHelper
-        ) extends SendEmail {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
+        );
         $this->action->setDispatcher($this->dispatcher);
-
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->action->setLogger($this->logger);
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             'no from' => [
                 'options' => ['to' => 'test@test.com', 'subject' => 'test', 'body' => 'test'],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'From parameter is required'
             ],
             'no from email' => [
@@ -96,12 +84,12 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
                     'to' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
                     'from' => ['name' => 'Test']
                 ],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Email parameter is required'
             ],
             'no to' => [
                 'options' => ['from' => 'test@test.com', 'subject' => 'test', 'body' => 'test'],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'To parameter is required'
             ],
             'no to email' => [
@@ -109,7 +97,7 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
                     'from' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
                     'to' => ['name' => 'Test']
                 ],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Email parameter is required'
             ],
             'no to email in one of addresses' => [
@@ -117,17 +105,17 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
                     'from' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
                     'to' => ['test@test.com', ['name' => 'Test']]
                 ],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Email parameter is required'
             ],
             'no subject' => [
                 'options' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'body' => 'test'],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Subject parameter is required'
             ],
             'no body' => [
                 'options' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'subject' => 'test'],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Body parameter is required'
             ],
         ];
@@ -135,16 +123,14 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expected
      */
-    public function testInitialize($options, $expected)
+    public function testInitialize(array $options, array $expected)
     {
-        static::assertSame($this->action, $this->action->initialize($options));
-        static::assertEquals($expected, $this->action->xgetOptions());
+        self::assertSame($this->action, $this->action->initialize($options));
+        self::assertEquals($expected, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'simple' => [
@@ -242,46 +228,44 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executeOptionsDataProvider
-     * @param array $options
-     * @param array $expected
      */
-    public function testExecute($options, $expected)
+    public function testExecute(array $options, array $expected)
     {
         $context = [];
-        $this->contextAccessor->method('getValue')->willReturnArgument(1);
-        $this->entityNameResolver->expects(static::any())
+        $this->contextAccessor->expects(self::any())
+            ->method('getValue')
+            ->willReturnArgument(1);
+        $this->entityNameResolver->expects(self::any())
             ->method('getName')
-            ->willReturnCallback(
-                function () {
-                    return '_Formatted';
-                }
-            );
+            ->willReturnCallback(function () {
+                return '_Formatted';
+            });
 
         $emailEntity = new EmailEntity();
         $emailUserEntity = $this->createMock(EmailUser::class);
-        $emailUserEntity->method('getEmail')->willReturn($emailEntity);
+        $emailUserEntity->expects(self::any())
+            ->method('getEmail')
+            ->willReturn($emailEntity);
 
         $emailOrigin = new TestEmailOrigin();
-        $this->emailOriginHelper->expects(static::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($expected['from'], null)
             ->willReturn($emailOrigin);
 
-        $this->emailProcessor->expects(static::once())
+        $this->emailProcessor->expects(self::once())
             ->method('process')
-            ->with(static::isInstanceOf(Email::class), $emailOrigin)
-            ->willReturnCallback(
-                function (Email $model) use ($emailUserEntity, $expected) {
-                    static::assertEquals($expected['body'], $model->getBody());
-                    static::assertEquals($expected['subject'], $model->getSubject());
-                    static::assertEquals($expected['from'], $model->getFrom());
-                    static::assertEquals($expected['to'], $model->getTo());
+            ->with(self::isInstanceOf(Email::class), $emailOrigin)
+            ->willReturnCallback(function (Email $model) use ($emailUserEntity, $expected) {
+                self::assertEquals($expected['body'], $model->getBody());
+                self::assertEquals($expected['subject'], $model->getSubject());
+                self::assertEquals($expected['from'], $model->getFrom());
+                self::assertEquals($expected['to'], $model->getTo());
 
-                    return $emailUserEntity;
-                }
-            );
+                return $emailUserEntity;
+            });
         if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects(static::once())
+            $this->contextAccessor->expects(self::once())
                 ->method('setValue')
                 ->with($context, $options['attribute'], $emailEntity);
         }
@@ -291,12 +275,13 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function executeOptionsDataProvider()
+    public function executeOptionsDataProvider(): array
     {
-        $nameMock = $this->getMockBuilder(FirstNameInterface::class)->getMock();
-        $nameMock->method('getFirstName')->willReturn('NAME');
+        $nameMock = $this->createMock(FirstNameInterface::class);
+        $nameMock->expects(self::any())
+            ->method('getFirstName')
+            ->willReturn('NAME');
 
         return [
             'simple' => [
@@ -411,28 +396,30 @@ class SendEmailTest extends \PHPUnit\Framework\TestCase
         ];
 
         $context = [];
-        $this->contextAccessor->method('getValue')->willReturnArgument(1);
-        $this->entityNameResolver->expects(static::any())
+        $this->contextAccessor->expects(self::any())
+            ->method('getValue')
+            ->willReturnArgument(1);
+        $this->entityNameResolver->expects(self::any())
             ->method('getName')
-            ->willReturnCallback(
-                function () {
-                    return '_Formatted';
-                }
-            );
+            ->willReturnCallback(function () {
+                return '_Formatted';
+            });
 
         $emailUserEntity = $this->getMockBuilder(EmailUser::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEmail'])
             ->getMock();
         $emailEntity = $this->createMock(EmailEntity::class);
-        $emailUserEntity->method('getEmail')->willReturn($emailEntity);
+        $emailUserEntity->expects(self::any())
+            ->method('getEmail')
+            ->willReturn($emailEntity);
 
-        $this->emailProcessor->expects(static::once())
+        $this->emailProcessor->expects(self::once())
             ->method('process')
-            ->with(static::isInstanceOf(Email::class))
+            ->with(self::isInstanceOf(Email::class))
             ->willThrowException(new \Swift_SwiftException('The email was not delivered.'));
 
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with('Workflow send email action.');
 

@@ -161,11 +161,7 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->with(
                 'oro_resize_email_attachment',
-                [
-                    'width'  => 100,
-                    'height' => 50,
-                    'id'     => 1,
-                ]
+                ['width' => 100, 'height' => 50, 'id' => 1]
             );
 
         $this->emailAttachmentManager->getResizedImageUrl($emailAttachment, 100, 50);

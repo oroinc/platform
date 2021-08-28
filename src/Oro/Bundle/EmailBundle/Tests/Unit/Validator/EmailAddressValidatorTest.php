@@ -15,7 +15,7 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddress */
     private $constraint;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
     /** @var EmailAddressHelper */

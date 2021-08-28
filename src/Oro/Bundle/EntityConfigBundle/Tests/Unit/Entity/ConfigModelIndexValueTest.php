@@ -41,12 +41,12 @@ class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
 
     public function propertiesDataProvider()
     {
-        return array(
+        return [
             ['scope', 'testScope'],
             ['code', 'testCode'],
             ['value', 'testValue'],
             ['entity', new EntityConfigModel()],
             ['field', new FieldConfigModel()],
-        );
+        ];
     }
 }
