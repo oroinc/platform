@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 class TestLogger extends BaseTestLogger implements DebugLoggerInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function countErrors(Request $request = null)
     {
@@ -17,7 +17,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLogs(Request $request = null)
     {
@@ -25,7 +25,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function clear()
     {

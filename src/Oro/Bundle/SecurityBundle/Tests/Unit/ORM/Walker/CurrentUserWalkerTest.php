@@ -12,7 +12,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class CurrentUserWalkerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {

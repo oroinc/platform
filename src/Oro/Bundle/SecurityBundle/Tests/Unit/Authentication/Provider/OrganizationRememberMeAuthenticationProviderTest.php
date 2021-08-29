@@ -7,23 +7,26 @@ use Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuth
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userChecker;
+
     /** @var OrganizationRememberMeAuthenticationProvider */
     private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UserCheckerInterface */
-    private $userChecker;
 
     protected function setUp(): void
     {
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
+
         $this->provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
         $this->provider->setTokenFactory(new OrganizationRememberMeTokenFactory());
         $this->provider->setOrganizationGuesser(new OrganizationGuesser());
@@ -32,7 +35,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
     public function testSupports()
     {
         $organization = new Organization(2);
-        $user         = new User(1);
+        $user = new User(1);
         $user->addOrganization($organization);
 
         $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
@@ -47,7 +50,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
 
     public function testAuthenticateIfTokenFactoryIsNotSet()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Token Factory is not set in OrganizationRememberMeAuthenticationProvider.');
 
         $token = new OrganizationRememberMeToken(new User(1), 'provider', 'testKey', new Organization(2));
@@ -57,7 +60,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
 
     public function testAuthenticateIfOrganizationGuesserIsNotSet()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage(
             'Organization Guesser is not set in OrganizationRememberMeAuthenticationProvider.'
         );
@@ -111,7 +114,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
 
     public function testBadOrganizationAuthenticate()
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException::class);
+        $this->expectException(BadUserOrganizationException::class);
         $this->expectExceptionMessage('The user does not have access to organization "Inactive Org".');
 
         $organization = new Organization(2);
@@ -130,10 +133,10 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
 
     public function testNoAssignedOrganizations()
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException::class);
+        $this->expectException(BadUserOrganizationException::class);
         $this->expectExceptionMessage('The user does not have active organization assigned to it.');
 
-        $user  = new User(1);
+        $user = new User(1);
         $token = new RememberMeToken($user, 'provider', 'testKey');
 
         $this->userChecker->expects($this->once())

@@ -192,39 +192,39 @@ class OwnerTreeProviderTest extends OrmTestCase
     private function assertOwnerTreeEquals(array $expected, OwnerTree $actual)
     {
         $a = new OwnerTreeWrappingPropertiesAccessor($actual);
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOwningOrganizationId'],
             $a->xgetUserOwningOrganizationId()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOrganizationIds'],
             $a->xgetUserOrganizationIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOwningBusinessUnitId'],
             $a->xgetUserOwningBusinessUnitId()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userBusinessUnitIds'],
             $a->xgetUserBusinessUnitIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOrganizationBusinessUnitIds'],
             $a->xgetUserOrganizationBusinessUnitIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['businessUnitOwningOrganizationId'],
             $a->xgetBusinessUnitOwningOrganizationId()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['assignedBusinessUnitUserIds'],
             $a->xgetAssignedBusinessUnitUserIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['subordinateBusinessUnitIds'],
             $a->xgetSubordinateBusinessUnitIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['organizationBusinessUnitIds'],
             $a->xgetOrganizationBusinessUnitIds()
         );

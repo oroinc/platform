@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -22,13 +23,13 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldAclHelper;
+    private $fieldAclHelper;
 
     /** @var TestLogger */
-    protected $logger;
+    private $logger;
 
     /** @var AclProtectedFieldTypeExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -253,7 +254,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
      *
      * @return array [view, form, options]
      */
-    protected function getTestFormAndFormView($showRestricted = true)
+    private function getTestFormAndFormView($showRestricted = true)
     {
         $options = $this->prepareCorrectOptions(CmsAddress::class, $showRestricted);
         $view = new FormView();
@@ -274,7 +275,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
      *
      * @return array
      */
-    protected function prepareCorrectOptions($className, $showRestricted = true)
+    private function prepareCorrectOptions($className, $showRestricted = true)
     {
         $this->fieldAclHelper->expects(self::any())
             ->method('isFieldAclEnabled')
@@ -293,17 +294,16 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     /**
      * @return array [dispatcher, builder]
      */
-    protected function getFormBuilderWithEventDispatcher($dataClass = null, $formName = null)
+    private function getFormBuilderWithEventDispatcher($dataClass = null, $formName = null)
     {
         $dispatcher = new EventDispatcher();
-        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')
-            ->disableOriginalConstructor()->getMock();
+        $formFactory = $this->createMock(FormFactoryInterface::class);
         $builder = new FormBuilder($formName, $dataClass, $dispatcher, $formFactory);
 
         return [$dispatcher, $builder];
     }
 
-    protected function addFieldModificationDeniedFormError(FormInterface $formField)
+    private function addFieldModificationDeniedFormError(FormInterface $formField)
     {
         $formField->addError(new FormError('You have no access to modify this field.'));
     }

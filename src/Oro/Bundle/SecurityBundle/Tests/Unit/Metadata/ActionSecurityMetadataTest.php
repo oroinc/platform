@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadata;
 class ActionSecurityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionSecurityMetadata */
-    protected $metadata;
+    private $metadata;
 
     protected function setUp(): void
     {

@@ -10,7 +10,7 @@ class UserImportExportConfigurationProviderTest extends \PHPUnit\Framework\TestC
 {
     public function testGet()
     {
-        static::assertEquals(
+        self::assertEquals(
             new ImportExportConfiguration([
                 ImportExportConfiguration::FIELD_ENTITY_CLASS => User::class,
                 ImportExportConfiguration::FIELD_EXPORT_PROCESSOR_ALIAS => 'oro_user',

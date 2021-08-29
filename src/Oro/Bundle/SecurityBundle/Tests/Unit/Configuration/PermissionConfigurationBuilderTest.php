@@ -20,29 +20,20 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ValidatorInterface
-     */
-    protected $validator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValidatorInterface */
+    private $validator;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /**
-     * @var PermissionConfigurationBuilder
-     */
-    protected $builder;
+    /** @var PermissionConfigurationBuilder */
+    private $builder;
 
     protected function setUp(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository $repository */
         $repository = $this->createMock(EntityRepository::class);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-
         $doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
             ->with(PermissionEntity::class)
@@ -61,12 +52,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator, $this->entityManager);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->builder, $this->validator);
-    }
-
-    protected function assertDefinitionConfiguration(array $expected, Permission $definition): void
+    private function assertDefinitionConfiguration(array $expected, Permission $definition): void
     {
         $this->assertSame($expected['label'], $definition->getLabel());
         $this->assertSame($expected['apply_to_all'], $definition->isApplyToAll());

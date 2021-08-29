@@ -34,26 +34,19 @@ abstract class AbstractPrependExtensionTest extends ExtensionTestCase
             ]
         ];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $containerBuilder */
-        $containerBuilder = $this->getMockBuilder(ExtendedContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
         $containerBuilder->expects($this->exactly(2))
             ->method('getExtensionConfig')
             ->with('security')
-            ->willReturnCallback(
-                function () use (&$securityConfig) {
-                    return $securityConfig;
-                }
-            );
+            ->willReturnCallback(function () use (&$securityConfig) {
+                return $securityConfig;
+            });
         $containerBuilder->expects($this->exactly(2))
             ->method('setExtensionConfig')
             ->with('security', $this->isType('array'))
-            ->willReturnCallback(
-                function ($name, array $config = []) use (&$securityConfig) {
-                    $securityConfig = $config;
-                }
-            );
+            ->willReturnCallback(function ($name, array $config = []) use (&$securityConfig) {
+                $securityConfig = $config;
+            });
 
         $extension = $this->getExtension();
         $extension->prepend($containerBuilder);

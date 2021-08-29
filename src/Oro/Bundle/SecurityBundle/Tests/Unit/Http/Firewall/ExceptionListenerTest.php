@@ -47,7 +47,8 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->setMethod('POST');
 
         $session = $this->createMock(SessionInterface::class);
-        $session->expects(self::never())->method('set');
+        $session->expects(self::never())
+            ->method('set');
         $event->getRequest()->setSession($session);
 
         $listener = $this->createExceptionListener();
@@ -63,7 +64,8 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $event->getRequest()->headers->set('X-Requested-With', 'XMLHttpRequest');
 
         $session = $this->createMock(SessionInterface::class);
-        $session->expects(self::never())->method('set');
+        $session->expects(self::never())
+            ->method('set');
         $event->getRequest()->setSession($session);
 
         $listener = $this->createExceptionListener();
@@ -137,7 +139,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
-        $authenticationEntryPoint = null;
         $tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));

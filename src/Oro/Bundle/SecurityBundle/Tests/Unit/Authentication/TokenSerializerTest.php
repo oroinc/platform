@@ -15,10 +15,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class TokenSerializerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var TokenSerializer */
-    protected $tokenSerializer;
+    private $tokenSerializer;
 
     protected function setUp(): void
     {
@@ -101,12 +101,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user->addUserRole($role2);
         $user->addUserRole($role3);
 
-        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $organizationRepo = $this->createMock(EntityRepository::class);
+        $userRepo = $this->createMock(EntityRepository::class);
         $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturnMap([
@@ -139,12 +135,12 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider unsupportedTokenProvider
      */
-    public function testDeserializeUnsupportedToken($value)
+    public function testDeserializeUnsupportedToken(?string $value)
     {
         self::assertNull($this->tokenSerializer->deserialize($value));
     }
 
-    public function unsupportedTokenProvider()
+    public function unsupportedTokenProvider(): array
     {
         return [
             [null],
@@ -166,12 +162,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $organization = new Organization();
         $organization->setId(1);
 
-        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $organizationRepo = $this->createMock(EntityRepository::class);
+        $userRepo = $this->createMock(EntityRepository::class);
         $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturnMap([
@@ -200,12 +192,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setId(123);
 
-        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $organizationRepo = $this->createMock(EntityRepository::class);
+        $userRepo = $this->createMock(EntityRepository::class);
         $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturnMap([
