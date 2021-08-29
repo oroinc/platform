@@ -22,9 +22,6 @@ class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultUserProvider */
     private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -37,21 +34,18 @@ class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
     {
         $user = $this->getEntity(User::class, ['first_name' => 'first name']);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with('alias.key')
             ->willReturn(null);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('findOneBy')
             ->with([], ['id' => 'ASC'])
             ->willReturn($user);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
             ->with(User::class)
             ->willReturn($repository);
@@ -63,21 +57,18 @@ class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
     {
         $user = $this->getEntity(User::class, ['id' => 1, 'first_name' => 'first name']);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with('alias.key')
             ->willReturn(1);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('find')
             ->with(1)
             ->willReturn($user);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
             ->with(User::class)
             ->willReturn($repository);
@@ -89,13 +80,11 @@ class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
     {
         $user = $this->getEntity(User::class, ['id' => 2, 'first_name' => 'first name']);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with('alias.key')
             ->willReturn(1);
 
-        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('find')
@@ -106,8 +95,7 @@ class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
             ->with([], ['id' => 'ASC'])
             ->willReturn($user);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
             ->with(User::class)
             ->willReturn($repository);

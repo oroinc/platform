@@ -13,7 +13,7 @@ class OrganizationTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var Organization */
-    protected $organization;
+    private $organization;
 
     protected function setUp(): void
     {

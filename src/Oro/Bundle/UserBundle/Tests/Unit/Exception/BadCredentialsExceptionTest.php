@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Exception\BadCredentialsException;
 class BadCredentialsExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BadCredentialsException */
-    protected $exception;
+    private $exception;
 
     protected function setUp(): void
     {

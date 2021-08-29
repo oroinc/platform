@@ -9,21 +9,20 @@ use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclPrivilegeRepository|MockObject */
-    protected $privilegeRepository;
+    /** @var AclPrivilegeRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $privilegeRepository;
 
     /** @var AclManager */
-    protected $aclManager;
+    private $aclManager;
 
     /** @var AclRoleHandler */
-    protected $handler;
+    private $handler;
 
     protected function setUp(): void
     {

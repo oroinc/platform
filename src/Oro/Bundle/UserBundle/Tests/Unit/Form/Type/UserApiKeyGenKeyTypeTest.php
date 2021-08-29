@@ -9,11 +9,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class UserApiKeyGenKeyTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserApiKeyGenKeyType */
-    protected $type;
+    private $type;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->type = new UserApiKeyGenKeyType();

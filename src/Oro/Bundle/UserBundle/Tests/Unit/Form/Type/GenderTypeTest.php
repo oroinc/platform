@@ -33,7 +33,7 @@ class GenderTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {

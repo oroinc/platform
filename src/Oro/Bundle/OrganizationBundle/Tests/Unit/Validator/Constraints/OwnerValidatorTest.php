@@ -86,7 +86,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function createValidator()
     {
@@ -113,7 +113,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function createContext()
     {

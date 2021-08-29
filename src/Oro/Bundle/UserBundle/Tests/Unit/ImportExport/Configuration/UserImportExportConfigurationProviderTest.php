@@ -5,9 +5,8 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\ImportExport\Configuration;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\ImportExport\Configuration\UserImportExportConfigurationProvider;
-use PHPUnit\Framework\TestCase;
 
-class UserImportExportConfigurationProviderTest extends TestCase
+class UserImportExportConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet()
     {

@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 class AbstractUserStub extends AbstractUser
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getOrganizations(bool $onlyEnabled = false)
     {

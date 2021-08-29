@@ -55,7 +55,6 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $container */
         $container = $this->createMock(ExtendedContainerBuilder::class);
         $container->expects($this->once())
             ->method('getExtensionConfig')

@@ -25,12 +25,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class UserTypeTest extends \PHPUnit\Framework\TestCase
 {
-    private const MY_PROFILE_ROUTE    = 'oro_user_profile_update';
+    private const MY_PROFILE_ROUTE = 'oro_user_profile_update';
     private const OTHER_PROFILE_ROUTE = 'oro_user_update';
-    private const RULE_BUSINESS_UNIT  = 'oro_business_unit_view';
-    private const RULE_ORGANIZATION   = 'oro_organization_view';
-    private const RULE_GROUP          = 'oro_user_group_view';
-    private const RULE_ROLE           = 'oro_user_role_view';
+    private const RULE_BUSINESS_UNIT = 'oro_business_unit_view';
+    private const RULE_ORGANIZATION = 'oro_organization_view';
+    private const RULE_GROUP = 'oro_user_group_view';
+    private const RULE_ROLE = 'oro_user_role_view';
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;

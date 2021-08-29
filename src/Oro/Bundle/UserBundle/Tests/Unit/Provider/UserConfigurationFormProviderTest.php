@@ -17,7 +17,7 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
     protected const CONFIG_NAME = 'user_configuration';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getParentCheckboxLabel(): string
     {
@@ -25,7 +25,7 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getProvider(
         ConfigBag $configBag,
@@ -46,7 +46,7 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFilePath(string $fileName): string
     {

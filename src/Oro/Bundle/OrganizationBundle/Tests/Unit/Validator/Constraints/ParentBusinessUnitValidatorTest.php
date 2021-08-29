@@ -21,7 +21,7 @@ class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function createValidator()
     {

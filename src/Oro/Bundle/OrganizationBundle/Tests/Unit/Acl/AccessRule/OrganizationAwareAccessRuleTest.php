@@ -22,7 +22,6 @@ class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicableWithoutOrganization(): void
     {
-        /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject $criteria */
         $criteria = $this->createMock(Criteria::class);
 
         $this->tokenAccessor->expects($this->once())
@@ -35,7 +34,6 @@ class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicableWithOrganization(): void
     {
-        /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject $criteria */
         $criteria = $this->createMock(Criteria::class);
 
         $this->tokenAccessor->expects($this->once())
@@ -52,7 +50,6 @@ class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganizationId')
             ->willReturn(1);
 
-        /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject $criteria */
         $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
             ->method('andExpression')
@@ -69,7 +66,6 @@ class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganizationId')
             ->willReturn(1);
 
-        /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject $criteria */
         $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
             ->method('andExpression')

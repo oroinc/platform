@@ -11,7 +11,7 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var GenderProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $genderProvider;
 
     /** @var OroUserExtension */

@@ -84,7 +84,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
         $removeForm = $this->createMock(Form::class);
         $removeForm->expects($this->once())
             ->method('getData')
-            ->willReturn(array($removedUser));
+            ->willReturn([$removedUser]);
 
         $this->form->expects($this->exactly(2))
             ->method('get')
