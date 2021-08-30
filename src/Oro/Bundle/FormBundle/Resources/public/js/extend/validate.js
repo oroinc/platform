@@ -648,7 +648,7 @@ define(function(require, exports, module) {
             }
         },
         // ignore all invisible elements except input type=hidden, which are ':input[data-validate-element]'
-        ignore: ':hidden:not([type=hidden]), [data-validation-ignore] :input',
+        ignore: ':hidden:not([type=hidden], [data-validation-force]), [data-validation-ignore] :input',
         onfocusout: function(element) {
             if (
                 !$(element).is(':disabled, [data-validation-ignore-onblur]') &&

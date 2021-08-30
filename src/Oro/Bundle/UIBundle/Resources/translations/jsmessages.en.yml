@@ -165,9 +165,15 @@ oro:
         dropdown_main_btn_prefix: "Action"
     htmlpurifier:
         formatted_error_line: 'Line #{{ line }}: {{ message }}'
+        formatted_error: '{{ message }}'
         messages:
             'AttrValidator: Attribute removed': 'The "{{ name }}" attribute with duplicate value "{{ value }}" on "{{ tagName }}" should be removed'
             reserved_id: 'The "id" attribute values that start with "{{ id }}" are reserved, please use a different ID.'
+            invalid_styles: 'CSS syntax error "{{ reason }}" in a column: {{ column }}'
+        lock_editor:
+            title: 'The source contains invalid code.'
+            desc: 'Please click the button below to fix it.'
+            open_editor: 'Open Content Editor'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"
