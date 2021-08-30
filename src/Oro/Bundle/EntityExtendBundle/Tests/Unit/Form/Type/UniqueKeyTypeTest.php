@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
@@ -31,7 +32,7 @@ class UniqueKeyTypeTest extends TypeTestCase
                 ->addExtensions([new ValidatorExtension($validator)])
                 ->getFormFactory();
 
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 

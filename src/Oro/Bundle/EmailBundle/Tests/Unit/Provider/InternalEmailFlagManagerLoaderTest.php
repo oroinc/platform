@@ -21,20 +21,14 @@ class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expectedIsSupports
-     * @param EmailOrigin $origin
-     *
      * @dataProvider getSupportsDataProvider
      */
-    public function testSupports($expectedIsSupports, EmailOrigin $origin)
+    public function testSupports(bool $expectedIsSupports, EmailOrigin $origin)
     {
         $this->assertEquals($expectedIsSupports, $this->loader->supports($origin));
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportsDataProvider()
+    public function getSupportsDataProvider(): array
     {
         return [
             'supports' => [
@@ -50,9 +44,7 @@ class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testSelect()
     {
-        /** @var EmailFolder|\PHPUnit\Framework\MockObject\MockObject $emailFolder */
         $emailFolder = $this->createMock(EmailFolder::class);
-        /** @var OroEntityManager|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock(OroEntityManager::class);
 
         $this->assertInstanceOf(InternalEmailFlagManager::class, $this->loader->select($emailFolder, $em));

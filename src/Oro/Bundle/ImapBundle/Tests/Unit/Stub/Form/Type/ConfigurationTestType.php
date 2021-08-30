@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Stub\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
@@ -12,33 +11,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationTestType extends AbstractType
 {
     public const NAME = 'oro_imap_configuration_test';
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** ConfigManager */
-    protected $userConfigManager;
-
     /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    public function __construct(
-        TranslatorInterface $translator,
-        ConfigManager $userConfigManager,
-        TokenAccessorInterface $tokenAccessor
-    ) {
-        $this->translator = $translator;
-        $this->userConfigManager = $userConfigManager;
+    public function __construct(TokenAccessorInterface $tokenAccessor)
+    {
         $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -48,7 +35,7 @@ class ConfigurationTestType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName()
     {
@@ -56,7 +43,7 @@ class ConfigurationTestType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getBlockPrefix()
     {
@@ -64,7 +51,7 @@ class ConfigurationTestType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

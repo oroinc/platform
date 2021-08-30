@@ -53,8 +53,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $this->decisionMaker = $this
-            ->getMockBuilder(AbstractEntityOwnershipDecisionMaker::class)
+        $this->decisionMaker = $this->getMockBuilder(AbstractEntityOwnershipDecisionMaker::class)
             ->setConstructorArgs([
                 $treeProvider,
                 new ObjectIdAccessor($doctrineHelper),

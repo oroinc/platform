@@ -32,10 +32,10 @@ class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
         $role = $this->createMock(Role::class);
         $user = $this->createMock(User::class);
 
-        $user->expects($this->exactly(1))
+        $user->expects($this->once())
             ->method('addUserRole')
             ->with($role);
-        $user->expects($this->exactly(1))
+        $user->expects($this->once())
             ->method('removeUserRole')
             ->with($role);
 

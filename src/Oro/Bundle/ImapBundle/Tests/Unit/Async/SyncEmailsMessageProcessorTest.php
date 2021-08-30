@@ -28,7 +28,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Got invalid message');
 
         $message = new Message();
-        $message->setBody(json_encode(['key' => 'value']));
+        $message->setBody(json_encode(['key' => 'value'], JSON_THROW_ON_ERROR));
 
         $processor = new SyncEmailsMessageProcessor($this->createMock(MessageProducerInterface::class), $logger);
 
@@ -52,7 +52,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
             );
 
         $message = new Message();
-        $message->setBody(json_encode(['ids' => [1,2]]));
+        $message->setBody(json_encode(['ids' => [1,2]], JSON_THROW_ON_ERROR));
 
         $processor = new SyncEmailsMessageProcessor($producer, $logger);
 

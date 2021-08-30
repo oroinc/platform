@@ -18,77 +18,85 @@ use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * @SuppressWarnings(PHPMD)
  */
 class OwnerTreeProviderTest extends OrmTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
+    private const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
 
-    const ORG_1 = 1;
-    const ORG_2 = 2;
+    private const ORG_1 = 1;
+    private const ORG_2 = 2;
 
-    const MAIN_BU_1 = 10;
-    const MAIN_BU_2 = 20;
-    const BU_1      = 30;
-    const BU_1_1    = 40;
-    const BU_2      = 50;
-    const BU_2_1    = 60;
-    const BU_2_2    = 70;
+    private const MAIN_BU_1 = 10;
+    private const MAIN_BU_2 = 20;
+    private const BU_1 = 30;
+    private const BU_1_1 = 40;
+    private const BU_2 = 50;
+    private const BU_2_1 = 60;
+    private const BU_2_2 = 70;
 
-    const USER_1 = 100;
-    const USER_2 = 200;
-    const USER_3 = 300;
-    const USER_4 = 400;
-
-    /** @var OwnerTreeProvider */
-    protected $treeProvider;
+    private const USER_1 = 100;
+    private const USER_2 = 200;
+    private const USER_3 = 300;
+    private const USER_4 = 400;
 
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    /** @var MockObject|DatabaseChecker */
-    protected $databaseChecker;
+    /** @var DatabaseChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $databaseChecker;
 
-    /** @var MockObject|CacheProvider */
-    protected $cache;
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /** @var MockObject|OwnershipMetadataProviderInterface */
-    protected $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
-    /** @var MockObject|TokenStorageInterface */
-    protected $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
-    /** @var LoggerInterface|MockObject */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var OwnerTreeProvider */
+    private $treeProvider;
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver($reader, self::ENTITY_NAMESPACE);
-
         $conn = new ConnectionMock([], new DriverMock());
         $conn->setDatabasePlatform(new MySqlPlatform());
         $this->em = $this->getTestEntityManager($conn);
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(['Test' => self::ENTITY_NAMESPACE]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            self::ENTITY_NAMESPACE
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => self::ENTITY_NAMESPACE
+        ]);
 
-        /** @var ManagerRegistry|MockObject $doctrine */
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
-        $doctrine->method('getManagerForClass')->willReturn($this->em);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
 
-        $this->databaseChecker = $this->getMockBuilder(DatabaseChecker::class)->disableOriginalConstructor()->getMock();
+        $this->databaseChecker = $this->createMock(DatabaseChecker::class);
 
         $this->cache = $this->createMock(CacheProvider::class);
-        $this->cache->method('fetch')->willReturn(false);
+        $this->cache->expects($this->any())
+            ->method('fetch')
+            ->willReturn(false);
 
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->ownershipMetadataProvider->method('getUserClass')->willReturn(self::ENTITY_NAMESPACE . '\TestUser');
-        $this->ownershipMetadataProvider->method('getBusinessUnitClass')
+        $this->ownershipMetadataProvider->expects($this->any())
+            ->method('getUserClass')
+            ->willReturn(self::ENTITY_NAMESPACE . '\TestUser');
+        $this->ownershipMetadataProvider->expects($this->any())
+            ->method('getBusinessUnitClass')
             ->willReturn(self::ENTITY_NAMESPACE . '\TestBusinessUnit');
 
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -106,7 +114,7 @@ class OwnerTreeProviderTest extends OrmTestCase
 
     public function testSupportsForSupportedUser()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
@@ -119,7 +127,7 @@ class OwnerTreeProviderTest extends OrmTestCase
 
     public function testSupportsForNotSupportedUser()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
@@ -139,7 +147,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->assertFalse($this->treeProvider->supports());
     }
 
-    protected function addGetBusinessUnitsExpectation(array $businessUnits)
+    private function addGetBusinessUnitsExpectation(array $businessUnits)
     {
         $queryResult = [];
         foreach ($businessUnits as $item) {
@@ -158,7 +166,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         );
     }
 
-    protected function addGetUsersExpectation(array $users)
+    private function addGetUsersExpectation(array $users)
     {
         $queryResult = [];
         foreach ($users as $item) {
@@ -181,42 +189,42 @@ class OwnerTreeProviderTest extends OrmTestCase
         );
     }
 
-    protected function assertOwnerTreeEquals(array $expected, OwnerTree $actual)
+    private function assertOwnerTreeEquals(array $expected, OwnerTree $actual)
     {
         $a = new OwnerTreeWrappingPropertiesAccessor($actual);
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOwningOrganizationId'],
             $a->xgetUserOwningOrganizationId()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOrganizationIds'],
             $a->xgetUserOrganizationIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOwningBusinessUnitId'],
             $a->xgetUserOwningBusinessUnitId()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userBusinessUnitIds'],
             $a->xgetUserBusinessUnitIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['userOrganizationBusinessUnitIds'],
             $a->xgetUserOrganizationBusinessUnitIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['businessUnitOwningOrganizationId'],
             $a->xgetBusinessUnitOwningOrganizationId()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['assignedBusinessUnitUserIds'],
             $a->xgetAssignedBusinessUnitUserIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['subordinateBusinessUnitIds'],
             $a->xgetSubordinateBusinessUnitIds()
         );
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             $expected['organizationBusinessUnitIds'],
             $a->xgetOrganizationBusinessUnitIds()
         );
@@ -852,8 +860,11 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @dataProvider addBusinessUnitDirectCyclicRelationProvider
      */
-    public function testDirectCyclicRelationshipBetweenBusinessUnits($src, $expected, $criticalMessageArguments)
-    {
+    public function testDirectCyclicRelationshipBetweenBusinessUnits(
+        array $src,
+        array $expected,
+        array $criticalMessageArguments
+    ) {
         $this->logger->expects($this->once())
             ->method('critical')
             ->with(
@@ -885,8 +896,11 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @dataProvider addBusinessUnitNotDirectCyclicRelationProvider
      */
-    public function testNotDirectCyclicRelationshipBetweenBusinessUnits($src, $expected, $criticalMessageArguments)
-    {
+    public function testNotDirectCyclicRelationshipBetweenBusinessUnits(
+        array $src,
+        array $expected,
+        array $criticalMessageArguments
+    ) {
         $this->logger->expects($this->exactly(count($criticalMessageArguments)))
             ->method('critical')
             ->withConsecutive(
@@ -925,10 +939,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function addBusinessUnitDirectCyclicRelationProvider()
+    public function addBusinessUnitDirectCyclicRelationProvider(): array
     {
         return [
             'direct cyclic relationship' => [
@@ -954,10 +965,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function addBusinessUnitNotDirectCyclicRelationProvider()
+    public function addBusinessUnitNotDirectCyclicRelationProvider(): array
     {
         return [
             'not direct cyclic relationship' => [

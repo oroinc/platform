@@ -151,7 +151,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $emailAttachment = $this->emailAttachmentTransformer->attachmentEntityToEntity($attachment);
 
         $this->assertInstanceOf(EmailAttachment::class, $emailAttachment);
-        $this->assertEquals($emailAttachment->getId(), null);
+        $this->assertEquals(null, $emailAttachment->getId());
         $this->assertInstanceOf(EmailAttachmentContent::class, $emailAttachment->getContent());
         $this->assertEquals(base64_encode('content'), $emailAttachment->getContent()->getContent());
         $this->assertEquals('base64', $emailAttachment->getContent()->getContentTransferEncoding());
@@ -188,7 +188,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(base64_encode($fileContent), $content->getContent());
         $this->assertEquals('base64', $content->getContentTransferEncoding());
 
-        $this->assertEquals($emailAttachment->getContentType(), 'text/plain');
-        $this->assertEquals($emailAttachment->getFileName(), 'test.txt');
+        $this->assertEquals('text/plain', $emailAttachment->getContentType());
+        $this->assertEquals('test.txt', $emailAttachment->getFileName());
     }
 }

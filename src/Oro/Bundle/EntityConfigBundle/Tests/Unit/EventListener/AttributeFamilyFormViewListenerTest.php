@@ -11,44 +11,30 @@ use Twig\Environment;
 
 class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /**
-     * @var \Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener
-     */
-    protected $listener;
+    /** @var AttributeFamilyFormViewListener */
+    private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($id) {
-                    return $id . '.trans';
-                }
-            );
+            ->willReturnCallback(function ($id) {
+                return $id . '.trans';
+            });
 
         $this->environment = $this->createMock(Environment::class);
 
         $this->listener = new AttributeFamilyFormViewListener($this->translator);
     }
 
-    /**
-     * @return array
-     */
-    public function onEditDataProvider()
+    public function onEditDataProvider(): array
     {
         return [
             'empty template' => [

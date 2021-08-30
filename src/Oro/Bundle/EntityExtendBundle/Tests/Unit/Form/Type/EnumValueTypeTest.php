@@ -2,16 +2,22 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
 use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -26,12 +32,10 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 class EnumValueTypeTest extends TypeTestCase
 {
     /** @var EnumValueType */
-    protected $type;
+    private $type;
 
-    /**
-     * @var ConstraintValidatorInterface[]
-     */
-    protected $validators;
+    /** @var ConstraintValidatorInterface[] */
+    private $validators;
 
     protected function setUp(): void
     {
@@ -39,6 +43,9 @@ class EnumValueTypeTest extends TypeTestCase
         parent::setUp();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getExtensions()
     {
         $validator = new RecursiveValidator(
@@ -99,12 +106,12 @@ class EnumValueTypeTest extends TypeTestCase
         $this->assertCount(2, $nameConstraints);
 
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\NotBlank',
+            NotBlank::class,
             $nameConstraints[0]
         );
 
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\Length',
+            Length::class,
             $nameConstraints[1]
         );
         $this->assertEquals(255, $nameConstraints[1]->max);
@@ -159,10 +166,7 @@ class EnumValueTypeTest extends TypeTestCase
         $this->assertSame($expectedData['allow_delete'], $view->vars['allow_delete']);
     }
 
-    /**
-     * @return array
-     */
-    public function allowDeleteProvider()
+    public function allowDeleteProvider(): array
     {
         return [
             'no config' => [
@@ -248,10 +252,7 @@ class EnumValueTypeTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             'valid data' => [
@@ -318,30 +319,9 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @param array                                    $data
-     * @param \PHPUnit\Framework\MockObject\MockObject $form
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormEvent($data, $form = null)
-    {
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->once())
-            ->method('getForm')
-            ->will($this->returnValue($form));
-        $event->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($data));
-
-        return $event;
-    }
-
-    /**
      * @return RecursiveValidator
      */
-    protected function getValidator()
+    private function getValidator()
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
@@ -350,27 +330,26 @@ class EnumValueTypeTest extends TypeTestCase
                 $this->loadMetadata($meta);
             });
 
-        $validator = new RecursiveValidator(
+        return new RecursiveValidator(
             new ExecutionContextFactory(new IdentityTranslator()),
             new LazyLoadingMetadataFactory($loader),
             $this->getConstraintValidatorFactory()
         );
-
-        return $validator;
     }
 
-    protected function loadMetadata(ClassMetadata $meta)
+    private function loadMetadata(ClassMetadata $meta)
     {
-        if (false !== ($configFile = $this->getConfigFile($meta->name))) {
+        $configFile = $this->getConfigFile($meta->name);
+        if ($configFile) {
             $loader = new YamlFileLoader($configFile);
             $loader->loadClassMetadata($meta);
         }
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface
+     * @return ConstraintValidatorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getConstraintValidatorFactory()
+    private function getConstraintValidatorFactory()
     {
         $factory = $this->createMock(ConstraintValidatorFactoryInterface::class);
         $factory->expects($this->any())
@@ -390,100 +369,77 @@ class EnumValueTypeTest extends TypeTestCase
         return $factory;
     }
 
-    /**
-     * @param string $class
-     * @return string
-     */
-    protected function getConfigFile($class)
+    private function getConfigFile(string $class): ?string
     {
-        if (false !== ($path = $this->getBundleRootPath($class))) {
+        $path = $this->getBundleRootPath($class);
+        if ($path) {
             $path .= '/Resources/config/validation.yml';
-
             if (!is_readable($path)) {
-                $path = false;
+                $path = null;
             }
         }
 
         return $path;
     }
 
-    /**
-     * @param string $class
-     * @return string
-     */
-    protected function getBundleRootPath($class)
+    private function getBundleRootPath(string $class): ?string
     {
-        $rclass = new \ReflectionClass($class);
-
-        $path = false;
-
-        if (false !== ($pos = strrpos($rclass->getFileName(), 'Bundle'))) {
-            $path = substr($rclass->getFileName(), 0, $pos) . 'Bundle';
+        $refl = new \ReflectionClass($class);
+        $path = null;
+        $pos = strrpos($refl->getFileName(), 'Bundle');
+        if (false !== $pos) {
+            $path = substr($refl->getFileName(), 0, $pos) . 'Bundle';
         }
 
         return $path;
     }
 
     /**
-     * @param boolean $hasConfig
-     * @param string $enumCode
-     * @param string[] $immutableCodes
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getConfigProvider($hasConfig = false, $enumCode = '', array $immutableCodes = [])
+    private function getConfigProvider(bool $hasConfig = false, string $enumCode = '', array $immutableCodes = [])
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->any())
             ->method('hasConfigById')
-            ->will($this->returnValue($hasConfig));
+            ->willReturn($hasConfig);
 
         if ($hasConfig) {
-            $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-                ->disableOriginalConstructor()
-                ->getMock();
-
+            $config = $this->createMock(Config::class);
             $config->expects($this->any())
                 ->method('get')
-                ->will($this->returnValueMap([
-                   ['enum_code', false, null, $enumCode],
-                   ['immutable_codes', false, [], $immutableCodes],
-                ]));
+                ->willReturnMap([
+                    ['enum_code', false, null, $enumCode],
+                    ['immutable_codes', false, [], $immutableCodes],
+                ]);
 
             $configProvider->expects($this->any())
                 ->method('getConfigById')
-                ->will($this->returnValue($config));
+                ->willReturn($config);
 
             $configProvider->expects($this->any())
                 ->method('getConfig')
-                ->will($this->returnValue($config));
+                ->willReturn($config);
         }
 
         return $configProvider;
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getConfiguredForm()
+    private function getConfiguredForm()
     {
         $configId = new FieldConfigId('enum', 'Test\Entity', 'status', 'enum');
-        $formConfig = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getOption')
-            ->will($this->returnValue($configId));
+            ->willReturn($configId);
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
 
         return $form;
     }

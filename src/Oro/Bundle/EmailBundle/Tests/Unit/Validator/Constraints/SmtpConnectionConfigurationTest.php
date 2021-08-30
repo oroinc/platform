@@ -10,7 +10,7 @@ class SmtpConnectionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTargets()
     {
-        static::assertSame(
+        self::assertSame(
             Constraint::CLASS_CONSTRAINT,
             (new SmtpConnectionConfiguration())->getTargets()
         );
@@ -18,7 +18,7 @@ class SmtpConnectionConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testValidatedBy()
     {
-        static::assertSame(
+        self::assertSame(
             SmtpConnectionConfigurationValidator::class,
             (new SmtpConnectionConfiguration())->validatedBy()
         );

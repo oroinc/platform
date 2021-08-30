@@ -47,12 +47,11 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->setConstructorArgs([[], new DriverMock()])
             ->getMock();
 
-        $metadataDriver = new AnnotationDriver(
+        $this->em = $this->getTestEntityManager($this->connection);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
             new AnnotationReader(),
             'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub'
-        );
-        $this->em = $this->getTestEntityManager($this->connection);
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        ));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Stub' => 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub'
         ]);

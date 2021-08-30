@@ -12,20 +12,20 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const SOME_CLASS = \stdClass::class;
-    const UNDEFINED_CLASS = 'UndefinedClass';
+    private const SOME_CLASS = \stdClass::class;
+    private const UNDEFINED_CLASS = 'UndefinedClass';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
-    protected $cache;
+    private $cache;
 
     /** @var OwnershipMetadataProviderStub */
-    protected $provider;
+    private $provider;
 
     /** @var Config */
-    protected $config;
+    private $config;
 
     protected function setUp(): void
     {

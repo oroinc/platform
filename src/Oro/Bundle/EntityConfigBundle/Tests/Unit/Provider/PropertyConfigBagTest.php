@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 class PropertyConfigBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PropertyConfigBag */
-    protected $propertyConfigBag;
+    private $propertyConfigBag;
 
     protected function setUp(): void
     {

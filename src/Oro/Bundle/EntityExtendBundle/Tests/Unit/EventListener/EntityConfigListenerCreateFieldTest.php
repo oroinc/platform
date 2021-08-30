@@ -7,10 +7,11 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
 {
-    const ENTITY_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
+    private const ENTITY_CLASS_NAME = User::class;
 
     public function testCreateNewField()
     {
@@ -24,7 +25,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
-            ->will($this->returnValue($entityConfig));
+            ->willReturn($entityConfig);
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
@@ -52,7 +53,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
-            ->will($this->returnValue($entityConfig));
+            ->willReturn($entityConfig);
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
@@ -87,7 +88,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
-            ->will($this->returnValue($entityConfig));
+            ->willReturn($entityConfig);
 
         $event = new RenameFieldEvent(self::ENTITY_CLASS_NAME, 'testField', 'newName', $this->configManager);
 

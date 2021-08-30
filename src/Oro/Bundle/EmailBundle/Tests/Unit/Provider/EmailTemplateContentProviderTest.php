@@ -15,22 +15,24 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Twig\Error\Error;
 
 class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    /** @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    private EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject $repository;
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailRenderer;
 
-    private EmailRenderer|\PHPUnit\Framework\MockObject\MockObject $emailRenderer;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
-    private EmailTemplateContentProvider $provider;
+    /** @var EmailTemplateContentProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -51,6 +53,17 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
             new PropertyAccessor(),
             $this->logger
         );
+    }
+
+    private function getLocalization(int $id, Localization $parentLocalization = null): Localization
+    {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+        if (null !== $parentLocalization) {
+            $localization->setParentLocalization($parentLocalization);
+        }
+
+        return $localization;
     }
 
     /**
@@ -123,20 +136,9 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $criteria = new EmailTemplateCriteria('test_template');
         $templateParams = ['any-key' => 'any-val'];
 
-        /** @var Localization $localizationRoot */
-        $localizationRoot = $this->getEntity(Localization::class, ['id' => 1]);
-
-        /** @var Localization $localizationChildrenA */
-        $localizationChildrenA = $this->getEntity(
-            Localization::class,
-            ['id' => 2, 'parentLocalization' => $localizationRoot]
-        );
-
-        /** @var Localization $localizationChildrenB */
-        $localizationChildrenB = $this->getEntity(
-            Localization::class,
-            ['id' => 3, 'parentLocalization' => $localizationChildrenA]
-        );
+        $localizationRoot = $this->getLocalization(1);
+        $localizationChildrenA = $this->getLocalization(2, $localizationRoot);
+        $localizationChildrenB = $this->getLocalization(3, $localizationChildrenA);
 
         $emailTemplate = new EmailTemplate();
         $emailTemplate
@@ -161,12 +163,10 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->emailRenderer->expects(self::once())
             ->method('compileMessage')
             ->with(
-                $this->equalTo(
-                    (new EmailTemplateModel())
-                        ->setType(EmailTemplateModel::CONTENT_TYPE_HTML)
-                        ->setSubject('Localized subject')
-                        ->setContent('Default content')
-                ),
+                (new EmailTemplateModel())
+                    ->setType(EmailTemplateModel::CONTENT_TYPE_HTML)
+                    ->setSubject('Localized subject')
+                    ->setContent('Default content'),
                 $templateParams
             )
             ->willReturn([

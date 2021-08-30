@@ -22,14 +22,9 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultUserSystemConfigListener */
     private $listener;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->defaultUserProvider = $this->createMock(DefaultUserProvider::class);
@@ -47,14 +42,12 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
 
         $userRepository = $this->getUserRepository($id, $owner);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
             ->with(User::class)
             ->willReturn($userRepository);
 
-        $this->defaultUserProvider
-            ->expects($this->never())
+        $this->defaultUserProvider->expects($this->never())
             ->method('getDefaultUser');
 
         $event = $this->getEvent([$key => ['value' => $id]]);
@@ -68,12 +61,10 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
         $key = $this->getConfigKey();
         $owner = new User();
 
-        $this->doctrineHelper
-            ->expects($this->never())
+        $this->doctrineHelper->expects($this->never())
             ->method('getEntityRepositoryForClass');
 
-        $this->defaultUserProvider
-            ->expects($this->once())
+        $this->defaultUserProvider->expects($this->once())
             ->method('getDefaultUser')
             ->with('alias', 'config_key')
             ->willReturn($owner);
@@ -92,14 +83,12 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
 
         $userRepository = $this->getUserRepository($id, null);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
             ->with(User::class)
             ->willReturn($userRepository);
 
-        $this->defaultUserProvider
-            ->expects($this->once())
+        $this->defaultUserProvider->expects($this->once())
             ->method('getDefaultUser')
             ->with('alias', 'config_key')
             ->willReturn($owner);
@@ -149,7 +138,6 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
      */
     private function getEvent(array $settings)
     {
-        /** @var ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
 
         return new ConfigSettingsUpdateEvent($configManager, $settings);
@@ -172,8 +160,7 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
     private function getUserRepository(int $id, User $user = null)
     {
         $userRepository = $this->createMock(EntityRepository::class);
-        $userRepository
-            ->expects($this->once())
+        $userRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['id' => $id])
             ->willReturn($user);

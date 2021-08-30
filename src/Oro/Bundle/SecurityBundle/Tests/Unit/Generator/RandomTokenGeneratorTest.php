@@ -6,14 +6,9 @@ use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 
 class RandomTokenGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RandomTokenGenerator
-     */
+    /** @var RandomTokenGenerator */
     private $generator;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->generator = new RandomTokenGenerator();

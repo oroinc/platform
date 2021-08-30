@@ -13,10 +13,10 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     private const ON  = '*';
 
     /** @var int */
-    protected $identity;
+    private $identity;
 
     /** @var EntityMaskBuilder */
-    protected $builder;
+    private $builder;
 
     protected function setUp(): void
     {
@@ -24,17 +24,10 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder = new EntityMaskBuilder($this->identity, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->builder, $this->identity);
-    }
-
     /**
      * @dataProvider maskConstantProvider
-     *
-     * @param int $mask
      */
-    public function testMaskConstant($mask)
+    public function testMaskConstant(string $mask)
     {
         $count = 0;
         $bitmask = decbin($this->builder->getMask($mask) & EntityMaskBuilder::REMOVE_SERVICE_BITS);
@@ -49,11 +42,8 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addAndRemoveProvider
-     *
-     * @param string $maskName
-     * @param int $mask
      */
-    public function testAddAndRemove($maskName, $mask)
+    public function testAddAndRemove(string|int $maskName, int $mask)
     {
         $this->builder->add($maskName);
         $this->assertEquals($mask | $this->identity, $this->builder->get());
@@ -111,11 +101,8 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider groupProvider
-     *
-     * @param string $groupName
-     * @param int $expectedMask
      */
-    public function testGroup($groupName, $expectedMask)
+    public function testGroup(string $groupName, int $expectedMask)
     {
         $groupMask = $this->builder->getMask($groupName);
 
@@ -126,10 +113,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public static function addAndRemoveProvider()
+    public static function addAndRemoveProvider(): array
     {
         return [
             ['VIEW_BASIC', 1],
@@ -181,10 +165,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function maskConstantProvider()
+    public static function maskConstantProvider(): array
     {
         return [
             ['MASK_VIEW_BASIC'],
@@ -205,10 +186,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function groupProvider()
+    public static function groupProvider(): array
     {
         return [
             'GROUP_BASIC' => [
@@ -262,11 +240,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int $index
-     * @return int
-     */
-    protected static function getIdentity($index)
+    private static function getIdentity(int $index): int
     {
         return $index << (count(AccessLevel::$allAccessLevelNames) * EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
     }

@@ -60,7 +60,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getExtensions()
     {

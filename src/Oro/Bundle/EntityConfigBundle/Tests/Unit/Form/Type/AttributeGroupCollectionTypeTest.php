@@ -21,11 +21,11 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
      */
     public function getExtensions()
     {
-        $attributeManagerMock = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeManagerMock = $this->createMock(AttributeManager::class);
 
-        $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
+        $attributeManagerMock->expects($this->any())
+            ->method('getActiveAttributesByClass')
+            ->willReturn([]);
 
         return [
             new PreloadedExtension([

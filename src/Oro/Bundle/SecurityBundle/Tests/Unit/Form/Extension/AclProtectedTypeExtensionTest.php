@@ -15,11 +15,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'AcmeEntity';
+    private const CLASS_NAME = 'AcmeEntity';
 
-    /**
-     * @var AclProtectedTypeExtension
-     */
+    /** @var AclProtectedTypeExtension */
     private $extension;
 
     protected function setUp(): void

@@ -31,23 +31,18 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
     private $localizationManager;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions(): array
     {
-        /** @var TranslatorInterface $translator */
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
-        /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider */
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
@@ -56,7 +51,6 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
         $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
         $htmlTagHelper->setTranslator($this->translator);
 
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
         return [

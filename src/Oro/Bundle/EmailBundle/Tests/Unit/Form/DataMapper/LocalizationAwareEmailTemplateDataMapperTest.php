@@ -6,14 +6,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormInterface;
 
 class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translationsForm;
 
@@ -32,12 +31,18 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
     protected function setUp(): void
     {
         $this->translationsForm = $this->createMock(FormInterface::class);
-        $this->translationsForm->expects($this->any())->method('getName')->willReturn('translations');
+        $this->translationsForm->expects($this->any())
+            ->method('getName')
+            ->willReturn('translations');
 
         $this->anotherForm = $this->createMock(FormInterface::class);
-        $this->anotherForm->expects($this->any())->method('getName')->willReturn('another_form');
-        $this->anotherForm->expects($this->never())->method('setData');
-        $this->anotherForm->expects($this->never())->method('getData');
+        $this->anotherForm->expects($this->any())
+            ->method('getName')
+            ->willReturn('another_form');
+        $this->anotherForm->expects($this->never())
+            ->method('setData');
+        $this->anotherForm->expects($this->never())
+            ->method('getData');
 
         $this->forms = new \ArrayIterator([
             $this->anotherForm,
@@ -49,18 +54,29 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
         $this->dataMapper = new LocalizationAwareEmailTemplateDataMapper($this->innerDataMapper);
     }
 
+    private function getLocalization(int $id): Localization
+    {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+
+        return $localization;
+    }
+
     public function testMapDataToFormsWithNullData(): void
     {
-        $this->translationsForm->expects($this->never())->method('getName');
-        $this->anotherForm->expects($this->never())->method('getName');
-        $this->innerDataMapper->expects($this->never())->method('mapFormsToData');
+        $this->translationsForm->expects($this->never())
+            ->method('getName');
+        $this->anotherForm->expects($this->never())
+            ->method('getName');
+        $this->innerDataMapper->expects($this->never())
+            ->method('mapFormsToData');
 
         $this->dataMapper->mapDataToForms(null, $this->forms);
     }
 
     public function testMapDataToFormsWithIncorrectData(): void
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\EmailBundle\Entity\EmailTemplate", "array" given'
         );
@@ -70,8 +86,7 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
 
     public function testMapDataToFormsWithValidData(): void
     {
-        /** @var Localization $existLocalization */
-        $existLocalization = $this->getEntity(Localization::class, ['id' => 42]);
+        $existLocalization = $this->getLocalization(42);
         $existTemplateLocalization = $this->getEmailTemplateTranslation($existLocalization, 'Exist localization');
 
         $emailTemplate = (new EmailTemplate())
@@ -97,9 +112,12 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
 
     public function testMapFormsToDataWithNullData(): void
     {
-        $this->translationsForm->expects($this->never())->method('getName');
-        $this->anotherForm->expects($this->never())->method('getName');
-        $this->innerDataMapper->expects($this->never())->method('mapFormsToData');
+        $this->translationsForm->expects($this->never())
+            ->method('getName');
+        $this->anotherForm->expects($this->never())
+            ->method('getName');
+        $this->innerDataMapper->expects($this->never())
+            ->method('mapFormsToData');
 
         $data = null;
         $this->dataMapper->mapFormsToData($this->forms, $data);
@@ -107,7 +125,7 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
 
     public function testMapFormsToDataWithIncorrectData(): void
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\EmailBundle\Entity\EmailTemplate", "array" given'
         );
@@ -118,12 +136,10 @@ class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\Te
 
     public function testMapFormsToDataWithValidData(): void
     {
-        /** @var Localization $newLocalization */
-        $newLocalization = $this->getEntity(Localization::class, ['id' => 28]);
+        $newLocalization = $this->getLocalization(28);
         $newTemplateLocalizationData = $this->getEmailTemplateTranslation($newLocalization, 'New localization');
 
-        /** @var Localization $existLocalization */
-        $existLocalization = $this->getEntity(Localization::class, ['id' => 42]);
+        $existLocalization = $this->getLocalization(42);
         $existTemplateLocalizationData = $this->getEmailTemplateTranslation(
             $existLocalization,
             'Exist localization updated'

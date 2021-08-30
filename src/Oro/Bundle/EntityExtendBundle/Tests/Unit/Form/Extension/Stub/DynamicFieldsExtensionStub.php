@@ -8,10 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicFieldsExtensionStub extends DynamicFieldsOptionsExtension
 {
-    /**
-     * @var array
-     */
-    private $fieldsConfiguration;
+    private array $fieldsConfiguration;
 
     public function __construct(array $fieldsConfiguration)
     {

@@ -25,9 +25,6 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $relationFullName;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
@@ -52,7 +49,8 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
-        $statement->expects($this->never())->method('execute');
+        $statement->expects($this->never())
+            ->method('execute');
 
         $this->query->setConnection($this->connection);
 
@@ -88,7 +86,9 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
-        $statement->expects($this->once())->method('execute')->with(['data serialized payload to persist', '42']);
+        $statement->expects($this->once())
+            ->method('execute')
+            ->with(['data serialized payload to persist', '42']);
 
         $logger = new ArrayLogger;
 
@@ -124,7 +124,6 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
         $logger->expects($this->exactly(3))
@@ -156,7 +155,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
      * @param $value
      * @return Statement|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function setUpConnection($key, $value)
+    private function setUpConnection($key, $value)
     {
         $this->connection->expects($this->once())
             ->method('convertToPHPValue')

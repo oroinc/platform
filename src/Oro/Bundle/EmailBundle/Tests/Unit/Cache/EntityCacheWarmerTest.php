@@ -87,10 +87,10 @@ class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
         $fs->expects($this->once())
             ->method('exists')
-            ->with($this->equalTo('SomeDir'));
+            ->with('SomeDir');
         $fs->expects($this->once())
             ->method('mkdir')
-            ->with($this->equalTo('SomeDir'), $this->equalTo(0777));
+            ->with('SomeDir', 0777);
 
         $twig->expects($this->exactly(2))
             ->method('render')

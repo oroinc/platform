@@ -27,18 +27,18 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     private const NAME = 'Sample Name';
 
     /** @var BusinessUnitType */
-    protected $form;
+    private $form;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $businessUnitManager = $this->createMock(BusinessUnitManager::class);
-        $businessUnitManager
+        $businessUnitManager->expects($this->any())
             ->method('getBusinessUnitsTree')
             ->willReturn([]);
 
-        $businessUnitManager
+        $businessUnitManager->expects($this->any())
             ->method('getBusinessUnitIds')
             ->willReturn([]);
 
@@ -46,31 +46,30 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions(): array
     {
         $registry = $this->createMock(ManagerRegistry::class);
-        $registry
+        $registry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
-        $entityManager
+        $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($classMetadata = new ClassMetadata(User::class));
         $classMetadata->setIdentifier(['id']);
 
-        /** @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject $searchRegistry */
         $searchRegistry = $this->createMock(SearchRegistry::class);
-        $searchRegistry
+        $searchRegistry->expects($this->any())
             ->method('getSearchHandler')
             ->willReturn($handler = $this->createMock(SearchHandlerInterface::class));
 
-        $handler
+        $handler->expects($this->any())
             ->method('getProperties')
             ->willReturn([]);
 
-        $handler
+        $handler->expects($this->any())
             ->method('getEntityName')
             ->willReturn(BusinessUnit::class);
 
@@ -97,7 +96,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getValidators()
     {
@@ -109,15 +108,9 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     public function testConfigureOptions()
     {
         $optionResolver = $this->createMock(OptionsResolver::class);
-        $optionResolver
-            ->expects($this->once())
+        $optionResolver->expects($this->once())
             ->method('setDefaults')
-            ->with(
-                [
-                    'data_class' => BusinessUnit::class,
-                    'ownership_disabled' => true,
-                ]
-            );
+            ->with(['data_class' => BusinessUnit::class, 'ownership_disabled' => true]);
 
         $this->form->configureOptions($optionResolver);
     }
@@ -125,8 +118,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     public function testBuildForm()
     {
         $builder = $this->createMock(FormBuilder::class);
-
-        $builder
+        $builder->expects($this->any())
             ->method('add')
             ->willReturnSelf();
 

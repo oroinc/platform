@@ -2,77 +2,75 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class EmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
 {
     private function getEmailOwnerProviderStorageMock(array $providers)
     {
-        $storage = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage');
+        $storage = $this->createMock(EmailOwnerProviderStorage::class);
         $storage->expects($this->any())
             ->method('getProviders')
-            ->will($this->returnValue($providers));
+            ->willReturn($providers);
 
         return $storage;
     }
 
     public function testFindEmailOwnerFirstProvider()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $result = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface');
-        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $em = $this->createMock(EntityManager::class);
+        $result = $this->createMock(EmailOwnerInterface::class);
+        $provider1 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider1->expects($this->once())
             ->method('findEmailOwner')
-            ->with($this->identicalTo($em), $this->equalTo('test'))
-            ->will($this->returnValue($result));
-        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+            ->with($this->identicalTo($em), 'test')
+            ->willReturn($result);
+        $provider2 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider2->expects($this->never())
             ->method('findEmailOwner');
 
-        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
+        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock([$provider1, $provider2]));
         $this->assertEquals($result, $provider->findEmailOwner($em, 'test'));
     }
 
     public function testFindEmailOwnerSecondProvider()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $result = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface');
-        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $em = $this->createMock(EntityManager::class);
+        $result = $this->createMock(EmailOwnerInterface::class);
+        $provider1 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider1->expects($this->once())
             ->method('findEmailOwner')
-            ->with($this->identicalTo($em), $this->equalTo('test'))
-            ->will($this->returnValue(null));
-        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+            ->with($this->identicalTo($em), 'test')
+            ->willReturn(null);
+        $provider2 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider2->expects($this->once())
             ->method('findEmailOwner')
-            ->with($this->identicalTo($em), $this->equalTo('test'))
-            ->will($this->returnValue($result));
+            ->with($this->identicalTo($em), 'test')
+            ->willReturn($result);
 
-        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
+        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock([$provider1, $provider2]));
         $this->assertEquals($result, $provider->findEmailOwner($em, 'test'));
     }
 
     public function testFindEmailOwnerNotFound()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $em = $this->createMock(EntityManager::class);
+        $provider1 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider1->expects($this->once())
             ->method('findEmailOwner')
-            ->with($this->identicalTo($em), $this->equalTo('test'))
-            ->will($this->returnValue(null));
-        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+            ->with($this->identicalTo($em), 'test')
+            ->willReturn(null);
+        $provider2 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider2->expects($this->once())
             ->method('findEmailOwner')
-            ->with($this->identicalTo($em), $this->equalTo('test'))
-            ->will($this->returnValue(null));
+            ->with($this->identicalTo($em), 'test')
+            ->willReturn(null);
 
-        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
+        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock([$provider1, $provider2]));
         $this->assertNull($provider->findEmailOwner($em, 'test'));
     }
 }

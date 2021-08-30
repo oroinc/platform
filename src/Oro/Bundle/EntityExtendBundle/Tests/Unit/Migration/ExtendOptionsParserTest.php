@@ -13,24 +13,19 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
  */
 class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityMetadataHelper;
-
     /** @var ExtendOptionsParser */
-    protected $extendOptionsParser;
+    private $extendOptionsParser;
 
     protected function setUp(): void
     {
-        $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
-        $this->entityMetadataHelper->expects($this->any())
+        $entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
+        $entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
-            ->willReturnMap(
-                [
-                    ['table1', ['Test\Entity1']],
-                    ['table2', ['Test\Entity2']],
-                ]
-            );
-        $this->entityMetadataHelper->expects($this->any())
+            ->willReturnMap([
+                ['table1', ['Test\Entity1']],
+                ['table2', ['Test\Entity2']],
+            ]);
+        $entityMetadataHelper->expects($this->any())
             ->method('isEntityClassContainsColumn')
             ->with('Test\Entity1', 'column1')
             ->willReturn(true);
@@ -38,7 +33,7 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('hasConfig')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
         $entityExtendConfigurationProvider->expects(self::any())
@@ -46,7 +41,7 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
 
         $this->extendOptionsParser = new ExtendOptionsParser(
-            $this->entityMetadataHelper,
+            $entityMetadataHelper,
             new FieldTypeHelper($entityExtendConfigurationProvider),
             $configManager
         );
@@ -55,13 +50,13 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseOptionsProvider
      */
-    public function testParseOptions($options, $expected)
+    public function testParseOptions(array $options, array $expected)
     {
         $result = $this->extendOptionsParser->parseOptions($options);
         $this->assertEquals($expected, $result);
     }
 
-    public function parseOptionsProvider()
+    public function parseOptionsProvider(): array
     {
         return [
             [

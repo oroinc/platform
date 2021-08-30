@@ -5,20 +5,19 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
+use Symfony\Component\Form\Test\FormBuilderInterface;
 
 class EnumFieldConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EnumFieldConfigExtension */
-    protected $extension;
+    private $extension;
 
     /** @var EnumFieldConfigSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
     protected function setUp(): void
     {
-        $this->subscriber = $this->getMockBuilder(EnumFieldConfigSubscriber::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->subscriber = $this->createMock(EnumFieldConfigSubscriber::class);
 
         $this->extension = new EnumFieldConfigExtension($this->subscriber);
     }
@@ -30,7 +29,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock(FormBuilderInterface::class);
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')

@@ -26,19 +26,14 @@ class OrmRelatedTestCase extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
+        ]);
 
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->doctrine->expects(self::any())

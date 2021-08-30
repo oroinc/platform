@@ -8,15 +8,12 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
 class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurablePermissionProvider */
-    private $provider;
-
     /** @var ConfigurablePermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationProvider;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var ConfigurablePermissionProvider */
+    private $provider;
+
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurablePermissionConfigurationProvider::class);
@@ -26,12 +23,8 @@ class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getDataProvider
-     *
-     * @param string $name
-     * @param array $data
-     * @param ConfigurablePermission $expected
      */
-    public function testGet($name, array $data, ConfigurablePermission $expected)
+    public function testGet(string $name, array $data, ConfigurablePermission $expected)
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
@@ -40,10 +33,7 @@ class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->get($name));
     }
 
-    /**
-     * @return array
-     */
-    public function getDataProvider()
+    public function getDataProvider(): array
     {
         $name = 'test_name';
         $default = true;

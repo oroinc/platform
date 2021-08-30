@@ -9,6 +9,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Bundle\UserBundle\Security\UserProvider;
 use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UserProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,7 +55,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadUserForNotExistingUsername()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException::class);
+        $this->expectException(UsernameNotFoundException::class);
         $username = 'foobar';
         $this->userLoader->expects(self::once())
             ->method('loadUser')
@@ -65,7 +67,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testRefreshUserNotFound()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException::class);
+        $this->expectException(UsernameNotFoundException::class);
         $user = $this->createMock(self::USER_CLASS);
         $user->expects(self::any())
             ->method('getId')
@@ -135,7 +137,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testRefreshUserNotOroUser()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\UnsupportedUserException::class);
+        $this->expectException(UnsupportedUserException::class);
         $this->expectExceptionMessage('Expected an instance of Oro\Bundle\UserBundle\Entity\User, but got');
 
         $user = $this->createMock(RegularUser::class);

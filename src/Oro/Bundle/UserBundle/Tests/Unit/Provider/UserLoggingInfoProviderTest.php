@@ -9,15 +9,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserLoggingInfoProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
     /** @var UserLoggingInfoProvider */
     private $provider;
-
-    /** @var RequestStack */
-    private $requestStack;
 
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
+
         $this->provider = new UserLoggingInfoProvider($this->requestStack);
     }
 

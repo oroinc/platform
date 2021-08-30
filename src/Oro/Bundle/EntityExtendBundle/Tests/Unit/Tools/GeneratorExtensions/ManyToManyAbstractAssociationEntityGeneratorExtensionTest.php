@@ -8,14 +8,13 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 use Oro\Component\PhpUtils\ClassGenerator;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const ASSOCIATION_KIND = 'test';
 
-    /** @var AbstractAssociationEntityGeneratorExtension|MockObject */
-    protected $extension;
+    /** @var AbstractAssociationEntityGeneratorExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -28,8 +27,12 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
             true,
             ['getAssociationKind', 'getAssociationType']
         );
-        $this->extension->method('getAssociationKind')->willReturn(self::ASSOCIATION_KIND);
-        $this->extension->method('getAssociationType')->willReturn(RelationType::MANY_TO_MANY);
+        $this->extension->expects($this->any())
+            ->method('getAssociationKind')
+            ->willReturn(self::ASSOCIATION_KIND);
+        $this->extension->expects($this->any())
+            ->method('getAssociationType')
+            ->willReturn(RelationType::MANY_TO_MANY);
     }
 
     /**
@@ -37,7 +40,7 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
      */
     public function testSupports(array $schemas, bool $expected)
     {
-        static::assertEquals($expected, $this->extension->supports($schemas));
+        self::assertEquals($expected, $this->extension->supports($schemas));
     }
 
     public function supportsProvider(): array
@@ -186,6 +189,6 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
         $this->extension->generate($schema, $class);
         $expectedCode = \file_get_contents(__DIR__ . '/../Fixtures/many_to_many_association.txt');
 
-        static::assertEquals(\trim($expectedCode), \trim($class->print()));
+        self::assertEquals(\trim($expectedCode), \trim($class->print()));
     }
 }

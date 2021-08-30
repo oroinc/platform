@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -15,22 +16,22 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
     const FORM_DATA = ['field' => 'value'];
 
     /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
+    private $form;
 
     /** @var Request */
-    protected $request;
+    private $request;
 
     /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailProcessor;
+    private $emailProcessor;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var EmailHandler */
-    protected $handler;
+    private $handler;
 
     /** @var Email */
-    protected $model;
+    private $model;
 
     protected function setUp(): void
     {
@@ -110,7 +111,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 
             $this->form->expects($this->once())
                 ->method('isValid')
-                ->will($this->returnValue($valid));
+                ->willReturn($valid);
 
             if ($valid) {
                 $this->emailProcessor->expects($this->once())
@@ -147,26 +148,23 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $exception = new \Exception('TEST');
         $this->emailProcessor->expects($this->once())
             ->method('process')
             ->with($this->model)
-            ->will(
-                $this->returnCallback(
-                    function () use ($exception) {
-                        throw $exception;
-                    }
-                )
-            );
+            ->willReturnCallback(function () use ($exception) {
+                throw $exception;
+            });
 
         $this->logger->expects($this->once())
             ->method('error')
             ->with('Email sending failed.', ['exception' => $exception]);
         $this->form->expects($this->once())
             ->method('addError')
-            ->with($this->isInstanceOf('Symfony\Component\Form\FormError'));
+            ->with($this->isInstanceOf(FormError::class));
+
         $this->assertFalse($this->handler->process($this->model));
     }
 

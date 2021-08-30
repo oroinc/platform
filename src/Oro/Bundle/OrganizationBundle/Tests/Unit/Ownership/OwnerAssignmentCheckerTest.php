@@ -5,31 +5,25 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestEntity;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class OwnerAssignmentCheckerTest extends OrmTestCase
 {
-    /**
-     * @var EntityManagerMock
-     */
-    protected $em;
+    /** @var EntityManagerMock */
+    private $em;
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Stub' => 'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Stub' => 'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity'
+        ]);
     }
 
     /**
@@ -41,20 +35,16 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
         $statement = $this->createFetchStatementMock($records);
         $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('prepare')
-            ->will(
-                $this->returnCallback(
-                    function ($prepareString) use (&$statement, &$actualSql) {
-                        $actualSql = $prepareString;
+            ->willReturnCallback(function ($prepareString) use (&$statement, &$actualSql) {
+                $actualSql = $prepareString;
 
-                        return $statement;
-                    }
-                )
-            );
+                return $statement;
+            });
 
         $checker      = new OwnerAssignmentChecker();
         $actualResult = $checker->hasAssignments(
             1,
-            'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestEntity',
+            TestEntity::class,
             'owner',
             $this->em
         );
@@ -68,7 +58,7 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    public function hasAssignmentsProvider()
+    public function hasAssignmentsProvider(): array
     {
         return [
             [[], false],

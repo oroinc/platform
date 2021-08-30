@@ -4,12 +4,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub;
 
 class StubEventListener
 {
-    /**
-     * @var bool
-     */
-    public $isFlushed = false;
+    public bool $isFlushed = false;
 
-    public function postFlush()
+    public function postFlush(): void
     {
         $this->isFlushed = true;
     }

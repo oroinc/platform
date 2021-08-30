@@ -26,9 +26,6 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigInterface */
     private $config;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
@@ -108,10 +105,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->helper->getConfigValue('stdClass', 'param', $strict));
     }
 
-    /**
-     * @return array
-     */
-    public function getRoutesProvider()
+    public function getRoutesProvider(): array
     {
         $config = [
             'route1' => 'route_name1',
@@ -162,10 +156,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getConfigValueProvider()
+    public function getConfigValueProvider(): array
     {
         return [
             'null result' => [
@@ -196,10 +187,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function strictParamProvider()
+    public function strictParamProvider(): array
     {
         return [
             [true],

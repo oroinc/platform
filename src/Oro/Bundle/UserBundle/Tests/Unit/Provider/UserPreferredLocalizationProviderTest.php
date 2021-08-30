@@ -29,11 +29,8 @@ class UserPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param object $entity
-     * @param bool $isSupported
      */
-    public function testSupports($entity, bool $isSupported): void
+    public function testSupports(object $entity, bool $isSupported): void
     {
         $this->assertSame($isSupported, $this->provider->supports($entity));
 

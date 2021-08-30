@@ -11,10 +11,8 @@ use Symfony\Component\Form\FormInterface;
 
 class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailAttachmentsType
-     */
-    protected $emailAttachmentsType;
+    /** @var EmailAttachmentsType */
+    private $emailAttachmentsType;
 
     protected function setUp(): void
     {

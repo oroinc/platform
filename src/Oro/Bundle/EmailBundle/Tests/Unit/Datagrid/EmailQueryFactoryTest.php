@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -16,60 +17,38 @@ use Symfony\Component\Form\FormFactoryInterface;
 class EmailQueryFactoryTest extends OrmTestCase
 {
     const JOIN_ALIAS              = 'a';
-    const TEST_ENTITY             = 'Oro\Bundle\UserBundle\Entity\User';
+    const TEST_ENTITY             = User::class;
     const TEST_NAME_DQL_FORMATTED = 'CONCAT(a.firstName, CONCAT(a.lastName, \'\'))';
 
     /** @var EmailOwnerProviderStorage */
-    protected $providerStorage;
+    private $providerStorage;
 
     /** @var EntityNameResolver */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var EmailQueryFactory */
-    protected $factory;
+    private $factory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var MailboxManager */
-    protected $mailboxManager;
+    private $mailboxManager;
 
     protected function setUp(): void
     {
-        $this->providerStorage  = new EmailOwnerProviderStorage();
-
-        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->providerStorage = new EmailOwnerProviderStorage();
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->mailboxManager = $this->createMock(MailboxManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
-        /** @var FormFactoryInterface $formFactory */
-        $formFactory   = $this->getMockForAbstractClass(FormFactoryInterface::class);
-
-        $filterUtility = new FilterUtility();
 
         $this->factory = new EmailQueryFactory(
             $this->providerStorage,
             $this->entityNameResolver,
             $this->mailboxManager,
             $this->tokenAccessor,
-            $formFactory,
-            $filterUtility
-        );
-    }
-
-    protected function tearDown(): void
-    {
-        unset(
-            $this->factory,
-            $this->entityNameResolver,
-            $this->providerStorage,
-            $this->mailboxManager,
-            $this->doctrine
+            $this->createMock(FormFactoryInterface::class),
+            new FilterUtility()
         );
     }
 
@@ -92,14 +71,16 @@ class EmailQueryFactoryTest extends OrmTestCase
 
     public function testAddFromEmailAddressOneProviderGiven()
     {
-        $provider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $provider->expects($this->any())->method('getEmailOwnerClass')
-            ->will($this->returnValue(self::TEST_ENTITY));
+        $provider = $this->createMock(EmailOwnerProviderInterface::class);
+        $provider->expects($this->any())
+            ->method('getEmailOwnerClass')
+            ->willReturn(self::TEST_ENTITY);
         $this->providerStorage->addProvider($provider);
 
-        $this->entityNameResolver->expects($this->once())->method('getNameDQL')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getNameDQL')
             ->with(self::TEST_ENTITY, 'owner1')
-            ->will($this->returnValue(self::TEST_NAME_DQL_FORMATTED));
+            ->willReturn(self::TEST_NAME_DQL_FORMATTED);
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->select('e')
@@ -135,16 +116,16 @@ class EmailQueryFactoryTest extends OrmTestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->tokenAccessor->expects($this->exactly(2))
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
 
         $this->mailboxManager->expects($this->any())
             ->method('findAvailableMailboxIds')
             ->with($user, $organization)
-            ->will($this->returnValue([1, 3, 5]));
+            ->willReturn([1, 3, 5]);
 
         $qb->select('eu')
             ->from('EmailUser', 'eu');
@@ -168,16 +149,16 @@ class EmailQueryFactoryTest extends OrmTestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->tokenAccessor->expects($this->exactly(2))
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
 
         $this->mailboxManager->expects($this->any())
             ->method('findAvailableMailboxIds')
             ->with($user, $organization)
-            ->will($this->returnValue([1, 3, 5]));
+            ->willReturn([1, 3, 5]);
 
         $qb->select('eu')
             ->from('EmailUser', 'eu');

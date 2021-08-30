@@ -23,12 +23,8 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $highPriorityProvider = $this->getMockBuilder(VirtualFieldProviderInterface::class)
-            ->setMockClassName('HighPriorityVirtualFieldProvider')
-            ->getMock();
-        $lowPriorityProvider = $this->getMockBuilder(VirtualFieldProviderInterface::class)
-            ->setMockClassName('LowPriorityVirtualFieldProvider')
-            ->getMock();
+        $highPriorityProvider = $this->createMock(VirtualFieldProviderInterface::class);
+        $lowPriorityProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
         $this->configProvider = $this->createMock(ConfigProvider::class);
 

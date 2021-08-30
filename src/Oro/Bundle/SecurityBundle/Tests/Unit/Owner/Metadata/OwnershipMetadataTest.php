@@ -105,7 +105,7 @@ class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetAccessLevelNames(array $arguments, array $levels)
     {
-        $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata');
+        $reflection = new \ReflectionClass(OwnershipMetadata::class);
         /** @var OwnershipMetadata $metadata */
         $metadata = $reflection->newInstanceArgs($arguments);
         $this->assertEquals($levels, $metadata->getAccessLevelNames());

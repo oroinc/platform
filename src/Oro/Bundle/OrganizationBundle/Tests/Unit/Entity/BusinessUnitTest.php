@@ -12,10 +12,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class BusinessUnitTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BusinessUnit
-     */
-    protected $unit;
+    /** @var BusinessUnit */
+    private $unit;
 
     protected function setUp(): void
     {

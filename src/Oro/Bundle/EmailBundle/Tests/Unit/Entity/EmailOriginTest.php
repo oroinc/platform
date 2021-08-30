@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Component\Testing\ReflectionUtil;
 
@@ -16,16 +18,16 @@ class EmailOriginTest extends \PHPUnit\Framework\TestCase
 
     public function testFolderGetterAndSetter()
     {
-        $folder = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $folder = $this->createMock(EmailFolder::class);
 
         $entity = new TestEmailOrigin();
         $entity->addFolder($folder);
 
         $folders = $entity->getFolders();
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $folders);
+        $this->assertInstanceOf(ArrayCollection::class, $folders);
         $this->assertCount(1, $folders);
-        $this->assertTrue($folder === $folders[0]);
+        $this->assertSame($folder, $folders[0]);
     }
 
     public function testIsActive()

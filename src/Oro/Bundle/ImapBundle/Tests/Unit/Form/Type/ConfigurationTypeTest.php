@@ -28,7 +28,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -42,19 +41,19 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var SymmetricCrypterInterface */
     private $encryptor;
 
-    /** @var TokenAccessorInterface|MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var Translator|MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /** @var ConfigProvider|MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var ImapSettingsChecker|MockObject */
+    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $imapSettingsChecker;
 
-    /** @var SmtpSettingsChecker|MockObject */
+    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $smtpSettingsChecker;
 
     protected function setUp(): void
@@ -81,6 +80,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getExtensions()
     {
         $type = new ConfigurationType(
@@ -108,7 +110,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getValidators()
     {
@@ -129,7 +131,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         return [
             $valid->validatedBy() => $this->createMock(ConstraintValidatorInterface::class),
-            $emailFolders->validatedBy() => new EmailFoldersValidator($this->translator),
+            $emailFolders->validatedBy() => new EmailFoldersValidator(),
             $imapConnectionConfiguration->validatedBy() => new ImapConnectionConfigurationValidator(
                 $this->imapSettingsChecker
             ),
@@ -201,13 +203,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param string $foldersForm
-     * @param array $folders
-     * @param array|bool $expectedFoldersCount
-     *
      * @dataProvider setFolderDataProvider
      */
-    public function testBindValidFolderData($foldersForm, $folders, $expectedFoldersCount)
+    public function testBindValidFolderData(string|array|null $foldersForm, ?array $folders, int $expectedFoldersCount)
     {
         $formData = [
             'imapHost' => 'someHost',

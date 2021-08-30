@@ -10,18 +10,16 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class ExtendTableTest extends TestCase
+class ExtendTableTest extends \PHPUnit\Framework\TestCase
 {
-    const TABLE_NAME = 'test_table';
-    const COLUMN_NAME = 'test_column';
+    private const TABLE_NAME = 'test_table';
+    private const COLUMN_NAME = 'test_column';
 
-    /** @var ExtendOptionsManager|MockObject */
+    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
     private $extendOptionsManager;
 
-    /** @var DbIdentifierNameGenerator|MockObject */
+    /** @var DbIdentifierNameGenerator|\PHPUnit\Framework\MockObject\MockObject */
     private $nameGenerator;
 
     /** @var ExtendTable */
@@ -45,8 +43,8 @@ class ExtendTableTest extends TestCase
         $this->setExpectations('string', 'length', 100);
         $options = ['length' => 100, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
         $column = $this->table->addColumn(self::COLUMN_NAME, 'string', $options);
-        static::assertInstanceOf(ExtendColumn::class, $column);
-        static::assertEquals(100, $column->getLength());
+        self::assertInstanceOf(ExtendColumn::class, $column);
+        self::assertEquals(100, $column->getLength());
     }
 
     public function testAddColumnWithSameExtendPrecision()
@@ -54,8 +52,8 @@ class ExtendTableTest extends TestCase
         $this->setExpectations('float', 'precision', 8);
         $options = ['precision' => 8, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
         $column = $this->table->addColumn(self::COLUMN_NAME, 'float', $options);
-        static::assertInstanceOf(ExtendColumn::class, $column);
-        static::assertEquals(8, $column->getPrecision());
+        self::assertInstanceOf(ExtendColumn::class, $column);
+        self::assertEquals(8, $column->getPrecision());
     }
 
     public function testAddColumnWithSameExtendScale()
@@ -63,8 +61,8 @@ class ExtendTableTest extends TestCase
         $this->setExpectations('float', 'scale', 5);
         $options = ['scale' => 5, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
         $column = $this->table->addColumn(self::COLUMN_NAME, 'float', $options);
-        static::assertInstanceOf(ExtendColumn::class, $column);
-        static::assertEquals(5, $column->getScale());
+        self::assertInstanceOf(ExtendColumn::class, $column);
+        self::assertEquals(5, $column->getScale());
     }
 
     public function testAddColumnWithSameExtendDefault()
@@ -72,15 +70,15 @@ class ExtendTableTest extends TestCase
         $this->setExpectations('string', 'default', 'N/A');
         $options = ['default' => 'N/A', OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
         $column = $this->table->addColumn(self::COLUMN_NAME, 'string', $options);
-        static::assertInstanceOf(ExtendColumn::class, $column);
-        static::assertEquals('N/A', $column->getDefault());
+        self::assertInstanceOf(ExtendColumn::class, $column);
+        self::assertEquals('N/A', $column->getDefault());
     }
 
     public function testAddColumnWithSameExtendNullable()
     {
         $type = Type::getType('string');
 
-        $this->extendOptionsManager->expects(static::exactly(2))
+        $this->extendOptionsManager->expects(self::exactly(2))
             ->method('setColumnOptions')
             ->withConsecutive(
                 [
@@ -103,15 +101,15 @@ class ExtendTableTest extends TestCase
 
         $options = ['notnull' => true, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
         $column = $this->table->addColumn(self::COLUMN_NAME, 'string', $options);
-        static::assertInstanceOf(ExtendColumn::class, $column);
-        static::assertTrue($column->getNotnull());
+        self::assertInstanceOf(ExtendColumn::class, $column);
+        self::assertTrue($column->getNotnull());
     }
 
     private function setExpectations($name, string $extend, $expected): void
     {
         $type = Type::getType($name);
 
-        $this->extendOptionsManager->expects(static::exactly(3))
+        $this->extendOptionsManager->expects(self::exactly(3))
             ->method('setColumnOptions')
             ->withConsecutive(
                 [

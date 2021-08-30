@@ -10,25 +10,29 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
 
 class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationHelper;
+    private $translationHelper;
 
     /** @var ConfigSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
     protected function setUp(): void
     {
@@ -56,10 +60,6 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider preSetDataProvider
-     * @param array $data
-     * @param ConfigModel $model
-     * @param array $trans
-     * @param array $expectedData
      */
     public function testPreSetData(array $data, ConfigModel $model, array $trans, array $expectedData = null)
     {
@@ -83,7 +83,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $provider1->expects($this->once())
             ->method('getConfigById')
-            ->will($this->returnValue(new Config(new EntityConfigId('extend'))));
+            ->willReturn(new Config(new EntityConfigId('extend')));
         $provider2 = $this->getConfigProvider(
             'test',
             [
@@ -101,30 +101,24 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->any())
             ->method('getConfigIdByModel')
-            ->will(
-                $this->returnCallback(
-                    function ($configModel, $scope) {
-                        return new EntityConfigId($scope, 'Entity\Test');
-                    }
-                )
-            );
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($provider1));
+            ->willReturn($provider1);
         $this->translationHelper->expects($this->any())
             ->method('translateWithFallback')
-            ->willReturnCallback(
-                function ($id, $fallback) use (&$trans) {
-                    return isset($trans[$id]) ? $trans[$id] : $fallback;
-                }
-            );
+            ->willReturnCallback(function ($id, $fallback) use (&$trans) {
+                return $trans[$id] ?? $fallback;
+            });
 
-        $event = $this->getFormEvent($data, $model);
         $this->configManager->expects($this->once())
             ->method('getProviders')
-            ->will($this->returnValue($providers));
+            ->willReturn($providers);
 
+        $event = $this->getFormEvent($data, $model);
         $event->expects($this->once())
             ->method('setData')
             ->with($expectedData ?: $data);
@@ -135,26 +129,20 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider postSubmitProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @param array $data
-     * @param bool $isValid
-     * @param ConfigModel $model
-     * @param array $trans
-     * @param array|null $expectedConfigData
-     * @param array $expectedTrans
      */
     public function testPostSubmit(
         array $data,
-        $isValid,
+        bool $isValid,
         ConfigModel $model,
         array $trans,
-        $expectedConfigData,
+        ?array $expectedConfigData,
         array $expectedTrans
     ) {
         $extendProvider = $this->getConfigProvider('extend', [], false);
         $config = new Config(new EntityConfigId('extend'));
         $extendProvider->expects($this->once())
             ->method('getConfigById')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $provider1 = $this->getConfigProvider(
             'entity',
@@ -174,7 +162,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             $provider1->expects($this->once())
                 ->method('getConfigById')
                 ->with($config1->getId())
-                ->will($this->returnValue($config1));
+                ->willReturn($config1);
         } else {
             $provider1->expects($this->never())
                 ->method('getConfigById');
@@ -184,36 +172,24 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->any())
             ->method('getConfigIdByModel')
-            ->will(
-                $this->returnCallback(
-                    function ($configModel, $scope) {
-                        return new EntityConfigId($scope, 'Entity\Test');
-                    }
-                )
-            );
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendProvider));
+            ->willReturn($extendProvider);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) use (&$trans) {
-                        if (isset($trans[$id])) {
-                            return $trans[$id];
-                        } else {
-                            return $id;
-                        }
-                    }
-                )
-            );
+            ->willReturnCallback(function ($id) use (&$trans) {
+                return $trans[$id] ?? $id;
+            });
 
-        $form  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $event = $this->getFormEvent($data, $model, $form);
+        $form = $this->createMock(FormInterface::class);
+
         $this->configManager->expects($this->once())
             ->method('getProviders')
-            ->will($this->returnValue($providers));
+            ->willReturn($providers);
 
         if (null === $expectedConfigData) {
             $this->configManager->expects($this->never())
@@ -223,16 +199,14 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             foreach ($expectedConfigData as $code => $val) {
                 $expectedConfig->set($code, $val);
             }
-            $this->configManager->expects($this->exactly(1))
+            $this->configManager->expects($this->once())
                 ->method('persist')
-                ->withConsecutive(
-                    [$expectedConfig]
-                );
+                ->with($expectedConfig);
         }
 
         $form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue($isValid));
+            ->willReturn($isValid);
 
         if ($isValid) {
             $this->translationHelper->expects($this->once())
@@ -247,10 +221,15 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
                 ->method('flush');
         }
 
-        $this->configManager->expects($this->any())->method('calculateConfigChangeSet')->with($config1);
-        $this->configManager->expects($this->any())->method('getConfigChangeSet')->with($config1)->willReturn([
-            'state' => ['Active', 'Requires update']
-        ]);
+        $this->configManager->expects($this->any())
+            ->method('calculateConfigChangeSet')
+            ->with($config1);
+        $this->configManager->expects($this->any())
+            ->method('getConfigChangeSet')
+            ->with($config1)
+            ->willReturn(['state' => ['Active', 'Requires update']]);
+
+        $event = $this->getFormEvent($data, $model, $form);
 
         $this->subscriber->postSubmit($event);
     }
@@ -258,7 +237,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function preSetDataProvider()
+    public function preSetDataProvider(): array
     {
         $existingFieldConfigModel = new FieldConfigModel('testField', 'string');
         ReflectionUtil::setId($existingFieldConfigModel, 1);
@@ -429,7 +408,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function postSubmitProvider()
+    public function postSubmitProvider(): array
     {
         $existingConfigModel = new EntityConfigModel('Entity\Test');
         ReflectionUtil::setId($existingConfigModel, 1);
@@ -577,69 +556,57 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array                                    $data
-     * @param FieldConfigModel|ConfigModel             $model
-     * @param \PHPUnit\Framework\MockObject\MockObject $form
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @param array                                                  $data
+     * @param FieldConfigModel|ConfigModel                           $model
+     * @param FormInterface|\PHPUnit\Framework\MockObject\MockObject $form
+     *
+     * @return FormEvent|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getFormEvent($data, $model, $form = null)
+    private function getFormEvent(array $data, ConfigModel $model, FormInterface $form = null)
     {
         $fieldName = '';
         if ($model instanceof FieldConfigModel && !$model->getId()) {
             $fieldName = $model->getFieldName();
         }
 
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->any())
             ->method('getOption')
-            ->withConsecutive(
-                ['config_model'],
-                ['field_name']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $model,
-                $fieldName
-            );
+            ->withConsecutive(['config_model'], ['field_name'])
+            ->willReturnOnConsecutiveCalls($model, $fieldName);
 
         if (null === $form) {
-            $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+            $form = $this->createMock(FormInterface::class);
         }
         $form->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($form));
+            ->willReturn($form);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
 
         return $event;
     }
 
     /**
-     * @param string $scope
-     * @param array  $configs
-     * @param bool   $isGetPropertyConfigExpected
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getConfigProvider($scope, $configs, $isGetPropertyConfigExpected)
+    private function getConfigProvider(string $scope, array $configs, bool $isGetPropertyConfigExpected)
     {
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->any())
             ->method('getScope')
-            ->will($this->returnValue($scope));
+            ->willReturn($scope);
         if ($isGetPropertyConfigExpected) {
             $propertyConfig = new PropertyConfigContainer($configs);
             $provider->expects($this->once())
                 ->method('getPropertyConfig')
-                ->will($this->returnValue($propertyConfig));
+                ->willReturn($propertyConfig);
         } else {
             $provider->expects($this->never())
                 ->method('getPropertyConfig');

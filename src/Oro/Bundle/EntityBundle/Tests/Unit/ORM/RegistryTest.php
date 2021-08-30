@@ -71,7 +71,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         $this->container->expects(self::exactly(3))
             ->method('get')
             ->with('service.default')
-            ->will(self::onConsecutiveCalls($manager1, $manager1, $manager2));
+            ->willReturnOnConsecutiveCalls($manager1, $manager1, $manager2);
         $this->container->expects(self::once())
             ->method('initialized')
             ->willReturnMap([['service.default', true]]);
@@ -95,7 +95,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         $this->container->expects(self::exactly(3))
             ->method('get')
             ->with('service.default')
-            ->will(self::onConsecutiveCalls($manager1, $manager1, $manager2));
+            ->willReturnOnConsecutiveCalls($manager1, $manager1, $manager2);
         $this->container->expects(self::once())
             ->method('initialized')
             ->willReturnMap([['service.default', true]]);

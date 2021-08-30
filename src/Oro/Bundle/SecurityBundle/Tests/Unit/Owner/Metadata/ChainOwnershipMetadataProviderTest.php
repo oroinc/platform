@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\ChainOwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
@@ -137,7 +138,7 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUserClassWhenSupportedProviderNotFound()
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException::class);
+        $this->expectException(UnsupportedMetadataProviderException::class);
         $this->expectExceptionMessage('Supported provider not found in chain');
 
         $provider = $this->getMetadataProviderMock(false);
@@ -152,7 +153,7 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBusinessUnitClassWhenSupportedProviderNotFound()
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException::class);
+        $this->expectException(UnsupportedMetadataProviderException::class);
         $this->expectExceptionMessage('Supported provider not found in chain');
 
         $provider = $this->getMetadataProviderMock(false);
@@ -167,7 +168,7 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrganizationClassWhenSupportedProviderNotFound()
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException::class);
+        $this->expectException(UnsupportedMetadataProviderException::class);
         $this->expectExceptionMessage('Supported provider not found in chain');
 
         $provider = $this->getMetadataProviderMock(false);
@@ -181,14 +182,11 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $isSupports
-     * @param array $metadata
      * @return OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMetadataProviderMock($isSupports = true, array $metadata = [])
+    private function getMetadataProviderMock(bool $isSupports = true, array $metadata = [])
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider */
-        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
+        $provider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $provider->expects($this->any())
             ->method('supports')
             ->willReturn($isSupports);
@@ -219,26 +217,29 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testSupportedProvider()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider */
-        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
-        $provider->expects($this->any())->method('supports')->willReturn(true);
+        $provider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $provider->expects($this->any())
+            ->method('supports')
+            ->willReturn(true);
 
         $chain = new ChainOwnershipMetadataProvider();
         $chain->addProvider('alias', $provider);
 
-        $provider->expects($this->once())->method('getUserClass')->willReturn('\stdClass');
+        $provider->expects($this->once())
+            ->method('getUserClass')
+            ->willReturn(\stdClass::class);
 
-        $this->assertEquals('\stdClass', $chain->getUserClass());
+        $this->assertEquals(\stdClass::class, $chain->getUserClass());
     }
 
     public function testEmulatedProvider()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider */
-        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
-        $provider->expects($this->any())->method('supports')->willReturn(true);
+        $provider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $provider->expects($this->any())
+            ->method('supports')
+            ->willReturn(true);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $emulated */
-        $emulated = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
+        $emulated = $this->createMock(OwnershipMetadataProviderInterface::class);
 
         $chain = new ChainOwnershipMetadataProvider();
         $chain->addProvider('alias', $provider);
@@ -246,9 +247,12 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $chain->startProviderEmulation('emulated');
 
-        $provider->expects($this->never())->method('getUserClass');
-        $emulated->expects($this->once())->method('getUserClass')->willReturn('\stdClass');
-        $this->assertEquals('\stdClass', $chain->getUserClass());
+        $provider->expects($this->never())
+            ->method('getUserClass');
+        $emulated->expects($this->once())
+            ->method('getUserClass')
+            ->willReturn(\stdClass::class);
+        $this->assertEquals(\stdClass::class, $chain->getUserClass());
 
         $chain->stopProviderEmulation();
     }
@@ -264,46 +268,42 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testClearCache()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider1 */
-        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider2 */
-        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $default */
-        $default = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
+        $provider1 = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $provider2 = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $default = $this->createMock(OwnershipMetadataProviderInterface::class);
 
         $chain = new ChainOwnershipMetadataProvider();
         $chain->setDefaultProvider($default);
         $chain->addProvider('alias1', $provider1);
         $chain->addProvider('alias2', $provider2);
 
-        $provider1->expects($this->once())->method('clearCache');
-        $provider1->expects($this->once())->method('clearCache');
-        $default->expects($this->once())->method('clearCache');
+        $provider1->expects($this->once())
+            ->method('clearCache');
+        $provider1->expects($this->once())
+            ->method('clearCache');
+        $default->expects($this->once())
+            ->method('clearCache');
 
         $chain->clearCache();
     }
 
     public function testWarmUpCache()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider1 */
-        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $provider2 */
-        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $default */
-        $default = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface');
+        $provider1 = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $provider2 = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $default = $this->createMock(OwnershipMetadataProviderInterface::class);
 
         $chain = new ChainOwnershipMetadataProvider();
         $chain->setDefaultProvider($default);
         $chain->addProvider('alias1', $provider1);
         $chain->addProvider('alias2', $provider2);
 
-        $provider1->expects($this->once())->method('warmUpCache');
-        $provider1->expects($this->once())->method('warmUpCache');
-        $default->expects($this->once())->method('warmUpCache');
+        $provider1->expects($this->once())
+            ->method('warmUpCache');
+        $provider1->expects($this->once())
+            ->method('warmUpCache');
+        $default->expects($this->once())
+            ->method('warmUpCache');
 
         $chain->warmUpCache();
     }

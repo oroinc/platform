@@ -28,12 +28,8 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
 
     protected function setUp(): void
     {
-        $this->baseExtension = $this->getMockBuilder(AbstractDynamicFieldsExtension::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attributeConfigHelper = $this->getMockBuilder(AttributeConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->baseExtension = $this->createMock(AbstractDynamicFieldsExtension::class);
+        $this->attributeConfigHelper = $this->createMock(AttributeConfigHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_entity_config.config.attributes_config_helper', $this->attributeConfigHelper)

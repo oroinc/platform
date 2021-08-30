@@ -25,14 +25,12 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
@@ -197,7 +195,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataProvider
      */
-    public function testGetData(?EntityMetadata $metadata, $expected)
+    public function testGetData(?EntityMetadata $metadata, ?string $expected)
     {
         $activityList = $this->createMock(ActivityList::class);
         $activityList->expects($this->once())
@@ -211,16 +209,13 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ->with($user)
             ->willReturn('test name');
 
-        $emailAddress = $this->getEntity(EmailAddress::class, ['owner' => $user]);
-        $email = $this->getEntity(
-            Email::class,
-            [
-                'id' => 42,
-                'subject' => 'test subject',
-                'sentAt' => new \DateTime('2018-03-23T11:43:15+00:00'),
-                'fromEmailAddress' => $emailAddress,
-            ]
-        );
+        $emailAddress = new EmailAddress();
+        $emailAddress->setOwner($user);
+        $email = new Email();
+        ReflectionUtil::setId($email, 42);
+        $email->setSubject('test subject');
+        $email->setSentAt(new \DateTime('2018-03-23T11:43:15+00:00'));
+        $email->setFromEmailAddress($emailAddress);
 
         $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
@@ -268,7 +263,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetGroupedEntitiesWithWrongEntityPassed()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Argument must be instance of "%s", "%s" given',
             Email::class,
             ActivityList::class

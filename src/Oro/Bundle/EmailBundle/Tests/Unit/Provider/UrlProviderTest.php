@@ -4,38 +4,28 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\UrlProvider;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $urlGenerator;
 
-    /**
-     * @var UrlProvider
-     */
+    /** @var UrlProvider */
     private $urlProvider;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+
         $this->urlProvider = new UrlProvider($this->configManager, $this->urlGenerator);
     }
 
-    public function testGetAbsoluteUrlWithSubfolderPath()
+    public function testGetAbsoluteUrlWithSubFolderPath()
     {
         $route = 'test';
         $routeParams = ['id' => 1 ];

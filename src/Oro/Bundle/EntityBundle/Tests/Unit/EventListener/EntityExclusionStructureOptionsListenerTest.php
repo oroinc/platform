@@ -19,17 +19,14 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
     use EntityTrait;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    private $managerRegistry;
 
     /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $exclusionProvider;
+    private $exclusionProvider;
 
     /** @var EntityExclusionStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
@@ -51,25 +48,21 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $metadata = $this->createMock(ClassMetadata::class);
 
         $manager = $this->createMock(ObjectManager::class);
-        $manager
-            ->expects($this->once())
+        $manager->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(Item::class)
             ->willReturn($manager);
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
             ->willReturn(false);
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredField')
             ->with($metadata, 'field1')
             ->willReturn(true);
@@ -119,19 +112,16 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $metadata = $this->createMock(ClassMetadata::class);
 
         $manager = $this->createMock(ObjectManager::class);
-        $manager
-            ->expects($this->once())
+        $manager->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(Item::class)
             ->willReturn($manager);
 
-        $this->exclusionProvider
-            ->expects($this->exactly(2))
+        $this->exclusionProvider->expects($this->exactly(2))
             ->method('isIgnoredEntity')
             ->willReturnMap([
                 [Item::class, false],
@@ -176,14 +166,12 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
             ]
         );
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
             ->willReturn(true);
 
-        $this->exclusionProvider
-            ->expects($this->never())
+        $this->exclusionProvider->expects($this->never())
             ->method('isIgnoredField');
 
         $expectedEntityStructure = $this->getEntity(
@@ -222,20 +210,17 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
             ]
         );
 
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(Item::class)
             ->willReturn(null);
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
             ->willReturn(false);
 
-        $this->exclusionProvider
-            ->expects($this->never())
+        $this->exclusionProvider->expects($this->never())
             ->method('isIgnoredField');
 
         $expectedEntityStructure = $this->getEntity(
@@ -273,25 +258,21 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         );
 
         $manager = $this->createMock(ObjectManager::class);
-        $manager
-            ->expects($this->once())
+        $manager->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn(null);
 
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(Item::class)
             ->willReturn($manager);
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
             ->willReturn(false);
 
-        $this->exclusionProvider
-            ->expects($this->never())
+        $this->exclusionProvider->expects($this->never())
             ->method('isIgnoredField');
 
         $expectedEntityStructure = $this->getEntity(
@@ -333,30 +314,26 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $metadataField = $this->createMock(ClassMetadata::class);
 
         $manager = $this->createMock(ObjectManager::class);
-        $manager
-            ->expects($this->exactly(2))
+        $manager->expects($this->exactly(2))
             ->method('getClassMetadata')
             ->willReturnMap([
                 [Item::class, $metadataEntity],
                 ['class', $metadataField],
             ]);
 
-        $this->managerRegistry
-            ->expects($this->exactly(2))
+        $this->managerRegistry->expects($this->exactly(2))
             ->method('getManagerForClass')
             ->willReturnMap([
                 [Item::class, $manager],
                 ['class', $manager],
             ]);
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredEntity')
             ->with(Item::class)
             ->willReturn(false);
 
-        $this->exclusionProvider
-            ->expects($this->once())
+        $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredField')
             ->willReturn(true);
 

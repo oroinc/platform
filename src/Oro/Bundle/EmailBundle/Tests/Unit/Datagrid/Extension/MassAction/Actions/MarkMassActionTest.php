@@ -10,13 +10,13 @@ use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler;
 class MarkMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MarkReadMassAction */
-    protected $readAction;
+    private $readAction;
 
     /** @var MarkUnreadMassAction */
-    protected $unreadAction;
+    private $unreadAction;
 
     /** @var ActionConfiguration */
-    protected $configuration;
+    private $configuration;
 
     protected function setUp(): void
     {

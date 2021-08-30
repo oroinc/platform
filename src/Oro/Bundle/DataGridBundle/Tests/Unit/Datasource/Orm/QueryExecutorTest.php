@@ -21,12 +21,11 @@ class QueryExecutorTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $metadataDriver = new AnnotationDriver(
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
             new AnnotationReader(),
             'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
-        );
-        $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        ));
 
         $this->queryExecutor = new QueryExecutor();
     }

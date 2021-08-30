@@ -49,8 +49,7 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendTemplateEmailToOneRecipientWithTextMimeTypeAndSendFailed(): void
     {
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('processEmbeddedImages')
             ->with($this->assertMessageCallback(
                 self::EMAIL_SUBJECT,
@@ -64,8 +63,7 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
             ->setContent(self::EMAIL_BODY)
             ->setType(EmailTemplate::CONTENT_TYPE_TEXT);
 
-        $this->mailer
-            ->expects($this->once())
+        $this->mailer->expects($this->once())
             ->method('send')
             ->with($this->assertMessageCallback(
                 self::EMAIL_SUBJECT,
@@ -121,8 +119,7 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
             ->setContent(self::EMAIL_BODY_GERMAN)
             ->setType(EmailTemplate::CONTENT_TYPE_TEXT);
 
-        $this->processor
-            ->expects($this->exactly(2))
+        $this->processor->expects($this->exactly(2))
             ->method('processEmbeddedImages')
             ->withConsecutive(
                 [$this->assertMessageCallback(
@@ -139,8 +136,7 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
                 )]
             );
 
-        $this->mailer
-            ->expects($this->exactly(3))
+        $this->mailer->expects($this->exactly(3))
             ->method('send')
             ->withConsecutive(
                 [$this->assertMessageCallback(

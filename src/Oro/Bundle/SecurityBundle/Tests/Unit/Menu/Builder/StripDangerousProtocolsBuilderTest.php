@@ -28,7 +28,7 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuild(ItemInterface $menuItem, ItemInterface $expectedMenuItem)
     {
-        $this->uriSecurityHelper
+        $this->uriSecurityHelper->expects($this->any())
             ->method('stripDangerousProtocols')
             ->willReturnMap([
                 ['sample-data', 'sample-data'],
@@ -40,7 +40,7 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->builder->build($menuItem);
 
-        static::assertEquals($expectedMenuItem, $menuItem);
+        self::assertEquals($expectedMenuItem, $menuItem);
     }
 
     public function buildDataProvider(): array
@@ -83,14 +83,7 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $menuName
-     * @param string $uri
-     * @param array $children
-     *
-     * @return ItemInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function mockMenuItem($menuName, string $uri, array $children)
+    private function mockMenuItem(string $menuName, string $uri, array $children): ItemInterface
     {
         $menuItem = new MenuItem($menuName, $this->createMock(FactoryInterface::class));
         $menuItem->setUri($uri);

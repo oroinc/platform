@@ -30,7 +30,6 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -38,8 +37,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
 
@@ -105,8 +102,6 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
             ->with('u', User::class)
             ->willReturn('u.name');
 
-        $expressionBuiled = $this->createMock(Expr::class);
-
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('setMaxResults')
@@ -116,7 +111,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
         $qb->expects($this->once())
             ->method('expr')
-            ->willReturn($expressionBuiled);
+            ->willReturn($this->createMock(Expr::class));
 
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->expects($this->once())
@@ -205,7 +200,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareFormRecipientIdsDataProvider
      */
-    public function testPrepareFormRecipientIds($ids, $expectedResult)
+    public function testPrepareFormRecipientIds(array $ids, string $expectedResult)
     {
         $this->assertEquals($expectedResult, EmailRecipientsHelper::prepareFormRecipientIds($ids));
     }
@@ -228,7 +223,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extractFormRecipientIdsDataProvider
      */
-    public function testExtractFormRecipientIds($value, $expectedResult)
+    public function testExtractFormRecipientIds(string $value, array $expectedResult)
     {
         $this->assertEquals($expectedResult, EmailRecipientsHelper::extractFormRecipientIds($value));
     }
@@ -257,7 +252,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider recipientsFromResultProvider
      */
-    public function testRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    public function testRecipientsFromResult(array $result, string $entityClass, array $expectedRecipients)
     {
         $this->assertEquals(
             $expectedRecipients,
@@ -297,7 +292,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider plainRecipientsFromResultProvider
      */
-    public function testRlainRecipientsFromResult(array $result, array $expectedRecipients)
+    public function testPlainRecipientsFromResult(array $result, array $expectedRecipients)
     {
         $this->assertEquals(
             $expectedRecipients,
@@ -337,13 +332,11 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $objectClass = get_class($object);
 
         $em = $this->createMock(ObjectManager::class);
-        $objectMetadata = $this->getEntity(ClassMetadata::class, [
-            'name' => CustomerStub::class,
-            'identifier' => ['id'],
-            'reflFields' => [
-                'id' => new ReflectionProperty(CustomerStub::class, 'id', [spl_object_hash($object) => 1])
-            ],
-        ], [null]);
+        $objectMetadata = new ClassMetadata(CustomerStub::class);
+        $objectMetadata->identifier = ['id'];
+        $objectMetadata->reflFields = [
+            'id' => new ReflectionProperty(CustomerStub::class, 'id', [spl_object_hash($object) => 1])
+        ];
 
         $this->registry->expects(self::once())
             ->method('getManagerForClass')

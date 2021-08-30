@@ -12,23 +12,23 @@ use Symfony\Component\Routing\Route;
 
 class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dictionaryProvider;
+    /** @var ChainDictionaryValueListProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $dictionaryProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var SortableRouteCollection */
-    protected $routeCollection;
+    private $routeCollection;
 
     /** @var RouteCollectionAccessor */
-    protected $routeCollectionAccessor;
+    private $routeCollectionAccessor;
 
     /** @var DictionaryEntityRouteOptionsResolver */
-    protected $routeOptionsResolver;
+    private $routeOptionsResolver;
 
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
             $this->logger
         );
 
-        $this->routeCollection         = new SortableRouteCollection();
+        $this->routeCollection = new SortableRouteCollection();
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 

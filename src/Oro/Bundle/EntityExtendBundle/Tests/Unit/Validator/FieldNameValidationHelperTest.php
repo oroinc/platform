@@ -32,13 +32,8 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        /** @var ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
-
-        $this->extendConfigProvider = new ConfigProviderMock(
-            $configManager,
-            'extend'
-        );
+        $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->validationHelper = new FieldNameValidationHelper(

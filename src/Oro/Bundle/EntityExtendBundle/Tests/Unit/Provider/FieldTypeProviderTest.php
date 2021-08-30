@@ -3,24 +3,18 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
 class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->configManager);
+        $this->configManager = $this->createMock(ConfigManager::class);
     }
 
     public function testGetSupportedFieldTypes()
@@ -51,9 +45,7 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 
         $providerConfig = [$code => ['options' => [], 'form' => []]];
 
-        $propertyConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $propertyConfig = $this->createMock(PropertyConfigContainer::class);
         $propertyConfig->expects($this->once())
             ->method('hasForm')
             ->with($configType, $fieldType)
@@ -63,9 +55,7 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
             ->with($configType, $fieldType)
             ->willReturn($providerConfig);
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->once())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfig);

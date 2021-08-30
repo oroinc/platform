@@ -8,26 +8,19 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
 {
     private const TEMPLATE_NAME = 'templateName';
     private const TEMPLATE_PARAMS = ['some' => 'params'];
 
-    /**
-     * @var NotificationSettings|MockObject
-     */
+    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettingsModel;
 
-    /**
-     * @var EmailTemplateManager|MockObject
-     */
+    /** @var EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject */
     private $emailTemplateManager;
 
-    /**
-     * @var UserTemplateEmailSender
-     */
+    /** @var UserTemplateEmailSender */
     private $sender;
 
     protected function setUp(): void

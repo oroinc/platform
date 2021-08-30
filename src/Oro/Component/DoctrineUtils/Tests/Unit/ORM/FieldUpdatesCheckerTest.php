@@ -12,8 +12,8 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    const RELATION_FIELD = 'relationEntity';
-    const RELATION_COLLECTION_FIELD = 'relationEntityCollection';
+    private const RELATION_FIELD = 'relationEntity';
+    private const RELATION_COLLECTION_FIELD = 'relationEntityCollection';
 
     public function testIsFieldChangedWhenUnitOfWorkHasUpdates()
     {
@@ -29,7 +29,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
             $updatedEntityTwo,
-            static::RELATION_FIELD
+            self::RELATION_FIELD
         ));
     }
 
@@ -50,7 +50,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
             $changedEntityThree,
-            static::RELATION_COLLECTION_FIELD
+            self::RELATION_COLLECTION_FIELD
         ));
     }
 
@@ -69,7 +69,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($fieldUpdatesChecker->isRelationFieldChanged(
             $changedEntityTwo,
-            static::RELATION_FIELD
+            self::RELATION_FIELD
         ));
     }
 
@@ -100,17 +100,17 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
             $updatedEntityTwo,
-            static::RELATION_FIELD
+            self::RELATION_FIELD
         ));
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
             $deletedEntityTwo,
-            static::RELATION_FIELD
+            self::RELATION_FIELD
         ));
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
             $insertedEntityTwo,
-            static::RELATION_FIELD
+            self::RELATION_FIELD
         ));
     }
 
@@ -126,37 +126,24 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
         array $insertedEntities = [],
         array $deletedEntities = []
     ) {
-        $uow = $this
-            ->getMockBuilder(UnitOfWork::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $uow
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->expects($this->any())
             ->method('getScheduledEntityUpdates')
             ->willReturn($updatedEntities);
-
-        $uow
+        $uow->expects($this->any())
             ->method('getScheduledEntityInsertions')
             ->willReturn($insertedEntities);
-
-        $uow
+        $uow->expects($this->any())
             ->method('getScheduledEntityDeletions')
             ->willReturn($deletedEntities);
 
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($uow);
 
-        $managerRegistry = $this
-            ->getMockBuilder(ManagerRegistry::class)
-            ->getMock();
-
-        $managerRegistry
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->any())
             ->method('getManager')
             ->willReturn($entityManager);
 

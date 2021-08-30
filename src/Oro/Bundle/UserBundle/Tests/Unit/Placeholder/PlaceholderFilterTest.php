@@ -8,11 +8,11 @@ use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PlaceholderFilter */
-    protected $placeholderFilter;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    protected $tokenAccessor;
+    /** @var PlaceholderFilter */
+    private $placeholderFilter;
 
     protected function setUp(): void
     {
@@ -21,17 +21,10 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->placeholderFilter = new PlaceholderFilter($this->tokenAccessor);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->placeholderFilter, $this->tokenAccessor);
-    }
-
     /**
-     * @param User $user
-     * @param bool $expected
      * @dataProvider dataProvider
      */
-    public function testIsApplicableOnUserPage($user, $expected)
+    public function testIsApplicableOnUserPage(?object $user, bool $expected)
     {
         $this->assertEquals(
             $expected,
@@ -39,15 +32,13 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         $object = new \stdClass();
         $userDisabled = new User();
         $userDisabled->setEnabled(false);
         $userEnabled = new User();
+
         return [
             [null, false],
             [$object, false],
@@ -58,11 +49,8 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isUserApplicableDataProvider
-     *
-     * @param object $user
-     * @param bool $expected
      */
-    public function testIsUserApplicable($user, $expected)
+    public function testIsUserApplicable(object $user, bool $expected)
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -71,10 +59,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->placeholderFilter->isUserApplicable());
     }
 
-    /**
-     * @return array
-     */
-    public function isUserApplicableDataProvider()
+    public function isUserApplicableDataProvider(): array
     {
         return [
             [new \stdClass(), false],

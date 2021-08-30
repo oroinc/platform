@@ -14,12 +14,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -30,36 +30,31 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const ENTITY_CLASS_NAME = 'entity_class_name';
-    const ATTRIBUTE_FIELD_NAME = 'attribute_field_name';
+    private const ENTITY_CLASS_NAME = 'entity_class_name';
+    private const ATTRIBUTE_FIELD_NAME = 'attribute_field_name';
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configTranslationHelper;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
+    private $configTranslationHelper;
 
     /** @var AttributeManager */
-    protected $manager;
+    private $manager;
 
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configTranslationHelper = $this->createMock(ConfigTranslationHelper::class);
-        $this->aclHelper = $this->createMock(AclHelper::class);
 
         $this->manager = new AttributeManager(
             $this->configManager,
             $this->doctrineHelper,
-            $this->configTranslationHelper,
-            $this->aclHelper
+            $this->configTranslationHelper
         );
     }
 
@@ -88,7 +83,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByGroupWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -127,7 +122,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByFamilyWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -157,7 +152,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByClassWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -209,7 +204,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActiveAttributesByClassWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -239,7 +234,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSystemAttributesByClassWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -269,7 +264,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNonSystemAttributesByClassWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -313,8 +308,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     public function testIsSystem(bool $expectation): void
     {
         $config = $this->createMock(ConfigInterface::class);
-        $config
-            ->expects($this->once())
+        $config->expects($this->once())
             ->method('is')
             ->with('owner', ExtendScope::OWNER_SYSTEM)
             ->willReturn($expectation);
@@ -322,18 +316,13 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $attributeFieldName = 'attributeFieldName';
         $entityClassName = 'entityClassName';
 
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($entityClassName, $attributeFieldName)
             ->willReturn($config);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
             ->willReturn($extendConfigProvider);
@@ -390,7 +379,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributesByIdsWithIndexWhenExceptionIsThrown(): void
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->expectsDatabaseCheck(false);
@@ -477,30 +466,22 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         /** @var AttributeFamily $attributeFamily */
         $attributeFamily = $this->getEntity(AttributeFamily::class, $familyData);
 
-        $groupRepository = $this->getMockBuilder(AttributeGroupRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $groupRepository = $this->createMock(AttributeGroupRepository::class);
 
-        $fieldRepository = $this->getMockBuilder(FieldConfigModelRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldRepository
-            ->expects($this->once())
+        $fieldRepository = $this->createMock(FieldConfigModelRepository::class);
+        $fieldRepository->expects($this->once())
             ->method('getAttributesByIds')
             ->with($attributeIds)
             ->willReturn($attributes);
 
-        $groupRepository
-            ->expects($this->once())
+        $groupRepository->expects($this->once())
             ->method('getGroupsWithAttributeRelations')
             ->with($attributeFamily)
             ->willReturn($groups);
 
         $this->expectsDatabaseCheck(true);
 
-        $this->doctrineHelper
-            ->expects($this->exactly(2))
+        $this->doctrineHelper->expects($this->exactly(2))
             ->method('getEntityRepositoryForClass')
             ->withConsecutive([AttributeGroup::class], [FieldConfigModel::class])
             ->willReturnOnConsecutiveCalls($groupRepository, $fieldRepository);
@@ -511,8 +492,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     public function testIsActive(): void
     {
         $config = $this->createMock(ConfigInterface::class);
-        $config
-            ->expects($this->exactly(2))
+        $config->expects($this->exactly(2))
             ->method('in')
             ->with('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE])
             ->willReturn(true);
@@ -520,18 +500,14 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $attributeFieldName = 'attributeFieldName';
         $entityClassName = 'entityClassName';
 
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
             ->with($entityClassName, $attributeFieldName)
             ->willReturn($config);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
             ->willReturn($extendConfigProvider);
@@ -555,14 +531,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $calls
      * @return FieldConfigModelRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function expectsGetFieldConfigModelRepository($calls = 1)
+    private function expectsGetFieldConfigModelRepository(int $calls = 1)
     {
-        $repository = $this->getMockBuilder(FieldConfigModelRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(FieldConfigModelRepository::class);
 
         $this->doctrineHelper->expects($this->exactly($calls))
             ->method('getEntityRepositoryForClass')
@@ -573,14 +546,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $calls
      * @return AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function expectsGetAttributeFamilyRepository($calls = 1)
+    private function expectsGetAttributeFamilyRepository(int $calls = 1)
     {
-        $repository = $this->getMockBuilder(AttributeFamilyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(AttributeFamilyRepository::class);
 
         $this->doctrineHelper->expects($this->exactly($calls))
             ->method('getEntityRepositoryForClass')
@@ -595,9 +565,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
      */
     private function expectsGetAttributeGroupRelationRepository()
     {
-        $repository = $this->getMockBuilder(AttributeGroupRelationRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(AttributeGroupRelationRepository::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
@@ -624,7 +592,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
             ->with('label')
             ->willReturn($attributeLabel);
 
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfigProvider->expects($this->once())
             ->method('getConfig')
@@ -636,8 +603,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
             ->with('entity')
             ->willReturn($entityConfigProvider);
 
-        $this->configTranslationHelper
-            ->expects($this->once())
+        $this->configTranslationHelper->expects($this->once())
             ->method('translateWithFallback')
             ->with($attributeLabel, $fieldName)
             ->willReturn($expectedTranslation);

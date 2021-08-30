@@ -5,7 +5,6 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM\Walker;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\Walker\MySqlUseIndexOutputResultModifier;
@@ -18,26 +17,19 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class SqlWalkerTest extends OrmTestCase
 {
-    /**
-     * @var EntityManager|EntityManagerMock
-     */
-    protected $em;
+    /** @var EntityManagerMock */
+    private $em;
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ]);
         $this->em->getConfiguration()->setDefaultQueryHint(
             OutputResultModifierInterface::HINT_RESULT_MODIFIERS,
             [
@@ -50,11 +42,8 @@ class SqlWalkerTest extends OrmTestCase
 
     /**
      * @dataProvider queryDataProvider
-     * @param string $query
-     * @param string $expectedQuery
-     * @param string $platformClass
      */
-    public function testQueryModification($query, $expectedQuery, $platformClass)
+    public function testQueryModification(string $query, string $expectedQuery, string $platformClass)
     {
         $platform = new $platformClass();
         $this->em->getConnection()->setDatabasePlatform($platform);
@@ -66,10 +55,9 @@ class SqlWalkerTest extends OrmTestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function queryDataProvider()
+    public function queryDataProvider(): array
     {
         return [
             'simple query pgsql asc' => [

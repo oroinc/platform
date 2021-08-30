@@ -44,7 +44,7 @@ class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($this->getConfigKey())
             ->willReturn(false);
 
-        $this->assertNull($this->handler->handle($this->configManager, $this->changeSet, $this->form));
+        $this->handler->handle($this->configManager, $this->changeSet, $this->form);
     }
 
     /**

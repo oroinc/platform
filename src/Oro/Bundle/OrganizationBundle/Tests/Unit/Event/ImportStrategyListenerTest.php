@@ -179,11 +179,21 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $repo = $this->createMock(EntityRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
-        $this->doctrine->expects($this->once())->method('getRepository')->willReturn($repo);
-        $repo->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('setMaxResults')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
-        $query->expects($this->once())->method('getResult')->willReturn([$organization]);
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([$organization]);
 
         $metadata = new OwnershipMetadata('USER', 'user', 'user', 'organization', 'organization');
         $this->metadataProvider->expects($this->once())

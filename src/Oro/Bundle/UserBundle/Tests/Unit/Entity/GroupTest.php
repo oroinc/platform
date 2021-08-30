@@ -13,12 +13,10 @@ use Oro\Bundle\UserBundle\Entity\Role;
  */
 class GroupTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ROLE = 'ROLE_FOO';
+    private const TEST_ROLE = 'ROLE_FOO';
 
-    /**
-     * @var Group
-     */
-    protected $group;
+    /** @var Group */
+    private $group;
 
     protected function setUp(): void
     {

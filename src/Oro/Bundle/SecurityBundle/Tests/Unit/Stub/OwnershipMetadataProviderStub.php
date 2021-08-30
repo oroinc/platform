@@ -60,7 +60,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetadata($className)
     {

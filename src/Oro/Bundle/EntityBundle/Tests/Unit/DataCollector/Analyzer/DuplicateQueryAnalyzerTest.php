@@ -6,10 +6,8 @@ use Oro\Bundle\EntityBundle\DataCollector\Analyzer\DuplicateQueryAnalyzer;
 
 class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DuplicateQueryAnalyzer
-     */
-    protected $queryAnalyzer;
+    /** @var DuplicateQueryAnalyzer */
+    private $queryAnalyzer;
 
     protected function setUp(): void
     {
@@ -27,10 +25,7 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedIdenticalQueries, $this->queryAnalyzer->getIdenticalQueries());
     }
 
-    /**
-     * @return array
-     */
-    public function getIdenticalQueriesDataProvider()
+    public function getIdenticalQueriesDataProvider(): array
     {
         return [
             [
@@ -91,10 +86,7 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedIdenticalQueries, $this->queryAnalyzer->getSimilarQueries());
     }
 
-    /**
-     * @return array
-     */
-    public function getSimilarQueriesDataProvider()
+    public function getSimilarQueriesDataProvider(): array
     {
         return [
             [

@@ -12,23 +12,23 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = \stdClass::class;
-    const FIELD_NAME = 'test_field';
+    private const CLASS_NAME = \stdClass::class;
+    private const FIELD_NAME = 'test_field';
 
     /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfig;
+    private $entityConfig;
 
     /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfig;
+    private $extendConfig;
 
     /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeConfig;
+    private $attributeConfig;
 
     /** @var AttributeConfigurationProvider */
-    protected $provider;
+    private $provider;
 
     /** @var FieldConfigModel */
-    protected $attribute;
+    private $attribute;
 
     protected function setUp(): void
     {
@@ -36,7 +36,6 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfig = $this->createMock(ConfigInterface::class);
         $this->attributeConfig = $this->createMock(ConfigInterface::class);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->once())
             ->method('getProvider')
@@ -114,13 +113,8 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isAttributeSortable($this->attribute));
     }
 
-    /**
-     * @param ConfigInterface $config
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProvider(ConfigInterface $config)
+    private function getConfigProvider(ConfigInterface $config): ConfigProvider
     {
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->any())
             ->method('getConfig')

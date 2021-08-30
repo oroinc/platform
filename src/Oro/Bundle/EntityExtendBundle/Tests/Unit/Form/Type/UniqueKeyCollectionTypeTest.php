@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
@@ -18,31 +21,19 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
 {
-    const ENTITY = 'Namespace\Entity';
+    private const ENTITY = 'Namespace\Entity';
 
-    /**
-     * @var UniqueKeyCollectionType
-     */
-    protected $type;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider;
 
-    /**
-     * @var FieldConfigId[]
-     */
-    protected $fields;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $provider;
+    /** @var UniqueKeyCollectionType */
+    private $type;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->provider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->provider = $this->createMock(ConfigProvider::class);
 
         $validator = new RecursiveValidator(
             new ExecutionContextFactory(new IdentityTranslator()),
@@ -61,43 +52,38 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
 
     public function testType()
     {
-        $this->provider
-            ->expects($this->once())
+        $this->provider->expects($this->once())
             ->method('getIds')
-            ->will(
-                $this->returnValue(
-                    [
-                        new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'firstName', 'string'),
-                        new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'lastName', 'string'),
-                        new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'email', 'string'),
-                    ]
-                )
+            ->willReturn(
+                [
+                    new FieldConfigId('entity', User::class, 'firstName', 'string'),
+                    new FieldConfigId('entity', User::class, 'lastName', 'string'),
+                    new FieldConfigId('entity', User::class, 'email', 'string'),
+                ]
             );
 
-        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $config
-            ->expects($this->exactly(3))
+        $config = $this->createMock(ConfigInterface::class);
+        $config->expects($this->exactly(3))
             ->method('get')
-            ->with($this->equalTo('label'))
-            ->will($this->returnValue('label'));
+            ->with('label')
+            ->willReturn('label');
 
-        $this->provider
-            ->expects($this->exactly(3))
+        $this->provider->expects($this->exactly(3))
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $formData = array(
-            'keys' => array(
-                'tag0' => array(
+        $formData = [
+            'keys' => [
+                'tag0' => [
                     'name' => 'test key 1',
-                    'key'  => array()
-                ),
-                'tag1' => array(
+                    'key'  => []
+                ],
+                'tag1' => [
                     'name' => 'test key 2',
-                    'key'  => array()
-                )
-            )
-        );
+                    'key'  => []
+                ]
+            ]
+        ];
 
         $form = $this->factory->create(UniqueKeyCollectionType::class, null, ['className' => self::ENTITY]);
         $form->submit($formData);

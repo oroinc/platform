@@ -10,16 +10,11 @@ use Oro\Component\Testing\ReflectionUtil;
 class PermissionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Permission */
-    protected $object;
+    private $object;
 
     protected function setUp(): void
     {
         $this->object = new Permission();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->object);
     }
 
     public function testConstructor()
@@ -40,12 +35,8 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider setGetDataProvider
-     *
-     * @param string $propertyName
-     * @param mixed $value
-     * @param mixed $defaultValue
      */
-    public function testSetGet($propertyName, $value, $defaultValue = null)
+    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null)
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = 'get' . ucfirst($propertyName);
@@ -60,13 +51,8 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addRemoveDataProvider
-     *
-     * @param string $propertyName
-     * @param string $getter
-     * @param mixed $value
-     * @param mixed $defaultValue
      */
-    public function testAddRemove($propertyName, $getter, $value, $defaultValue = null)
+    public function testAddRemove(string $propertyName, string $getter, mixed $value, mixed $defaultValue = null)
     {
         $defaultValue = $defaultValue ?: new ArrayCollection();
         $adder = 'add' . ucfirst($propertyName);
@@ -79,10 +65,7 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new ArrayCollection(), $this->object->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             'name' => [
@@ -116,10 +99,7 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function addRemoveDataProvider()
+    public function addRemoveDataProvider(): array
     {
         return [
             'groupNames' => [

@@ -57,19 +57,14 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->queryExecutor = $this->createMock(QueryExecutorInterface::class);
 
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
+        ]);
 
         $this->fetcher = new DatagridExportIdFetcher(
             $this->gridManagerLink,

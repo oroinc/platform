@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
 use Oro\Bundle\EntityConfigBundle\Migration\WarmUpEntityConfigCacheMigration;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
@@ -12,15 +14,11 @@ class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testUpdateConfigs()
     {
-        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $commandExecutor = $this->createMock(CommandExecutor::class);
 
         $postUpMigrationListener = new PostUpMigrationListener($commandExecutor);
 
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
 
         $event = new PostMigrationEvent($connection);
         $event->addMigration(new TestMigration());
@@ -33,11 +31,11 @@ class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $migrations);
 
         $this->assertInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration',
+            TestMigration::class,
             $migrations[0]
         );
         $this->assertInstanceOf(
-            'Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration',
+            UpdateEntityConfigMigration::class,
             $migrations[1]
         );
         $this->assertEquals(
@@ -52,15 +50,11 @@ class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testWarmUpCache()
     {
-        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $commandExecutor = $this->createMock(CommandExecutor::class);
 
         $postUpMigrationListener = new PostUpMigrationListener($commandExecutor);
 
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
 
         $event = new PostMigrationEvent($connection);
         $event->addMigration(new TestMigration());
@@ -73,11 +67,11 @@ class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $migrations);
 
         $this->assertInstanceOf(
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration',
+            TestMigration::class,
             $migrations[0]
         );
         $this->assertInstanceOf(
-            'Oro\Bundle\EntityConfigBundle\Migration\WarmUpEntityConfigCacheMigration',
+            WarmUpEntityConfigCacheMigration::class,
             $migrations[1]
         );
         $this->assertEquals(

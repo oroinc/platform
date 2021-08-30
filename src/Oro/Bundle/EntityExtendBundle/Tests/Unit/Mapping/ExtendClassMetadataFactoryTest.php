@@ -5,21 +5,18 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Mapping;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ExtendClassMetadataFactory
-     */
+    /** @var ExtendClassMetadataFactory */
     private $cmf;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $driver = $this->createMock('Doctrine\Persistence\Mapping\Driver\MappingDriver');
-        $metadata = $this->createMock('Doctrine\Persistence\Mapping\ClassMetadata');
-        $this->cmf = new ExtendClassMetadataFactory($driver, $metadata);
+        $this->cmf = new ExtendClassMetadataFactory();
     }
 
     public function testSetMetadataFor()
@@ -27,9 +24,9 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $cache = new ArrayCache();
         $this->cmf->setCacheDriver($cache);
 
-        $metadata = new ClassMetadata('Oro\Bundle\UserBundle\Entity\User');
+        $metadata = new ClassMetadata(User::class);
         $this->cmf->setMetadataFor(
-            'Oro\Bundle\UserBundle\Entity\User',
+            User::class,
             $metadata
         );
 
@@ -41,9 +38,9 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testSetMetadataForWithoutCacheDriver()
     {
-        $metadata = new ClassMetadata('Oro\Bundle\UserBundle\Entity\User');
+        $metadata = new ClassMetadata(User::class);
         $this->cmf->setMetadataFor(
-            'Oro\Bundle\UserBundle\Entity\User',
+            User::class,
             $metadata
         );
     }

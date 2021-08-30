@@ -123,7 +123,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
                 ['ownership', $ownershipConfigProvider],
                 ['extend', $extendConfigProvider],
             ]);
-        if ($getOwnerClassMethodNameCalls == 1) {
+        if ($getOwnerClassMethodNameCalls === 1) {
             $this->ownershipMetadataProvider->expects($this->exactly(2))
                 ->method($getOwnerClassMethodName)
                 ->willReturn('Test\Owner');
@@ -227,7 +227,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
         $this->extension->preUpdate();
     }
 
-    public function preUpdateProvider()
+    public function preUpdateProvider(): array
     {
         return [
             ['USER', 'getUserClass', 2],

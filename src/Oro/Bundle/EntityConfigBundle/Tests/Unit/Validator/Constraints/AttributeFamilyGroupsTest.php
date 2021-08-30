@@ -7,10 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroupsVal
 
 class AttributeFamilyGroupsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AttributeFamilyGroups
-     */
-    protected $constraint;
+    /** @var AttributeFamilyGroups */
+    private $constraint;
 
     protected function setUp(): void
     {

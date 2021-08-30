@@ -15,19 +15,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    private $manager;
 
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
-    protected $eventMock;
+    private $eventMock;
 
     /** @var UserImapConfigSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
     protected function setUp(): void
     {
@@ -70,8 +70,10 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->manager->expects($this->once())->method('find')->with('OroUserBundle:User', $id)
-            ->will($this->returnValue($user));
+        $this->manager->expects($this->once())
+            ->method('find')
+            ->with('OroUserBundle:User', $id)
+            ->willReturn($user);
 
         $this->eventMock->expects($this->once())
             ->method('setData')
@@ -92,7 +94,8 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $this->requestStack->push($request);
 
-        $this->manager->expects($this->never())->method('find');
+        $this->manager->expects($this->never())
+            ->method('find');
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -120,7 +123,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->eventMock->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($eventData));
+            ->willReturn($eventData);
         $this->eventMock->expects($this->once())
             ->method('setData')
             ->with($this->equalTo(

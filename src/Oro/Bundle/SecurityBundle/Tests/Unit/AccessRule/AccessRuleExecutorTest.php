@@ -18,8 +18,6 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $rules [service id => AccessRuleInterface or [AccessRuleInterface, options], ...]
-     *
-     * @return AccessRuleExecutor
      */
     private function getAccessRuleExecutor(array $rules): AccessRuleExecutor
     {
@@ -59,7 +57,7 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
 
         /** @var CompositeExpression $expression */
         $expression = $criteria->getExpression();
-        $this->assertTrue($expression instanceof CompositeExpression);
+        $this->assertInstanceOf(CompositeExpression::class, $expression);
         $this->assertEquals(CompositeExpression::TYPE_AND, $expression->getType());
         $expressions = $expression->getExpressionList();
         $this->assertCount(2, $expressions);
@@ -84,7 +82,7 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
         $accessRuleExecutor->process($criteria);
 
         $expression = $criteria->getExpression();
-        $this->assertTrue($expression instanceof Comparison);
+        $this->assertInstanceOf(Comparison::class, $expression);
         $this->assertEquals(new Comparison(new Path('owner'), Comparison::IN, [1, 2, 3, 4, 5]), $expression);
     }
 
@@ -104,7 +102,7 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
         $accessRuleExecutor->process($criteria);
 
         $expression = $criteria->getExpression();
-        $this->assertTrue($expression instanceof Comparison);
+        $this->assertInstanceOf(Comparison::class, $expression);
         $this->assertEquals(new Comparison(new Path('owner'), Comparison::IN, [1, 2, 3, 4, 5]), $expression);
     }
 }

@@ -10,8 +10,8 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    const ENCRYPTED_STRING = 'encryptedSample';
-    const DECRYPTED_STRING = 'sample';
+    private const ENCRYPTED_STRING = 'encryptedSample';
+    private const DECRYPTED_STRING = 'sample';
 
     /**
      * @var CryptedDataTransformer
@@ -23,9 +23,6 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     private $crypter;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
@@ -49,7 +46,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
         $actual = $this->transformer->transform($value);
 
-        static::assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -66,7 +63,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
     public function testTransformWithException()
     {
         $this->crypter
-            ->expects(static::once())
+            ->expects(self::once())
             ->method('decryptData')
             ->willThrowException(new \Exception());
 
@@ -74,7 +71,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
         $actual = $this->transformer->transform(self::ENCRYPTED_STRING);
 
-        static::assertNull($actual);
+        self::assertNull($actual);
     }
 
     /**
@@ -92,7 +89,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
         $actual = $this->transformer->reverseTransform($value);
 
-        static::assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**

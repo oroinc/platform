@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityFieldFallbackValueHeadersListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

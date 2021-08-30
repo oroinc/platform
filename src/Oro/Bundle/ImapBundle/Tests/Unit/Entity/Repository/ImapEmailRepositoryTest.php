@@ -14,7 +14,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class ImapEmailRepositoryTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
@@ -23,11 +23,9 @@ class ImapEmailRepositoryTest extends OrmTestCase
             new AnnotationReader(),
             ['Oro\Bundle\ImapBundle\Entity', 'Oro\Bundle\EmailBundle\Entity']
         ));
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
+        ]);
     }
 
     public function testGetEmailsByUidsQueryBuilder()

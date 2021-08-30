@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use DateInterval;
-use DateTime;
-use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
@@ -31,25 +28,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var EmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailBuilder;
+    private $emailBuilder;
 
     /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailProcessor;
+    private $emailProcessor;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $render;
+    private $render;
 
     /** @var AutoResponseManager */
-    protected $autoResponseManager;
+    private $autoResponseManager;
 
     /** @var array|null */
-    protected $definitions;
+    private $definitions;
 
     protected function setUp(): void
     {
@@ -58,7 +55,6 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $this->emailProcessor = $this->createMock(Processor::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->render = $this->createMock(EmailRenderer::class);
-        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
@@ -80,13 +76,13 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider definitionNamesProvider
      */
-    public function testCreateRuleExpr($definition)
+    public function testCreateRuleExpr(string $definition)
     {
         $expr = $this->autoResponseManager->createRuleExpr($this->getAutoResponseRule($definition), new Email());
         $this->assertEquals($this->getExpectedExpression($definition), $expr);
     }
 
-    public function definitionNamesProvider()
+    public function definitionNamesProvider(): array
     {
         return [
             ['and'],
@@ -97,7 +93,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applicableEmailsProvider
      */
-    public function testGetApplicableRulesReturnsTheRule($definition, Email $email)
+    public function testGetApplicableRulesReturnsTheRule(string $definition, Email $email)
     {
         $mailbox = new Mailbox();
         $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
@@ -106,7 +102,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $rules->count());
     }
 
-    public function applicableEmailsProvider()
+    public function applicableEmailsProvider(): array
     {
         return $this->emailsProvider('applicable_emails');
     }
@@ -114,7 +110,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider inapplicableEmailsProvider
      */
-    public function testGetApplicableRulesDoesNotReturnTheRule($definition, Email $email)
+    public function testGetApplicableRulesDoesNotReturnTheRule(string $definition, Email $email)
     {
         $mailbox = new Mailbox();
         $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
@@ -123,17 +119,15 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $rules->count());
     }
 
-    public function inapplicableEmailsProvider()
+    public function inapplicableEmailsProvider(): array
     {
         return $this->emailsProvider('inapplicable_emails');
     }
 
     /**
      * @dataProvider applicableEmailsProvider
-     * @param string $definition
-     * @param Email $email
      */
-    public function testSendAutoResponses($definition, Email $email)
+    public function testSendAutoResponses(string $definition, Email $email)
     {
         $mailbox = new Mailbox();
         $origin = new UserEmailOrigin();
@@ -164,12 +158,10 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->render->expects($this->exactly(2))
             ->method('renderTemplate')
-            ->willReturnMap(
-                [
-                    ['SUBJECT EN', ['entity' => $email], 'RENDERED EN SUBJECT'],
-                    ['CONTENT EN', ['entity' => $email], 'RENDERED EN CONTENT']
-                ]
-            );
+            ->willReturnMap([
+                ['SUBJECT EN', ['entity' => $email], 'RENDERED EN SUBJECT'],
+                ['CONTENT EN', ['entity' => $email], 'RENDERED EN CONTENT']
+            ]);
         $this->emailProcessor->expects($this->once())
             ->method('process')
             ->with($emailModel, $origin);
@@ -180,16 +172,11 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('RENDERED EN CONTENT', $emailModel->getBody());
     }
 
-    /**
-     * @param string $definition
-     *
-     * @return AutoResponseRule
-     */
-    protected function getAutoResponseRule($definition = 'and')
+    private function getAutoResponseRule(string $definition = 'and'): AutoResponseRule
     {
         $autoResponseRule = new AutoResponseRule();
-        $createdAt = new DateTime('now', new DateTimeZone('UTC'));
-        $createdAt->sub(DateInterval::createFromDateString('1 day'));
+        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $createdAt->sub(\DateInterval::createFromDateString('1 day'));
         $autoResponseRule->setCreatedAt($createdAt);
         $autoResponseRule->setDefinition($this->getDefinition($definition));
         $autoResponseRule->setActive(true);
@@ -248,27 +235,17 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->autoResponseManager->createEmailEntity());
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    protected function getDefinition($name)
+    private function getDefinition(string $name): string
     {
-        return json_encode($this->getDefinitions()[$name]['definition']);
+        return json_encode($this->getDefinitions()[$name]['definition'], JSON_THROW_ON_ERROR);
     }
 
-    /**
-     * @param string $definition
-     *
-     * @return array
-     */
-    protected function getExpectedExpression($definition)
+    private function getExpectedExpression(string $definition): array
     {
         return $this->getDefinitions()[$definition]['expression'];
     }
 
-    private function emailsProvider($key)
+    private function emailsProvider(string $key): array
     {
         $definitionNames = array_keys($this->getDefinitions());
 
@@ -281,19 +258,16 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
                 $email = new Email();
                 $email->setSubject($data['subject']);
                 $email->setEmailBody($body);
-                $email->setSentAt(new DateTime($data['date'], new DateTimeZone('UTC')));
+                $email->setSentAt(new \DateTime($data['date'], new \DateTimeZone('UTC')));
 
                 return [$definition, $email];
             }, $this->getDefinitions()[$definition][$key]);
         }
 
-        return call_user_func_array('array_merge', $results);
+        return array_merge(...$results);
     }
 
-    /**
-     * @return array
-     */
-    protected function getDefinitions()
+    private function getDefinitions(): array
     {
         if (!$this->definitions) {
             $this->definitions = Yaml::parse(file_get_contents($this->getAutoResponseRuleDefinitionsPath()));
@@ -302,10 +276,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         return $this->definitions;
     }
 
-    /**
-     * @return string
-     */
-    protected function getAutoResponseRuleDefinitionsPath()
+    private function getAutoResponseRuleDefinitionsPath(): string
     {
         return __DIR__ . '/../Fixtures/autorResponseRuleDefinitions.yml';
     }

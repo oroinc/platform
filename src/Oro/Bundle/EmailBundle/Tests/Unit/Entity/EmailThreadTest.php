@@ -6,21 +6,16 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-/**
- * Class EmailThreadTest
- *
- * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity
- */
 class EmailThreadTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmailsGetterAndSetter()
     {
-        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock(Email::class);
 
         $entity = new EmailThread();
         $entity->addEmail($email);
 
-        $this->assertTrue($email === $entity->getEmails()->first());
+        $this->assertSame($email, $entity->getEmails()->first());
     }
 
     public function testBeforeSave()
@@ -35,10 +30,8 @@ class EmailThreadTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $emailThread = new EmailThread();
 
@@ -47,7 +40,7 @@ class EmailThreadTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($emailThread, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['lastUnseenEmail', new Email()],

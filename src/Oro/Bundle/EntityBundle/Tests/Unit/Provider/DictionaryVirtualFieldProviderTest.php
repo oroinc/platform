@@ -40,7 +40,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->provider = new DictionaryVirtualFieldProvider(
             $this->configManager,
@@ -275,9 +275,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with('dictionaries')
-            ->willReturn([
-                'Acme\TestBundle\Entity\Dictionary3' => ['name']
-            ]);
+            ->willReturn(['Acme\TestBundle\Entity\Dictionary3' => ['name']]);
         $this->cache->expects($this->never())
             ->method('save');
 
@@ -386,11 +384,9 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getClassMetadata')
             ->willReturnCallback(function ($class) use ($metadata) {
                 switch ($class) {
-                    case 'Acme\TestBundle\Entity\Dictionary1':
-                        return $this->createDictionaryMetadata($class);
                     case 'Acme\TestBundle\Entity\Dictionary2':
-                        return $this->createDictionaryMetadata($class);
                     case 'Acme\TestBundle\Entity\Dictionary3':
+                    case 'Acme\TestBundle\Entity\Dictionary1':
                         return $this->createDictionaryMetadata($class);
                     case 'Acme\TestBundle\Entity\Dictionary4':
                         return $this->createDictionaryMetadata(

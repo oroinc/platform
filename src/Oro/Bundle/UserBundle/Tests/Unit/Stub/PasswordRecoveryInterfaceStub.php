@@ -27,7 +27,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     protected $passwordChangedAt;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isAccountNonLocked(): bool
     {
@@ -35,7 +35,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isEnabled(): bool
     {
@@ -43,7 +43,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setUsername($username): self
     {
@@ -53,7 +53,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setPassword(?string $password): self
     {
@@ -63,7 +63,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSalt()
     {
@@ -71,7 +71,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setPlainPassword(?string $password): self
     {
@@ -81,7 +81,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getRoles()
     {
@@ -89,7 +89,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getUserRoles(): array
     {
@@ -97,7 +97,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPassword()
     {
@@ -105,7 +105,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getUsername()
     {
@@ -113,7 +113,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function eraseCredentials()
     {
@@ -121,7 +121,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPlainPassword(): ?string
     {
@@ -129,7 +129,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function addUserRole(Role $role): self
     {
@@ -137,7 +137,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isPasswordRequestNonExpired($ttl)
     {
@@ -145,7 +145,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getConfirmationToken()
     {
@@ -153,7 +153,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setConfirmationToken($token)
     {
@@ -163,7 +163,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function generateToken()
     {
@@ -171,7 +171,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPasswordRequestedAt()
     {
@@ -179,7 +179,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     *{@inheritdoc}
+     *{@inheritDoc}
      */
     public function setPasswordRequestedAt(\DateTime $time = null)
     {
@@ -189,7 +189,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     *{@inheritdoc}
+     *{@inheritDoc}
      */
     public function getPasswordChangedAt()
     {
@@ -197,7 +197,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setPasswordChangedAt(\DateTime $time = null)
     {
