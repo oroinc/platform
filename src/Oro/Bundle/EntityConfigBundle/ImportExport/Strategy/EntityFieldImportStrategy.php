@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Helper\ConfigModelConstraintsHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
@@ -165,7 +166,13 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
                             $errors[] = sprintf('%s.%s.%s: %s', $scope, $code, $key, implode(' ', $result));
                         }
                     }
-                } elseif (isset($config['constraints'])) {
+                }
+                if (isset($config['constraints'])) {
+                    $config['constraints'] = ConfigModelConstraintsHelper::configureConstraintsWithConfigModel(
+                        $config['constraints'],
+                        $entity
+                    );
+
                     $result = $this->strategyHelper->validateEntity(
                         $scopeData[$code],
                         $this->constraintFactory->parse($config['constraints'])
