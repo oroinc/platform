@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -15,7 +15,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 /**
  * Doctrine repository for WorkflowItem entity
  */
-class WorkflowItemRepository extends EntityRepository
+class WorkflowItemRepository extends ServiceEntityRepository
 {
     const DELETE_BATCH_SIZE = 1000;
 

@@ -6,14 +6,16 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy;
+use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ConfigModelAwareConstraintInterface;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUnique;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
-use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -43,6 +45,9 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
     private $context;
 
+    /** @var ConstraintFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintFactory;
+
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
@@ -52,10 +57,8 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->databaseHelper = $this->createMock(DatabaseHelper::class);
         $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
         $this->context = $this->createMock(ContextInterface::class);
-
-        $this->fieldTypeProvider->expects(self::any())
-            ->method('getFieldProperties')
-            ->willReturn([]);
+        $this->constraintFactory = $this->createMock(ConstraintFactory::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
         $this->translator->expects(self::any())
             ->method('trans')
@@ -69,31 +72,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->setFieldTypeProvider($this->fieldTypeProvider);
         $this->strategy->setTranslator($this->translator);
         $this->strategy->setFieldValidationHelper($this->validationHelper);
-    }
-
-    public function testSetTranslator()
-    {
-        $strategy = $this->createStrategy();
-        self::assertNull(ReflectionUtil::getPropertyValue($strategy, 'translator'));
-        $strategy->setTranslator($this->translator);
-        self::assertSame($this->translator, ReflectionUtil::getPropertyValue($strategy, 'translator'));
-    }
-
-    public function testSetConstraintFactory()
-    {
-        $factory = $this->createMock(ConstraintFactory::class);
-        $strategy = $this->createStrategy();
-        self::assertNull(ReflectionUtil::getPropertyValue($strategy, 'constraintFactory'));
-        $strategy->setConstraintFactory($factory);
-        self::assertSame($factory, ReflectionUtil::getPropertyValue($strategy, 'constraintFactory'));
-    }
-
-    public function testSetFieldTypeProvider()
-    {
-        $strategy = $this->createStrategy();
-        self::assertNull(ReflectionUtil::getPropertyValue($strategy, 'fieldTypeProvider'));
-        $strategy->setFieldTypeProvider($this->fieldTypeProvider);
-        self::assertSame($this->fieldTypeProvider, ReflectionUtil::getPropertyValue($strategy, 'fieldTypeProvider'));
+        $this->strategy->setConstraintFactory($this->constraintFactory);
     }
 
     public function testProcessWrongType()
@@ -111,6 +90,9 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
             ->willReturn(['string', 'integer', 'date']);
+        $this->fieldTypeProvider->expects(static::any())
+            ->method('getFieldProperties')
+            ->willReturn([]);
 
         $this->strategyHelper->expects($this->never())
             ->method('addValidationErrors');
@@ -166,6 +148,9 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
             ->willReturn(['string', 'integer', 'date']);
+        $this->fieldTypeProvider->expects(static::any())
+            ->method('getFieldProperties')
+            ->willReturn([]);
 
         $this->strategyHelper->expects($this->once())
             ->method('validateEntity')
@@ -178,6 +163,75 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategyHelper->expects($this->once())
             ->method('addValidationErrors')
             ->with(['first error message', 'second error message'], $this->context);
+
+        $this->validationHelper->expects($this->once())
+            ->method('findFieldConfig')
+            ->willReturn(null);
+
+        self::assertNull($this->strategy->process($entity));
+    }
+
+    public function testProcessValidationErrorsOfEntityFields()
+    {
+        $entityModel = new EntityConfigModel(\stdClass::class);
+        $entity = new FieldConfigModel('testFieldName', 'integer');
+        $entity->fromArray('enum', ['enum_options' => [['id' => null, 'label' => 'label']]]);
+        $entity->setEntity($entityModel);
+
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getSupportedFieldTypes')
+            ->willReturn(['string', 'integer', 'date']);
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getFieldProperties')
+            ->willReturn([
+                'enum' => [
+                    'enum_options' => [
+                        'constraints' => [
+                            [EnumValuesUnique::class => null],
+                            [ConfigModelAwareConstraintInterface::class => null]
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->constraintFactory->expects($this->once())
+            ->method('parse')
+            ->with([
+                [EnumValuesUnique::class => null],
+                [ConfigModelAwareConstraintInterface::class => ['configModel' => $entity]]
+            ])
+            ->willReturnArgument(0);
+
+        $this->strategyHelper->expects($this->exactly(3))
+            ->method('validateEntity')
+            ->withConsecutive(
+                [$entity],
+                [EnumValue::createFromArray(['id' => null, 'label' => 'label'])],
+                [
+                    [
+                        [
+                            'id' => null,
+                            'label' => 'label'
+                        ]
+                    ],
+                    [
+                        [EnumValuesUnique::class => null],
+                        [ConfigModelAwareConstraintInterface::class => ['configModel' => $entity]]
+                    ]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                null,
+                null,
+                ['first error message', 'second error message']
+            );
+
+        $this->context->expects($this->once())
+            ->method('incrementErrorEntriesCount');
+
+        $this->strategyHelper->expects($this->once())
+            ->method('addValidationErrors')
+            ->with(['enum.enum_options: first error message second error message'], $this->context);
 
         $this->validationHelper->expects($this->once())
             ->method('findFieldConfig')

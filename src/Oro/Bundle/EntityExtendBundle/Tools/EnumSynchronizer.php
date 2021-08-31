@@ -395,7 +395,7 @@ class EnumSynchronizer
         return null;
     }
 
-    protected function fillOptionIds(array $values, array &$options)
+    public function fillOptionIds(array $values, array &$options)
     {
         $ids = array_map(function (AbstractEnumValue $value) {
             return $value->getId();

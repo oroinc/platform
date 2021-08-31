@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 
-class TransitionEventTriggerRepository extends EntityRepository implements EventTriggerRepositoryInterface
+/**
+ * Doctrine repository for TransitionEventTrigger entity
+ */
+class TransitionEventTriggerRepository extends ServiceEntityRepository implements EventTriggerRepositoryInterface
 {
     /**
      * @param bool|null $enabled

@@ -291,22 +291,34 @@ services:
             - 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition'
 
     oro_workflow.repository.workflow_item:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+        alias: Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository
+
+    Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_workflow.repository.process_trigger:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
+        alias: Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository
+
+    Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_workflow.repository.transition_event_trigger:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository'
+        alias: Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository
+
+    Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_workflow.helper.workflow_aware_entity_fetcher:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher'

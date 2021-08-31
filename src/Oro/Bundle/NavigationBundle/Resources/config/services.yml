@@ -447,12 +447,16 @@ services:
             - { name: kernel.event_listener, event: oro_menu.menu_update_with_scope_change, method: onMenuUpdateWithScopeChange }
 
     oro_navigation.repository.menu_update:
-        class: Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository
+        alias: Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository
+
+    Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
         calls:
             - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_navigation.menu_update.cache:
         parent: oro.cache.abstract

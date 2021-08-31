@@ -13,7 +13,6 @@ use Doctrine\ORM\Events as OrmEvents;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\EntityListenerResolver;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
-use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\EntityExtendBundle\Async\OrmMetadataFactoryClearer;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -216,60 +215,6 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new OrmConfiguration());
         $em->expects(self::once())
             ->method('close');
-
-        $this->clearer->clear($logger);
-    }
-
-    public function testShouldClearRepositoryFactoryIfItIsInstanceOfEntityRepositoryFactoryClass()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
-        $em = $this->createMock(EntityManager::class);
-        $configuration = new OrmConfiguration();
-        $repositoryFactory = $this->createMock(EntityRepositoryFactory::class);
-        $configuration->setRepositoryFactory($repositoryFactory);
-
-        $connection = $this->createMock(Connection::class);
-        $connection->expects(self::once())
-            ->method('getConfiguration')
-            ->willReturn(new DbalConfiguration());
-        $connection->expects(self::once())
-            ->method('isConnected')
-            ->willReturn(true);
-        $connection->expects(self::once())
-            ->method('close');
-        $em->expects(self::once())
-            ->method('getConnection')
-            ->willReturn($connection);
-
-        $logger->expects(self::once())
-            ->method('info')
-            ->with('Disconnect ORM metadata factory');
-        $logger->expects(self::never())
-            ->method('warning');
-
-        $this->container->expects(self::once())
-            ->method('initialized')
-            ->with('foo_metadata_factory')
-            ->willReturn(true);
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('foo_metadata_factory')
-            ->willReturn($metadataFactory);
-        $metadataFactory->expects(self::once())
-            ->method('isDisconnected')
-            ->willReturn(false);
-        $metadataFactory->expects(self::once())
-            ->method('getEntityManager')
-            ->willReturn($em);
-        $em->expects(self::once())
-            ->method('isOpen')
-            ->willReturn(true);
-        $em->expects(self::any())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
-        $repositoryFactory->expects(self::once())
-            ->method('clear');
 
         $this->clearer->clear($logger);
     }
