@@ -200,7 +200,9 @@ services:
             - [ setNamespace, [ 'doctrine_query_search' ] ]
 
     oro_search.entity.repository.search_index:
-        class: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+        alias: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+
+    Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\SearchBundle\Entity\Item'
@@ -209,6 +211,8 @@ services:
             - [setRegistry,  ['@doctrine']]
             - [setDriversClasses, ['%oro_search.drivers%']]
         lazy: true
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_search.async.index_entity_processor:
         class: Oro\Bundle\SearchBundle\Async\IndexEntityMessageProcessor

@@ -15,6 +15,12 @@ The current file describes significant changes in the code that may affect the u
   The `post_save_data` event is dispatched after the database transaction is committed.
   API processors for these events can be used to customize database update logic. 
 
+### Changed
+
+#### EntityBundle
+
+* Parent class for repositories as a services was changed to `Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository`.
+
 ### Removed
 
 #### UIBundle
@@ -30,6 +36,8 @@ The current file describes significant changes in the code that may affect the u
   use `Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getEntityFields()` instead.
 * `Oro\Bundle\EntityBundle\Helper\FieldHelper::getFields()` was removed,
   use `Oro\Bundle\EntityBundle\Helper\FieldHelper::getEntityFields()` instead.
+* The service `oro_entity.repository.factory` was removed.
+* The DIC compiler pass `Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityRepositoryCompilerPass` was removed.
 
 #### EntityMergeBundle
 * The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -15,7 +15,7 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 /**
  * Repository for MenuUpdate ORM Entity.
  */
-class MenuUpdateRepository extends EntityRepository
+class MenuUpdateRepository extends ServiceEntityRepository
 {
     /**
      * @var CacheProvider

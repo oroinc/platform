@@ -67,7 +67,6 @@ class OroEntityBundle extends Bundle
             'id'
         ));
         $container->addCompilerPass(new Compiler\SqlWalkerPass());
-        $container->addCompilerPass(new Compiler\EntityRepositoryCompilerPass());
         $container->addCompilerPass(new Compiler\EntityDeleteHandlerCompilerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
