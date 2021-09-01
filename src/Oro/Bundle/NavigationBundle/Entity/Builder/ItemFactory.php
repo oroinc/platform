@@ -25,7 +25,7 @@ class ItemFactory
      *
      * @return object|null
      */
-    public function createItem($type, $params)
+    public function createItem(string $type, $params)
     {
         if (!$this->builders->has($type)) {
             return null;
@@ -45,7 +45,7 @@ class ItemFactory
      *
      * @return object|null
      */
-    public function findItem($type, $itemId)
+    public function findItem(string $type, $itemId)
     {
         if (!$this->builders->has($type)) {
             return null;

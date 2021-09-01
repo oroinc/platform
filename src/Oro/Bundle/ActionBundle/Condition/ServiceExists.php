@@ -39,7 +39,7 @@ class ServiceExists extends AbstractCondition implements ContextAccessorAwareInt
      */
     protected function isConditionAllowed($context)
     {
-        $serviceName = $this->resolveValue($context, $this->propertyPath);
+        $serviceName = (string) $this->resolveValue($context, $this->propertyPath);
 
         return $this->container->has($serviceName);
     }

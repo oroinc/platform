@@ -4,9 +4,7 @@ namespace Oro\Bundle\EntityBundle;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
-use Oro\Component\DependencyInjection\Compiler\InverseTaggedIteratorCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
-use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherConfigurator;
 use Oro\Component\DoctrineUtils\DependencyInjection\AddTransactionWatcherCompilerPass;
@@ -43,19 +41,6 @@ class OroEntityBundle extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_entity.exclusion_provider',
-            'oro_entity.exclusion_provider.default',
-            'addProvider'
-        ));
-        $container->addCompilerPass(new InverseTaggedIteratorCompilerPass(
-            'oro_entity.virtual_field_provider',
-            'oro_entity.virtual_field_provider'
-        ));
-        $container->addCompilerPass(new InverseTaggedIteratorCompilerPass(
-            'oro_entity.virtual_relation_provider',
-            'oro_entity.virtual_relation_provider'
-        ));
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());
         $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());
         $container->addCompilerPass(new Compiler\CustomGridFieldValidatorCompilerPass());

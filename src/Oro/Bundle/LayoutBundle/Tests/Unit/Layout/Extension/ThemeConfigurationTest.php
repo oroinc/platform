@@ -10,25 +10,20 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    private function processConfiguration(array $config)
+    private function processConfiguration(array $config): array
     {
         $processor = new Processor();
 
         return $processor->processConfiguration(new ThemeConfiguration(), [$config]);
     }
 
-    public function testProcessEmptyConfiguration()
+    public function testProcessEmptyConfiguration(): void
     {
         $result = $this->processConfiguration([]);
-        $this->assertSame([], $result);
+        self::assertSame([], $result);
     }
 
-    public function testProcessBaseConfiguration()
+    public function testProcessBaseConfiguration(): void
     {
         $themeConfig = [
             'label'              => 'test label',
@@ -43,10 +38,10 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
             'screenshot'         => 'test_screenshot.jpg'
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
-        $this->assertSame($themeConfig, $result['test_theme']);
+        self::assertSame($themeConfig, $result['test_theme']);
     }
 
-    public function testProcessAssets()
+    public function testProcessAssets(): void
     {
         $themeConfig = [
             'label'  => 'test label',
@@ -62,10 +57,10 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
-        $this->assertSame($themeConfig['config']['assets'], $result['test_theme']['config']['assets']);
+        self::assertSame($themeConfig['config']['assets'], $result['test_theme']['config']['assets']);
     }
 
-    public function testProcessImagesTypes()
+    public function testProcessImagesTypes(): void
     {
         $themeConfig = [
             'label'  => 'test label',
@@ -90,10 +85,10 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $expected['config']['images']['dimensions'] = [];
 
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
-        $this->assertSame($expected['config']['images'], $result['test_theme']['config']['images']);
+        self::assertSame($expected['config']['images'], $result['test_theme']['config']['images']);
     }
 
-    public function testProcessImagesDimensions()
+    public function testProcessImagesDimensions(): void
     {
         $themeConfig = [
             'label'  => 'test label',
@@ -130,14 +125,14 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $expected['config']['images']['types'] = [];
 
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
-        $this->assertSame($expected['config']['images'], $result['test_theme']['config']['images']);
+        self::assertSame($expected['config']['images'], $result['test_theme']['config']['images']);
     }
 
-    public function testProcessImagesDimensionWithoutHeight()
+    public function testProcessImagesDimensionWithoutHeight(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage(
-            'The child node "height" at path "themes.test_theme.config.images.dimensions.test_dimension1"'
+            'The child config "height" under "themes.test_theme.config.images.dimensions.test_dimension1"'
             . ' must be configured.'
         );
 
@@ -156,11 +151,11 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    public function testProcessImagesDimensionWithoutWidth()
+    public function testProcessImagesDimensionWithoutWidth(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage(
-            'The child node "width" at path "themes.test_theme.config.images.dimensions.test_dimension1"'
+            'The child config "width" under "themes.test_theme.config.images.dimensions.test_dimension1"'
             . ' must be configured.'
         );
 
@@ -179,7 +174,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    public function testProcessPageTemplates()
+    public function testProcessPageTemplates(): void
     {
         $themeConfig = [
             'label'  => 'test label',
@@ -218,10 +213,10 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $expected['config']['page_templates']['titles'] = [];
 
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
-        $this->assertSame($expected['config']['page_templates'], $result['test_theme']['config']['page_templates']);
+        self::assertSame($expected['config']['page_templates'], $result['test_theme']['config']['page_templates']);
     }
 
-    public function testProcessPageTemplatesTitles()
+    public function testProcessPageTemplatesTitles(): void
     {
         $themeConfig = [
             'label'  => 'test label',
@@ -235,10 +230,10 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $expected['config']['page_templates']['templates'] = [];
 
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
-        $this->assertSame($expected['config']['page_templates'], $result['test_theme']['config']['page_templates']);
+        self::assertSame($expected['config']['page_templates'], $result['test_theme']['config']['page_templates']);
     }
 
-    public function testProcessPageTemplateWithEmptyRoute()
+    public function testProcessPageTemplateWithEmptyRoute(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -261,7 +256,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    public function testProcessPageTemplateWithEmptyKey()
+    public function testProcessPageTemplateWithEmptyKey(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -284,7 +279,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration(['test_theme' => $themeConfig]);
     }
 
-    public function testProcessPageTemplateWithEmptyLabel()
+    public function testProcessPageTemplateWithEmptyLabel(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage(

@@ -118,7 +118,7 @@ class GaufretteResolverFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
-            'The child node "file_manager_service" at path "oro_gaufrette" must be configured.'
+            'The child config "file_manager_service" under "oro_gaufrette" must be configured.'
         );
 
         $treeBuilder = new TreeBuilder('oro_gaufrette');

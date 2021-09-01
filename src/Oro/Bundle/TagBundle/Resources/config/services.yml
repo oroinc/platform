@@ -89,7 +89,7 @@ services:
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.doctrine_helper'
         tags:
-            - { name: oro_entity.virtual_relation_provider, priority: 150 }
+            - { name: oro_entity.virtual_relation_provider, priority: -150 }
 
     oro_tag.virtual_field_provider.tag:
         class: Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider
@@ -98,7 +98,7 @@ services:
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.doctrine_helper'
         tags:
-            - { name: oro_entity.virtual_field_provider, priority: 150 }
+            - { name: oro_entity.virtual_field_provider, priority: -150 }
 
     oro_tag.filter.tags_choice_tree:
         class: Oro\Bundle\TagBundle\Filter\TagsDictionaryFilter

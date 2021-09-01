@@ -125,7 +125,7 @@ class FormatterExtension extends AbstractExtension
      */
     private function getPropertyObject(PropertyConfiguration $config): PropertyInterface
     {
-        $type = $config->offsetGet(Configuration::TYPE_KEY);
+        $type = (string) $config->offsetGet(Configuration::TYPE_KEY);
         if (!$this->propertyContainer->has($type)) {
             throw new RuntimeException(sprintf('The "%s" formatter not found.', $type));
         }

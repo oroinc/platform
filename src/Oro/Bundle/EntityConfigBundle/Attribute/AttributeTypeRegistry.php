@@ -38,11 +38,12 @@ class AttributeTypeRegistry
         if (!$this->attributeTypes->has($type)) {
             $type = $this->getType($attribute);
         }
-        if (!$this->attributeTypes->has($type)) {
-            return null;
+
+        if ($type && $this->attributeTypes->has($type)) {
+            return $this->attributeTypes->get($type);
         }
 
-        return $this->attributeTypes->get($type);
+        return null;
     }
 
     /**

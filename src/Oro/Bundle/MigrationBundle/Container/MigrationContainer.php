@@ -55,7 +55,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function set($id, $service)
+    public function set(string $id, ?object $service)
     {
         $this->publicContainer->set($id, $service);
     }
@@ -63,7 +63,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function has($id)
+    public function has(string $id)
     {
         return $this->publicContainer->has($id) || $this->privateContainer->has($id);
     }
@@ -81,7 +81,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function initialized($id)
+    public function initialized(string $id)
     {
         return $this->publicContainer->initialized($id);
     }

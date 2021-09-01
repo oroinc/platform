@@ -323,7 +323,7 @@ class EntityFallbackResolver
      * @return EntityFallbackProviderInterface
      * @throws FallbackProviderNotFoundException
      */
-    public function getFallbackProvider($key)
+    public function getFallbackProvider(string $key)
     {
         if (isset($this->loadedFallbackProviders[$key])) {
             return $this->loadedFallbackProviders[$key];
