@@ -59,5 +59,7 @@ HELP
         $configManager = $this->configManager;
         $configManager->set($input->getArgument('name'), $input->getArgument('value'));
         $configManager->flush();
+
+        return 0;
     }
 }

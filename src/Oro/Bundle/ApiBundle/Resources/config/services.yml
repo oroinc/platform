@@ -374,6 +374,7 @@ services:
     oro_api.entity_exclusion_provider.shared:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
         arguments:
+            - !tagged_iterator oro_entity.exclusion_provider.api
             - '@oro_entity.entity_hierarchy_provider.all'
 
     oro_api.entity_override_provider_registry:

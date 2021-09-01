@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class LazyDoctrineOrmListenersPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldMarkDoctrineOrmEntityListenersAsLazyAndPublic()
+    public function testShouldMarkDoctrineOrmEntityListenersAsLazyAndPublic(): void
     {
         $container = new ContainerBuilder();
         $container->register('public_listener')
@@ -18,9 +18,9 @@ class LazyDoctrineOrmListenersPassTest extends \PHPUnit\Framework\TestCase
         $container->register('lazy_listener')
             ->addTag('doctrine.orm.entity_listener', ['lazy' => true]);
         $container->register('not_lazy_listener')
+            ->setPublic(true)
             ->addTag('doctrine.orm.entity_listener', ['lazy' => false]);
         $container->register('private_lazy_listener')
-            ->setPublic(false)
             ->addTag('doctrine.orm.entity_listener', ['lazy' => true]);
         $container->register('private_not_lazy_listener')
             ->setPublic(false)

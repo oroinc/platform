@@ -123,6 +123,8 @@ HELP
         }
 
         $output->writeln(sprintf('<info>Done.</info>'));
+
+        return 0;
     }
 
     private function processLocales(array $locales, OutputInterface $output): void

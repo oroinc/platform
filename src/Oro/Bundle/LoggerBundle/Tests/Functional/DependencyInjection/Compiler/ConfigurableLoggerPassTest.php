@@ -24,8 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ConfigurableLoggerPassTest extends WebTestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
+    private RequestStack $requestStack;
 
     /**
      * {@inheritdoc}
@@ -38,11 +37,16 @@ class ConfigurableLoggerPassTest extends WebTestCase
         $this->requestStack->push(new Request());
     }
 
-    public function testLogToCustomChannel()
+    public function testLogToCustomChannel(): void
     {
         $application = new Application(self::$kernel);
         $application->add($this->getLoggerLevelCommand());
-        $application->add(new CustomLogChannelCommandStub());
+
+        $containerBuilder = $this->getContainerBuilder();
+        /** @var Logger $logger */
+        $logger = $containerBuilder->get(CustomLogChannelCommandStub::LOGGER_NAME);
+
+        $application->add(new CustomLogChannelCommandStub($logger));
 
         $command = $application->find('oro:logger:level');
         $commandTester = new CommandTester($command);
@@ -59,28 +63,20 @@ class ConfigurableLoggerPassTest extends WebTestCase
         /** @var CustomLogChannelCommandStub $command */
         $command = $application->find('oro:logger:use-custom-channel');
 
-        $containerBuilder = $this->getContainerBuilder();
-        $command->setContainer($containerBuilder);
-
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName()
         ]);
 
-        /** @var Logger $logger */
-        $logger = $containerBuilder->get(CustomLogChannelCommandStub::LOGGER_NAME);
         $logs = $logger->getLogs($this->requestStack->getCurrentRequest());
 
-        $this->assertNotEmpty($logs);
-        $this->assertEquals(CustomLogChannelCommandStub::LOG_MESSAGE, $logs[0]['message']);
-        $this->assertEquals('custom_channel', $logs[0]['channel']);
-        $this->assertEquals('INFO', $logs[0]['priorityName']);
+        self::assertNotEmpty($logs);
+        self::assertEquals(CustomLogChannelCommandStub::LOG_MESSAGE, $logs[0]['message']);
+        self::assertEquals('custom_channel', $logs[0]['channel']);
+        self::assertEquals('INFO', $logs[0]['priorityName']);
     }
 
-    /**
-     * @return ContainerBuilder
-     */
-    private function getContainerBuilder()
+    private function getContainerBuilder(): ContainerBuilder
     {
         $container = new ContainerBuilder();
 
@@ -105,7 +101,7 @@ class ConfigurableLoggerPassTest extends WebTestCase
     /**
      * Loads YAML files service definitions
      */
-    private function loadYmlFixture(ContainerBuilder $container, string $fixtureFileName)
+    private function loadYmlFixture(ContainerBuilder $container, string $fixtureFileName): void
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../Fixtures/yml'));
         $loader->load($fixtureFileName.'.yml');

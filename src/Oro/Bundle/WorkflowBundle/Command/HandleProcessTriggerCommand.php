@@ -59,20 +59,23 @@ HELP
         $triggerId = $input->getOption('id');
         if (!filter_var($triggerId, FILTER_VALIDATE_INT)) {
             $output->writeln('<error>No process trigger identifier defined</error>');
-            return;
+
+            return 1;
         }
 
         /** @var ProcessTrigger $processTrigger */
         $processTrigger = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')->find($triggerId);
         if (!$processTrigger) {
             $output->writeln('<error>Process trigger not found</error>');
-            return;
+
+            return 1;
         }
 
         $processDefinition = $processTrigger->getDefinition();
         if ($processName !== $processDefinition->getName()) {
             $output->writeln(sprintf('<error>Trigger not found in process definition "%s"</error>', $processName));
-            return;
+
+            return 1;
         }
 
         $processData = new ProcessData();
@@ -114,5 +117,7 @@ HELP
 
             throw $e;
         }
+
+        return 0;
     }
 }

@@ -91,13 +91,13 @@ invalid_identifier_field_names:
     config:
         identifier_field_names: 123
     expected: []
-    error: 'Invalid type for path "entity.identifier_field_names". Expected array, but got integer'
+    error: 'Invalid type for path "entity.identifier_field_names". Expected "array", but got "int"'
 
 default_max_results:
     config:
         max_results: ~
     expected: []
-    error: 'Invalid type for path "entity.max_results". Expected int, but got NULL.'
+    error: 'Invalid type for path "entity.max_results". Expected "int", but got "null".'
 
 zero_max_results:
     config:
@@ -202,7 +202,7 @@ invalid_value_for_disable_inclusion:
     config:
         disable_inclusion: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_inclusion". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_inclusion". Expected "bool", but got "int"'
 
 enable_fieldset:
     config:
@@ -220,7 +220,7 @@ invalid_value_for_disable_fieldset:
     config:
         disable_fieldset: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_fieldset". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_fieldset". Expected "bool", but got "int"'
 
 enable_meta_properties:
     config:
@@ -238,7 +238,7 @@ invalid_value_for_disable_meta_properties:
     config:
         disable_meta_properties: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_meta_properties". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_meta_properties". Expected "bool", but got "int"'
 
 enable_partial_load:
     config:
@@ -256,7 +256,7 @@ invalid_value_for_disable_partial_load:
     config:
         disable_partial_load: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_partial_load". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.disable_partial_load". Expected "bool", but got "int"'
 
 all_attributes:
     config:
@@ -316,7 +316,7 @@ invalid_field_exclude:
             field1:
                 exclude: 123
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.exclude". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.fields.field1.exclude". Expected "bool", but got "int".'
 
 field_property_path:
     config:
@@ -364,7 +364,7 @@ invalid_field_meta_property:
             field1:
                 meta_property: 123
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.meta_property". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.fields.field1.meta_property". Expected "bool", but got "int".'
 
 field_collapse:
     config:
@@ -386,7 +386,7 @@ invalid_field_collapse:
             field1:
                 collapse: 123
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.collapse". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.fields.field1.collapse". Expected "bool", but got "int".'
 
 data_transformer_should_not_be_supported:
     config:
@@ -741,13 +741,13 @@ invalid_entity_form_type:
     config:
         form_type: []
     expected: []
-    error: 'Invalid type for path "entity.form_type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.form_type". Expected "scalar", but got "array".'
 
 invalid_entity_form_options:
     config:
         form_options: test
     expected: []
-    error: 'Invalid type for path "entity.form_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.form_options". Expected "array", but got "string"'
 
 dash_in_field_name:
     config:
@@ -815,7 +815,7 @@ invalid_field_form_type:
             field1:
                 form_type: []
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.form_type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.fields.field1.form_type". Expected "scalar", but got "array".'
 
 invalid_field_form_options:
     config:
@@ -823,7 +823,7 @@ invalid_field_form_options:
             field1:
                 form_options: test
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.form_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.fields.field1.form_options". Expected "array", but got "string"'
 
 invalid_field_post_processor:
     config:
@@ -831,7 +831,7 @@ invalid_field_post_processor:
             field1:
                 post_processor: []
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.post_processor". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.fields.field1.post_processor". Expected "scalar", but got "array".'
 
 unknown_field_post_processor:
     config:
@@ -847,7 +847,7 @@ invalid_field_post_processor_options:
             field1:
                 post_processor_options: test
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.post_processor_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.fields.field1.post_processor_options". Expected "array", but got "string"'
 
 twig_field_post_processor_without_options:
     config:
@@ -883,4 +883,4 @@ invalid_field_depends_on:
             field1:
                 depends_on: field2
     expected: []
-    error: 'Invalid type for path "entity.fields.field1.depends_on". Expected array, but got string'
+    error: 'Invalid type for path "entity.fields.field1.depends_on". Expected "array", but got "string"'

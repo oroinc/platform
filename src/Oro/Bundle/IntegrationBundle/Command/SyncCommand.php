@@ -155,6 +155,8 @@ HELP
             $this->syncScheduler->schedule($integration->getId(), $connector, $connectorParameters);
         }
         $output->writeln('Integration sync scheduling complete');
+
+        return 0;
     }
 
     /**

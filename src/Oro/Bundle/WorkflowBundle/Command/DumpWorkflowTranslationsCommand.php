@@ -72,5 +72,7 @@ HELP
         $translations = $this->workflowTranslationHelper->generateDefinitionTranslations($keys, $locale);
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
+
+        return 0;
     }
 }

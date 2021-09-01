@@ -44,7 +44,7 @@ class ActionFactory
             );
         }
 
-        $type = $config->offsetGet(self::ACTION_TYPE_KEY);
+        $type = (string) $config->offsetGet(self::ACTION_TYPE_KEY);
         if (!$this->actionContainer->has($type)) {
             throw new RuntimeException(sprintf('Unknown action type "%s". Action: %s.', $type, $actionName));
         }

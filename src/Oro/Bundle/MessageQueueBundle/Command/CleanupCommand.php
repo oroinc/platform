@@ -85,7 +85,7 @@ HELP
                 )
             );
 
-            return;
+            return 0;
         }
 
         $output->writeln(sprintf(
@@ -94,6 +94,8 @@ HELP
         ));
 
         $output->writeln('<info>Message queue job history cleanup complete</info>');
+
+        return 0;
     }
 
     /**

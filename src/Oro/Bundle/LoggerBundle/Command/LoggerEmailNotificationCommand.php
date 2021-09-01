@@ -79,30 +79,32 @@ HELP
             if (!$this->configManager->get($recipientsConfigKey)) {
                 $io->text("Error logs notification already disabled.");
 
-                return;
+                return 0;
             }
             $this->configManager->reset($recipientsConfigKey);
             $io->text("Error logs notification successfully disabled.");
             $this->configManager->flush();
 
-            return;
+            return 0;
         }
         if ($recipients) {
             $errors = $this->validateRecipients($recipients);
             if (!empty($errors)) {
                 $io->error($errors);
 
-                return;
+                return 1;
             }
             $this->configManager->set($recipientsConfigKey, $recipients);
             $io->text(["Error logs notification will be sent to listed email addresses:", $recipients]);
 
             $this->configManager->flush();
 
-            return;
+            return 0;
         }
 
         $io->error('Please provide --recipients or add --disable flag to the command.');
+
+        return 1;
     }
 
     protected function validateRecipients(string $recipients): array

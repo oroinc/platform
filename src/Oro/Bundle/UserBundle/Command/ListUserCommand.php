@@ -113,6 +113,8 @@ HELP
             ->setRows(array_map([$this, 'getUserRow'], $builder->getQuery()->getResult()))
             ->render()
         ;
+
+        return 0;
     }
 
     protected function getUserRow(User $user): array

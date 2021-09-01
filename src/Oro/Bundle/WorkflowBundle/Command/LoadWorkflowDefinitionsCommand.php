@@ -128,5 +128,7 @@ HELP
         } else {
             $output->writeln('No workflow definitions found.');
         }
+
+        return 0;
     }
 }

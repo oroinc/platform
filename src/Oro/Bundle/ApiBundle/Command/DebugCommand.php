@@ -20,18 +20,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Displays registered API actions and processors.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterface
+class DebugCommand extends AbstractDebugCommand
 {
-    use ContainerAwareTrait;
-
     private const MAX_ELEMENTS_PER_LINE = 2;
 
     /** @var string */
@@ -146,27 +142,27 @@ HELP
     /**
      * {@inheritdoc }
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $showProcessors = $input->getOption('processors');
         if ($showProcessors) {
             $this->dumpAllProcessors($output, $this->getRequestType($input));
 
-            return;
+            return 0;
         }
 
         $showProcessorsWithoutDescription = $input->getOption('processors-without-description');
         if ($showProcessorsWithoutDescription) {
             $this->dumpProcessorsWithoutDescription($output, $this->getRequestType($input));
 
-            return;
+            return 0;
         }
 
         $action = $input->getArgument('action');
         if (empty($action)) {
             $this->dumpActions($output);
 
-            return;
+            return 0;
         }
 
         /** @var string[] $attributes */
@@ -182,6 +178,8 @@ HELP
             $attributes,
             $input->getOption('no-docs')
         );
+
+        return 0;
     }
 
     private function dumpActions(OutputInterface $output): void

@@ -208,6 +208,8 @@ HELP
                 }
             }
         }
+
+        return 0;
     }
 
     protected function dumpEntityList(OutputInterface $output): void

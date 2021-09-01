@@ -108,6 +108,8 @@ HELP
             $io->table(['Tag', 'Documentation Path'], $rows);
             $io->text('Total: ' . count($rows));
         }
+
+        return 0;
     }
 
     protected function getAsTableRows(array $documentationInfo, bool $withDocs, bool $withoutDocs): array

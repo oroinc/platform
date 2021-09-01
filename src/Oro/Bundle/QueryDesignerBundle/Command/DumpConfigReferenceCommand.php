@@ -51,5 +51,7 @@ HELP
         $output->writeln('# The structure of "Resources/config/oro/query_designer.yml"');
         $dumper = new YamlReferenceDumper();
         $output->writeln($dumper->dump($this->configuration));
+
+        return 0;
     }
 }

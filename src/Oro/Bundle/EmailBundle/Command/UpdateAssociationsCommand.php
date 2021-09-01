@@ -50,5 +50,7 @@ HELP
         $this->producer->send(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, []);
 
         $output->writeln('<info>Update of associations has been scheduled.</info>');
+
+        return 0;
     }
 }

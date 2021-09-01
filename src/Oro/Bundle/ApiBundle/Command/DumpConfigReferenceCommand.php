@@ -85,5 +85,7 @@ HELP
         $output->writeln('# The structure of "Resources/config/oro/api.yml"');
         $dumper = new YamlReferenceDumper();
         $output->writeln($dumper->dump($configuration));
+
+        return 0;
     }
 }

@@ -99,6 +99,8 @@ HELP
         if (!$input->getOption('dry-run')) {
             $this->enumSynchronizer->sync();
         }
+
+        return 0;
     }
 
     protected function getClassesMetadata(EntityManager $em): array

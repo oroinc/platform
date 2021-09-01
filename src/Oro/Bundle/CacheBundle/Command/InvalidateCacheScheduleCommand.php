@@ -6,15 +6,16 @@ namespace Oro\Bundle\CacheBundle\Command;
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionHandlerInterface;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Schedules cache invalidation using a specified service and parameters.
  */
-class InvalidateCacheScheduleCommand extends ContainerAwareCommand
+class InvalidateCacheScheduleCommand extends Command
 {
     /**
      * @internal
@@ -25,6 +26,15 @@ class InvalidateCacheScheduleCommand extends ContainerAwareCommand
 
     /** @var string */
     protected static $defaultName = 'oro:cache:invalidate:schedule';
+
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+
+        parent::__construct();
+    }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
@@ -63,6 +73,8 @@ HELP
         $dataStorage = $this->buildDataStorage($input);
 
         $this->getService($service)->handle($dataStorage);
+
+        return 0;
     }
 
     private function buildDataStorage(InputInterface $input): InvalidateCacheDataStorage
@@ -76,5 +88,10 @@ HELP
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getContainer()->get($service);
+    }
+
+    private function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 }

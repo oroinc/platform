@@ -84,7 +84,7 @@ HELP
         $formattingCode = (string)$input->getOption('formatting-code');
 
         if ($languageCode === Translator::DEFAULT_LOCALE && $formattingCode === Translator::DEFAULT_LOCALE) {
-            return;
+            return 0;
         }
 
         /** @var LocalizationRepository $localizationRepository */
@@ -108,6 +108,8 @@ HELP
         } else {
             throw new \RuntimeException('Default localization not found');
         }
+
+        return 0;
     }
 
     private function createLanguage(Language $defaultLanguage, string $languageCode): Language
