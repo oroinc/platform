@@ -78,12 +78,14 @@ HELP
     {
         // do nothing if check was disabled with 0 config option value
         if ($this->heartBeatUpdatePeriod === 0) {
-            return;
+            return 0;
         }
 
         if (!$this->consumerHeartbeat->isAlive() && $this->connectionChecker->checkConnection()) {
             // Notify frontend that there are no alive consumers.
             $this->websocketClient->publish('oro/message_queue_heartbeat', '');
         }
+
+        return 0;
     }
 }

@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\LoggerBundle\Tests\Functional\Stub\CustomLogChannelCommandStub:
+        arguments:
+            - '@monolog.logger.custom_channel'
+        tags:
+            - { name: console.command }

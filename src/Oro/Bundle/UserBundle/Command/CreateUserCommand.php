@@ -91,9 +91,15 @@ HELP
                 ->updateUser($user, $options);
         } catch (InvalidArgumentException $exception) {
             $output->writeln($exception->getMessage());
+
+            return $exception->getCode() ?: 1;
         } catch (DBALException $exception) {
             $output->writeln('User exists');
+
+            return $exception->getCode() ?: 1;
         }
+
+        return 0;
     }
 
     /**

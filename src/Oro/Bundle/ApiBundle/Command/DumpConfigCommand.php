@@ -159,6 +159,8 @@ HELP
 
             $this->dumpConfig($output, $config);
         }
+
+        return 0;
     }
 
     protected function getConfigExtras(InputInterface $input): array

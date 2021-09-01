@@ -143,7 +143,11 @@ HELP
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+
+            return 1;
         }
+
+        return 0;
     }
 
     protected function getMigrationLoader(InputInterface $input): MigrationsLoader

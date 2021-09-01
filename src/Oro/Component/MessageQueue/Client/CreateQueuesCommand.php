@@ -53,5 +53,7 @@ HELP
 
             $this->clientDriver->createQueue($meta->getTransportName());
         }
+
+        return 0;
     }
 }

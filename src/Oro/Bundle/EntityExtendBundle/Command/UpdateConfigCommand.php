@@ -80,10 +80,12 @@ HELP
             $output->writeln('<error>This is an internal command. Please do not run it manually.</error>');
             $output->writeln('<error>Execution of this command can break the system.</error>');
 
-            return;
+            return 1;
         }
 
         $this->extendConfigDumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
+
+        return 0;
     }
 
     protected function getFilter(InputInterface $input): ?callable

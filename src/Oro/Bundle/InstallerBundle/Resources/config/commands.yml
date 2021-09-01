@@ -10,10 +10,11 @@ services:
 
     Oro\Bundle\InstallerBundle\Command\InstallCommand:
         arguments:
-            - '@oro_installer.yaml_persister'
-            - '@oro_installer.script_manager'
+            - '@service_container'
             - '@doctrine'
             - '@event_dispatcher'
+            - '@oro_installer.yaml_persister'
+            - '@oro_installer.script_manager'
         tags:
             - { name: console.command }
 
@@ -28,10 +29,13 @@ services:
 
     Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand:
         arguments:
+            - '@service_container'
             - '@oro_installer.platform_update_checker'
         tags:
             - { name: console.command }
 
     Oro\Bundle\InstallerBundle\Command\RunScriptsCommand:
+        arguments:
+            - '@service_container'
         tags:
             - { name: console.command }

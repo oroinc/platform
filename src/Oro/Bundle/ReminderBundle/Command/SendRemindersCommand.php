@@ -69,7 +69,7 @@ HELP
 
         if (!$reminders) {
             $output->writeln('<info>No reminders to sent</info>');
-            return;
+            return 0;
         }
 
         $output->writeln(
@@ -90,6 +90,8 @@ HELP
             $em->rollback();
             throw $e;
         }
+
+        return 0;
     }
 
     /**

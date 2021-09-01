@@ -88,6 +88,8 @@ HELP
         array_unshift($extensions, $this->getLoggerExtension($input, $output));
 
         $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
+
+        return 0;
     }
 
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void

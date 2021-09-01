@@ -116,5 +116,7 @@ HELP
             'API documentation cache was successfully cleared for "%s" environment.',
             $this->environment
         ));
+
+        return 0;
     }
 }

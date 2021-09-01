@@ -83,7 +83,6 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $user = null;
         $level = $this->getLogLevel($input->getArgument('level'));
         $disableAfter = $this->getDisableAfterDateTime($input->getArgument('disable-after'));
 
@@ -124,6 +123,8 @@ HELP
         }
 
         $output->writeln($message);
+
+        return 0;
     }
 
     /**

@@ -47,5 +47,7 @@ HELP
         if (!$input->getOption('no-warmup')) {
             $this->warmup($output);
         }
+
+        return 0;
     }
 }

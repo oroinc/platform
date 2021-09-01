@@ -136,6 +136,8 @@ HELP
         } else {
             $output->writeln('Scheduled successfully.');
         }
+
+        return 0;
     }
 
     /**

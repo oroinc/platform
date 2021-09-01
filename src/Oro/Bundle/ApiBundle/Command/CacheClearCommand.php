@@ -67,5 +67,7 @@ HELP
         }
 
         $io->success('API cache was successfully cleared.');
+
+        return 0;
     }
 }

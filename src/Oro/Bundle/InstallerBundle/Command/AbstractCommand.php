@@ -4,16 +4,26 @@ declare(strict_types=1);
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for install and update commands that need to pass debug and timeout options to subsequent commands.
  */
-abstract class AbstractCommand extends ContainerAwareCommand
+abstract class AbstractCommand extends Command
 {
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+
+        parent::__construct();
+    }
+
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
@@ -68,5 +78,10 @@ HELP
         }
 
         return $commandExecutor;
+    }
+
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 }

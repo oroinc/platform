@@ -104,6 +104,8 @@ HELP
         } else {
             $this->dumpPhpSchema($schema, $output);
         }
+
+        return 0;
     }
 
     protected function initializeBundleRestrictions(?string $bundle): void
