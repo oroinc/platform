@@ -323,7 +323,7 @@ class Translator extends BaseTranslator
         $locales = array_unique($this->getFallbackLocales());
         foreach ($locales as $locale) {
             $catalogueFile = $this->getCatalogueCachePath($locale);
-            if (is_file($catalogueFile)) {
+            if ($this->isCatalogueCacheFileExits($catalogueFile)) {
                 unlink($catalogueFile);
             }
         }
@@ -440,7 +440,7 @@ class Translator extends BaseTranslator
     protected function loadCatalogue($locale)
     {
         $this->initializeDynamicResources($locale);
-        $isCacheReady = is_file($this->getCatalogueCachePath($locale));
+        $isCacheReady = $this->isCatalogueCacheFileExits($this->getCatalogueCachePath($locale));
         parent::loadCatalogue($locale);
 
         if (!$isCacheReady && $this->isApplicationInstalled()) {
@@ -493,7 +493,7 @@ class Translator extends BaseTranslator
         // check if any dynamic resource is changed and update translation catalogue if needed
         if (!empty($this->dynamicResources[$locale])) {
             $catalogueFile = $this->getCatalogueCachePath($locale);
-            if (is_file($catalogueFile)) {
+            if ($this->isCatalogueCacheFileExits($catalogueFile)) {
                 $time = filemtime($catalogueFile);
                 foreach ($this->dynamicResources[$locale] as $item) {
                     /** @var DynamicResourceInterface $dynamicResource */
@@ -521,6 +521,13 @@ class Translator extends BaseTranslator
             '/',
             '_'
         ).'.php';
+    }
+
+    private function isCatalogueCacheFileExits(string $path): bool
+    {
+        clearstatcache(true, $path);
+
+        return is_file($path);
     }
 
     /**
