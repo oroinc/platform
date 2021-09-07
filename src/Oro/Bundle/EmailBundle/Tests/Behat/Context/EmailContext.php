@@ -16,6 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTra
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Feature context to work with emails
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -23,7 +24,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 {
     use AssertTrait, MessageQueueProcessorAwareTrait;
 
-    private ?DirectMailerDecorator $mailer = null;
+    private ?DirectMailer $mailer = null;
 
     private string $downloadedFile = '';
 

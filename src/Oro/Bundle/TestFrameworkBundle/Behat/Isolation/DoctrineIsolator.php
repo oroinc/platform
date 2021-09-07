@@ -18,9 +18,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Disables all optional listeners (except list of required listeners) before loading data fixtures and enables them
- * again after loading data completed. It will increase performance of data fixtures, because many listeners don't
- * required during data loading (like data audit listener).
+ * - Disables all optional listeners (except required listeners),
+ * - loads data fixtures,
+ * - and enables listeners back after completion.
+ * It increases the performance of data fixtures load because many listeners
+ * are not required during data loading (like data audit listener)
  */
 class DoctrineIsolator implements IsolatorInterface
 {

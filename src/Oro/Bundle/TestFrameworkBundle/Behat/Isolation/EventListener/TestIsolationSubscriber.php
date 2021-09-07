@@ -14,7 +14,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,30 +22,29 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * Event subscriber to register test isolators
+ * Registers test isolators
  */
 class TestIsolationSubscriber implements EventSubscriberInterface
 {
-    use SkipIsolatorsTrait;
-
     const ISOLATOR_THRESHOLD = 500;
 
     const YES_PATTERN = '/^Y/i';
 
     /** @var IsolatorInterface[] */
-    protected $isolators;
+    private array $isolators = [];
 
     /** @var IsolatorInterface[] */
-    protected $reverseIsolators;
+    private array $reverseIsolators;
 
-    /** @var OutputInterface */
-    private $output;
+    private ?OutputInterface $output = null;
 
-    /** @var InputInterface */
-    protected $input;
+    private ?InputInterface $input = null;
 
-    /** @var Stopwatch */
-    private $stopwatch;
+    private Stopwatch $stopwatch;
+
+    private bool $skip = false;
+
+    private array $skipIsolatorsTags = [];
 
     /**
      * @param IsolatorInterface[] $isolators
@@ -73,6 +71,21 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         ];
     }
 
+    public function skip(): void
+    {
+        $this->skip = true;
+    }
+
+    public function skipIsolatorsTags(array $tags)
+    {
+        $this->skipIsolatorsTags = $tags;
+    }
+
+    public function getIsolatorsTags(): array
+    {
+        return array_unique(array_map(fn ($isolator) => $isolator->getTag(), $this->isolators));
+    }
+
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -83,7 +96,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
 
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -110,7 +123,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin isolating application state</comment>');
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -138,7 +151,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $event = new BeforeIsolatedTestEvent($this->output, $event->getFeature());
 
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -179,7 +192,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $event = new AfterIsolatedTestEvent($this->output);
 
         foreach ($this->reverseIsolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -207,7 +220,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin clean up isolation environment</comment>');
         foreach ($this->reverseIsolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
