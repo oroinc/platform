@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener;
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
@@ -14,21 +13,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Subscriber that processed message queue during test execution
+ * Starts, waits and stops the message queue during test execution
  */
 class MessageQueueIsolationSubscriber implements EventSubscriberInterface, MessageQueueProcessorAwareInterface
 {
-    use SkipIsolatorsTrait, MessageQueueProcessorAwareTrait;
+    public const TAG = 'message_queue';
 
-    /** @var KernelInterface */
-    private $kernel;
+    use MessageQueueProcessorAwareTrait;
 
-    /** @var OutputInterface */
-    private $output;
+    private KernelInterface $kernel;
+
+    private OutputInterface $output;
+
+    protected bool $skip = false;
 
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
+    }
+
+    public function skip(): void
+    {
+        $this->skip = true;
     }
 
     /**
