@@ -14,7 +14,7 @@ define(function(require) {
      * @extends oroui/js/app/views/base/view
      */
     const ActionHeaderCell = BaseView.extend({
-        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
+        attributes: Backgrid.Cell.prototype.attributes,
 
         keepElement: false,
 
@@ -96,7 +96,6 @@ define(function(require) {
                 panel.render();
                 panel.$el.children().wrap('<li/>');
             }
-            this.setAriaAttrs();
             return this;
         },
 

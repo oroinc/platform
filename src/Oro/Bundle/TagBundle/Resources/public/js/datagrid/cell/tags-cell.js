@@ -27,13 +27,7 @@ define(function(require) {
 
         getTemplateData: TagsView.prototype.getTemplateData,
 
-        render: _.wrap(TagsView.prototype.render, function(originalRender) {
-            const render = originalRender.call(this);
-
-            this.setAriaAttrs();
-
-            return render;
-        }),
+        render: TagsView.prototype.render,
 
         showDefault: false,
         /**

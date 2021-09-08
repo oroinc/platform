@@ -105,20 +105,38 @@ define(function(require) {
         return Backgrid.callByNeed(this.column.editable(), this.column, this.model);
     };
 
-    Backgrid.Cell.prototype.setAriaAttrs = function() {
-        if (this.disposed) {
-            return;
+    Backgrid.Cell.prototype.attributes = function() {
+        let attrs = Backgrid.Cell.__super__.attributes || {};
+
+        if (_.isFunction(attrs)) {
+            attrs = attrs.call(this);
         }
+
+        attrs = {...attrs};
 
         const {collection, cid} = this.column || {};
-        let rowIndex = -1;
 
         if (collection && collection.length) {
-            rowIndex = collection.findIndex(model => model.cid === cid);
+            const rowIndex = collection.findIndex(model => model.cid === cid);
+
+            if (rowIndex !== -1 && (this.model && this.model.get('isAuxiliary') !== true)) {
+                attrs['aria-colindex'] = rowIndex + 1;
+            }
         }
 
-        if (rowIndex !== -1) {
-            this.$el.attr('aria-colindex', rowIndex + 1);
+        return attrs;
+    };
+
+    Backgrid.HeaderCell.prototype.attributes = function() {
+        // Check own attrs
+        if (this.column.get('label')) {
+            let attrs = Backgrid.Cell.prototype.attributes || {};
+
+            if (_.isFunction(attrs)) {
+                attrs = attrs.call(this);
+            }
+
+            return attrs;
         }
     };
 

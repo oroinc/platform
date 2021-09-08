@@ -13,7 +13,7 @@ define(function(require) {
      * @extends Backbone.View
      */
     const FooterCell = Backbone.View.extend({
-        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
+        attributes: Backgrid.Cell.prototype.attributes,
 
         /** @property */
         tagName: 'th',
@@ -39,7 +39,6 @@ define(function(require) {
         initialize: function(options) {
             this.options = options || {};
 
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
@@ -92,8 +91,6 @@ define(function(require) {
                 this.$el.removeClass('align-left align-center align-right');
                 this.$el.addClass('align-' + this.column.get('align'));
             }
-
-            this.setAriaAttrs();
             return this;
         }
     });

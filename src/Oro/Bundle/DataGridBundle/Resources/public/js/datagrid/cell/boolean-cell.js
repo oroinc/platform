@@ -46,7 +46,6 @@ define(function(require) {
                 this.delegateEvents();
             }
 
-            this.setAriaAttrs();
             return this;
         },
 

@@ -25,7 +25,6 @@ const HtmlTemplateCell = StringCell.extend({
     render: function() {
         const template = this.getTemplateFunction();
         this.$el.html(template(this.getTemplateData()));
-        this.setAriaAttrs();
         return this;
     }
 });

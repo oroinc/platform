@@ -85,7 +85,6 @@ define(function(require) {
                 html = this.ERROR_HTML;
             }
             this.$el.html(html);
-            this.setAriaAttrs();
 
             return this;
         }

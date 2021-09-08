@@ -101,17 +101,20 @@ define(function(require) {
                     this.$el.append(row.$el);
                 }, this);
             }
-            this.setAriaAttrs();
             this.delegateEvents();
             return this;
         },
 
-        setAriaAttrs() {
-            if (this.disposed) {
-                return;
+        attributes() {
+            let attrs = Footer.__super__.attributes || {};
+
+            if (_.isFunction(attrs)) {
+                attrs = attrs.call(this);
             }
 
-            this.$el.attr('aria-hidden', this.renderable ? null : true);
+            attrs['aria-hidden'] = this.renderable ? null : true;
+
+            return attrs;
         },
 
         /**

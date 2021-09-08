@@ -15,8 +15,6 @@ define(function(require) {
      * @extends Backgrid.HeaderCell
      */
     const HeaderCell = Backgrid.HeaderCell.extend({
-        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
-
         /** @property */
         template: template,
 
@@ -40,6 +38,7 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function HeaderCell(options) {
+            this.column = options.column;
             HeaderCell.__super__.constructor.call(this, options);
         },
 
@@ -127,7 +126,6 @@ define(function(require) {
                 label: label,
                 sortable: this.column.get('sortable')
             }));
-            this.setAriaAttrs();
 
             if (this.column.has('width')) {
                 this.$el.width(this.column.get('width'));

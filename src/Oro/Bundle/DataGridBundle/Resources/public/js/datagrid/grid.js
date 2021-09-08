@@ -1120,7 +1120,7 @@ define(function(require) {
         setGridAriaAttrs() {
             this.$grid.attr({
                 'aria-rowcount': this.gridRowsCounter.getGridRowsCount(),
-                'aria-colcount': this.columns.length
+                'aria-colcount': this.columns.filter(model => model.renderable).length
             });
         },
 

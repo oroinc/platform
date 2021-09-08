@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
     const FooterCell = require('./footer-cell');
     const Chaplin = require('chaplin');
 
@@ -15,6 +16,7 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function FooterRow(options) {
+            this.ariaRowIndex = options.ariaRowIndex;
             FooterRow.__super__.constructor.call(this, options);
         },
 
@@ -24,7 +26,6 @@ define(function(require) {
         initialize: function(options) {
             this.columns = options.columns;
             this.dataCollection = options.dataCollection;
-            this.ariaRowIndex = options.ariaRowIndex;
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
@@ -50,22 +51,27 @@ define(function(require) {
                 };
             }
             FooterRow.__super__.initialize.call(this, options);
-            this.listenTo(this.dataCollection, 'add remove reset', this.setAriaAttrs);
+            this.listenTo(this.dataCollection, 'add remove reset', this.syncAttrs);
             this.cells = this.subviews;
         },
 
-        render() {
-            FooterRow.__super__.render.call(this);
-            this.setAriaAttrs();
-            return this;
-        },
-
-        setAriaAttrs() {
+        syncAttrs() {
             if (this.disposed) {
                 return;
             }
-
             this.$el.attr('aria-rowindex', this.ariaRowIndex);
+        },
+
+        attributes() {
+            let attrs = FooterRow.__super__.attributes || {};
+
+            if (_.isFunction(attrs)) {
+                attrs = attrs.call(this);
+            }
+
+            attrs['aria-rowindex'] = this.ariaRowIndex;
+
+            return attrs;
         },
 
         /**

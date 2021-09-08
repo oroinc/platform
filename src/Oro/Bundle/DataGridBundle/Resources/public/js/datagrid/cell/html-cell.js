@@ -33,7 +33,6 @@ define(function(require) {
             const value = this.model.get(this.column.get('name'));
             const formattedValue = this.formatter.fromRaw(value);
             this.$el.html(formattedValue);
-            this.setAriaAttrs();
             return this;
         }
     });

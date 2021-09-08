@@ -25,6 +25,7 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function HeaderRow(options) {
+            this.ariaRowIndex = options.ariaRowIndex;
             HeaderRow.__super__.constructor.call(this, options);
         },
 
@@ -34,7 +35,6 @@ define(function(require) {
         initialize: function(options) {
             this.columns = options.columns;
             this.dataCollection = options.dataCollection;
-            this.ariaRowIndex = options.ariaRowIndex;
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
@@ -87,8 +87,6 @@ define(function(require) {
                 HeaderRow.__super__.render.call(this);
             }
             this._resolveDeferredRender();
-
-            this.setAriaAttrs();
             return this;
         },
 
@@ -126,12 +124,16 @@ define(function(require) {
             return this;
         },
 
-        setAriaAttrs() {
-            if (this.disposed) {
-                return;
+        attributes() {
+            let attrs = HeaderRow.__super__.attributes || {};
+
+            if (_.isFunction(attrs)) {
+                attrs = attrs.call(this);
             }
 
-            this.$el.attr('aria-rowindex', this.ariaRowIndex);
+            attrs['aria-rowindex'] = this.ariaRowIndex;
+
+            return attrs;
         }
     });
 
