@@ -112,7 +112,9 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getAutocompleteUrl()
     {
-        return $this->router->generate($this->getOr('autocomplete_url') ?: 'oro_form_autocomplete_search');
+        return $this->router->generate(
+            (string)($this->getOr('autocomplete_url', '') ?: 'oro_form_autocomplete_search')
+        );
     }
 
     /**

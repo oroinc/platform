@@ -371,16 +371,27 @@ class Workflow
             unset($data[$entityAttributeName]);
         }
 
-        $workflowItem->getData()
+        $workflowData = $workflowItem
+            ->getData()
             ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
         $workflowItem->setDefinition($this->getDefinition());
 
-        // populate WorkflowData with variables
+        // Populates WorkflowData with attributes default values.
+        foreach ($this->getAttributeManager()->getAttributes() as $attribute) {
+            if ($attribute->getDefault() !== null) {
+                $attributeValue = $workflowData->get($attribute->getName());
+                if ($attributeValue === null) {
+                    $workflowData->set($attribute->getName(), $attribute->getDefault());
+                }
+            }
+        }
+
+        // Populates WorkflowData with variables.
         if ($variables = $this->getVariables()) {
             foreach ($variables as $name => $variable) {
-                $workflowItem->getData()->set($name, $variable->getValue());
+                $workflowData->set($name, $variable->getValue());
             }
         }
 

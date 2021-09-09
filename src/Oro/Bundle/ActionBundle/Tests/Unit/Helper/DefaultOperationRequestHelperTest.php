@@ -9,42 +9,38 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
-    protected $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouteProviderInterface */
-    protected $routeProvider;
+    private RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject $routeProvider;
 
-    /** @var DefaultOperationRequestHelper */
-    protected $helper;
+    private DefaultOperationRequestHelper $helper;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
 
-        $this->routeProvider = $this->getMockBuilder(RouteProviderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->helper = new DefaultOperationRequestHelper($this->requestStack, $this->routeProvider);
     }
 
     /**
-     * @param Request $masterRequest
-     * @param string|null $executionRoute
+     * @param Request|null $masterRequest
+     * @param string $executionRoute
      * @param string|null $expected
      *
      * @dataProvider getRequestRouteProvider
      */
-    public function testGetRequestRoute(Request $masterRequest = null, $executionRoute = null, $expected = null)
-    {
+    public function testGetRequestRoute(
+        Request $masterRequest = null,
+        string $executionRoute = '',
+        string $expected = null
+    ): void {
         $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($masterRequest);
 
         $this->routeProvider->expects($executionRoute ? $this->once() : $this->never())
@@ -54,15 +50,12 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->getRequestRoute());
     }
 
-    /**
-     * @return array
-     */
-    public function getRequestRouteProvider()
+    public function getRequestRouteProvider(): array
     {
         return [
             'empty master request' => [
                 'masterRequest' => null,
-                'executionRoute' => null,
+                'executionRoute' => '',
                 'expected' => null,
             ],
             'empty route name' => [
@@ -123,16 +116,15 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Request $masterRequest
-     * @param string|null $executionRoute
-     * @param bool $expected
-     *
      * @dataProvider isExecutionRouteRequestProvider
      */
-    public function isExecutionRouteRequest(Request $masterRequest = null, $executionRoute = null, $expected = null)
-    {
+    public function isExecutionRouteRequest(
+        Request $masterRequest = null,
+        string $executionRoute = null,
+        bool $expected = null
+    ): void {
         $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($masterRequest);
 
         $this->routeProvider->expects($executionRoute ? $this->once() : $this->never())
@@ -142,10 +134,7 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->isExecutionRouteRequest());
     }
 
-    /**
-     * @return array
-     */
-    public function isExecutionRouteRequestProvider()
+    public function isExecutionRouteRequestProvider(): array
     {
         return [
             'empty master request' => [

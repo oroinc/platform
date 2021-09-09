@@ -30,7 +30,7 @@ class FormFieldType extends AbstractType
                 'use_parent_field_options' => [],
                 'target_field_type' => TextType::class,
                 'target_field_alias' => 'text',
-                'resettable'           => true,
+                'resettable' => true,
                 'parent_checkbox_label' => ''
             ]
         );
@@ -84,8 +84,7 @@ class FormFieldType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
                 $parentValueDisabled = $form->get('value')->getConfig()->getOption('disabled');
-                $disabled = isset($data['use_parent_scope_value']) ? $data['use_parent_scope_value'] : false;
-                $disabled = $disabled || $parentValueDisabled;
+                $disabled = ($data['use_parent_scope_value'] ?? false) || $parentValueDisabled;
                 FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
                 if ($parentValueDisabled) {
                     FormUtils::replaceField($form, 'use_parent_scope_value', ['disabled' => $disabled]);
@@ -98,26 +97,18 @@ class FormFieldType extends AbstractType
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
                 $form = $event->getForm()->getParent();
-                $disabled = $event->getForm()->getData();
+                $disabled = (bool) $event->getForm()->getData();
                 FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
             }
         );
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['value_field_only'] = empty($options['resettable']) && empty($options['label']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**

@@ -37,7 +37,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform(?object $value, ?string $expectedValue)
+    public function testTransform(?object $value, ?string $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->transformer->transform($value));
     }
@@ -56,10 +56,10 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformWhenInvalidValueType()
+    public function testTransformWhenInvalidValueType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "object", "integer" given');
+        $this->expectExceptionMessage('Expected argument of type "object", "int" given');
 
         $this->transformer->transform(123);
     }
@@ -67,7 +67,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform(?string $value, ?object $expectedValue)
+    public function testReverseTransform(?string $value, ?object $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->transformer->reverseTransform($value));
     }
@@ -86,7 +86,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformWithInvalidValueType()
+    public function testReverseTransformWithInvalidValueType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a string.');
@@ -94,7 +94,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->reverseTransform(123);
     }
 
-    public function testReverseTransformWithMissingEntityClass()
+    public function testReverseTransformWithMissingEntityClass(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array with "entityClass" element after decoding a string.');
@@ -104,7 +104,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReverseTransformWithMissingEntityId()
+    public function testReverseTransformWithMissingEntityId(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array with "entityId" element after decoding a string.');

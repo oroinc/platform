@@ -13,12 +13,10 @@ class RequestVoter extends UriVoter
     public function __construct(RequestStack $requestStack)
     {
         // Using master request, as sub-requests routes must not be taken into account when matching the menu items
-        $request = $requestStack->getMasterRequest();
+        $request = $requestStack->getMainRequest();
 
         if ($request) {
             parent::__construct($request->getRequestUri());
         }
-
-        return $this;
     }
 }

@@ -41,10 +41,10 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTokenForEmptyRequestStack()
+    public function testGetTokenForEmptyRequestStack(): void
     {
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn(null);
 
         $this->mainTokenStorage->expects(self::once())
@@ -52,13 +52,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CSRF_TOKEN_ID)
             ->willReturn('test');
 
-        $this->assertEquals(
+        self::assertEquals(
             'test',
             $this->csrfTokenStorageDecorator->getToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testGetTokenWhenSessionIdCookieExists()
+    public function testGetTokenWhenSessionIdCookieExists(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -71,7 +71,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->cookies->set(self::TEST_PHP_SESSION_NAME, 'php_sid');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->mainTokenStorage->expects(self::once())
@@ -79,13 +79,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CSRF_TOKEN_ID)
             ->willReturn('test');
 
-        $this->assertEquals(
+        self::assertEquals(
             'test',
             $this->csrfTokenStorageDecorator->getToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testGetTokenForNotEmbeddedFormRoute()
+    public function testGetTokenForNotEmbeddedFormRoute(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::never())
@@ -96,7 +96,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_route', 'not_embedded_form_route');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->mainTokenStorage->expects(self::once())
@@ -104,13 +104,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CSRF_TOKEN_ID)
             ->willReturn('test');
 
-        $this->assertEquals(
+        self::assertEquals(
             'test',
             $this->csrfTokenStorageDecorator->getToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testGetTokenForEmbeddedFormRoute()
+    public function testGetTokenForEmbeddedFormRoute(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -122,7 +122,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->embeddedFormTokenStorage->expects(self::once())
@@ -130,13 +130,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CSRF_TOKEN_ID)
             ->willReturn('test');
 
-        $this->assertEquals(
+        self::assertEquals(
             'test',
             $this->csrfTokenStorageDecorator->getToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testGetTokenForEmbeddedFormRouteButWithSessionIdCookie()
+    public function testGetTokenForEmbeddedFormRouteButWithSessionIdCookie(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -149,7 +149,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->cookies->set(self::TEST_PHP_SESSION_NAME, 'php_sid');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->mainTokenStorage->expects(self::once())
@@ -157,13 +157,13 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CSRF_TOKEN_ID)
             ->willReturn('test');
 
-        $this->assertEquals(
+        self::assertEquals(
             'test',
             $this->csrfTokenStorageDecorator->getToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testHasToken()
+    public function testHasToken(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -175,7 +175,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->embeddedFormTokenStorage->expects(self::once())
@@ -183,12 +183,12 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CSRF_TOKEN_ID)
             ->willReturn(true);
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->csrfTokenStorageDecorator->hasToken(self::TEST_CSRF_TOKEN_ID)
         );
     }
 
-    public function testSetToken()
+    public function testSetToken(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -200,7 +200,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->embeddedFormTokenStorage->expects(self::once())
@@ -210,7 +210,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->csrfTokenStorageDecorator->setToken(self::TEST_CSRF_TOKEN_ID, 'test');
     }
 
-    public function testRemoveToken()
+    public function testRemoveToken(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -222,7 +222,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->embeddedFormTokenStorage->expects(self::once())
@@ -232,7 +232,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->csrfTokenStorageDecorator->removeToken(self::TEST_CSRF_TOKEN_ID);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
@@ -244,7 +244,7 @@ class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_route', self::TEST_ROUTE_NAME);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $this->embeddedFormTokenStorage->expects(self::once())

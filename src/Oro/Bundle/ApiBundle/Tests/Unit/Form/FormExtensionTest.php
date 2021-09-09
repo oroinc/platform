@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 
 use Oro\Bundle\ApiBundle\Form\FormExtension;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Stub\StubFormTypeExtensionInterface;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\AbstractFormTypeExtensionStub;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Form\FormTypeGuesserChain;
@@ -26,19 +26,9 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         return new FormExtension($this->container, $types, $typeExtensions, $guessers);
     }
 
-    /**
-     * @param string $extendedType
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|StubFormTypeExtensionInterface
-     */
-    private function getFormTypeExtension(string $extendedType)
+    private function getFormTypeExtension(string $extendedType): AbstractFormTypeExtensionStub
     {
-        $extension = $this->createMock(StubFormTypeExtensionInterface::class);
-        $extension->expects(self::any())
-            ->method('getExtendedTypes')
-            ->willReturn([$extendedType]);
-
-        return $extension;
+        return AbstractFormTypeExtensionStub::createUniqueInstance($extendedType);
     }
 
     public function testGetType(): void

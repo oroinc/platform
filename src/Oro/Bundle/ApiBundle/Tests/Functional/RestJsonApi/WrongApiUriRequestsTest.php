@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class WrongApiUriRequestsTest extends RestJsonApiTestCase
 {
@@ -34,7 +35,7 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
             : '';
     }
 
-    public function testTryToGetAnotherApiResourceWithFullReplaceOfBaseUrl()
+    public function testTryToGetAnotherApiResourceWithFullReplaceOfBaseUrl(): void
     {
         $baseUrl = $this->getUrl($this->getListRouteName(), ['entity' => 'testapientity1']);
         $additionalUrl = $this->getUrl($this->getItemRouteName(), ['entity' => 'users', 'id' => 1]);
@@ -60,7 +61,7 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToGetAnotherApiResource()
+    public function testTryToGetAnotherApiResource(): void
     {
         $baseUrl = $this->getUrl($this->getListRouteName(), ['entity' => 'testapientity1']);
 
@@ -85,10 +86,12 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToGetUserViewPageThroughtApiRequest()
+    public function testTryToGetUserViewPageThroughtApiRequest(): void
     {
         $baseUrl = $this->getUrl($this->getListRouteName(), ['entity' => 'testapientity1']);
-        $additionalUrl = self::getContainer()->get('router')->generate('oro_user_view', ['id' => 1], false);
+        $additionalUrl = self::getContainer()
+            ->get('router')
+            ->generate('oro_user_view', ['id' => 1], UrlGeneratorInterface::ABSOLUTE_PATH);
         $slashesCount = substr_count($baseUrl, '/') - 1;
 
         $response = $this->request(

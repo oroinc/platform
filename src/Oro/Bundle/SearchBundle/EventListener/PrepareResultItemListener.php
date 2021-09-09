@@ -96,7 +96,7 @@ class PrepareResultItemListener
         }
 
         return $this->urlGenerator->generate(
-            $routeParameters['name'],
+            (string) $routeParameters['name'],
             $routeData,
             UrlGeneratorInterface::ABSOLUTE_URL
         );

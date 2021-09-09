@@ -144,7 +144,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
             $params
         );
 
-        $route = $metaData->offsetGetByPath('[options][route]');
+        $route = (string) $metaData->offsetGetByPath('[options][route]', '');
         $metaData->offsetAddToArray(
             'options',
             [
@@ -277,11 +277,11 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      * @return string
      */
     public function generateGridUrl(
-        $routeName,
-        $gridName,
+        string $routeName,
+        string $gridName,
         array $params = [],
-        $referenceType = RouterInterface::ABSOLUTE_PATH
-    ) {
+        int $referenceType = RouterInterface::ABSOLUTE_PATH
+    ): string {
         return $this->getRouteHelper()->generate($routeName, $gridName, $params, $referenceType);
     }
 
@@ -292,7 +292,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
      *
      * @return string
      */
-    protected function generateUrl(DatagridInterface $grid, $route, $params)
+    protected function generateUrl(DatagridInterface $grid, string $route, array $params): string
     {
         $nameStrategy = $this->getNameStrategy();
         $gridFullName = $nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());

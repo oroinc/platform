@@ -33,7 +33,9 @@
                 'triggers' => [],
             ],
         ],
-        'attributes' => ['attribute1' => ['type' => 'object', 'property_path' => null, 'options' => []]],
+        'attributes' => [
+            'attribute1' => ['type' => 'object', 'property_path' => null, 'options' => [], 'default' => null],
+        ],
         'is_system' => false,
         'start_step' => null,
         'force_autostart' => false,

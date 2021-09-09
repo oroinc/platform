@@ -14,18 +14,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject|RequestStack $requestStack;
 
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
     }
 
-    public function testGetViewWhenRequestStackIsEmpty()
+    public function testGetViewWhenRequestStackIsEmpty(): void
     {
         $this->requestStack->expects(self::exactly(2))
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn(null);
 
         $docViewDetector = new RestDocViewDetector($this->requestStack, []);
@@ -35,12 +34,12 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $docViewDetector->getView());
     }
 
-    public function testGetViewWhenRequestDoesNotContainViewAttribute()
+    public function testGetViewWhenRequestDoesNotContainViewAttribute(): void
     {
         $request = Request::create('url');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $docViewDetector = new RestDocViewDetector($this->requestStack, []);
@@ -50,14 +49,14 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $docViewDetector->getView());
     }
 
-    public function testGetViewWhenRequestContainsViewAttribute()
+    public function testGetViewWhenRequestContainsViewAttribute(): void
     {
         $view = 'test';
         $request = Request::create('url');
         $request->attributes->set('view', $view);
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $docViewDetector = new RestDocViewDetector($this->requestStack, []);
@@ -67,7 +66,7 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($view, $docViewDetector->getView());
     }
 
-    public function testSetView()
+    public function testSetView(): void
     {
         $view = 'test';
 
@@ -75,12 +74,12 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         $docViewDetector->setView($view);
 
         $this->requestStack->expects(self::never())
-            ->method('getMasterRequest');
+            ->method('getMainRequest');
 
         self::assertEquals($view, $docViewDetector->getView());
     }
 
-    public function testGetRequestTypeWhenNoProviderThatCanDetectRequestType()
+    public function testGetRequestTypeWhenNoProviderThatCanDetectRequestType(): void
     {
         $requestTypeProvider = $this->createMock(RequestTypeProviderInterface::class);
         $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
@@ -99,7 +98,7 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($requestType->isEmpty());
     }
 
-    public function testGetRequestTypeWhenProviderDetectsRequestType()
+    public function testGetRequestTypeWhenProviderDetectsRequestType(): void
     {
         $requestTypeProvider = $this->createMock(RequestTypeProviderInterface::class);
         $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
@@ -118,7 +117,7 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($requestType->contains('test'));
     }
 
-    public function testShouldClearRequestTypeWhenViewChanged()
+    public function testShouldClearRequestTypeWhenViewChanged(): void
     {
         $requestTypeProvider = $this->createMock(RequestTypeProviderInterface::class);
         $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
@@ -133,7 +132,7 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         $docViewDetector->getRequestType();
     }
 
-    public function testShouldInitializeRequestTypeProvider()
+    public function testShouldInitializeRequestTypeProvider(): void
     {
         $requestTypeProvider = $this->createMock(RestRequestTypeProvider::class);
         $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
@@ -150,7 +149,7 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         $docViewDetector->getRequestType();
     }
 
-    public function testShouldReinitializeRequestTypeProviderAfterReset()
+    public function testShouldReinitializeRequestTypeProviderAfterReset(): void
     {
         $requestTypeProvider = $this->createMock(RestRequestTypeProvider::class);
         $docViewDetector = new RestDocViewDetector($this->requestStack, [$requestTypeProvider]);
@@ -167,13 +166,13 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         $docViewDetector->getRequestType();
     }
 
-    public function testGetVersionIfItWasNotSetExplicitly()
+    public function testGetVersionIfItWasNotSetExplicitly(): void
     {
         $docViewDetector = new RestDocViewDetector($this->requestStack, []);
         self::assertEquals('latest', $docViewDetector->getVersion());
     }
 
-    public function testSetVersion()
+    public function testSetVersion(): void
     {
         $version = '1.2';
 
@@ -183,7 +182,7 @@ class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($version, $docViewDetector->getVersion());
     }
 
-    public function testShouldClearVersionWhenViewChanged()
+    public function testShouldClearVersionWhenViewChanged(): void
     {
         $docViewDetector = new RestDocViewDetector($this->requestStack, []);
         $docViewDetector->setVersion('1.2');

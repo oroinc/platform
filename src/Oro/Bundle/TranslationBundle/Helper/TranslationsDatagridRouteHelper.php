@@ -3,12 +3,15 @@
 namespace Oro\Bundle\TranslationBundle\Helper;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Generates URL or URI to "Manage Translations" page with properly configured query string to apply filter criteria.
+ */
 class TranslationsDatagridRouteHelper
 {
-    const TRANSLATION_GRID_ROUTE_NAME = 'oro_translation_translation_index';
-    const TRANSLATION_GRID_NAME = 'oro-translation-translations-grid';
+    public const TRANSLATION_GRID_ROUTE_NAME = 'oro_translation_translation_index';
+    public const TRANSLATION_GRID_NAME = 'oro-translation-translations-grid';
 
     /**
      * @var DatagridRouteHelper
@@ -21,9 +24,6 @@ class TranslationsDatagridRouteHelper
     }
 
     /**
-     * Generates URL or URI to "Manage Translations" page with properly configured query string
-     * to apply filter criteria.
-     *
      * Param 'filters' uses next format ['filterName' => 'filterCriterion', ... , 'filterNameN' => 'filterCriterionN']
      *
      * @param array $filters
@@ -34,7 +34,7 @@ class TranslationsDatagridRouteHelper
      */
     public function generate(
         array $filters = [],
-        $referenceType = RouterInterface::ABSOLUTE_PATH,
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
         array $filtersType = []
     ) {
         $params = ['f' => []];

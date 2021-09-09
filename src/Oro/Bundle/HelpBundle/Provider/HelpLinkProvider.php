@@ -94,7 +94,7 @@ class HelpLinkProvider
     private function ensureRequestSet()
     {
         if (null === $this->request) {
-            $request = $this->requestStack->getMasterRequest();
+            $request = $this->requestStack->getMainRequest();
             if (null !== $request) {
                 $this->requestRoute = $request->get('_route');
                 $this->helpAnnotation = null;

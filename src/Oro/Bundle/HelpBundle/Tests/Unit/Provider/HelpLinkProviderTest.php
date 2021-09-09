@@ -20,17 +20,13 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     private const TEST      = 'http://test.com';
     private const TEST_WIKI = self::TEST . '/wiki';
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $controllerClassProvider;
+    private ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject $controllerClassProvider;
 
-    /** @var VersionHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
+    private VersionHelper|\PHPUnit\Framework\MockObject\MockObject $helper;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache;
 
     protected function setUp(): void
     {
@@ -43,7 +39,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     private function getHelpLinkProvider(array $defaultConfig = [], array $config = []): HelpLinkProvider
     {
         $configProvider = $this->createMock(ConfigurationProvider::class);
-        $configProvider->expects($this->any())
+        $configProvider->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($config);
 
@@ -62,51 +58,51 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $expectedLink = self::TEST . '/help/test?v=1.1';
         $routeName = 'test_route';
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
             ->with($routeName)
-            ->will($this->returnValue($expectedLink));
-        $this->cache->expects($this->never())
+            ->willReturn($expectedLink);
+        $this->cache->expects(self::never())
             ->method('save');
 
         $request = new Request();
         $request->attributes->add(['_route' => $routeName]);
-        $this->requestStack->expects($this->any())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::any())
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $helpLinkProvider = $this->getHelpLinkProvider();
-        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
+        self::assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     public function testGetHelpLinkWithoutRouteAndWithoutCache(): void
     {
         $expectedLink = 'http://example.com/';
 
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('fetch');
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('save');
 
         $helpLinkProvider = $this->getHelpLinkProvider(
             ['link' => 'http://example.com/']
         );
-        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
+        self::assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     public function testGetHelpLinkWithoutRouteAndWithCache(): void
     {
         $expectedLink = 'http://example.com/';
 
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('fetch');
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('save');
 
         $helpLinkProvider = $this->getHelpLinkProvider(
             ['link' => 'http://example.com/']
         );
-        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
+        self::assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     /**
@@ -119,25 +115,25 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         string $expectedLink
     ): void {
         $this->helper
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getVersion')
-            ->will($this->returnValue(self::VERSION));
+            ->willReturn(self::VERSION);
 
         $request = new Request();
         $request->attributes->add($requestAttributes);
-        $this->requestStack->expects($this->any())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::any())
+            ->method('getMainRequest')
             ->willReturn($request);
-        $this->controllerClassProvider->expects($this->any())
+        $this->controllerClassProvider->expects(self::any())
             ->method('getControllers')
             ->willReturn($controllers);
 
         if (isset($requestAttributes['_route'])) {
-            $this->cache->expects($this->once())
+            $this->cache->expects(self::once())
                 ->method('fetch')
                 ->with($requestAttributes['_route'])
                 ->willReturn(false);
-            $this->cache->expects($this->once())
+            $this->cache->expects(self::once())
                 ->method('save')
                 ->with($requestAttributes['_route'], $expectedLink);
         }
@@ -148,7 +144,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
             unset($configuration['defaults']);
         }
         $helpLinkProvider = $this->getHelpLinkProvider($defaultConfig, $configuration);
-        $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
+        self::assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
     /**

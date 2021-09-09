@@ -10,8 +10,7 @@ use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
  */
 class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 {
-    /** @var EnumSelectType */
-    private $type;
+    private EnumSelectType $type;
 
     protected function setUp(): void
     {
@@ -20,58 +19,63 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         $this->type = new EnumSelectType($this->configManager, $this->doctrine);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             Select2TranslatableEntityType::class,
             $this->type->getParent()
         );
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $this->doTestBuildForm($this->type);
     }
 
-    public function testPreSetDataForExistingEntity()
+    public function testPreSetDataForExistingEntity(): void
     {
         $this->doTestPreSetDataForExistingEntity($this->type);
     }
 
-    public function testPreSetDataForNullEntity()
+    public function testPreSetDataForNullEntity(): void
     {
         $this->doTestPreSetDataForNullEntity($this->type);
     }
 
-    public function testPreSetDataForFormWithoutDataClass()
+    public function testPreSetDataForFormWithoutDataClass(): void
     {
         $this->doTestPreSetDataForFormWithoutDataClass($this->type);
     }
 
-    public function testPreSetDataForNewEntityKeepExistingValue()
+    public function testPreSetDataForNewEntityKeepExistingValue(): void
     {
         $this->doTestPreSetDataForNewEntityKeepExistingValue($this->type);
     }
 
-    public function testPreSetDataForNewEntity()
+    public function testPreSetDataForNewEntity(): void
     {
         $this->doTestPreSetDataForNewEntity($this->type);
     }
 
-    public function testPreSetDataForNewEntityWithMultiEnum()
+    public function testPreSetDataForNewEntityWithMultiEnum(): void
     {
         $this->doTestPreSetDataForNewEntityWithMultiEnum($this->type);
     }
 
     /**
      * @dataProvider configureOptionsProvider
-     * @param boolean $multiple
-     * @param boolean $expanded
+     *
+     * @param bool $multiple
+     * @param bool $expanded
      * @param mixed $expectedEmptyValue
      * @param mixed $expectedEmptyData
      */
-    public function testConfigureOptions($multiple, $expanded, $expectedEmptyValue, $expectedEmptyData)
-    {
+    public function testConfigureOptions(
+        bool $multiple,
+        bool $expanded,
+        mixed $expectedEmptyValue,
+        mixed $expectedEmptyData
+    ): void {
         $resolver = $this->getOptionsResolver();
 
         $resolvedOptions = $this->doTestConfigureOptions(
@@ -82,13 +86,13 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
             $expanded
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'placeholder' => $expectedEmptyValue,
-                'empty_data'  => $expectedEmptyData,
-                'configs'     => [
-                    'allowClear'  => true,
-                    'placeholder' => 'oro.form.choose_value'
+                'empty_data' => $expectedEmptyData,
+                'configs' => [
+                    'allowClear' => true,
+                    'placeholder' => 'oro.form.choose_value',
                 ],
                 'disabled_values' => [],
                 'excluded_values' => [],
@@ -100,17 +104,17 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
     /**
      * @return array
      */
-    public function configureOptionsProvider()
+    public function configureOptionsProvider(): array
     {
         return [
             [false, false, '', null],
             [false, true, null, null],
-            [true, false, null, null],
-            [true, true, null, null]
+            [true, false, null, []],
+            [true, true, null, []],
         ];
     }
 
-    public function testConfigureOptionsWithOverrideConfigs()
+    public function testConfigureOptionsWithOverrideConfigs(): void
     {
         $newPlaceholder = 'Test Placeholder';
 
@@ -124,18 +128,18 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
             false,
             [
                 'configs' => [
-                    'placeholder' => $newPlaceholder
-                ]
+                    'placeholder' => $newPlaceholder,
+                ],
             ]
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'placeholder' => null,
-                'empty_data'  => '',
-                'configs'     => [
-                    'allowClear'  => true,
-                    'placeholder' => $newPlaceholder
+                'empty_data' => '',
+                'configs' => [
+                    'allowClear' => true,
+                    'placeholder' => $newPlaceholder,
                 ],
                 'disabled_values' => [],
                 'excluded_values' => [],

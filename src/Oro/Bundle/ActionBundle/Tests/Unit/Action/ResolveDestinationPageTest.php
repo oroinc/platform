@@ -13,14 +13,11 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    protected RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $resolver;
+    protected DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject $resolver;
 
-    /** @var ResolveDestinationPage */
-    protected $action;
+    protected ResolveDestinationPage $action;
 
     /**
      * {@inheritdoc}
@@ -37,78 +34,78 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($eventDispatcher);
     }
 
-    public function testExecuteWithoutRequest()
+    public function testExecuteWithoutRequest(): void
     {
         $context = new ActionData();
         $this->action->initialize(['dest1']);
 
-        $this->requestStack->expects($this->once())->method('getMasterRequest')->willReturn(null);
-        $this->resolver->expects($this->never())->method('resolveDestinationUrl');
+        $this->requestStack->expects(self::once())->method('getMainRequest')->willReturn(null);
+        $this->resolver->expects(self::never())->method('resolveDestinationUrl');
 
         $this->action->execute($context);
 
-        $this->assertEquals([], $context->toArray());
+        self::assertEquals([], $context->toArray());
     }
 
-    public function testExecuteWithDefaultDestination()
+    public function testExecuteWithDefaultDestination(): void
     {
         $context = new ActionData([]);
         $this->action->initialize([DestinationPageResolver::DEFAULT_DESTINATION]);
 
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn(new Request(['originalUrl' => 'example.com']));
-        $this->resolver->expects($this->never())->method('resolveDestinationUrl');
+        $this->resolver->expects(self::never())->method('resolveDestinationUrl');
 
         $this->action->execute($context);
 
-        $this->assertEquals(['redirectUrl' => 'example.com'], $context->toArray());
+        self::assertEquals(['redirectUrl' => 'example.com'], $context->toArray());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $entity = (object)[];
 
         $context = new ActionData(['entity' => $entity]);
         $this->action->initialize(['dest1']);
 
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn(new Request(['originalUrl' => 'example.com']));
 
-        $this->resolver->expects($this->once())->method('resolveDestinationUrl')
+        $this->resolver->expects(self::once())->method('resolveDestinationUrl')
             ->with($entity, 'dest1')
             ->willReturn('test.example.com');
 
         $this->action->execute($context);
 
-        $this->assertEquals(['entity' => $entity, 'redirectUrl' => 'test.example.com'], $context->toArray());
+        self::assertEquals(['entity' => $entity, 'redirectUrl' => 'test.example.com'], $context->toArray());
     }
 
-    public function testExecuteWithEmptyDestinationUrl()
+    public function testExecuteWithEmptyDestinationUrl(): void
     {
         $entity = (object)[];
 
         $context = new ActionData(['entity' => $entity]);
         $this->action->initialize(['dest1']);
 
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn(new Request(['originalUrl' => 'example.com']));
 
-        $this->resolver->expects($this->once())->method('resolveDestinationUrl')
+        $this->resolver->expects(self::once())->method('resolveDestinationUrl')
             ->with($entity, 'dest1')
             ->willReturn(null);
 
         $this->action->execute($context);
 
-        $this->assertEquals(['entity' => $entity], $context->toArray());
+        self::assertEquals(['entity' => $entity], $context->toArray());
     }
 
     /**
      * @dataProvider executionDataProvider
      */
-    public function testExecuteWithCustomEntityAndAttributeOptions(array $options)
+    public function testExecuteWithCustomEntityAndAttributeOptions(array $options): void
     {
         $entity1 = (object)[];
         $entity2 = (object)[];
@@ -116,17 +113,17 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
         $context = new ActionData(['entity' => $entity1, 'original' => $entity2]);
         $this->action->initialize($options);
 
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn(new Request(['originalUrl' => 'example.com']));
 
-        $this->resolver->expects($this->once())->method('resolveDestinationUrl')
+        $this->resolver->expects(self::once())->method('resolveDestinationUrl')
             ->with($entity2, 'dest1')
             ->willReturn('test.example.com');
 
         $this->action->execute($context);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['entity' => $entity1, 'original' => $entity2, 'result' => 'test.example.com'],
             $context->toArray()
         );
@@ -150,7 +147,7 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeEntityOptionException()
+    public function testInitializeEntityOptionException(): void
     {
         $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage('Entity must be valid property definition.');
@@ -158,7 +155,7 @@ class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['test', 'test']);
     }
 
-    public function testInitializeAttributeOptionException()
+    public function testInitializeAttributeOptionException(): void
     {
         $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');

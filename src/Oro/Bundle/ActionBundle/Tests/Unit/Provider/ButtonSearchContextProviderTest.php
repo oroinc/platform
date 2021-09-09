@@ -106,12 +106,12 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
     {
         return array_merge(
             [
-                ContextHelper::ROUTE_PARAM => null,
+                ContextHelper::ROUTE_PARAM => '',
                 ContextHelper::ENTITY_ID_PARAM => null,
                 ContextHelper::ENTITY_CLASS_PARAM => null,
-                ContextHelper::DATAGRID_PARAM => null,
-                ContextHelper::GROUP_PARAM => null,
-                ContextHelper::FROM_URL_PARAM => null,
+                ContextHelper::DATAGRID_PARAM => '',
+                ContextHelper::GROUP_PARAM => '',
+                ContextHelper::FROM_URL_PARAM => '',
             ],
             $context
         );

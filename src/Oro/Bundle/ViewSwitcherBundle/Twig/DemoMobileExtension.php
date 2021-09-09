@@ -78,6 +78,6 @@ class DemoMobileExtension extends AbstractExtension implements ServiceSubscriber
 
     private function getMasterRequest(): ?Request
     {
-        return $this->container->get(RequestStack::class)->getMasterRequest();
+        return $this->container->get(RequestStack::class)->getMainRequest();
     }
 }
