@@ -131,7 +131,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::REQUEST_URI);
 
         $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         if (array_key_exists('entity', $context)) {

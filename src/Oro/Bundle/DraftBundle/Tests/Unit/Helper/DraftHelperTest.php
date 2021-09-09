@@ -14,20 +14,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DraftHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $draftProvider;
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $draftProvider;
 
-    /**
-     * @var DraftHelper
-     */
-    private $helper;
+    private DraftHelper $helper;
 
     protected function setUp(): void
     {
@@ -41,33 +32,33 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
     {
         $request = new Request([], [Router::ACTION_PARAMETER => DraftHelper::SAVE_AS_DRAFT_ACTION]);
         $this->requestStack
-            ->expects($this->exactly(2))
-            ->method('getMasterRequest')
+            ->expects(self::exactly(2))
+            ->method('getMainRequest')
             ->willReturn($request);
 
-        $this->assertTrue($this->helper->isSaveAsDraftAction());
+        self::assertTrue($this->helper->isSaveAsDraftAction());
     }
 
     public function testIsAnyAction(): void
     {
         $request = new Request([], [Router::ACTION_PARAMETER => 'any_action']);
         $this->requestStack
-            ->expects($this->exactly(2))
-            ->method('getMasterRequest')
+            ->expects(self::exactly(2))
+            ->method('getMainRequest')
             ->willReturn($request);
 
-        $this->assertFalse($this->helper->isSaveAsDraftAction());
+        self::assertFalse($this->helper->isSaveAsDraftAction());
     }
 
     public function testIsDraft(): void
     {
         $source = new DraftableEntityStub();
-        $this->assertFalse($this->helper->isDraft($source));
+        self::assertFalse($this->helper->isDraft($source));
 
         $draftSource = new DraftableEntityStub();
         $source->setDraftUuid(UUIDGenerator::v4());
         $source->setDraftSource($draftSource);
-        $this->assertTrue(DraftHelper::isDraft($source));
+        self::assertTrue(DraftHelper::isDraft($source));
     }
 
     public function testGetDraftableProperties(): void
@@ -76,7 +67,7 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
         $className = DraftableEntityStub::class;
 
         $this->draftProvider
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn([
@@ -84,6 +75,6 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
                 new Config(new FieldConfigId('draftable', $className, 'titles'), ['draftable' => false]),
             ]);
 
-        $this->assertEquals(['content'], $this->helper->getDraftableProperties($source));
+        self::assertEquals(['content'], $this->helper->getDraftableProperties($source));
     }
 }

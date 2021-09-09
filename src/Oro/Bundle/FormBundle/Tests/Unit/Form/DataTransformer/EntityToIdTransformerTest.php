@@ -177,7 +177,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
     public function testReverseTransformQueryBuilderUnexpectedTypeException()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "NULL" given');
+        $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "null" given');
 
         $entity = $this->createEntity(1);
 

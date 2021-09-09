@@ -19,7 +19,14 @@
                 'position' => [],
             ],
         ],
-        'attributes' => ['attribute1' => ['type' => 'string', 'property_path' => null, 'options' => []]],
+        'attributes' => [
+            'attribute1' => [
+                'type' => 'string',
+                'property_path' => null,
+                'options' => [],
+                'default' => null,
+            ],
+        ],
         'transitions' => [
             'transition_two' => [
                 'step_to' => 'step_b',
@@ -78,7 +85,14 @@
                 'position' => [],
             ],
         ],
-        'attributes' => ['attribute1' => ['type' => 'string', 'property_path' => null, 'options' => []]],
+        'attributes' => [
+            'attribute1' => [
+                'type' => 'string',
+                'property_path' => null,
+                'options' => [],
+                'default' => null,
+            ],
+        ],
         'transitions' => [
             'transition_two' => [
                 'step_to' => 'step_b',
@@ -129,7 +143,14 @@
                 'position' => [],
             ],
         ],
-        'attributes' => ['attribute1' => ['type' => 'string', 'property_path' => null, 'options' => []]],
+        'attributes' => [
+            'attribute1' => [
+                'type' => 'string',
+                'property_path' => null,
+                'options' => [],
+                'default' => null,
+            ],
+        ],
         'transitions' => [
             'transition_one' => [
                 'is_start' => true,

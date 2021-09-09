@@ -24,7 +24,7 @@ services:
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
-            - ~
+            - ''
             - Oro\Bundle\NoteBundle\Form\Type\NoteApiType
 
     Oro\Bundle\NoteBundle\Form\Handler\NoteHandler:

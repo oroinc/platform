@@ -235,11 +235,14 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->variableNode('default')
+                        ->defaultNull()
+                    ->end()
                 ->end()
                 ->validate()
                     ->always(
                         function ($value) {
-                            if (array_key_exists('entity_acl', $value) && $value['type'] != 'entity') {
+                            if (array_key_exists('entity_acl', $value) && $value['type'] !== 'entity') {
                                 throw new WorkflowException(
                                     'Entity ACL only can be defined for attributes with type "entity"'
                                 );
@@ -247,6 +250,27 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             return $value;
                         }
                     )
+                ->end()
+                ->beforeNormalization()
+                    ->always(function ($value) {
+                        // Native types supported by settype().
+                        $castedTypes = [
+                            'bool',
+                            'boolean',
+                            'int',
+                            'integer',
+                            'float',
+                            'double',
+                            'string',
+                            'array',
+                        ];
+
+                        if (!empty($value['type']) && in_array($value['type'], $castedTypes, true)) {
+                            settype($value['default'], $value['type']);
+                        }
+
+                        return $value;
+                    })
                 ->end()
             ->end();
 

@@ -11,17 +11,13 @@ use Symfony\Component\Routing\RouterInterface;
 
 class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OriginalUrlProvider */
-    private $urlProvider;
+    private OriginalUrlProvider $urlProvider;
 
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
+    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var UrlConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridUrlConverter;
+    private UrlConverter|\PHPUnit\Framework\MockObject\MockObject $datagridUrlConverter;
 
     /** {@inheritdoc} */
     protected function setUp(): void
@@ -36,21 +32,21 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetOriginalUrl()
+    public function testGetOriginalUrl(): void
     {
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn($this->getRequest('example.com'));
 
-        $this->assertEquals('example.com', $this->urlProvider->getOriginalUrl());
+        self::assertEquals('example.com', $this->urlProvider->getOriginalUrl());
     }
 
-    public function testGetOriginalUrlReturnNullIfRequestIsNotDefined()
+    public function testGetOriginalUrlReturnNullIfRequestIsNotDefined(): void
     {
-        $this->assertNull($this->urlProvider->getOriginalUrl());
+        self::assertNull($this->urlProvider->getOriginalUrl());
     }
 
-    public function testGetOriginalUrlWhenDatagridIsSet()
+    public function testGetOriginalUrlWhenDatagridIsSet(): void
     {
         $datagridName = 'quotes-grid';
         $pageParams = [
@@ -77,19 +73,19 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
         $requestUri = '/admin/datagrid/quotes-grid?' . \http_build_query($pageParams);
         $responseUri = '/admin/sale/quote?' . \http_build_query([$datagridName => $pageParams[$datagridName]]);
 
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn($this->getRequest($requestUri));
 
         $this->datagridUrlConverter
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('convertGridUrlToPageUrl')
             ->with($datagridName, $requestUri)
             ->willReturn($responseUri);
 
         $buttonContext = $this->getSearchButtonContext($datagridName);
 
-        $this->assertEquals(
+        self::assertEquals(
             $responseUri,
             $this->urlProvider->getOriginalUrl($buttonContext)
         );
@@ -99,7 +95,7 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
      * @param string $requestUri
      * @return Request
      */
-    private function getRequest(string $requestUri)
+    private function getRequest(string $requestUri): Request
     {
         return new Request([], [], [], [], [], ['REQUEST_URI' => $requestUri]);
     }
@@ -108,7 +104,7 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
      * @param string|null $datagridName
      * @return ButtonSearchContext
      */
-    private function getSearchButtonContext($datagridName)
+    private function getSearchButtonContext($datagridName): ButtonSearchContext
     {
         $btnContext = new ButtonSearchContext();
         $btnContext->setDatagrid($datagridName);

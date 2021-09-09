@@ -97,7 +97,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableToken
      */
     private function isEmbeddedFormRequest()
     {
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         if (null === $request || $request->attributes->get('_route') !== $this->embeddedFormRouteName) {
             return false;
         }

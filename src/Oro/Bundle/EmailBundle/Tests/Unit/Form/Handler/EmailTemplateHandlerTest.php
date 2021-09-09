@@ -59,9 +59,8 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedMethods
-     * @param string $method
      */
-    public function testProcessSupportedRequest($method)
+    public function testProcessSupportedRequest(string $method): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -126,7 +125,8 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request->setMethod('POST');
 
         $this->translator->expects($this->once())
-            ->method('trans');
+            ->method('trans')
+            ->willReturnCallback(static fn (string $key) => '[trans]' . $key . '[/trans]');
 
         $this->assertFalse($this->handler->process($this->entity));
     }

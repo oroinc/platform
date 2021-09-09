@@ -58,7 +58,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     public function handle(MassActionHandlerArgs $args)
     {
         $limitResult = $this->limiter->getLimitResult($args);
-        $method      = $this->requestStack->getMasterRequest()->getMethod();
+        $method      = $this->requestStack->getMainRequest()->getMethod();
         if ($method === 'POST') {
             $result = $this->getPostResponse($limitResult);
         } elseif ($method === 'DELETE') {

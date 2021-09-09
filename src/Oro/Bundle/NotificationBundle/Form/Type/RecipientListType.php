@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type that provides inputs for choosing recipients.
+ */
 class RecipientListType extends AbstractType
 {
     const NAME = 'oro_notification_recipient_list';
@@ -32,14 +35,13 @@ class RecipientListType extends AbstractType
             'groups',
             EntityType::class,
             [
-                'label'       => 'oro.user.group.entity_plural_label',
-                'class'       => 'OroUserBundle:Group',
-                'choice_label'      => 'name',
-                'multiple'      => true,
-                'expanded'      => true,
-                'placeholder'   => '',
-                'empty_data'    => null,
-                'required'      => false,
+                'label'        => 'oro.user.group.entity_plural_label',
+                'class'        => 'OroUserBundle:Group',
+                'choice_label' => 'name',
+                'multiple'     => true,
+                'expanded'     => true,
+                'placeholder'  => '',
+                'required'     => false,
             ]
         );
 

@@ -60,7 +60,8 @@ class MimeTypeConfigTypeTest extends FormIntegrationTestCase
     {
         $form = $this->factory->create(FileMimeTypeConfigType::class);
         $form->submit($value);
-        self::assertFalse($form->isSynchronized());
+        self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function invalidValuesDataProvider()

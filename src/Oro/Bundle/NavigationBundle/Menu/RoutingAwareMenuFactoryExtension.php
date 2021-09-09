@@ -36,7 +36,7 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
                 ? RouterInterface::ABSOLUTE_URL
                 : RouterInterface::ABSOLUTE_PATH;
 
-            $route = $options['route'];
+            $route = (string) $options['route'];
             $newOptions['uri'] = $this->router->generate($route, $params, $referenceType);
             $newOptions['extras']['routes'] = [$route];
             $newOptions['extras']['routesParameters'] = [$route => $params];
