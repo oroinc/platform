@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_method_name';
-
     /** @var ClassMethodNameChecker */
     protected $methodNameChecker;
 

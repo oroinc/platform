@@ -40,8 +40,8 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'data_class'         => EmailAttachment::class,
-                    'csrf_token_id'      => 'email_attachment',
+                    'data_class'    => EmailAttachment::class,
+                    'csrf_token_id' => 'email_attachment',
                 ]
             );
 
@@ -51,13 +51,9 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder(FormBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(3))
             ->method('add');
-
         $builder->expects($this->once())
             ->method('addEventListener');
 
@@ -79,8 +75,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $attachment->expects($this->once())
             ->method('setEmailAttachment');
 
-        $uploadedFile = $this
-            ->getMockBuilder(UploadedFile::class)
+        $uploadedFile = $this->getMockBuilder(UploadedFile::class)
             ->enableOriginalConstructor()
             ->setConstructorArgs([__DIR__ . '/../../Fixtures/attachment/test.txt', ''])
             ->getMock();

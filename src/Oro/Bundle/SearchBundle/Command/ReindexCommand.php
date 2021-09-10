@@ -92,6 +92,8 @@ HELP
         if (false === $isScheduled) {
             $output->writeln('Reindex finished successfully.');
         }
+
+        return 0;
     }
 
     protected function getSearchIndexer($useAsynchronousIndexer = false): IndexerInterface

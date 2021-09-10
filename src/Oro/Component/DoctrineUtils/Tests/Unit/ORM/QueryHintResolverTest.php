@@ -14,15 +14,11 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
  */
 class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $walkers
-     * @param array $providers
-     * @param array $aliases
-     *
-     * @return QueryHintResolver
-     */
-    private function getQueryHintResolver(array $walkers = [], array $providers = [], array $aliases = [])
-    {
+    private function getQueryHintResolver(
+        array $walkers = [],
+        array $providers = [],
+        array $aliases = []
+    ): QueryHintResolver {
         $containerBuilder = TestContainerBuilder::create();
         foreach ($providers as $id => $provider) {
             $containerBuilder->add($id, $provider);
@@ -35,23 +31,20 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Query
-     */
-    private function getQuery()
+    private function getQuery(): Query
     {
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects($this->any())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $configuration->expects($this->any())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
         return new Query($em);
     }

@@ -11,7 +11,7 @@
         <div class="form-wrapper__inner">
             {% set requestLabel = 'Request'|trans %}
             {% set returnToLoginLabel = 'Return to Login'|trans %}
-            {% set showLabels = (requestLabel|length <= 9) and (returnToLoginLabel|trans <= 15) %}
+            {% set showLabels = (requestLabel|length <= 9) and (returnToLoginLabel|length <= 15) %}
             {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
             <form action="{{ path('oro_user_reset_send_email') }}" method="post" class="form-signin form-signin--forgot {{ layoutName }}">
                 <div class="title-box">

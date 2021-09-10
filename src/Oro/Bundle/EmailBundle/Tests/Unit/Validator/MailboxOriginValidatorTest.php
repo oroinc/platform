@@ -11,7 +11,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
 {
-    private Translator|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     protected function setUp(): void
     {

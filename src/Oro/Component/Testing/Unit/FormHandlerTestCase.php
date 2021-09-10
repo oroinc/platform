@@ -3,6 +3,7 @@
 namespace Oro\Component\Testing\Unit;
 
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,16 +41,12 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->form = $this->createMock(Form::class);
         $this->request = new Request();
-        $this->manager = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(ObjectManager::class);
     }
 
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -65,11 +62,8 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedMethods
-     * @param string $method
-     * @param boolean $isValid
-     * @param boolean $isProcessed
      */
-    public function testProcessSupportedRequest($method, $isValid, $isProcessed)
+    public function testProcessSupportedRequest(string $method, bool $isValid, bool $isProcessed): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -77,7 +71,7 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->any())
             ->method('isValid')
-            ->will($this->returnValue($isValid));
+            ->willReturn($isValid);
 
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
@@ -89,10 +83,7 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isProcessed, $this->handler->process($this->entity));
     }
 
-    /**
-     * @return array
-     */
-    public function supportedMethods()
+    public function supportedMethods(): array
     {
         return [
             'post valid' => [
@@ -113,7 +104,7 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -128,7 +119,7 @@ abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->expects($this->once())
             ->method('persist')

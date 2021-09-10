@@ -84,7 +84,8 @@ HELP
             $output->writeln('');
             $output->writeln(sprintf('<error>%s</error>', $message));
             $this->logger->error($message);
-            return;
+
+            return 1;
         }
 
         $schedules = $this->getAllSchedules();
@@ -134,6 +135,8 @@ HELP
         }
 
         $output->writeln('All commands scheduled', OutputInterface::VERBOSITY_DEBUG);
+
+        return 0;
     }
 
     /**

@@ -12,14 +12,12 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class SqlWalkerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SqlWalkerPass
-     */
-    private $pass;
+    /** @var SqlWalkerPass */
+    private $compiler;
 
     protected function setUp(): void
     {
-        $this->pass = new SqlWalkerPass();
+        $this->compiler = new SqlWalkerPass();
     }
 
     public function testProcess()
@@ -29,11 +27,11 @@ class SqlWalkerPassTest extends \PHPUnit\Framework\TestCase
         $container->setDefinition('doctrine.orm.configuration', $configDefinition);
 
         $container->register('service1', Stub\AstWalkerStub::class)
-            ->addTag(SqlWalkerPass::TAG_NAME);
+            ->addTag('oro_entity.sql_walker');
         $container->register('service2', Stub\OutputResultModifierStub::class)
-            ->addTag(SqlWalkerPass::TAG_NAME);
+            ->addTag('oro_entity.sql_walker');
 
-        $this->pass->process($container);
+        $this->compiler->process($container);
 
         $methodCalls = $configDefinition->getMethodCalls();
         $this->assertCount(3, $methodCalls);

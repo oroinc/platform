@@ -10,6 +10,9 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
+/**
+ * Assembles attributes collection for the specified action configuration.
+ */
 class AttributeAssembler extends AbstractAssembler
 {
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -78,6 +81,7 @@ class AttributeAssembler extends AbstractAssembler
         $attribute->setEntityAcl($this->getOption($options, 'entity_acl', []));
         $attribute->setPropertyPath($this->getOption($options, 'property_path'));
         $attribute->setOptions($this->getOption($options, 'options', []));
+        $attribute->setDefault($this->getOption($options, 'default', null));
 
         $this->validateAttribute($attribute);
 

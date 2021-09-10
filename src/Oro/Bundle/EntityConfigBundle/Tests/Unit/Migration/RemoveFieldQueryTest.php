@@ -9,28 +9,16 @@ use Psr\Log\LoggerInterface;
 
 class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commandExecutor;
-
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    protected $connector;
-
-    /** @var Statement|\PHPUnit\Framework\MockObject\MockObject */
-    protected $statement;
+    private $connector;
 
     protected function setUp(): void
     {
-        $this->connector = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
-        $this->statement = $this->getMockBuilder('\Doctrine\DBAL\Driver\Statement')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connector = $this->createMock(Connection::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     public function testExecuteConfigFieldIsAbsent()
@@ -38,8 +26,12 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
         $migration = new RemoveFieldQuery('TestClassName', 'TestFieldName');
         $migration->setConnection($this->connector);
 
-        $this->connector->expects(self::once())->method('fetchAssoc')->willReturn(null);
-        $this->connector->expects(self::never())->method('prepare');
+        $this->connector->expects(self::once())
+            ->method('fetchAssoc')
+            ->willReturn(null);
+        $this->connector->expects(self::never())
+            ->method('prepare');
+
         $migration->execute($this->logger);
     }
 

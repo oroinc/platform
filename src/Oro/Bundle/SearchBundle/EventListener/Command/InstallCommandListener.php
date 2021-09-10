@@ -46,7 +46,7 @@ class InstallCommandListener
             $event,
             $this->reindexCommandName,
             $this->isScheduled,
-            !$this->requestStack->getMasterRequest() instanceof Request
+            !$this->requestStack->getMainRequest() instanceof Request
         );
         $output->writeln('');
     }

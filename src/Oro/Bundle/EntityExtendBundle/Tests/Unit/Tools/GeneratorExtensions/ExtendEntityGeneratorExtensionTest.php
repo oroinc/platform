@@ -24,7 +24,7 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testSupports(): void
     {
-        static::assertTrue($this->extension->supports([]));
+        self::assertTrue($this->extension->supports([]));
     }
 
     public function testEmptyCustom(): void
@@ -225,6 +225,6 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $expectedCode = \trim(\str_replace(PHP_EOL, "\n", $expectedCode));
         $generatedCode = \trim(\str_replace(PHP_EOL, "\n", $class->print()));
 
-        static::assertEquals($expectedCode, $generatedCode);
+        self::assertEquals($expectedCode, $generatedCode);
     }
 }

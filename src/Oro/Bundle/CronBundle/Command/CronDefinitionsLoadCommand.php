@@ -72,6 +72,8 @@ HELP
         }
 
         $em->flush();
+
+        return 0;
     }
 
     private function createSchedule(

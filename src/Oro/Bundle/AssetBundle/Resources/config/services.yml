@@ -28,6 +28,8 @@ services:
             - { name: console.command, command: 'oro:assets:build' }
 
     Oro\Bundle\AssetBundle\Command\OroAssetsInstallCommand:
+        arguments:
+            - '@service_container'
         tags:
             - { name: console.command, command: 'oro:assets:install' }
 

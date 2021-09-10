@@ -12,19 +12,13 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SessionInterface
-     */
+    /** @var SessionInterface */
     private $session;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @var PasswordChangeExceptionListener
-     */
+    /** @var PasswordChangeExceptionListener */
     private $listener;
 
     protected function setUp(): void

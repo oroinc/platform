@@ -318,13 +318,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'input' => [
                     'oper1' => 'not array value'
                 ],
-                'message' => 'Invalid type for path "actions.operations.oper1". Expected array, but got string'
+                'message' => 'Invalid type for path "actions.operations.oper1". Expected "array", but got "string"'
             ],
             'incorrect array' => [
                 'input' => [
                     'oper1' => []
                 ],
-                'message' => 'The child node "label" at path "actions.operations.oper1" must be configured'
+                'message' => 'The child config "label" under "actions.operations.oper1" must be configured'
             ],
             'incorrect operation[substitute_operation]' => [
                 'input' => [
@@ -334,13 +334,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.substitute_operation". '
-                    . 'Expected scalar, but got array'
+                    . 'Expected "scalar", but got "array"'
             ],
             'incorrect action[application]' => [
                 'input' => [
                     'oper1' => []
                 ],
-                'message' => 'The child node "label" at path "actions.operations.oper1" must be configured'
+                'message' => 'The child config "label" under "actions.operations.oper1" must be configured'
             ],
             'incorrect operation[application]' => [
                 'input' => [
@@ -350,7 +350,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.applications".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[entities]' => [
                 'input' => [
@@ -361,7 +361,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.entities".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[routes]' => [
                 'input' => [
@@ -372,7 +372,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'routes' => 'not array value',
                     ]
                 ],
-                'message' => 'Invalid type for path "actions.operations.oper1.routes". Expected array, but got string'
+                'message' => 'Invalid type for path "actions.operations.oper1.routes".'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[groups]' => [
                 'input' => [
@@ -384,7 +385,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'groups' => 'not array route'
                     ]
                 ],
-                'message' => 'Invalid type for path "actions.operations.oper1.groups". Expected array, but got string'
+                'message' => 'Invalid type for path "actions.operations.oper1.groups".'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect action[order]' => [
                 'input' => [
@@ -396,7 +398,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'order' => 'not integer value',
                     ]
                 ],
-                'message' => 'Invalid type for path "actions.operations.oper1.order". Expected int, but got string'
+                'message' => 'Invalid type for path "actions.operations.oper1.order". Expected "int", but got "string"'
             ],
             'incorrect operation[enabled]' => [
                 'input' => [
@@ -410,7 +412,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.enabled".'
-                    . ' Expected boolean, but got string'
+                    . ' Expected "bool", but got "string"'
             ],
             'incorrect operation[frontend_options]' => [
                 'input' => [
@@ -425,7 +427,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.frontend_options".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
         ];
     }
@@ -444,7 +446,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[attribute][type]' => [
                 'input' => [
@@ -458,7 +460,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes.test.type". '
-                    . 'Expected scalar, but got array'
+                    . 'Expected "scalar", but got "array"'
             ],
             'incorrect operation[attribute][label]' => [
                 'input' => [
@@ -473,7 +475,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes.test.label". '
-                    . 'Expected scalar, but got array'
+                    . 'Expected "scalar", but got "array"'
             ],
             'incorrect operation[attribute][options]' => [
                 'input' => [
@@ -489,7 +491,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes.test.options". '
-                    . 'Expected array, but got integer'
+                    . 'Expected "array", but got "int"'
             ],
         ];
     }
@@ -508,7 +510,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.form_options".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[form_options][attribute_fields][options]' => [
                 'input' => [
@@ -522,7 +524,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.form_options.attribute_fields.options". '
-                    . 'Expected array, but got string'
+                    . 'Expected "array", but got "string"'
             ],
             'incorrect operation[form_options][attribute_fields]' => [
                 'input' => [
@@ -534,7 +536,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.form_options.attribute_fields". '
-                    . 'Expected array, but got string'
+                    . 'Expected "array", but got "string"'
             ],
             'incorrect operation[form_options][attribute_default_values]' => [
                 'input' => [
@@ -546,7 +548,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.form_options.attribute_default_values". '
-                    . 'Expected array, but got string'
+                    . 'Expected "array", but got "string"'
             ],
         ];
     }
@@ -567,7 +569,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[attributes][0]' => [
                 'input' => [
@@ -579,7 +581,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes.0".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect operation[attributes][attribute1]' => [
                 'input' => [
@@ -591,7 +593,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes.attribute1". '
-                    . 'Expected array, but got string'
+                    . 'Expected "array", but got "string"'
             ],
             'empty operation[attributes][attribute2][type] and operation[attributes][attribute2][property_path]' => [
                 'input' => [
@@ -647,7 +649,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.attributes.attribute5.entity_acl". '
-                    . 'Expected array, but got string'
+                    . 'Expected "array", but got "string"'
             ],
             'used entity_acl & !entity type operation[attributes][attribute6]' => [
                 'input' => [
@@ -730,7 +732,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.datagrid_options".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'specified both options of operation[datagrid_options]' => [
                 'input' => [
@@ -825,7 +827,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'config' => [
                     'group1' => 'not array value'
                 ],
-                'message' => 'Invalid type for path "actions.action_groups.group1". Expected array, but got string'
+                'message' => 'Invalid type for path "actions.action_groups.group1". Expected "array", but got "string"'
             ],
             'incorrect action_groups[parameters]' => [
                 'input' => [
@@ -834,7 +836,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.action_groups.group1.parameters".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect array action_groups[parameters]' => [
                 'input' => [
@@ -843,7 +845,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.action_groups.group1.parameters.0".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect action_groups[parameters][type]' => [
                 'input' => [
@@ -856,7 +858,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.action_groups.group1.parameters.arg1.type". '
-                    . 'Expected scalar, but got array'
+                    . 'Expected "scalar", but got "array"'
             ],
             'incorrect action_groups[parameters][message]' => [
                 'input' => [
@@ -869,7 +871,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.action_groups.group1.parameters.arg1.message". '
-                    . 'Expected scalar, but got array'
+                    . 'Expected "scalar", but got "array"'
             ],
             'incorrect action_groups[conditions]' => [
                 'input' => [
@@ -878,7 +880,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.action_groups.group1.conditions".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
             'incorrect action_groups[actions]' => [
                 'input' => [
@@ -887,7 +889,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "actions.action_groups.group1.actions".'
-                    . ' Expected array, but got string'
+                    . ' Expected "array", but got "string"'
             ],
         ];
     }

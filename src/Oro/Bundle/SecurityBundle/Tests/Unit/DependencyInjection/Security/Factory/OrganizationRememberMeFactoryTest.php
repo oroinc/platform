@@ -6,10 +6,8 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationR
 
 class OrganizationRememberMeFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OrganizationRememberMeFactory
-     */
-    protected $factory;
+    /** @var OrganizationRememberMeFactory */
+    private $factory;
 
     protected function setUp(): void
     {

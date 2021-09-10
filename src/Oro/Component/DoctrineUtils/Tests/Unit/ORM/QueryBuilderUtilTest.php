@@ -7,8 +7,12 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
@@ -24,34 +28,22 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ]);
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    private function getQueryBuilder()
+    private function getQueryBuilder(): QueryBuilder
     {
         return new QueryBuilder($this->createMock(EntityManager::class));
     }
 
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getParameterMock($name)
+    private function getParameter(string|int $name): Parameter
     {
         $parameter = $this->createMock(Parameter::class);
         $parameter->expects($this->any())
@@ -75,10 +67,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertSame($expectedOffset, QueryBuilderUtil::getPageOffset($page, $limit));
     }
 
-    /**
-     * @return array
-     */
-    public function getPageOffsetProvider()
+    public function getPageOffsetProvider(): array
     {
         return [
             [0, null, null],
@@ -130,19 +119,13 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getSelectExprProvider
-     *
-     * @param QueryBuilder $qb
-     * @param string       $expectedExpr
      */
-    public function testGetSelectExpr($qb, $expectedExpr)
+    public function testGetSelectExpr(QueryBuilder $qb, string $expectedExpr)
     {
         $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExpr($qb));
     }
 
-    /**
-     * @return array
-     */
-    public function getSelectExprProvider()
+    public function getSelectExprProvider(): array
     {
         return [
             [
@@ -182,20 +165,13 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getSelectExprByAliasProvider
-     *
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     * @param string       $expectedExpr
      */
-    public function testGetSelectExprByAlias($qb, $alias, $expectedExpr)
+    public function testGetSelectExprByAlias(QueryBuilder $qb, string $alias, ?string $expectedExpr)
     {
         $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExprByAlias($qb, $alias));
     }
 
-    /**
-     * @return array
-     */
-    public function getSelectExprByAliasProvider()
+    public function getSelectExprByAliasProvider(): array
     {
         return [
             [
@@ -247,10 +223,10 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases()
     {
-        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
-            "Can't get single root alias for the given query."
-            . " Reason: the query has several root aliases: root_alias1, root_alias1."
+            'Can\'t get single root alias for the given query.'
+            . ' Reason: the query has several root aliases: root_alias1, root_alias1.'
         );
 
         $qb = $this->createMock(QueryBuilder::class);
@@ -264,9 +240,9 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootAliasWhenQueryHasNoRootAlias()
     {
-        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
-            "Can't get single root alias for the given query. Reason: the query has no any root aliases."
+            'Can\'t get single root alias for the given query. Reason: the query has no any root aliases.'
         );
 
         $qb = $this->createMock(QueryBuilder::class);
@@ -305,10 +281,10 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootEntityWhenQueryHasSeveralRootEntities()
     {
-        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
-            "Can't get single root entity for the given query."
-            . " Reason: the query has several root entities: Test\Entity1, Test\Entity1."
+            'Can\'t get single root entity for the given query.'
+            . ' Reason: the query has several root entities: Test\Entity1, Test\Entity1.'
         );
 
         $qb = $this->createMock(QueryBuilder::class);
@@ -322,9 +298,9 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootEntityWhenQueryHasNoRootEntity()
     {
-        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
-            "Can't get single root entity for the given query. Reason: the query has no any root entities."
+            'Can\'t get single root entity for the given query. Reason: the query has no any root entities.'
         );
 
         $qb = $this->createMock(QueryBuilder::class);
@@ -404,11 +380,11 @@ class QueryBuilderUtilTest extends OrmTestCase
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
                 AND a.name != :param2 AND a.status = ?1';
         $parameters = [
-            $this->getParameterMock(0),
-            $this->getParameterMock(1),
-            $this->getParameterMock('param1'),
-            $this->getParameterMock('param2'),
-            $this->getParameterMock('param3'),
+            $this->getParameter(0),
+            $this->getParameter(1),
+            $this->getParameter('param1'),
+            $this->getParameter('param2'),
+            $this->getParameter('param3'),
         ];
         $expectedParameters = [
             1 => '1_value',
@@ -432,11 +408,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getJoinClassDataProvider
-     * @param callable $qbFactory
-     * @param array $joinPath
-     * @param string $expectedClass
      */
-    public function testGetJoinClass(callable $qbFactory, $joinPath, $expectedClass)
+    public function testGetJoinClass(callable $qbFactory, array $joinPath, string $expectedClass)
     {
         $qb = $qbFactory($this->em);
 
@@ -446,73 +419,70 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getJoinClassDataProvider()
+    public function getJoinClassDataProvider(): array
     {
         return [
             'field:manyToOne' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.bestItem', 'i');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
             'field:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.groups', 'g');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+                Group::class,
             ],
             'field:manyToMany.field:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.groups', 'g')
                         ->join('g.items', 'i');
                 },
                 ['p', 1],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
             'class:manyToOne' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                        ->from(Person::class, 'p')
+                        ->join(Item::class, 'i');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
             'class:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g');
+                        ->from(Person::class, 'p')
+                        ->join(Group::class, 'g');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+                Group::class,
             ],
             'class:manyToMany.class:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                        ->from(Person::class, 'p')
+                        ->join(Group::class, 'g')
+                        ->join(Item::class, 'i');
                 },
                 ['p', 1],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
         ];
     }
@@ -521,9 +491,9 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
-            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
-            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+            ->from(Person::class, 'p')
+            ->join(Group::class, 'g')
+            ->join(Item::class, 'i');
 
         $this->assertNull(QueryBuilderUtil::findJoinByAlias($qb, 'p'));
         $this->assertEquals('g', QueryBuilderUtil::findJoinByAlias($qb, 'g')->getAlias());
@@ -535,7 +505,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
-            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+            ->from(Person::class, 'p')
             ->join('p.bestItem', 'i')
             ->join('i.owner', 'o')
             ->join('i.persons', 'persons')
@@ -555,9 +525,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider invalidDataProvider
-     * @param string $invalid
      */
-    public function testSprintfInvalid($invalid)
+    public function testSprintfInvalid(string $invalid)
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::sprintf('%s.%s > 0', $invalid, 'id');
@@ -570,9 +539,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider invalidDataProvider
-     * @param string $invalid
      */
-    public function testCheckStringInvalid($invalid)
+    public function testCheckStringInvalid(string $invalid)
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkIdentifier($invalid);
@@ -652,9 +620,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider invalidDataProvider
-     * @param string $invalid
      */
-    public function testGetFieldInvalid($invalid)
+    public function testGetFieldInvalid(string $invalid)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));

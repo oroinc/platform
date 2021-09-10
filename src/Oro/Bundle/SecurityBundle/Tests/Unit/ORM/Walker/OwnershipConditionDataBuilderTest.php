@@ -28,9 +28,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     private const BUSINESS_UNIT = BusinessUnit::class;
-    private const ORGANIZATION  = Organization::class;
-    private const USER          = User::class;
-    private const TEST_ENTITY   = TestEntity::class;
+    private const ORGANIZATION = Organization::class;
+    private const USER = User::class;
+    private const TEST_ENTITY = TestEntity::class;
 
     /** @var OwnershipConditionDataBuilder */
     private $builder;
@@ -167,14 +167,14 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
      * @dataProvider buildFilterConstraintProvider
      */
     public function testGetAclConditionData(
-        $userId,
-        $organizationId,
-        $isGranted,
-        $accessLevel,
-        $ownerType,
-        $targetEntityClassName,
-        $expectedConstraint,
-        $expectedGroup = ''
+        string $userId,
+        string $organizationId,
+        bool $isGranted,
+        ?int $accessLevel,
+        ?string $ownerType,
+        string $targetEntityClassName,
+        ?array $expectedConstraint,
+        string $expectedGroup = ''
     ) {
         $this->buildTestTree();
 
@@ -185,14 +185,10 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
             );
         }
 
-        /** @var OneShotIsGrantedObserver $aclObserver */
-        $aclObserver = null;
         $this->aclVoter->expects($this->any())
             ->method('addOneShotIsGrantedObserver')
-            ->willReturnCallback(function ($observer) use (&$aclObserver, &$accessLevel) {
-                $aclObserver = $observer;
-                /** @var OneShotIsGrantedObserver $aclObserver */
-                $aclObserver->setAccessLevel($accessLevel);
+            ->willReturnCallback(function (OneShotIsGrantedObserver $observer) use ($accessLevel) {
+                $observer->setAccessLevel($accessLevel);
             });
 
         $user = new User($userId);
@@ -254,7 +250,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public static function buildFilterConstraintProvider()
+    public static function buildFilterConstraintProvider(): array
     {
         return [
             'for the TEST entity without userId, grant, ownerType; with NONE ACL' => [

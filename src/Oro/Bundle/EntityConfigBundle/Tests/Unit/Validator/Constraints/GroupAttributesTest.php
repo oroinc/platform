@@ -7,10 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributesValidator
 
 class GroupAttributesTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GroupAttributes
-     */
-    protected $constraint;
+    /** @var GroupAttributes */
+    private $constraint;
 
     protected function setUp(): void
     {

@@ -45,7 +45,7 @@ class RestDocViewDetector implements ResetInterface
         $view = $this->view;
         if (null === $view) {
             $view = '';
-            $request = $this->requestStack->getMasterRequest();
+            $request = $this->requestStack->getMainRequest();
             if (null !== $request) {
                 if ($request->attributes->has('view')) {
                     $view = $request->attributes->get('view');

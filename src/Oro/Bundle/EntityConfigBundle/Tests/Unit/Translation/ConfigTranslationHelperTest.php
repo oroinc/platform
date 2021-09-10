@@ -9,25 +9,21 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const LOCALE = 'en';
+    private const LOCALE = 'en';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationManager */
-    protected $translationManager;
+    private $translationManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
-    protected $translator;
+    private $translator;
 
     /** @var ConfigTranslationHelper */
-    protected $helper;
+    private $helper;
 
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
-
-        $this->translationManager = $this
-            ->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationManager = $this->createMock(TranslationManager::class);
 
         $this->helper = new ConfigTranslationHelper(
             $this->translationManager,
@@ -35,24 +31,10 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown(): void
-    {
-        unset(
-            $this->translator,
-            $this->helper,
-            $this->translationManager
-        );
-    }
-
     /**
      * @dataProvider isTranslationEqualDataProvider
-     *
-     * @param string $translation
-     * @param string $key
-     * @param string $value
-     * @param bool $expected
      */
-    public function testIsTranslationEqual($translation, $key, $value, $expected)
+    public function testIsTranslationEqual(string $translation, string $key, string $value, bool $expected)
     {
         $this->translator->expects($this->once())
             ->method('trans')
@@ -62,10 +44,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->isTranslationEqual($key, $value));
     }
 
-    /**
-     * @return array
-     */
-    public function isTranslationEqualDataProvider()
+    public function isTranslationEqualDataProvider(): array
     {
         return [
             'equal' => [
@@ -102,27 +81,21 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider saveTranslationsDataProvider
-     *
-     * @param array $translations
-     * @param string|null $key
-     * @param string|null $value
      */
-    public function testSaveTranslations(array $translations, $key = null, $value = null)
+    public function testSaveTranslations(array $translations, string $key = null, string $value = null)
     {
         if ($translations) {
             $this->assertTranslationManagerCalled($key, $value);
             $this->assertTranslationServicesCalled();
         } else {
-            $this->translationManager->expects($this->never())->method($this->anything());
+            $this->translationManager->expects($this->never())
+                ->method($this->anything());
         }
 
         $this->helper->saveTranslations($translations);
     }
 
-    /**
-     * @return array
-     */
-    public function saveTranslationsDataProvider()
+    public function saveTranslationsDataProvider(): array
     {
         $key = 'test.domain.label';
         $value = 'translation label';
@@ -139,11 +112,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
-    protected function assertTranslationManagerCalled($key, $value)
+    private function assertTranslationManagerCalled(string $key, string $value)
     {
         $trans = new Translation();
 
@@ -160,7 +129,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
             ->method('flush');
     }
 
-    protected function assertTranslationServicesCalled()
+    private function assertTranslationServicesCalled()
     {
         $this->translator->expects($this->once())
             ->method('getLocale')

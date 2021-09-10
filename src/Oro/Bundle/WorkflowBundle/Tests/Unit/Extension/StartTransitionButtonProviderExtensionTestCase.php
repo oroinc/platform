@@ -26,7 +26,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
     public function testFind(
         bool $expected,
         string $entityClass = null,
-        string $routeName = null,
+        string $routeName = '',
         string $datagrid = null
     ) {
         $this->applicationProvider->expects($this->atLeastOnce())
@@ -101,7 +101,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
             'datagrid' => [
                 'expected' => true,
                 'entityClass' => null,
-                'routeName' => null,
+                'routeName' => '',
                 'datagrid' => self::DATAGRID,
             ],
             'not matched' => [

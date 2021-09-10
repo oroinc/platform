@@ -32,7 +32,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -205,7 +205,8 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
             ->method('getAttributeLabel')
             ->willReturn('Label');
 
-        $this->managerMock->method('isSystem')
+        $this->managerMock->expects($this->any())
+            ->method('isSystem')
             ->willReturn(false);
 
         $builder = $this->factory->createBuilder(AttributeMultiSelectType::class, []);

@@ -16,9 +16,9 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit\Framework\
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new PurgeEmailAttachmentsByIdsMessageProcessor(
-            $this->createRegistryMock(),
-            $this->createJobRunnerMock(),
-            $this->createLoggerMock()
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
@@ -32,56 +32,22 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit\Framework\
 
     public function testShouldRejectMessageIfIdsIsMissing()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
-        $message->setBody(json_encode([]));
+        $message->setBody(json_encode([], JSON_THROW_ON_ERROR));
 
         $processor = new PurgeEmailAttachmentsByIdsMessageProcessor(
-            $this->createRegistryMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(JobRunner::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    private function createRegistryMock()
-    {
-        return $this->createMock(ManagerRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

@@ -30,7 +30,7 @@ class EmailAddressTypeTest extends TypeTestCase
     {
         $formData = ' John Smith 1 <john1@example.com> ;; ; "John Smith 2" <john2@example.com>; john3@example.com';
 
-        $form = $this->factory->create(EmailAddressType::class, null, array('multiple' => true));
+        $form = $this->factory->create(EmailAddressType::class, null, ['multiple' => true]);
 
         $form->submit($formData);
 
@@ -38,7 +38,7 @@ class EmailAddressTypeTest extends TypeTestCase
         /** @var array $result */
         $result = $form->getData();
         $this->assertEquals(
-            array('John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'),
+            ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
             $result
         );
 
@@ -48,23 +48,18 @@ class EmailAddressTypeTest extends TypeTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(
-                array(
-                    'multiple' => false
-                )
-            );
+            ->with(['multiple' => false]);
 
-        $type = new EmailAddressType(array());
+        $type = new EmailAddressType([]);
         $type->configureOptions($resolver);
     }
 
     public function testGetParent()
     {
-        $type = new EmailAddressType(array());
+        $type = new EmailAddressType([]);
         $this->assertEquals(TextType::class, $type->getParent());
     }
 }

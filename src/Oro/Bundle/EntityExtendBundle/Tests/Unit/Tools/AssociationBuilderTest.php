@@ -474,7 +474,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->throwException(new \ReflectionException('test')));
+            ->willThrowException(new \ReflectionException('test'));
 
         $builder = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callMethod(
@@ -491,7 +491,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->throwException(new ORMMappingException('test')));
+            ->willThrowException(new ORMMappingException('test'));
 
         $builder = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callMethod(
@@ -508,7 +508,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->throwException(new PersistenceMappingException('test')));
+            ->willThrowException(new PersistenceMappingException('test'));
 
         $builder = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callMethod(

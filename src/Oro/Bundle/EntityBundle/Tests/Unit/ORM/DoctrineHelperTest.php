@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
@@ -125,9 +127,9 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $expectedClass = ItemStub::class;
         $this->registry->expects($this->once())
             ->method('getAliasNamespace')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['OroEntityBundle', 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub']
-            ]));
+            ]);
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
         // test internal cache
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
@@ -147,18 +149,14 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $entity
-     * @param string $class
-     * @param array $identifiers
-     * @param bool $expected
      * @dataProvider testIsNewEntityDataProvider
      */
-    public function testIsNewEntity($entity, $class, array $identifiers, $expected)
+    public function testIsNewEntity(object $entity, string $class, array $identifiers, bool $expected)
     {
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnCallback(function ($entity) use ($identifiers) {
+            ->willReturnCallback(function ($entity) use ($identifiers) {
                 $res = [];
                 foreach ($identifiers as $identifier) {
                     if (isset($entity->$identifier)) {
@@ -167,15 +165,15 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
                 }
 
                 return $res;
-            }));
+            });
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             $expected,
@@ -183,10 +181,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function testIsNewEntityDataProvider()
+    public function testIsNewEntityDataProvider(): array
     {
         $entityWithTwoId = new ItemStub();
         $entityWithTwoId->id = 1;
@@ -197,19 +192,19 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         return [
             'existing entity with 2 id fields' => [
                 'entity' => $entityWithTwoId,
-                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'class'  => ItemStub::class,
                 'identifiers' => ['id', 'id2'],
                 'expected' => false
             ],
             'existing entity with 1 id fields' => [
                 'entity' => $entityWithTwoId,
-                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'class'  => ItemStub::class,
                 'identifiers' => ['id'],
                 'expected' => false
             ],
             'existing entity without id fields' => [
                 'entity' => $entityWithoutId,
-                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'class'  => ItemStub::class,
                 'identifiers' => ['id'],
                 'expected' => true
             ],
@@ -217,26 +212,24 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $entity
-     * @param string $class
      * @dataProvider getEntityIdentifierDataProvider
      */
-    public function testGetEntityIdentifier($entity, $class)
+    public function testGetEntityIdentifier(object $entity, string $class)
     {
         $identifiers = ['id' => self::TEST_IDENTIFIER];
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnValue($identifiers));
+            ->willReturn($identifiers);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             $identifiers,
@@ -248,26 +241,23 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = $this->createMock(\stdClass::class);
 
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', get_class($entity)));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with(get_class($entity))
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityIdentifier($entity);
     }
 
-    /**
-     * @return array
-     */
-    public function getEntityIdentifierDataProvider()
+    public function getEntityIdentifierDataProvider(): array
     {
         return [
             'existing entity' => [
                 'entity' => new ItemStub(),
-                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'class'  => ItemStub::class,
             ],
             'entity proxy'    => [
                 'entity' => new ItemStubProxy(),
@@ -278,11 +268,8 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getSingleEntityIdentifierDataProvider
-     * @param integer $expected
-     * @param array $identifiers
-     * @param bool $throwException
      */
-    public function testGetSingleEntityIdentifier($expected, array $identifiers, $throwException = true)
+    public function testGetSingleEntityIdentifier(?int $expected, array $identifiers, bool $throwException = true)
     {
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
@@ -290,15 +277,15 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnValue($identifiers));
+            ->willReturn($identifiers);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             $expected,
@@ -306,10 +293,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getSingleEntityIdentifierDataProvider()
+    public function getSingleEntityIdentifierDataProvider(): array
     {
         return [
             'valid identifier'                  => [
@@ -330,7 +314,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSingleEntityIdentifierIncorrectIdentifier()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier for "ItemStubProxy" entity.');
 
         $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
@@ -341,39 +325,37 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnValue($identifiers));
+            ->willReturn($identifiers);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
     /**
-     * @param object $entity
-     * @param string $class
      * @dataProvider getEntityIdentifierFieldNamesDataProvider
      */
-    public function testGetEntityIdentifierFieldNames($entity, $class)
+    public function testGetEntityIdentifierFieldNames(object $entity, string $class)
     {
         $identifiers = ['id' => self::TEST_IDENTIFIER];
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             array_keys($identifiers),
@@ -385,26 +367,23 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = $this->createMock(\stdClass::class);
 
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', get_class($entity)));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with(get_class($entity))
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityIdentifierFieldNames($entity);
     }
 
-    /**
-     * @return array
-     */
-    public function getEntityIdentifierFieldNamesDataProvider()
+    public function getEntityIdentifierFieldNamesDataProvider(): array
     {
         return [
             'existing entity' => [
                 'entity' => new ItemStub(),
-                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'class'  => ItemStub::class,
             ],
             'entity proxy'    => [
                 'entity' => new ItemStubProxy(),
@@ -415,20 +394,20 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityIdentifierFieldNamesForClass()
     {
-        $class       = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub';
+        $class = ItemStub::class;
         $identifiers = ['id' => self::TEST_IDENTIFIER];
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             array_keys($identifiers),
@@ -440,39 +419,39 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $class = \stdClass::class;
 
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', $class));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($class);
     }
 
     /**
      * @dataProvider getSingleEntityIdentifierFieldNameDataProvider
-     * @param string $expected
-     * @param array $identifiers
-     * @param bool $throwException
      */
-    public function testGetSingleEntityIdentifierFieldName($expected, array $identifiers, $throwException = true)
-    {
+    public function testGetSingleEntityIdentifierFieldName(
+        ?string $expected,
+        array $identifiers,
+        bool $throwException = true
+    ) {
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             $expected,
@@ -480,10 +459,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getSingleEntityIdentifierFieldNameDataProvider()
+    public function getSingleEntityIdentifierFieldNameDataProvider(): array
     {
         return [
             'valid identifier'                  => [
@@ -504,7 +480,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSingleEntityIdentifierFieldNameIncorrectIdentifier()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier field name for "ItemStubProxy" entity.');
 
         $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
@@ -514,50 +490,46 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity);
     }
 
     /**
      * @dataProvider getSingleEntityIdentifierFieldTypeDataProvider
-     * @param string $expected
-     * @param array $identifiers
-     * @param bool $throwException
      */
-    public function testGetSingleEntityIdentifierFieldType($expected, array $identifiers, $throwException = true)
-    {
+    public function testGetSingleEntityIdentifierFieldType(
+        ?string $expected,
+        array $identifiers,
+        bool $throwException = true
+    ) {
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $this->classMetadata->expects($this->any())
             ->method('getTypeOfField')
-            ->will(
-                $this->returnCallback(
-                    function ($fieldName) use ($identifiers) {
-                        return $identifiers[$fieldName];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($fieldName) use ($identifiers) {
+                return $identifiers[$fieldName];
+            });
 
         $this->assertEquals(
             $expected,
@@ -565,10 +537,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getSingleEntityIdentifierFieldTypeDataProvider()
+    public function getSingleEntityIdentifierFieldTypeDataProvider(): array
     {
         return [
             'valid identifier'                  => [
@@ -590,7 +559,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSingleEntityIdentifierFieldTypeIncorrectIdentifier()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier field type for "ItemStubProxy" entity.');
 
         $identifiers = ['key1' => 'integer', 'key2' => 'string'];
@@ -600,15 +569,15 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $this->classMetadata->expects($this->never())
             ->method('getTypeOfField');
 
@@ -617,7 +586,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSingleEntityIdentifierFieldTypeEmptyIdentifier()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier field type for "ItemStubProxy" entity.');
 
         $identifiers = [];
@@ -627,15 +596,15 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array_keys($identifiers)));
+            ->willReturn(array_keys($identifiers));
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $this->classMetadata->expects($this->never())
             ->method('getTypeOfField');
 
@@ -649,7 +618,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($this->doctrineHelper->getEntityClass($entity))
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertTrue(
             $this->doctrineHelper->isManageableEntity($entity)
@@ -663,7 +632,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($this->doctrineHelper->getEntityClass($entity))
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertFalse(
             $this->doctrineHelper->isManageableEntity($entity)
@@ -672,12 +641,12 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsManageableEntityClass()
     {
-        $class = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub';
+        $class = ItemStub::class;
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertTrue(
             $this->doctrineHelper->isManageableEntityClass($class)
@@ -686,12 +655,12 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsManageableEntityClassForNotManageableEntity()
     {
-        $class = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub';
+        $class = ItemStub::class;
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertFalse(
             $this->doctrineHelper->isManageableEntityClass($class)
@@ -700,19 +669,17 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getEntityMetadataDataProvider
-     * @param string|object $entityOrClass
-     * @param string $class
      */
-    public function testGetEntityMetadata($entityOrClass, $class)
+    public function testGetEntityMetadata(string|object $entityOrClass, string $class)
     {
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertSame(
             $this->classMetadata,
@@ -720,10 +687,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getEntityMetadataDataProvider()
+    public function getEntityMetadataDataProvider(): array
     {
         return [
             ['ItemStubProxy', 'ItemStubProxy'],
@@ -733,7 +697,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityMetadataNotManageableEntity()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
 
         $class = 'ItemStub';
@@ -741,7 +705,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityMetadata($class);
     }
@@ -753,7 +717,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             $this->doctrineHelper->getEntityMetadata($class, false)
@@ -767,11 +731,11 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertSame(
             $this->classMetadata,
@@ -781,7 +745,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityMetadataForClassNotManageableEntity()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
 
         $class = 'ItemStub';
@@ -789,7 +753,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityMetadataForClass($class);
     }
@@ -801,7 +765,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             $this->doctrineHelper->getEntityMetadataForClass($class, false)
@@ -810,14 +774,13 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getEntityManagerDataProvider
-     * @param string|object $entityOrClass
      */
-    public function testGetEntityManager($entityOrClass)
+    public function testGetEntityManager(string|object $entityOrClass)
     {
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($this->doctrineHelper->getEntityClass($entityOrClass))
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertSame(
             $this->em,
@@ -825,10 +788,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getEntityManagerDataProvider()
+    public function getEntityManagerDataProvider(): array
     {
         return [
             ['ItemStubProxy'],
@@ -838,7 +798,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityManagerNotManageableEntity()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
 
         $class = 'ItemStub';
@@ -846,7 +806,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityManager($class);
     }
@@ -858,7 +818,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             $this->doctrineHelper->getEntityManager($class, false)
@@ -872,7 +832,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertSame(
             $this->em,
@@ -882,7 +842,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityManagerForClassNotManageableEntity()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
 
         $class = 'ItemStub';
@@ -890,7 +850,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityManagerForClass($class);
     }
@@ -902,7 +862,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             $this->doctrineHelper->getEntityManagerForClass($class, false)
@@ -911,7 +871,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityRepositoryByEntity()
     {
-        $entity      = new ItemStubProxy();
+        $entity = new ItemStubProxy();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         $repo = $this->createMock(EntityRepository::class);
@@ -919,11 +879,11 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with($entityClass)
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
 
         $this->assertSame(
             $repo,
@@ -940,11 +900,11 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with($class)
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
 
         $this->assertSame(
             $repo,
@@ -956,13 +916,13 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $class = 'ItemStubProxy';
 
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', $class));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityRepository($class);
     }
@@ -976,11 +936,11 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with($class)
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
 
         $this->assertSame(
             $repo,
@@ -992,13 +952,13 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $class = 'ItemStub';
 
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\NotManageableEntityException::class);
+        $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', $class));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->doctrineHelper->getEntityRepositoryForClass($class);
     }
@@ -1063,17 +1023,17 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityReference()
     {
         $expectedResult = $this->createMock(\stdClass::class);
-        $entityClass    = 'MockEntity';
-        $entityId       = 100;
+        $entityClass = 'MockEntity';
+        $entityId = 100;
 
         $this->em->expects($this->once())
             ->method('getReference')
             ->with($entityClass, $entityId)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertEquals(
             $expectedResult,
@@ -1084,8 +1044,8 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetEntity()
     {
         $expectedResult = new TestEntity();
-        $entityClass    = 'MockEntity';
-        $entityId       = 100;
+        $entityClass = 'MockEntity';
+        $entityId = 100;
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
@@ -1105,19 +1065,19 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     public function testCreateEntityInstance()
     {
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->once())
             ->method('newInstance')
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($class)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->assertSame(
             $entity,
@@ -1135,14 +1095,14 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $entity = new ItemStub();
         $entity->cascadeRefreshPersistentInitializedCollection = new PersistentCollection(
             $this->em,
-            'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+            ItemStub::class,
             new ArrayCollection([
                 $itemsToRefresh[0],
             ])
         );
         $entity->cascadeRefreshPersistentUninitializedCollection = new PersistentCollection(
             $this->em,
-            'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+            ItemStub::class,
             new ArrayCollection([
                 $itemsToRefresh[1],
             ])
@@ -1150,27 +1110,27 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $entity->cascadeRefreshPersistentUninitializedCollection->setInitialized(false);
         $entity->persistentUninitializedCollection = new PersistentCollection(
             $this->em,
-            'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+            ItemStub::class,
             new ArrayCollection([
                 $itemsToRefresh[1],
             ])
         );
         $entity->persistentUninitializedCollection->setInitialized(false);
 
-        $entityMetadata = new ClassMetadata('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub');
+        $entityMetadata = new ClassMetadata(ItemStub::class);
         $entityMetadata->reflFields = [
             'cascadeRefreshPersistentInitializedCollection' => new ReflectionProperty(
-                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                ItemStub::class,
                 'cascadeRefreshPersistentInitializedCollection',
                 [spl_object_hash($entity) => $entity->cascadeRefreshPersistentInitializedCollection]
             ),
             'cascadeRefreshPersistentUninitializedCollection' => new ReflectionProperty(
-                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                ItemStub::class,
                 'cascadeRefreshPersistentInitializedCollection',
                 [spl_object_hash($entity) => $entity->cascadeRefreshPersistentUninitializedCollection]
             ),
             'persistentUninitializedCollection' => new ReflectionProperty(
-                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                ItemStub::class,
                 'persistentUninitializedCollection',
                 [spl_object_hash($entity) => $entity->persistentUninitializedCollection]
             ),
@@ -1192,15 +1152,15 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValueMap([
-                ['Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub', $this->em],
-            ]));
+            ->willReturnMap([
+                [ItemStub::class, $this->em],
+            ]);
 
         $this->em->expects($this->any())
             ->method('getClassMetadata')
-            ->will($this->returnValueMap([
-                ['Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub', $entityMetadata],
-            ]));
+            ->willReturnMap([
+                [ItemStub::class, $entityMetadata],
+            ]);
 
         $this->em->expects($this->exactly(2))
             ->method('refresh')

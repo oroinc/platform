@@ -26,9 +26,6 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var SessionHttpKernelDecorator */
     private $kernelDecorator;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(HttpKernel::class);

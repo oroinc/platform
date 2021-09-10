@@ -17,10 +17,10 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var PermissionManager|\PHPUnit\Framework\MockObject\MockObject */
     private $permissionManager;
 
     /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */

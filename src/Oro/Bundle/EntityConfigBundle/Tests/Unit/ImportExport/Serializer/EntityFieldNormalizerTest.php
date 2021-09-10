@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,9 +27,6 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldNormalizer */
     private $normalizer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
@@ -39,23 +37,17 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $inputData
-     * @param bool $expected
-     *
      * @dataProvider supportsNormalizationProvider
      */
-    public function testSupportsNormalization($inputData, $expected)
+    public function testSupportsNormalization(mixed $inputData, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($inputData));
     }
 
     /**
-     * @param array $inputData
-     * @param bool $expected
-     *
      * @dataProvider supportsDenormalizationProvider
      */
-    public function testSupportsDenormalization(array $inputData, $expected)
+    public function testSupportsDenormalization(array $inputData, bool $expected)
     {
         $this->assertEquals(
             $expected,
@@ -83,16 +75,13 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testDenormalizeException(array $data)
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage("Data doesn't contains entity id");
 
         $this->normalizer->denormalize($data, '');
     }
 
-    /**
-     * @return array
-     */
-    public function denormalizeExceptionDataProvider()
+    public function denormalizeExceptionDataProvider(): array
     {
         return [
             [
@@ -133,10 +122,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $this->normalizer->denormalize($inputData['data'], $inputData['class']));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDenormalizationProvider()
+    public function supportsDenormalizationProvider(): array
     {
         return [
             'supported' => [
@@ -169,10 +155,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function supportsNormalizationProvider()
+    public function supportsNormalizationProvider(): array
     {
         return [
             'supported' => [
@@ -190,10 +173,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function normalizeProvider()
+    public function normalizeProvider(): array
     {
         return [
             [
@@ -228,11 +208,9 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function denormalizeProvider()
+    public function denormalizeProvider(): array
     {
         return [
             [
@@ -370,28 +348,17 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getEnumOptions()
+    private function getEnumOptions(): array
     {
         return [EntityFieldNormalizer::CONFIG_TYPE => EntityFieldNormalizer::TYPE_ENUM];
     }
 
-    /**
-     * @param string $type
-     * @return array
-     */
-    private function getOptions($type)
+    private function getOptions(string $type): array
     {
         return [EntityFieldNormalizer::CONFIG_TYPE => $type];
     }
 
-    /**
-     * @param string $scope
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getConfigProvider($scope)
+    private function getConfigProvider(string $scope): ConfigProvider
     {
         $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->any())

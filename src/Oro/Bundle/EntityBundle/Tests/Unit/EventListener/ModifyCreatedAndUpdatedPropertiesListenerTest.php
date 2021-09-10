@@ -15,11 +15,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ModifyCreatedAndUpdatedPropertiesListener */
-    protected $listener;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    protected $tokenStorage;
+    /** @var ModifyCreatedAndUpdatedPropertiesListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -30,22 +30,22 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
 
     /**
      * @dataProvider userDataProvider
-     *
-     * @param object  $user
-     * @param boolean $expectedCallSetUpdatedBy
      */
-    public function testModifyCreatedAndUpdatedPropertiesForNewEntity($user, $expectedCallSetUpdatedBy)
+    public function testModifyCreatedAndUpdatedPropertiesForNewEntity(object $user, bool $expectedCallSetUpdatedBy)
     {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
 
-        $datesAwareEntity->expects(static::once())->method('getCreatedAt');
-        $datesAwareEntity->expects(static::once())
+        $datesAwareEntity->expects(self::once())
+            ->method('getCreatedAt');
+        $datesAwareEntity->expects(self::once())
             ->method('setCreatedAt')
-            ->with(static::equalToWithDelta(new \DateTime(), 1.0));
-        $datesAwareEntity->expects(static::once())->method('isUpdatedAtSet')->willReturn(false);
-        $datesAwareEntity->expects(static::once())
+            ->with(self::equalToWithDelta(new \DateTime(), 1.0));
+        $datesAwareEntity->expects(self::once())
+            ->method('isUpdatedAtSet')
+            ->willReturn(false);
+        $datesAwareEntity->expects(self::once())
             ->method('setUpdatedAt')
-            ->with(static::equalToWithDelta(new \DateTime(), 1.0));
+            ->with(self::equalToWithDelta(new \DateTime(), 1.0));
 
         $alreadyUpdatedDatesAwareEntity = $this->createMock(DatesAwareInterface::class);
         $alreadyUpdatedDatesAwareEntity->expects($this->once())
@@ -93,43 +93,54 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
             $alreadyUpdatedUpdatedByAwareEntity
         ];
         $countOfRecompute = $expectedCallSetUpdatedBy ? 2 : 1;
-        $args = $this->createArgsMock($countOfRecompute, $scheduled, []);
 
+        $args = $this->getOnFlushEventArgs($countOfRecompute, $scheduled, []);
         $this->listener->onFlush($args);
     }
 
     /**
      * @dataProvider userDataProvider
-     *
-     * @param object  $user
-     * @param boolean $expectedCallSetUpdatedBy
      */
-    public function testModifyCreatedAndUpdatedPropertiesForExistingEntity($user, $expectedCallSetUpdatedBy)
+    public function testModifyCreatedAndUpdatedPropertiesForExistingEntity(object $user, bool $expectedCallSetUpdatedBy)
     {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
 
-        $datesAwareEntity->expects(static::once())->method('isUpdatedAtSet')->willReturn(false);
-        $datesAwareEntity->expects(static::once())
+        $datesAwareEntity->expects(self::once())
+            ->method('isUpdatedAtSet')
+            ->willReturn(false);
+        $datesAwareEntity->expects(self::once())
             ->method('setUpdatedAt')
-            ->with(static::equalToWithDelta(new \DateTime(), 1.0));
+            ->with(self::equalToWithDelta(new \DateTime(), 1.0));
 
         $alreadyUpdatedDatesAwareEntity = $this->createMock(DatesAwareInterface::class);
-        $alreadyUpdatedDatesAwareEntity->expects(static::once())->method('isUpdatedAtSet')->willReturn(true);
-        $alreadyUpdatedDatesAwareEntity->expects(static::never())->method('setUpdatedAt');
+        $alreadyUpdatedDatesAwareEntity->expects(self::once())
+            ->method('isUpdatedAtSet')
+            ->willReturn(true);
+        $alreadyUpdatedDatesAwareEntity->expects(self::never())
+            ->method('setUpdatedAt');
 
         $currentToken = $this->createMock(TokenInterface::class);
-        $currentToken->expects(static::once())->method('getUser')->willReturn($user);
-        $this->tokenStorage->expects(static::once())->method('getToken')->willReturn($currentToken);
+        $currentToken->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($currentToken);
 
         $updatedByAwareEntity = $this->createMock(UpdatedByAwareInterface::class);
-        $updatedByAwareEntity->expects(static::once())->method('isUpdatedBySet')->willReturn(false);
-        $updatedByAwareEntity->expects(static::exactly((int)$expectedCallSetUpdatedBy))
+        $updatedByAwareEntity->expects(self::once())
+            ->method('isUpdatedBySet')
+            ->willReturn(false);
+        $updatedByAwareEntity->expects(self::exactly((int)$expectedCallSetUpdatedBy))
             ->method('setUpdatedBy')
             ->with($user);
 
         $alreadyUpdatedUpdatedByAwareEntity = $this->createMock(UpdatedByAwareInterface::class);
-        $alreadyUpdatedUpdatedByAwareEntity->expects(static::once())->method('isUpdatedBySet')->willReturn(true);
-        $alreadyUpdatedUpdatedByAwareEntity->expects(static::never())->method('setUpdatedBy');
+        $alreadyUpdatedUpdatedByAwareEntity->expects(self::once())
+            ->method('isUpdatedBySet')
+            ->willReturn(true);
+        $alreadyUpdatedUpdatedByAwareEntity->expects(self::never())
+            ->method('setUpdatedBy');
 
         $scheduled = [
             $datesAwareEntity,
@@ -138,15 +149,12 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
             $alreadyUpdatedUpdatedByAwareEntity
         ];
         $countOfRecompute = $expectedCallSetUpdatedBy ? 2 : 1;
-        $args = $this->createArgsMock($countOfRecompute, [], $scheduled);
 
+        $args = $this->getOnFlushEventArgs($countOfRecompute, [], $scheduled);
         $this->listener->onFlush($args);
     }
 
-    /**
-     * @return array
-     */
-    public function userDataProvider()
+    public function userDataProvider(): array
     {
         return [
             'realUser'    => [
@@ -160,15 +168,11 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
         ];
     }
 
-    /**
-     * @param int      $countOfRecompute
-     * @param object[] $scheduledForInsert
-     * @param object[] $scheduledForUpdate
-     *
-     * @return OnFlushEventArgs
-     */
-    protected function createArgsMock($countOfRecompute, array $scheduledForInsert, array $scheduledForUpdate)
-    {
+    private function getOnFlushEventArgs(
+        int $countOfRecompute,
+        array $scheduledForInsert,
+        array $scheduledForUpdate
+    ): OnFlushEventArgs {
         $entityManager = $this->createMock(EntityManager::class);
         $unitOfWork = $this->createMock(UnitOfWork::class);
         $metadataStub = $this->createMock(ClassMetadata::class);

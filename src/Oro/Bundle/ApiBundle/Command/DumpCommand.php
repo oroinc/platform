@@ -102,6 +102,8 @@ HELP
         } else {
             $this->dumpResources($input, $output);
         }
+
+        return 0;
     }
 
     public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output): void

@@ -97,7 +97,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                     }
                 }
             } else {
-                $view->children[$childName]->setRendered();
+                $view->offsetUnset($childName);
                 if ($childForm->getErrors()->count()) {
                     $hiddenFieldsWithErrors[$childName] = (string)$childForm->getErrors();
                 }

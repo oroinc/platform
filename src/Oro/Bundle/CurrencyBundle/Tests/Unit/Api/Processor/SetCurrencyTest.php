@@ -40,7 +40,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
     private function getFormBuilder()
     {
         return $this->createFormBuilder()->create(
-            null,
+            '',
             FormType::class,
             ['data_class' => CurrencyAwareStub::class]
         );

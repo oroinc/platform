@@ -38,6 +38,8 @@ class AclProvider implements AclProviderInterface
 {
     const MAX_BATCH_SIZE = 30;
 
+    protected const EMPTY_ACL_ID = 0;
+
     /** @var Connection */
     protected $connection;
 
@@ -197,25 +199,22 @@ class AclProvider implements AclProviderInterface
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $e) {
                     $this->notFoundAcls[$oidKey][$sidKey] = true;
-                    if ($result->count()) {
-                        $partialResultException = new NotAllAclsFoundException(
-                            'The provider could not find ACLs for all object identities.'
-                        );
-                        $partialResultException->setPartialResult($result);
-                        throw $partialResultException;
-                    } else {
+                    if ($result->count() === 0) {
                         throw $e;
                     }
+                    throw $this->createNotAllAclsFoundException($result);
                 }
-                foreach ($loadedBatch as $loadedOid) {
-                    $loadedAcl = $loadedBatch->offsetGet($loadedOid);
+                foreach ($currentBatch as $oid) {
+                    $loadedAcl = $loadedBatch->offsetExists($oid)
+                        ? $loadedBatch->offsetGet($oid)
+                        : $this->createEmptyAcl($oid);
 
                     if (null !== $this->cache) {
                         $this->cache->putInCacheBySids($loadedAcl, $sids);
                     }
 
-                    if (isset($oidLookup[$loadedOid->getIdentifier().$loadedOid->getType()])) {
-                        $result->attach($loadedOid, $loadedAcl);
+                    if (isset($oidLookup[$this->getOidKey($oid->getType(), $oid->getIdentifier())])) {
+                        $result->attach($oid, $loadedAcl);
                     }
                 }
 
@@ -228,18 +227,13 @@ class AclProvider implements AclProviderInterface
             if (!$result->contains($oid)) {
                 $oidKey = $this->getOidKey($oid->getType(), $oid->getIdentifier());
                 $this->notFoundAcls[$oidKey][$sidKey] = true;
-
                 if (1 === count($oids)) {
-                    $objectName = method_exists($oid, '__toString') ? $oid : get_class($oid);
-                    throw new AclNotFoundException(sprintf('No ACL found for %s.', $objectName));
+                    throw new AclNotFoundException(sprintf(
+                        'No ACL found for %s.',
+                        method_exists($oid, '__toString') ? $oid : get_class($oid)
+                    ));
                 }
-
-                $partialResultException = new NotAllAclsFoundException(
-                    'The provider could not find ACLs for all object identities.'
-                );
-                $partialResultException->setPartialResult($result);
-
-                throw $partialResultException;
+                throw $this->createNotAllAclsFoundException($result);
             }
         }
 
@@ -526,7 +520,6 @@ class AclProvider implements AclProviderInterface
         $acls = $aces = $emptyArray = [];
         $oidCache = $oidLookup;
         $result = new \SplObjectStorage();
-        $permissionGrantingStrategy = $this->permissionGrantingStrategy;
         $sidKey = $this->getSidKey($sids);
 
         // we need these to set protected properties on hydrated objects
@@ -594,7 +587,7 @@ class AclProvider implements AclProviderInterface
                 $acl = new Acl(
                     (int) $aclId,
                     $oidCache[$oidKey],
-                    $permissionGrantingStrategy,
+                    $this->permissionGrantingStrategy,
                     $emptyArray,
                     (bool) $entriesInheriting
                 );
@@ -761,6 +754,16 @@ class AclProvider implements AclProviderInterface
         return [$sql, $params, $types];
     }
 
+    private function createNotAllAclsFoundException(\SplObjectStorage $partialResult): NotAllAclsFoundException
+    {
+        $exception = new NotAllAclsFoundException(
+            'The provider could not find ACLs for all object identities.'
+        );
+        $exception->setPartialResult($partialResult);
+
+        return $exception;
+    }
+
     protected function getOidKey(string $classType, ?string $objectIdentifier): string
     {
         return $objectIdentifier . $classType;
@@ -805,5 +808,13 @@ class AclProvider implements AclProviderInterface
         }
 
         return new RoleSecurityIdentity($securityIdentifier);
+    }
+
+    /**
+     * Creates a new instance of an empty ACL object.
+     */
+    protected function createEmptyAcl(ObjectIdentityInterface $oid): AclInterface
+    {
+        return new Acl(self::EMPTY_ACL_ID, $oid, $this->permissionGrantingStrategy, [], false);
     }
 }

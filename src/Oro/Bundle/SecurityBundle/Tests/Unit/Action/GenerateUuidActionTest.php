@@ -33,13 +33,11 @@ class GenerateUuidActionTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute(array $options): void
     {
-        $this->contextAccessor
-            ->expects($this->any())
+        $this->contextAccessor->expects($this->any())
             ->method('getValue')
             ->willReturnArgument(1);
 
-        $this->contextAccessor
-            ->expects($this->once())
+        $this->contextAccessor->expects($this->once())
             ->method('setValue')
             ->willReturnCallback(function ($context, $attributePath, string $uuid) {
                 $this->assertNotEmpty($uuid);

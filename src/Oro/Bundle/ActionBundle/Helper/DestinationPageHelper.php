@@ -6,6 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Helper for available destinations
+ */
 class DestinationPageHelper
 {
     /** @var RequestStack */
@@ -56,7 +59,7 @@ class DestinationPageHelper
      */
     public function getOriginalUrl()
     {
-        return $this->requestStack->getMasterRequest()->getRequestUri();
+        return $this->requestStack->getMainRequest()->getRequestUri();
     }
 
     /**

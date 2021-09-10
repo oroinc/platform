@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -17,17 +18,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AclGrantedTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var AclGranted */
-    protected $condition;
+    private $condition;
 
     protected function setUp(): void
     {
@@ -267,7 +268,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyOptions(): void
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
 
         $this->condition->initialize([]);
@@ -275,7 +276,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyAttributes(): void
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('ACL attributes must not be empty.');
 
         $this->condition->initialize(['']);
@@ -283,7 +284,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyObject(): void
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('ACL object must not be empty.');
 
         $this->condition->initialize(['VIEW', '']);
@@ -292,7 +293,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected): void
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -335,7 +336,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected): void
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {

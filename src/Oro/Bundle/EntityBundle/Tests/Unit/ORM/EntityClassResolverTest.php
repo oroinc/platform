@@ -40,8 +40,8 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
         $this->expectException(ORMException::class);
         $this->doctrine->expects($this->once())
             ->method('getAliasNamespace')
-            ->with($this->equalTo('AcmeSomeBundle'))
-            ->will($this->throwException(new ORMException()));
+            ->with('AcmeSomeBundle')
+            ->willThrowException(new ORMException());
         $this->resolver->getEntityClass('AcmeSomeBundle:SomeClass');
     }
 
@@ -49,7 +49,7 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine->expects($this->once())
             ->method('getAliasNamespace')
-            ->with($this->equalTo('AcmeSomeBundle'))
+            ->with('AcmeSomeBundle')
             ->willReturn('Acme\Bundle\SomeBundle');
         $this->assertEquals(
             'Acme\Bundle\SomeBundle\SomeClass',

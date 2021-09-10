@@ -35,9 +35,6 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
     /** @var VariableProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $variablesProcessorRegistry;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translation;
-
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
@@ -46,16 +43,16 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
         $this->configProvider = $this->createMock(TemplateRendererConfigProviderInterface::class);
         $this->variablesProcessorRegistry = $this->createMock(VariableProcessorRegistry::class);
-        $this->translation = $this->createMock(TranslatorInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->translation->expects($this->any())
+        $translation = $this->createMock(TranslatorInterface::class);
+        $translation->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
+        $environment = new Environment(new ArrayLoader(), ['strict_variables' => true]);
         $environment->addExtension(new SandboxExtension(new SecurityPolicy()));
         $environment->addExtension(new HttpKernelExtension());
         $environment->addExtension(new HtmlTagExtension($this->container));
@@ -64,7 +61,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
             $environment,
             $this->configProvider,
             $this->variablesProcessorRegistry,
-            $this->translation,
+            $translation,
             (new InflectorFactory())->build()
         );
     }
@@ -76,18 +73,6 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $emailTemplate->setSubject($subject);
 
         return $emailTemplate;
-    }
-
-    private function getEntityVariableTemplate(string $propertyName, string $path, string $parentPath): string
-    {
-        return strtr(
-            self::ENTITY_VARIABLE_TEMPLATE,
-            [
-                '%name%' => $propertyName,
-                '%val%' => $path,
-                '%parent%' => $parentPath,
-            ]
-        );
     }
 
     private function expectVariables(array $entityVariableProcessors = [], array $systemVariableValues = []): void

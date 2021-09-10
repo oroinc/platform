@@ -112,7 +112,6 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
 
     public function testToString()
     {
-        /** @var AttributeFamily $entity */
         $entity = new AttributeFamily();
         $entity->setCode('default_family');
         $this->assertEquals('code:default_family', $entity->toString());

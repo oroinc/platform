@@ -66,7 +66,7 @@ class FormHelper
     public function createFormBuilder($formType, $data, array $options, array $eventSubscribers = null)
     {
         $formBuilder = $this->formFactory->createNamedBuilder(
-            null,
+            '',
             $formType,
             $data,
             array_merge($this->getFormDefaultOptions(), $options)

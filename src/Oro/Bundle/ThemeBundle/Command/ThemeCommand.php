@@ -58,6 +58,8 @@ HELP
         } else {
             $output->writeln('<info>No themes are available.</info>');
         }
+
+        return 0;
     }
 
     protected function outputTheme(OutputInterface $output, Theme $theme, bool $isActive): void

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Exception\AssemblerException;
+use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
@@ -9,27 +12,20 @@ use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
 class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionData */
-    protected $actionData;
+    private ActionData|\PHPUnit\Framework\MockObject\MockObject $actionData;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeGuesser */
-    protected $attributeGuesser;
+    private AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject $attributeGuesser;
 
-    /** @var AttributeAssembler */
-    protected $assembler;
+    private AttributeAssembler $assembler;
 
     protected function setUp(): void
     {
-        $this->actionData = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->actionData = $this->createMock(ActionData::class);
         $this->actionData->expects($this->any())
             ->method('getEntity')
             ->willReturn(new \stdClass());
 
-        $this->attributeGuesser = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeGuesser = $this->createMock(AttributeGuesser::class);
 
         $this->assembler = new AttributeAssembler($this->attributeGuesser);
     }
@@ -41,7 +37,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
      * @param string $exception
      * @param string $message
      */
-    public function testAssembleRequiredOptionException(array $configuration, $exception, $message)
+    public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -53,49 +49,49 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
      * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             'no_options' => [
                 [
                     'attribute_name' => [
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException',
-                'Option "label" is required'
+                MissedRequiredOptionException::class,
+                'Option "label" is required',
             ],
             'no_type' => [
                 [
                     'attribute_name' => [
                         'label' => 'test',
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException',
-                'Option "type" is required'
+                MissedRequiredOptionException::class,
+                'Option "type" is required',
             ],
             'no_label' => [
                 [
                     'attribute_name' => [
                         'type' => 'test',
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException',
-                'Option "label" is required'
+                MissedRequiredOptionException::class,
+                'Option "label" is required',
             ],
             'invalid_type' => [
                 [
                     'attribute_name' => [
                         'label' => 'Label',
                         'type' => 'text',
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\AssemblerException',
+                AssemblerException::class,
                 'Invalid attribute type "text", allowed types are "bool", "boolean", "int", "integer", ' .
-                    '"float", "string", "array", "object", "entity"'
+                '"float", "string", "array", "object", "entity"',
             ],
             'invalid_type_class' => [
                 [
@@ -103,35 +99,35 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'label' => 'Label',
                         'type' => 'string',
                         'options' => [
-                            'class' => 'stdClass'
+                            'class' => 'stdClass',
                         ],
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\AssemblerException',
-                'Option "class" cannot be used in attribute "attribute_name"'
+                AssemblerException::class,
+                'Option "class" cannot be used in attribute "attribute_name"',
             ],
             'missing_object_class' => [
                 [
                     'attribute_name' => [
                         'label' => 'Label',
                         'type' => 'object',
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException',
-                'Option "class" is required in attribute "attribute_name"'
+                MissedRequiredOptionException::class,
+                'Option "class" is required in attribute "attribute_name"',
             ],
             'missing_entity_class' => [
                 [
                     'attribute_name' => [
                         'label' => 'Label',
                         'type' => 'entity',
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException',
-                'Option "class" is required in attribute "attribute_name"'
+                MissedRequiredOptionException::class,
+                'Option "class" is required in attribute "attribute_name"',
             ],
             'invalid_class' => [
                 [
@@ -139,13 +135,13 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'label' => 'Label',
                         'type' => 'object',
                         'options' => [
-                            'class' => 'InvalidClass'
+                            'class' => 'InvalidClass',
                         ],
-                        'property_path' => null
-                    ]
+                        'property_path' => null,
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\AssemblerException',
-                'Class "InvalidClass" referenced by "class" option in attribute "attribute_name" not found'
+                AssemblerException::class,
+                'Class "InvalidClass" referenced by "class" option in attribute "attribute_name" not found',
             ],
             'not_allowed_entity_acl' => [
                 [
@@ -153,15 +149,15 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'label' => 'Label',
                         'type' => 'object',
                         'options' => [
-                            'class' => 'stdClass'
+                            'class' => 'stdClass',
                         ],
                         'entity_acl' => [
-                            'update' => false
+                            'update' => false,
                         ],
-                    ]
+                    ],
                 ],
-                'Oro\Bundle\ActionBundle\Exception\AssemblerException',
-                'Attribute "Label" with type "object" can\'t have entity ACL'
+                AssemblerException::class,
+                'Attribute "Label" with type "object" can\'t have entity ACL',
             ],
         ];
     }
@@ -173,8 +169,11 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
      * @param Attribute $expectedAttribute
      * @param array $guessedParameters
      */
-    public function testAssemble(array $configuration, $expectedAttribute, array $guessedParameters = [])
-    {
+    public function testAssemble(
+        array $configuration,
+        Attribute $expectedAttribute,
+        array $guessedParameters = []
+    ): void {
         $attributeConfiguration = current($configuration);
         if ($guessedParameters && array_key_exists('property_path', $attributeConfiguration)) {
             $this->attributeGuesser->expects($this->any())
@@ -185,7 +184,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $attributes = $this->assembler->assemble($this->actionData, $configuration);
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attributes);
+        $this->assertInstanceOf(ArrayCollection::class, $attributes);
         $this->assertCount(array_key_exists('entity', $configuration) ? 1 : 2, $attributes);
         $this->assertTrue($attributes->containsKey($expectedAttribute->getName()));
         $this->assertEquals($expectedAttribute, $attributes->get($expectedAttribute->getName()));
@@ -195,71 +194,71 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
      * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
         return [
             'string' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'string'
-                    ]
+                        'type' => 'string',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'string')
+                $this->getAttribute('attribute_one', 'label', 'string'),
             ],
             'bool' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'bool'
-                    ]
+                        'type' => 'bool',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'bool')
+                $this->getAttribute('attribute_one', 'label', 'bool'),
             ],
             'boolean' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'boolean'
-                    ]
+                        'type' => 'boolean',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'boolean')
+                $this->getAttribute('attribute_one', 'label', 'boolean'),
             ],
             'int' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'int'
-                    ]
+                        'type' => 'int',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'int')
+                $this->getAttribute('attribute_one', 'label', 'int'),
             ],
             'integer' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'integer'
-                    ]
+                        'type' => 'integer',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'integer')
+                $this->getAttribute('attribute_one', 'label', 'integer'),
             ],
             'float' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'float'
-                    ]
+                        'type' => 'float',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'float')
+                $this->getAttribute('attribute_one', 'label', 'float'),
             ],
             'array' => [
                 [
                     'attribute_one' => [
                         'label' => 'label',
-                        'type' => 'array'
-                    ]
+                        'type' => 'array',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'array')
+                $this->getAttribute('attribute_one', 'label', 'array'),
             ],
             'object' => [
                 [
@@ -267,9 +266,9 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'label' => 'label',
                         'type' => 'object',
                         'options' => ['class' => 'stdClass'],
-                    ]
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'object', ['class' => 'stdClass'])
+                $this->getAttribute('attribute_one', 'label', 'object', ['class' => 'stdClass']),
             ],
             'entity_minimal' => [
                 [
@@ -277,9 +276,20 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'label' => 'label',
                         'type' => 'entity',
                         'options' => ['class' => 'stdClass'],
-                    ]
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'entity', ['class' => 'stdClass'])
+                $this->getAttribute('attribute_one', 'label', 'entity', ['class' => 'stdClass']),
+            ],
+            'with_default' => [
+                [
+                    'attribute_one' => [
+                        'label' => 'label',
+                        'type' => 'string',
+                        'options' => [],
+                        'default' => 'sample_value',
+                    ],
+                ],
+                $this->getAttribute('attribute_one', 'label', 'string', [], 'sample_value'),
             ],
             'with_related_entity' => [
                 [
@@ -288,9 +298,9 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'type' => 'entity',
                         'options' => ['class' => 'stdClass'],
 
-                    ]
+                    ],
                 ],
-                $this->getAttribute('entity', 'label', 'entity', ['class' => 'stdClass'])
+                $this->getAttribute('entity', 'label', 'entity', ['class' => 'stdClass']),
             ],
             'with_entity_acl' => [
                 [
@@ -299,7 +309,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'type' => 'entity',
                         'options' => ['class' => 'stdClass'],
                         'entity_acl' => ['update' => false],
-                    ]
+                    ],
                 ],
                 $this->getAttribute(
                     'attribute_one',
@@ -307,16 +317,17 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                     'entity',
                     ['class' => 'stdClass'],
                     null,
+                    null,
                     ['update' => false]
-                )
+                ),
             ],
             'entity_minimal_guessed_parameters' => [
                 [
                     'attribute_one' => [
-                        'property_path' => 'entity.field'
-                    ]
+                        'property_path' => 'entity.field',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'entity', ['class' => 'stdClass'], 'entity.field'),
+                $this->getAttribute('attribute_one', 'label', 'entity', ['class' => 'stdClass'], null, 'entity.field'),
                 'guessedParameters' => [
                     'label' => 'label',
                     'type' => 'entity',
@@ -329,10 +340,10 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
                         'label' => 'label',
                         'type' => 'entity',
                         'options' => ['class' => 'stdClass'],
-                        'property_path' => 'entity.field'
-                    ]
+                        'property_path' => 'entity.field',
+                    ],
                 ],
-                $this->getAttribute('attribute_one', 'label', 'entity', ['class' => 'stdClass'], 'entity.field'),
+                $this->getAttribute('attribute_one', 'label', 'entity', ['class' => 'stdClass'], null, 'entity.field'),
                 'guessedParameters' => [
                     'label' => 'guessed label',
                     'type' => 'object',
@@ -342,28 +353,21 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $label
-     * @param string $type
-     * @param array $options
-     * @param string $propertyPath
-     * @param array $entityAcl
-     * @return Attribute
-     */
-    protected function getAttribute(
+    private function getAttribute(
         $name,
-        $label,
-        $type,
+        string $label,
+        string $type,
         array $options = [],
-        $propertyPath = null,
+        mixed $default = null,
+        ?string $propertyPath = null,
         array $entityAcl = []
-    ) {
+    ): Attribute {
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($label);
         $attribute->setType($type);
         $attribute->setOptions($options);
+        $attribute->setDefault($default);
         $attribute->setPropertyPath($propertyPath);
         $attribute->setEntityAcl($entityAcl);
 

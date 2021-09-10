@@ -28,7 +28,6 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper */
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
             ->method('getEntityMetadata')

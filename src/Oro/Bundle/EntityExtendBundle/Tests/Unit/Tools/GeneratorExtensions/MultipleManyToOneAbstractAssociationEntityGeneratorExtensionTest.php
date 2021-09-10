@@ -8,14 +8,13 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 use Oro\Component\PhpUtils\ClassGenerator;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const ASSOCIATION_KIND = 'test';
 
-    /** @var AbstractAssociationEntityGeneratorExtension|MockObject */
-    protected $extension;
+    /** @var AbstractAssociationEntityGeneratorExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -28,8 +27,12 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
             true,
             ['getAssociationKind', 'getAssociationType']
         );
-        $this->extension->method('getAssociationKind')->willReturn(self::ASSOCIATION_KIND);
-        $this->extension->method('getAssociationType')->willReturn(RelationType::MULTIPLE_MANY_TO_ONE);
+        $this->extension->expects($this->any())
+            ->method('getAssociationKind')
+            ->willReturn(self::ASSOCIATION_KIND);
+        $this->extension->expects($this->any())
+            ->method('getAssociationType')
+            ->willReturn(RelationType::MULTIPLE_MANY_TO_ONE);
     }
 
     /**
@@ -37,10 +40,10 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
      */
     public function testSupports(array $schemas, bool $expected)
     {
-        static::assertEquals($expected, $this->extension->supports($schemas));
+        self::assertEquals($expected, $this->extension->supports($schemas));
     }
 
-    public function supportsProvider()
+    public function supportsProvider(): array
     {
         return [
             'supported' => [
@@ -114,6 +117,6 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
         $this->extension->generate($schema, $class);
         $expectedCode = \file_get_contents(__DIR__ . '/../Fixtures/multiple_many_to_one_association.txt');
 
-        static::assertEquals(\trim($expectedCode), \trim($class->print()));
+        self::assertEquals(\trim($expectedCode), \trim($class->print()));
     }
 }

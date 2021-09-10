@@ -2,28 +2,23 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Repository;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    const ENUM_VALUE_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue';
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private const ENUM_VALUE_CLASS_NAME = TestEnumValue::class;
 
     /** @var EnumValueRepository */
-    protected $repo;
+    private $repo;
 
     protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->repo = new EnumValueRepository(
-            $this->em,
+            $this->createMock(EntityManagerInterface::class),
             new ClassMetadata(self::ENUM_VALUE_CLASS_NAME)
         );
     }

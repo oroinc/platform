@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Component\Testing\ReflectionUtil;
 
@@ -16,12 +17,12 @@ class EmailAttachmentContentTest extends \PHPUnit\Framework\TestCase
 
     public function testEmailAttachmentGetterAndSetter()
     {
-        $emailAttachment = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        $emailAttachment = $this->createMock(EmailAttachment::class);
 
         $entity = new EmailAttachmentContent();
         $entity->setEmailAttachment($emailAttachment);
 
-        $this->assertTrue($emailAttachment === $entity->getEmailAttachment());
+        $this->assertSame($emailAttachment, $entity->getEmailAttachment());
     }
 
     public function testValueGetterAndSetter()

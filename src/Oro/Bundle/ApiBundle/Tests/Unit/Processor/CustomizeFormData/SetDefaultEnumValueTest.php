@@ -51,7 +51,7 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
     private function getForm(bool $withEnumField = true): FormInterface
     {
         $formBuilder = $this->createFormBuilder()->create(
-            null,
+            '',
             FormType::class,
             ['data_class' => TestEntityWithEnum::class]
         );

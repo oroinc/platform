@@ -13,9 +13,6 @@ class AclAnnotationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $cacheFile;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
 
@@ -30,10 +27,10 @@ class AclAnnotationProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
         $this->loader = $this->createMock(AclAnnotationLoaderInterface::class);
 
-        $this->cacheFile = $this->getTempFile('AclAnnotationProvider');
+        $cacheFile = $this->getTempFile('AclAnnotationProvider');
 
         $this->provider = new AclAnnotationProvider(
-            $this->cacheFile,
+            $cacheFile,
             false,
             $this->entityClassResolver,
             [$this->loader]
@@ -77,18 +74,14 @@ class AclAnnotationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->loader->expects($this->once())
             ->method('load')
-            ->will(
-                $this->returnCallback(
-                    function ($storage) {
-                        /** @var AclAnnotationStorage $storage */
-                        $storage->add(
-                            new AclAnnotation(array('id' => 'test', 'type' => 'entity')),
-                            \stdClass::class,
-                            'SomeMethod'
-                        );
-                    }
-                )
-            );
+            ->willReturnCallback(function ($storage) {
+                /** @var AclAnnotationStorage $storage */
+                $storage->add(
+                    new AclAnnotation(['id' => 'test', 'type' => 'entity']),
+                    \stdClass::class,
+                    'SomeMethod'
+                );
+            });
 
         $this->assertFalse($this->provider->hasAnnotation(\stdClass::class));
         $this->assertFalse($this->provider->hasAnnotation('UnknownClass'));

@@ -45,9 +45,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnProcessAfterWhenWrongEntity()
     {
-        /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject $strategy */
         $strategy = $this->createMock(StrategyInterface::class);
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $context->expects($this->never())
@@ -66,9 +64,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnProcessAfterWhenNoExistingEntity()
     {
-        /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject $strategy */
         $strategy = $this->createMock(StrategyInterface::class);
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new FieldConfigModel();
         $context->expects($this->once())
@@ -89,9 +85,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnProcessAfterWhenNotAttribute()
     {
-        /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject $strategy */
         $strategy = $this->createMock(StrategyInterface::class);
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new FieldConfigModel();
         $existingEntity = new FieldConfigModel();
@@ -117,9 +111,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnProcessAfterWhenExistingIsAttributeToo()
     {
-        /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject $strategy */
         $strategy = $this->createMock(StrategyInterface::class);
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new FieldConfigModel();
         $existingEntity = new FieldConfigModel();
@@ -157,9 +149,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnProcessAfter()
     {
-        /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject $strategy */
         $strategy = $this->createMock(StrategyInterface::class);
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new FieldConfigModel();
         $existingEntity = new FieldConfigModel();

@@ -168,7 +168,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFromUserEmailOriginWithEmptyUserEmailOrigin()
     {
-        /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject $encryptor */
         $encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
         $smtpSettings = $smtpSettingsFactory->createFromUserEmailOrigin(new UserEmailOrigin());
@@ -185,7 +184,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
         $userEmailOrigin->setUser('user');
         $userEmailOrigin->setPassword('encrypted_password');
 
-        /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject $encryptor */
         $encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $encryptor->expects($this->once())
             ->method('decryptData')
@@ -203,7 +201,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateWithUnsupportedType()
     {
         $this->expectException(\InvalidArgumentException::class);
-        /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject $encryptor */
         $encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
 
@@ -212,7 +209,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFromEmptyArray()
     {
-        /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject $encryptor */
         $encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
         $smtpSettings = $smtpSettingsFactory->create([]);
@@ -224,7 +220,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $encryptedPassword = 'encrypted_password';
 
-        /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject $encryptor */
         $encryptor = $this->createMock(SymmetricCrypterInterface::class);
         $encryptor->expects($this->once())
             ->method('decryptData')

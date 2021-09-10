@@ -42,7 +42,7 @@ class BigNumberProcessor
      */
     public function getBigNumberValues(
         WidgetOptionBag $widgetOptions,
-        $providerAlias,
+        string $providerAlias,
         $getterName,
         $dataType,
         $lessIsBetter = false,
@@ -80,7 +80,7 @@ class BigNumberProcessor
      *
      * @return callable
      */
-    private function getGetter($providerAlias, $getterName)
+    private function getGetter(string $providerAlias, $getterName)
     {
         if (!$this->valueProviders->has($providerAlias)) {
             throw new \LogicException(sprintf('BigNumber provider "%s" was not found', $providerAlias));

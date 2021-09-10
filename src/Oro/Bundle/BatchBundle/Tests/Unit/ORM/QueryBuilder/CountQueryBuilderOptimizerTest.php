@@ -29,18 +29,14 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $metadataDriver = new AnnotationDriver(
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
             new AnnotationReader(),
             __DIR__ . '/../../Fixtures/Entity'
-        );
-
-        $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity'
+        ]);
         $this->em->getConfiguration()->addCustomDatetimeFunction('date', Functions\SimpleFunction::class);
         $this->em->getConfiguration()->addCustomDatetimeFunction('convert_tz', Functions\DateTime\ConvertTz::class);
 

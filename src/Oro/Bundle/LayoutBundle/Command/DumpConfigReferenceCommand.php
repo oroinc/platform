@@ -56,5 +56,7 @@ HELP
         foreach ($this->themeConfiguration->getAdditionalConfigFileNames() as $fileName) {
             $output->writeln(sprintf(' - Resources/views/layouts/*/config/%s', $fileName));
         }
+
+        return 0;
     }
 }

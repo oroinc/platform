@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 class EmailRecipientsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailRecipients */
-    protected $constraint;
+    private $constraint;
 
     protected function setUp(): void
     {

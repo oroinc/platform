@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\Firewall\RememberMeListener as OrigRememberM
 class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
-    private const SESSION_ID   = 'o595fqdg5214u4e4nfcs3uc923';
+    private const SESSION_ID = 'o595fqdg5214u4e4nfcs3uc923';
 
     public function testShouldCallInnerAuthenticateForAnyRequestWithAjaxCsrfModeOff(): void
     {
@@ -141,12 +141,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         return new RememberMeListener($innerListener, $sessionMock);
     }
 
-    /**
-     * @param bool $isXmlHttpRequest
-     *
-     * @return RequestEvent
-     */
-    private function createMasterRequestEvent($isXmlHttpRequest = false): RequestEvent
+    private function createMasterRequestEvent(bool $isXmlHttpRequest = false): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);

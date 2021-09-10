@@ -84,7 +84,7 @@
 
     .title-box {
         color: $primary-200;
-        margin: 0 0 27px;
+        margin: 0 0 16px;
         text-align: left;
 
         .divider-vertical {
@@ -163,8 +163,8 @@
     }
 
     &__fieldset {
-        max-width: 270px;
-        min-width: 270px;
+        max-width: $field-width;
+        min-width: $field-width;
 
         input {
             width: 100%;
@@ -264,7 +264,7 @@
         }
 
         .title-box {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
     }
 

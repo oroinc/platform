@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
@@ -45,56 +46,25 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerTree */
     private $tree;
 
-    /** @var Organization */
-    private $org1;
+    private Organization $org1;
+    private Organization $org2;
+    private Organization $org3;
+    private Organization $org4;
 
-    /** @var Organization */
-    private $org2;
+    private BusinessUnit $bu1;
+    private BusinessUnit $bu2;
+    private BusinessUnit $bu3;
+    private BusinessUnit $bu31;
+    private BusinessUnit $bu4;
+    private BusinessUnit $bu41;
+    private BusinessUnit $bu411;
 
-    /** @var Organization */
-    private $org3;
-
-    /** @var Organization */
-    private $org4;
-
-    /** @var BusinessUnit */
-    private $bu1;
-
-    /** @var BusinessUnit */
-    private $bu2;
-
-    /** @var BusinessUnit */
-    private $bu3;
-
-    /** @var BusinessUnit */
-    private $bu31;
-
-    /** @var BusinessUnit */
-    private $bu4;
-
-    /** @var BusinessUnit */
-    private $bu41;
-
-    /** @var BusinessUnit */
-    private $bu411;
-
-    /** @var User */
-    private $user1;
-
-    /** @var User */
-    private $user2;
-
-    /** @var User */
-    private $user3;
-
-    /** @var User */
-    private $user31;
-
-    /** @var User */
-    private $user4;
-
-    /** @var User */
-    private $user411;
+    private User $user1;
+    private User $user2;
+    private User $user3;
+    private User $user31;
+    private User $user4;
+    private User $user411;
 
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
@@ -128,7 +98,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         $treeProviderMock = $this->createMock(OwnerTreeProvider::class);
         $treeProviderMock->expects($this->any())
             ->method('getTree')
-            ->will($this->returnValue($this->tree));
+            ->willReturn($this->tree);
 
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
@@ -236,7 +206,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForOrganizationProvider
      */
-    public function testValidateMaskForOrganization($mask)
+    public function testValidateMaskForOrganization(int $mask)
     {
         $this->extension->validateMask($mask, new Organization());
     }
@@ -244,16 +214,16 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForOrganizationInvalidProvider
      */
-    public function testValidateMaskForOrganizationInvalid($mask)
+    public function testValidateMaskForOrganizationInvalid(int $mask)
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new Organization());
     }
 
     /**
      * @dataProvider validateMaskForBusinessUnitProvider
      */
-    public function testValidateMaskForBusinessUnit($mask)
+    public function testValidateMaskForBusinessUnit(int $mask)
     {
         $this->extension->validateMask($mask, new BusinessUnit());
     }
@@ -261,16 +231,16 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForBusinessUnitInvalidProvider
      */
-    public function testValidateMaskForBusinessUnitInvalid($mask)
+    public function testValidateMaskForBusinessUnitInvalid(int $mask)
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new BusinessUnit());
     }
 
     /**
      * @dataProvider validateMaskForUserProvider
      */
-    public function testValidateMaskForUser($mask)
+    public function testValidateMaskForUser(int $mask)
     {
         $this->extension->validateMask($mask, new User());
     }
@@ -278,19 +248,19 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForUserInvalidProvider
      */
-    public function testValidateMaskForUserInvalid($mask)
+    public function testValidateMaskForUserInvalid(int $mask)
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new User());
     }
 
     /**
      * @dataProvider validateMaskForOrganizationOwnedProvider
      */
-    public function testValidateMaskForOrganizationOwned($mask)
+    public function testValidateMaskForOrganizationOwned(int $mask)
     {
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -299,11 +269,11 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForOrganizationOwnedInvalidProvider
      */
-    public function testValidateMaskForOrganizationOwnedInvalid($mask)
+    public function testValidateMaskForOrganizationOwnedInvalid(int $mask)
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
+        $this->expectException(InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -312,10 +282,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForUserOwnedProvider
      */
-    public function testValidateMaskForUserOwned($mask)
+    public function testValidateMaskForUserOwned(int $mask)
     {
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -324,11 +294,11 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
      */
-    public function testValidateMaskForUserOwnedInvalid($mask)
+    public function testValidateMaskForUserOwnedInvalid(int $mask)
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
+        $this->expectException(InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -337,9 +307,9 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
      */
-    public function testValidateMaskForRootInvalid($mask)
+    public function testValidateMaskForRootInvalid(int $mask)
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException::class);
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 
@@ -356,7 +326,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
     }
 
-    public function getPermissionGroupMaskProvider()
+    public function getPermissionGroupMaskProvider(): array
     {
         return [
             [0, null],
@@ -385,8 +355,13 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider decideIsGrantingProvider
      */
-    public function testDecideIsGranting($triggeredMask, $user, $organization, $object, $expectedResult)
-    {
+    public function testDecideIsGranting(
+        int $triggeredMask,
+        ?User $user,
+        Organization $organization,
+        object|string|null $object,
+        bool $expectedResult
+    ) {
         $this->buildTestTree();
         if ($object instanceof TestEntity && $object->getOwner() !== null) {
             $owner = $object->getOwner();
@@ -410,10 +385,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
         $token->expects($this->any())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
         $token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
         $this->assertEquals(
             $expectedResult,
             $this->extension->decideIsGranting($triggeredMask, $object, $token)
@@ -438,12 +413,12 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getServiceBitsProvider
      */
-    public function testGetServiceBits($mask, $expectedMask)
+    public function testGetServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
     }
 
-    public function getServiceBitsProvider()
+    public function getServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -468,12 +443,12 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeServiceBitsProvider
      */
-    public function testRemoveServiceBits($mask, $expectedMask)
+    public function testRemoveServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
     }
 
-    public function removeServiceBitsProvider()
+    public function removeServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -710,9 +685,8 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function decideIsGrantingProvider()
+    public function decideIsGrantingProvider(): array
     {
         $this->org1 = new Organization('org1');
         $this->org2 = new Organization('org2');
@@ -731,6 +705,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->user31 = new User('user31', $this->bu31);
         $this->user4 = new User('user4', $this->bu4);
         $this->user411 = new User('user411', $this->bu411);
+
         return [
             [FieldMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, null, true],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL, null, $this->org4, null, true],
@@ -938,7 +913,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForOrganizationProvider()
+    public static function validateMaskForOrganizationProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_SYSTEM],
@@ -947,7 +922,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForOrganizationInvalidProvider()
+    public static function validateMaskForOrganizationInvalidProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_GLOBAL],
@@ -957,36 +932,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForBusinessUnitProvider()
-    {
-        return [
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM],
-            [FieldMaskBuilder::MASK_CREATE_SYSTEM],
-            [FieldMaskBuilder::MASK_EDIT_SYSTEM],
-            [FieldMaskBuilder::MASK_VIEW_GLOBAL],
-            [FieldMaskBuilder::MASK_EDIT_GLOBAL],
-            [FieldMaskBuilder::MASK_VIEW_DEEP],
-            [FieldMaskBuilder::MASK_EDIT_DEEP],
-            [FieldMaskBuilder::MASK_VIEW_LOCAL],
-            [FieldMaskBuilder::MASK_EDIT_LOCAL],
-            [
-                FieldMaskBuilder::MASK_VIEW_SYSTEM
-                | FieldMaskBuilder::MASK_CREATE_SYSTEM
-                | FieldMaskBuilder::MASK_EDIT_DEEP
-            ],
-        ];
-    }
-
-    public static function validateMaskForBusinessUnitInvalidProvider()
-    {
-        return [
-            [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
-            [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
-        ];
-    }
-
-    public static function validateMaskForUserProvider()
+    public static function validateMaskForBusinessUnitProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_SYSTEM],
@@ -1006,7 +952,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForUserInvalidProvider()
+    public static function validateMaskForBusinessUnitInvalidProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_BASIC],
@@ -1015,7 +961,36 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForUserOwnedProvider()
+    public static function validateMaskForUserProvider(): array
+    {
+        return [
+            [FieldMaskBuilder::MASK_VIEW_SYSTEM],
+            [FieldMaskBuilder::MASK_CREATE_SYSTEM],
+            [FieldMaskBuilder::MASK_EDIT_SYSTEM],
+            [FieldMaskBuilder::MASK_VIEW_GLOBAL],
+            [FieldMaskBuilder::MASK_EDIT_GLOBAL],
+            [FieldMaskBuilder::MASK_VIEW_DEEP],
+            [FieldMaskBuilder::MASK_EDIT_DEEP],
+            [FieldMaskBuilder::MASK_VIEW_LOCAL],
+            [FieldMaskBuilder::MASK_EDIT_LOCAL],
+            [
+                FieldMaskBuilder::MASK_VIEW_SYSTEM
+                | FieldMaskBuilder::MASK_CREATE_SYSTEM
+                | FieldMaskBuilder::MASK_EDIT_DEEP
+            ],
+        ];
+    }
+
+    public static function validateMaskForUserInvalidProvider(): array
+    {
+        return [
+            [FieldMaskBuilder::MASK_VIEW_BASIC],
+            [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
+            [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
+        ];
+    }
+
+    public static function validateMaskForUserOwnedProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_SYSTEM],
@@ -1037,7 +1012,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForUserOwnedInvalidProvider()
+    public static function validateMaskForUserOwnedInvalidProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
@@ -1046,7 +1021,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForOrganizationOwnedProvider()
+    public static function validateMaskForOrganizationOwnedProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_SYSTEM],
@@ -1058,7 +1033,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function validateMaskForOrganizationOwnedInvalidProvider()
+    public static function validateMaskForOrganizationOwnedInvalidProvider(): array
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_DEEP],

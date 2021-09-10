@@ -143,7 +143,7 @@ services:
         public: true
         factory: ['@form.factory', createNamed]
         arguments:
-            - ~
+            - ''
             - Oro\Bundle\EmailBundle\Form\Type\EmailApiType
 
     oro_email.form.type.email.api:

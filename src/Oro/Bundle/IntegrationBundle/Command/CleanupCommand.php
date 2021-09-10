@@ -114,13 +114,15 @@ HELP
         if (!count($iterator)) {
             $output->writeln('<info>There are no integration statuses eligible for clean up</info>');
 
-            return;
+            return 0;
         }
         $output->writeln(sprintf('<comment>Integration statuses will be deleted:</comment> %d', count($iterator)));
 
         $this->deleteRecords($iterator, 'OroIntegrationBundle:Status');
 
         $output->writeln('<info>Integration statuses history cleanup completed</info>');
+
+        return 0;
     }
 
     /**

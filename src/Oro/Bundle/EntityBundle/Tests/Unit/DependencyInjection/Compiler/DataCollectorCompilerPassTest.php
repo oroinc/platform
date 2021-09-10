@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer;
@@ -18,15 +19,14 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DataCollectorCompilerPass */
-    private $compilerPass;
+    private DataCollectorCompilerPass $compilerPass;
 
     protected function setUp(): void
     {
         $this->compilerPass = new DataCollectorCompilerPass();
     }
 
-    public function testConfigureWhenProfilingIsDisabled()
+    public function testConfigureWhenProfilingIsDisabled(): void
     {
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->setParameter('oro_entity.orm.hydrators', []);
@@ -41,7 +41,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($containerBuilder->hasParameter('oro_entity.orm.hydrators'));
     }
 
-    public function testConfigureDuplicateQueriesDataCollector()
+    public function testConfigureDuplicateQueriesDataCollector(): void
     {
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->register('profiler');
@@ -66,10 +66,8 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
             ->method('getConnectionNames')
             ->willReturn($connections);
 
-        $defaultProfilingLoggerDef = new Definition();
-        $containerBuilder->register('doctrine.dbal.logger.profiling.default', $defaultProfilingLoggerDef);
-        $configProfilingLoggerDef = new Definition();
-        $containerBuilder->register('doctrine.dbal.logger.profiling.config', $configProfilingLoggerDef);
+        $containerBuilder->register('doctrine.dbal.logger.profiling.default', SQLLogger::class);
+        $containerBuilder->register('doctrine.dbal.logger.profiling.config', SQLLogger::class);
 
         $this->compilerPass->process($containerBuilder);
 
@@ -82,7 +80,7 @@ class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureOrmDataCollector()
+    public function testConfigureOrmDataCollector(): void
     {
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->register('profiler');

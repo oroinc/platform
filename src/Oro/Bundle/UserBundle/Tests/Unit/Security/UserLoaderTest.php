@@ -48,10 +48,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         return $repository;
     }
 
-    /**
-     * @return array
-     */
-    public function findUserDataProvider()
+    public function findUserDataProvider(): array
     {
         return [
             [$this->createMock(User::class)],
@@ -67,7 +64,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testLoadUserByUsername($user)
+    public function testLoadUserByUsername(?User $user)
     {
         $username = 'test';
 
@@ -83,7 +80,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testLoadUserByEmail($user)
+    public function testLoadUserByEmail(?User $user)
     {
         $email = 'test@example.com';
         $caseInsensitiveEmailAddressesEnabled = true;

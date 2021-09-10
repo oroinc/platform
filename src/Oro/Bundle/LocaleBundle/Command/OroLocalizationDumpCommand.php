@@ -83,6 +83,8 @@ HELP
         if (false === @file_put_contents($file, $content)) {
             throw new \RuntimeException('Unable to write file ' . $file);
         }
+
+        return 0;
     }
 
     /**

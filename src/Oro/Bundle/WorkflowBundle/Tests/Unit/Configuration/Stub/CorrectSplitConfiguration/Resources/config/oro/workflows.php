@@ -44,7 +44,8 @@ return [
                 'options' => [
                     'class' => 'DateTime'
                 ],
-                'property_path' => null
+                'property_path' => null,
+                'default' => null,
             ],
             'second_attribute' => [
                 'type' => 'entity',
@@ -55,7 +56,8 @@ return [
                 'property_path' => 'first_attribute.test',
                 'options' => [
                     'class' => 'DateTime',
-                ]
+                ],
+                'default' => null,
             ]
         ],
         'variable_definitions' => [

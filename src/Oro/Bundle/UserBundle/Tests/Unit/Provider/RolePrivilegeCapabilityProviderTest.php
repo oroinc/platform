@@ -59,10 +59,7 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->capabilityProvider->getCapabilities($role));
     }
 
-    /**
-     * @return array
-     */
-    public function getCapabilitiesDataProvider()
+    public function getCapabilitiesDataProvider(): array
     {
         $category1 = new PrivilegeCategory('category1', '', true, 1);
         $category2 = new PrivilegeCategory('category2', '', true, 1);

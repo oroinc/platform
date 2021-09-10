@@ -3,31 +3,33 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Mapping;
 
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 
 class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AdditionalMetadataProvider */
-    protected $additionalMetadataProvider;
+    private $additionalMetadataProvider;
 
     /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataFactory;
+    private $metadataFactory;
 
     protected function setUp(): void
     {
-        $this->metadataFactory = $this->createMock('Doctrine\Persistence\Mapping\ClassMetadataFactory');
+        $this->metadataFactory = $this->createMock(ClassMetadataFactory::class);
 
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($this->metadataFactory));
+            ->willReturn($this->metadataFactory);
 
-        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->additionalMetadataProvider = new AdditionalMetadataProvider(
             $registry,
@@ -85,7 +87,7 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->metadataFactory->expects($this->once())
             ->method('getAllMetadata')
-            ->will($this->returnValue($allMetadata));
+            ->willReturn($allMetadata);
 
         $expectedMetadata = [
             [

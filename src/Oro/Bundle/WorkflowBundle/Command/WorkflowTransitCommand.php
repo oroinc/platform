@@ -89,7 +89,7 @@ HELP
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
 
             // do not throw exception for ForbiddenTransitionException (see BAP-10872)
-            return;
+            return $e->getCode() ?: 1;
         } catch (\Exception $e) {
             $output->writeln(
                 sprintf(
@@ -102,5 +102,7 @@ HELP
 
             throw $e;
         }
+
+        return 0;
     }
 }

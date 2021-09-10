@@ -22,20 +22,14 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $messageProducer;
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageProducer;
 
-    /**
-     * @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $deletedAttributeProvider;
+    /** @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $deletedAttributeProvider;
 
-    /**
-     * @var DeletedAttributeRelationListener
-     */
-    protected $listener;
+    /** @var DeletedAttributeRelationListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -60,7 +54,6 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $deletedAttributeId));
         $uow->addDeletion(new \stdClass());
 
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getUnitOfWork')
@@ -116,7 +109,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
      * @param int $movedAttributeId
      * @return AttributeFamily
      */
-    protected function getFilledAttributeFamily($attributeFamilyId, $movedAttributeId)
+    private function getFilledAttributeFamily($attributeFamilyId, $movedAttributeId)
     {
         $attributeRelation = new AttributeGroupRelation();
         $attributeRelation->setEntityConfigFieldId($movedAttributeId);
@@ -136,7 +129,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
      * @param int $attributeId
      * @return AttributeGroupRelation
      */
-    protected function getFilledAttributeGroupRelation(AttributeFamily $attributeFamily, $attributeId)
+    private function getFilledAttributeGroupRelation(AttributeFamily $attributeFamily, $attributeId)
     {
         $attributeGroup = new AttributeGroup();
         $attributeGroup->setAttributeFamily($attributeFamily);

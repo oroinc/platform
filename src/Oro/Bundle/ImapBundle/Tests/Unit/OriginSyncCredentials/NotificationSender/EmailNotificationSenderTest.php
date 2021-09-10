@@ -40,8 +40,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $origin->setMailbox($mailbox);
 
         $sender = From::emailAddress('sender@test.com', 'sender name');
-        $this->notificationSettingsModel
-            ->expects($this->atLeastOnce())
+        $this->notificationSettingsModel->expects($this->atLeastOnce())
             ->method('getSender')
             ->willReturn($sender);
 
@@ -71,13 +70,11 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $origin->setOwner($user);
 
         $sender = From::emailAddress('sender@test.com', 'sender name');
-        $this->notificationSettingsModel
-            ->expects($this->atLeastOnce())
+        $this->notificationSettingsModel->expects($this->atLeastOnce())
             ->method('getSender')
             ->willReturn($sender);
 
-        $this->emailTemplateManager
-            ->expects($this->once())
+        $this->emailTemplateManager->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
                 $sender,

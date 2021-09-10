@@ -22,7 +22,7 @@ class RoutePatternVoter implements VoterInterface
     public function matchItem(ItemInterface $item): ?bool
     {
         // Using master request, as sub-requests routes must not be taken into account when matching the menu items
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if (null === $request) {
             return null;

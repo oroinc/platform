@@ -91,7 +91,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $serializedString = $firstRole->serialize();
         $secondRole->unserialize($serializedString);
 
-        $this->assertEquals($label, $secondRole->getLabel());
-        static::assertStringContainsString($role, $secondRole->getRole());
+        self::assertEquals($label, $secondRole->getLabel());
+        self::assertStringContainsString($role, $secondRole->getRole());
     }
 }

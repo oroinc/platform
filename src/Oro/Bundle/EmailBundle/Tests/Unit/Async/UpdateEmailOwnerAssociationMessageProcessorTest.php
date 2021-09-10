@@ -16,76 +16,68 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new UpdateEmailOwnerAssociationMessageProcessor(
-            $this->createAssociationManagerMock(),
-            $this->createJobRunnerMock(),
-            $this->createLoggerMock()
+            $this->createMock(AssociationManager::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldRejectMessageIfOwnerClassIsMissing()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
         $message->setBody(json_encode([
             'ownerId' => [1],
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new UpdateEmailOwnerAssociationMessageProcessor(
-            $this->createAssociationManagerMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(AssociationManager::class),
+            $this->createMock(JobRunner::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfOwnerIdIsMissing()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
         $message->setBody(json_encode([
             'ownerClass' => 'class',
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new UpdateEmailOwnerAssociationMessageProcessor(
-            $this->createAssociationManagerMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(AssociationManager::class),
+            $this->createMock(JobRunner::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldProcessUpdateEmailOwner()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
-            ->method('critical')
-        ;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('critical');
 
-        $manager = $this->createAssociationManagerMock();
-        $manager
-            ->expects($this->once())
+        $manager = $this->createMock(AssociationManager::class);
+        $manager->expects($this->once())
             ->method('processUpdateEmailOwner')
-            ->with('class', [1])
-        ;
+            ->with('class', [1]);
 
         $data = [
             'ownerClass' => 'class',
@@ -94,19 +86,17 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework
         ];
 
         $message = new Message();
-        $message->setBody(json_encode($data));
+        $message->setBody(json_encode($data, JSON_THROW_ON_ERROR));
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(12345)
-            ->will($this->returnCallback(function ($name, $callback) use ($data) {
+            ->willReturnCallback(function ($name, $callback) use ($data) {
                 $callback($data);
 
                 return true;
-            }))
-        ;
+            });
 
         $processor = new UpdateEmailOwnerAssociationMessageProcessor(
             $manager,
@@ -114,7 +104,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -125,37 +115,5 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework
             [Topics::UPDATE_EMAIL_OWNER_ASSOCIATION],
             UpdateEmailOwnerAssociationMessageProcessor::getSubscribedTopics()
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|AssociationManager
-     */
-    private function createAssociationManagerMock()
-    {
-        return $this->createMock(AssociationManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

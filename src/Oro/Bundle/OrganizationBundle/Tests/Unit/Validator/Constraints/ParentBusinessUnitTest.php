@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit;
 class ParentBusinessUnitTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ParentBusinessUnit */
-    protected $constraint;
+    private $constraint;
 
     protected function setUp(): void
     {

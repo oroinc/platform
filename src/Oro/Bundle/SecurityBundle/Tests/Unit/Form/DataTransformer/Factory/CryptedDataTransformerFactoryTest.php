@@ -24,9 +24,6 @@ class CryptedDataTransformerFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private $logger;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -41,6 +38,6 @@ class CryptedDataTransformerFactoryTest extends \PHPUnit\Framework\TestCase
 
         $actualTransformer = $this->factory->create();
 
-        static::assertEquals($transformer, $actualTransformer);
+        self::assertEquals($transformer, $actualTransformer);
     }
 }

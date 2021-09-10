@@ -116,16 +116,11 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                     [
                         ChoiceAccountType::class     => $type,
                         CheckButtonType::class       => new CheckButtonType(),
-                        ConfigurationTestType::class => new ConfigurationTestType(
-                            $this->translator,
-                            $this->userConfigManager,
-                            $this->tokenAccessor
-                        ),
+                        ConfigurationTestType::class => new ConfigurationTestType($this->tokenAccessor),
                         ConfigurationType::class     => new ConfigurationType(
                             $this->encryptor,
                             $this->tokenAccessor,
-                            $this->translator,
-                            $this->oauthManagerRegistry
+                            $this->translator
                         ),
                         EmailFolderTreeType::class   => new EmailFolderTreeType(),
                     ],

@@ -32,5 +32,6 @@ services:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\LocalHandler
     arguments:
       - []
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'artifacts_handler' }

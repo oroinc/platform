@@ -52,6 +52,11 @@ class DataBlockBuilder
             }
         }
 
+        if ($form->isRendered()) {
+            // Child blocks are already rendered so there is no sense in going through them.
+            return;
+        }
+
         foreach ($form->children as $name => $child) {
             if (isset($child->vars['block']) || isset($child->vars['subblock'])) {
                 $block = null;
@@ -65,16 +70,8 @@ class DataBlockBuilder
 
                 $subBlock = $this->getSubBlock($name, $child, $block);
 
-                $tmpChild = $child;
-                $formPath = '';
-
-                while ($tmpChild->parent) {
-                    $formPath = sprintf('.children[\'%s\']', $tmpChild->vars['name']) . $formPath;
-                    $tmpChild = $tmpChild->parent;
-                }
-
                 $html = $this->templateRenderer->render(
-                    '{{ form_row(' . $this->formVariableName . $formPath . ') }}'
+                    '{{ form_row(' . $this->formVariableName . $this->getFullPath($child) . ') }}'
                 );
 
                 $subBlock->setData(array_merge($subBlock->getData(), [$child->vars['name'] => $html]));
@@ -82,6 +79,18 @@ class DataBlockBuilder
 
             $this->doBuild($child);
         }
+    }
+
+    private function getFullPath(FormView $formView): string
+    {
+        $formPath = '';
+        $tmpFormView = $formView;
+        while ($tmpFormView->parent) {
+            $formPath = sprintf('.children[\'%s\']', $tmpFormView->vars['name']) . $formPath;
+            $tmpFormView = $tmpFormView->parent;
+        }
+
+        return $formPath;
     }
 
     /**

@@ -30,22 +30,18 @@ class RolesChangeListenerTest extends OrmTestCase
     /** @var RolesChangeListener */
     private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheProvider::class);
         $this->em = $this->getTestEntityManager();
         $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver($reader, self::ENTITY_NAMESPACE);
         $doctrine = $this->createMock(ManagerRegistry::class);
 
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver($reader, self::ENTITY_NAMESPACE));
         $this->em->getConfiguration()->setEntityNamespaces(['Test' => self::ENTITY_NAMESPACE]);
 
         $this->conn = $this->getDriverConnectionMock($this->em);
@@ -70,7 +66,7 @@ class RolesChangeListenerTest extends OrmTestCase
 
         $this->conn->expects(self::once())
             ->method('prepare')
-            ->will($this->returnValue($this->createMock(StatementMock::class)));
+            ->willReturn($this->createMock(StatementMock::class));
 
         $entity = new TestBusinessUnit();
         $this->em->persist($entity);
@@ -84,7 +80,7 @@ class RolesChangeListenerTest extends OrmTestCase
 
         $this->conn->expects(self::exactly(2))
             ->method('prepare')
-            ->will($this->returnValue($this->createMock(StatementMock::class)));
+            ->willReturn($this->createMock(StatementMock::class));
 
         $entity = new TestUser();
         $organization = new TestOrganization();

@@ -4,12 +4,23 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+/**
+ * Delegates a work to child ExclusionProviderInterface providers.
+ */
 class ChainExclusionProvider implements ExclusionProviderInterface
 {
     /**
      * @var ExclusionProviderInterface[]
      */
-    protected $providers = [];
+    protected array $providers = [];
+
+    /**
+     * @param iterable<ExclusionProviderInterface> $providers
+     */
+    public function __construct(iterable $providers = [])
+    {
+        $this->providers = $providers instanceof \Traversable ? iterator_to_array($providers): $providers;
+    }
 
     /**
      * Registers the given provider in the chain

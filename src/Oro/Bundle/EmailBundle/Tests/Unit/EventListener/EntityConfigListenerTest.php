@@ -35,7 +35,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $configManager->expects(self::exactly($scope === 'email' ? 1 : 0))
             ->method('getConfigChangeSet')
             ->with(self::identicalTo($config))
-            ->will(self::returnValue($changeSet));
+            ->willReturn($changeSet);
 
         if ($shouldClearCache) {
             $this->emailRendererConfigProvider->expects(self::once())

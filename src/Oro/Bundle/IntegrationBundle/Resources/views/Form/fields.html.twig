@@ -23,11 +23,11 @@
         {{ form_widget(form.transport, {'attr': {'class': 'control-group-container'}}) }}
     {% endif %}
 
-    {% if (form.synchronizationSettings is defined) %}
+    {% if (form.synchronizationSettings is defined and not form.synchronizationSettings.rendered) %}
         {{ form_widget(form.synchronizationSettings) }}
     {% endif %}
 
-    {% if (form.mappingSettings is defined) %}
+    {% if (form.mappingSettings is defined and not form.mappingSettings.rendered) %}
         {{ form_widget(form.mappingSettings) }}
     {% endif %}
 

@@ -7,6 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
@@ -184,7 +185,7 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAuthenticatedTokenWhenNoOrganization(): void
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException::class);
+        $this->expectException(BadUserOrganizationException::class);
         $this->expectExceptionMessage("You don't have active organization assigned.");
 
         $this->authenticator->createAuthenticatedToken(new User(), 'sample-key');

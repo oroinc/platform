@@ -5,18 +5,28 @@ namespace Oro\Bundle\InstallerBundle\Command;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Runs OroScript files in the application scope.
  */
-class RunScriptsCommand extends ContainerAwareCommand
+class RunScriptsCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:platform:run-script';
+
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+
+        parent::__construct();
+    }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
@@ -54,5 +64,12 @@ HELP
         foreach ($scriptFiles as $scriptFile) {
             $scriptExecutor->runScript($scriptFile);
         }
+
+        return 0;
+    }
+
+    private function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 }

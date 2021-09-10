@@ -216,7 +216,6 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManagers')
             ->willReturn([]);
 
-        /** @var AbstractEntityConfigDumperExtension $extension */
         $extension = $this->createMock(AbstractEntityConfigDumperExtension::class);
         $configId = new EntityConfigId('somescope', 'SomeClass');
         $config = new Config(

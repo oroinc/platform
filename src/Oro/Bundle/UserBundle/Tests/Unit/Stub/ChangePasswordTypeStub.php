@@ -8,14 +8,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 class ChangePasswordTypeStub extends ChangePasswordType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __construct()
     {
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

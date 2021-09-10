@@ -74,7 +74,7 @@ services:
     oro_action.operation_registry:
         class: 'Oro\Bundle\ActionBundle\Model\OperationRegistry'
         arguments:
-            - [] # filters
+            - !tagged_iterator oro_action.operation_registry.filter
             - '@oro_action.configuration.provider.operations'
             - '@oro_action.assembler.operation'
             - '@oro_action.provider.current_application'
@@ -143,7 +143,7 @@ services:
     oro_action.provider.doctrine_type_mapping:
         class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
         arguments:
-            - [] # extensions
+            - !tagged_iterator oro.action.extension.doctrine_type_mapping
 
     Oro\Bundle\ActionBundle\Handler\OperationFormHandler:
         alias: oro_action.form.handler.operation_button
@@ -218,7 +218,7 @@ services:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
         public: true
         arguments:
-            - [] # extensions
+            - !tagged_iterator oro.action.extension.button_provider
             - '@event_dispatcher'
             - '@logger'
         tags:
@@ -235,7 +235,7 @@ services:
             - '@oro_action.provider.route'
             - '@oro_action.resolver.options_resolver'
         tags:
-            - { name: oro.action.extension.button_provider, priority: 100 }
+            - { name: oro.action.extension.button_provider, priority: -100 }
 
     oro_action.twig.extension.operation:
         class: 'Oro\Bundle\ActionBundle\Twig\OperationExtension'

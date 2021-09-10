@@ -35,6 +35,9 @@ class EmailCaseInsensitiveOptionValidatorTest extends ConstraintValidatorTestCas
         parent::setUp();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function createValidator()
     {
         $doctrine = $this->createMock(ManagerRegistry::class);

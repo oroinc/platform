@@ -389,10 +389,16 @@ class UserTest extends AbstractUserTest
             $user->removeEmailOrigin($origin);
             self::assertEmpty($user->getImapAccountType());
         } else {
-            $origin->expects(self::once())->method('isActive')->willReturn(true);
-            $origin->expects(self::once())->method('getMailbox')->willReturn(false);
+            $origin->expects(self::once())
+                ->method('isActive')
+                ->willReturn(true);
+            $origin->expects(self::once())
+                ->method('getMailbox')
+                ->willReturn(false);
 
-            $origin->expects(self::any())->method('getAccessToken')->willReturn($accessToken);
+            $origin->expects(self::any())
+                ->method('getAccessToken')
+                ->willReturn($accessToken);
             self::assertEquals($accountType, $user->getImapAccountType()->getAccountType());
         }
     }

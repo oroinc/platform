@@ -24,43 +24,43 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ENTITY_CLASS = 'Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity';
+    private const TEST_ENTITY_CLASS = Entity::class;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityOwnerAccessor;
+    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityOwnerAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $businessUnitManager;
+    /** @var BusinessUnitManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $businessUnitManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclVoter;
+    /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclVoter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $treeProvider;
+    /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $treeProvider;
 
     /** @var Entity */
-    protected $testEntity;
+    private $testEntity;
 
     /** @var User */
-    protected $currentUser;
+    private $currentUser;
 
     /** @var Organization */
-    protected $currentOrg;
+    private $currentOrg;
 
     /** @var OwnerChecker */
-    protected $ownerChecker;
+    private $ownerChecker;
 
     protected function setUp(): void
     {
@@ -674,10 +674,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    /**
-     * @param OwnershipMetadata $ownershipMetadata
-     */
-    protected function getOwnershipMetadataExpectation($ownershipMetadata)
+    private function getOwnershipMetadataExpectation(OwnershipMetadata $ownershipMetadata)
     {
         $this->ownershipMetadataProvider->expects($this->once())
             ->method('getMetadata')
@@ -685,27 +682,18 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($ownershipMetadata);
     }
 
-    /**
-     * @param int $accessLevel
-     */
-    protected function addOneShotIsGrantedObserverExpectation($accessLevel)
+    private function addOneShotIsGrantedObserverExpectation(int $accessLevel)
     {
         $this->aclVoter->expects($this->once())
             ->method('addOneShotIsGrantedObserver')
-            ->will(
-                $this->returnCallback(
-                    function ($input) use ($accessLevel) {
-                        $input->setAccessLevel($accessLevel);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($input) use ($accessLevel) {
+                $input->setAccessLevel($accessLevel);
+            });
     }
 
-    protected function getUserOrganizationIdsExpectation(array $organizationIds)
+    private function getUserOrganizationIdsExpectation(array $organizationIds)
     {
-        $ownerTree = $this->getMockBuilder(OwnerTreeInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ownerTree = $this->createMock(OwnerTreeInterface::class);
         $ownerTree->expects($this->once())
             ->method('getUserOrganizationIds')
             ->willReturn($organizationIds);

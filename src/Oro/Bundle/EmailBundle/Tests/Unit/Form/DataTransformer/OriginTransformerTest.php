@@ -52,9 +52,9 @@ class OriginTransformerTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManagerMock->expects($this->any())
             ->method('find')
-            ->with($this->equalTo(EmailOrigin::class), $this->equalTo(1))
+            ->with(EmailOrigin::class, 1)
             ->willReturn($testOrigin);
 
-        $this->assertEquals($testOrigin, $this->transformer->reverseTransform("1|mail@example.com"));
+        $this->assertEquals($testOrigin, $this->transformer->reverseTransform('1|mail@example.com'));
     }
 }

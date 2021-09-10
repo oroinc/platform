@@ -34,6 +34,7 @@ return [
                 'type' => 'string',
                 'property_path' => null,
                 'options' => [],
+                'default' => null,
             ]
         ],
         'transitions' => [

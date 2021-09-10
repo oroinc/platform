@@ -12,9 +12,6 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
@@ -38,7 +35,7 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $attribute = new FieldConfigModel();
         $attribute->setType('string');
 
-        $mapper = $this->getMockBuilder(AttributeBlockTypeMapperInterface::class)->getMock();
+        $mapper = $this->createMock(AttributeBlockTypeMapperInterface::class);
         $mapper->expects($this->once())
             ->method('getBlockType')
             ->with($attribute)
@@ -55,7 +52,7 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $attribute = new FieldConfigModel();
         $attribute->setType('percent');
 
-        $mapper = $this->getMockBuilder(AttributeBlockTypeMapperInterface::class)->getMock();
+        $mapper = $this->createMock(AttributeBlockTypeMapperInterface::class);
         $mapper->expects($this->once())
             ->method('getBlockType')
             ->with($attribute)

@@ -97,7 +97,7 @@ HELP
             if (!$helper->ask($input, $output, $question)) {
                 $output->writeln('<error>Command aborted</error>');
 
-                return;
+                return 1;
             }
         }
 
@@ -118,6 +118,8 @@ HELP
         }
 
         $output->writeln($message);
+
+        return 0;
     }
 
     private function resetMenuUpdates(?User $user = null, ?string $menuName = null): void

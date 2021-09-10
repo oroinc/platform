@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
@@ -15,7 +15,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 /**
  * Doctrine repository for Channel entity
  */
-class ChannelRepository extends EntityRepository
+class ChannelRepository extends ServiceEntityRepository
 {
     const BUFFER_SIZE = 100;
 

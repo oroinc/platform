@@ -52,5 +52,7 @@ HELP
         foreach ($this->optionalListenerManager->getListeners() as $listener) {
             $output->writeln(sprintf('  <comment>> %s</comment>', $listener));
         }
+
+        return 0;
     }
 }

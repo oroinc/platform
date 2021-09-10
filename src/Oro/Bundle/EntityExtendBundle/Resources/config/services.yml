@@ -182,7 +182,7 @@ services:
             - '@oro_entity_extend.tools.class_method_name_checker'
             - '@oro_entity_extend.extend.field_type_helper'
         tags:
-            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
+            - { name: validator.constraint_validator }
 
     oro_entity_extend.validator.default_relation_field:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator

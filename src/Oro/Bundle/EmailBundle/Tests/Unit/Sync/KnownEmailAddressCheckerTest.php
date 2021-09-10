@@ -18,28 +18,28 @@ use Psr\Log\LoggerInterface;
 class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
 {
     private const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
-    private const TEST_CONTACT_CLASS        = 'Entity\TestContact';
-    private const USER_CLASS                = User::class;
-    private const MAILBOX_CLASS             = Mailbox::class;
+    private const TEST_CONTACT_CLASS = 'Entity\TestContact';
+    private const USER_CLASS = User::class;
+    private const MAILBOX_CLASS = Mailbox::class;
 
     // @codingStandardsIgnoreStart
     private const QB_SELECT = 'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.contactId) AS contactId,IDENTITY(a.mailboxId) AS mailboxId';
     // @codingStandardsIgnoreStop
 
-    /** @var KnownEmailAddressChecker */
-    private $checker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject */
     private $emailAddressManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $emailAddressRepository;
+
+    /** @var KnownEmailAddressChecker */
+    private $checker;
 
     protected function setUp(): void
     {
@@ -184,7 +184,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->emailAddressRepository->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->will($this->onConsecutiveCalls($queryBuilder1, $queryBuilder2));
+            ->willReturnOnConsecutiveCalls($queryBuilder1, $queryBuilder2);
 
         $this->assertTrue(
             $this->checker->isAtLeastOneKnownEmailAddress(
@@ -213,8 +213,12 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAtLeastOneKnownEmailAddressProvider
      */
-    public function testIsAtLeastOneKnownEmailAddress($emailAddress, $emailsToLoad, $queryResult, $expected)
-    {
+    public function testIsAtLeastOneKnownEmailAddress(
+        array|string $emailAddress,
+        array $emailsToLoad,
+        array $queryResult,
+        array $expected
+    ) {
         $query = $this->getLoadEmailAddressesQuery(
             $queryResult
         );
@@ -239,7 +243,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function isAtLeastOneKnownEmailAddressProvider()
+    public function isAtLeastOneKnownEmailAddressProvider(): array
     {
         return [
             [
@@ -275,8 +279,12 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAtLeastOneUserEmailAddressProvider
      */
-    public function testIsAtLeastOneUserEmailAddress($emailAddress, $emailsToLoad, $queryResult, $expected)
-    {
+    public function testIsAtLeastOneUserEmailAddress(
+        array|string $emailAddress,
+        array $emailsToLoad,
+        array $queryResult,
+        array $expected
+    ) {
         $query = $this->getLoadEmailAddressesQuery(
             $queryResult
         );
@@ -303,7 +311,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function isAtLeastOneUserEmailAddressProvider()
+    public function isAtLeastOneUserEmailAddressProvider(): array
     {
         return [
             [
@@ -336,10 +344,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return EmailOwnerProviderStorage
-     */
-    public function getEmailOwnerProviderStorage()
+    private function getEmailOwnerProviderStorage(): EmailOwnerProviderStorage
     {
         $userProvider = $this->createMock(EmailOwnerProviderInterface::class);
         $userProvider->expects($this->any())

@@ -12,9 +12,7 @@ class EmailTypeTemplateAccessibilityCheckerExtensionTest extends TypeTestCase
     public function testRemoveField()
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-
-        $authorizationChecker
-            ->expects($this->once())
+        $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', 'entity:' . EmailTemplate::class)
             ->willReturn(false);
@@ -30,9 +28,7 @@ class EmailTypeTemplateAccessibilityCheckerExtensionTest extends TypeTestCase
     public function testSafeField()
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-
-        $authorizationChecker
-            ->expects($this->once())
+        $authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('VIEW', 'entity:' . EmailTemplate::class)
             ->willReturn(true);

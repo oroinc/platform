@@ -2,61 +2,46 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\Translator;
 
 class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $manager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var EmailTemplateHandler
-     */
-    protected $handler;
+    /** @var EmailTemplateHandler */
+    private $handler;
 
-    /**
-     * @var EmailTemplate
-     */
-    protected $entity;
+    /** @var EmailTemplate */
+    private $entity;
 
     protected function setUp(): void
     {
-        $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->form = $this->createMock(Form::class);
         $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->manager = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(ObjectManager::class);
+        $this->translator = $this->createMock(Translator::class);
 
-        $this->entity  = new EmailTemplate();
+        $this->entity = new EmailTemplate();
         $this->handler = new EmailTemplateHandler($this->form, $requestStack, $this->manager, $this->translator);
     }
 
@@ -74,9 +59,8 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedMethods
-     * @param string $method
      */
-    public function testProcessSupportedRequest($method)
+    public function testProcessSupportedRequest(string $method): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -94,10 +78,10 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function supportedMethods()
     {
-        return array(
-            array('POST'),
-            array('PUT')
-        );
+        return [
+            ['POST'],
+            ['PUT']
+        ];
     }
 
     public function testProcessValidData()
@@ -115,7 +99,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->expects($this->once())
             ->method('persist')
@@ -132,14 +116,17 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->entity->setIsSystem(true);
         $this->entity->setIsEditable(false);
 
-        $this->form->expects($this->once())->method('setData')
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
-        $this->form->expects($this->once())->method('addError');
+        $this->form->expects($this->once())
+            ->method('addError');
 
         $this->request->setMethod('POST');
 
         $this->translator->expects($this->once())
-            ->method('trans');
+            ->method('trans')
+            ->willReturnCallback(static fn (string $key) => '[trans]' . $key . '[/trans]');
 
         $this->assertFalse($this->handler->process($this->entity));
     }

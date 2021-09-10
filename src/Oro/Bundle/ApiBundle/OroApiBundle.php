@@ -8,7 +8,6 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
-use Oro\Component\DependencyInjection\Compiler\PriorityTaggedServiceViaAddMethodCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -53,11 +52,6 @@ class OroApiBundle extends Bundle
         ));
         $container->addCompilerPass(new Compiler\EntityIdResolverCompilerPass());
         $container->addCompilerPass(new Compiler\EntityAliasCompilerPass());
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_api.entity_exclusion_provider.shared',
-            'oro_entity.exclusion_provider.api',
-            'addProvider'
-        ));
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(new Compiler\ApiDocLogoutCompilerPass());
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());

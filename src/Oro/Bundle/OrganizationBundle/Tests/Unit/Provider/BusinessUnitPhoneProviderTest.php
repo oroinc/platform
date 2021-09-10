@@ -8,7 +8,7 @@ use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider;
 class BusinessUnitPhoneProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BusinessUnitPhoneProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {

@@ -22,35 +22,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseHelper */
-    protected $databaseHelper;
+    private $databaseHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
-    protected $fieldTypeProvider;
+    private $fieldTypeProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFieldImportStrategy */
-    protected $strategy;
+    private $strategy;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
-    protected $fieldHelper;
+    private $fieldHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
-    protected $strategyHelper;
+    private $strategyHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FieldNameValidationHelper */
-    protected $validationHelper;
+    private $validationHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigHelper */
-    protected $configHelper;
+    private $configHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
-    protected $context;
+    private $context;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);

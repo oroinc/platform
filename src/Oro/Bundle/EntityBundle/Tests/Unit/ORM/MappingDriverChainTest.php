@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\MappingDriverChain;
 class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MappingDriverChain */
-    protected $chain;
+    private $chain;
 
     protected function setUp(): void
     {
@@ -17,13 +17,12 @@ class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
 
     public function testTransientCache()
     {
-        /** @var MappingDriver|\PHPUnit\Framework\MockObject\MockObject $mappingDriver */
-        $mappingDriver = $this->createMock('Doctrine\Persistence\Mapping\Driver\MappingDriver');
+        $mappingDriver = $this->createMock(MappingDriver::class);
         $mappingDriver->expects($this->once())->method('isTransient')->willReturn(true);
 
-        $this->chain->addDriver($mappingDriver, '\stdClass');
+        $this->chain->addDriver($mappingDriver, \stdClass::class);
 
-        $this->chain->isTransient('\stdClass');
-        $this->chain->isTransient('\stdClass');
+        $this->chain->isTransient(\stdClass::class);
+        $this->chain->isTransient(\stdClass::class);
     }
 }

@@ -3,19 +3,18 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class StatusTest extends \PHPUnit\Framework\TestCase
 {
     private $user;
 
-    /**
-     * @var Status
-     */
+    /** @var Status */
     private $status;
 
     protected function setUp(): void
     {
-        $this->user = $this->getMockForAbstractClass('Oro\Bundle\UserBundle\Entity\User');
+        $this->user = $this->createMock(User::class);
         $this->status = new Status();
     }
 

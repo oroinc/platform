@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
+use Oro\Bundle\UserBundle\Exception\OrganizationException;
+use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\UserBundle\Security\UserChecker;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
@@ -11,11 +15,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var UserChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $userChecker;
-
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenStorage;
+    private $tokenStorage;
+
+    /** @var UserChecker */
+    private $userChecker;
 
     protected function setUp(): void
     {
@@ -25,21 +29,16 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param UserInterface $user
-     * @param int           $getTokenCalls
-     * @param string        $token
-     * @param boolean       $exceptionThrown
-     *
      * @dataProvider checkPreAuthProvider
      */
-    public function testCheckPreAuth(UserInterface $user, $getTokenCalls, $token, $exceptionThrown)
+    public function testCheckPreAuth(UserInterface $user, int $getTokenCalls, ?string $token, bool $exceptionThrown)
     {
         $this->tokenStorage->expects($this->exactly($getTokenCalls))
             ->method('getToken')
             ->willReturn($token);
 
         if ($exceptionThrown) {
-            $this->expectException(\Oro\Bundle\UserBundle\Exception\PasswordChangedException::class);
+            $this->expectException(PasswordChangedException::class);
             $this->expectExceptionMessage('Invalid password.');
         }
 
@@ -47,26 +46,23 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param UserInterface $user
-     * @param boolean       $exceptionThrown
-     *
      * @dataProvider checkPostAuthProvider
      */
-    public function testCheckPostAuth(UserInterface $user, $exceptionThrown)
+    public function testCheckPostAuth(UserInterface $user, bool $exceptionThrown)
     {
         if ($exceptionThrown) {
-            $this->expectException(\Oro\Bundle\UserBundle\Exception\OrganizationException::class);
+            $this->expectException(OrganizationException::class);
             $this->expectExceptionMessage('');
         }
 
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function checkPreAuthProvider()
+    public function checkPreAuthProvider(): array
     {
         $data = [];
 
-        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock(UserInterface::class);
         $data[] = [
             'user' => $user,
             'getTokenCalls' => 0,
@@ -121,11 +117,11 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         return $data;
     }
 
-    public function checkPostAuthProvider()
+    public function checkPostAuthProvider(): array
     {
         $data = [];
 
-        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock(UserInterface::class);
         $data['invalid_user_class'] = [
             'user' => $user,
             'exceptionThrown' => false,
@@ -136,7 +132,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $user1 = new User();
         $user1->setOwner($this->createMock(BusinessUnit::class));
         $user1->addOrganization($organization);
-        $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $authStatus = $this->createMock(AbstractEnumValue::class);
         $user1->setAuthStatus($authStatus);
         $data['with_organization'] = [
             'user' => $user1,
@@ -145,7 +141,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
 
         $user2 = new User();
         $user2->setOwner($this->createMock(BusinessUnit::class));
-        $authStatus = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $authStatus = $this->createMock(AbstractEnumValue::class);
         $user2->setAuthStatus($authStatus);
         $data['without_organization'] = [
             'user' => $user2,
@@ -157,7 +153,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckPostAuthOnUserWithoutOwner()
     {
-        $this->expectException(\Oro\Bundle\UserBundle\Exception\EmptyOwnerException::class);
+        $this->expectException(EmptyOwnerException::class);
         $user = new User();
 
         $this->userChecker->checkPostAuth($user);

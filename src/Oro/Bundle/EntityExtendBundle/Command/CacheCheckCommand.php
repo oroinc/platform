@@ -74,5 +74,7 @@ HELP
                 throw $e;
             }
         }
+
+        return 0;
     }
 }

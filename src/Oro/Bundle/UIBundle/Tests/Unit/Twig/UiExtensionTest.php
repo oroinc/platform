@@ -26,26 +26,19 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
+    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $contentProviderManager;
+    private TwigContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $userAgentProvider;
+    private UserAgentProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userAgentProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
+    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
 
-    /** @var UiExtension */
-    private $extension;
+    private UiExtension $extension;
 
     protected function setUp(): void
     {
@@ -67,29 +60,29 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new UiExtension($container);
     }
 
-    public function testOnScrollDataBefore()
+    public function testOnScrollDataBefore(): void
     {
         $pageIdentifier = 'test-page';
         $data = new ScrollData(['fields']);
         $alteredData = new ScrollData(['altered', 'fields']);
         $formView = $this->createMock(FormView::class);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(BeforeListRenderEvent::class),
                 'oro_ui.scroll_data.before.' . $pageIdentifier
             )
             ->willReturnCallback(function (BeforeListRenderEvent $event) use ($data, $alteredData, $formView) {
-                $this->assertEquals($this->environment, $event->getEnvironment());
-                $this->assertEquals($data, $event->getScrollData());
-                $this->assertEquals($formView, $event->getFormView());
+                self::assertEquals($this->environment, $event->getEnvironment());
+                self::assertEquals($data, $event->getScrollData());
+                self::assertEquals($formView, $event->getFormView());
                 $event->setScrollData($alteredData);
             });
 
         $entity = new \stdClass();
 
-        $this->assertEquals(
+        self::assertEquals(
             $alteredData->getData(),
             self::callTwigFunction(
                 $this->extension,
@@ -99,7 +92,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRenderBlock()
+    public function testRenderBlock(): void
     {
         $testTemplate = 'testTemplate';
         $expected = 'result';
@@ -126,7 +119,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForm()
+    public function testProcessForm(): void
     {
         $entity = new \stdClass();
         $formData = ['test'];
@@ -134,7 +127,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $formView = $this->getMockBuilder(FormView::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(BeforeFormRenderEvent::class),
@@ -146,7 +139,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 self::assertSame($entity, $event->getEntity());
             });
 
-        $this->assertSame(
+        self::assertSame(
             $formData,
             self::callTwigFunction(
                 $this->extension,
@@ -156,14 +149,14 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessFormWithoutEntity()
+    public function testProcessFormWithoutEntity(): void
     {
         $formData = ['test'];
 
         $formView = $this->getMockBuilder(FormView::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
                 $this->isInstanceOf(BeforeFormRenderEvent::class),
@@ -175,7 +168,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 self::assertNull($event->getEntity());
             });
 
-        $this->assertSame(
+        self::assertSame(
             $formData,
             self::callTwigFunction(
                 $this->extension,
@@ -188,14 +181,14 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider contentDataProvider
      */
-    public function testGetContent($content, $additionalContent, $keys, $expected)
+    public function testGetContent($content, $additionalContent, $keys, $expected): void
     {
-        $this->contentProviderManager->expects($this->once())
+        $this->contentProviderManager->expects(self::once())
             ->method('getContent')
             ->with($keys)
             ->willReturn($content);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             self::callTwigFunction($this->extension, 'oro_get_content', [$additionalContent, $keys])
         );
@@ -222,9 +215,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareJsTemplateContentProvider
      */
-    public function testPrepareJsTemplateContent($content, $expectedContent)
+    public function testPrepareJsTemplateContent($content, $expectedContent): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedContent,
             self::callTwigFilter($this->extension, 'oro_js_template_content', [$content])
         );
@@ -281,9 +274,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider pregReplaceProvider
      */
-    public function testRegex($expected, $subject, $pattern, $replacement, $limit)
+    public function testRegex($expected, $subject, $pattern, $replacement, $limit): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             self::callTwigFilter(
                 $this->extension,
@@ -323,7 +316,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addUrlQueryProvider
      */
-    public function testAddUrlQuery($expected, $source, array $query = null)
+    public function testAddUrlQuery($expected, $source, array $query = null): void
     {
         $request = new Request($query ?? []);
 
@@ -331,7 +324,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             self::callTwigFunction($this->extension, 'oro_url_add_query', [$source])
         );
@@ -400,18 +393,16 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isUrlLocalProvider
      */
-    public function testIsUrlLocal($expected, $server, $linkUrl)
+    public function testIsUrlLocal(bool $expected, array $server, string $linkUrl): void
     {
         $request = new Request();
-        if (null !== $server) {
-            $request->server->add($server);
-        }
+        $request->server->add($server);
 
         $this->requestStack->expects(self::once())
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             self::callTwigFunction($this->extension, 'oro_is_url_local', [$linkUrl])
         );
@@ -484,7 +475,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSortByWithDefaultOptions()
+    public function testSortByWithDefaultOptions(): void
     {
         $result = self::callTwigFilter(
             $this->extension,
@@ -497,7 +488,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['name' => '1'],
                 ['name' => '3'],
@@ -507,7 +498,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByReverse()
+    public function testSortByReverse(): void
     {
         $result = self::callTwigFilter(
             $this->extension,
@@ -523,7 +514,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['name' => '2', 'priority' => 100],
                 ['name' => '1'],
@@ -533,7 +524,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByString()
+    public function testSortByString(): void
     {
         $result = self::callTwigFilter(
             $this->extension,
@@ -550,7 +541,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['name' => 'a'],
                 ['name' => 'b'],
@@ -560,7 +551,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByStringCaseInsensitive()
+    public function testSortByStringCaseInsensitive(): void
     {
         $result = self::callTwigFilter(
             $this->extension,
@@ -577,7 +568,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['name' => 'a'],
                 ['name' => 'b'],
@@ -589,7 +580,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testRenderContent(): void
     {
-        $this->assertSame(
+        self::assertSame(
             'render_content data',
             self::callTwigFilter(
                 $this->extension,
@@ -604,9 +595,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider skypeButtonProvider
      */
-    public function testGetSkypeButton($username, $options, $expectedOptions, $expectedTemplate)
+    public function testGetSkypeButton($username, $options, $expectedOptions, $expectedTemplate): void
     {
-        $this->environment->expects($this->once())
+        $this->environment->expects(self::once())
             ->method('render')
             ->with($expectedTemplate, $this->anything())
             ->willReturnCallback(function ($template, $options) use ($expectedOptions, $username) {
@@ -619,7 +610,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
                 return 'BUTTON_CODE';
             });
-        $this->assertEquals(
+        self::assertEquals(
             'BUTTON_CODE',
             self::callTwigFunction($this->extension, 'skype_button', [$this->environment, $username, $options])
         );
@@ -656,9 +647,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ceilProvider
      */
-    public function testCeil($expected, $testValue)
+    public function testCeil($expected, $testValue): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             self::callTwigFilter($this->extension, 'ceil', [$testValue])
         );
@@ -672,7 +663,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testRenderAdditionalData()
+    public function testRenderAdditionalData(): void
     {
         $childView = new FormView();
         $childView->vars['extra_field'] = true;
@@ -685,7 +676,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             [$this->environment, $form, 'Label']
         );
 
-        $this->assertSame(
+        self::assertSame(
             [
                 UiExtension::ADDITIONAL_SECTION_KEY => [
                     'title' => 'Label',
@@ -706,12 +697,12 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetDefaultPage(): void
     {
         $url = 'http://sample-app/sample-url';
-        $this->router->expects($this->once())
+        $this->router->expects(self::once())
             ->method('generate')
             ->with('oro_default')
             ->willReturn($url);
 
-        $this->assertEquals(
+        self::assertEquals(
             $url,
             self::callTwigFunction($this->extension, 'oro_default_page', [$this->environment])
         );
@@ -720,9 +711,9 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider urlAddQueryParametersDataProvider
      */
-    public function testUrlAddQueryParameters(string $url, array $parameters, string $expected)
+    public function testUrlAddQueryParameters(string $url, array $parameters, string $expected): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             self::callTwigFilter($this->extension, 'url_add_query_parameters', [$url, $parameters])
         );

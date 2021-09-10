@@ -4,6 +4,9 @@ namespace Oro\Bundle\UIBundle\Provider;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Provides UserAgent based on User-Agent header value
+ */
 class UserAgentProvider implements UserAgentProviderInterface
 {
     const UNKNOWN_USER_AGENT = 'unknown_user_agent';
@@ -26,7 +29,7 @@ class UserAgentProvider implements UserAgentProviderInterface
     {
         $userAgentName = self::UNKNOWN_USER_AGENT;
 
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         if ($request) {
             /** @var string $userAgentName */
             $userAgentHeader = $request->headers->get('User-Agent');

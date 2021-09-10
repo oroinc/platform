@@ -15,14 +15,11 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
     use EntityTrait;
 
     /** @var EntityVirtualStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
     /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $virtualFieldProvider;
+    private $virtualFieldProvider;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
@@ -41,8 +38,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ]
         );
 
-        $this->virtualFieldProvider
-            ->expects($this->once())
+        $this->virtualFieldProvider->expects($this->once())
             ->method('isVirtualField')
             ->with($entityStructure->getClassName(), 'field1')
             ->willReturn(true);
@@ -74,8 +70,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
             ]
         );
 
-        $this->virtualFieldProvider
-            ->expects($this->once())
+        $this->virtualFieldProvider->expects($this->once())
             ->method('isVirtualField')
             ->with('class', 'field')
             ->willReturn(true);

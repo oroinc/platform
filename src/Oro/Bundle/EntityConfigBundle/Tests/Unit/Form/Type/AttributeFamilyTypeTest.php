@@ -17,10 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class AttributeFamilyTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var AttributeFamilyType
-     */
-    protected $type;
+    /** @var AttributeFamilyType */
+    private $type;
 
     protected function setUp(): void
     {
@@ -58,11 +56,11 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
      */
     public function getExtensions()
     {
-        $attributeManagerMock = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeManagerMock = $this->createMock(AttributeManager::class);
 
-        $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
+        $attributeManagerMock->expects($this->any())
+            ->method('getActiveAttributesByClass')
+            ->willReturn([]);
 
         return [
             new PreloadedExtension(

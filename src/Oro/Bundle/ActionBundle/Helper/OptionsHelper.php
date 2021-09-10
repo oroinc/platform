@@ -176,12 +176,12 @@ class OptionsHelper
      */
     protected function normalizeTemplateData(array $data)
     {
-        return array_merge(
+        $normalizedData = array_merge(
             [
                 'hasForm'         => null,
                 'showDialog'      => null,
-                'executionRoute'  => null,
-                'dialogRoute'     => null,
+                'executionRoute'  => '',
+                'dialogRoute'     => '',
                 'routeParams'     => [],
                 'frontendOptions' => [],
                 'buttonOptions'   => [],
@@ -189,5 +189,10 @@ class OptionsHelper
             ],
             $data
         );
+
+        $normalizedData['executionRoute'] = (string) $normalizedData['executionRoute'];
+        $normalizedData['dialogRoute'] = (string) $normalizedData['dialogRoute'];
+
+        return $normalizedData;
     }
 }

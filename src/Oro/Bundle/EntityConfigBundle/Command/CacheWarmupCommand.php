@@ -50,5 +50,7 @@ HELP
         $output->writeln('Warm up the entity config cache');
 
         $this->configCacheWarmer->warmUpCache();
+
+        return 0;
     }
 }

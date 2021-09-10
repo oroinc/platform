@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -9,14 +11,14 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AclProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var AclProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {
@@ -44,14 +46,9 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getIsGrantedByObjectIdentityDescriptorDataProvider
-     *
-     * @param string|string[] $attributes
-     * @param string $entity
-     * @param array $isGrantedCalls
-     * @param bool $expectedResult
      */
     public function testIsGrantedByObjectIdentityDescriptor(
-        $attributes,
+        array|string $attributes,
         string $entity,
         array $isGrantedCalls,
         bool $expectedResult
@@ -120,12 +117,8 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
@@ -157,12 +150,8 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
@@ -192,12 +181,8 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);

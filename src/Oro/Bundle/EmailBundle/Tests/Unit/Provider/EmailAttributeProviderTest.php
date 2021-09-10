@@ -15,12 +15,9 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
@@ -52,13 +49,9 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $className
-     * @param ClassMetadata $metadata
-     * @param array $expected
-     *
      * @dataProvider getAttributesDataProvider
      */
-    public function testGetAttributes($className, $metadata, $expected)
+    public function testGetAttributes(string $className, ClassMetadata $metadata, array $expected)
     {
         $em = $this->createMock(ObjectManager::class);
 
@@ -80,17 +73,14 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getAttributesDataProvider()
+    public function getAttributesDataProvider(): array
     {
         return [
             'without EmailHolderInterface' => [
                 'className' => CustomerStub::class,
-                'metadata' => $this->getEntity(ClassMetadata::class, [
-                    'name' => CustomerStub::class,
-                    'fieldNames' => [
+                'metadata' => $this->getClassMetadata(
+                    CustomerStub::class,
+                    [
                         'name' => 'name',
                         'email' => 'email',
                         'hidden_email' => 'hiddenEmail',
@@ -98,8 +88,8 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
                         'no_config' => 'noConfig',
                         'deleted_email' => 'deletedEmail',
                         'has_contact_information' => 'hasContactInformation',
-                    ],
-                ], [null]),
+                    ]
+                ),
                 'expected' => [
                     new EmailAttribute('email'),
                     new EmailAttribute('secondaryEmail'),
@@ -108,9 +98,9 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'with EmailHolderInterface' => [
                 'className' => TestEmailHolder::class,
-                'metadata' => $this->getEntity(ClassMetadata::class, [
-                    'name' => CustomerStub::class,
-                    'fieldNames' => [
+                'metadata' => $this->getClassMetadata(
+                    CustomerStub::class,
+                    [
                         'name' => 'name',
                         'email' => 'email',
                         'hidden_email' => 'hiddenEmail',
@@ -118,8 +108,8 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
                         'no_config' => 'noConfig',
                         'deleted_email' => 'deletedEmail',
                         'has_contact_information' => 'hasContactInformation',
-                    ],
-                ], [null]),
+                    ]
+                ),
                 'expected' => [
                     new EmailAttribute('email'),
                     new EmailAttribute('email'),
@@ -130,59 +120,61 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    private function getClassMetadata(string $entityName, array $fieldNames): ClassMetadata
+    {
+        $classMetadata = new ClassMetadata($entityName);
+        $classMetadata->fieldNames = $fieldNames;
+
+        return $classMetadata;
+    }
+
     private function expectConfigManager(ClassMetadata $metadata)
     {
         $this->configManager->expects(self::any())
             ->method('hasConfig')
             ->with($metadata->name, self::isType('string'))
             ->willReturnCallback(function ($className, $fieldName) {
-                if ($fieldName === 'noConfig') {
-                    return false;
-                }
-
-                return true;
+                return 'noConfig' !== $fieldName;
             });
 
         $this->configManager->expects(self::any())
             ->method('isHiddenModel')
             ->with($metadata->name, self::isType('string'))
             ->willReturnCallback(function ($className, $fieldName) {
-                return $fieldName === 'hiddenEmail';
+                return 'hiddenEmail' === $fieldName;
             });
 
         $this->configManager->expects(self::any())
             ->method('getFieldConfig')
             ->with(self::isType('string'), $metadata->name, self::isType('string'))
-            ->willReturnCallback(
-                function ($scope, $className, $fieldName) {
-                    switch ($scope) {
-                        case 'extend':
-                            $extendFieldConfig = $this->createMock(ConfigInterface::class);
+            ->willReturnCallback(function ($scope, $className, $fieldName) {
+                switch ($scope) {
+                    case 'extend':
+                        $extendFieldConfig = $this->createMock(ConfigInterface::class);
 
-                            $extendFieldConfig->expects(self::any())
-                                ->method('is')
-                                ->with('is_deleted')
-                                ->willReturnCallback(function ($code) use ($fieldName) {
-                                    return $fieldName === 'deletedEmail';
-                                });
+                        $extendFieldConfig->expects(self::any())
+                            ->method('is')
+                            ->with('is_deleted')
+                            ->willReturnCallback(function () use ($fieldName) {
+                                return $fieldName === 'deletedEmail';
+                            });
 
-                            return $extendFieldConfig;
-                        case 'entity':
-                            $entityFieldConfig = $this->createMock(ConfigInterface::class);
+                        return $extendFieldConfig;
+                    case 'entity':
+                        $entityFieldConfig = $this->createMock(ConfigInterface::class);
 
-                            $entityFieldConfig->expects(self::any())
-                                ->method('get')
-                                ->with('contact_information')
-                                ->willReturnCallback(function ($code) use ($fieldName) {
-                                    return $fieldName === 'hasContactInformation' ? 'email' : null;
-                                });
+                        $entityFieldConfig->expects(self::any())
+                            ->method('get')
+                            ->with('contact_information')
+                            ->willReturnCallback(function () use ($fieldName) {
+                                return $fieldName === 'hasContactInformation' ? 'email' : null;
+                            });
 
-                            return $entityFieldConfig;
-                        default:
-                            return null;
-                    }
+                        return $entityFieldConfig;
+                    default:
+                        return null;
                 }
-            );
+            });
     }
 
     public function testCreateEmailsFromAttributes()

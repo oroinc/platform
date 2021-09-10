@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 class OwnerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Owner */
-    protected $owner;
+    private $owner;
 
     protected function setUp(): void
     {

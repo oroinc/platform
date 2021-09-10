@@ -34,23 +34,16 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class FieldTypeTest extends TypeTestCase
 {
-    const FIELDS_GROUP = 'oro.entity_extend.form.data_type_group.fields';
-    const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
+    private const FIELDS_GROUP = 'oro.entity_extend.form.data_type_group.fields';
+    private const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
 
     /** @var FieldType */
-    protected $type;
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
-    protected $fieldTypeProvider;
-
-    /** @var array */
-    protected $defaultFieldTypeChoices = [
+    private array $defaultFieldTypeChoices = [
         self::FIELDS_GROUP    => [
             'bigint'    => 'oro.entity_extend.form.data_type.bigint',
             'boolean'   => 'oro.entity_extend.form.data_type.boolean',
@@ -76,59 +69,43 @@ class FieldTypeTest extends TypeTestCase
         ],
     ];
 
-    /** @var array */
-    protected $expectedChoicesView;
+    private array $expectedChoicesView;
 
     protected function setUp(): void
     {
         $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($id, $parameters) {
-                    if ($id === 'oro.entity_extend.form.data_type.inverse_relation') {
-                        return strtr('Reuse "%field_name%" of %entity_name%', $parameters);
-                    }
-
-                    return $id;
+            ->willReturnCallback(function ($id, $parameters) {
+                if ($id === 'oro.entity_extend.form.data_type.inverse_relation') {
+                    return strtr('Reuse "%field_name%" of %entity_name%', $parameters);
                 }
-            );
 
-        $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->fieldTypeProvider->expects($this->any())
+                return $id;
+            });
+
+        $fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
+        $fieldTypeProvider->expects($this->any())
             ->method('getSupportedFieldTypes')
             ->willReturn(array_keys($this->defaultFieldTypeChoices[self::FIELDS_GROUP]));
-        $this->fieldTypeProvider->expects($this->any())
+        $fieldTypeProvider->expects($this->any())
             ->method('getSupportedRelationTypes')
             ->willReturn(array_keys($this->defaultFieldTypeChoices[self::RELATIONS_GROUP]));
 
         $this->type = new FieldType(
             $this->configManager,
-            $this->translator,
+            $translator,
             new ExtendDbIdentifierNameGenerator(),
-            $this->fieldTypeProvider
+            $fieldTypeProvider
         );
+
         parent::setUp();
     }
 
-    /**
-     * @param array $defaultFieldTypeChoices
-     * @param array $attributes
-     *
-     * @return array
-     */
-    protected function prepareExpectedChoicesView($defaultFieldTypeChoices, array $attributes = [])
+    private function prepareExpectedChoicesView(array $defaultFieldTypeChoices, array $attributes = []): array
     {
         $choiceCounter = 0;
         $expectedChoicesView = [];
@@ -151,7 +128,7 @@ class FieldTypeTest extends TypeTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -161,7 +138,6 @@ class FieldTypeTest extends TypeTestCase
             new ConstraintValidatorFactory()
         );
 
-        /** @var ConstraintsProviderInterface $constraintsProvider */
         $constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);
         $constraintsProvider->expects($this->any())
             ->method('getFormConstraints')
@@ -208,13 +184,14 @@ class FieldTypeTest extends TypeTestCase
 
         $this->assertEquals(
             [
-                'data-validation' => \json_encode(
+                'data-validation' => json_encode(
                     [
                         FieldNameLength::class => [
                             'min' => FieldNameLength::MIN_LENGTH,
                             'max' => 55, //will be returned by generator
                         ]
-                    ]
+                    ],
+                    JSON_THROW_ON_ERROR
                 )
             ],
             $fieldNameView->vars['attr']
@@ -227,12 +204,10 @@ class FieldTypeTest extends TypeTestCase
         $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $extendConfigProvider->addEntityConfig('Test\SourceEntity');
 
@@ -308,18 +283,16 @@ class FieldTypeTest extends TypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function prepareRelations()
+    private function prepareRelations()
     {
         $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
         $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $selfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
@@ -489,18 +462,16 @@ class FieldTypeTest extends TypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function prepareRelationsWithReverseRelations()
+    private function prepareRelationsWithReverseRelations()
     {
         $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
         $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $selfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
@@ -744,18 +715,16 @@ class FieldTypeTest extends TypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function prepareRelationsWithReverseRelationsMarkedAsToBeDeleted()
+    private function prepareRelationsWithReverseRelationsMarkedAsToBeDeleted()
     {
         $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
         $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $selfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [

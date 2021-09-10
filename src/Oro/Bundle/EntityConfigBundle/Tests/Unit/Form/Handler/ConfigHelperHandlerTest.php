@@ -25,74 +25,41 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var FormFactory|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /**
-     * @var Session|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
-    /**
-     * @var Router|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /**
-     * @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $configHelper;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
-    /**
-     * @var Request|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     private $request;
 
-    /**
-     * @var ConfigHelperHandler
-     */
+    /** @var ConfigHelperHandler */
     private $handler;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
+    /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     private $translator;
 
     protected function setUp(): void
     {
-        $this->formFactory = $this->getMockBuilder(FormFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->session = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configHelper = $this->getMockBuilder(ConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->formFactory = $this->createMock(FormFactory::class);
+        $this->session = $this->createMock(Session::class);
+        $this->router = $this->createMock(Router::class);
+        $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->form = $this->createMock(FormInterface::class);
-        $this->request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->request = $this->createMock(Request::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
@@ -113,8 +80,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class, ['entity' => $entityConfigModel]);
 
-        $this->formFactory
-            ->expects($this->once())
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
                 FieldType::class,
@@ -131,8 +97,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
-        $this->formFactory
-            ->expects($this->once())
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
                 ConfigType::class,
@@ -146,14 +111,12 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsFormValidAfterSubmitWhenMethodIsNotPost()
     {
-        $this->request
-            ->expects($this->once())
+        $this->request->expects($this->once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(false);
 
-        $this->form
-            ->expects($this->never())
+        $this->form->expects($this->never())
             ->method('handleRequest');
 
         $this->assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
@@ -161,22 +124,18 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsNotValid()
     {
-        $this->request
-            ->expects($this->once())
+        $this->request->expects($this->once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(true);
 
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -185,22 +144,18 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsValid()
     {
-        $this->request
-            ->expects($this->once())
+        $this->request->expects($this->once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(true);
 
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
@@ -210,22 +165,19 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
     public function testShowSuccessMessageAndRedirect()
     {
         $successMessage = 'Success message';
-        $flashBag = $this->createMock(FlashBagInterface::class);
 
-        $flashBag
-            ->expects($this->once())
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        $flashBag->expects($this->once())
             ->method('add')
             ->with('success', $successMessage);
 
-        $this->session
-            ->expects($this->once())
+        $this->session->expects($this->once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
-        $this->router
-            ->expects($this->once())
+        $this->router->expects($this->once())
             ->method('redirect')
             ->with($fieldConfigModel);
 
@@ -237,18 +189,15 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $message = 'Translation cache update is required';
         $flashBag = $this->createMock(FlashBagInterface::class);
 
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
-            ->will($this->returnValue($message));
+            ->willReturn($message);
 
-        $flashBag
-            ->expects($this->once())
+        $flashBag->expects($this->once())
             ->method('add')
             ->with('warning', $message);
 
-        $this->session
-            ->expects($this->once())
+        $this->session->expects($this->once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
@@ -261,38 +210,32 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $formView = new FormView();
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('createView')
             ->willReturn($formView);
 
         $formAction = 'someAction';
 
         $entityConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getEntityConfigByField')
             ->with($fieldConfigModel, 'entity')
             ->willReturn($entityConfig);
 
         $fieldConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getFieldConfig')
             ->with($fieldConfigModel, 'entity')
             ->willReturn($fieldConfig);
 
         $modules = ['somemodule'];
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getExtendJsModules')
             ->willReturn($modules);
 
         $nonExtendedEntities = ['first', 'second'];
-        $this->configHelper
-            ->expects($this->once())
+        $this->configHelper->expects($this->once())
             ->method('getNonExtendedEntitiesClasses')
             ->willReturn($nonExtendedEntities);
 
@@ -318,8 +261,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $redirectResponse = new RedirectResponse('some_url');
-        $this->router
-            ->expects($this->once())
+        $this->router->expects($this->once())
             ->method('redirect')
             ->with($fieldConfigModel)
             ->willReturn($redirectResponse);

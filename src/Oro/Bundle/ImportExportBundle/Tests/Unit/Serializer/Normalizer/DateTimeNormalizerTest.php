@@ -105,6 +105,20 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testNormalizeWithoutFormatter()
+    {
+        $normalizer = new DateTimeNormalizer();
+
+        $date = new \DateTime('2013-12-31 23:59:59+0200');
+        $expected = '2013-12-31T23:59:59+0200';
+        $context = ['type' => 'datetime'];
+
+        $this->assertEquals(
+            $expected,
+            $normalizer->normalize($date, null, $context)
+        );
+    }
+
     /**
      * @return array of [
      *      'Expected DateTime string',
@@ -245,6 +259,20 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         if ($timezone !== null) {
             $this->localeSettings->expects($this->any())->method('getTimezone')->willReturn($timezone);
         }
+
+        $this->assertEquals(
+            $expected,
+            $this->normalizer->denormalize($data, 'DateTime', null, $context)
+        );
+    }
+
+    public function testDenormalizeWithoutFormatter()
+    {
+        $normalizer = new DateTimeNormalizer();
+
+        $data = '2013-12-31T23:59:59+0200';
+        $expected = new \DateTime('2013-12-31 23:59:59+0200');
+        $context = ['type' => 'datetime'];
 
         $this->assertEquals(
             $expected,

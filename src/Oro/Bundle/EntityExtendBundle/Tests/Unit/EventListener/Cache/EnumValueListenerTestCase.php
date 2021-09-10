@@ -7,7 +7,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 abstract class EnumValueListenerTestCase extends \PHPUnit\Framework\TestCase
 {
-    const ENUM_VALUE_CLASS = TestEnumValue::class;
+    protected const ENUM_VALUE_CLASS = TestEnumValue::class;
 
     /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UserAuthenticationFieldsValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UserManager */
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
     protected function setUp(): void

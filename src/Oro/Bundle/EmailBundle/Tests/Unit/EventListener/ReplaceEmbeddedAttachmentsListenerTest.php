@@ -12,7 +12,7 @@ use Oro\Bundle\EmailBundle\EventListener\ReplaceEmbeddedAttachmentsListener;
 class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReplaceEmbeddedAttachmentsListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

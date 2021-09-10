@@ -10,36 +10,30 @@ use Oro\Component\DependencyInjection\ServiceLink;
 
 class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configBag;
+    /** @var PropertyConfigBag|\PHPUnit\Framework\MockObject\MockObject */
+    private $configBag;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManagerLink;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var ConfigProviderBag */
-    protected $configProviderBag;
+    private $configProviderBag;
 
     protected function setUp(): void
     {
-        $this->configBag = $this->getMockBuilder(PropertyConfigBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManagerLink = $this->getMockBuilder(ServiceLink::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configBag = $this->createMock(PropertyConfigBag::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->configProviderBag = new ConfigProviderBag(['scope1'], $this->configManagerLink, $this->configBag);
+        $configManagerLink = $this->createMock(ServiceLink::class);
+        $configManagerLink->expects(self::any())
+            ->method('getService')
+            ->willReturn($this->configManager);
+
+        $this->configProviderBag = new ConfigProviderBag(['scope1'], $configManagerLink, $this->configBag);
     }
 
     public function testGetProviderForExistingScope()
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManagerLink->expects(self::once())
-            ->method('getService')
-            ->willReturn($configManager);
-
         $provider = $this->configProviderBag->getProvider('scope1');
         self::assertInstanceOf(ConfigProvider::class, $provider);
 
@@ -49,21 +43,11 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProviderForNotExistingScope()
     {
-        $this->configManagerLink->expects(self::never())
-            ->method('getService');
-
         self::assertNull($this->configProviderBag->getProvider('scope2'));
     }
 
     public function testGetProviders()
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManagerLink->expects(self::once())
-            ->method('getService')
-            ->willReturn($configManager);
-
         $providers = $this->configProviderBag->getProviders();
         self::assertCount(1, $providers);
         self::assertArrayHasKey('scope1', $providers);

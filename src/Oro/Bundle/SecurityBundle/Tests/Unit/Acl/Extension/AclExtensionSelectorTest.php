@@ -17,25 +17,24 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
  */
 class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $objectIdAccessor;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityExtension;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldExtension;
+
+    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionExtension;
+
     /** @var AclExtensionSelector */
-    protected $selector;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $actionExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $objectIdAccessor;
+    private $selector;
 
     protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
-
         $this->entityExtension = $this->getMockExtension('entity');
         $this->actionExtension = $this->getMockExtension('action');
         $this->fieldExtension = $this->getMockExtension('entity', false);
@@ -55,6 +54,26 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
             $container,
             $this->objectIdAccessor
         );
+    }
+
+    /**
+     * @return AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getMockExtension(string $supportedType, bool $setSupportsExpectation = true)
+    {
+        $extension = $this->createMock(AclExtensionInterface::class);
+        if ($setSupportsExpectation) {
+            $extension->expects($this->any())
+                ->method('supports')
+                ->willReturnCallback(function ($type, $id) use ($supportedType) {
+                    return $id === $supportedType;
+                });
+        }
+        $extension->expects($this->any())
+            ->method('getExtensionKey')
+            ->willReturn($supportedType);
+
+        return $extension;
     }
 
     public function testSelectByExtensionKeyForExistingExtension()
@@ -248,25 +267,5 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->selector->all();
         $this->assertCount(2, $result);
-    }
-
-    /**
-     * @return AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockExtension(string $supportedType, bool $setSupportsExpectation = true)
-    {
-        $extension = $this->createMock(AclExtensionInterface::class);
-        if ($setSupportsExpectation) {
-            $extension->expects($this->any())
-                ->method('supports')
-                ->willReturnCallback(function ($type, $id) use ($supportedType) {
-                    return $id === $supportedType;
-                });
-        }
-        $extension->expects($this->any())
-            ->method('getExtensionKey')
-            ->willReturn($supportedType);
-
-        return $extension;
     }
 }

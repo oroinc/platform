@@ -13,25 +13,25 @@ use Oro\Bundle\SecurityBundle\Search\AclHelper;
 class AclHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclHelper */
-    protected $aclHelper;
+    private $aclHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mappingProvider;
+    /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $mappingProvider;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var OwnershipConditionDataBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipDataBuilder;
+    private $ownershipDataBuilder;
 
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipMetadataProvider;
+    private $ownershipMetadataProvider;
 
     /** @var OwnershipMetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipMetadata;
+    private $ownershipMetadata;
 
     /** @var array */
-    protected $mappings = [
+    private $mappings = [
         'Oro\Test\Entity\Organization'      => [
             'alias'        => 'testOrganization',
             'aclCondition' => [null, null, 'organization', 1, false] // no access
@@ -81,9 +81,6 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->mappingProvider = $this->createMock(SearchMappingProvider::class);
@@ -92,8 +89,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->ownershipMetadata = $this->createMock(OwnershipMetadataInterface::class);
 
-        $this->ownershipMetadataProvider
-            ->expects($this->any())
+        $this->ownershipMetadataProvider->expects($this->any())
             ->method('getMetadata')
             ->willReturn($this->ownershipMetadata);
 
@@ -107,40 +103,32 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider applyTestCases
-     *
-     * @param mixed  $from
-     * @param string $ownerColumnName
-     * @param string $expectedQuery
      */
-    public function testApply($from, $ownerColumnName, $expectedQuery)
+    public function testApply(mixed $from, string $ownerColumnName, string $expectedQuery)
     {
         $mappings = $this->mappings;
 
         $this->mappingProvider->expects($this->any())
             ->method('getEntitiesListAliases')
-            ->willReturnCallback(
-                function () use ($mappings) {
-                    $result = [];
-                    foreach ($mappings as $className => $mapping) {
-                        $result[$className] = $mapping['alias'];
-                    }
-
-                    return $result;
+            ->willReturnCallback(function () use ($mappings) {
+                $result = [];
+                foreach ($mappings as $className => $mapping) {
+                    $result[$className] = $mapping['alias'];
                 }
-            );
+
+                return $result;
+            });
         $this->mappingProvider->expects($this->any())
             ->method('getEntityClass')
-            ->willReturnCallback(
-                function ($alias) use ($mappings) {
-                    foreach ($mappings as $className => $mapping) {
-                        if ($mapping['alias'] == $alias) {
-                            return $className;
-                        }
+            ->willReturnCallback(function ($alias) use ($mappings) {
+                foreach ($mappings as $className => $mapping) {
+                    if ($mapping['alias'] == $alias) {
+                        return $className;
                     }
-
-                    return null;
                 }
-            );
+
+                return null;
+            });
 
         $this->tokenAccessor->expects($this->any())
             ->method('getOrganizationId')
@@ -148,19 +136,19 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->ownershipDataBuilder->expects($this->any())
             ->method('getAclConditionData')
-            ->willReturnCallback(
-                function ($class) use ($mappings) {
-                    foreach ($mappings as $className => $mapping) {
-                        if ($class === $className) {
-                            return $mapping['aclCondition'];
-                        }
+            ->willReturnCallback(function ($class) use ($mappings) {
+                foreach ($mappings as $className => $mapping) {
+                    if ($class === $className) {
+                        return $mapping['aclCondition'];
                     }
-
-                    return null;
                 }
-            );
 
-        $this->ownershipMetadata->expects($this->any())->method('getOwnerFieldName')->willReturn($ownerColumnName);
+                return null;
+            });
+
+        $this->ownershipMetadata->expects($this->any())
+            ->method('getOwnerFieldName')
+            ->willReturn($ownerColumnName);
 
         $query = new Query();
         $query->from($from);
@@ -168,10 +156,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedQuery, $query->getStringQuery());
     }
 
-    /**
-     * @return array
-     */
-    public function applyTestCases()
+    public function applyTestCases(): array
     {
         return [
             'select from *'             => [

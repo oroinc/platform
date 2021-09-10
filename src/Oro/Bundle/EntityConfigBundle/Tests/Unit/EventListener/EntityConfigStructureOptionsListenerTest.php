@@ -15,14 +15,11 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCa
     use EntityTrait;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    private $entityConfigProvider;
 
     /** @var EntityConfigStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
@@ -41,8 +38,7 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCa
             ]
         );
 
-        $this->entityConfigProvider
-            ->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->withConsecutive(
                 [\stdClass::class],
@@ -78,8 +74,7 @@ class EntityConfigStructureOptionsListenerTest extends \PHPUnit\Framework\TestCa
             ]
         );
 
-        $this->entityConfigProvider
-            ->expects($this->once())
+        $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with('class', 'field')
             ->willReturn(true);

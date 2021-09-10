@@ -22,12 +22,8 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $highPriorityProvider = $this->getMockBuilder(VirtualRelationProviderInterface::class)
-            ->setMockClassName('HighPriorityVirtualRelationProvider')
-            ->getMock();
-        $lowPriorityProvider = $this->getMockBuilder(VirtualRelationProviderInterface::class)
-            ->setMockClassName('LowPriorityVirtualRelationProvider')
-            ->getMock();
+        $highPriorityProvider = $this->createMock(VirtualRelationProviderInterface::class);
+        $lowPriorityProvider = $this->createMock(VirtualRelationProviderInterface::class);
 
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
         $this->configProvider = $this->createMock(ConfigProvider::class);
@@ -37,13 +33,11 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsVirtualRelationByLowPriorityProvider()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(true));
-        $this->providers[1]
-            ->expects($this->never())
+            ->willReturn(true);
+        $this->providers[1]->expects($this->never())
             ->method('isVirtualRelation');
 
         $this->assertTrue($this->chainProvider->isVirtualRelation('testClass', 'testField'));
@@ -51,32 +45,28 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsVirtualRelationByHighPriorityProvider()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects($this->once())
             ->method('isVirtualRelation')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue($this->chainProvider->isVirtualRelation('testClass', 'testField'));
     }
 
     public function testIsVirtualRelationNone()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects($this->once())
             ->method('isVirtualRelation')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse($this->chainProvider->isVirtualRelation('testClass', 'testField'));
     }
@@ -204,11 +194,11 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->providers[0]->expects($this->once())
             ->method('getVirtualRelationQuery')
             ->with($className, $fieldName)
-            ->will($this->returnValue($query));
+            ->willReturn($query);
         $this->providers[1]->expects($this->never())
             ->method('isVirtualRelation')
             ->with($className, $fieldName);
