@@ -4,21 +4,29 @@ define(function(require) {
     const $ = require('jquery');
     const TableCellIterator = require('orodatagrid/js/datagrid/table-cell-iterator').default;
     const mockGid = `
+        <style>
+            [role="grid"] [aria-rowindex] {
+                display: flex;
+            }
+            [aria-rowindex] div:not([aria-colindex]){
+                text-decoration: line-through
+            }
+        </style>
         <div role="grid">
             <div aria-rowindex="1">
-                <div aria-colindex="1">title 1</div>
-                <div aria-colindex="2">title 2</div>
-                <div aria-colindex="3">title 3</div>
+                <div aria-colindex="1">(1,1)</div>
+                <div aria-colindex="2">(1,2)</div>
+                <div aria-colindex="3">(1,3)</div>
             </div>
             <div aria-rowindex="2">
-                <div aria-colindex="1">1</div>
-                <div aria-colindex="2">2</div>
-                <div aria-colindex="3">3</div>
+                <div aria-colindex="1">(2,1)</div>
+                <div>(2,3)</div>
+                <div aria-colindex="3">(2,4)</div>
             </div>
             <div aria-rowindex="3">
-                <div aria-colindex="1">4</div>
-                <div aria-colindex="2">5</div>
-                <div aria-colindex="3">6</div>
+                <div aria-colindex="1">(3,1)</div>
+                <div aria-colindex="2">(3,2)</div>
+                <div>(3,3)</div>
             </div>
         </div>`;
 
@@ -27,7 +35,8 @@ define(function(require) {
         let changeCurrentHandler;
 
         beforeEach(function() {
-            tableCellIterator = new TableCellIterator($(mockGid));
+            window.setFixtures(mockGid);
+            tableCellIterator = new TableCellIterator($('[role="grid"]'));
             changeCurrentHandler = jasmine.createSpy('changeCurrentHandler');
             tableCellIterator.on('change:current', changeCurrentHandler);
         });
@@ -43,19 +52,20 @@ define(function(require) {
         });
 
         it('check initialized state', function() {
-            expect(tableCellIterator.$cell instanceof $).toBe(true);
-            expect(tableCellIterator.$row instanceof $).toBe(true);
+            expect(tableCellIterator.$cell).toBeInstanceOf($);
+            expect(tableCellIterator.$row).toBeInstanceOf($);
             expect(tableCellIterator.colindex).toBe(1);
             expect(tableCellIterator.rowindex).toBe(1);
         });
 
         it('check "setCurrentCell" method', function() {
-            const $cell = tableCellIterator.$row.find('[aria-colindex]:last');
+            const $previousCell = tableCellIterator.$cell;
+            const $newCell = tableCellIterator.$row.find('[aria-colindex]:last');
 
-            tableCellIterator.setCurrentCell($cell);
+            tableCellIterator.setCurrentCell($newCell);
 
-            expect(tableCellIterator.$cell).toEqual($cell);
-            expect(changeCurrentHandler).toHaveBeenCalled();
+            expect(tableCellIterator.$cell).toEqual($newCell);
+            expect(changeCurrentHandler).toHaveBeenCalledOnceWith($newCell, $previousCell);
         });
 
         it('check "setCurrentCell" method with invalid arguments', function() {
@@ -71,8 +81,7 @@ define(function(require) {
             let $previousCell = tableCellIterator.$cell;
             tableCellIterator.next();
 
-            expect(tableCellIterator.colindex).toBe(2);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 2]);
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
                 $previousCell
@@ -81,8 +90,7 @@ define(function(require) {
             $previousCell = tableCellIterator.$cell;
             tableCellIterator.next();
 
-            expect(tableCellIterator.colindex).toBe(3);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 3]);
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
                 $previousCell
@@ -90,29 +98,25 @@ define(function(require) {
 
             tableCellIterator.next();
 
-            expect(tableCellIterator.colindex).toBe(3);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 3]);
             expect(changeCurrentHandler.calls.count()).toEqual(2);
         });
 
         it('check "prev" method', function() {
             tableCellIterator.prev();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
-            expect(changeCurrentHandler.calls.count()).toEqual(0);
+            expect(tableCellIterator.index).toEqual([1, 1]);
+            expect(changeCurrentHandler).not.toHaveBeenCalled();
 
             tableCellIterator.next();
             tableCellIterator.next();
 
-            expect(tableCellIterator.colindex).toBe(3);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 3]);
 
             let $previousCell = tableCellIterator.$cell;
 
             tableCellIterator.prev();
-            expect(tableCellIterator.colindex).toBe(2);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 2]);
 
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
@@ -122,8 +126,7 @@ define(function(require) {
             $previousCell = tableCellIterator.$cell;
 
             tableCellIterator.prev();
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 1]);
 
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
@@ -133,8 +136,7 @@ define(function(require) {
 
         it('check "firstInRow" method', function() {
             tableCellIterator.firstInRow();
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 1]);
             expect(changeCurrentHandler).not.toHaveBeenCalled();
 
             tableCellIterator.next();
@@ -142,32 +144,28 @@ define(function(require) {
 
             tableCellIterator.firstInRow();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 1]);
         });
 
         it('check "lastInRow" method', function() {
             const $previousCell = tableCellIterator.$cell;
 
             tableCellIterator.lastInRow();
-            expect(tableCellIterator.colindex).toBe(3);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 3]);
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
                 $previousCell
             ]);
 
             tableCellIterator.lastInRow();
-            expect(tableCellIterator.colindex).toBe(3);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 3]);
             expect(changeCurrentHandler.calls.count()).toEqual(1);
         });
 
         it('check "prevRow" method', function() {
             tableCellIterator.prevRow();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 1]);
             expect(changeCurrentHandler).not.toHaveBeenCalled();
 
             tableCellIterator.nextRow();
@@ -181,14 +179,12 @@ define(function(require) {
         it('check "nextRow" method', function() {
             tableCellIterator.nextRow();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(2);
+            expect(tableCellIterator.index).toEqual([2, 1]);
             expect(changeCurrentHandler).toHaveBeenCalled();
 
             tableCellIterator.nextRow();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(3);
+            expect(tableCellIterator.index).toEqual([3, 1]);
             expect(changeCurrentHandler).toHaveBeenCalled();
             expect(changeCurrentHandler.calls.count()).toEqual(2);
         });
@@ -196,8 +192,7 @@ define(function(require) {
         it('check "firstRow" method', function() {
             tableCellIterator.firstRow();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 1]);
             expect(changeCurrentHandler).not.toHaveBeenCalled();
 
             tableCellIterator.nextRow();
@@ -207,8 +202,7 @@ define(function(require) {
 
             tableCellIterator.firstRow();
 
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(1);
+            expect(tableCellIterator.index).toEqual([1, 1]);
 
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
@@ -220,13 +214,52 @@ define(function(require) {
             const $previousCell = tableCellIterator.$cell;
 
             tableCellIterator.lastRow();
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(3);
+            expect(tableCellIterator.index).toEqual([3, 1]);
 
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
                 $previousCell
             ]);
+        });
+
+        describe('skip element', function() {
+            it('check "lastRow" and "lastInRow" methods', function() {
+                tableCellIterator.lastRow();
+                tableCellIterator.lastInRow();
+                expect(tableCellIterator.index).toEqual([3, 2]);
+            });
+
+            it('check "lastInRow" and "lastRow" methods', function() {
+                tableCellIterator.lastInRow();
+                tableCellIterator.lastRow();
+                expect(tableCellIterator.index).toEqual([2, 3]);
+            });
+
+            it('check "next" and "nextRow" methods', function() {
+                tableCellIterator.next();
+                tableCellIterator.nextRow();
+                expect(tableCellIterator.index).toEqual([3, 2]);
+            });
+
+            it('check "lastInRow", "nextRow" and "prev" methods', function() {
+                tableCellIterator.lastInRow();
+                tableCellIterator.nextRow();
+                tableCellIterator.prev();
+                expect(tableCellIterator.index).toEqual([2, 1]);
+            });
+
+            it('check "lastRow", "next" and "prevRow" methods', function() {
+                tableCellIterator.lastRow();
+                tableCellIterator.next();
+                tableCellIterator.prevRow();
+                expect(tableCellIterator.index).toEqual([1, 2]);
+            });
+
+            it('check "nextRow" and "next" methods', function() {
+                tableCellIterator.nextRow();
+                tableCellIterator.next();
+                expect(tableCellIterator.index).toEqual([2, 3]);
+            });
         });
     });
 });

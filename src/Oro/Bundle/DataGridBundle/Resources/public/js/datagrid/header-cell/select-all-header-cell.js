@@ -21,7 +21,9 @@ define(function(require) {
      * @extends BaseView
      */
     const SelectAllHeaderCell = BaseView.extend({
-        attributes: Backgrid.Cell.prototype.attributes,
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
 
         keepElement: false,
         /** @property */
@@ -51,7 +53,6 @@ define(function(require) {
          */
         initialize: function(options) {
             const debouncedUpdateState = _.debounce(this.updateState.bind(this), 50);
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }

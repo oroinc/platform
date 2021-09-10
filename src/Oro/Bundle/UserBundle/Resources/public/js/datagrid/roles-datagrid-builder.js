@@ -13,7 +13,7 @@ define(function(require) {
         processDatagridOptions: function(deferred, options) {
             const reg = /\\/g;
             options.themeOptions.rowView = options.themeOptions.readonly ? ReadonlyRowView : RowView;
-            options.themeOptions.disableAccessibilityPlugin = true;
+            options.themeOptions.enabledAccessibilityPlugin = false;
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel

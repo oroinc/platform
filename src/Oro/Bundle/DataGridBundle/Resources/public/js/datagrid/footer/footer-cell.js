@@ -13,7 +13,9 @@ define(function(require) {
      * @extends Backbone.View
      */
     const FooterCell = Backbone.View.extend({
-        attributes: Backgrid.Cell.prototype.attributes,
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
 
         /** @property */
         tagName: 'th',

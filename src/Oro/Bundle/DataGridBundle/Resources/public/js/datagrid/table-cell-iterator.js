@@ -15,7 +15,7 @@ class TableCellIterator {
 
     setCurrentCell($cell) {
         // Set a new cell only if it is a child of current iterable table
-        if (!this.$table[0].contains($cell[0])) {
+        if (!this.$table[0].contains($cell[0]) || !$cell.is('[aria-colindex]')) {
             return this;
         }
 
@@ -41,8 +41,12 @@ class TableCellIterator {
         return Number(this.$row.attr('aria-rowindex'));
     }
 
+    get index() {
+        return [this.rowindex, this.colindex];
+    }
+
     prev() {
-        const $cell = this.$cell.prev('[aria-colindex]');
+        const $cell = this.$cell.prevAll('[aria-colindex]:first');
         if ($cell.length) {
             this.setCurrentCell($cell);
         }
@@ -50,7 +54,7 @@ class TableCellIterator {
     }
 
     next() {
-        const $cell = this.$cell.next('[aria-colindex]');
+        const $cell = this.$cell.nextAll('[aria-colindex]:first');
         if ($cell.length) {
             this.setCurrentCell($cell);
         }
@@ -82,7 +86,7 @@ class TableCellIterator {
     }
 
     firstRow() {
-        return this._goToRow(0);
+        return this._goToRow(-Infinity);
     }
 
     lastRow() {
@@ -93,20 +97,36 @@ class TableCellIterator {
         const $rows = this.$table.find('[aria-rowindex]');
         const place = $rows.index(this.$row);
         let goTo;
+        let $cell;
 
-        if (step === 0) {
+        if (step === -Infinity) {
             // go to first row
             goTo = 0;
+            step = 1; // start from first row and increase rowindex number
         } else if (step === Infinity) {
             // go to last row
             goTo = $rows.length - 1;
+            step = -1; // start from last row and decrease rowindex number
         } else {
             // go to row with increment
             goTo = place + step;
         }
 
-        if (goTo !== place && goTo >= 0 && goTo < $rows.length) {
-            this.setCurrentCell($rows.eq(goTo).find(`[aria-colindex="${this.colindex}"]:first`));
+        while (
+            goTo !== place &&
+            goTo >= 0 &&
+            goTo < $rows.length &&
+            !$cell
+        ) {
+            $cell = $rows.eq(goTo).find(`[aria-colindex="${this.colindex}"]:first`);
+            if (!$cell.length) {
+                goTo += step;
+                $cell = null;
+            }
+        }
+
+        if ($cell) {
+            this.setCurrentCell($cell);
         }
 
         return this;

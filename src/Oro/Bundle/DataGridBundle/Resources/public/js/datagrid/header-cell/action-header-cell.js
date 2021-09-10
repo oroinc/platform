@@ -14,7 +14,9 @@ define(function(require) {
      * @extends oroui/js/app/views/base/view
      */
     const ActionHeaderCell = BaseView.extend({
-        attributes: Backgrid.Cell.prototype.attributes,
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
 
         keepElement: false,
 

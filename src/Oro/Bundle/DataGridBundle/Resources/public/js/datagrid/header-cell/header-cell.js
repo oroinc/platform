@@ -38,7 +38,6 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function HeaderCell(options) {
-            this.column = options.column;
             HeaderCell.__super__.constructor.call(this, options);
         },
 
@@ -53,7 +52,7 @@ define(function(require) {
             HeaderCell.__super__.initialize.call(this, options);
             this._initCellDirection(this.collection);
             this.listenTo(this.collection, 'reset', this._initCellDirection);
-            this.listenTo(this.column, 'change:direction', this.syncAriaSortAttr);
+            this.listenTo(this.column, 'change:direction', this._updateAttributes);
         },
 
         /**
@@ -93,12 +92,12 @@ define(function(require) {
                     }
                 }
 
-                if (this.column.get('sortable')) {
-                    this.syncAriaSortAttr(this.column, direction);
-                }
-
                 if (direction !== this.column.get('direction')) {
                     this.column.set({direction: direction});
+                }
+
+                if (this.column.get('sortable')) {
+                    this._updateAttributes();
                 }
             }
         },
@@ -265,16 +264,18 @@ define(function(require) {
             }
         },
 
-        /**
-         * @param {Object} column
-         * @param {null|string} direction
-         */
-        syncAriaSortAttr(column, direction) {
-            const ariaSort = direction ? direction : 'none';
-
-            if (column.cid === this.column.cid) {
-                this.$el.attr('aria-sort', ariaSort);
+        _updateAttributes() {
+            if (this.disposed) {
+                return;
             }
+            this._setAttributes(this._collectAttributes());
+        },
+
+        _attributes() {
+            const direction = this.column.get('direction');
+            return {
+                'aria-sort': direction ? direction : 'none'
+            };
         }
     });
 

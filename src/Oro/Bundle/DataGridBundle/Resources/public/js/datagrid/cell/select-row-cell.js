@@ -14,7 +14,9 @@ define(function(require) {
      * @extends BaseView
      */
     const SelectRowCell = BaseView.extend({
-        attributes: Backgrid.Cell.prototype.attributes,
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
 
         /** @property */
         className: 'select-row-cell renderable',

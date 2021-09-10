@@ -105,16 +105,10 @@ define(function(require) {
             return this;
         },
 
-        attributes() {
-            let attrs = Footer.__super__.attributes || {};
-
-            if (_.isFunction(attrs)) {
-                attrs = attrs.call(this);
-            }
-
-            attrs['aria-hidden'] = this.renderable ? null : true;
-
-            return attrs;
+        _attributes() {
+            return {
+                'aria-hidden': this.renderable ? null : true
+            };
         },
 
         /**

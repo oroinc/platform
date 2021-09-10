@@ -469,6 +469,25 @@ define(function(require) {
             };
 
             return buildPath(element);
+        },
+
+        getPrototypeChain: function(object) {
+            const chain = [];
+            while (object = Object.getPrototypeOf(object)) {
+                chain.unshift(object);
+            }
+            return chain;
+        },
+
+        getAllPropertyVersions: function(object, name) {
+            const versions = [];
+            const prototypeChain = tools.getPrototypeChain(object);
+            prototypeChain.forEach(prototype => {
+                if (prototype.hasOwnProperty(name)) {
+                    versions.push(prototype[name]);
+                }
+            });
+            return versions;
         }
     });
 

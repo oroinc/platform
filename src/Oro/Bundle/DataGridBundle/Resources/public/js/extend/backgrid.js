@@ -4,6 +4,8 @@ define(function(require) {
     const _ = require('underscore');
     const Backgrid = require('backgrid/lib/backgrid');
 
+    Backgrid.Cell.prototype.optionNames = ['column'];
+
     /**
      * Cells should be removed durung dispose cycle
      */
@@ -13,7 +15,6 @@ define(function(require) {
      * Copied from backgrid. Removed unused in our project code which slow downs rendering
      */
     Backgrid.Cell.prototype.initialize = function(options) {
-        this.column = options.column;
         /*
         // Columns are always prepared in Oro.Datagrid
         if (!(this.column instanceof Column)) {
@@ -105,21 +106,13 @@ define(function(require) {
         return Backgrid.callByNeed(this.column.editable(), this.column, this.model);
     };
 
-    Backgrid.Cell.prototype.attributes = function() {
-        let attrs = Backgrid.Cell.__super__.attributes || {};
-
-        if (_.isFunction(attrs)) {
-            attrs = attrs.call(this);
-        }
-
-        attrs = {...attrs};
-
-        const {collection, cid} = this.column || {};
+    Backgrid.Cell.prototype._attributes = function() {
+        const attrs = {};
+        const {collection} = this.column || {};
 
         if (collection && collection.length) {
-            const rowIndex = collection.findIndex(model => model.cid === cid);
-
-            if (rowIndex !== -1 && (this.model && this.model.get('isAuxiliary') !== true)) {
+            const rowIndex = collection.indexOf(this.column);
+            if (rowIndex !== -1 && (!this.model || this.model.get('isAuxiliary') !== true)) {
                 attrs['aria-colindex'] = rowIndex + 1;
             }
         }
@@ -127,17 +120,22 @@ define(function(require) {
         return attrs;
     };
 
-    Backgrid.HeaderCell.prototype.attributes = function() {
-        // Check own attrs
-        if (this.column.get('label')) {
-            let attrs = Backgrid.Cell.prototype.attributes || {};
+    Backgrid.HeaderCell.prototype.optionNames = ['column'];
 
-            if (_.isFunction(attrs)) {
-                attrs = attrs.call(this);
+    Backgrid.HeaderCell.prototype._attributes = function() {
+        const attrs = {};
+
+        if (this.column && this.column.get('label')) {
+            const {collection} = this.column;
+            if (collection && collection.length) {
+                const rowIndex = collection.indexOf(this.column);
+                if (rowIndex !== -1) {
+                    attrs['aria-colindex'] = rowIndex + 1;
+                }
             }
-
-            return attrs;
         }
+
+        return attrs;
     };
 
     return Backgrid;

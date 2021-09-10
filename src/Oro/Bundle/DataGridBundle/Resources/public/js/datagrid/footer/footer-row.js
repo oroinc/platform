@@ -1,11 +1,12 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const FooterCell = require('./footer-cell');
     const Chaplin = require('chaplin');
 
     const FooterRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -16,7 +17,6 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function FooterRow(options) {
-            this.ariaRowIndex = options.ariaRowIndex;
             FooterRow.__super__.constructor.call(this, options);
         },
 
@@ -51,27 +51,21 @@ define(function(require) {
                 };
             }
             FooterRow.__super__.initialize.call(this, options);
-            this.listenTo(this.dataCollection, 'add remove reset', this.syncAttrs);
+            this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
             this.cells = this.subviews;
         },
 
-        syncAttrs() {
+        _updateAttributes() {
             if (this.disposed) {
                 return;
             }
-            this.$el.attr('aria-rowindex', this.ariaRowIndex);
+            this._setAttributes(this._collectAttributes());
         },
 
-        attributes() {
-            let attrs = FooterRow.__super__.attributes || {};
-
-            if (_.isFunction(attrs)) {
-                attrs = attrs.call(this);
-            }
-
-            attrs['aria-rowindex'] = this.ariaRowIndex;
-
-            return attrs;
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         },
 
         /**

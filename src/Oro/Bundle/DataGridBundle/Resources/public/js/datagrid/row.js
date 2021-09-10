@@ -116,7 +116,7 @@ define(function(require) {
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
             this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
             this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
-            this.listenTo(this.dataCollection, 'add remove reset', this.syncAttrs);
+            this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -224,20 +224,11 @@ define(function(require) {
             return classes.join(' ');
         },
 
-        attributes: function() {
-            let attrs = Row.__super__.attributes || {};
-
-            if (_.isFunction(attrs)) {
-                attrs = attrs.call(this);
-            }
-
-            if (this.model.get('row_attributes')) {
-                Object.assign(attrs, this.model.get('row_attributes'));
-            }
-
-            attrs['aria-rowindex'] = this.getAriaRowIndex();
-
-            return attrs;
+        _attributes: function() {
+            return {
+                ...this.model.get('row_attributes'),
+                'aria-rowindex': this.getAriaRowIndex()
+            };
         },
 
         /**
@@ -430,11 +421,11 @@ define(function(require) {
         /**
          * Sync attributes for view element
          */
-        syncAttrs() {
+        _updateAttributes() {
             if (this.disposed) {
                 return;
             }
-            this.$el.attr('aria-rowindex', this.getAriaRowIndex());
+            this._setAttributes(this._collectAttributes());
         },
 
         /**

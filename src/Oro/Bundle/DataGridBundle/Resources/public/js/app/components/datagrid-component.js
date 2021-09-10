@@ -276,7 +276,7 @@ define(function(require) {
                 }
             }
 
-            if (!this.themeOptions.disableAccessibilityPlugin) {
+            if (this.themeOptions.enabledAccessibilityPlugin) {
                 modules.AccessibilityPlugin = pluginModules.AccessibilityPlugin;
             }
         },
@@ -452,7 +452,7 @@ define(function(require) {
                 'FullscreenPlugin',
                 'DatagridSettingsPlugin',
                 'ToolbarMassActionPlugin',
-                'AccessibilityPlugin' // @todo
+                'AccessibilityPlugin'
             ])).forEach(plugin => plugins.push(plugin));
 
             if (modules.StickedScrollbarPlugin) {
