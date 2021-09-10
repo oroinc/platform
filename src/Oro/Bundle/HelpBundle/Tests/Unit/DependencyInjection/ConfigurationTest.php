@@ -11,7 +11,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration($options, $expects)
+    public function testProcessConfiguration($options, $expects): void
     {
         $processor = new Processor();
         $configuration = new Configuration();
@@ -20,7 +20,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expects, $result);
     }
 
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'minimal_config'  => [
@@ -55,7 +55,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationFailsDataProvider
      */
-    public function testProcessConfigurationFails($options, $expectedException, $expectedExceptionMessage)
+    public function testProcessConfigurationFails($options, $expectedException, $expectedExceptionMessage): void
     {
         $processor = new Processor();
         $configuration = new Configuration();
@@ -66,20 +66,20 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $processor->processConfiguration($configuration, [$options]);
     }
 
-    public function processConfigurationFailsDataProvider()
+    public function processConfigurationFailsDataProvider(): array
     {
         return [
             'no_defaults'    => [
                 [],
                 InvalidConfigurationException::class,
-                'The child node "defaults" at path "oro_help" must be configured.'
+                'The child config "defaults" under "oro_help" must be configured.'
             ],
             'no_server'      => [
                 [
                     'defaults' => []
                 ],
                 InvalidConfigurationException::class,
-                'The child node "server" at path "oro_help.defaults" must be configured.'
+                'The child config "server" under "oro_help.defaults" must be configured.'
             ],
             'invalid_server' => [
                 [

@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerRepository extends EntityRepository implements EventTriggerRepositoryInterface
+/**
+ * Doctrine repository for ProcessTrigger entity
+ */
+class ProcessTriggerRepository extends ServiceEntityRepository implements EventTriggerRepositoryInterface
 {
     /**
      * @param ProcessTrigger $trigger

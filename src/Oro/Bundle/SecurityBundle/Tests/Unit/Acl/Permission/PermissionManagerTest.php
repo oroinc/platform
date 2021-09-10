@@ -20,9 +20,6 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var PermissionManager */
-    private $manager;
-
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
@@ -34,6 +31,9 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
+
+    /** @var PermissionManager */
+    private $manager;
 
     protected function setUp(): void
     {

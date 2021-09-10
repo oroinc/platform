@@ -296,7 +296,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $exceptionCount);
     }
 
-    public function testFindAclsAclNotFoundExceptionThrownForNonEmptyAncestorIdsAndDbQueriesExecutedOnlyOnce()
+    public function testFindAclsShouldUseEmptyAclWhenNonEmptyAncestorIdsAndAclNotFound()
     {
         $oid = new ObjectIdentity('(root)', 'entity');
         $sid = new RoleSecurityIdentity('ROLE_TEST');
@@ -338,18 +338,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
                 $stmtIdentities
             );
 
-        $exceptionCount = 0;
-        try {
-            $this->provider->findAcls([$oid], [$sid]);
-        } catch (AclNotFoundException $e) {
-            $exceptionCount++;
-        }
-        try {
-            $this->provider->findAcls([$oid], [$sid]);
-        } catch (AclNotFoundException $e) {
-            $exceptionCount++;
-        }
-
-        $this->assertEquals(2, $exceptionCount);
+        $acls = $this->provider->findAcls([$oid], [$sid]);
+        $this->assertCount(1, $acls);
+        $this->assertSame(0, $acls->offsetGet($oid)->getId(0));
     }
 }

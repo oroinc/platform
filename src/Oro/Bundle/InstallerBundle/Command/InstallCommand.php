@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Process\Process;
@@ -47,16 +48,18 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        YamlPersister $yamlPersister,
-        ScriptManager $scriptManager,
+        ContainerInterface $container,
         Registry $doctrine,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        YamlPersister $yamlPersister,
+        ScriptManager $scriptManager
     ) {
-        $this->yamlPersister = $yamlPersister;
-        $this->scriptManager = $scriptManager;
+        parent::__construct($container);
+
         $this->doctrine = $doctrine;
         $this->eventDispatcher = $eventDispatcher;
-        parent::__construct();
+        $this->yamlPersister = $yamlPersister;
+        $this->scriptManager = $scriptManager;
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */

@@ -64,5 +64,7 @@ HELP
         $this->migrationService->setManager($manager);
         $this->migrationService->migrate($this->prefix, $this->prefix);
         $output->writeln('Attachments migration finished');
+
+        return 0;
     }
 }

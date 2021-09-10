@@ -9,52 +9,62 @@ use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Defines whether the current user is allowed to view File.
  */
-class FileVoter extends AbstractEntityVoter
+class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    /** @var array */
+    /** {@inheritDoc} */
     protected $supportedAttributes = [BasicPermission::VIEW, BasicPermission::EDIT, BasicPermission::DELETE];
 
-    /** @var CurrentApplicationProviderInterface */
-    private $currentApplicationProvider;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private ContainerInterface $container;
 
-    /** @var FileApplicationsProvider */
-    private $fileApplicationsProvider;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var FileAccessControlChecker */
-    private $fileAccessControlChecker;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
+    private ?TokenInterface $token;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        FileAccessControlChecker $fileAccessControlChecker,
-        FileApplicationsProvider $fileApplicationsProvider,
-        CurrentApplicationProviderInterface $currentApplicationProvider,
         AuthorizationCheckerInterface $authorizationChecker,
-        TokenAccessorInterface $tokenAccessor
+        ContainerInterface $container
     ) {
         parent::__construct($doctrineHelper);
-
-        $this->fileAccessControlChecker = $fileAccessControlChecker;
-        $this->fileApplicationsProvider = $fileApplicationsProvider;
-        $this->currentApplicationProvider = $currentApplicationProvider;
         $this->authorizationChecker = $authorizationChecker;
-        $this->tokenAccessor = $tokenAccessor;
+        $this->container = $container;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_attachment.acl.file_access_control_checker' => FileAccessControlChecker::class,
+            'oro_attachment.provider.file_applications' => FileApplicationsProvider::class,
+            'oro_action.provider.current_application' => CurrentApplicationProviderInterface::class
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function vote(TokenInterface $token, $object, array $attributes)
+    {
+        $this->token = $token;
+        try {
+            return parent::vote($token, $object, $attributes);
+        } finally {
+            $this->token = null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
@@ -65,21 +75,21 @@ class FileVoter extends AbstractEntityVoter
         }
 
         // Checks if file is covered by ACL.
-        if (!$this->fileAccessControlChecker->isCoveredByAcl($file)) {
+        if (!$this->getFileAccessControlChecker()->isCoveredByAcl($file)) {
             return VoterInterface::ACCESS_ABSTAIN;
         }
 
-        $allowedApplications = $this->fileApplicationsProvider->getFileApplications($file);
-        if (!$this->currentApplicationProvider->isApplicationsValid($allowedApplications)) {
+        $allowedApplications = $this->getFileApplicationsProvider()->getFileApplications($file);
+        if (!$this->getCurrentApplicationProvider()->isApplicationsValid($allowedApplications)) {
             return VoterInterface::ACCESS_DENIED;
         }
 
         $parentEntity = $this->getParentEntity($file);
-        if (!$parentEntity) {
+        if (null === $parentEntity) {
             return VoterInterface::ACCESS_DENIED;
         }
 
-        if (BasicPermission::VIEW === $attribute && $this->tokenAccessor->getUser() === $parentEntity) {
+        if (BasicPermission::VIEW === $attribute && $this->token->getUser() === $parentEntity) {
             // Allows to view own avatar for those who do not have permission to view User entity.
             return VoterInterface::ACCESS_GRANTED;
         }
@@ -89,19 +99,32 @@ class FileVoter extends AbstractEntityVoter
             : VoterInterface::ACCESS_DENIED;
     }
 
-    /**
-     * @param File $file
-     *
-     * @return object|null
-     */
-    private function getParentEntity(File $file)
+    private function getParentEntity(File $file): ?object
     {
         $parentEntityClass = $file->getParentEntityClass();
+        if (!$parentEntityClass) {
+            return null;
+        }
         $parentEntityId = $file->getParentEntityId();
-        if (!$parentEntityClass || !$parentEntityId) {
+        if (!$parentEntityId) {
             return null;
         }
 
         return $this->doctrineHelper->getEntity($parentEntityClass, $parentEntityId);
+    }
+
+    private function getFileAccessControlChecker(): FileAccessControlChecker
+    {
+        return $this->container->get('oro_attachment.acl.file_access_control_checker');
+    }
+
+    private function getFileApplicationsProvider(): FileApplicationsProvider
+    {
+        return $this->container->get('oro_attachment.provider.file_applications');
+    }
+
+    private function getCurrentApplicationProvider(): CurrentApplicationProviderInterface
+    {
+        return $this->container->get('oro_action.provider.current_application');
     }
 }

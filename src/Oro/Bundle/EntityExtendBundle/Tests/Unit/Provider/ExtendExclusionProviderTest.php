@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendExclusionProvider;
@@ -13,17 +14,15 @@ use Oro\Bundle\EntityExtendBundle\Provider\ExtendExclusionProvider;
  */
 class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
-    const FIELD_NAME   = 'testField';
+    private const ENTITY_CLASS = 'Test\Entity';
+    private const FIELD_NAME   = 'testField';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
     }
 
     public function testIsIgnoredEntityForNonConfigurableEntity()
@@ -482,32 +481,17 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($className, $values = [])
+    private function getEntityConfig(string $className, array $values = []): Config
     {
-        $configId = new EntityConfigId('extend', $className);
-        $config   = new Config($configId);
+        $config = new Config(new EntityConfigId('extend', $className));
         $config->setValues($values);
 
         return $config;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getFieldConfig($className, $fieldName, $values = [])
+    private function getFieldConfig(string $className, string $fieldName, array $values = []): Config
     {
-        $configId = new FieldConfigId('extend', $className, $fieldName);
-        $config   = new Config($configId);
+        $config = new Config(new FieldConfigId('extend', $className, $fieldName));
         $config->setValues($values);
 
         return $config;

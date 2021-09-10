@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -14,49 +17,36 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadata;
+    private $metadata;
 
     /** @var EntityNameProvider */
-    protected $entityNameProvider;
+    private $entityNameProvider;
 
     /** @var ConfigProviderMock */
-    protected $extendConfigProvider;
+    private $extendConfigProvider;
 
     protected function setUp(): void
     {
-        $this->doctrine = $this->createMock('Doctrine\Persistence\ManagerRegistry');
-        $manager        = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadata = $this->getMockBuilder('Doctrine\Persistence\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadata = $this->createMock(ClassMetadata::class);
 
-        $this->doctrine->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $manager = $this->createMock(ObjectManager::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturnMap(
-                [
-                    [TestEntity::class, $manager]
-                ]
-            );
+            ->willReturnMap([
+                [TestEntity::class, $manager]
+            ]);
         $manager->expects($this->any())
             ->method('getClassMetadata')
-            ->willReturnMap(
-                [
-                    [TestEntity::class, $this->metadata]
-                ]
-            );
+            ->willReturnMap([
+                [TestEntity::class, $this->metadata]
+            ]);
 
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
         $this->entityNameProvider = new EntityNameProvider(
-            $this->doctrine,
+            $doctrine,
             $this->extendConfigProvider,
             (new InflectorFactory())->build()
         );
@@ -78,11 +68,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(TestEntity::class);
         $this->metadata->expects($this->any())
             ->method('hasField')
-            ->willReturnMap(
-                [
-                    ['name', true]
-                ]
-            );
+            ->willReturnMap([
+                ['name', true]
+            ]);
         $this->metadata->expects($this->once())
             ->method('getTypeOfField')
             ->with('name')
@@ -189,11 +177,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(TestEntity::class);
         $this->metadata->expects($this->any())
             ->method('hasField')
-            ->willReturnMap(
-                [
-                    ['name', true]
-                ]
-            );
+            ->willReturnMap([
+                ['name', true]
+            ]);
         $this->metadata->expects($this->once())
             ->method('getTypeOfField')
             ->with('name')
@@ -316,7 +302,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('alias.description', $result);
     }
 
-    protected function initEntityFieldsMetadata($initIdentityField = false, array $extendedFieldConfig = [])
+    private function initEntityFieldsMetadata($initIdentityField = false, array $extendedFieldConfig = [])
     {
         $this->metadata->expects($this->any())
             ->method('getIdentifierFieldNames')
@@ -324,12 +310,10 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->metadata->expects($this->any())
             ->method('hasField')
-            ->willReturnMap(
-                [
-                    ['name', true],
-                    ['description', true]
-                ]
-            );
+            ->willReturnMap([
+                ['name', true],
+                ['description', true]
+            ]);
 
         $this->metadata->expects($this->any())
             ->method('getName')
@@ -337,12 +321,10 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->metadata->expects($this->any())
             ->method('getTypeOfField')
-            ->willReturnMap(
-                [
-                    ['name', 'string'],
-                    ['description', 'string']
-                ]
-            );
+            ->willReturnMap([
+                ['name', 'string'],
+                ['description', 'string']
+            ]);
 
         $this->metadata->expects($this->any())
             ->method('getFieldNames')

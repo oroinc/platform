@@ -18,21 +18,17 @@ class InternalEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetSeen()
     {
-        /** @var EmailFolder|\PHPUnit\Framework\MockObject\MockObject $emailFolder */
         $emailFolder = $this->createMock(EmailFolder::class);
-        /** @var Email|\PHPUnit\Framework\MockObject\MockObject $email */
         $email = $this->createMock(Email::class);
 
-        $this->assertNull($this->flagManager->setSeen($emailFolder, $email));
+        $this->flagManager->setSeen($emailFolder, $email);
     }
 
     public function testSetUnseen()
     {
-        /** @var EmailFolder|\PHPUnit\Framework\MockObject\MockObject $emailFolder */
         $emailFolder = $this->createMock(EmailFolder::class);
-        /** @var Email|\PHPUnit\Framework\MockObject\MockObject $email */
         $email = $this->createMock(Email::class);
 
-        $this->assertNull($this->flagManager->setUnseen($emailFolder, $email));
+        $this->flagManager->setUnseen($emailFolder, $email);
     }
 }

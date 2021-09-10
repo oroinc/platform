@@ -54,5 +54,7 @@ HELP
         foreach ($emailTemplates as $template) {
             $output->write($template->getName() . ':'. \md5($template->getContent()), true);
         }
+
+        return 0;
     }
 }

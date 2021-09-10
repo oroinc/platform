@@ -13,29 +13,19 @@ use Psr\Log\LoggerInterface;
 
 class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $emailNotificationManager;
 
-    /**
-     * @var UserManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
-    /**
-     * @var Registry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var ResetPasswordHandler
-     */
+    /** @var ResetPasswordHandler */
     private $handler;
 
     protected function setUp(): void

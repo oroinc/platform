@@ -103,9 +103,12 @@ HELP
         } catch (NotificationSendException $exception) {
             $this->logger->error('An error occurred while sending mass notification', ['exception' => $exception]);
             $output->writeln('An error occurred while sending mass notification');
-            return;
+
+            return 1;
         }
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
+
+        return 0;
     }
 }

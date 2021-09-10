@@ -17,18 +17,20 @@
         border-radius: $scrollspy-mobile-border-radius;
 
         @include fa-icon($fa-var-angle-down, before, true) {
+            width: $scrollspy-mobile-toggle-icon-width;
             margin: $scrollspy-mobile-toggle-icon-offset;
 
             font-size: $scrollspy-mobile-toggle-icon-font-size;
             font-weight: font-weight('light');
 
             color: $scrollspy-mobile-toggle-icon-color;
+            text-align: $scrollspy-mobile-toggle-icon-text-align;
 
             vertical-align: middle;
         }
 
         &.collapsed {
-            @include fa-icon(var(--fa-var-angle-right), after, false, true);
+            @include fa-icon(var(--fa-var-angle-right), before, false, true);
         }
     }
 }

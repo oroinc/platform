@@ -15,8 +15,7 @@ class FormListenerTest extends \PHPUnit\Framework\TestCase
     {
         $environment = $this->createMock(Environment::class);
         $newField = '<input>';
-        $environment
-            ->expects(self::once())
+        $environment->expects(self::once())
             ->method('render')
             ->willReturn($newField);
 
@@ -44,8 +43,7 @@ class FormListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager
-            ->expects(self::any())
+        $configManager->expects(self::any())
             ->method('getProvider')
             ->willReturn($provider);
 
@@ -58,8 +56,7 @@ class FormListenerTest extends \PHPUnit\Framework\TestCase
     public function testAddOwnerFieldWhenNoOwner(): void
     {
         $environment = $this->createMock(Environment::class);
-        $environment
-            ->expects(self::never())
+        $environment->expects(self::never())
             ->method('render');
 
         $formView = new FormView();
@@ -75,8 +72,7 @@ class FormListenerTest extends \PHPUnit\Framework\TestCase
     public function testAddOwnerFieldWhenOwnerIsRendered(): void
     {
         $environment = $this->createMock(Environment::class);
-        $environment
-            ->expects(self::never())
+        $environment->expects(self::never())
             ->method('render');
 
         $formView = new FormView();

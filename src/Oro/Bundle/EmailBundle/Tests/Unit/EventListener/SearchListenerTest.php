@@ -14,7 +14,7 @@ use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 class SearchListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

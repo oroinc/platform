@@ -26,9 +26,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with([
-                'allow_extra_fields' => true
-            ]);
+            ->with(['allow_extra_fields' => true]);
 
         $this->emailFolderTreeType->configureOptions($resolver);
     }

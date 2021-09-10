@@ -120,7 +120,7 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $this->filterAwareGenerator->generate($route, $parameters));
     }
 
-    public function testGenerateWhenGeneratorReturnsNull()
+    public function testGenerateWhenGeneratorReturnsEmptyString(): void
     {
         $route = 'test';
         $parameters = ['id' => 1];
@@ -132,7 +132,7 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with($route, $parameters)
-            ->willReturn(null);
+            ->willReturn('');
 
         $this->assertLoggerNotCalled();
 

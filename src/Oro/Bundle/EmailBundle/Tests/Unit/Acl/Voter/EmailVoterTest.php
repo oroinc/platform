@@ -6,7 +6,10 @@ use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class EmailVoterTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,16 +27,19 @@ class EmailVoterTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->mailboxManager = $this->createMock(MailboxManager::class);
 
-        $this->emailVoter = new EmailVoter($this->authorizationChecker, $this->mailboxManager);
+        $container = TestContainerBuilder::create()
+            ->add('oro_email.mailbox.manager', $this->mailboxManager)
+            ->getContainer($this);
+
+        $this->emailVoter = new EmailVoter($this->authorizationChecker, $container);
     }
 
     /**
-     * @param boolean $atLeastOneGranted
      * @dataProvider voteProvider
      */
-    public function testVote($atLeastOneGranted)
+    public function testVote(bool $atLeastOneGranted)
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $email = new Email();
         $emailUser1 = new EmailUser();
         $emailUser2 = new EmailUser();
@@ -50,14 +56,11 @@ class EmailVoterTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(true);
         }
 
-        $result = $atLeastOneGranted ? EmailVoter::ACCESS_GRANTED : EmailVoter::ACCESS_DENIED;
+        $result = $atLeastOneGranted ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED;
         $this->assertEquals($result, $this->emailVoter->vote($token, $email, $attributes));
     }
 
-    /**
-     * @return array
-     */
-    public function voteProvider()
+    public function voteProvider(): array
     {
         return [[true], [false]];
     }

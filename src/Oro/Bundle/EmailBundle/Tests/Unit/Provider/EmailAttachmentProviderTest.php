@@ -45,12 +45,7 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $count
-     *
-     * @return array
-     */
-    private function getAttachments($count)
+    private function getAttachments(int $count): array
     {
         $attachments = [];
         for ($i = 0; $i < $count; $i++) {
@@ -63,7 +58,7 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider threadEmailsProvider
      */
-    public function testGetThreadAttachments($threadEmails, $transformationCalls)
+    public function testGetThreadAttachments(array $threadEmails, int $transformationCalls)
     {
         $emailEntity = $this->createMock(Email::class);
 

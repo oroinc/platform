@@ -9,33 +9,33 @@ class EnumValueTest extends \PHPUnit\Framework\TestCase
     public function testIdGetterAndSetter()
     {
         $enumValue = new EnumValue();
-        static::assertNull($enumValue->getId());
+        self::assertNull($enumValue->getId());
         $enumValue->setId('testId');
-        static::assertEquals('testId', $enumValue->getId());
+        self::assertEquals('testId', $enumValue->getId());
     }
 
     public function testLabelGetterAndSetter()
     {
         $enumValue = new EnumValue();
-        static::assertNull($enumValue->getLabel());
+        self::assertNull($enumValue->getLabel());
         $enumValue->setLabel('test label');
-        static::assertEquals('test label', $enumValue->getLabel());
+        self::assertEquals('test label', $enumValue->getLabel());
     }
 
     public function testIsDefaultGetterAndSetter()
     {
         $enumValue = new EnumValue();
-        static::assertNull($enumValue->getIsDefault());
+        self::assertNull($enumValue->getIsDefault());
         $enumValue->setIsDefault(true);
-        static::assertEquals(true, $enumValue->getIsDefault());
+        self::assertEquals(true, $enumValue->getIsDefault());
     }
 
     public function testPriorityGetterAndSetter()
     {
         $enumValue = new EnumValue();
-        static::assertNull($enumValue->getPriority());
+        self::assertNull($enumValue->getPriority());
         $enumValue->setPriority(100);
-        static::assertEquals(100, $enumValue->getPriority());
+        self::assertEquals(100, $enumValue->getPriority());
     }
 
     public function testFromArrayAndToArray()
@@ -54,7 +54,7 @@ class EnumValueTest extends \PHPUnit\Framework\TestCase
             ->setIsDefault(true)
             ->setPriority(100);
 
-        static::assertEquals($enumValue, EnumValue::createFromArray($array));
-        static::assertEquals($array, $enumValue->toArray());
+        self::assertEquals($enumValue, EnumValue::createFromArray($array));
+        self::assertEquals($array, $enumValue->toArray());
     }
 }

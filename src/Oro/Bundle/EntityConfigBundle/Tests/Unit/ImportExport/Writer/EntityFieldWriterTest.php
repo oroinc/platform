@@ -15,29 +15,19 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EntityFieldWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
-    /**
-     * @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject */
     private $enumSynchronizer;
 
-    /**
-     * @var EntityFieldStateChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityFieldStateChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $stateChecker;
 
-    /**
-     * @var EntityFieldWriter
-     */
+    /** @var EntityFieldWriter */
     private $writer;
 
     protected function setUp(): void

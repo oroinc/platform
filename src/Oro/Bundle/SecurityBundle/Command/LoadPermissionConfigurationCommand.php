@@ -89,7 +89,11 @@ HELP
             }
         } else {
             $output->writeln('No permissions found.');
+
+            return 1;
         }
+
+        return 0;
     }
 
     protected function validatePermissionEntities(Permission $permission, OutputInterface $output): void

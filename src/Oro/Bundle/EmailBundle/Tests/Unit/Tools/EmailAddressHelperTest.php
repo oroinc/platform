@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 /**
@@ -10,7 +11,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailAddressHelper */
-    protected $helper;
+    private $helper;
 
     protected function setUp(): void
     {
@@ -20,7 +21,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emailAddressProvider
      */
-    public function testExtractPureEmailAddress($fullEmailAddress, $pureEmailAddress, $name)
+    public function testExtractPureEmailAddress(string $fullEmailAddress, string $pureEmailAddress, string $name)
     {
         $this->assertEquals($pureEmailAddress, $this->helper->extractPureEmailAddress($fullEmailAddress));
     }
@@ -28,7 +29,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emailAddressProvider
      */
-    public function testExtractEmailAddressName($fullEmailAddress, $pureEmailAddress, $name)
+    public function testExtractEmailAddressName(string $fullEmailAddress, string $pureEmailAddress, string $name)
     {
         $this->assertEquals($name, $this->helper->extractEmailAddressName($fullEmailAddress));
     }
@@ -36,7 +37,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emailAddressesProvider
      */
-    public function testExtractEmailAddresses($src, $expected)
+    public function testExtractEmailAddresses(array|string $src, array $expected)
     {
         $this->assertEquals($expected, $this->helper->extractEmailAddresses($src));
     }
@@ -44,7 +45,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildFullEmailAddressProvider
      */
-    public function testBuildFullEmailAddress($pureEmailAddress, $name, $fullEmailAddress)
+    public function testBuildFullEmailAddress(?string $pureEmailAddress, ?string $name, string $fullEmailAddress)
     {
         $this->assertEquals($fullEmailAddress, $this->helper->buildFullEmailAddress($pureEmailAddress, $name));
     }
@@ -52,7 +53,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isFullEmailAddressProvider
      */
-    public function testIsFullEmailAddress($emailAddress, $isFull)
+    public function testIsFullEmailAddress(?string $emailAddress, bool $isFull)
     {
         $this->assertEquals($isFull, $this->helper->isFullEmailAddress($emailAddress));
     }
@@ -60,7 +61,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extractEmailAddressFirstNameProvider
      */
-    public function testExtractEmailAddressFirstName($emailAddress, $expected)
+    public function testExtractEmailAddressFirstName(string $emailAddress, string $expected)
     {
         $this->assertEquals($expected, $this->helper->extractEmailAddressFirstName($emailAddress));
     }
@@ -68,12 +69,12 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extractEmailAddressLastNameProvider
      */
-    public function testExtractEmailAddressLastName($emailAddress, $expected)
+    public function testExtractEmailAddressLastName(string $emailAddress, string $expected)
     {
         $this->assertEquals($expected, $this->helper->extractEmailAddressLastName($emailAddress));
     }
 
-    public static function emailAddressProvider()
+    public static function emailAddressProvider(): array
     {
         return [
             ['john@example.com', 'john@example.com', ''],
@@ -89,7 +90,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function buildFullEmailAddressProvider()
+    public static function buildFullEmailAddressProvider(): array
     {
         return [
             [null, null, ''],
@@ -102,7 +103,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function isFullEmailAddressProvider()
+    public static function isFullEmailAddressProvider(): array
     {
         return [
             [null, false],
@@ -114,10 +115,12 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function emailAddressesProvider()
+    public function emailAddressesProvider(): array
     {
-        $emailObj = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailInterface');
-        $emailObj->expects($this->any())->method('getEmail')->will($this->returnValue('john@example.com'));
+        $emailObj = $this->createMock(EmailInterface::class);
+        $emailObj->expects($this->any())
+            ->method('getEmail')
+            ->willReturn('john@example.com');
 
         return [
             ['', []],
@@ -128,37 +131,37 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function extractEmailAddressFirstNameProvider()
+    public static function extractEmailAddressFirstNameProvider(): array
     {
         return [
-            ['John Smith IV. <john@example.com>',   'John'],
-            ['"John Smith" <john@example.com>',     'John'],
-            ['John <john@example.com>',             'John'],
-            ['john.smith@example.com',              'john'],
-            ['john@example.com',                    'john'],
+            ['John Smith IV. <john@example.com>', 'John'],
+            ['"John Smith" <john@example.com>', 'John'],
+            ['John <john@example.com>', 'John'],
+            ['john.smith@example.com', 'john'],
+            ['john@example.com', 'john'],
         ];
     }
 
-    public static function extractEmailAddressLastNameProvider()
+    public static function extractEmailAddressLastNameProvider(): array
     {
         return [
-            ['John Smith IV. <john@example.com>',   'Smith IV.'],
-            ['"John Smith" <john@example.com>',     'Smith'],
-            ['John <john@example.com>',             'example.com'],
-            ['john.smith@example.com',              'smith'],
-            ['john@example.com',                    'example.com'],
+            ['John Smith IV. <john@example.com>', 'Smith IV.'],
+            ['"John Smith" <john@example.com>', 'Smith'],
+            ['John <john@example.com>', 'example.com'],
+            ['john.smith@example.com', 'smith'],
+            ['john@example.com', 'example.com'],
         ];
     }
 
     /**
      * @dataProvider truncateFullEmailAddressProvider
      */
-    public function testTruncateFullEmailAddress($email, $maxLength, $expected)
+    public function testTruncateFullEmailAddress(string $email, int $maxLength, string $expected)
     {
         $this->assertEquals($expected, $this->helper->truncateFullEmailAddress($email, $maxLength));
     }
 
-    public static function truncateFullEmailAddressProvider()
+    public static function truncateFullEmailAddressProvider(): array
     {
         return [
             ['john@example.com', 255, 'john@example.com'],

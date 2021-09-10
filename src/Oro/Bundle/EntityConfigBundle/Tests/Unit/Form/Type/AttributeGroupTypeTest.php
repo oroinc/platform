@@ -37,43 +37,37 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeManager;
+    private $attributeManager;
 
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     protected function setUp(): void
     {
         $repositoryLocalization = $this->createMock(ObjectRepository::class);
         $repositoryLocalization->expects($this->any())
             ->method('find')
-            ->willReturnCallback(
-                function ($id) {
-                    return $this->getEntity(Localization::class, ['id' => $id]);
-                }
-            );
+            ->willReturnCallback(function ($id) {
+                return $this->getEntity(Localization::class, ['id' => $id]);
+            });
 
         $repositoryLocalizedFallbackValue = $this->createMock(ObjectRepository::class);
         $repositoryLocalizedFallbackValue->expects($this->any())
             ->method('find')
-            ->willReturnCallback(
-                function ($id) {
-                    return $this->getEntity(LocalizedFallbackValue::class, ['id' => $id]);
-                }
-            );
+            ->willReturnCallback(function ($id) {
+                return $this->getEntity(LocalizedFallbackValue::class, ['id' => $id]);
+            });
 
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->registry->expects($this->any())
             ->method('getRepository')
-            ->willReturnMap(
-                [
-                    ['OroLocaleBundle:Localization', null, $repositoryLocalization],
-                    ['OroLocaleBundle:LocalizedFallbackValue', null, $repositoryLocalizedFallbackValue],
-                ]
-            );
+            ->willReturnMap([
+                ['OroLocaleBundle:Localization', null, $repositoryLocalization],
+                ['OroLocaleBundle:LocalizedFallbackValue', null, $repositoryLocalizedFallbackValue],
+            ]);
 
         $this->attributeManager = $this->createMock(AttributeManager::class);
         $this->translator = $this->createMock(Translator::class);
@@ -82,11 +76,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
 
         return [
@@ -127,7 +120,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
      *
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($string = null, $text = null, Localization $localization = null)
+    private function createLocalizedValue($string = null, $text = null, Localization $localization = null)
     {
         $value = new LocalizedFallbackValue();
         $value->setString($string)
@@ -254,13 +247,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     public function testPostSetDataWhenNoData(): void
     {
         $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->expects($this->once())
+        $formEvent->expects($this->once())
             ->method('getData')
             ->willReturn(null);
-
-        $formEvent
-            ->expects($this->never())
+        $formEvent->expects($this->never())
             ->method('getForm');
 
         (new AttributeGroupType())->postSetData($formEvent);
@@ -273,19 +263,16 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     {
         $formEvent = new FormEvent($form = $this->createMock(FormInterface::class), $attributeGroup);
 
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('get')
             ->with('attributeRelations')
             ->willReturn($attributeRelationsForm = $this->createMock(FormInterface::class));
 
-        $attributeRelationsForm
-            ->expects($this->once())
+        $attributeRelationsForm->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
 
-        $formConfig
-            ->expects($this->once())
+        $formConfig->expects($this->once())
             ->method('getOption')
             ->with('choices')
             ->willReturn($choices);
@@ -300,8 +287,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
             'choices' => $expectedChoices,
         ];
 
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('add')
             ->with('attributeRelations', AttributeMultiSelectType::class, $expectedOptions);
 
@@ -349,8 +335,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
             'by_reference' => false,
         ];
 
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('add')
             ->with('attributeRelations', AttributeMultiSelectType::class, $expectedOptions);
 

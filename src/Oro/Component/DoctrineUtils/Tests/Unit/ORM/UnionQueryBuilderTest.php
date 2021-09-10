@@ -17,23 +17,18 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class UnionQueryBuilderTest extends OrmTestCase
 {
     /** @var EntityManager */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ]);
     }
 
     public function testConstructorWithDefaultArguments()

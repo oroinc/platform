@@ -69,7 +69,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
     {
         $this->storage->expects($this->once())
             ->method('search')
-            ->with($this->equalTo(['some query']))
+            ->with(['some query'])
             ->willReturn(['1', '2']);
         $this->storage->expects($this->never())
             ->method('getMessage')
@@ -86,7 +86,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
     {
         $this->storage->expects($this->once())
             ->method('search')
-            ->with($this->equalTo(['some query']))
+            ->with(['some query'])
             ->willReturn(['1', '2']);
         $this->storage->expects($this->exactly(2))
             ->method('getMessage')
@@ -115,7 +115,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
 
         $this->storage->expects($this->once())
             ->method('getFolders')
-            ->with($this->equalTo('SomeFolder'))
+            ->with('SomeFolder')
             ->willReturn($folder);
 
         $result = $this->connector->findFolders('SomeFolder');
@@ -128,7 +128,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
 
         $this->storage->expects($this->once())
             ->method('getFolders')
-            ->with($this->equalTo('SomeFolder'))
+            ->with('SomeFolder')
             ->willReturn($folder);
 
         $result = $this->connector->findFolder('SomeFolder');
@@ -141,11 +141,11 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
 
         $this->storage->expects($this->once())
             ->method('getNumberByUniqueId')
-            ->with($this->equalTo(123))
+            ->with(123)
             ->willReturn(12345);
         $this->storage->expects($this->once())
             ->method('getMessage')
-            ->with($this->equalTo(12345))
+            ->with(12345)
             ->willReturn($msg);
 
         $result = $this->connector->getItem(123);
@@ -160,7 +160,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
 
         $this->storage->expects($this->once())
             ->method('getNumberByUniqueId')
-            ->with($this->equalTo($uid))
+            ->with($uid)
             ->willReturn($id);
 
         $this->storage->expects($this->once())

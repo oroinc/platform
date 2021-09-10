@@ -17,14 +17,11 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
     use EntityTrait;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    private $managerRegistry;
 
     /** @var EntityIdentifierStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);

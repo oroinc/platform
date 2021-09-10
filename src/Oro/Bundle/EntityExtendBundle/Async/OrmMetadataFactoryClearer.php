@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events as OrmEvents;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
-use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherAwareInterface;
 use Oro\Component\PhpUtils\ReflectionUtil;
@@ -63,17 +62,8 @@ class OrmMetadataFactoryClearer implements ClearerInterface
     private function disconnectEntityManager(EntityManager $em, LoggerInterface $logger)
     {
         $em->close();
-        $this->clearRepositoryFactory($em);
         $this->clearEventManager($em, $logger);
         $this->clearConnection($em->getConnection());
-    }
-
-    private function clearRepositoryFactory(EntityManager $em)
-    {
-        $repositoryFactory = $em->getConfiguration()->getRepositoryFactory();
-        if ($repositoryFactory instanceof EntityRepositoryFactory) {
-            $repositoryFactory->clear();
-        }
     }
 
     private function clearEventManager(EntityManager $em, LoggerInterface $logger)

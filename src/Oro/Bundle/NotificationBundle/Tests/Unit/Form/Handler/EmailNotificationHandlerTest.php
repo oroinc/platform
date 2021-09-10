@@ -13,20 +13,15 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface |\PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
+    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    private ObjectManager|\PHPUnit\Framework\MockObject\MockObject $manager;
 
-    /** @var Request */
-    protected $request;
+    private Request $request;
 
-    /** @var EmailNotification */
-    protected $entity;
+    private EmailNotification $entity;
 
-    /** @var EmailNotificationHandler */
-    protected $handler;
+    private EmailNotificationHandler $handler;
 
     protected function setUp(): void
     {
@@ -44,7 +39,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new EmailNotificationHandler($registry);
     }
 
-    public function testProcessException()
+    public function testProcessException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument data should be instance of EmailNotification entity');
@@ -52,7 +47,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process(new \stdClass(), $this->form, $this->request);
     }
 
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
         $this->form->expects($this->never())->method('submit');
@@ -62,12 +57,8 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processDataProvider
-     *
-     * @param string $method
-     * @param string $marker
-     * @param bool $expectedHandleRequest
      */
-    public function testProcess($method, $marker, $expectedHandleRequest)
+    public function testProcess(string $method, string $marker, bool $expectedHandleRequest): void
     {
         $this->form->expects($this->once())->method('setData')->with($this->entity);
         $this->form->expects($expectedHandleRequest ? $this->once() : $this->never())->method('submit');
@@ -78,10 +69,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->entity, $this->form, $this->request));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function processDataProvider()
+    public function processDataProvider(): \Generator
     {
         yield 'put request without marker' => [
             'method' => Request::METHOD_PUT,
@@ -108,7 +96,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->form->expects($this->any())->method('getName')->willReturn('formName');
         $this->form->expects($this->once())->method('setData')->with($this->entity);

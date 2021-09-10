@@ -221,6 +221,8 @@ HELP
         if (!$input->getOption('hot') && !$input->getOption('watch')) {
             $io->success('All assets were successfully built.');
         }
+
+        return 0;
     }
 
     /** @SuppressWarnings(PHPMD.UnusedLocalVariable) */

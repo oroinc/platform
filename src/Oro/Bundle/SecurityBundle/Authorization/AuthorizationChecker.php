@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Authorization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -16,27 +15,20 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
-    /** @var ServiceLink */
-    private $authorizationCheckerLink;
-
-    /** @var ServiceLink */
-    private $objectIdentityFactoryLink;
-
-    /** @var ServiceLink */
-    private $annotationProviderLink;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private ObjectIdentityFactory $objectIdentityFactory;
+    private AclAnnotationProvider $annotationProvider;
+    private LoggerInterface $logger;
 
     public function __construct(
-        ServiceLink $authorizationCheckerLink,
-        ServiceLink $objectIdentityFactoryLink,
-        ServiceLink $annotationProviderLink,
+        AuthorizationCheckerInterface $authorizationChecker,
+        ObjectIdentityFactory $objectIdentityFactory,
+        AclAnnotationProvider $annotationProvider,
         LoggerInterface $logger
     ) {
-        $this->authorizationCheckerLink = $authorizationCheckerLink;
-        $this->objectIdentityFactoryLink = $objectIdentityFactoryLink;
-        $this->annotationProviderLink = $annotationProviderLink;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->objectIdentityFactory = $objectIdentityFactory;
+        $this->annotationProvider = $annotationProvider;
         $this->logger = $logger;
     }
 
@@ -59,21 +51,21 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 $this->logger->debug(
                     sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
                 );
-                $isGranted = $this->isAccessGranted(
+                $isGranted = $this->authorizationChecker->isGranted(
                     $annotation->getPermission(),
-                    $this->getObjectIdentity($annotation)
+                    $this->objectIdentityFactory->get($annotation)
                 );
             } else {
                 $this->logger->debug(
                     sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
                 );
-                $isGranted = $this->isAccessGranted(
+                $isGranted = $this->authorizationChecker->isGranted(
                     $annotation->getPermission(),
                     $object
                 );
             }
         } elseif (\is_string($object)) {
-            $isGranted = $this->isAccessGranted(
+            $isGranted = $this->authorizationChecker->isGranted(
                 $attribute,
                 $this->tryGetObjectIdentity($object) ?? $object
             );
@@ -86,61 +78,25 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 }
             }
 
-            $isGranted = $this->isAccessGranted($attribute, $object);
+            $isGranted = $this->authorizationChecker->isGranted($attribute, $object);
         }
 
         return $isGranted;
     }
 
-    /**
-     * @param mixed $attribute
-     * @param mixed $object
-     *
-     * @return bool
-     */
-    private function isAccessGranted($attribute, $object = null): bool
-    {
-        /** @var AuthorizationCheckerInterface $authorizationChecker */
-        $authorizationChecker = $this->authorizationCheckerLink->getService();
-
-        return $authorizationChecker->isGranted($attribute, $object);
-    }
-
     private function getAnnotation(string $annotationId): ?AclAnnotation
     {
-        /** @var AclAnnotationProvider $annotationProvider */
-        $annotationProvider = $this->annotationProviderLink->getService();
-
-        return $annotationProvider->findAnnotationById($annotationId);
+        return $this->annotationProvider->findAnnotationById($annotationId);
     }
 
-    /**
-     * @param mixed $val
-     *
-     * @return ObjectIdentity
-     */
-    private function getObjectIdentity($val): ObjectIdentity
+    private function tryGetObjectIdentity(mixed $val): ?ObjectIdentity
     {
-        /** @var ObjectIdentityFactory $objectIdentityFactory */
-        $objectIdentityFactory = $this->objectIdentityFactoryLink->getService();
-
-        return $objectIdentityFactory->get($val);
-    }
-
-    /**
-     * @param mixed $val
-     *
-     * @return ObjectIdentity|null
-     */
-    private function tryGetObjectIdentity($val)
-    {
-        /** @var ObjectIdentityFactory $objectIdentityFactory */
-        $objectIdentityFactory = $this->objectIdentityFactoryLink->getService();
-
         try {
-            return $objectIdentityFactory->get($val);
+            return $this->objectIdentityFactory->get($val);
         } catch (InvalidDomainObjectException $e) {
             $this->logger->debug('The ObjectIdentity cannot be created.', ['exception' => $e, 'object' => $val]);
+
+            return null;
         }
     }
 }

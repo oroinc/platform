@@ -106,5 +106,7 @@ HELP
             $logger,
             $input->getOption('dry-run')
         );
+
+        return 0;
     }
 }

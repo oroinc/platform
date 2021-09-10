@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EntityTypeTest extends FormIntegrationTestCase
 {
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {
@@ -61,9 +61,9 @@ class EntityTypeTest extends FormIntegrationTestCase
 
     public function testType()
     {
-        $formData = array(
+        $formData = [
             'className' => 'NewEntityClassName'
-        );
+        ];
 
         $form = $this->factory->create(EntityType::class);
         $form->submit($formData);

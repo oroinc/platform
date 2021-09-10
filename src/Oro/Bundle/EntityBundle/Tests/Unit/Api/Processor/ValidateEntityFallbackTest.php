@@ -49,7 +49,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
     private function getEntityFieldFallbackValueForm(EntityFieldFallbackValue $fallbackValue)
     {
         $formBuilder = $this->createFormBuilder()->create(
-            null,
+            '',
             FormType::class,
             ['data_class' => EntityFieldFallbackValue::class]
         );

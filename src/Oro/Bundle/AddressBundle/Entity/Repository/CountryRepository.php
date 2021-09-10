@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
@@ -10,7 +10,7 @@ use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 /**
  * Entity repository for Country dictionary.
  */
-class CountryRepository extends EntityRepository implements IdentityAwareTranslationRepositoryInterface
+class CountryRepository extends ServiceEntityRepository implements IdentityAwareTranslationRepositoryInterface
 {
     /**
      * @return Country[]

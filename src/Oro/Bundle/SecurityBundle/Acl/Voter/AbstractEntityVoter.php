@@ -4,8 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -14,14 +12,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 abstract class AbstractEntityVoter implements VoterInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var string[] */
+    protected $supportedAttributes = [];
 
     /** @var string */
     protected $className;
 
-    /** @var array */
-    protected $supportedAttributes = [];
+    protected DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -178,18 +175,6 @@ abstract class AbstractEntityVoter implements VoterInterface
      */
     protected function getEntityIdentifier($object)
     {
-        if ($object instanceof FieldVote) {
-            $object = $object->getDomainObject();
-        }
-
-        if ($object instanceof ObjectIdentityInterface) {
-            $identifier = $object->getIdentifier();
-
-            return filter_var($identifier, FILTER_VALIDATE_INT)
-                ? (int)$identifier
-                : null;
-        }
-
-        return $this->doctrineHelper->getSingleEntityIdentifier($object, false);
+        return EntityIdentifierResolverUtil::getEntityIdentifier($object, $this->doctrineHelper);
     }
 }

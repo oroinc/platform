@@ -29,7 +29,7 @@ class TwigSandboxConfigurationPassStub extends AbstractTwigSandboxConfigurationP
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getTags(): array
     {

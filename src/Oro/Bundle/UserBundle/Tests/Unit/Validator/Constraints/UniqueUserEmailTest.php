@@ -7,9 +7,7 @@ use Symfony\Component\Validator\Constraint;
 
 class UniqueUserEmailTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UniqueUserEmail
-     */
+    /** @var UniqueUserEmail */
     private $constraint;
 
     protected function setUp(): void

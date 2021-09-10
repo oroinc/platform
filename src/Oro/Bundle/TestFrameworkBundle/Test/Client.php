@@ -12,6 +12,7 @@ use Symfony\Component\BrowserKit\Response as InternalResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Simulates a browser and makes requests to a Kernel object.
@@ -129,7 +130,7 @@ class Client extends BaseKernelBrowser
         $isRealRequest = false,
         $route = 'oro_datagrid_index'
     ) {
-        list($gridName, $gridParameters) = $this->parseGridParameters($gridParameters, $filter);
+        [$gridName, $gridParameters] = $this->parseGridParameters($gridParameters, $filter);
 
         if ($isRealRequest) {
             $this->request(
@@ -207,9 +208,15 @@ class Client extends BaseKernelBrowser
      * @param bool $absolute
      * @return string
      */
-    protected function getUrl($name, $parameters = array(), $absolute = false)
+    protected function getUrl(string $name, array $parameters = [], bool $absolute = false)
     {
-        return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
+        return $this->getContainer()
+            ->get('router')
+            ->generate(
+                $name,
+                $parameters,
+                $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
+            );
     }
 
     /**

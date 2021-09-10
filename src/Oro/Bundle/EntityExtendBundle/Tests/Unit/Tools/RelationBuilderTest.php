@@ -471,9 +471,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $fieldConfigModel = $this->getMockBuilder(FieldConfigModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         $this->configManager->expects($this->once())
             ->method('hasConfigFieldModel')
@@ -550,9 +548,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $fieldConfigModel = $this->getMockBuilder(FieldConfigModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         $this->configManager->expects($this->once())
             ->method('hasConfigFieldModel')
@@ -638,9 +634,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $fieldConfigModel = $this->getMockBuilder(FieldConfigModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         $this->configManager->expects($this->once())
             ->method('hasConfigFieldModel')
@@ -744,9 +738,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $fieldConfigModel = $this->getMockBuilder(FieldConfigModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         $this->configManager->expects($this->once())
             ->method('hasConfigFieldModel')

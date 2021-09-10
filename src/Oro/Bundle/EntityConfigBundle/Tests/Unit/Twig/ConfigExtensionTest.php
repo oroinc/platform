@@ -96,7 +96,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'testField';
         $config = ['key' => 'value'];
 
-        $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
+        $configEntity = $this->createMock(ConfigInterface::class);
 
         $configEntity->expects($this->any())
             ->method('all')
@@ -187,7 +187,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $attrName = 'attrName';
         $config = ['key' => 'value'];
 
-        $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
+        $configEntity = $this->createMock(ConfigInterface::class);
 
         $configEntity->expects($this->any())
             ->method('get')
@@ -258,7 +258,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $className = 'Test\Entity';
         $config = ['key' => 'value'];
 
-        $configEntity = $this->getMockForAbstractClass(ConfigInterface::class);
+        $configEntity = $this->createMock(ConfigInterface::class);
         $configEntity->expects($this->any())
             ->method('all')
             ->willReturn($config);
@@ -270,14 +270,12 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getConfig')
             ->with($this->isInstanceOf(EntityConfigId::class))
-            ->willReturnCallback(
-                function (EntityConfigId $configId) use ($className, $expectedScope, $configEntity) {
-                    self::assertEquals($className, $configId->getClassName());
-                    self::assertEquals($expectedScope, $configId->getScope());
+            ->willReturnCallback(function (EntityConfigId $configId) use ($className, $expectedScope, $configEntity) {
+                self::assertEquals($className, $configId->getClassName());
+                self::assertEquals($expectedScope, $configId->getScope());
 
-                    return $configEntity;
-                }
-            );
+                return $configEntity;
+            });
 
         if ($inputScope) {
             $actualConfig = self::callTwigFunction($this->extension, 'oro_entity_config', [$className, $inputScope]);

@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress;
 class EmailAddressTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailAddress */
-    protected $constraint;
+    private $constraint;
 
     protected function setUp(): void
     {

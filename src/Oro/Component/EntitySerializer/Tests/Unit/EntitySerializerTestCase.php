@@ -40,19 +40,14 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
+        ]);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())

@@ -2,51 +2,54 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
+use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
+use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Component\Testing\ReflectionUtil;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $selector;
+    /** @var EmailBodyLoaderSelector|\PHPUnit\Framework\MockObject\MockObject */
+    private $selector;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
     /** @var EmailBodySynchronizer */
-    protected $synchronizer;
+    private $synchronizer;
 
     protected function setUp(): void
     {
-        $this->logger   = $this->createMock('Psr\Log\LoggerInterface');
-        $this->selector = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine   = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->selector = $this->createMock(EmailBodyLoaderSelector::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->em = $this->createMock(EntityManager::class);
 
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->doctrine->expects($this->any())->method('getManager')->willReturn($this->em);
+        $this->doctrine->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->em);
 
         $this->synchronizer = new EmailBodySynchronizer(
             $this->selector,
@@ -69,7 +72,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOneEmailBody()
     {
-        $email     = new Email();
+        $email = new Email();
         $emailBody = new EmailBody();
         $emailUser = new EmailUser();
 
@@ -82,12 +85,12 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
-        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
         $this->selector->expects($this->once())
             ->method('select')
             ->with($this->identicalTo($origin))
-            ->will($this->returnValue($loader));
+            ->willReturn($loader);
         $loader->expects($this->once())
             ->method('loadEmailBody')
             ->with(
@@ -95,7 +98,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($email),
                 $this->identicalTo($this->em)
             )
-            ->will($this->returnValue($emailBody));
+            ->willReturn($emailBody);
 
         $this->em->expects($this->once())
             ->method('flush')
@@ -113,7 +116,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOneEmailBodyFailure()
     {
-        $this->expectException(\Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException::class);
+        $this->expectException(LoadEmailBodyFailedException::class);
         $this->expectExceptionMessage('Cannot load a body for "test email" email.');
 
         $email = new Email();
@@ -133,15 +136,15 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \Exception('some exception');
 
-        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
         $this->selector->expects($this->once())
             ->method('select')
             ->with($this->identicalTo($origin))
-            ->will($this->returnValue($loader));
+            ->willReturn($loader);
         $loader->expects($this->once())
             ->method('loadEmailBody')
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $this->em->expects($this->once())
             ->method('persist');
@@ -158,7 +161,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOneEmailBodyNotFound()
     {
-        $this->expectException(\Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException::class);
+        $this->expectException(LoadEmailBodyFailedException::class);
         $this->expectExceptionMessage('Cannot load a body for "test email" email.');
 
         $email = new Email();
@@ -178,15 +181,15 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $exception = new EmailBodyNotFoundException($email);
 
-        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
         $this->selector->expects($this->once())
             ->method('select')
             ->with($this->identicalTo($origin))
-            ->will($this->returnValue($loader));
+            ->willReturn($loader);
         $loader->expects($this->once())
             ->method('loadEmailBody')
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $this->em->expects($this->once())
             ->method('persist');
@@ -209,24 +212,23 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOnEmptyData()
     {
-        $repo = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())->method('getRepository')->willReturn($repo);
-        $repo->expects($this->once())->method('getEmailsWithoutBody')
+        $repo = $this->createMock(EmailRepository::class);
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('getEmailsWithoutBody')
             ->willReturn([]);
         $this->logger->expects($this->once())
             ->method('info')
-            ->with(
-                'All emails was processed'
-            );
+            ->with('All emails was processed');
 
         $this->synchronizer->sync();
     }
 
     public function testSync()
     {
-        $email     = new Email();
+        $email = new Email();
         $email->setSubject('Test email');
         $emailBody = new EmailBody();
         $emailUser = new EmailUser();
@@ -240,26 +242,24 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())->method('getRepository')->willReturn($repo);
+        $repo = $this->createMock(EmailRepository::class);
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
         $runCount = 0;
         $repo->expects($this->exactly(2))
             ->method('getEmailsWithoutBody')
-            ->willReturnCallback(
-                function () use (&$runCount, $email) {
-                    $runCount++;
-                    return $runCount === 1 ? [$email] : [];
-                }
-            );
+            ->willReturnCallback(function () use (&$runCount, $email) {
+                $runCount++;
+                return $runCount === 1 ? [$email] : [];
+            });
 
-        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
         $this->selector->expects($this->once())
             ->method('select')
             ->with($this->identicalTo($origin))
-            ->will($this->returnValue($loader));
+            ->willReturn($loader);
         $loader->expects($this->once())
             ->method('loadEmailBody')
             ->with(
@@ -267,7 +267,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
                 $this->identicalTo($email),
                 $this->identicalTo($this->em)
             )
-            ->will($this->returnValue($emailBody));
+            ->willReturn($emailBody);
 
         $this->em->expects($this->once())
             ->method('flush')

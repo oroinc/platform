@@ -23,16 +23,14 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver($reader, 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub');
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Stub' => 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub',
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Stub' => 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub',
+        ]);
     }
 
     public function testCountMethod(): void

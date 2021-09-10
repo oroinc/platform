@@ -2,88 +2,100 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\UserBundle\Entity\Manager\StatusManager;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class StatusManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Oro\Bundle\UserBundle\Entity\Manager\StatusManager
-     */
-    private $manager;
-
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
+
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $um;
 
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    private $user;
+    /** @var StatusManager */
+    private $manager;
 
     protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->um = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->repository = $this->createMock(
-            'Doctrine\Persistence\ObjectRepository',
-            array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName')
-        );
+        $this->em = $this->createMock(EntityManager::class);
+        $this->um = $this->createMock(UserManager::class);
+        $this->repository = $this->createMock(EntityRepository::class);
 
         $this->em->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->repository));
-
-        $this->user = $this->getMockForAbstractClass('Oro\Bundle\UserBundle\Entity\User');
+            ->willReturn($this->repository);
 
         $this->manager = new StatusManager($this->em, $this->um);
     }
 
     public function testGetUserStatuses()
     {
+        $user = $this->createMock(User::class);
+
         $this->repository->expects($this->once())
             ->method('findBy')
-            ->will($this->returnValue(array()));
+            ->with(['user' => $user])
+            ->willReturn([]);
 
-        $this->manager->getUserStatuses($this->user);
+        $this->manager->getUserStatuses($user);
+    }
+
+    public function testDeleteStatusWhenUserStatusDoesNotEqualToDeletingStatus()
+    {
+        $user = $this->createMock(User::class);
+        $status = new Status();
+
+        $user->expects($this->never())
+            ->method('setCurrentStatus');
+
+        $this->assertFalse($this->manager->deleteStatus($user, $status, true));
     }
 
     public function testDeleteStatus()
     {
+        $user = new User();
         $status = new Status();
-
-        $this->assertFalse($this->manager->deleteStatus($this->user, $status, true));
-
-        $status->setUser($this->user);
-        $this->user->setCurrentStatus($status);
+        $status->setUser($user);
+        $user->setCurrentStatus($status);
 
         $this->um->expects($this->once())
             ->method('updateUser');
-
         $this->um->expects($this->once())
             ->method('reloadUser');
 
         $this->em->expects($this->once())
             ->method('remove');
-
         $this->em->expects($this->once())
             ->method('flush');
-        $this->assertTrue($this->manager->deleteStatus($this->user, $status, true));
+
+        $this->assertTrue($this->manager->deleteStatus($user, $status, true));
+
+        $this->assertNull($user->getCurrentStatus());
     }
 
     public function testSetCurrentStatus()
     {
+        $user = $this->createMock(User::class);
         $status = new Status();
 
+        $user->expects($this->once())
+            ->method('setCurrentStatus')
+            ->with($this->identicalTo($status));
         $this->um->expects($this->once())
-            ->method('updateUser');
+            ->method('updateUser')
+            ->with($this->identicalTo($user));
+        $this->um->expects($this->once())
+            ->method('reloadUser')
+            ->with($this->identicalTo($user));
 
-        $this->um->expects($this->once())
-            ->method('reloadUser');
-        $this->manager->setCurrentStatus($this->user, $status, true);
+        $this->manager->setCurrentStatus($user, $status, true);
     }
 }

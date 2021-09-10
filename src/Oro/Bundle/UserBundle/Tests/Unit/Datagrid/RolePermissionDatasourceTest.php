@@ -109,7 +109,8 @@ class RolePermissionDatasourceTest extends \PHPUnit\Framework\TestCase
             ->method('getCategories')
             ->willReturn([$category]);
 
-        $this->translator->expects($this->any())->method('trans')
+        $this->translator->expects($this->any())
+            ->method('trans')
             ->willReturnCallback(function ($value) {
                 return $value;
             });

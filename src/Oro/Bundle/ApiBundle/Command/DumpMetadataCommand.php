@@ -100,6 +100,8 @@ HELP
 
         $metadata = $this->getMetadata($entityClass, $version, $requestType, $action, $hateoas);
         $output->write(Yaml::dump($metadata, 100, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT));
+
+        return 0;
     }
 
     protected function getMetadata(

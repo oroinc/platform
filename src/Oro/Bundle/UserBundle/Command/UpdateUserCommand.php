@@ -80,6 +80,10 @@ HELP
             $this->updateUser($user, $options);
         } catch (InvalidArgumentException $exception) {
             $output->writeln($exception->getMessage());
+
+            return $exception->getCode() ?: 1;
         }
+
+        return 0;
     }
 }

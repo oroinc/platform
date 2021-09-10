@@ -14,10 +14,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token;
+    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $token;
 
-    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
+    /** @var User */
     private User $user;
 
     protected function setUp(): void
@@ -28,10 +31,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn($this->user);
 
-        $this->tokenStorage = $this
-            ->getMockBuilder(TokenStorageInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
     }
 
     public function testOnKernelRequestWithExpiredUser(): void
@@ -59,9 +59,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSession')
             ->willReturn($session);
 
-        $requestEvent = $this->getMockBuilder(RequestEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $requestEvent = $this->createMock(RequestEvent::class);
         $requestEvent->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
@@ -95,10 +93,8 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSession')
             ->willReturn($session);
 
-        $requestEvent = $this->getMockBuilder(RequestEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requestEvent
+        $requestEvent = $this->createMock(RequestEvent::class);
+        $requestEvent->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 

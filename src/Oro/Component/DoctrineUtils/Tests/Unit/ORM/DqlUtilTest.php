@@ -6,43 +6,35 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class DqlUtilTest extends OrmTestCase
 {
     /** @var EntityManager */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ]);
     }
 
     /**
      * @dataProvider hasParameterDataProvider
-     *
-     * @param string $dql
-     * @param string $parameter
-     * @param bool $expected
      */
-    public function testHasParameter($dql, $parameter, $expected)
+    public function testHasParameter(string $dql, string|int $parameter, bool $expected)
     {
         $this->assertEquals($expected, DqlUtil::hasParameter($dql, $parameter));
     }
 
-    public function hasParameterDataProvider()
+    public function hasParameterDataProvider(): array
     {
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1'
             . ' AND a.name != :param2 AND a.status = ?1';
@@ -64,14 +56,14 @@ class DqlUtilTest extends OrmTestCase
         $this->assertEquals($expectedAliases, DqlUtil::getAliases($dqlFactory($this->em)));
     }
 
-    public function getAliasesDataProvider()
+    public function getAliasesDataProvider(): array
     {
         return [
             'query with fully qualified entity name' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.bestItem', 'i')
                         ->getDQL();
                 },
@@ -131,12 +123,12 @@ DQL
     /**
      * @dataProvider replaceAliasesProvider
      */
-    public function testReplaceAliases($dql, array $replacements, $expectedDql)
+    public function testReplaceAliases(string $dql, array $replacements, string $expectedDql)
     {
         $this->assertEquals($expectedDql, DqlUtil::replaceAliases($dql, $replacements));
     }
 
-    public function replaceAliasesProvider()
+    public function replaceAliasesProvider(): array
     {
         return [
             [
@@ -197,16 +189,13 @@ DQL
 
     /**
      * @dataProvider buildConcatExprProvider
-     *
-     * @param string[] $parts
-     * @param string   $expectedExpr
      */
-    public function testBuildConcatExpr($parts, $expectedExpr)
+    public function testBuildConcatExpr(array $parts, string $expectedExpr)
     {
         $this->assertEquals($expectedExpr, DqlUtil::buildConcatExpr($parts));
     }
 
-    public function buildConcatExprProvider()
+    public function buildConcatExprProvider(): array
     {
         return [
             [[], ''],

@@ -139,7 +139,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getExtensions()
     {

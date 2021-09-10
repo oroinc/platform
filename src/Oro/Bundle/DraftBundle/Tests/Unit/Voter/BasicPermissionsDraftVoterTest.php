@@ -3,17 +3,15 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Voter;
 
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
-use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\DraftBundle\Helper\DraftPermissionHelper;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\DraftBundle\Voter\BasicPermissionsDraftVoter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -24,54 +22,36 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
 
     public static $user;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var DraftPermissionHelper */
-    private $draftPermissionHelper;
-
-    /** @var DraftHelper */
-    private $draftHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessor */
-    private $tokenAccessor;
 
     /** @var BasicPermissionsDraftVoter */
     private $voter;
 
     protected function setUp(): void
     {
-        $this->tokenAccessor = $this->createMock(TokenAccessor::class);
-        $this->tokenAccessor
-            ->expects($this->any())
+        $tokenAccessor = $this->createMock(TokenAccessor::class);
+        $tokenAccessor->expects($this->any())
             ->method('getUser')
             ->willReturn(self::$user);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->willReturn(1);
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
             ->willReturn(DraftableEntityStub::class);
-        $this->draftPermissionHelper = new DraftPermissionHelper($this->tokenAccessor);
+
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack $requestStack */
-        $requestStack = $this->createMock(RequestStack::class);
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->createMock(ConfigProvider::class);
 
-        $this->draftHelper = new DraftHelper($requestStack, $configProvider);
+        $container = TestContainerBuilder::create()
+            ->add('oro_draft.helper.draft_permission_helper', new DraftPermissionHelper($tokenAccessor))
+            ->getContainer($this);
 
-        $this->voter = new BasicPermissionsDraftVoter(
-            $this->doctrineHelper,
-            $this->draftPermissionHelper,
-            $this->authorizationChecker
-        );
+        $this->voter = new BasicPermissionsDraftVoter($this->doctrineHelper, $this->authorizationChecker, $container);
     }
 
     /**
@@ -79,14 +59,11 @@ class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetPermissionForAttribute(int $expected, array $permissions, DraftableInterface $source): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface $token */
         $token = $this->createMock(TokenInterface::class);
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntity')
             ->willReturn($source);
-        $this->authorizationChecker
-            ->expects($this->any())
+        $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->willReturn(false);
 

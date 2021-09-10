@@ -8,16 +8,11 @@ use Oro\Component\Testing\ReflectionUtil;
 class PermissionEntityTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PermissionEntity */
-    protected $object;
+    private $object;
 
     protected function setUp(): void
     {
         $this->object = new PermissionEntity();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->object);
     }
 
     public function testGetId()
@@ -31,12 +26,8 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider setGetDataProvider
-     *
-     * @param string $propertyName
-     * @param mixed $value
-     * @param mixed $defaultValue
      */
-    public function testSetGet($propertyName, $value, $defaultValue = null)
+    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null)
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = 'get' . ucfirst($propertyName);
@@ -49,10 +40,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->object->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             'name' => [

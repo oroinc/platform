@@ -83,7 +83,7 @@ class EntityRoutingHelper
      *
      * @return string|null
      */
-    public function getEntityClassName(Request $request, $paramName = self::PARAM_ENTITY_CLASS)
+    public function getEntityClassName(Request $request, string $paramName = self::PARAM_ENTITY_CLASS)
     {
         $className = $request->get($paramName);
         if ($className) {
@@ -101,7 +101,7 @@ class EntityRoutingHelper
      *
      * @return mixed
      */
-    public function getEntityId(Request $request, $paramName = self::PARAM_ENTITY_ID)
+    public function getEntityId(Request $request, string $paramName = self::PARAM_ENTITY_ID)
     {
         return $request->get($paramName);
     }

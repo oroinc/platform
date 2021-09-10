@@ -115,12 +115,8 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getUserTopicDataProvider
-     *
-     * @param User|string $user
-     * @param Organization $organization
-     * @param string $expected
      */
-    public function testGetUserTopic($user, $organization, $expected)
+    public function testGetUserTopic(User|string $user, ?Organization $organization, string $expected)
     {
         $this->assertEquals($expected, WebSocketSendProcessor::getUserTopic($user, $organization));
     }

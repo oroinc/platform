@@ -8,14 +8,11 @@ use Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider;
 class CurrentUserProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var CurrentUserProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -28,7 +25,7 @@ class CurrentUserProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($object));
+            ->willReturn($object);
 
         $this->assertEquals($object, $this->provider->getCurrentUser());
     }
@@ -37,7 +34,7 @@ class CurrentUserProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull($this->provider->getCurrentUser());
     }

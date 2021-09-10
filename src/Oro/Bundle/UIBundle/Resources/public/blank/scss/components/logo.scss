@@ -15,11 +15,3 @@
         height: $logo-img-height;
     }
 }
-
-@include breakpoint('print') {
-    .logo {
-        &--print-only {
-            display: $logo-display-print;
-        }
-    }
-}

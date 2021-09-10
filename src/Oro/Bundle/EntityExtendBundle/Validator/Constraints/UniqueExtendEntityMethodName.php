@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * The validation constraint to validate method name for uniqueness for field name.
+ */
 class UniqueExtendEntityMethodName extends Constraint
 {
     /** @var string */
@@ -11,14 +14,6 @@ class UniqueExtendEntityMethodName extends Constraint
 
     /** @var string */
     public $unexpectedNameMessage = 'The field name must be \'{{ field }}\'.';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return UniqueExtendEntityMethodNameValidator::ALIAS;
-    }
 
     /**
      * {@inheritdoc}

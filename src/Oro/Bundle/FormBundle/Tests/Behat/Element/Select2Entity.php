@@ -3,12 +3,19 @@
 namespace Oro\Bundle\FormBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Session;
 use Oro\Bundle\FormBundle\Tests\Behat\Context\ClearableInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
 use WebDriver\Exception\StaleElementReference;
 use WebDriver\Key;
 
+/**
+ * Select control with autocomplete functionality
+ * uses in fields that represent many one relationships.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Select2Entity extends Element implements ClearableInterface
 {
     /**
@@ -135,6 +142,39 @@ class Select2Entity extends Element implements ClearableInterface
     }
 
     /**
+     * @param Session $session
+     * @param string $value
+     * @return mixed|null
+     */
+    public function getAllSuggestions(Session $session, $value = '')
+    {
+        $this->attempts = 0;
+        $resultSet = $this->getResultSetFromAllPages($session, true, $value);
+
+        $results = $this->spin(function (Select2Entity $element) use ($resultSet) {
+            /** @var NodeElement[] $results */
+            $results = $resultSet->findAll('css', 'li');
+            if (3 == $element->attempts) {
+                return $results;
+            }
+
+            try {
+                foreach ($results as $result) {
+                    $result->isVisible();
+                }
+            } catch (\Exception $e) {
+                $element->attempts = 0;
+            }
+
+            $element->attempts++;
+
+            return [];
+        }, 5);
+
+        return $results;
+    }
+
+    /**
      * @param bool $failOnEmpty
      * @param string $value
      * @return NodeElement|null
@@ -145,6 +185,41 @@ class Select2Entity extends Element implements ClearableInterface
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
+
+        /** @var NodeElement $resultSet */
+        foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {
+            if ($resultSet->isVisible()) {
+                return $resultSet;
+            }
+        }
+
+        if ($failOnEmpty) {
+            self::fail('No select 2 entity results found on page');
+        }
+
+        return null;
+    }
+
+    public function getResultSetFromAllPages(Session $session, $failOnEmpty = true, $value = '')
+    {
+        $this->fillSearchField($value);
+        $this->waitFor(60, function () {
+            return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
+        });
+
+        $function = <<<JS
+            (function(){
+                 var activeResultContainer = $('.select2-drop-active .select2-results').get(0);
+                 activeResultContainer.scrollTo(0,activeResultContainer.scrollHeight);
+            })()
+JS;
+
+        while (null !== $this->getPage()->find('css', '.select2-more-results')) {
+            $session->executeScript($function);
+            $this->waitFor(60, function () {
+                return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
+            });
+        }
 
         /** @var NodeElement $resultSet */
         foreach ($this->getPage()->findAll('css', '.select2-results') as $resultSet) {

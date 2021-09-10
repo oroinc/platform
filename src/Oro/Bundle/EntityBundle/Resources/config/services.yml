@@ -166,6 +166,8 @@ services:
 
     oro_entity.exclusion_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+        arguments:
+            - !tagged_iterator oro_entity.exclusion_provider.default
 
     oro_entity.exclusion_provider.config:
         class: Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
@@ -180,7 +182,7 @@ services:
     oro_entity.virtual_field_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
         arguments:
-            - [] # providers
+            - !tagged_iterator oro_entity.virtual_field_provider
             - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_field_provider.config:
@@ -206,7 +208,7 @@ services:
             - '@oro_entity.virtual_field_provider.cache.dictionary'
             - '@Doctrine\Inflector\Inflector'
         tags:
-            - { name: oro_entity.virtual_field_provider, priority: 100 }
+            - { name: oro_entity.virtual_field_provider, priority: -100 }
             - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: clearCache }
 
     oro_entity.virtual_field_provider.enum:
@@ -214,12 +216,12 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
-            - { name: oro_entity.virtual_field_provider, priority: 100 }
+            - { name: oro_entity.virtual_field_provider, priority: -100 }
 
     oro_entity.virtual_relation_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
         arguments:
-            - [] # providers
+            - !tagged_iterator oro_entity.virtual_relation_provider
             - '@oro_entity_config.provider.extend'
 
     oro_entity.virtual_relation_provider.config:

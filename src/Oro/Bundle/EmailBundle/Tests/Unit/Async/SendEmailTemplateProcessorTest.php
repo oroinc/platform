@@ -43,11 +43,8 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider bodyExceptionDataProvider
-     *
-     * @param array $body
-     * @param string $expectedMessage
      */
-    public function testBodyException(array $body, $expectedMessage): void
+    public function testBodyException(array $body, string $expectedMessage): void
     {
         $this->logger->expects($this->once())
             ->method('error')
@@ -55,19 +52,17 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->validator->expects($this->any())
             ->method('validate')
-            ->willReturnCallback(
-                function ($value) {
-                    $violationList = $this->createMock(ConstraintViolationList::class);
-                    $violationList->expects($this->once())
-                        ->method('count')
-                        ->willReturn(!$value);
+            ->willReturnCallback(function ($value) {
+                $violationList = $this->createMock(ConstraintViolationList::class);
+                $violationList->expects($this->once())
+                    ->method('count')
+                    ->willReturn(!$value);
 
-                    return $violationList;
-                }
-            );
+                return $violationList;
+            });
 
         $message = new Message();
-        $message->setBody(\json_encode($body));
+        $message->setBody(json_encode($body, JSON_THROW_ON_ERROR));
 
         $this->assertEquals(
             MessageProcessorInterface::REJECT,
@@ -116,16 +111,12 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Cannot send email template.', ['exception' => new EntityNotFoundException()]);
 
         $message = new Message();
-        $message->setBody(
-            \json_encode(
-                [
-                    'from' => 'test@test.com',
-                    'to' => 'test@test.com',
-                    'templateName' => 'test',
-                    'entity' => [\stdClass::class, 42]
-                ]
-            )
-        );
+        $message->setBody(json_encode([
+            'from' => 'test@test.com',
+            'to' => 'test@test.com',
+            'templateName' => 'test',
+            'entity' => [\stdClass::class, 42]
+        ], JSON_THROW_ON_ERROR));
 
         $this->assertEquals(
             MessageProcessorInterface::REJECT,
@@ -133,9 +124,6 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function testExecuteWithMultipleRecipients(): void
     {
         $this->sender->expects($this->once())
@@ -153,16 +141,12 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
             ->method($this->anything());
 
         $message = new Message();
-        $message->setBody(
-            \json_encode(
-                [
-                    'from' => 'test@test.com',
-                    'to' => 'test@test.com',
-                    'templateName' => 'test',
-                    'entity' => [\stdClass::class, 42]
-                ]
-            )
-        );
+        $message->setBody(json_encode([
+            'from' => 'test@test.com',
+            'to' => 'test@test.com',
+            'templateName' => 'test',
+            'entity' => [\stdClass::class, 42]
+        ], JSON_THROW_ON_ERROR));
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Component\Testing\TempDirExtension;
@@ -10,17 +11,15 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commandExecutor;
+    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
+    private $commandExecutor;
 
     /** @var string */
-    protected $temporaryFilePath;
+    private $temporaryFilePath;
 
     protected function setUp(): void
     {
-        $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->commandExecutor = $this->createMock(CommandExecutor::class);
 
         $this->temporaryFilePath = $this->getTempDir('extend_config_migration')
             . DIRECTORY_SEPARATOR
@@ -37,17 +36,13 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
                 'oro:entity-extend:migration:update-config',
                 ['--dry-run' => true, '--ignore-errors' => true]
             )
-            ->will(
-                $this->returnCallback(
-                    function ($command, $params, $logger) {
-                        if ($logger instanceof ArrayLogger) {
-                            $logger->info('test message');
-                        }
+            ->willReturnCallback(function ($command, $params, $logger) {
+                if ($logger instanceof ArrayLogger) {
+                    $logger->info('test message');
+                }
 
-                        return 0;
-                    }
-                )
-            );
+                return 0;
+            });
 
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
             $options,
@@ -70,17 +65,13 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
                 'oro:entity-extend:migration:update-config',
                 []
             )
-            ->will(
-                $this->returnCallback(
-                    function ($command, $params, $logger) {
-                        if ($logger instanceof ArrayLogger) {
-                            $logger->info('test message');
-                        }
+            ->willReturnCallback(function ($command, $params, $logger) {
+                if ($logger instanceof ArrayLogger) {
+                    $logger->info('test message');
+                }
 
-                        return 0;
-                    }
-                )
-            );
+                return 0;
+            });
 
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
             $options,

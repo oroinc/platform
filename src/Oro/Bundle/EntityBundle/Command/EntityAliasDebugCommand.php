@@ -44,12 +44,12 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->outputEntityAliases($output);
+        return $this->outputEntityAliases($output);
     }
 
-    protected function outputEntityAliases(OutputInterface $output)
+    protected function outputEntityAliases(OutputInterface $output): int
     {
         $entityAliases = $this->entityAliasResolver->getAll();
 
@@ -100,5 +100,7 @@ HELP
                 OutputInterface::OUTPUT_RAW
             );
         }
+
+        return 0;
     }
 }

@@ -176,7 +176,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.cache.entities_with_workflow'
         tags:
-            - { name: oro_entity.virtual_relation_provider, priority: 150 }
+            - { name: oro_entity.virtual_relation_provider, priority: -150 }
 
     oro_workflow.handler.widget_template.transition_helper:
         class: 'Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionWidgetTemplateHelper'
@@ -291,22 +291,34 @@ services:
             - 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition'
 
     oro_workflow.repository.workflow_item:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository'
+        alias: Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository
+
+    Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_workflow.repository.process_trigger:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
+        alias: Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository
+
+    Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_workflow.repository.transition_event_trigger:
-        class: 'Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository'
+        alias: Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository
+
+    Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_workflow.helper.workflow_aware_entity_fetcher:
         class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher'
@@ -448,7 +460,7 @@ services:
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
-           - { name: oro.action.extension.button_provider, priority: 100 }
+           - { name: oro.action.extension.button_provider, priority: -100 }
 
     oro_workflow.extension.start_transition_button_provider:
         class: 'Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension'
@@ -459,7 +471,7 @@ services:
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
-           - { name: oro.action.extension.button_provider, priority: 110 }
+           - { name: oro.action.extension.button_provider, priority: -110 }
 
     oro_workflow.extension.transition_button_provider:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
@@ -470,7 +482,7 @@ services:
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
-           - { name: oro.action.extension.button_provider, priority: 120 }
+           - { name: oro.action.extension.button_provider, priority: -120 }
 
     oro_workflow.event_listener.button_provider.process_buttons_static_translations:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\ProcessButtonsStaticTranslations'

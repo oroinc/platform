@@ -10,8 +10,7 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
  */
 class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 {
-    /** @var EnumChoiceType */
-    protected $type;
+    private EnumChoiceType $type;
 
     protected function setUp(): void
     {
@@ -20,7 +19,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->type = new EnumChoiceType($this->configManager, $this->doctrine);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(
             TranslatableEntityType::class,
@@ -28,37 +27,37 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         );
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $this->doTestBuildForm($this->type);
     }
 
-    public function testPreSetDataForExistingEntity()
+    public function testPreSetDataForExistingEntity(): void
     {
         $this->doTestPreSetDataForExistingEntity($this->type);
     }
 
-    public function testPreSetDataForNullEntity()
+    public function testPreSetDataForNullEntity(): void
     {
         $this->doTestPreSetDataForNullEntity($this->type);
     }
 
-    public function testPreSetDataForFormWithoutDataClass()
+    public function testPreSetDataForFormWithoutDataClass(): void
     {
         $this->doTestPreSetDataForFormWithoutDataClass($this->type);
     }
 
-    public function testPreSetDataForNewEntityKeepExistingValue()
+    public function testPreSetDataForNewEntityKeepExistingValue(): void
     {
         $this->doTestPreSetDataForNewEntityKeepExistingValue($this->type);
     }
 
-    public function testPreSetDataForNewEntity()
+    public function testPreSetDataForNewEntity(): void
     {
         $this->doTestPreSetDataForNewEntity($this->type);
     }
 
-    public function testPreSetDataForNewEntityWithMultiEnum()
+    public function testPreSetDataForNewEntityWithMultiEnum(): void
     {
         $this->doTestPreSetDataForNewEntityWithMultiEnum($this->type);
     }
@@ -66,7 +65,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     /**
      * @dataProvider configureOptionsProvider
      */
-    public function testConfigureOptions($multiple, array $options, array $expectedOptions)
+    public function testConfigureOptions($multiple, array $options, array $expectedOptions): void
     {
         $resolver = $this->getOptionsResolver();
 
@@ -82,7 +81,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->assertEquals($expectedOptions, $resolvedOptions);
     }
 
-    public function testClassNormalizerOptionsException()
+    public function testClassNormalizerOptionsException(): void
     {
         $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->expectExceptionMessage('Either "class" or "enum_code" must option must be set.');
@@ -91,11 +90,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->type->configureOptions($resolver);
         $resolver->resolve([
             'enum_code' => null,
-            'class' => null
+            'class' => null,
         ]);
     }
 
-    public function testClassNormalizerUnexpectedEnumException()
+    public function testClassNormalizerUnexpectedEnumException(): void
     {
         $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->expectExceptionMessage('must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"');
@@ -103,14 +102,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([
-            'enum_code' => 'unknown'
+            'enum_code' => 'unknown',
         ]);
     }
 
-    /**
-     * @return array
-     */
-    public function configureOptionsProvider()
+    public function configureOptionsProvider(): array
     {
         return [
             'not multiple, not expanded' => [
@@ -119,7 +115,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'expectedOptions' => [
                     'placeholder' => 'oro.form.choose_value',
                     'empty_data' => null,
-                ]
+                ],
             ],
             'not multiple, not expanded, not null "placeholder"' => [
                 'multiple' => false,
@@ -127,15 +123,15 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'expectedOptions' => [
                     'placeholder' => false,
                     'empty_data' => null,
-                ]
+                ],
             ],
             'not multiple, expanded' => [
                 'multiple' => true,
                 'options' => ['expanded' => false],
                 'expectedOptions' => [
                     'placeholder' => null,
-                    'empty_data' => null,
-                ]
+                    'empty_data' => [],
+                ],
             ],
             'multiple, not expanded' => [
                 'multiple' => false,
@@ -143,15 +139,15 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'expectedOptions' => [
                     'placeholder' => null,
                     'empty_data' => null,
-                ]
+                ],
             ],
             'multiple, expanded' => [
                 'multiple' => true,
                 'options' => ['expanded' => true],
                 'expectedOptions' => [
                     'placeholder' => null,
-                    'empty_data' => null,
-                ]
+                    'empty_data' => [],
+                ],
             ],
             'multiple, expanded, other options' => [
                 'multiple' => true,
@@ -163,7 +159,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
                 'expectedOptions' => [
                     'placeholder' => 'test',
                     'empty_data' => '123',
-                ]
+                ],
             ],
         ];
     }

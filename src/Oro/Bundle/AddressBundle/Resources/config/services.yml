@@ -13,10 +13,14 @@ services:
             - '@oro_address.repository.country'
 
     oro_address.repository.country:
-        class: Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository
+        alias: Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository
+
+    Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\AddressBundle\Entity\Country'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_address.extension.action.type.map:
         class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction

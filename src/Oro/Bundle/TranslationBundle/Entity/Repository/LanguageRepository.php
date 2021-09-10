@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -12,7 +12,7 @@ use Oro\Component\DoctrineUtils\ORM\ArrayKeyTrueHydrator;
 /**
  * Repository for Language entity
  */
-class LanguageRepository extends EntityRepository
+class LanguageRepository extends ServiceEntityRepository
 {
     /**
      * Returns all (or only enabled if $onlyEnabled is true) language codes as an array,

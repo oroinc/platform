@@ -49,15 +49,14 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param [] $data
-     * @param bool $configSyncEnabled
-     * @param int $configSyncMaxSize
-     *
      * @dataProvider addAttachmentProvider
      */
-    public function testAddAttachment($expected, $data, $configSyncEnabled, $configSyncMaxSize)
-    {
+    public function testAddAttachment(
+        bool $expected,
+        array $data,
+        ?bool $configSyncEnabled,
+        int|float|null $configSyncMaxSize
+    ) {
         $this->emailBodyBuilder->setEmailBody('test', true);
 
         if ($configSyncEnabled) {
@@ -91,7 +90,7 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $body->getHasAttachments());
     }
 
-    public function addAttachmentProvider()
+    public function addAttachmentProvider(): array
     {
         return [
             'not set' => [

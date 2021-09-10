@@ -16,7 +16,6 @@ services:
 
     oro_workflow.acl.voter.workflow_edit_voter:
         class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter
-        public: false
         tags:
             - { name: security.voter }
 

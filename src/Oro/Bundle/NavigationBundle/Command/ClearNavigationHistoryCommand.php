@@ -95,6 +95,10 @@ HELP
             $output->writeln(sprintf("'%d' items deleted from navigation history.", $deletedCnt));
         } catch (\Exception $e) {
             $output->writeln($e->getMessage());
+
+            return $e->getCode() ?: 1;
         }
+
+        return 0;
     }
 }

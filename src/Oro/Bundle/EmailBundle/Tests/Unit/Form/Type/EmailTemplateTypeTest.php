@@ -53,11 +53,10 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
-        /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject $entityProvider */
         $entityProvider = $this->createMock(EntityProvider::class);
         $entityProvider->expects($this->any())
             ->method('getEntities')
@@ -65,18 +64,14 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
                 ['name' => \stdClass::class, 'label' => \stdClass::class . '_label'],
                 ['name' => \stdClass::class . '_new', 'label' => \stdClass::class . '_new_label'],
             ]);
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
-        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
 
-        /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider */
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
@@ -84,7 +79,6 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
 
         $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
 
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
 
         return [
@@ -108,11 +102,6 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
             ),
             new ValidatorExtension(Validation::createValidator()),
         ];
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->type);
     }
 
     public function testConfigureOptions()
@@ -152,10 +141,9 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         /** @var Localization $localizationA */
         $localizationA = $this->getEntity(Localization::class, ['id' => 1]);

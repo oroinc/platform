@@ -24,10 +24,9 @@ class InstallCommandTest extends TestCase
     use CommandTestingTrait;
     use TempDirExtension;
 
-    /** @var InstallCommand */
-    private $command;
+    private InstallCommand $command;
 
-    public function testDisplaysErrorAndTerminatesIfAlreadyInstalled()
+    public function testDisplaysErrorAndTerminatesIfAlreadyInstalled(): void
     {
         $commandTester = $this->doExecuteCommand($this->command);
 
@@ -37,12 +36,21 @@ class InstallCommandTest extends TestCase
 
     protected function setUp(): void
     {
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('hasParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container->method('getParameter')
+            ->with('installed')
+            ->willReturn('2020-01-01T01:01:01-08:00');
+
         /** @noinspection PhpParamsInspection */
         $this->command = new InstallCommand(
-            $this->createMock(YamlPersister::class),
-            $this->createMock(ScriptManager::class),
+            $container,
             $this->createMock(Registry::class),
-            $this->createMock(EventDispatcherInterface::class)
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(YamlPersister::class),
+            $this->createMock(ScriptManager::class)
         );
 
         $questionHelper = $this->createMock(QuestionHelper::class);
@@ -51,14 +59,5 @@ class InstallCommandTest extends TestCase
         $helperSet->method('get')
             ->willReturn($questionHelper);
         $this->command->setHelperSet($helperSet);
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('hasParameter')
-            ->with('installed')
-            ->willReturn(true);
-        $container->method('getParameter')
-            ->with('installed')
-            ->willReturn('2020-01-01T01:01:01-08:00');
-        $this->command->setContainer($container);
     }
 }

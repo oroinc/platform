@@ -37,7 +37,7 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getClassName(): string
     {
@@ -45,7 +45,7 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getGroup(): string
     {
@@ -53,7 +53,7 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLabel()
     {
@@ -61,7 +61,7 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getDescription()
     {
@@ -69,7 +69,7 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getCategory(): string
     {
@@ -77,7 +77,7 @@ class ClassSecurityMetadataStub implements ClassSecurityMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFields(): array
     {

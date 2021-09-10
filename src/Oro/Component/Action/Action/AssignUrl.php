@@ -7,6 +7,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Actions that generates url and assigns to the specified attribute.
+ */
 class AssignUrl extends AbstractAction
 {
     /**
@@ -76,13 +79,13 @@ class AssignUrl extends AbstractAction
 
     /**
      * @param mixed $context
-     * @return string|null
+     * @return string
      */
-    protected function getRoute($context)
+    protected function getRoute($context): string
     {
         return !empty($this->options['route'])
-            ? $this->contextAccessor->getValue($context, $this->options['route'])
-            : null;
+            ? (string) $this->contextAccessor->getValue($context, $this->options['route'])
+            : '';
     }
 
     /**

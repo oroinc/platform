@@ -47,5 +47,7 @@ HELP
         $this->cacheDir = $input->getOption('cache-dir');
 
         $this->warmup($output);
+
+        return 0;
     }
 }

@@ -50,5 +50,8 @@ class UrlInfoType extends AbstractType
         $resolver->setDefault('route', self::DEFAULT_DISPLAY_ROUTE);
         $resolver->setDefault('route_params', self::DEFAULT_DISPLAY_ROUTE_PARAMS);
         $resolver->setDefault('url_type', RouterInterface::ABSOLUTE_URL);
+        $resolver->setAllowedTypes('route', 'string');
+        $resolver->setAllowedTypes('route_params', 'array');
+        $resolver->setAllowedTypes('url_type', 'int');
     }
 }

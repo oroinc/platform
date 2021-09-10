@@ -3,37 +3,28 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\EntityField\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use Symfony\Component\Form\FormInterface;
 
 class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $processor;
+    /** @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $processor;
 
-    /**
-     * @var EntityApiBaseHandler
-     */
-    protected $handler;
+    /** @var EntityApiBaseHandler */
+    private $handler;
 
-    /**
-     * @var Registry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityClassNameHelper;
+    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassNameHelper;
 
-    /**
-     * @return array
-     */
-    public function methodsDataProvider()
+    public function methodsDataProvider(): array
     {
         return [
             'POST' => ['POST', true],
@@ -44,17 +35,9 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->processor = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassNameHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(Registry::class);
+        $this->processor = $this->createMock(EntityApiHandlerProcessor::class);
+        $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
 
         $this->handler = new EntityApiBaseHandler($this->registry, $this->processor, $this->entityClassNameHelper);
     }
@@ -62,16 +45,14 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessUnsupportedMethod()
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = ['a' => 1];
         $method = 'UNSUP';
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->never())
@@ -89,15 +70,13 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessDataEmpty($method, $clearMissing)
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = [];
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->once())
@@ -115,15 +94,13 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessInvalid($method, $clearMissing)
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = ['a' => '1', 'b' => '2'];
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->once())
@@ -132,16 +109,13 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
-        $this->processor
-            ->expects($this->never())
+        $this->processor->expects($this->never())
             ->method('beforeProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->never())
+        $this->processor->expects($this->never())
             ->method('afterProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('invalidateProcess')
             ->with($entity);
 
@@ -156,15 +130,13 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessValid($method, $clearMissing)
     {
         $entity = new SomeEntity();
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $data = ['a' => '1', 'b' => '2'];
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('preProcess')
             ->with($entity);
-        $form
-            ->expects($this->once())
+        $form->expects($this->once())
             ->method('setData')
             ->with($entity);
         $form->expects($this->once())
@@ -173,16 +145,13 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('beforeProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('afterProcess')
             ->with($entity);
-        $this->processor
-            ->expects($this->never())
+        $this->processor->expects($this->never())
             ->method('invalidateProcess')
             ->with($entity);
 
@@ -196,17 +165,16 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         ], $this->handler->process($entity, $form, $data, $method));
     }
 
-    protected function initManager()
+    private function initManager()
     {
-        $manager = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $manager = $this->createMock(EntityManager::class);
         $manager->expects($this->any())
             ->method('persist');
         $manager->expects($this->any())
             ->method('flush');
 
-        $this->registry->expects($this->any())->method('getManager')->willReturn($manager);
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($manager);
     }
 }

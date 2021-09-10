@@ -15,21 +15,19 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SmtpSettingsProvider */
-    protected $provider;
+    private $provider;
 
     /** @var ConfigManager */
-    protected $manager;
+    private $manager;
 
     /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $globalScopeManager;
+    private $globalScopeManager;
 
     /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $crypter;
+    private $crypter;
 
-    /**
-     * @var array
-     */
-    protected $settings = [
+    /** @var array */
+    private $settings = [
         'oro_email' => [
             'smtp_settings_host' => [
                 'value' => 'smtp.orocrm.com',
@@ -62,9 +60,7 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
         );
 
         $bag = new ConfigDefinitionImmutableBag($this->settings);
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
 
         $this->manager = new ConfigManager(
             'global',
@@ -73,9 +69,7 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
             new MemoryCache()
         );
 
-        $this->globalScopeManager = $this->getMockBuilder(GlobalScopeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->globalScopeManager = $this->createMock(GlobalScopeManager::class);
 
         $this->manager->addManager('global', $this->globalScopeManager);
 
@@ -86,19 +80,14 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $smtpSettings = new SmtpSettings();
 
-        $providerMock = $this->getMockBuilder(SmtpSettingsProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $providerMock
-            ->expects($this->once())
+        $provider = $this->createMock(SmtpSettingsProvider::class);
+        $provider->expects($this->once())
             ->method('getSmtpSettings')
             ->with(null)
-            ->will($this->returnValue($smtpSettings))
-        ;
+            ->willReturn($smtpSettings);
 
         $this->assertInstanceOf(SmtpSettings::class, $smtpSettings);
-        $this->assertEquals($smtpSettings, $providerMock->getSmtpSettings());
+        $this->assertEquals($smtpSettings, $provider->getSmtpSettings());
     }
 
     public function testDefaultSmtpSettings()

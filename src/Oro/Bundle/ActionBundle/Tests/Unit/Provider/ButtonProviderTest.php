@@ -30,7 +30,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->searchContext = $this->createMock(ButtonSearchContext::class);
+        $this->searchContext = new ButtonSearchContext();
     }
 
     public function testMatch()

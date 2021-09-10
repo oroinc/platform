@@ -13,26 +13,10 @@ use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
  */
 class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
 {
-    /**
-     * @var TypeFormatterInterface
-     */
-    protected TypeFormatterInterface $formatter;
-
-    /**
-     * @var string
-     */
+    protected ?TypeFormatterInterface $formatter = null;
     protected string $defaultDateTimeFormat;
-
-    /**
-     * @var string
-     */
     protected string $defaultDateFormat;
-
-    /**
-     * @var string
-     */
     protected string $defaultTimeFormat;
-
     protected \DateTimeZone $defaultTimezone;
 
     public function __construct(
@@ -64,7 +48,7 @@ class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwar
         }
 
         if (!empty($context['type']) && in_array($context['type'], ['datetime', 'date', 'time'], true)) {
-            if ($this->formatter !== null && $this->formatter instanceof TypeFormatterInterface) {
+            if ($this->formatter instanceof TypeFormatterInterface) {
                 return $this->formatter->formatType($object, $context['type']);
             }
         }
@@ -93,10 +77,9 @@ class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwar
         if (!empty($context['format'])) {
             $datetime = \DateTime::createFromFormat($context['format'] . '|', (string)$data, $timezone);
         } elseif (!empty($context['type']) && in_array($context['type'], ['datetime', 'date', 'time'], true)) {
-            $formatter = $this->formatter;
-            if (null !== $formatter && $formatter instanceof DateTimeTypeConverterInterface) {
+            if ($this->formatter instanceof DateTimeTypeConverterInterface) {
                 /** @var DateTimeTypeConverterInterface $formatter */
-                $datetime = $formatter->convertToDateTime($data, $context['type']);
+                $datetime = $this->formatter->convertToDateTime($data, $context['type']);
             }
         }
 

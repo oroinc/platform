@@ -19,8 +19,8 @@ class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
         $group2 = 'group2';
 
         $chain = new ChainAclGroupProvider([
-            $this->getAclGroupProviderMock(false, $group1),
-            $this->getAclGroupProviderMock(true, $group2)
+            $this->getAclGroupProvider(false, $group1),
+            $this->getAclGroupProvider(true, $group2)
         ]);
 
         $this->assertSame($group2, $chain->getGroup());
@@ -29,20 +29,14 @@ class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetGroupForDefaultGroup()
     {
         $chain = new ChainAclGroupProvider([
-            $this->getAclGroupProviderMock(false, 'group1'),
-            $this->getAclGroupProviderMock(false, 'group2')
+            $this->getAclGroupProvider(false, 'group1'),
+            $this->getAclGroupProvider(false, 'group2')
         ]);
 
         $this->assertSame(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP, $chain->getGroup());
     }
 
-    /**
-     * @param bool   $isSupports
-     * @param string $group
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface
-     */
-    private function getAclGroupProviderMock(bool $isSupports, string $group)
+    private function getAclGroupProvider(bool $isSupports, string $group): AclGroupProviderInterface
     {
         $provider = $this->createMock(AclGroupProviderInterface::class);
         $provider->expects($this->any())

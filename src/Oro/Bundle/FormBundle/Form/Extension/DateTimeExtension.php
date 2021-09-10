@@ -10,18 +10,20 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reverts https://github.com/symfony/symfony/pull/24401 to avoid BC break,
  * https://github.com/symfony/symfony/pull/28466 and https://github.com/symfony/symfony/pull/28372 as well.
  * Also the default format is changed in OroDateTimeType
+ *
  * @see \Oro\Bundle\FormBundle\Form\Type\OroDateTimeType::setDefaultOptions
  */
 class DateTimeExtension extends AbstractTypeExtension
 {
-    const HTML5_FORMAT_WITHOUT_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
-    const HTML5_FORMAT_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+    public const HTML5_FORMAT_WITHOUT_TIMEZONE = DateTimeType::HTML5_FORMAT;
+    public const HTML5_FORMAT_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
     /**
      * {@inheritdoc}
@@ -29,6 +31,14 @@ class DateTimeExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['format' => self::HTML5_FORMAT_WITH_TIMEZONE]);
+        $resolver->setNormalizer('html5', function (Options $options, $html5) {
+            if ($html5 && self::HTML5_FORMAT_WITHOUT_TIMEZONE !== $options['format']) {
+                // Option html5 cannot be set if the datetime format is not local.
+                return false;
+            }
+
+            return $html5;
+        });
     }
 
     /**
@@ -53,10 +63,8 @@ class DateTimeExtension extends AbstractTypeExtension
     {
         if (array_key_exists('type', $view->vars) && 'datetime-local' === $view->vars['type']) {
             $view->vars['type'] = 'datetime';
-        } elseif ($options['html5']
-            && 'single_text' === $options['widget']
-            && self::HTML5_FORMAT_WITH_TIMEZONE === $options['format']
-        ) {
+        } elseif (($options['html5'] || $options['format'] === self::HTML5_FORMAT_WITH_TIMEZONE)
+            && 'single_text' === $options['widget']) {
             $view->vars['type'] = 'datetime';
         }
     }
@@ -98,8 +106,8 @@ class DateTimeExtension extends AbstractTypeExtension
      * Replaces DateTimeToHtml5LocalDateTimeTransformer with DateTimeToLocalizedStringTransformer view transformer.
      *
      * @param FormBuilderInterface $builder
-     * @param string               $pattern
-     * @param array                $options
+     * @param string $pattern
+     * @param array $options
      */
     private function replaceHtml5LocalDateTimeWithLocalizedStringViewTransformer(
         FormBuilderInterface $builder,

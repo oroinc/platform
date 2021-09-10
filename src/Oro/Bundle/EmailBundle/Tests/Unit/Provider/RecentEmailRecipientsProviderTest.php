@@ -19,13 +19,25 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
+
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
+
+    /** @var RelatedEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $relatedEmailsProvider;
+
+    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
+
+    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailOwnerProvider;
+
+    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $emailRecipientsHelper;
 
+    /** @var RecentEmailRecipientsProvider */
     private $emailRecipientsProvider;
 
     protected function setUp(): void
@@ -33,17 +45,13 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);
-
-        $em = $this->createMock(EntityManager::class);
-
         $this->registry = $this->createMock(Registry::class);
+        $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
+        $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
+
         $this->registry->expects($this->any())
             ->method('getManager')
-            ->willReturn($em);
-
-        $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
-
-        $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
+            ->willReturn($this->createMock(EntityManager::class));
 
         $this->emailRecipientsProvider = new RecentEmailRecipientsProvider(
             $this->tokenAccessor,
@@ -125,7 +133,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->emailRecipientsProvider->getRecipients($args));
     }
 
-    public function emailProvider()
+    public function emailProvider(): array
     {
         return [
             [

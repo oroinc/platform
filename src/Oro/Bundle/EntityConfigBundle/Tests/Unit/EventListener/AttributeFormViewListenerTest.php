@@ -19,41 +19,26 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $environment;
 
-    /**
-     * @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
-    /**
-     * @var AttributeFormViewListener
-     */
+    /** @var AttributeFormViewListener */
     private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->environment = $this->getMockBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->environment = $this->createMock(Environment::class);
+        $this->attributeManager = $this->createMock(AttributeManager::class);
 
         $this->listener = new AttributeFormViewListener($this->attributeManager);
     }
 
     public function testOnEditWithoutFormRenderEvent()
     {
-        $this->attributeManager
-            ->expects($this->never())
+        $this->attributeManager->expects($this->never())
             ->method('getGroupsWithAttributes');
 
         $this->listener->onEdit(new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass()));
@@ -61,8 +46,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnViewWithoutViewRenderEvent()
     {
-        $this->attributeManager
-            ->expects($this->never())
+        $this->attributeManager->expects($this->never())
             ->method('getGroupsWithAttributes');
 
         $this->listener->onViewList(new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass()));
@@ -90,13 +74,11 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
             'attributeFamily' => $this->getEntity(AttributeFamily::class)
         ]);
 
-        $this->environment
-            ->expects($templateHtml ? $this->once() : $this->never())
+        $this->environment->expects($templateHtml ? $this->once() : $this->never())
             ->method('render')
             ->willReturn($templateHtml);
 
-        $this->attributeManager
-            ->expects($this->once())
+        $this->attributeManager->expects($this->once())
             ->method('getGroupsWithAttributes')
             ->willReturn($groupsData);
 
@@ -107,10 +89,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $listEvent->getScrollData()->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function formRenderDataProvider()
+    public function formRenderDataProvider(): array
     {
         $data = $this->viewListDataProvider();
 
@@ -141,13 +120,11 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
             'attributeFamily' => $this->getEntity(AttributeFamily::class)
         ]);
 
-        $this->environment
-            ->expects($this->exactly((int)!empty($templateHtml)))
+        $this->environment->expects($this->exactly((int)!empty($templateHtml)))
             ->method('render')
             ->willReturn($templateHtml);
 
-        $this->attributeManager
-            ->expects($this->once())
+        $this->attributeManager->expects($this->once())
             ->method('getGroupsWithAttributes')
             ->willReturn($groupsData);
 
@@ -159,10 +136,9 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function viewListDataProvider()
+    public function viewListDataProvider(): array
     {
         $label = $this->getEntity(LocalizedFallbackValue::class, ['string' => 'Group1Title']);
         $group1 = $this->getEntity(AttributeGroupStub::class, ['code' => 'group1', 'label' => $label]);

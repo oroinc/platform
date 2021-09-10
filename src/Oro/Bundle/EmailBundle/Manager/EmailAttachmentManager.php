@@ -136,7 +136,7 @@ class EmailAttachmentManager
         EmailAttachment $entity,
         $width = AttachmentManager::DEFAULT_IMAGE_WIDTH,
         $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT,
-        $referenceType = RouterInterface::ABSOLUTE_PATH
+        int $referenceType = RouterInterface::ABSOLUTE_PATH
     ) {
         return $this->router->generate(
             'oro_resize_email_attachment',

@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\EventListener\SearchAliasesListener;
 class SearchAliasesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchAliasesListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

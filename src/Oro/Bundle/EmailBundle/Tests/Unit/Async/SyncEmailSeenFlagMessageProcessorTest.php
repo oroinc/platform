@@ -19,96 +19,78 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new SyncEmailSeenFlagMessageProcessor(
-            $this->createDoctrineMock(),
-            $this->createEmailFlagManagerMock(),
-            $this->createLoggerMock()
+            $this->createMock(Registry::class),
+            $this->createMock(EmailFlagManager::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldRejectMessageIfMessageIdPropertyIsNotSet()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
-            $this->createDoctrineMock(),
-            $this->createEmailFlagManagerMock(),
+            $this->createMock(Registry::class),
+            $this->createMock(EmailFlagManager::class),
             $logger
         );
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'seen' => true,
-        ]));
+        $message->setBody(json_encode(['seen' => true], JSON_THROW_ON_ERROR));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfMessageSeenPropertyIsNotSet()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
-            $this->createDoctrineMock(),
-            $this->createEmailFlagManagerMock(),
+            $this->createMock(Registry::class),
+            $this->createMock(EmailFlagManager::class),
             $logger
         );
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'id' => 123,
-        ]));
+        $message->setBody(json_encode(['id' => 123], JSON_THROW_ON_ERROR));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfUserEmailEntityWasNotFound()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with('UserEmail was not found. id: "123"')
-        ;
+            ->with('UserEmail was not found. id: "123"');
 
-        $repository = $this->createEmailUserRepositoryMock();
-        $repository
-            ->expects($this->once())
+        $repository = $this->createMock(EmailUserRepository::class);
+        $repository->expects($this->once())
             ->method('find')
             ->with(123)
-            ->will($this->returnValue(null))
-        ;
+            ->willReturn(null);
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $doctrine = $this->createMock(Registry::class);
+        $doctrine->expects($this->once())
             ->method('getRepository')
             ->with(EmailUser::class)
-            ->will($this->returnValue($repository))
-        ;
+            ->willReturn($repository);
 
-        $flagManager = $this->createEmailFlagManagerMock();
-        $flagManager
-            ->expects($this->never())
-            ->method('setSeen')
-        ;
-        $flagManager
-            ->expects($this->never())
-            ->method('setUnseen')
-        ;
+        $flagManager = $this->createMock(EmailFlagManager::class);
+        $flagManager->expects($this->never())
+            ->method('setSeen');
+        $flagManager->expects($this->never())
+            ->method('setUnseen');
 
         $processor = new SyncEmailSeenFlagMessageProcessor(
             $doctrine,
@@ -117,12 +99,9 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'id' => 123,
-            'seen' => true,
-        ]));
+        $message->setBody(json_encode(['id' => 123, 'seen' => true], JSON_THROW_ON_ERROR));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -131,52 +110,39 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $emailUser = new EmailUser();
 
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $flagManager = $this->createEmailFlagManagerMock();
-        $flagManager
-            ->expects($this->once())
+        $flagManager = $this->createMock(EmailFlagManager::class);
+        $flagManager->expects($this->once())
             ->method('changeStatusSeen')
-            ->with($this->identicalTo($emailUser), true)
-        ;
+            ->with($this->identicalTo($emailUser), true);
 
-        $repository = $this->createEmailUserRepositoryMock();
-        $repository
-            ->expects($this->once())
+        $repository = $this->createMock(EmailUserRepository::class);
+        $repository->expects($this->once())
             ->method('find')
             ->with(123)
-            ->will($this->returnValue($emailUser))
-        ;
+            ->willReturn($emailUser);
 
-        $em = $this->createEntityManagerMock();
-        $em
-            ->expects($this->once())
-            ->method('flush')
-        ;
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->once())
+            ->method('flush');
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $doctrine = $this->createMock(Registry::class);
+        $doctrine->expects($this->once())
             ->method('getRepository')
             ->with(EmailUser::class)
-            ->will($this->returnValue($repository))
-        ;
-        $doctrine
-            ->expects($this->once())
+            ->willReturn($repository);
+        $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(EmailUser::class)
-            ->will($this->returnValue($em))
-        ;
+            ->willReturn($em);
 
         $processor = new SyncEmailSeenFlagMessageProcessor($doctrine, $flagManager, $logger);
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'id' => 123,
-            'seen' => true,
-        ]));
+        $message->setBody(json_encode(['id' => 123, 'seen' => true], JSON_THROW_ON_ERROR));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -185,53 +151,39 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $emailUser = new EmailUser();
 
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $flagManager = $this->createEmailFlagManagerMock();
-
-        $flagManager
-            ->expects($this->once())
+        $flagManager = $this->createMock(EmailFlagManager::class);
+        $flagManager->expects($this->once())
             ->method('changeStatusSeen')
-            ->with($this->identicalTo($emailUser), false)
-        ;
+            ->with($this->identicalTo($emailUser), false);
 
-        $repository = $this->createEmailUserRepositoryMock();
-        $repository
-            ->expects($this->once())
+        $repository = $this->createMock(EmailUserRepository::class);
+        $repository->expects($this->once())
             ->method('find')
             ->with(123)
-            ->will($this->returnValue($emailUser))
-        ;
+            ->willReturn($emailUser);
 
-        $em = $this->createEntityManagerMock();
-        $em
-            ->expects($this->once())
-            ->method('flush')
-        ;
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->once())
+            ->method('flush');
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $doctrine = $this->createMock(Registry::class);
+        $doctrine->expects($this->once())
             ->method('getRepository')
             ->with(EmailUser::class)
-            ->will($this->returnValue($repository))
-        ;
-        $doctrine
-            ->expects($this->once())
+            ->willReturn($repository);
+        $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(EmailUser::class)
-            ->will($this->returnValue($em))
-        ;
+            ->willReturn($em);
 
         $processor = new SyncEmailSeenFlagMessageProcessor($doctrine, $flagManager, $logger);
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'id' => 123,
-            'seen' => false,
-        ]));
+        $message->setBody(json_encode(['id' => 123, 'seen' => false], JSON_THROW_ON_ERROR));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -239,53 +191,5 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals([Topics::SYNC_EMAIL_SEEN_FLAG], SyncEmailSeenFlagMessageProcessor::getSubscribedTopics());
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
-     */
-    private function createEntityManagerMock()
-    {
-        return $this->createMock(EntityManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EmailUserRepository
-     */
-    private function createEmailUserRepositoryMock()
-    {
-        return $this->createMock(EmailUserRepository::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EmailFlagManager
-     */
-    private function createEmailFlagManagerMock()
-    {
-        return $this->createMock(EmailFlagManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Registry
-     */
-    private function createDoctrineMock()
-    {
-        return $this->createMock(Registry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

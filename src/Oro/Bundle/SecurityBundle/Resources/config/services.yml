@@ -2,19 +2,30 @@ parameters:
     oro_security.allowed_protocols: ['http', 'https']
 
 services:
+    oro_security.authorization_checker:
+        class: Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker
+        decorates: security.authorization_checker
+        arguments:
+            - '@oro_security.authorization_checker.inner'
+            - '@oro_security.acl.object_identity_factory'
+            - '@oro_security.acl.annotation_provider'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: security }
+
     oro_security.request_authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker
         arguments:
             - '@security.authorization_checker'
-            - '@oro_security.entity_class_resolver.link'
-            - '@oro_security.acl.annotation_provider.link'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.acl.annotation_provider'
 
     oro_security.class_authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker
         arguments:
             - '@security.authorization_checker'
-            - '@oro_security.acl.object_identity_factory.link'
-            - '@oro_security.acl.annotation_provider.link'
+            - '@oro_security.acl.object_identity_factory'
+            - '@oro_security.acl.annotation_provider'
             - '@logger'
         tags:
             - { name: monolog.logger, channel: security }
@@ -27,18 +38,6 @@ services:
 
     Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface:
         alias: oro_security.token_accessor
-
-    oro_security.acl.object_identity_factory.link:
-        tags:
-            - { name: oro_service_link, service: oro_security.acl.object_identity_factory }
-
-    oro_security.acl.annotation_provider.link:
-        tags:
-            - { name: oro_service_link, service: oro_security.acl.annotation_provider }
-
-    oro_security.entity_class_resolver.link:
-        tags:
-            - { name: oro_service_link, service: oro_entity.orm.entity_class_resolver }
 
     oro_security.acl.base_manager:
         class: Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
@@ -81,6 +80,7 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
         arguments:
+            - [] # extension names
             - [] # extensions
             - '@oro_security.acl.object_id_accessor'
 
@@ -439,12 +439,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
-    Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory:
-        alias: oro_security.token.factory.username_password_organization
-
     oro_security.token.factory.username_password_organization:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
-        public: true
 
     oro_security.token.provider.rememberme:
         class: Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider
@@ -455,12 +451,8 @@ services:
     oro_security.token.factory.organization_rememberme:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
-    Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser:
-        alias: oro_security.authentication.organization_guesser
-
     oro_security.authentication.organization_guesser:
         class: Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser
-        public: true
 
     oro_security.authentication.listener.basic:
         class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener

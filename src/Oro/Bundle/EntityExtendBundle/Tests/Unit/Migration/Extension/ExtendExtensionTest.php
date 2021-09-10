@@ -31,13 +31,13 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityMetadataHelper;
+    private $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
-    protected $extendOptionsManager;
+    private $extendOptionsManager;
 
     /** @var ExtendOptionsParser */
-    protected $extendOptionsParser;
+    private $extendOptionsParser;
 
     protected function setUp(): void
     {
@@ -51,7 +51,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->entityMetadataHelper->expects($this->any())
             ->method('getFieldNameByColumnName')
-            ->will($this->returnArgument(1));
+            ->willReturnArgument(1);
 
         $this->extendOptionsManager = new ExtendOptionsManager();
 
@@ -72,19 +72,12 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return ExtendSchema
-     */
-    protected function getExtendSchema()
+    private function getExtendSchema(): ExtendSchema
     {
         return new ExtendSchema($this->extendOptionsManager, new ExtendDbIdentifierNameGenerator());
     }
 
-    /**
-     * @param array $config
-     * @return ExtendExtension
-     */
-    protected function getExtendExtension(array $config = [])
+    private function getExtendExtension(array $config = []): ExtendExtension
     {
         $result = new ExtendExtension(
             $this->extendOptionsManager,
@@ -309,11 +302,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
      * @dataProvider createEnumWithIdentityDataProvider
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @param array $identityFields
-     * @param array $expected
      */
-    public function testCreateEnum($identityFields = [], $expected = [])
+    public function testCreateEnum(array $identityFields = [], array $expected = [])
     {
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -327,14 +317,12 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->entityMetadataHelper->expects($this->exactly(4))
             ->method('isEntityClassContainsColumn')
-            ->willReturnMap(
-                [
-                    [$expectedClassName, 'id', true],
-                    [$expectedClassName, 'name', true],
-                    [$expectedClassName, 'priority', true],
-                    [$expectedClassName, 'is_default', true],
-                ]
-            );
+            ->willReturnMap([
+                [$expectedClassName, 'id', true],
+                [$expectedClassName, 'name', true],
+                [$expectedClassName, 'priority', true],
+                [$expectedClassName, 'is_default', true],
+            ]);
 
         $extension->createEnum($schema, 'test_status', false, false, false, [], $identityFields);
 
@@ -422,9 +410,6 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array[]
-     */
     public function createEnumWithIdentityDataProvider(): array
     {
         return [
@@ -459,9 +444,6 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->createEnum($schema, 'test_status', false, false, false, [], $identityFields);
     }
 
-    /**
-     * @return array[]
-     */
     public function createEnumWithInvalidIdentityFieldDataProvider(): array
     {
         return [
@@ -497,14 +479,12 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->entityMetadataHelper->expects($this->exactly(4))
             ->method('isEntityClassContainsColumn')
-            ->willReturnMap(
-                [
-                    [$expectedClassName, 'id', true],
-                    [$expectedClassName, 'name', true],
-                    [$expectedClassName, 'priority', true],
-                    [$expectedClassName, 'is_default', true],
-                ]
-            );
+            ->willReturnMap([
+                [$expectedClassName, 'id', true],
+                [$expectedClassName, 'name', true],
+                [$expectedClassName, 'priority', true],
+                [$expectedClassName, 'is_default', true],
+            ]);
 
         $extension->createEnum(
             $schema,
@@ -2653,10 +2633,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateOptionsDataProvider
-     * @param array $config
-     * @param bool $throwException
      */
-    public function testValidateOptionAllowedTypesInManyToManyRelation(array $config, $throwException)
+    public function testValidateOptionAllowedTypesInManyToManyRelation(array $config, bool $throwException)
     {
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension($config);
@@ -2690,10 +2668,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateOptionsDataProvider
-     * @param array $config
-     * @param bool $throwException
      */
-    public function testValidateOptionAllowedTypesInOneToManyRelation(array $config, $throwException)
+    public function testValidateOptionAllowedTypesInOneToManyRelation(array $config, bool $throwException)
     {
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension($config);
@@ -2727,10 +2703,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateOptionsDataProvider
-     * @param array $config
-     * @param bool $throwException
      */
-    public function testValidateOptionAllowedTypesInManyToOneRelation(array $config, $throwException)
+    public function testValidateOptionAllowedTypesInManyToOneRelation(array $config, bool $throwException)
     {
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension($config);
@@ -2789,10 +2763,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('table1!associationName', $schema->getExtendOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function validateOptionsDataProvider()
+    public function validateOptionsDataProvider(): array
     {
         return [
             'config with not allowed option ' => [
@@ -2830,7 +2801,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function assertSchemaSql(Schema $schema, array $expectedSql)
+    private function assertSchemaSql(Schema $schema, array $expectedSql)
     {
         $sql = $schema->toSql(new MySqlPlatform());
         foreach ($sql as &$el) {
@@ -2843,7 +2814,7 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedSql, $sql);
     }
 
-    protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
+    private function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
         $extendOptions = $schema->getExtendOptions();
         $extendOptions = $this->extendOptionsParser->parseOptions($extendOptions);

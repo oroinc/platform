@@ -4,9 +4,3 @@
     font-size: $page-title-font-size;
     font-family: $page-title-font-family;
 }
-
-@include breakpoint('print') {
-    .page-title {
-        text-align: center;
-    }
-}

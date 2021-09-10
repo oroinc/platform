@@ -19,25 +19,20 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
      */
     public function testVote(array $expected, string $sourceUuid = null): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|BaseAclVoter $decorateVoter */
         $decorateVoter = $this->createMock(BaseAclVoter::class);
-        /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface $token */
         $token = $this->createMock(TokenInterface::class);
         $source = $this->getEntity(DraftableEntityStub::class, ['draftUuid' => $sourceUuid]);
         $voter = new AclVoter($decorateVoter);
         $attributes = ['MASTER', 'VIEW', 'EDIT', 'DELETE'];
 
-        $decorateVoter
-            ->expects($this->once())
+        $result = VoterInterface::ACCESS_ABSTAIN;
+
+        $decorateVoter->expects($this->once())
             ->method('vote')
             ->with($token, $source, $expected)
-            ->willReturn(VoterInterface::ACCESS_ABSTAIN);
+            ->willReturn($result);
 
-        $voter->vote(
-            $token,
-            $source,
-            $attributes
-        );
+        $this->assertSame($result, $voter->vote($token, $source, $attributes));
     }
 
     public function permissionProvider(): array

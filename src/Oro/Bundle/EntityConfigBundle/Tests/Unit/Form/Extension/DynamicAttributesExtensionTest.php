@@ -33,70 +33,35 @@ use Symfony\Component\Form\Test\TypeTestCase;
  */
 class DynamicAttributesExtensionTest extends TypeTestCase
 {
-    const DATA_CLASS = TestActivityTarget::class;
+    private const DATA_CLASS = TestActivityTarget::class;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
-    /**
-     * @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeConfigHelper;
 
-    /**
-     * @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $attributeEntityConfig;
-
-    /**
-     * @var DynamicFieldsHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DynamicFieldsHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $dynamicFieldsHelper;
 
-    /**
-     * @var DynamicAttributesExtension
-     */
+    /** @var DynamicAttributesExtension */
     private $extension;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeEntityConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeConfigHelper = $this->getMockBuilder(AttributeConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dynamicFieldsHelper = $this->getMockBuilder(DynamicFieldsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->attributeManager = $this->createMock(AttributeManager::class);
+        $this->attributeConfigHelper = $this->createMock(AttributeConfigHelper::class);
+        $this->dynamicFieldsHelper = $this->createMock(DynamicFieldsHelper::class);
 
         $container = TestContainerBuilder::create()
             ->add('oro_entity_config.manager.attribute_manager', $this->attributeManager)
@@ -111,10 +76,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function notApplicableDataProvider()
+    public function notApplicableDataProvider(): array
     {
         return [
             'no data_class option' => [
@@ -131,10 +93,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
      */
     public function testBuildFormWhenNotApplicable(array $options)
     {
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder
-            ->expects($this->never())
+        $builder->expects($this->never())
             ->method('addEventListener');
 
         $this->extension->buildForm($builder, $options);
@@ -142,7 +102,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     public function testBuildForm()
     {
-        $viewConfigProvider = $this->getViewConfigProvider();
+        $viewConfigProvider = $this->createMock(ConfigProvider::class);
         $formConfigProvider = $this->getFormConfigProvider();
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
@@ -171,10 +131,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->method('isFieldAttribute')
             ->willReturnOnConsecutiveCalls(false, true);
 
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder
-            ->expects($this->exactly(2))
+        $builder->expects($this->exactly(2))
             ->method('addEventListener')
             ->withConsecutive(
                 [FormEvents::PRE_SET_DATA, [$this->extension, 'onPreSetData'], 0],
@@ -250,10 +208,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->extension->onPreSetData($event);
     }
 
-    /**
-     * @return array
-     */
-    public function addAttributesDataProvider()
+    public function addAttributesDataProvider(): array
     {
         return [
             'one item' => [
@@ -322,12 +277,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->with($entity->getAttributeFamily())
             ->willReturn($attributes);
 
-        $attributeFamilyRepository = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $attributeFamilyRepository
-            ->expects($this->once())
+        $attributeFamilyRepository = $this->createMock(EntityRepository::class);
+        $attributeFamilyRepository->expects($this->once())
             ->method('find')
             ->with($attributeFamilyId)
             ->willReturn($entity->getAttributeFamily());
@@ -349,38 +300,32 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $this->expectsApplicable();
         $formConfigProvider = $this->getFormConfigProvider();
 
-        $attributeConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attributeConfigProvider = $this->createMock(ConfigProvider::class);
         $attributeConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturnMap([
                 [self::DATA_CLASS, 'no_attribute', new Config(
-                    $this->getMockBuilder(ConfigIdInterface::class)->getMock(),
+                    $this->createMock(ConfigIdInterface::class),
                     ['is_attribute' => false]
                 )],
                 [self::DATA_CLASS, 'attribute',  new Config(
-                    $this->getMockBuilder(ConfigIdInterface::class)->getMock(),
+                    $this->createMock(ConfigIdInterface::class),
                     ['is_attribute' => true]
                 )],
             ]);
 
-        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->willReturn($this->getMockBuilder(ConfigInterface::class)->getMock());
+            ->willReturn($this->createMock(ConfigInterface::class));
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['attribute', $attributeConfigProvider],
-                    ['form', $formConfigProvider],
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['attribute', $attributeConfigProvider],
+                ['form', $formConfigProvider],
+            ]);
 
         $this->dynamicFieldsHelper->expects($this->once())
             ->method('shouldBeInitialized')
@@ -403,24 +348,9 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     /**
      * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getViewConfigProvider()
-    {
-        $viewConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $viewConfigProvider;
-    }
-
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getFormConfigProvider()
     {
-        $formConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $formConfigProvider = $this->createMock(ConfigProvider::class);
         $formConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::DATA_CLASS)
@@ -429,10 +359,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         return $formConfigProvider;
     }
 
-    /**
-     * @return array
-     */
-    private function getFormConfigs()
+    private function getFormConfigs(): array
     {
         $disabledFormConfig = new Config(
             new FieldConfigId('form', self::DATA_CLASS, 'disabled'),
@@ -459,10 +386,8 @@ class DynamicAttributesExtensionTest extends TypeTestCase
      */
     private function getForm()
     {
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
-        $config = $this->getMockBuilder(FormConfigInterface::class)
-            ->getMock();
+        $form = $this->createMock(FormInterface::class);
+        $config = $this->createMock(FormConfigInterface::class);
         $form->expects($this->any())
             ->method('getConfig')
             ->willReturn($config);
@@ -479,11 +404,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
      */
     private function getFormView()
     {
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $formView;
+        return $this->createMock(FormView::class);
     }
 
     /**

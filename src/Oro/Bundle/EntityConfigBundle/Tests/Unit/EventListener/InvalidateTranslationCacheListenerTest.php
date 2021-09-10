@@ -38,13 +38,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $cacheProvider = $this->getMockBuilder(Cache::class)
-            ->onlyMethods(['fetch', 'contains', 'save', 'delete', 'getStats'])
-            ->addMethods(['deleteAll'])
-            ->getMock();
-        $configuration->setQueryCacheImpl($cacheProvider);
-        $cacheProvider->expects($this->never())
-            ->method('deleteAll');
+        $configuration->setQueryCacheImpl($this->createMock(Cache::class));
 
         $this->listener->onInvalidateTranslationCache();
     }

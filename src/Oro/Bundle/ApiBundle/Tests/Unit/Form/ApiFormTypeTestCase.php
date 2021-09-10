@@ -11,14 +11,13 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\ResolvedFormTypeFactory;
 
-class ApiFormTypeTestCase extends TestCase
+class ApiFormTypeTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var FormFactoryInterface */
     protected $factory;

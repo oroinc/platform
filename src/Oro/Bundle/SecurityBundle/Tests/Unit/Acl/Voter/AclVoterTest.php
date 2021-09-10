@@ -17,6 +17,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -201,7 +202,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->method('contains');
 
         self::assertEquals(
-            AclVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -223,7 +224,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         self::assertEquals(
-            AclVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -245,7 +246,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         self::assertEquals(
-            AclVoter::ACCESS_GRANTED,
+            VoterInterface::ACCESS_GRANTED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -276,7 +277,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         self::assertEquals(
-            AclVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -302,7 +303,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getMasks');
 
         self::assertEquals(
-            AclVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -333,7 +334,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         self::assertEquals(
-            AclVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -363,7 +364,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getMasks');
 
         self::assertEquals(
-            AclVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -394,7 +395,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         self::assertEquals(
-            AclVoter::ACCESS_GRANTED,
+            VoterInterface::ACCESS_GRANTED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -420,7 +421,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getMasks');
 
         self::assertEquals(
-            AclVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -451,7 +452,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         self::assertEquals(
-            AclVoter::ACCESS_GRANTED,
+            VoterInterface::ACCESS_GRANTED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -481,7 +482,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getMasks');
 
         self::assertEquals(
-            AclVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -504,7 +505,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         self::assertEquals(
-            AclVoter::ACCESS_GRANTED,
+            VoterInterface::ACCESS_GRANTED,
             $this->voter->vote($this->securityToken, $object, ['test'])
         );
     }
@@ -549,7 +550,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         self::assertEquals(
-            AclVoter::ACCESS_GRANTED,
+            VoterInterface::ACCESS_GRANTED,
             $voter->vote($this->securityToken, $object, ['test'])
         );
     }

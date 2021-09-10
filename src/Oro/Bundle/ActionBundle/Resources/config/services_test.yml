@@ -7,4 +7,4 @@ services:
         class: Oro\Bundle\ActionBundle\Tests\Functional\Environment\TestButtonProviderExtension
         public: true
         tags:
-            - { name: oro.action.extension.button_provider, priority: 256 }
+            - { name: oro.action.extension.button_provider, priority: -256 }

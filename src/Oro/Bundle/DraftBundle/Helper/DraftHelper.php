@@ -34,11 +34,11 @@ class DraftHelper
 
     public function isSaveAsDraftAction(): bool
     {
-        if (!$this->requestStack->getMasterRequest()) {
+        if (!$this->requestStack->getMainRequest()) {
             return false;
         }
 
-        $action = $this->requestStack->getMasterRequest()->request->get(Router::ACTION_PARAMETER);
+        $action = $this->requestStack->getMainRequest()->request->get(Router::ACTION_PARAMETER);
 
         return self::SAVE_AS_DRAFT_ACTION === $action;
     }

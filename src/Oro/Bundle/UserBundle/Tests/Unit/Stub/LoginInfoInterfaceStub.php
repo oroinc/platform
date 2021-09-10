@@ -24,7 +24,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     protected $plainPassword;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isAccountNonLocked(): bool
     {
@@ -32,7 +32,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isEnabled(): bool
     {
@@ -40,7 +40,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLastLogin()
     {
@@ -48,7 +48,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLoginCount()
     {
@@ -56,7 +56,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setLastLogin(\DateTime $time)
     {
@@ -66,7 +66,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setLoginCount($count)
     {
@@ -76,7 +76,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setUsername($username): self
     {
@@ -86,7 +86,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setPassword(?string $password): self
     {
@@ -96,7 +96,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSalt()
     {
@@ -104,7 +104,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setPlainPassword(?string $password): self
     {
@@ -114,7 +114,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getRoles()
     {
@@ -122,7 +122,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getUserRoles(): array
     {
@@ -130,7 +130,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPassword()
     {
@@ -138,7 +138,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getUsername()
     {
@@ -146,7 +146,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function eraseCredentials()
     {
@@ -154,7 +154,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPlainPassword(): ?string
     {
@@ -162,7 +162,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function addUserRole(Role $role): self
     {

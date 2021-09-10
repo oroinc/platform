@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Provides the embedded form session id
+ */
 class SessionIdProvider implements SessionIdProviderInterface
 {
     /** @var RequestStack */
@@ -28,7 +31,7 @@ class SessionIdProvider implements SessionIdProviderInterface
     public function getSessionId()
     {
         $sessionId = null;
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         if (null !== $request) {
             $method = $request->getMethod();
             if ('POST' === $method) {

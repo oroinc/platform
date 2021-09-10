@@ -129,9 +129,14 @@ define(function(require) {
                         !_.isNull(this.options.emailVariableView)
                     ) {
                         const tinymceInstance = component.view.tinymceInstance;
-                        $(tinymceInstance.getBody()).on('blur', e => {
-                            $(tinymceInstance.targetElm).trigger(e);
-                        });
+                        if (!tinymceInstance) {
+                            return;
+                        }
+                        $(tinymceInstance.getBody())
+                            .off(`blur${component.view.eventNamespace()}`)
+                            .on(`blur${component.view.eventNamespace()}`, e => {
+                                $(tinymceInstance.targetElm).trigger(e);
+                            });
                     }
                 });
             }

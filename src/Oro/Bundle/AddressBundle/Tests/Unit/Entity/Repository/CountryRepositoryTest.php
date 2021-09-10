@@ -7,17 +7,16 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
 use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
 class CountryRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
-    /** @var CountryRepository */
-    protected $repository;
+    private CountryRepository $repository;
 
     /**
      * {@inheritdoc}
@@ -25,10 +24,23 @@ class CountryRepositoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
-        $this->repository = new CountryRepository($this->entityManager, new ClassMetadata(Country::class));
+        $this->entityManager->expects(self::any())
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [Country::class, new ClassMetadata(Country::class)],
+            ]);
+
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturnMap([
+                [Country::class, $this->entityManager],
+            ]);
+
+        $this->repository = new CountryRepository($managerRegistry, Country::class);
     }
 
-    public function testGetCountries()
+    public function testGetCountries(): void
     {
         $countries = [
             new Country('iso2Code1'),
@@ -36,20 +48,37 @@ class CountryRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())->method('setHint')->with(
-            Query::HINT_CUSTOM_OUTPUT_WALKER,
-            TranslatableSqlWalker::class
-        );
-        $query->expects($this->once())->method('execute')->willReturn($countries);
+        $query->expects(self::once())
+            ->method('setHint')
+            ->with(
+                Query::HINT_CUSTOM_OUTPUT_WALKER,
+                TranslatableSqlWalker::class
+            );
+        $query->expects(self::once())
+            ->method('execute')
+            ->willReturn($countries);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects($this->once())->method('select')->with('c')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('from')->with(Country::class, 'c')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('orderBy')->with('c.name', 'ASC')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
+        $queryBuilder->expects(self::once())
+            ->method('select')
+            ->with('c')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('from')
+            ->with(Country::class, 'c')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('orderBy')
+            ->with('c.name', 'ASC')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $this->entityManager->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $this->entityManager->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
-        $this->assertSame($countries, $this->repository->getCountries());
+        self::assertSame($countries, $this->repository->getCountries());
     }
 }

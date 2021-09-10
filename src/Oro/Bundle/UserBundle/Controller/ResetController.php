@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -127,15 +126,14 @@ class ResetController extends AbstractController
             return $params;
         }
 
-        $session = $this->get('session');
-        $em = $this->get('doctrine.orm.entity_manager');
         $resetPasswordHandler = $this->get(ResetPasswordHandler::class);
         $translator = $this->get(TranslatorInterface::class);
 
         $resetPasswordSuccess = $resetPasswordHandler->resetPasswordAndNotify($user);
+        $em = $this->get('doctrine')->getManagerForClass(User::class);
         $em->flush();
 
-        $flashBag = $session->getFlashBag();
+        $flashBag = $this->get('session')->getFlashBag();
 
         if ($resetPasswordSuccess) {
             $flashBag->add(
@@ -316,7 +314,6 @@ class ResetController extends AbstractController
                 MassActionDispatcher::class,
                 UserLoggingInfoProvider::class,
                 EntityRoutingHelper::class,
-                'doctrine.orm.entity_manager' => EntityManager::class,
                 LoggerInterface::class,
                 ResetPasswordHandler::class,
                 'oro_user.form.reset' => Form::class,

@@ -16,30 +16,22 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const ENTITY_ALIAS = 'someAlias';
-    const ENTITY_CLASS = 'someClass';
-    const ENTITY_ID = 712;
-    const TOPIC = 'Topic';
+    private const ENTITY_ALIAS = 'someAlias';
+    private const ENTITY_CLASS = 'someClass';
+    private const ENTITY_ID = 712;
+    private const TOPIC = 'Topic';
 
-    /**
-     * @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityAliasResolver;
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityAliasResolver;
 
-    /**
-     * @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $topicSender;
+    /** @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $topicSender;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var AttributesImportFilter
-     */
-    protected $attributesImportFilter;
+    /** @var AttributesImportFilter */
+    private $attributesImportFilter;
 
     protected function setUp(): void
     {
@@ -59,8 +51,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsApplicableAlias(bool $hasAttributes, bool $isApplicable)
     {
-        $this->entityAliasResolver
-            ->expects($this->once())
+        $this->entityAliasResolver->expects($this->once())
             ->method('getClassByAlias')
             ->with(self::ENTITY_ALIAS)
             ->willReturn(self::ENTITY_CLASS);
@@ -69,8 +60,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
             AttributeConfigHelper::CODE_HAS_ATTRIBUTES => $hasAttributes
         ]);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('attribute', self::ENTITY_CLASS)
             ->willReturn($entityConfig);
@@ -110,8 +100,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
             AttributeConfigHelper::CODE_HAS_ATTRIBUTES => $hasAttributes
         ]);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('attribute', self::ENTITY_CLASS)
             ->willReturn($entityConfig);
@@ -138,20 +127,17 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('No entity config model found for class ' . self::ENTITY_CLASS);
 
-        $this->entityAliasResolver
-            ->expects($this->once())
+        $this->entityAliasResolver->expects($this->once())
             ->method('getClassByAlias')
             ->with(self::ENTITY_ALIAS)
             ->willReturn(self::ENTITY_CLASS);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getConfigEntityModel')
             ->with(self::ENTITY_CLASS)
             ->willReturn(null);
 
-        $this->topicSender
-            ->expects($this->never())
+        $this->topicSender->expects($this->never())
             ->method('getTopic');
 
         $this->attributesImportFilter->getTopicByAlias(self::ENTITY_ALIAS);
@@ -159,21 +145,18 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTopicByAlias()
     {
-        $this->entityAliasResolver
-            ->expects($this->once())
+        $this->entityAliasResolver->expects($this->once())
             ->method('getClassByAlias')
             ->with(self::ENTITY_ALIAS)
             ->willReturn(self::ENTITY_CLASS);
 
         $entityConfigModel = $this->getEntity(EntityConfigModel::class, ['id' => self::ENTITY_ID]);
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getConfigEntityModel')
             ->with(self::ENTITY_CLASS)
             ->willReturn($entityConfigModel);
 
-        $this->topicSender
-            ->expects($this->once())
+        $this->topicSender->expects($this->once())
             ->method('getTopic')
             ->with(self::ENTITY_ID)
             ->willReturn(self::TOPIC);
@@ -186,8 +169,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTopicByEntity()
     {
-        $this->topicSender
-            ->expects($this->once())
+        $this->topicSender->expects($this->once())
             ->method('getTopic')
             ->with(self::ENTITY_ID)
             ->willReturn(self::TOPIC);

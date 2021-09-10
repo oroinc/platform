@@ -27,7 +27,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider aceTypesProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetPermissionShouldCallUpdateAceForAce3($type, $field)
+    public function testSetPermissionShouldCallUpdateAceForAce3(string $type, ?string $field)
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
         $replace = true;
@@ -117,7 +117,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider aceTypesProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetPermissionShouldCallInsertAce($type, $field)
+    public function testSetPermissionShouldCallInsertAce(string $type, ?string $field)
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
         $replace = false;
@@ -202,7 +202,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testDeletePermission($type, $field)
+    public function testDeletePermission(string $type, ?string $field)
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
         $granting = true;
@@ -271,7 +271,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testDeleteAllPermissions($type, $field)
+    public function testDeleteAllPermissions(string $type, ?string $field)
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
 
@@ -322,7 +322,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testGetAces($type, $field)
+    public function testGetAces(string $type, ?string $field)
     {
         if ($field === null) {
             $this->acl->expects($this->once())
@@ -344,7 +344,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testInsertAce($type, $field)
+    public function testInsertAce(string $type, ?string $field)
     {
         $index = 1;
         $sid = $this->createMock(SecurityIdentityInterface::class);
@@ -380,7 +380,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testUpdateAce($type, $field)
+    public function testUpdateAce(string $type, ?string $field)
     {
         $index = 1;
         $mask = 123;
@@ -410,11 +410,9 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testDeleteAce($type, $field)
+    public function testDeleteAce(string $type, ?string $field)
     {
         $index = 1;
-        $mask = 123;
-        $strategy = 'any';
         if ($field === null) {
             $this->acl->expects($this->once())
                 ->method('delete' . $type . 'Ace')
@@ -433,7 +431,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
         $this->manipulator->deleteAce($this->acl, $type, $field, $index);
     }
 
-    public static function aceTypesProvider()
+    public static function aceTypesProvider(): array
     {
         return [
             [AclManager::CLASS_ACE, null],
@@ -444,13 +442,13 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     private function getAce(
-        $sid,
-        $granting = null,
-        $mask = null,
-        $strategy = null,
-        $getMaskCallCount = 1,
-        $getStrategyCallCount = 1
-    ) {
+        SecurityIdentityInterface $sid,
+        bool $granting = null,
+        int $mask = null,
+        string $strategy = null,
+        int $getMaskCallCount = 1,
+        int $getStrategyCallCount = 1
+    ): EntryInterface {
         $ace = $this->createMock(EntryInterface::class);
         $ace->expects($this->once())
             ->method('getSecurityIdentity')

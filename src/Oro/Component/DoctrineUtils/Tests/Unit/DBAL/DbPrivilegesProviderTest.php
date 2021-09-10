@@ -102,7 +102,7 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         $privileges = DbPrivilegesProvider::getMySqlGrantedPrivileges($pdo, $dbName);
         \sort($privileges);
 
-        static::assertEquals(
+        self::assertEquals(
             ['ALL PRIVILEGES', 'CREATE TEMPORARY TABLES', 'INSERT', 'SELECT', 'TRIGGER', 'USAGE'],
             $privileges
         );
@@ -121,7 +121,7 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         $privileges = DbPrivilegesProvider::getMySqlGrantedPrivileges($pdoEscapedNonEscaped, $dbName);
         \sort($privileges);
 
-        static::assertEquals(['ALL PRIVILEGES', 'USAGE'], $privileges);
+        self::assertEquals(['ALL PRIVILEGES', 'USAGE'], $privileges);
     }
 
     /**
@@ -132,12 +132,12 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $pdo = $this->createMock(\PDO::class);
         $stmt = $this->createMock(\PDOStatement::class);
-        $stmt->expects(static::once())
+        $stmt->expects(self::once())
             ->method('fetchAll')
             ->with(\PDO::FETCH_COLUMN)
             ->willReturn($grants);
 
-        $pdo->expects(static::once())
+        $pdo->expects(self::once())
             ->method('query')
             ->with('SHOW GRANTS')
             ->willReturn($stmt);

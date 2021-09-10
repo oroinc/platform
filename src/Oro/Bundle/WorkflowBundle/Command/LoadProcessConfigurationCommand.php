@@ -90,6 +90,8 @@ HELP
 
         // update triggers cache
         $this->eventTriggerCache->build();
+
+        return 0;
     }
 
     protected function createConsoleLogger(OutputInterface $output): ConsoleLogger

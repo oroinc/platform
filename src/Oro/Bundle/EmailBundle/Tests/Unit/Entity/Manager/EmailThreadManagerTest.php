@@ -11,16 +11,16 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
 class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EmailThreadProvider */
-    protected $emailThreadProvider;
+    private $emailThreadProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EmailThreadManager */
-    protected $emailThreadManager;
+    private $emailThreadManager;
 
     /** @var array */
-    protected $fixtures = [];
+    private $fixtures = [];
 
     protected function setUp(): void
     {
@@ -50,12 +50,8 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->emailThreadProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);
+        $this->em = $this->createMock(EntityManager::class);
 
         $this->emailThreadManager = new EmailThreadManager($this->emailThreadProvider, $this->em);
     }
@@ -82,7 +78,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
             ->will(call_user_func_array([$this, 'onConsecutiveCalls'], $consecutiveThreads));
         $this->emailThreadProvider->expects($this->any())
             ->method('getEmailReferences')
-            ->will($this->returnValue($emailReferences));
+            ->willReturn($emailReferences);
 
         $this->emailThreadManager->updateThreads($newEmails);
         $this->assertEquals($expectedEmails, $newEmails);
@@ -228,7 +224,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param object $entity
      */
-    protected function getThreadEmails($entity)
+    private function getThreadEmails($entity)
     {
         return array_merge(
             [$entity],
@@ -244,7 +240,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
      *
      * @return mixed
      */
-    protected function findFixtureBy($value, $key)
+    private function findFixtureBy($value, $key)
     {
         if (array_key_exists($key, $this->fixtures) && array_key_exists($value, $this->fixtures[$key])) {
             return $this->fixtures[$key][$value];

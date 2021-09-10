@@ -12,15 +12,16 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class LoginListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var SyncCredentialsIssueManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $syncCredentialsManager;
+
     /** @var LoginListener */
     private $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $syncCredentialsManager;
 
     protected function setUp(): void
     {
         $this->syncCredentialsManager = $this->createMock(SyncCredentialsIssueManager::class);
+
         $this->listener = new LoginListener($this->syncCredentialsManager);
     }
 

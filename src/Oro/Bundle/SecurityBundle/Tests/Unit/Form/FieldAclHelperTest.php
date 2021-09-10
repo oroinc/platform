@@ -20,17 +20,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class FieldAclHelperTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var FieldAclHelper */
-    protected $fieldAclHelper;
+    private $fieldAclHelper;
 
     protected function setUp(): void
     {

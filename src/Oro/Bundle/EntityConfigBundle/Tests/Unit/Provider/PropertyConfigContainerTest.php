@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PropertyConfigContainer */
-    protected $configContainer;
+    private $configContainer;
 
     protected function setUp(): void
     {
@@ -417,7 +417,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForDefaultValuesTest()
+    private function getItemsForDefaultValuesTest(): array
     {
         return [
             'items' => [
@@ -502,7 +502,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForRequiredPropertyValuesTest()
+    private function getItemsForRequiredPropertyValuesTest(): array
     {
         return [
             'items' => [
@@ -571,7 +571,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForNotAuditableValuesTest()
+    private function getItemsForNotAuditableValuesTest(): array
     {
         return [
             'items' => [
@@ -634,7 +634,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForTranslatableValuesTest()
+    private function getItemsForTranslatableValuesTest(): array
     {
         return [
             'items' => [
@@ -705,7 +705,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForIndexedValuesTest()
+    private function getItemsForIndexedValuesTest(): array
     {
         return [
             'items' => [
@@ -926,7 +926,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForFormItemsTest()
+    private function getItemsForFormItemsTest(): array
     {
         return [
             'items' => [

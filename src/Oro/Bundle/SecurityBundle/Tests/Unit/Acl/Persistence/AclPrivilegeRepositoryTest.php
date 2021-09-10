@@ -32,34 +32,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    private AclPrivilegeRepository $repository;
-
     /** @var AclManager|\PHPUnit\Framework\MockObject\MockObject */
-    private AclManager $manager;
+    private $manager;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private TranslatorInterface $translator;
+    private $translator;
 
     /** @var AclExtensionSelector|\PHPUnit\Framework\MockObject\MockObject */
-    private AclExtensionSelector $extensionSelector;
+    private $extensionSelector;
 
     /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private AclExtensionInterface $extension;
+    private $extension;
 
     /** @var AceManipulationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private AceManipulationHelper $aceProvider;
+    private $aceProvider;
+
+    private array $expectationsForSetPermission;
+    private array $triggeredExpectationsForSetPermission;
+
+    /** @var AclPrivilegeRepository */
+    private $repository;
 
     protected function setUp(): void
     {
         $this->extension = $this->createMock(AclExtensionInterface::class);
         $this->extension->expects(self::any())
             ->method('getObjectIdentity')
-            ->willReturnCallback(
-                static fn ($object) => new ObjectIdentity(
-                    substr($object, 0, strpos($object, ':')),
-                    substr($object, strpos($object, ':') + 1)
-                )
-            );
+            ->willReturnCallback(fn ($object) => new ObjectIdentity(
+                substr($object, 0, strpos($object, ':')),
+                substr($object, strpos($object, ':') + 1)
+            ));
         $this->extension->expects(self::any())
             ->method('getMaskBuilder')
             ->willReturn(new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']));
@@ -91,21 +93,19 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($label, $parameters, $domain) {
-                    $result = 'translated: ' . $label;
-                    if (!empty($parameters)) {
-                        foreach ($parameters as $key => $val) {
-                            $result .= ' ' . $key . ': (' . $val . ')';
-                        }
+            ->willReturnCallback(function ($label, $parameters, $domain) {
+                $result = 'translated: ' . $label;
+                if (!empty($parameters)) {
+                    foreach ($parameters as $key => $val) {
+                        $result .= ' ' . $key . ': (' . $val . ')';
                     }
-                    if (!empty($domain)) {
-                        $result .= ' [domain: ' . $domain . ']';
-                    }
-
-                    return $result;
                 }
-            );
+                if (!empty($domain)) {
+                    $result .= ' [domain: ' . $domain . ']';
+                }
+
+                return $result;
+            });
 
         $this->repository = new AclPrivilegeRepository($this->manager, $this->translator);
     }
@@ -150,7 +150,9 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testGetPrivileges(): void
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
-        $sid->expects(self::any())->method('equals')->willReturn(true);
+        $sid->expects(self::any())
+            ->method('equals')
+            ->willReturn(true);
 
         $extensionKey = 'test';
         $classes = [
@@ -206,55 +208,51 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(static fn ($oid) => $allowedPermissions[(string)$oid]);
         $this->extension->expects(self::any())
             ->method('adaptRootMask')
-            ->willReturnCallback(
-                function ($mask, $object) {
-                    if ($mask === 'root' && $object === 'test:Acme\Class2') {
-                        return 'adaptedRoot';
-                    }
-
-                    return $mask;
+            ->willReturnCallback(function ($mask, $object) {
+                if ($mask === 'root' && $object === 'test:Acme\Class2') {
+                    return 'adaptedRoot';
                 }
-            );
+
+                return $mask;
+            });
         $this->extension->expects(self::any())
             ->method('getPermissions')
             ->willReturn(['VIEW', 'CREATE', 'EDIT']);
         $this->extension->expects(self::any())
             ->method('getAccessLevel')
-            ->willReturnCallback(
-                function ($mask, $permission) {
-                    switch ($permission) {
-                        case 'VIEW':
-                            if ($mask === 'root') {
-                                return AccessLevel::GLOBAL_LEVEL;
-                            }
-                            if ($mask === 'oid1') {
-                                return AccessLevel::BASIC_LEVEL;
-                            }
-                            break;
-                        case 'CREATE':
-                            if ($mask === 'root') {
-                                return AccessLevel::DEEP_LEVEL;
-                            }
-                            if ($mask === 'oid1') {
-                                return AccessLevel::BASIC_LEVEL;
-                            }
-                            break;
-                        case 'EDIT':
-                            if ($mask === 'root') {
-                                return AccessLevel::LOCAL_LEVEL;
-                            }
-                            if ($mask === 'oid1') {
-                                return AccessLevel::NONE_LEVEL;
-                            }
-                            break;
-                    }
-                    if ($mask === 'adaptedRoot') {
-                        return AccessLevel::SYSTEM_LEVEL;
-                    }
-
-                    return AccessLevel::NONE_LEVEL;
+            ->willReturnCallback(function ($mask, $permission) {
+                switch ($permission) {
+                    case 'VIEW':
+                        if ($mask === 'root') {
+                            return AccessLevel::GLOBAL_LEVEL;
+                        }
+                        if ($mask === 'oid1') {
+                            return AccessLevel::BASIC_LEVEL;
+                        }
+                        break;
+                    case 'CREATE':
+                        if ($mask === 'root') {
+                            return AccessLevel::DEEP_LEVEL;
+                        }
+                        if ($mask === 'oid1') {
+                            return AccessLevel::BASIC_LEVEL;
+                        }
+                        break;
+                    case 'EDIT':
+                        if ($mask === 'root') {
+                            return AccessLevel::LOCAL_LEVEL;
+                        }
+                        if ($mask === 'oid1') {
+                            return AccessLevel::NONE_LEVEL;
+                        }
+                        break;
                 }
-            );
+                if ($mask === 'adaptedRoot') {
+                    return AccessLevel::SYSTEM_LEVEL;
+                }
+
+                return AccessLevel::NONE_LEVEL;
+            });
 
         $this->manager->expects(self::once())
             ->method('getRootOid')
@@ -268,17 +266,15 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->aceProvider->expects(self::any())
             ->method('getAces')
-            ->willReturnCallback(
-                function ($acl, $type, $field) use (&$rootAcl, &$oid1Acl) {
-                    if ($acl === $oid1Acl) {
-                        $a = $oid1Acl;
-                    } else {
-                        $a = $rootAcl;
-                    }
-
-                    return $a->{"get{$type}Aces"}();
+            ->willReturnCallback(function ($acl, $type, $field) use (&$rootAcl, &$oid1Acl) {
+                if ($acl === $oid1Acl) {
+                    $a = $oid1Acl;
+                } else {
+                    $a = $rootAcl;
                 }
-            );
+
+                return $a->{"get{$type}Aces"}();
+            });
 
         $result = $this->repository->getPrivileges($sid);
 
@@ -318,7 +314,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetPrivilegesWithFields($fields, $expectation): void
+    public function testGetPrivilegesWithFields(array $fields, ArrayCollection $expectation): void
     {
         $sid = new RoleSecurityIdentity('ROLE_ADMINISTRATOR');
         $extensionKey = 'test';
@@ -342,7 +338,8 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
             (string)$oid1 => ['VIEW', 'CREATE', 'EDIT'],
         ];
 
-        $rootAcl->expects(self::never())->method('getClassAces');
+        $rootAcl->expects(self::never())
+            ->method('getClassAces');
 
         $oid1Ace = $this->getAce('oid1', $sid);
         $oid1Acl->expects(self::any())
@@ -366,21 +363,19 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['VIEW', 'CREATE', 'EDIT']);
         $this->extension->expects(self::any())
             ->method('getAccessLevel')
-            ->willReturnCallback(
-                static function ($mask, $permission) {
-                    switch ($permission) {
-                        case 'VIEW':
-                        case 'CREATE':
-                            return AccessLevel::BASIC_LEVEL;
-                        case 'EDIT':
-                            return AccessLevel::NONE_LEVEL;
-                        default:
-                            return $mask === 'adaptedRoot'
-                                ? AccessLevel::SYSTEM_LEVEL
-                                : AccessLevel::NONE_LEVEL;
-                    }
+            ->willReturnCallback(function ($mask, $permission) {
+                switch ($permission) {
+                    case 'VIEW':
+                    case 'CREATE':
+                        return AccessLevel::BASIC_LEVEL;
+                    case 'EDIT':
+                        return AccessLevel::NONE_LEVEL;
+                    default:
+                        return $mask === 'adaptedRoot'
+                            ? AccessLevel::SYSTEM_LEVEL
+                            : AccessLevel::NONE_LEVEL;
                 }
-            );
+            });
         $this->extension->expects(self::any())
             ->method('getFieldExtension')
             ->willReturnSelf();
@@ -399,13 +394,11 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->aceProvider->expects(self::any())
             ->method('getAces')
-            ->willReturnCallback(
-                static function ($acl, $type, $field) use (&$rootAcl, &$oid1Acl) {
-                    return $acl === $oid1Acl
-                        ? $oid1Acl->{"get{$type}Aces"}()
-                        : $rootAcl->{"get{$type}Aces"}();
-                }
-            );
+            ->willReturnCallback(function ($acl, $type, $field) use (&$rootAcl, &$oid1Acl) {
+                return $acl === $oid1Acl
+                    ? $oid1Acl->{"get{$type}Aces"}()
+                    : $rootAcl->{"get{$type}Aces"}();
+            });
 
         $result = $this->repository->getPrivileges($sid);
         self::assertCount(1, $result);
@@ -496,7 +489,8 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
             ($oid1 . $field->getFieldName()) => ['VIEW', 'EDIT', 'CUSTOM'],
         ];
 
-        $rootAcl->expects(self::never())->method('getClassAces');
+        $rootAcl->expects(self::never())
+            ->method('getClassAces');
 
         $oid1Ace = $this->getAce('oid1', $sid);
         $oid1Acl->expects(self::any())
@@ -520,21 +514,19 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['VIEW', 'CREATE', 'EDIT']);
         $this->extension->expects(self::any())
             ->method('getAccessLevel')
-            ->willReturnCallback(
-                static function ($mask, $permission) {
-                    switch ($permission) {
-                        case 'VIEW':
-                        case 'CREATE':
-                            return AccessLevel::BASIC_LEVEL;
-                        case 'EDIT':
-                            return AccessLevel::NONE_LEVEL;
-                        default:
-                            return $mask === 'adaptedRoot'
-                                ? AccessLevel::SYSTEM_LEVEL
-                                : AccessLevel::NONE_LEVEL;
-                    }
+            ->willReturnCallback(function ($mask, $permission) {
+                switch ($permission) {
+                    case 'VIEW':
+                    case 'CREATE':
+                        return AccessLevel::BASIC_LEVEL;
+                    case 'EDIT':
+                        return AccessLevel::NONE_LEVEL;
+                    default:
+                        return $mask === 'adaptedRoot'
+                            ? AccessLevel::SYSTEM_LEVEL
+                            : AccessLevel::NONE_LEVEL;
                 }
-            );
+            });
         $fieldOid = ObjectIdentityHelper::encodeIdentityString(
             $oid1->getIdentifier(),
             ObjectIdentityHelper::encodeEntityFieldInfo($oid1->getType(), $field->getFieldName())
@@ -610,9 +602,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->manager->expects(self::once())
             ->method('flush');
     }
-
-    private array $expectationsForSetPermission;
-    private array $triggeredExpectationsForSetPermission;
 
     private function validateExpectationsForSetPermission(): void
     {
@@ -926,7 +915,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->validateExpectationsForDeletePermission();
     }
 
-    public static function getMask(array $masks, MaskBuilder $maskBuilder = null): int
+    private static function getMask(array $masks, MaskBuilder $maskBuilder = null): int
     {
         if ($maskBuilder === null) {
             $maskBuilder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);
@@ -939,12 +928,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         return $maskBuilder->get();
     }
 
-    /**
-     * @param  string $id
-     * @param  array  $permissions
-     * @return AclPrivilege
-     */
-    public static function getPrivilege($id, array $permissions): AclPrivilege
+    private static function getPrivilege(string $id, array $permissions): AclPrivilege
     {
         $privilege = new AclPrivilege();
         $privilege->setIdentity(new AclPrivilegeIdentity($id));
@@ -955,22 +939,25 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         return $privilege;
     }
 
-    public function getAce($mask, $sid = null): EntryInterface
+    private function getAce($mask, $sid = null): EntryInterface
     {
         $ace = $this->createMock(EntryInterface::class);
-        $ace->expects(self::any())->method('isGranting')->willReturn(true);
-        $ace->expects(self::any())->method('getMask')->willReturn($mask);
+        $ace->expects(self::any())
+            ->method('isGranting')
+            ->willReturn(true);
+        $ace->expects(self::any())
+            ->method('getMask')
+            ->willReturn($mask);
         if ($sid !== null) {
-            $ace->expects(self::any())->method('getSecurityIdentity')->willReturn($sid);
+            $ace->expects(self::any())
+                ->method('getSecurityIdentity')
+                ->willReturn($sid);
         }
 
         return $ace;
     }
 
-    /**
-     * @throws NotAllAclsFoundException
-     */
-    public static function getAcls(array $src): \SplObjectStorage
+    private static function getAcls(array $src): \SplObjectStorage
     {
         $isPartial = false;
         $acls = new \SplObjectStorage();

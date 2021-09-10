@@ -19,7 +19,7 @@ class UserStub implements EmailInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEmailField()
     {
@@ -27,7 +27,7 @@ class UserStub implements EmailInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getId()
     {
@@ -35,7 +35,7 @@ class UserStub implements EmailInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEmail()
     {
@@ -43,7 +43,7 @@ class UserStub implements EmailInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEmailOwner()
     {

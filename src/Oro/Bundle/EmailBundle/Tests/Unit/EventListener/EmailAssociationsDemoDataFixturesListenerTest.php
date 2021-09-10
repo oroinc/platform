@@ -15,13 +15,13 @@ class EmailAssociationsDemoDataFixturesListenerTest extends \PHPUnit\Framework\T
     ];
 
     /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $listenerManager;
+    private $listenerManager;
 
     /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $associationManager;
+    private $associationManager;
 
     /** @var EmailAssociationsDemoDataFixturesListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

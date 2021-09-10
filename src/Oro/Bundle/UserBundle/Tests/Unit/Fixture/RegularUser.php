@@ -83,10 +83,9 @@ class RegularUser implements UserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
     }
 }

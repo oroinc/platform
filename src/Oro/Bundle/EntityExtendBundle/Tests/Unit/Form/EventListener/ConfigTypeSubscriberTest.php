@@ -206,7 +206,6 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getOptions')
             ->willReturn(['config_id' => $fieldConfigId]);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getConfig')
@@ -215,7 +214,6 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::FORM_NAME);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManger */
         $configManger = $this->createMock(ConfigManager::class);
 
         $configProvider = $this->createMock(ConfigProvider::class);

@@ -64,6 +64,8 @@ HELP
 
         $this->queueConsumer->bind($queueName, $messageProcessor);
         $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
+
+        return 0;
     }
 
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void

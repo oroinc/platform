@@ -300,11 +300,12 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_entity_config.manager.attribute_family_manager'
+            - '@Psr\Container\ContainerInterface'
         calls:
             - [setClassName, ['Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily']]
         tags:
             - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_entity_config.manager.attribute_family_manager }
 
     oro_entity_config.form.extension.attribute_family:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension
@@ -552,7 +553,7 @@ services:
     oro_entity_config.validator.field_config_constraints_factory:
         class: Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory
         arguments:
-            - !tagged { tag: 'oro_entity_config.field_config_constraints_provider', index_by: 'type' }
+            - !tagged_iterator { tag: 'oro_entity_config.field_config_constraints_provider', index_by: 'type' }
 
     oro_entity_config.validator.constraints.provider.string:
         class: Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider

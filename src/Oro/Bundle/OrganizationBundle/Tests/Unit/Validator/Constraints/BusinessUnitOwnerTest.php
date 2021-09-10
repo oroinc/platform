@@ -6,10 +6,8 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner;
 
 class BusinessUnitOwnerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BusinessUnitOwner
-     */
-    protected $businessUnitOwner;
+    /** @var BusinessUnitOwner */
+    private $businessUnitOwner;
 
     protected function setUp(): void
     {

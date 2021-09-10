@@ -72,5 +72,7 @@ HELP
         $this->asyncIndexer->save($entities);
 
         $output->writeln('Started index update for entities.');
+
+        return 0;
     }
 }

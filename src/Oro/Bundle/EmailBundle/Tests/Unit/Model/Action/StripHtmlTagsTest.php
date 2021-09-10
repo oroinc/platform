@@ -4,31 +4,29 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var StripHtmlTags */
-    protected $action;
+    private $action;
 
     /** @var ContextAccessor */
-    protected $contextAccessor;
+    private $contextAccessor;
 
     /** @var HtmlTagHelper */
-    protected $helper;
+    private $helper;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessor');
-
-        $this->helper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
+        $this->helper = $this->createMock(HtmlTagHelper::class);
         $this->action = new StripHtmlTags($this->contextAccessor, $this->helper);
 
-        $this->action->setDispatcher($this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testInitializeWithNamedOptions()
@@ -59,7 +57,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeWithMissingOption()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $options = [
             '$.attribute'
         ];
@@ -78,28 +76,22 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 
         $this->contextAccessor->expects($this->once())
             ->method('getValue')
-            ->with(
-                $this->equalTo($fakeContext),
-                $this->equalTo('$.html')
-            )->will($this->returnValue($html = '<html></html>'));
+            ->with($fakeContext, '$.html')
+            ->willReturn($html = '<html></html>');
 
         $this->contextAccessor->expects($this->once())
             ->method('setValue')
-            ->with(
-                $this->equalTo($fakeContext),
-                $this->equalTo('$.attribute'),
-                $this->equalTo($stripped = 'stripped')
-            );
+            ->with($fakeContext, '$.attribute', $stripped = 'stripped');
 
         $this->helper->expects($this->once())
             ->method('purify')
-            ->with($this->equalTo($html))
-            ->will($this->returnValue($purified = 'purified'));
+            ->with($html)
+            ->willReturn($purified = 'purified');
 
         $this->helper->expects($this->once())
             ->method('stripTags')
-            ->with($this->equalTo($purified))
-            ->will($this->returnValue($stripped));
+            ->with($purified)
+            ->willReturn($stripped);
 
         $this->action->initialize($options);
         $this->action->execute($fakeContext);

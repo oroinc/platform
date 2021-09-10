@@ -48,14 +48,11 @@ class SecurityExtensionHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $securityConfig
      * @return \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder
      */
     protected function getContainerBuilder(array $securityConfig)
     {
-        $containerBuilder = $this->getMockBuilder('Oro\Component\DependencyInjection\ExtendedContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
         $containerBuilder->expects($this->once())
             ->method('getExtensionConfig')
             ->with('security')

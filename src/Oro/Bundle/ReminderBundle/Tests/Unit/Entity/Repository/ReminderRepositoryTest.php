@@ -15,19 +15,14 @@ class ReminderRepositoryTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\ReminderBundle\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            array(
-                'OroReminderBundle' => 'Oro\Bundle\ReminderBundle\Entity'
-            )
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\ReminderBundle\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'OroReminderBundle' => 'Oro\Bundle\ReminderBundle\Entity'
+        ]);
     }
 
     public function testGetTaskListByTimeIntervalQueryBuilder()

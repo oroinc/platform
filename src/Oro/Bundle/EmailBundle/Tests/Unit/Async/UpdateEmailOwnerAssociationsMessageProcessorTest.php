@@ -33,7 +33,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
         $message = new Message();
         $message->setBody(json_encode([
             'ownerIds' => [1],
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
@@ -56,7 +56,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
         $message = new Message();
         $message->setBody(json_encode([
             'ownerClass' => 'class',
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
@@ -76,7 +76,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
             ->method('critical');
         $logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Sent "2" messages'));
+            ->with('Sent "2" messages');
 
         $producer = $this->createMock(MessageProducerInterface::class);
         $producer->expects($this->exactly(2))
@@ -98,7 +98,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
         ];
 
         $message = new Message();
-        $message->setBody(json_encode($body));
+        $message->setBody(json_encode($body, JSON_THROW_ON_ERROR));
         $message->setMessageId('message-id');
 
         $jobRunner = $this->createMock(JobRunner::class);

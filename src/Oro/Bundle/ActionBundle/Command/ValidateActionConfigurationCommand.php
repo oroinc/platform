@@ -67,5 +67,7 @@ HELP
         } else {
             $output->writeln('No actions found.');
         }
+
+        return 0;
     }
 }

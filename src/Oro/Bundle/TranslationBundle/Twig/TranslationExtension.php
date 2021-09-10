@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Twig;
 
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -56,8 +56,10 @@ class TranslationExtension extends AbstractExtension implements ServiceSubscribe
      *
      * @return string
      */
-    public function getTranslationGridLink(array $filters = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
-    {
+    public function getTranslationGridLink(
+        array $filters = [],
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ) {
         return $this->getTranslationsDatagridRouteHelper()->generate($filters, $referenceType);
     }
 

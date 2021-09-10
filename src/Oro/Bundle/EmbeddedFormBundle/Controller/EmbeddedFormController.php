@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
@@ -59,9 +58,7 @@ class EmbeddedFormController extends AbstractController
      */
     public function deleteAction(EmbeddedForm $entity)
     {
-        /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
-
+        $em = $this->get('doctrine')->getManagerForClass(EmbeddedForm::class);
         $em->remove($entity);
         $em->flush();
 
@@ -145,10 +142,9 @@ class EmbeddedFormController extends AbstractController
 
         $form = $this->createForm(EmbeddedFormType::class, $entity);
         $form->handleRequest($this->get('request_stack')->getCurrentRequest());
-        /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
         if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
+            $em = $this->get('doctrine')->getManagerForClass(EmbeddedForm::class);
             $em->persist($entity);
             $em->flush();
 
@@ -185,7 +181,6 @@ class EmbeddedFormController extends AbstractController
                 TranslatorInterface::class,
                 Router::class,
                 EmbeddedFormManager::class,
-                'doctrine.orm.entity_manager' => EntityManager::class,
             ]
         );
     }

@@ -180,10 +180,14 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }
 
     oro_translation.repository.language:
-        class: Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository
+        alias: Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository
+
+    Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\TranslationBundle\Entity\Language'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_translation.provider.translation_context:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider

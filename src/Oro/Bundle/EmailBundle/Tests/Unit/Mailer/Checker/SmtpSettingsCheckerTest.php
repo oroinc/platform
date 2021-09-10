@@ -8,24 +8,19 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 
 class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SmtpSettingsChecker */
-    protected $smtpSettingsChecker;
+    /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject */
+    private $mailerTransport;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DirectMailer */
-    protected $directMailer;
+    /** @var DirectMailer|\PHPUnit\Framework\MockObject\MockObject */
+    private $directMailer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mailerTransport;
+    /** @var SmtpSettingsChecker */
+    private $smtpSettingsChecker;
 
     protected function setUp(): void
     {
-        $this->mailerTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->directMailer = $this->getMockBuilder(DirectMailer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mailerTransport = $this->createMock(\Swift_Transport_EsmtpTransport::class);
+        $this->directMailer = $this->createMock(DirectMailer::class);
 
         $this->smtpSettingsChecker = new SmtpSettingsChecker($this->directMailer);
     }
@@ -53,7 +48,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->directMailer->expects($this->once())
             ->method('getTransport')
-            ->will($this->returnValue($this->mailerTransport));
+            ->willReturn($this->mailerTransport);
 
         $this->mailerTransport->expects($this->once())
             ->method('start');
@@ -70,13 +65,13 @@ class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->directMailer->expects($this->once())
             ->method('getTransport')
-            ->will($this->returnValue($this->mailerTransport));
+            ->willReturn($this->mailerTransport);
 
         $exception = new \Swift_TransportException('Test exception message');
 
         $this->mailerTransport->expects($this->once())
             ->method('start')
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $this->assertSame($this->smtpSettingsChecker->checkConnection($smtpSettings), $exception->getMessage());
     }

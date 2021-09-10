@@ -138,7 +138,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         $this->formContext->setConfig($config);
 
         return $this->createFormBuilder()->create(
-            null,
+            '',
             FormType::class,
             [
                 'data_class'                          => Entity\Account::class,

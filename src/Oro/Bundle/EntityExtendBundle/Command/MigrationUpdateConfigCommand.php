@@ -92,6 +92,10 @@ HELP
             $output->writeln(
                 sprintf('<error>The options file "%s" was not found.</error>', $this->optionsPath)
             );
+
+            return 1;
         }
+
+        return 0;
     }
 }

@@ -34,7 +34,7 @@ class DefaultOperationRequestHelper
      */
     public function getRequestRoute()
     {
-        if (null === ($request = $this->requestStack->getMasterRequest())) {
+        if (null === ($request = $this->requestStack->getMainRequest())) {
             return null;
         }
 
@@ -56,7 +56,7 @@ class DefaultOperationRequestHelper
      */
     public function isExecutionRouteRequest()
     {
-        if (null === ($request = $this->requestStack->getMasterRequest())) {
+        if (null === ($request = $this->requestStack->getMainRequest())) {
             return false;
         }
 

@@ -119,7 +119,7 @@ class ConfigHelperHandler
         $message = $this->translator->trans(
             'oro.translation.translation.rebuild_cache_required',
             [
-                '%path%' => $this->generateUrl('oro_translation_translation_index')
+                '%path%' => $this->urlGenerator->generate('oro_translation_translation_index'),
             ]
         );
 
@@ -154,21 +154,5 @@ class ConfigHelperHandler
             'formAction' => $formAction,
             'jsmodules' => $this->configHelper->getExtendJsModules()
         ];
-    }
-
-    /**
-     * Generates a URL from the given parameters.
-     *
-     * @param string $route         The name of the route
-     * @param mixed  $parameters    An array of parameters
-     * @param int    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
-     *
-     * @return string The generated URL
-     *
-     * @see UrlGeneratorInterface
-     */
-    private function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
-    {
-        return $this->urlGenerator->generate($route, $parameters, $referenceType);
     }
 }

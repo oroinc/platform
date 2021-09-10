@@ -14,14 +14,13 @@ class EmailTemplateVoter extends AbstractEntityVoter
 {
     const EMAIL_TEMPLATE_DELETE_ALIAS = 'oro_email_emailtemplate_delete';
 
-    /** @var array */
+    /** {@inheritDoc} */
     protected $supportedAttributes = [
         BasicPermission::DELETE,
         self::EMAIL_TEMPLATE_DELETE_ALIAS
     ];
 
-    /** @var EmailTemplate */
-    private $object;
+    private mixed $object;
 
     /**
      * {@inheritDoc}
@@ -29,31 +28,27 @@ class EmailTemplateVoter extends AbstractEntityVoter
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         $this->object = $object;
-
-        return parent::vote($token, $object, $attributes);
+        try {
+            return parent::vote($token, $object, $attributes);
+        } finally {
+            $this->object = null;
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        if ($this->isDeleteDenied($attribute)) {
-            return self::ACCESS_DENIED;
-        }
-
-        return self::ACCESS_ABSTAIN;
+        return $this->isDeleteDenied($attribute)
+            ? self::ACCESS_DENIED
+            : self::ACCESS_ABSTAIN;
     }
 
-    /**
-     * @param string $attribute
-     *
-     * @return bool
-     */
-    private function isDeleteDenied($attribute)
+    private function isDeleteDenied(string $attribute): bool
     {
         return
-            in_array($attribute, $this->supportedAttributes, true)
+            \in_array($attribute, $this->supportedAttributes, true)
             && $this->object instanceof EmailTemplate
             && $this->object->getIsSystem();
     }

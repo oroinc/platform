@@ -41,7 +41,9 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
         $userInfo = ['user', 'info', 'that', 'must', 'be', 'written', 'into', 'log'];
 
         $token = $this->createMock(UsernamePasswordToken::class);
-        $token->expects($this->once())->method('getUser')->willReturn($user);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
 
         $event = new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class));
 
@@ -66,7 +68,9 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $token = $this->createMock(UsernamePasswordToken::class);
-        $token->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
+        $token->expects($this->atLeastOnce())
+            ->method('getUser')
+            ->willReturn($user);
 
         $event = new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class));
 
@@ -98,10 +102,14 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($userInfo);
 
         $token = $this->createMock(UsernamePasswordToken::class);
-        $token->expects($this->once())->method('getUser')->willReturn($user);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
 
         $event = $this->createMock(InteractiveLoginEvent::class);
-        $event->expects($this->once())->method('getAuthenticationToken')->willReturn($token);
+        $event->expects($this->once())
+            ->method('getAuthenticationToken')
+            ->willReturn($token);
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -115,10 +123,14 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
         $user = 'some wrong username';
 
         $token = $this->createMock(UsernamePasswordToken::class);
-        $token->expects($this->once())->method('getUser')->willReturn($user);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
 
         $event = $this->createMock(InteractiveLoginEvent::class);
-        $event->expects($this->once())->method('getAuthenticationToken')->willReturn($token);
+        $event->expects($this->once())
+            ->method('getAuthenticationToken')
+            ->willReturn($token);
 
         $this->logger->expects($this->never())
             ->method('info');

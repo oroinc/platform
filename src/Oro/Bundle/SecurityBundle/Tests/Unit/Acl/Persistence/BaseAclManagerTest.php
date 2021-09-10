@@ -11,7 +11,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private BaseAclManager $manager;
+    /** @var BaseAclManager */
+    private $manager;
 
     protected function setUp(): void
     {

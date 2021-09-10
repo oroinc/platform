@@ -11,12 +11,10 @@ use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class LocalizedTemplateProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var PreferredLocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationProvider;
 
@@ -32,6 +30,14 @@ class LocalizedTemplateProviderTest extends \PHPUnit\Framework\TestCase
         $this->templateProvider = $this->createMock(EmailTemplateContentProvider::class);
 
         $this->provider = new LocalizedTemplateProvider($this->localizationProvider, $this->templateProvider);
+    }
+
+    private function getLocalization(int $id): Localization
+    {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+
+        return $localization;
     }
 
     public function testGetAggregatedInvalidArgumentException(): void
@@ -67,8 +73,8 @@ class LocalizedTemplateProviderTest extends \PHPUnit\Framework\TestCase
 
         $criteria = new EmailTemplateCriteria('template_name');
 
-        $localizationA = $this->getEntity(Localization::class, ['id' => 42]);
-        $localizationB = $this->getEntity(Localization::class, ['id' => 54]);
+        $localizationA = $this->getLocalization(42);
+        $localizationB = $this->getLocalization(54);
 
         $templateA = (new EmailTemplate())->setSubject('Subject A');
         $templateB = (new EmailTemplate())->setSubject('Subject B');

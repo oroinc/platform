@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AbstractAclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager;
 use Oro\Bundle\SecurityBundle\Model\Role;
@@ -12,7 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private AbstractAclManager|\PHPUnit\Framework\MockObject\MockObject $abstract;
+    /** @var AbstractAclManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $abstract;
 
     protected function setUp(): void
     {
@@ -68,7 +70,7 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoBaseAclManager(): void
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException::class);
+        $this->expectException(InvalidAclManagerException::class);
         $this->abstract->getSid('ROLE_TEST');
     }
 }

@@ -92,10 +92,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         return $encoder;
     }
 
-    /**
-     * @return array
-     */
-    public function findUserDataProvider()
+    public function findUserDataProvider(): array
     {
         return [
             [$this->createMock(User::class)],

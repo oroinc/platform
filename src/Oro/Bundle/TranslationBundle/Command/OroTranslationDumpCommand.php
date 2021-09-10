@@ -59,5 +59,7 @@ HELP
 
         $this->dumper->setLogger(new OutputLogger($output));
         $this->dumper->dumpTranslations($locales);
+
+        return 0;
     }
 }

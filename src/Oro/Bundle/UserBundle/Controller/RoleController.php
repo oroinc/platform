@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
@@ -65,11 +64,7 @@ class RoleController extends AbstractController
                 'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabIds(),
                 'readonly' => true
             ],
-            'allow_delete' =>
-                $role->getId() &&
-                !$this->get('doctrine.orm.entity_manager')
-                    ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($role)
+            'allow_delete' => $role->getId() && !$this->hasAssignedUsers($role)
         ];
     }
 
@@ -150,11 +145,7 @@ class RoleController extends AbstractController
             ],
             'capabilitySetOptions' => $this->getRolePrivilegeCapabilityProvider()->getCapabilitySetOptions($role),
             'privilegesConfig' => $this->getParameter('oro_user.privileges'),
-            'allow_delete' =>
-                $role->getId() &&
-                !$this->get('doctrine.orm.entity_manager')
-                    ->getRepository('OroUserBundle:Role')
-                    ->hasAssignedUsers($role)
+            'allow_delete' => $role->getId() && !$this->hasAssignedUsers($role)
         ];
     }
 
@@ -166,6 +157,13 @@ class RoleController extends AbstractController
     protected function getRolePrivilegeCapabilityProvider(): RolePrivilegeCapabilityProvider
     {
         return $this->get(RolePrivilegeCapabilityProvider::class);
+    }
+
+    protected function hasAssignedUsers(Role $role): bool
+    {
+        return $this->get('doctrine')->getManagerForClass(Role::class)
+            ->getRepository(Role::class)
+            ->hasAssignedUsers($role);
     }
 
     /**
@@ -183,7 +181,6 @@ class RoleController extends AbstractController
                 AclRoleHandler::class,
                 ConnectionChecker::class,
                 WebsocketClient::class,
-                'doctrine.orm.entity_manager' => EntityManager::class,
             ]
         );
     }

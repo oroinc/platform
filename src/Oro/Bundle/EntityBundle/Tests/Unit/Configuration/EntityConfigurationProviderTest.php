@@ -19,9 +19,6 @@ class EntityConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('EntityConfigurationProvider');
@@ -50,11 +47,9 @@ class EntityConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
         return [
             'exclusions'              => [

@@ -742,7 +742,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string
      */
-    protected function getUrl($name, $parameters = [], $absolute = false)
+    protected function getUrl(string $name, array $parameters = [], bool|int $absolute = false)
     {
         $referenceType = $absolute;
         if (is_bool($absolute)) {

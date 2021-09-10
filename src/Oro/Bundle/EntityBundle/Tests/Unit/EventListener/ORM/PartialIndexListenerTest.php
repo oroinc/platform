@@ -12,93 +12,67 @@ use Oro\Bundle\EntityBundle\EventListener\ORM\PartialIndexListener;
 
 class PartialIndexListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
-
-    /**
-     * @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadata;
-
-    /**
-     * @var PartialIndexListener
-     */
-    protected $listener;
-
-    protected function setUp(): void
-    {
-        $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
-        $this->metadata = $this->createMock(ClassMetadataInfo::class);
-    }
-
     public function testPlatformNotMatch()
     {
-        $manager = $this->getManagerMock(SqlitePlatform::class);
-        $this->event->method('getEntityManager')->willReturn($manager);
-        $this->event
-            ->expects($this->never())
+        $manager = $this->getEntityManager(SqlitePlatform::class);
+
+        $event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $event->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($manager);
+        $event->expects($this->never())
             ->method('getClassMetadata');
 
         $listener = new PartialIndexListener('table', 'index');
-        $listener->loadClassMetadata($this->event);
+        $listener->loadClassMetadata($event);
     }
 
     public function testPlatformMatch()
     {
-        $manager = $this->getManagerMock(MySqlPlatform::class);
-        $this->event->method('getEntityManager')->willReturn($manager);
+        $manager = $this->getEntityManager(MySqlPlatform::class);
 
-        $classMetadataInfo = $this->getClassMetadataInfoMock('table', 'index');
-        $this->event
-            ->expects($this->once())
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects($this->any())
+            ->method('getTableName')
+            ->willReturn('table');
+        $classMetadata->table = [
+            'indexes' => [
+                'index' => [
+                    'options' => [
+                        'where' => 'some condition',
+                        'option2' => 'some value'
+                    ]
+                ]
+            ]
+        ];
+
+        $event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $event->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($manager);
+        $event->expects($this->once())
             ->method('getClassMetadata')
-            ->willReturn($classMetadataInfo);
+            ->willReturn($classMetadata);
 
         $listener = new PartialIndexListener('table', 'index');
-        $listener->loadClassMetadata($this->event);
-        static::assertArrayNotHasKey('where', $classMetadataInfo->table['indexes']['index']['options']);
-        static::assertArrayHasKey('option2', $classMetadataInfo->table['indexes']['index']['options']);
+        $listener->loadClassMetadata($event);
+
+        self::assertArrayNotHasKey('where', $classMetadata->table['indexes']['index']['options']);
+        self::assertArrayHasKey('option2', $classMetadata->table['indexes']['index']['options']);
     }
 
-    /**
-     * @param string $platformClass
-     *
-     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getManagerMock($platformClass)
+    private function getEntityManager(string $platformClass): EntityManager
     {
         $connection = $this->createMock(Connection::class);
         $platform = $this->createMock($platformClass);
-        $connection->method('getDatabasePlatform')->willReturn($platform);
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn($platform);
         $manager = $this->createMock(EntityManager::class);
-        $manager->method('getConnection')->willReturn($connection);
+        $manager->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($connection);
 
         return $manager;
-    }
-
-    /**
-     * @param string $table
-     * @param string $index
-     *
-     * @return ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getClassMetadataInfoMock($table, $index)
-    {
-        $classInfo = $this->createMock(ClassMetadataInfo::class);
-        $classInfo->method('getTableName')->willReturn($table);
-        $classInfo->table = [
-           'indexes' => [
-               $index => [
-                   'options' => [
-                       'where' => 'some condition',
-                       'option2' => 'some value'
-                   ]
-               ]
-           ]
-        ];
-
-        return $classInfo;
     }
 }

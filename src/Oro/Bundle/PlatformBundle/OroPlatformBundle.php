@@ -25,13 +25,8 @@ class OroPlatformBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new Compiler\LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new Compiler\OptionalListenersCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
-        $container->addCompilerPass(
-            new ServiceLinkCompilerPass(
-                'oro_service_link',
-                ServiceLink::class
-            )
-        );
+        $container->addCompilerPass(new Compiler\OptionalListenersCompilerPass());
+        $container->addCompilerPass(new ServiceLinkCompilerPass('oro_service_link', ServiceLink::class));
         $container->addCompilerPass(new Compiler\UpdateDoctrineConfigurationPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new Compiler\LazyDoctrineOrmListenersPass());
@@ -72,6 +67,10 @@ class OroPlatformBundle extends Bundle
         $container->addCompilerPass(new Compiler\MergeServiceLocatorsCompilerPass(
             'doctrine.orm.entity_listener',
             'oro_platform.doctrine.event_listener.service_locator'
+        ), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new Compiler\MergeServiceLocatorsCompilerPass(
+            'security.voter',
+            'oro_platform.security.voter.service_locator'
         ), PassConfig::TYPE_BEFORE_REMOVING);
 
         if ('test' === $container->getParameter('kernel.environment')) {

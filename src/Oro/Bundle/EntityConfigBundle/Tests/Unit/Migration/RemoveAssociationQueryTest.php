@@ -17,18 +17,24 @@ use Psr\Log\LoggerInterface;
 
 class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    private Connection $connection;
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
-    private AbstractSchemaManager $schemaManager;
+    /** @var AbstractSchemaManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $schemaManager;
 
-    private LoggerInterface $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $this->connection->method('getSchemaManager')->willReturn($this->schemaManager);
+
+        $this->connection->expects($this->any())
+            ->method('getSchemaManager')
+            ->willReturn($this->schemaManager);
     }
 
     public function testGetDescription()
@@ -43,7 +49,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             'target_table',
         );
 
-        static::assertEquals(
+        self::assertEquals(
             'Remove association relation from Some\Source entity to Some\Target '
             . '(association kind: some_association, relation type: some_relation, drop relation column/table: yes, '
             . 'source table: source_table, target table: target_table).',
@@ -53,7 +59,9 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteThrowsExceptionForNonConfigurableEntity()
     {
-        $this->connection->method('fetchAssoc')->willReturn(false);
+        $this->connection->expects($this->any())
+            ->method('fetchAssoc')
+            ->willReturn(false);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Source entity Some\Source is not a configurable entity.');
@@ -94,14 +102,18 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->connection->method('fetchAssoc')->willReturn(['id' => '12345', 'data' => \serialize($dataWithRelation)]);
-        $this->connection->expects(static::once())
+        $this->connection->expects($this->any())
+            ->method('fetchAssoc')
+            ->willReturn(['id' => '12345', 'data' => \serialize($dataWithRelation)]);
+        $this->connection->expects(self::once())
             ->method('convertToPHPValue')
             ->with(\serialize($dataWithRelation), Types::ARRAY)
             ->willReturn($dataWithRelation);
-        $this->connection->method('getDatabasePlatform')->willReturn(new PostgreSqlPlatform());
+        $this->connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(new PostgreSqlPlatform());
 
-        $this->logger->expects(static::exactly(9))
+        $this->logger->expects(self::exactly(9))
             ->method('info')
             ->withConsecutive(
                 [\var_export($dataWithoutRelation, true)],
@@ -115,7 +127,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
                 ['[field_name] = target_74573926', []]
             );
 
-        $this->connection->expects(static::exactly(2))
+        $this->connection->expects(self::exactly(2))
             ->method('executeStatement')
             ->withConsecutive(
                 [
@@ -157,7 +169,9 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
      */
     public function testDropRelationshipColumnForManyToOneRelation(AbstractPlatform $dbPlatform, string $dropFKSql)
     {
-        $this->connection->method('getDatabasePlatform')->willReturn($dbPlatform);
+        $this->connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn($dbPlatform);
 
         $dataWithRelation = [
             'extend' => [
@@ -180,38 +194,53 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->connection->method('fetchAssoc')->willReturn(['id' => '12345', 'data' => \serialize($dataWithRelation)]);
-        $this->connection->expects(static::once())
+        $this->connection->expects($this->any())
+            ->method('fetchAssoc')
+            ->willReturn(['id' => '12345', 'data' => \serialize($dataWithRelation)]);
+        $this->connection->expects(self::once())
             ->method('convertToPHPValue')
             ->with(\serialize($dataWithRelation), Types::ARRAY)
             ->willReturn($dataWithRelation);
 
         $targetTable = $this->createMock(Table::class);
-        $targetTable->method('getPrimaryKeyColumns')->willReturn(['primary']);
+        $targetTable->expects($this->any())
+            ->method('getPrimaryKeyColumns')
+            ->willReturn(['primary']);
 
         $sourceTable = $this->createMock(Table::class);
-        $sourceTable->method('hasColumn')->with('target_74573926_primary')->willReturn(true);
+        $sourceTable->expects($this->any())
+            ->method('hasColumn')
+            ->with('target_74573926_primary')
+            ->willReturn(true);
 
         $foreignKey = $this->createMock(ForeignKeyConstraint::class);
-        $foreignKey->method('getUnquotedLocalColumns')->willReturn(['target_74573926_primary']);
-        $foreignKey->method('getName')->willReturn('FK_9876543210');
-        $sourceTable->method('getForeignKeys')->willReturn([$foreignKey]);
+        $foreignKey->expects($this->any())
+            ->method('getUnquotedLocalColumns')
+            ->willReturn(['target_74573926_primary']);
+        $foreignKey->expects($this->any())
+            ->method('getName')
+            ->willReturn('FK_9876543210');
+        $sourceTable->expects($this->any())
+            ->method('getForeignKeys')
+            ->willReturn([$foreignKey]);
 
-        $this->schemaManager->method('listTableDetails')->willReturnMap([
-            ['source_table', $sourceTable],
-            ['target_table', $targetTable],
-        ]);
+        $this->schemaManager->expects($this->any())
+            ->method('listTableDetails')
+            ->willReturnMap([
+                ['source_table', $sourceTable],
+                ['target_table', $targetTable],
+            ]);
 
-        $this->connection->method('quoteIdentifier')->willReturnCallback(
-            static fn ($id) => $dbPlatform->quoteIdentifier($id)
-        );
+        $this->connection->expects($this->any())
+            ->method('quoteIdentifier')
+            ->willReturnCallback(static fn ($id) => $dbPlatform->quoteIdentifier($id));
 
-        $dropColumnSql = \sprintf(
+        $dropColumnSql = sprintf(
             'ALTER TABLE source_table DROP COLUMN %s',
             $dbPlatform->quoteIdentifier('target_74573926_primary')
         );
 
-        $this->logger->expects(static::exactly(11))
+        $this->logger->expects(self::exactly(11))
             ->method('info')
             ->withConsecutive(
                 [\var_export($dataWithoutRelation, true)],
@@ -227,7 +256,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
                 [$dropColumnSql, []]
             );
 
-        $this->connection->expects(static::exactly(2))
+        $this->connection->expects(self::exactly(2))
             ->method('executeStatement')
             ->withConsecutive(
                 [
@@ -242,7 +271,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
                 ],
             );
 
-        $this->connection->expects(static::exactly(2))
+        $this->connection->expects(self::exactly(2))
             ->method('executeQuery')
             ->withConsecutive(
                 [$dropFKSql],
@@ -264,7 +293,9 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
 
     public function testDropRelationshipTableForManyToManyRelation()
     {
-        $this->connection->method('getDatabasePlatform')->willReturn(new PostgreSqlPlatform());
+        $this->connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(new PostgreSqlPlatform());
 
         $dataWithRelation = [
             'extend' => [
@@ -287,15 +318,19 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->connection->method('fetchAssoc')->willReturn(['id' => '12345', 'data' => \serialize($dataWithRelation)]);
-        $this->connection->expects(static::once())
+        $this->connection->expects($this->any())
+            ->method('fetchAssoc')
+            ->willReturn(['id' => '12345', 'data' => \serialize($dataWithRelation)]);
+        $this->connection->expects(self::once())
             ->method('convertToPHPValue')
             ->with(\serialize($dataWithRelation), Types::ARRAY)
             ->willReturn($dataWithRelation);
 
-        $this->schemaManager->method('listTableNames')->willReturn(['oro_rel_58267a4541c32acac0f56e']);
+        $this->schemaManager->expects($this->any())
+            ->method('listTableNames')
+            ->willReturn(['oro_rel_58267a4541c32acac0f56e']);
 
-        $this->logger->expects(static::exactly(10))
+        $this->logger->expects(self::exactly(10))
             ->method('info')
             ->withConsecutive(
                 [\var_export($dataWithoutRelation, true)],
@@ -310,7 +345,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
                 ['DROP TABLE oro_rel_58267a4541c32acac0f56e', []],
             );
 
-        $this->connection->expects(static::exactly(2))
+        $this->connection->expects(self::exactly(2))
             ->method('executeStatement')
             ->withConsecutive(
                 [
@@ -325,7 +360,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
                 ],
             );
 
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('executeQuery')
             ->with('DROP TABLE oro_rel_58267a4541c32acac0f56e');
 
@@ -342,10 +377,6 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
         $query->execute($this->logger);
     }
 
-    /**
-     * @return RemoveAssociationQuery
-     * @noinspection PhpTooManyParametersInspection
-     */
     private function createQuery(
         string $sourceEntityClass,
         string $targetEntityClass,
@@ -354,7 +385,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
         bool $dropRelationColumnsAndTables,
         string $sourceTableName,
         string $targetTableName
-    ) {
+    ): RemoveAssociationQuery {
         $query = new class (
             $sourceEntityClass,
             $targetEntityClass,

@@ -39,7 +39,7 @@ class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setAccessToken('test_string_token');
@@ -53,7 +53,7 @@ class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->never())
             ->method('add')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         //test without origin
         $formEvent = new FormEvent($form, null);

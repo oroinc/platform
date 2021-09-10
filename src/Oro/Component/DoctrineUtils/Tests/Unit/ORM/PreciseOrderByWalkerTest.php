@@ -12,29 +12,24 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class PreciseOrderByWalkerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
+        ]);
     }
 
     /**
      * @dataProvider queryModificationProvider
      */
-    public function testQueryModification($dql, $expectedSql)
+    public function testQueryModification(string $dql, string $expectedSql)
     {
         $query = $this->em->createQuery($dql);
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [PreciseOrderByWalker::class]);
@@ -43,10 +38,9 @@ class PreciseOrderByWalkerTest extends OrmTestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function queryModificationProvider()
+    public function queryModificationProvider(): array
     {
         return [
             'no ORDER BY'                                                 => [

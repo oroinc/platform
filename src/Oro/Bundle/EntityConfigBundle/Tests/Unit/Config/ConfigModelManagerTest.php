@@ -835,7 +835,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->equalTo($fieldModel));
+            ->with($this->identicalTo($fieldModel));
         $this->em->expects($this->never())
             ->method('flush');
 
@@ -925,7 +925,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->equalTo($fieldModel));
+            ->with($this->identicalTo($fieldModel));
         $this->em->expects($this->never())
             ->method('flush');
 
@@ -1013,7 +1013,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->equalTo($fieldModel));
+            ->with($this->identicalTo($fieldModel));
         $this->em->expects($this->never())
             ->method('flush');
 
@@ -1088,7 +1088,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->equalTo($entityModel));
+            ->with($this->identicalTo($entityModel));
         $this->em->expects($this->never())
             ->method('flush');
 

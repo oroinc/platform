@@ -19,10 +19,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 {
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var RoleMultiSelectType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {
@@ -54,7 +54,6 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -74,7 +73,6 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testBuildView()
     {
-        /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())
             ->method('addModelTransformer')
@@ -99,10 +97,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expected, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'empty string' => [
@@ -113,7 +108,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -122,14 +117,12 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
             ->method('getProperties')
             ->willReturn(['label']);
 
-        /** @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject $searchRegistry */
         $searchRegistry = $this->createMock(SearchRegistry::class);
         $searchRegistry->expects($this->any())
             ->method('getSearchHandler')
             ->with('roles')
             ->willReturn($searchHandler);
 
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
 
         return [

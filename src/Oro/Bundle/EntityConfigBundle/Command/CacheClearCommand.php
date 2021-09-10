@@ -61,5 +61,7 @@ HELP
         if (!$input->getOption('no-warmup')) {
             $this->configCacheWarmer->warmUpCache();
         }
+
+        return 0;
     }
 }

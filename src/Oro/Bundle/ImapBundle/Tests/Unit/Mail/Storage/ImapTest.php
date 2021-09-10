@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
 use Laminas\Mail\Storage\Exception\InvalidArgumentException;
+use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ImapProtocol;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
-use PHPUnit\Framework\TestCase;
 
-class ImapTest extends TestCase
+class ImapTest extends \PHPUnit\Framework\TestCase
 {
     public function testCacheForGetNumberByUniqueId()
     {
@@ -18,17 +18,21 @@ class ImapTest extends TestCase
             5 => 5,
         ];
 
-        $protocolImap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Protocol\Imap')
-            ->disableOriginalConstructor()->getMock();
-        $protocolImap->expects(self::once())->method('select')->willReturn(['uidvalidity'=>'']);
-        $protocolImap->expects(self::once())->method('fetch')->willReturn($ids);
+        $protocolImap = $this->createMock(ImapProtocol::class);
+        $protocolImap->expects(self::once())
+            ->method('select')
+            ->willReturn(['uidvalidity'=>'']);
+        $protocolImap->expects(self::once())
+            ->method('fetch')
+            ->willReturn($ids);
 
         $imap = new Imap($protocolImap);
 
         $id = '3';
         self::assertEquals(3, $imap->getNumberByUniqueId($id));
 
-        $protocolImap->expects(self::never())->method('fetch');
+        $protocolImap->expects(self::never())
+            ->method('fetch');
         self::assertEquals(3, $imap->getNumberByUniqueId($id));
     }
 
@@ -45,10 +49,13 @@ class ImapTest extends TestCase
             5 => 5
         ];
 
-        $protocolImap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Protocol\Imap')
-            ->disableOriginalConstructor()->getMock();
-        $protocolImap->expects(self::once())->method('select')->willReturn(['uidvalidity'=>'']);
-        $protocolImap->expects(self::once())->method('fetch')->willReturn($ids);
+        $protocolImap = $this->createMock(ImapProtocol::class);
+        $protocolImap->expects(self::once())
+            ->method('select')
+            ->willReturn(['uidvalidity'=>'']);
+        $protocolImap->expects(self::once())
+            ->method('fetch')
+            ->willReturn($ids);
 
         $imap = new Imap($protocolImap);
 
@@ -63,10 +70,13 @@ class ImapTest extends TestCase
 
         $ids = 3;
 
-        $protocolImap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Protocol\Imap')
-            ->disableOriginalConstructor()->getMock();
-        $protocolImap->expects(self::once())->method('select')->willReturn(['uidvalidity'=>'']);
-        $protocolImap->expects(self::once())->method('fetch')->willReturn($ids);
+        $protocolImap = $this->createMock(ImapProtocol::class);
+        $protocolImap->expects(self::once())
+            ->method('select')
+            ->willReturn(['uidvalidity'=>'']);
+        $protocolImap->expects(self::once())
+            ->method('fetch')
+            ->willReturn($ids);
 
         $imap = new Imap($protocolImap);
 
