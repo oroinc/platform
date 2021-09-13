@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Oro\Bundle\TranslationBundle\Controller\Api\Rest\TranslationController;
 use Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension;
 
 class OroTranslationExtensionTest extends ExtensionTestCase
@@ -14,6 +15,7 @@ class OroTranslationExtensionTest extends ExtensionTestCase
             'oro_translation.form.type.translatable_entity',
             'oro_translation.form.type.select2_translatable_entity',
             'oro_translation.controller',
+            TranslationController::class,
         ];
 
         $expectedParameters = [

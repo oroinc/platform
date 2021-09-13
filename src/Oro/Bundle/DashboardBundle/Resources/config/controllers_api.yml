@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    OroDashboardBundleRestApiController:
+        namespace: Oro\Bundle\DashboardBundle\Controller\Api\Rest\
+        resource: '../../Controller/Api/Rest/*Controller.php'
+        calls:
+            - [setContainer, ['@service_container']]

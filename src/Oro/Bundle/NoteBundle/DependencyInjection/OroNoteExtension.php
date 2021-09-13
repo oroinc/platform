@@ -22,5 +22,6 @@ class OroNoteExtension extends Extension
         $loader->load('form.yml');
         $loader->load('actions.yml');
         $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
     }
 }

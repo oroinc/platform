@@ -26,6 +26,7 @@ class OroFormExtension extends Extension
         $loader->load('importexport.yml');
         $loader->load('services.yml');
         $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
 
         if (isset($config['html_purifier_modes'])) {
             $definition = $container->getDefinition('oro_form.provider.html_tag_provider');

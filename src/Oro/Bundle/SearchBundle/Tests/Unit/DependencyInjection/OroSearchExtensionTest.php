@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\SearchBundle\Controller\Api\SearchAdvancedController;
+use Oro\Bundle\SearchBundle\Controller\Api\SearchController;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle;
@@ -22,7 +24,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
-    public function testLoadDefaultConfig()
+    public function testLoadDefaultConfig(): void
     {
         $container = new ContainerBuilder();
 
@@ -44,9 +46,12 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
             '@OroSearch/Datagrid/itemContainer.html.twig',
             $container->getParameter('oro_search.twig.item_container_template')
         );
+
+        self::assertTrue($container->hasDefinition(SearchAdvancedController::class));
+        self::assertTrue($container->hasDefinition(SearchController::class));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
 
@@ -77,7 +82,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrmSearchEngineLoad()
+    public function testOrmSearchEngineLoad(): void
     {
         $container = new ContainerBuilder();
 
@@ -91,7 +96,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($container->hasDefinition('test_orm_service'));
     }
 
-    public function testOtherSearchEngineLoad()
+    public function testOtherSearchEngineLoad(): void
     {
         $container = new ContainerBuilder();
 
