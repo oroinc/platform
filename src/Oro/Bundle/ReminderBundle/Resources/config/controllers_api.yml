@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    OroReminderBundleRestApiController:
+        namespace: Oro\Bundle\ReminderBundle\Controller\Api\Rest\
+        resource: '../../Controller/Api/Rest/*Controller.php'
+        calls:
+            - [setContainer, ['@service_container']]

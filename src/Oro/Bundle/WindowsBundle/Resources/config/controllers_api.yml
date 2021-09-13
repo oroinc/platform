@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    OroWindowsBundleRestApiController:
+        namespace: Oro\Bundle\WindowsBundle\Controller\Api\
+        resource: '../../Controller/Api/*Controller.php'
+        calls:
+            - [setContainer, ['@service_container']]
