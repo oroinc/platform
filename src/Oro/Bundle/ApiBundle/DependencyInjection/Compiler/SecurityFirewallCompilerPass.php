@@ -87,9 +87,17 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         $contextListeners = [];
         /** @var IteratorArgument $listeners */
         $listeners = $contextDef->getArgument(0);
+        $wasSet = false;
         foreach ($listeners->getValues() as $listener) {
-            // the context listener should be before the access listener
-            if ('security.access_listener' === (string)$listener) {
+            $id = (string)$listener;
+            // the context listener should be before the access listener or remember me listener
+            if (false === $wasSet
+                && (
+                    'security.access_listener' === $id
+                    || str_starts_with($id, 'oro_security.authentication.listener.rememberme')
+                )
+            ) {
+                $wasSet = true;
                 $contextListeners[] = new Reference($apiContextListenerId);
             }
             $contextListeners[] = $listener;
