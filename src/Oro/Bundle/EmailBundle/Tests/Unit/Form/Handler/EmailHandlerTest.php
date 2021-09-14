@@ -13,25 +13,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private Form|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /** @var Request */
-    private $request;
+    private Request $request;
 
-    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailProcessor;
+    private Processor|\PHPUnit\Framework\MockObject\MockObject $emailProcessor;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var EmailHandler */
-    private $handler;
+    private EmailHandler $handler;
 
-    /** @var Email */
-    private $model;
+    private Email $model;
 
     protected function setUp(): void
     {
@@ -53,44 +47,40 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessGetRequest()
+    public function testProcessGetRequest(): void
     {
         $this->request->setMethod('GET');
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->never())
+        $this->form->expects(self::never())
             ->method('submit');
 
-        $this->assertFalse($this->handler->process($this->model));
+        self::assertFalse($this->handler->process($this->model));
     }
 
-    public function testProcessPostRequestWithInitParam()
+    public function testProcessPostRequestWithInitParam(): void
     {
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod('POST');
         $this->request->request->set('_widgetInit', true);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->never())
+        $this->form->expects(self::never())
             ->method('submit');
 
-        $this->assertFalse($this->handler->process($this->model));
+        self::assertFalse($this->handler->process($this->model));
     }
 
     /**
-     * @param string $method
-     * @param bool $valid
-     * @param bool $assert
-     *
      * @dataProvider processData
      */
-    public function testProcessData($method, $valid, $assert)
+    public function testProcessData(string $method, bool $valid, bool $assert): void
     {
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
@@ -100,35 +90,33 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->setSubject('testSubject')
             ->setBody('testBody');
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
         if (in_array($method, ['POST', 'PUT'])) {
-            $this->form->expects($this->once())
+            $this->form->expects(self::once())
                 ->method('submit')
                 ->with(self::FORM_DATA);
 
-            $this->form->expects($this->once())
+            $this->form->expects(self::once())
                 ->method('isValid')
                 ->willReturn($valid);
 
             if ($valid) {
-                $this->emailProcessor->expects($this->once())
+                $this->emailProcessor->expects(self::once())
                     ->method('process')
                     ->with($this->model);
             }
         }
 
-        $this->assertEquals($assert, $this->handler->process($this->model));
+        self::assertEquals($assert, $this->handler->process($this->model));
     }
 
     /**
-     * @param string $method
-     *
      * @dataProvider methodsData
      */
-    public function testProcessException($method)
+    public function testProcessException(string $method): void
     {
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
@@ -138,40 +126,37 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->setSubject('testSubject')
             ->setBody('testBody');
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('submit')
             ->with(self::FORM_DATA);
 
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
         $exception = new \Exception('TEST');
-        $this->emailProcessor->expects($this->once())
+        $this->emailProcessor->expects(self::once())
             ->method('process')
             ->with($this->model)
             ->willReturnCallback(function () use ($exception) {
                 throw $exception;
             });
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with('Email sending failed.', ['exception' => $exception]);
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('addError')
             ->with($this->isInstanceOf(FormError::class));
 
-        $this->assertFalse($this->handler->process($this->model));
+        self::assertFalse($this->handler->process($this->model));
     }
 
-    /**
-     * @return array
-     */
-    public function processData()
+    public function processData(): array
     {
         return [
             ['POST', true, true],
@@ -185,10 +170,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function methodsData()
+    public function methodsData(): array
     {
         return [
             ['POST'],

@@ -57,10 +57,13 @@ define(function(require) {
                 this.options
             );
 
-            this.$mapContainer = $('<div class="map-visual"/>')
+            this.$viewContainer = $('<div class="map-visual-container"/>')
                 .appendTo(this.$el);
 
-            this.loadingMask = new LoadingMaskView({container: this.$el});
+            this.$mapContainer = $('<div class="map-visual"/>')
+                .appendTo(this.$viewContainer);
+
+            this.loadingMask = new LoadingMaskView({container: this.$viewContainer});
 
             if (options.address) {
                 this.updateMap(options.address.address, options.address.label);
@@ -257,7 +260,7 @@ define(function(require) {
                 type || 'warning',
                 message || __('map.unknown.unavailable'),
                 {
-                    container: this.$el,
+                    container: this.$viewContainer,
                     hideCloseButton: true,
                     insertMethod: 'prependTo'
                 }
@@ -269,7 +272,7 @@ define(function(require) {
                 return;
             }
             messenger.clear(this.errorMessage.namespace, {
-                container: this.$el
+                container: this.$viewContainer
             });
 
             delete this.errorMessage;

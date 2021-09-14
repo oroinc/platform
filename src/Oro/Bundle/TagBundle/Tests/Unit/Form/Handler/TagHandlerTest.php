@@ -13,30 +13,15 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FormInterface
-     */
-    protected $form;
+    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    private Request $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager
-     */
-    protected $manager;
+    private ObjectManager|\PHPUnit\Framework\MockObject\MockObject $manager;
 
-    /**
-     * @var TagHandler
-     */
-    protected $handler;
+    private TagHandler $handler;
 
-    /**
-     * @var Tag
-     */
-    protected $entity;
+    private Tag $entity;
 
     protected function setUp(): void
     {
@@ -54,7 +39,7 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new TagHandler($this->form, $requestStack, $this->manager);
     }
 
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -63,14 +48,13 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
         $this->form->expects($this->never())
             ->method('submit');
 
-        $this->assertFalse($this->handler->process($this->entity));
+        self::assertFalse($this->handler->process($this->entity));
     }
 
     /**
      * @dataProvider supportedMethods
-     * @param string $method
      */
-    public function testProcessSupportedRequest($method)
+    public function testProcessSupportedRequest(string $method): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -83,18 +67,18 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('submit')
             ->with(self::FORM_DATA);
 
-        $this->assertFalse($this->handler->process($this->entity));
+        self::assertFalse($this->handler->process($this->entity));
     }
 
-    public function supportedMethods()
+    public function supportedMethods(): array
     {
-        return array(
-            array('POST'),
-            array('PUT')
-        );
+        return [
+            ['POST'],
+            ['PUT'],
+        ];
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -109,7 +93,7 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->manager->expects($this->once())
             ->method('persist')
@@ -118,6 +102,6 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
         $this->manager->expects($this->once())
             ->method('flush');
 
-        $this->assertTrue($this->handler->process($this->entity));
+        self::assertTrue($this->handler->process($this->entity));
     }
 }

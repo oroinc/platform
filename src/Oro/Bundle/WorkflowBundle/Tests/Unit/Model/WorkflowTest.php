@@ -33,39 +33,19 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class WorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
 
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
     }
 
-    /**
-     * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
-     */
-    public function testGettersAndSetters(string $property, $value): void
+    public function testGettersAndSetters(): void
     {
-        $getter = 'get' . ucfirst($property);
-        $setter = 'set' . ucfirst($property);
         $workflow = $this->createWorkflow();
-        $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Workflow',
-            call_user_func_array(array($workflow, $setter), array($value))
-        );
-        $this->assertEquals($value, call_user_func_array(array($workflow, $getter), array()));
-    }
-
-    public function propertiesDataProvider(): array
-    {
-        return array(
-            'definition' => array(
-                'definition',
-                $this->createMock(WorkflowDefinition::class)
-            )
-        );
+        $definition = $this->createMock(WorkflowDefinition::class);
+        $this->assertInstanceOf(Workflow::class, $workflow->setDefinition($definition));
+        $this->assertEquals($definition, $workflow->getDefinition());
     }
 
     public function testIsTransitionAllowedArgumentException(): void
@@ -117,14 +97,15 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $transition = $this->getTransitionMock('test_transition', false);
 
         $workflow = $this->createWorkflow('test_workflow');
-        $workflow->getTransitionManager()->setTransitions(array($transition));
-        $workflow->getStepManager()->setSteps(array($step));
+        $workflow->getTransitionManager()->setTransitions([$transition]);
+        $workflow->getStepManager()->setSteps([$step]);
 
         $workflow->isTransitionAllowed($workflowItem, 'test_transition', null, true);
     }
 
     /**
      * @dataProvider isTransitionAllowedDataProvider
+     *
      * @param mixed $expectedResult
      * @param bool $transitionExist
      * @param bool $transitionAllowed
@@ -134,7 +115,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param bool $fireExceptions
      */
     public function testIsTransitionAllowed(
-        $expectedResult,
+        mixed $expectedResult,
         bool $transitionExist,
         bool $transitionAllowed,
         bool $isTransitionStart,
@@ -174,9 +155,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $workflow = $this->createWorkflow('test_workflow');
         if ($transitionExist) {
-            $workflow->getTransitionManager()->setTransitions(array($transition));
+            $workflow->getTransitionManager()->setTransitions([$transition]);
         }
-        $workflow->getStepManager()->setSteps(array($step));
+        $workflow->getStepManager()->setSteps([$step]);
 
         if ($expectedResult instanceof \Exception) {
             $this->expectException(get_class($expectedResult));
@@ -195,57 +176,57 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      */
     public function isTransitionAllowedDataProvider(): array
     {
-        return array(
-            'not_allowed_transition' => array(
+        return [
+            'not_allowed_transition' => [
                 'expectedResult' => false,
                 'transitionExist' => true,
                 'transitionAllowed' => false,
                 'isTransitionStart' => true,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-            ),
-            'allowed_transition' => array(
+            ],
+            'allowed_transition' => [
                 'expectedResult' => true,
                 'transitionExist' => true,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-            ),
-            'not_allowed_start_transition' => array(
+            ],
+            'not_allowed_start_transition' => [
                 'expectedResult' => false,
                 'transitionExist' => true,
                 'transitionAllowed' => false,
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-            ),
-            'allowed_start_transition' => array(
+            ],
+            'allowed_start_transition' => [
                 'expectedResult' => true,
                 'transitionExist' => true,
                 'transitionAllowed' => true,
                 'isTransitionStart' => true,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-            ),
-            'unknown_transition_fire_exception' => array(
+            ],
+            'unknown_transition_fire_exception' => [
                 'expectedException' => InvalidTransitionException::unknownTransition('test_transition'),
                 'transitionExist' => false,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-            ),
-            'unknown_transition_no_exception' => array(
+            ],
+            'unknown_transition_no_exception' => [
                 'expectedResult' => false,
                 'transitionExist' => false,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'fireException' => false
-            ),
-            'not_start_transition_fire_exception' => array(
+                'fireException' => false,
+            ],
+            'not_start_transition_fire_exception' => [
                 'expectedException' => InvalidTransitionException::notStartTransition(
                     'test_workflow',
                     'test_transition'
@@ -255,17 +236,17 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => false,
                 'stepAllowTransition' => true,
-            ),
-            'not_start_transition_no_exception' => array(
+            ],
+            'not_start_transition_no_exception' => [
                 'expectedResult' => false,
                 'transitionExist' => true,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
                 'hasCurrentStep' => false,
                 'stepAllowTransition' => true,
-                'fireException' => false
-            ),
-            'step_not_allow_transition_fire_exception' => array(
+                'fireException' => false,
+            ],
+            'step_not_allow_transition_fire_exception' => [
                 'expectedException' => InvalidTransitionException::stepHasNoAllowedTransition(
                     'test_workflow',
                     'test_step',
@@ -276,17 +257,17 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => false,
-            ),
-            'step_not_allow_transition_no_exception' => array(
+            ],
+            'step_not_allow_transition_no_exception' => [
                 'expectedResult' => false,
                 'transitionExist' => true,
                 'transitionAllowed' => true,
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => false,
-                'fireException' => false
-            ),
-        );
+                'fireException' => false,
+            ],
+        ];
     }
 
     public function testTransitNotAllowedTransition(): void
@@ -295,11 +276,13 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $stepName = 'stepOne';
 
         $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
-        $this->expectExceptionMessage(\sprintf(
-            'Step "%s" of workflow "%s" doesn\'t have allowed transition "transition".',
-            $stepName,
-            $workflowName
-        ));
+        $this->expectExceptionMessage(
+            \sprintf(
+                'Step "%s" of workflow "%s" doesn\'t have allowed transition "transition".',
+                $stepName,
+                $workflowName
+            )
+        );
 
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepName);
@@ -322,8 +305,8 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $transition = $this->getTransitionMock('transition');
 
         $workflow = $this->createWorkflow($workflowName);
-        $workflow->getTransitionManager()->setTransitions(array($transition));
-        $workflow->getStepManager()->setSteps(array($step));
+        $workflow->getTransitionManager()->setTransitions([$transition]);
+        $workflow->getStepManager()->setSteps([$step]);
         $workflow->transit($workflowItem, 'transition');
     }
 
@@ -383,8 +366,8 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $workflow = $this->createWorkflow(null, $aclManager);
         $workflow->setDefinition($workflowDefinition);
-        $workflow->getTransitionManager()->setTransitions(array($transition));
-        $workflow->getStepManager()->setSteps(array($stepOne, $stepTwo));
+        $workflow->getTransitionManager()->setTransitions([$transition]);
+        $workflow->getStepManager()->setSteps([$stepOne, $stepTwo]);
         $workflow->transit($workflowItem, 'transition', $errors);
     }
 
@@ -416,8 +399,8 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow = $this->createWorkflow();
         $workflow->setDefinition($workflowDefinition);
         $workflowDefinition->expects($this->once())->method('getName')->willReturn('test');
-        $workflow->getTransitionManager()->setTransitions(array($transition));
-        $workflow->getStepManager()->setSteps(array($stepOne));
+        $workflow->getTransitionManager()->setTransitions([$transition]);
+        $workflow->getStepManager()->setSteps([$stepOne]);
         $workflow->transit($workflowItem, 'transition');
     }
 
@@ -450,26 +433,33 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity');
 
+        $attributeWithDefault = new Attribute();
+        $attributeWithDefault->setName('attr_with_default');
+        $attributeWithDefault->setDefault(new \stdClass());
+
         $this->assertDoctrineHelperCalled($entity, 'test_wf_name');
 
         $workflow = $this->createWorkflow();
         $workflow->setDefinition($workflowDefinition);
         $workflow->getTransitionManager()->setTransitions([$transition]);
-        $workflow->getAttributeManager()->setAttributes([$entityAttribute]);
+        $workflow->getAttributeManager()->setAttributes([$entityAttribute, $attributeWithDefault]);
         $workflow->getAttributeManager()->setEntityAttributeName($entityAttribute->getName());
 
         $item = $workflow->start($entity, $data, $transitionName, $errors);
 
         $this->assertInstanceOf(WorkflowItem::class, $item);
         $this->assertEquals($entity, $item->getEntity());
-        $this->assertEquals(array_merge($data, ['entity' => $entity]), $item->getData()->getValues());
+        $this->assertEquals(
+            array_merge($data, ['entity' => $entity, 'attr_with_default' => $attributeWithDefault->getDefault()]),
+            $item->getData()->getValues()
+        );
     }
 
     public function startDataProvider(): array
     {
         return [
             [[], null],
-            [['test' => 'test'], 'test']
+            [['test' => 'test'], 'test'],
         ];
     }
 
@@ -582,17 +572,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $transition->expects($this->once())
             ->method('transit')
             ->with($this->isInstanceOf(WorkflowItem::class), $errors)
-            ->willReturnCallback(
-                static function (WorkflowItem $workflowItem) use ($step) {
-                    $workflowItem->setCurrentStep($step);
-                }
-            );
+            ->willReturnCallback(static fn (WorkflowItem $workflowItem) => $workflowItem->setCurrentStep($step));
 
         return $transition;
     }
 
     /**
      * @param string $name
+     *
      * @return Step|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getStepMock(string $name): Step
@@ -609,6 +596,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param string $name
      * @param bool $isStart
      * @param Step|null $step
+     *
      * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition
@@ -641,17 +629,17 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $step = new Step();
         $step->setName($workflowStep->getName());
-        $step->setAllowedTransitions(array($secondTransition->getName()));
+        $step->setAllowedTransitions([$secondTransition->getName()]);
 
         $workflow = $this->createWorkflow();
-        $workflow->getStepManager()->setSteps(array($step));
-        $workflow->getTransitionManager()->setTransitions(array($firstTransition, $secondTransition));
+        $workflow->getStepManager()->setSteps([$step]);
+        $workflow->getTransitionManager()->setTransitions([$firstTransition, $secondTransition]);
 
         $workflowItem = new WorkflowItem();
         $workflowItem->setCurrentStep($workflowStep);
 
         $actualTransitions = $workflow->getTransitionsByWorkflowItem($workflowItem);
-        $this->assertEquals(array($secondTransition), $actualTransitions->getValues());
+        $this->assertEquals([$secondTransition], $actualTransitions->getValues());
     }
 
     public function testGetAllowedTransitionsUnknownStepException(): void
@@ -693,7 +681,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testIsStartTransitionAvailable(): void
     {
-        $data = array();
+        $data = [];
         $errors = new ArrayCollection();
         $transitionName = 'test_transition';
 
@@ -702,7 +690,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $transition = $this->getTransitionMock($transitionName);
         $transition->expects($this->once())
             ->method('isAvailable')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'), $errors)
+            ->with($this->isInstanceOf(WorkflowItem::class), $errors)
             ->willReturn(true);
         $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->once())
@@ -718,7 +706,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow = $this->createWorkflow(null, null, null, $transitionManager);
 
         $workflow->setDefinition($workflowDefinition);
-        $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
+        $workflow->getAttributeManager()->setAttributes([$entityAttribute]);
         $workflow->getAttributeManager()->setEntityAttributeName($entityAttribute->getName());
 
         $this->assertTrue($workflow->isStartTransitionAvailable($transition, $entity, $data, $errors));
@@ -748,11 +736,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             ->willReturn(2);
 
         $workflow = $this->createWorkflow();
-        $workflow->getStepManager()->setSteps(array($stepsOne, $stepsTwo, $stepsThree));
+        $workflow->getStepManager()->setSteps([$stepsOne, $stepsTwo, $stepsThree]);
 
         $passedSteps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $passedSteps);
-        $actual = array();
+        $this->assertInstanceOf(ArrayCollection::class, $passedSteps);
+        $actual = [];
         /** @var Step $step */
         foreach ($passedSteps as $step) {
             $actual[] = $step->getName();
@@ -762,56 +750,42 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function passedStepsDataProvider(): array
     {
-        return array(
-            array(
-                array(
-                    $this->getTransitionRecordMock('step1')
-                ),
-                array('step1')
-            ),
-            array(
-                array(
+        return [
+            [
+                [
+                    $this->getTransitionRecordMock('step1'),
+                ],
+                ['step1'],
+            ],
+            [
+                [
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step2'),
-                ),
-                array('step1', 'step2')
-            ),
-            array(
-                array(
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                ),
-                array('step1', 'step2')
-            ),
-            array(
-                array(
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step3'),
-                ),
-                array('step1', 'step3')
-            ),
-            array(
-                array(
+                ],
+                ['step1', 'step2'],
+            ],
+            [
+                [
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step2'),
                     $this->getTransitionRecordMock('step3'),
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step2'),
+                ],
+                ['step1', 'step2'],
+            ],
+            [
+                [
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step3'),
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step3'),
-                ),
-                array('step1', 'step3')
-            ),
-            array(
-                array(
+                ],
+                ['step1', 'step3'],
+            ],
+            [
+                [
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step2'),
                     $this->getTransitionRecordMock('step3'),
@@ -820,28 +794,43 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step2'),
                     $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step3'),
+                ],
+                ['step1', 'step3'],
+            ],
+            [
+                [
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step3'),
                     $this->getTransitionRecordMock('step3'),
-                ),
-                array('step1', 'step3')
-            ),
-            array(
-                array(
+                ],
+                ['step1', 'step3'],
+            ],
+            [
+                [
                     $this->getTransitionRecordMock('step1'),
                     $this->getTransitionRecordMock('step3'),
                     $this->getTransitionRecordMock('step2'),
-                ),
-                array('step1', 'step3', 'step2')
-            ),
-        );
+                ],
+                ['step1', 'step3', 'step2'],
+            ],
+        ];
     }
 
     /**
      * @param string $stepToName
+     *
      * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getTransitionRecordMock($stepToName): WorkflowTransitionRecord
+    protected function getTransitionRecordMock(string $stepToName): WorkflowTransitionRecord
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepToName);
@@ -860,6 +849,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
      * @param VariableManager $variableManager
+     *
      * @return Workflow
      */
     protected function createWorkflow(
@@ -922,14 +912,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn('name');
 
-        $attributes = array($attributeOne, $attributeTwo);
+        $attributes = [$attributeOne, $attributeTwo];
         $attributeManager = $this->createMock(AttributeManager::class);
         $attributeManager->expects($this->once())
             ->method('getAttributes')
             ->willReturn($attributes);
 
         $workflow = $this->createWorkflow(null, null, $attributeManager);
-        $expected = array('name' => 'path');
+        $expected = ['name' => 'path'];
         $this->assertEquals($expected, $workflow->getAttributesMapping());
     }
 
@@ -951,13 +941,13 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         yield [
             'data' => ['route1' => ['trans1']],
             'property' => 'initRoutes',
-            'node' => WorkflowConfiguration::NODE_INIT_ROUTES
+            'node' => WorkflowConfiguration::NODE_INIT_ROUTES,
         ];
 
         yield [
             'data' => ['entity1' => ['trans1']],
             'property' => 'initEntities',
-            'node' => WorkflowConfiguration::NODE_INIT_ENTITIES
+            'node' => WorkflowConfiguration::NODE_INIT_ENTITIES,
         ];
     }
 

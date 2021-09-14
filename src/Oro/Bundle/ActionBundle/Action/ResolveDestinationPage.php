@@ -58,7 +58,7 @@ class ResolveDestinationPage extends AbstractAction
      */
     protected function executeAction($context)
     {
-        if (null === ($request = $this->requestStack->getMasterRequest())) {
+        if (null === ($request = $this->requestStack->getMainRequest())) {
             return;
         }
 

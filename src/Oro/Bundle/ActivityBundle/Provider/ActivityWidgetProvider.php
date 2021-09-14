@@ -11,6 +11,9 @@ use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides activity widgets.
+ */
 class ActivityWidgetProvider implements WidgetProviderInterface
 {
     /** @var ActivityManager */
@@ -63,7 +66,7 @@ class ActivityWidgetProvider implements WidgetProviderInterface
         $items = $this->activityManager->getActivityAssociations($entityClass);
         foreach ($items as $item) {
             if (empty($item['acl']) || $this->authorizationChecker->isGranted($item['acl'])) {
-                $url    = $this->entityRoutingHelper->generateUrl($item['route'], $entityClass, $entityId);
+                $url    = $this->entityRoutingHelper->generateUrl((string) $item['route'], $entityClass, $entityId);
                 $alias  = sprintf(
                     '%s_%s_%s',
                     strtolower(ExtendHelper::getShortClassName($item['className'])),

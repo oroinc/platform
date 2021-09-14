@@ -38,8 +38,12 @@ class DatagridRouteHelper
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
-    public function generate($routeName, $gridName, array $params = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
-    {
+    public function generate(
+        string $routeName,
+        string $gridName,
+        array $params = [],
+        int $referenceType = RouterInterface::ABSOLUTE_PATH
+    ) {
         return $this->router->generate(
             $routeName,
             ['grid' => [$gridName => http_build_query($params)]],

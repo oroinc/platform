@@ -100,7 +100,7 @@ class FormExtension implements FormExtensionInterface
                 $extensions[] = $extension = $this->container->get($serviceId);
 
                 // validate result of getExtendedType() to ensure it is consistent with the service definition
-                if (!empty(\array_diff($extension->getExtendedTypes(), [$name]))) {
+                if (!in_array($name, $extension->getExtendedTypes(), true)) {
                     throw new InvalidArgumentException(\sprintf(
                         'The extended type specified for the service "%s" does not match the actual extended type.'
                         . ' Expected "%s", given "%s".',

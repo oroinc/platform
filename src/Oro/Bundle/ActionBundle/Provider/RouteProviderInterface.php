@@ -2,25 +2,16 @@
 
 namespace Oro\Bundle\ActionBundle\Provider;
 
+/**
+ * Interface for provider that returns routes needed for action.
+ */
 interface RouteProviderInterface
 {
-    /**
-     * @return string
-     */
-    public function getWidgetRoute();
+    public function getWidgetRoute(): string;
 
-    /**
-     * @return string
-     */
-    public function getFormDialogRoute();
+    public function getFormDialogRoute(): string;
 
-    /**
-     * @return string
-     */
-    public function getFormPageRoute();
+    public function getFormPageRoute(): string;
 
-    /**
-     * @return string
-     */
-    public function getExecutionRoute();
+    public function getExecutionRoute(): string;
 }

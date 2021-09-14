@@ -127,14 +127,18 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
                 'submittedData' => [
                     'workflowsToDeactivation' => ['workflow1'],
                 ],
-                'expectedData' => [],
+                'expectedData' => [
+                    'workflowsToDeactivation' => [],
+                ],
             ],
             'deactivate invalid workflow' => [
                 'valid' => false,
                 'submittedData' => [
                     'workflowsToDeactivation' => ['unknown_workflow'],
                 ],
-                'expectedData' => [],
+                'expectedData' => [
+                    'workflowsToDeactivation' => [],
+                ],
             ],
         ];
     }

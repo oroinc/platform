@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+/**
+ * Represents action attribute.
+ */
 class Attribute implements EntityParameterInterface
 {
     const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
@@ -35,6 +38,11 @@ class Attribute implements EntityParameterInterface
      * @var array
      */
     protected $options = [];
+
+    /**
+     * @var mixed
+     */
+    protected $default;
 
     /**
      * Set attribute type
@@ -205,5 +213,24 @@ class Attribute implements EntityParameterInterface
     public function getInternalType()
     {
         return self::INTERNAL_TYPE_ATTRIBUTE;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefault(): mixed
+    {
+        return $this->default;
+    }
+
+    /**
+     * @param mixed $default
+     * @return Attribute
+     */
+    public function setDefault(mixed $default): Attribute
+    {
+        $this->default = $default;
+
+        return $this;
     }
 }

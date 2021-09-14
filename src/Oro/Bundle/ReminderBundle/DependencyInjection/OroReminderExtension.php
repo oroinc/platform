@@ -20,6 +20,7 @@ class OroReminderExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('form.yml');
         $loader->load('services.yml');
+        $loader->load('controllers_api.yml');
         $loader->load('commands.yml');
     }
 }

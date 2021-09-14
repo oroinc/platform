@@ -13,6 +13,9 @@ use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Assembles attributes collection for the specified workflow configuration.
+ */
 class AttributeAssembler extends BaseAbstractAssembler
 {
     /**
@@ -111,9 +114,10 @@ class AttributeAssembler extends BaseAbstractAssembler
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
-        $attribute->setEntityAcl($this->getOption($options, 'entity_acl', array()));
+        $attribute->setEntityAcl($this->getOption($options, 'entity_acl', []));
         $attribute->setPropertyPath($this->getOption($options, 'property_path'));
-        $attribute->setOptions($this->getOption($options, 'options', array()));
+        $attribute->setOptions($this->getOption($options, 'options', []));
+        $attribute->setDefault($this->getOption($options, 'default', null));
 
         $this->validateAttribute($attribute);
 

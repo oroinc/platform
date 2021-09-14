@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -270,6 +271,12 @@ abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
                     return isset($this->actualDefinitions[$id]);
                 }
             );
+        $containerBuilder->expects(self::any())
+            ->method('getReflectionClass')
+            ->willReturnCallback(static fn ($class) =>  new \ReflectionClass($class));
+        $containerBuilder->expects(self::any())
+            ->method('getParameterBag')
+            ->willReturn(new ParameterBag($this->actualParameters));
 
         return $containerBuilder;
     }

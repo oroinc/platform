@@ -147,7 +147,7 @@ class SecurityContext implements SecurityContextInterface
             return null;
         }
 
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         if (null === $request) {
             return null;
         }

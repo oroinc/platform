@@ -10,15 +10,14 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ExportQueryTupleLengthProvider
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
+    private array $tupleLengthByClassName;
+    private ExportQueryProvider $exportQueryProvider;
 
-    /** @var array */
-    private $tupleLengthByClassName;
-
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, ExportQueryProvider $exportQueryProvider)
     {
         $this->doctrine = $doctrine;
+        $this->exportQueryProvider = $exportQueryProvider;
     }
 
     /**
@@ -43,7 +42,7 @@ class ExportQueryTupleLengthProvider
             // For main entity fields.
             $this->tupleLengthByClassName[$className] = count($metadata->getFieldNames());
             foreach ($metadata->getAssociationNames() as $associationName) {
-                if ($metadata->isAssociationWithSingleJoinColumn($associationName)) {
+                if ($this->exportQueryProvider->isAssociationExportable($metadata, $associationName)) {
                     $targetClass = $metadata->getAssociationTargetClass($associationName);
                     $targetMetadata = $entityManager->getClassMetadata($targetClass);
 
@@ -55,7 +54,12 @@ class ExportQueryTupleLengthProvider
                     $tupleLength += count(
                         array_filter(
                             $targetMetadata->getAssociationNames(),
-                            [$targetMetadata, 'isAssociationWithSingleJoinColumn']
+                            function (string $fieldName) use ($targetMetadata) {
+                                return $this->exportQueryProvider->isAssociationExportable(
+                                    $targetMetadata,
+                                    $fieldName
+                                );
+                            }
                         )
                     );
 

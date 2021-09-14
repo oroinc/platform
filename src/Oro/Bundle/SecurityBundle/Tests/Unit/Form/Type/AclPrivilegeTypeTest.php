@@ -13,21 +13,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $options = ['privileges_config' => ['field_type' => 'grid']];
         $builder->expects(self::exactly(2))
             ->method('add')
             ->withConsecutive(
-                ['identity', self::isInstanceOf(AclPrivilegeIdentityType::class), ['required' => false]],
+                ['identity', AclPrivilegeIdentityType::class, ['required' => false]],
                 ['permissions', PermissionCollectionType::class, self::containsEqual($options)]
             );
 
         (new AclPrivilegeType())->buildForm($builder, $options);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
 
@@ -38,7 +38,7 @@ class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
         (new AclPrivilegeType())->configureOptions($resolver);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $view = $this->createMock(FormView::class);
         $form = $this->createMock(FormInterface::class);

@@ -66,7 +66,7 @@ class OriginalUrlProvider
 
     private function getMasterRequestUri(): ?string
     {
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
 
         /**
          * Based on the "requestStack" contract "MasterRequest" could be "null". it could happens in case

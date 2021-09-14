@@ -30,6 +30,7 @@ abstract class BaseDriver implements DBALPersisterInterface
 {
     const EXPRESSION_TYPE_OR  = 'OR';
     const EXPRESSION_TYPE_AND = 'AND';
+    const SPECIAL_SEPARATOR = '__SEPARATOR__';
 
     /**
      * @var string
@@ -373,6 +374,8 @@ abstract class BaseDriver implements DBALPersisterInterface
             $fieldName = implode('_', $fieldName);
         }
 
+        $fieldName = str_replace('.', '_', $fieldName);
+
         $i = 0;
         do {
             $i++;
@@ -585,7 +588,8 @@ abstract class BaseDriver implements DBALPersisterInterface
 
         foreach ($selects as $select) {
             [$type, $name] = Criteria::explodeFieldTypeName($select);
-            QueryBuilderUtil::checkIdentifier($name);
+            [$fieldName,] = explode('.', $name);
+            QueryBuilderUtil::checkIdentifier($fieldName);
             QueryBuilderUtil::checkIdentifier($type);
 
             $joinField = $this->getJoinField($type);
@@ -599,7 +603,13 @@ abstract class BaseDriver implements DBALPersisterInterface
             $qb->leftJoin($joinField, $joinAlias, Join::WITH, $withClause)
                 ->setParameter($param, $name);
 
-            $qb->addSelect($joinAlias . '.value as ' . $name);
+            $qb->addSelect(
+                QueryBuilderUtil::sprintf(
+                    '%s.value as %s',
+                    $joinAlias,
+                    str_replace('.', self::SPECIAL_SEPARATOR, $name)
+                )
+            );
         }
     }
 

@@ -24,6 +24,7 @@ class OroReportExtension extends Extension
         $loader->load('form_types.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
 
         if (isset($config['dbal']['connection']) && $config['dbal']['connection']) {
             $container->setParameter(

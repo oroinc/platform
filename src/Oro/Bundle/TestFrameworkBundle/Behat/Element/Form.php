@@ -352,7 +352,7 @@ class Form extends Element
 
         if (!empty($matches['function']) && !empty($matches['value'])) {
             if ('DateTime' === $matches['function']) {
-                $value = new \DateTime($matches['value']);
+                $value = (new \DateTime($matches['value']))->format(\DateTimeInterface::ATOM);
             }
             if ('Date' === $matches['function']) {
                 $parsed =  new \DateTime($matches['value']);

@@ -7,60 +7,42 @@ namespace Oro\Bundle\ActionBundle\Provider;
  */
 class RouteProvider implements RouteProviderInterface
 {
-    /** @var string */
-    private $formDialogRoute;
+    private string $formDialogRoute;
 
-    /** @var string */
-    private $formPageRoute;
+    private string $formPageRoute;
 
-    /** @var string */
-    private $executionRoute;
+    private string $executionRoute;
 
-    /** @var string|null */
-    private $widgetRoute;
+    private string $widgetRoute;
 
-    /**
-     * @param string $formDialogRoute
-     * @param string $formPageRoute
-     * @param string $executionRoute
-     * @param string|null $widgetRoute
-     */
-    public function __construct($formDialogRoute, $formPageRoute, $executionRoute, $widgetRoute = null)
-    {
+    public function __construct(
+        string $formDialogRoute,
+        string $formPageRoute,
+        string $executionRoute,
+        string $widgetRoute = ''
+    ) {
         $this->formDialogRoute = $formDialogRoute;
         $this->formPageRoute = $formPageRoute;
         $this->executionRoute = $executionRoute;
         $this->widgetRoute = $widgetRoute;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getWidgetRoute()
+    public function getWidgetRoute(): string
     {
         return $this->widgetRoute;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormDialogRoute()
+    public function getFormDialogRoute(): string
     {
         return $this->formDialogRoute;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormPageRoute()
+    public function getFormPageRoute(): string
     {
         return $this->formPageRoute;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExecutionRoute()
+    public function getExecutionRoute(): string
     {
         return $this->executionRoute;
     }

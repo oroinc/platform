@@ -82,7 +82,7 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
             ],
         ];
 
-        $form->submit($submittedData, [$existingEntity]);
+        $form->submit($submittedData);
         $this->assertTrue($form->isValid());
         $this->assertTrue($form->isSynchronized());
 

@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
@@ -28,27 +29,23 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
 {
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /** @var OwnershipMetadataProviderInterface */
-    protected $ownershipMetadata;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /** @var AclHelper */
-    protected $aclHelper;
+    protected ManagerRegistry $registry;
+    protected OwnershipMetadataProviderInterface $ownershipMetadata;
+    protected ?EventDispatcherInterface $dispatcher = null;
+    protected ?AclHelper $aclHelper = null;
+    protected ExportQueryProvider $exportQueryProvider;
 
     public function __construct(
         ContextRegistry $contextRegistry,
         ManagerRegistry $registry,
-        OwnershipMetadataProviderInterface $ownershipMetadata
+        OwnershipMetadataProviderInterface $ownershipMetadata,
+        ExportQueryProvider $exportQueryProvider
     ) {
         parent::__construct($contextRegistry);
 
         $this->ownershipMetadata = $ownershipMetadata;
         $this->registry = $registry;
+        $this->exportQueryProvider = $exportQueryProvider;
     }
 
     /**
@@ -113,8 +110,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
         $metadata = $entityManager->getClassMetadata($entityName);
         foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {
-            // can't join with *-to-many relations because they affects query pagination
-            if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
+            if ($this->exportQueryProvider->isAssociationExportable($metadata, $fieldName)) {
                 $alias = '_' . $fieldName;
                 $qb->addSelect($alias);
                 $qb->leftJoin('o.' . $fieldName, $alias);

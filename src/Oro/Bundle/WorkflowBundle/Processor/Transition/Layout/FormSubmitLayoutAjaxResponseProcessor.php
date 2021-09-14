@@ -8,6 +8,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Sets JsonResponse with WorkflowResult as a TransitionContext result data.
+ */
 class FormSubmitLayoutAjaxResponseProcessor implements ProcessorInterface
 {
     /**
@@ -23,7 +26,7 @@ class FormSubmitLayoutAjaxResponseProcessor implements ProcessorInterface
             'workflowItem' => ['result' => $context->getWorkflowItem()->getResult()->toArray()]
         ];
 
-        $context->setResult(JsonResponse::create($data));
+        $context->setResult(new JsonResponse($data));
         $context->setProcessed(true);
     }
 

@@ -62,7 +62,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -76,10 +76,8 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportedMethods
-     *
-     * @param string $method
      */
-    public function testProcessSupportedRequest($method)
+    public function testProcessSupportedRequest(string $method): void
     {
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod($method);
@@ -97,15 +95,12 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->entity));
     }
 
-    /**
-     * @return array
-     */
-    public function supportedMethods()
+    public function supportedMethods(): array
     {
         return [['POST', 'PUT']];
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
@@ -147,7 +142,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $existingIntegration,
         $expectOwnerSetEvent,
         $expectIntegrationUpdateEvent
-    ) {
+    ): void {
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
@@ -211,10 +206,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($entity));
     }
 
-    /**
-     * @return array
-     */
-    public function eventDataProvider()
+    public function eventDataProvider(): array
     {
         $newIntegration = new Integration();
         $newOwner = $this->createMock(User::class);
@@ -261,12 +253,12 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         self::assertSame($this->form, $this->handler->getForm());
     }
 
-    public function testUpdateForm()
+    public function testUpdateForm(): void
     {
         $this->request->initialize([], [
             self::FORM_NAME                   => self::FORM_DATA,
@@ -296,7 +288,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process($this->entity);
     }
 
-    public function testUpdateFormOnTransportTypeChanged()
+    public function testUpdateFormOnTransportTypeChanged(): void
     {
         $this->request->initialize([], [
             self::FORM_NAME                   => self::FORM_DATA,

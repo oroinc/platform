@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\EmailBundle\Controller\Api\Rest as Api;
 use Oro\Bundle\EmailBundle\DependencyInjection\OroEmailExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
 class OroEmailExtensionTest extends ExtensionTestCase
 {
-    /** @var OroEmailExtension */
-    private $extension;
+    private OroEmailExtension $extension;
 
     protected function setUp(): void
     {
@@ -18,7 +18,7 @@ class OroEmailExtensionTest extends ExtensionTestCase
 
     public function testGetAlias(): void
     {
-        $this->assertEquals('oro_email', $this->extension->getAlias());
+        self::assertEquals('oro_email', $this->extension->getAlias());
     }
 
     /**
@@ -27,11 +27,11 @@ class OroEmailExtensionTest extends ExtensionTestCase
     public function testPrepend(array $securityConfig, array $expectedSecurityConfig): void
     {
         $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
-        $containerBuilder->expects($this->once())
+        $containerBuilder->expects(self::once())
             ->method('getExtensionConfig')
             ->with('nelmio_security')
             ->willReturn($securityConfig);
-        $containerBuilder->expects($this->once())
+        $containerBuilder->expects(self::once())
             ->method('setExtensionConfig')
             ->with('nelmio_security')
             ->willReturn($expectedSecurityConfig);
@@ -74,5 +74,23 @@ class OroEmailExtensionTest extends ExtensionTestCase
                 ],
             ],
         ];
+    }
+
+    public function testLoad(): void
+    {
+        $this->loadExtension($this->extension);
+
+        $expectedDefinitions = [
+            Api\AutoResponseRuleController::class,
+            Api\EmailActivityController::class,
+            Api\EmailActivityEntityController::class,
+            Api\EmailActivitySearchController::class,
+            Api\EmailActivitySuggestionController::class,
+            Api\EmailController::class,
+            Api\EmailOriginController::class,
+            Api\EmailTemplateController::class,
+        ];
+
+        $this->assertDefinitionsLoaded($expectedDefinitions);
     }
 }

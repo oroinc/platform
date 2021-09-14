@@ -164,7 +164,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNotCompoundForm()
+    public function testNotCompoundForm(): void
     {
         $config = $this->createMock(FormConfigInterface::class);
         $config->expects($this->any())
@@ -184,7 +184,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, ['ownership_disabled' => false]);
     }
 
-    public function testAnonymousUser()
+    public function testAnonymousUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
@@ -202,7 +202,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with user owner type and change owner permission granted
      */
-    public function testUserOwnerBuildFormGranted()
+    public function testUserOwnerBuildFormGranted(): void
     {
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER]);
         $this->builder->expects($this->once())
@@ -214,7 +214,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with user owner type and change owner permission isn't granted
      */
-    public function testUserOwnerBuildFormNotGranted()
+    public function testUserOwnerBuildFormNotGranted(): void
     {
         $this->mockConfigs(['is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_USER]);
         $this->builder->expects($this->never())
@@ -225,7 +225,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with business unit owner type and change owner permission granted
      */
-    public function testBusinessUnitOwnerBuildFormGranted()
+    public function testBusinessUnitOwnerBuildFormGranted(): void
     {
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
 
@@ -253,7 +253,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with business unit owner type and change owner permission granted, but view business unit not.
      */
-    public function testBusinessUnitOwnerBuildFormAssignGrantedViewBusinessUnitNotGranted()
+    public function testBusinessUnitOwnerBuildFormAssignGrantedViewBusinessUnitNotGranted(): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
@@ -291,8 +291,8 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
-           ->method('getClassMetadata')
-           ->willReturn($classMetadata);
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
@@ -328,7 +328,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with business unit owner type and change owner permission isn't granted
      */
-    public function testBusinessUnitOwnerBuildFormNotGranted()
+    public function testBusinessUnitOwnerBuildFormNotGranted(): void
     {
         $this->mockConfigs(['is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
         $this->builder->expects($this->once())
@@ -354,7 +354,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with organization owner type and change owner permission granted
      */
-    public function testOrganizationOwnerBuildFormGranted()
+    public function testOrganizationOwnerBuildFormGranted(): void
     {
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_ORGANIZATION]);
         $this->builder->expects($this->never())
@@ -365,7 +365,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Testing case with organization owner type and change owner permission isn't granted
      */
-    public function testOrganizationOwnerBuildFormNotGranted()
+    public function testOrganizationOwnerBuildFormNotGranted(): void
     {
         $this->mockConfigs(['is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_ORGANIZATION]);
         $this->builder->expects($this->never())
@@ -373,7 +373,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, ['ownership_disabled' => false]);
     }
 
-    public function testEventListener()
+    public function testEventListener(): void
     {
         $this->mockConfigs(['is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_ORGANIZATION]);
         $this->builder->expects($this->never())
@@ -384,7 +384,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Test case, when business unit not assigned and not available for user
      */
-    public function testDefaultOwnerUnavailableBusinessUnit()
+    public function testDefaultOwnerUnavailableBusinessUnit(): void
     {
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
 
@@ -409,7 +409,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, ['ownership_disabled' => false]);
     }
 
-    private function mockConfigs(array $values)
+    private function mockConfigs(array $values): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getOrganization')
@@ -452,7 +452,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreSubmit()
+    public function testPreSubmit(): void
     {
         $this->mockConfigs(
             [
@@ -494,6 +494,9 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->businessUnitManager->expects($this->once())
             ->method('canUserBeSetAsOwner')
             ->willReturn(false);
+
+        $this->extension->buildForm($this->builder, ['ownership_disabled' => false]);
+
         $event = new FormEvent($form, $this->user);
 
         $this->extension->preSubmit($event);
@@ -505,7 +508,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->postSubmit($event);
     }
 
-    public function testPreSetData()
+    public function testPreSetData(): void
     {
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER]);
         $form = $this->createMock(Form::class);
@@ -527,6 +530,9 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($businessUnit);
         $form->expects($this->once())
             ->method('remove');
+
+        $this->extension->buildForm($this->builder, ['ownership_disabled' => false]);
+
         $event = new FormEvent($form, $this->user);
         $this->extension->preSetData($event);
     }
@@ -534,7 +540,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * The test case, when default owner set from User's owner
      */
-    public function testDefaultOwnerAvailableBusinessUnit()
+    public function testDefaultOwnerAvailableBusinessUnit(): void
     {
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
 
