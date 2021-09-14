@@ -77,8 +77,8 @@
         <textarea id="oro_embeddedform_iframe" cols="60" rows="10" class="fill-tab" style="height: 300px" dir="ltr">
 {%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
-<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
-<script type="text/javascript">
+<script src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script>
     new ORO.EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         iframe: {
@@ -98,8 +98,8 @@
         <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px" dir="ltr">
 {%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
-<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
-<script type="text/javascript">
+<script src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script>
     new ORO.EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         xhr: {

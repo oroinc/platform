@@ -1,5 +1,5 @@
 {% if check_ws() %}
-<script type="text/javascript">
+<script>
     loadModules(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp', 'routing'],
     function($, sync, Wamp, routing){
         $(document).on('click.action.data-api', '[data-action=sync-connect]', function (e) {
