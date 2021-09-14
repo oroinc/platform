@@ -510,8 +510,8 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
     {
         $collection->addRequirement(
             NodeJsVersionChecker::satisfies($nodeExecutable, self::REQUIRED_NODEJS_VERSION),
-            'NodeJS 12 - 14 version must be installed.',
-            'Upgrade <strong>NodeJS</strong> to 12 - 14 version.'
+            'NodeJS version 12 - 14 must be installed.',
+            'Switch <strong>NodeJS</strong> to version 12 - 14.'
         );
     }
 
