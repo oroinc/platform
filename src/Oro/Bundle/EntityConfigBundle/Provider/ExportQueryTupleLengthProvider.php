@@ -16,9 +16,17 @@ class ExportQueryTupleLengthProvider
     /** @var array */
     private $tupleLengthByClassName;
 
+    /** @var ExportQueryProvider */
+    private $exportQueryProvider;
+
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
+    }
+
+    public function setExportQueryProvider(ExportQueryProvider $exportQueryProvider): void
+    {
+        $this->exportQueryProvider = $exportQueryProvider;
     }
 
     /**
@@ -43,7 +51,7 @@ class ExportQueryTupleLengthProvider
             // For main entity fields.
             $this->tupleLengthByClassName[$className] = count($metadata->getFieldNames());
             foreach ($metadata->getAssociationNames() as $associationName) {
-                if ($metadata->isAssociationWithSingleJoinColumn($associationName)) {
+                if ($this->exportQueryProvider->isAssociationExportable($metadata, $associationName)) {
                     $targetClass = $metadata->getAssociationTargetClass($associationName);
                     $targetMetadata = $entityManager->getClassMetadata($targetClass);
 
@@ -55,7 +63,12 @@ class ExportQueryTupleLengthProvider
                     $tupleLength += count(
                         array_filter(
                             $targetMetadata->getAssociationNames(),
-                            [$targetMetadata, 'isAssociationWithSingleJoinColumn']
+                            function (string $fieldName) use ($targetMetadata) {
+                                return $this->exportQueryProvider->isAssociationExportable(
+                                    $targetMetadata,
+                                    $fieldName
+                                );
+                            }
                         )
                     );
 
