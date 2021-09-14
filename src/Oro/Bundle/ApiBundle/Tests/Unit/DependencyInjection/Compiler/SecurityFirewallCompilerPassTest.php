@@ -162,8 +162,48 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $listeners = $contextFirewallContext->getArgument(0);
         self::assertCount(2, $listeners);
-        // Context serializer listener should does before the access listener
+        // the context listener should be before the access listener
         self::assertEquals('oro_security.context_listener.main.testFirewall', (string)$listeners[0]);
         self::assertEquals('security.access_listener', (string)$listeners[1]);
+    }
+
+    public function testProcessWithRememberMeListener()
+    {
+        $this->container->prependExtensionConfig(
+            'security',
+            ['firewalls' => [
+                'testFirewall' => ['stateless' => true, 'context' => 'main', 'organization-remember-me' =>[]]
+            ]]
+        );
+        $exceptionListener = new Reference('exceptionListener');
+        $exceptionListenerDefinition = new Definition(BaseExceptionListener::class, []);
+        $this->container->setDefinition('exceptionListener', $exceptionListenerDefinition);
+
+        $contextFirewallContext = new Definition(
+            FirewallContext::class,
+            [
+                new IteratorArgument([
+                    new Reference('oro_security.authentication.listener.rememberme.main'),
+                    new Reference('security.access_listener')
+                ]),
+                $exceptionListener
+            ]
+        );
+
+        $this->container->setDefinition(
+            'security.firewall.map.context.testFirewall',
+            $contextFirewallContext
+        );
+
+        $this->compiler->process($this->container);
+
+        $this->assertFirewallMap();
+
+        $listeners = $contextFirewallContext->getArgument(0);
+        self::assertCount(3, $listeners);
+        // the context listener should be before the access listener or remember me listener
+        self::assertEquals('oro_security.context_listener.main.testFirewall', (string)$listeners[0]);
+        self::assertEquals('oro_security.authentication.listener.rememberme.main', (string)$listeners[1]);
+        self::assertEquals('security.access_listener', (string)$listeners[2]);
     }
 }
