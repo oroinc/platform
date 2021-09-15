@@ -24,7 +24,11 @@ define(function(require, exports, module) {
         DIALOG_SCROLLABLE_CONTAINER,
         GRID_SCROLLABLE_CONTAINER
     ].join(',');
-    const ESC_KEY_CODE = 27;
+    const ESCAPE_KEYCODE = 27; // KeyboardEvent.which value for Escape (Esc) key
+    const SPACE_KEYCODE = 32; // KeyboardEvent.which value for space key
+    const ARROW_UP_KEYCODE = 38; // KeyboardEvent.which value for up arrow key
+    const ARROW_DOWN_KEYCODE = 40; // KeyboardEvent.which value for down arrow key
+    const REGEXP_KEYDOWN = new RegExp(`${ARROW_UP_KEYCODE}|${ARROW_DOWN_KEYCODE}|${ESCAPE_KEYCODE}`);
     const ClassName = {
         DISABLED: 'disabled',
         SHOW: 'show',
@@ -34,6 +38,12 @@ define(function(require, exports, module) {
         MENURIGHT: 'dropdown-menu-right',
         MENULEFT: 'dropdown-menu-left',
         POSITION_STATIC: 'position-static'
+    };
+    const Selector = {
+        DATA_TOGGLE: '[data-toggle="dropdown"]',
+        FORM_CHILD: '.click',
+        MENU: '.dropdown-menu',
+        VISIBLE_ITEMS: '.dropdown-menu .dropdown-item:not(.disabled):not(:disabled)'
     };
 
     config = _.extend({
@@ -84,7 +94,7 @@ define(function(require, exports, module) {
 
         bindKeepFocusInside: function() {
             $(this._menu).on(_events(['keydown']), e => {
-                if (e.keyCode === ESC_KEY_CODE) {
+                if (e.keyCode === ESCAPE_KEYCODE) {
                     e.stopPropagation();
                     this.hide();
                     this._element.focus();
@@ -348,6 +358,71 @@ define(function(require, exports, module) {
         delete Dropdown._clickEvent;
     };
 
+    /**
+     * Method `_dataApiKeydownHandler` is copied from bootstrap 4.6 where already fixed issue with Esc keydown event
+     */
+    Dropdown._dataApiKeydownHandler = function(event) {
+        // If not input/textarea:
+        //  - And not a key in REGEXP_KEYDOWN => not a dropdown command
+        // If input/textarea:
+        //  - If space key => not a dropdown command
+        //  - If key is other than escape
+        //    - If key is not up or down => not a dropdown command
+        //    - If trigger inside the menu => not a dropdown command
+        if (/input|textarea/i.test(event.target.tagName)
+            ? event.which === SPACE_KEYCODE || event.which !== ESCAPE_KEYCODE &&
+            (event.which !== ARROW_DOWN_KEYCODE && event.which !== ARROW_UP_KEYCODE ||
+                $(event.target).closest(Selector.MENU).length) : !REGEXP_KEYDOWN.test(event.which)) {
+            return;
+        }
+
+        if (this.disabled || $(this).hasClass(ClassName.DISABLED)) {
+            return;
+        }
+
+        const parent = Dropdown._getParentFromElement(this);
+        const isActive = $(parent).hasClass(ClassName.SHOW);
+
+        if (!isActive && event.which === ESCAPE_KEYCODE) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!isActive || event.which === ESCAPE_KEYCODE || event.which === SPACE_KEYCODE) {
+            if (event.which === ESCAPE_KEYCODE) {
+                const toggle = parent.querySelector(Selector.DATA_TOGGLE);
+                $(toggle).trigger('focus');
+            }
+
+            $(this).trigger('click');
+            return;
+        }
+
+        const items = [].slice.call(parent.querySelectorAll(Selector.VISIBLE_ITEMS));
+
+        if (items.length === 0) {
+            return;
+        }
+
+        let index = items.indexOf(event.target);
+
+        if (event.which === ARROW_UP_KEYCODE && index > 0) { // Up
+            index--;
+        }
+
+        if (event.which === ARROW_DOWN_KEYCODE && index < items.length - 1) { // Down
+            index++;
+        }
+
+        if (index < 0) {
+            index = 0;
+        }
+
+        items[index].focus();
+    };
+
     function _events(names) {
         return names.map(function(name) {
             return name + EVENT_KEY + DATA_API_KEY;
@@ -355,12 +430,18 @@ define(function(require, exports, module) {
     }
 
     $(document)
+        // fixed issue when dropdown opens on Esc key down
+        .off(_events(['keydown']), Selector.DATA_TOGGLE)
+        .off(_events(['keydown']), Selector.MENU)
+        .on(_events(['keydown']), Selector.DATA_TOGGLE, Dropdown._dataApiKeydownHandler)
+        .on(_events(['keydown']), Selector.MENU, Dropdown._dataApiKeydownHandler)
+
         // replaced _clearMenus handler with custom one
         .off(_events(['click', 'keyup']), _clearMenus)
         .on(_events(['click', 'keyup', 'clearMenus']), Dropdown._clearMenus)
 
         // nested form click events are processed in _clearMenus method extend
-        .off(_events(['click']), '.dropdown form')
+        .off(_events(['click']), Selector.FORM_CHILD)
         .on(_events(['disposeLayout']), function(event) {
             $('[data-toggle="dropdown"]', event.target).each(function() {
                 const $toogler = $(this);
