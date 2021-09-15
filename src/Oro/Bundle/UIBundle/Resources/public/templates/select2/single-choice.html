@@ -2,7 +2,8 @@
 <% var chosenId = _.uniqueId('select2-chosen-'); %>
 
 <div class="select2-container select2-container-single">
-    <div class="select2-choice"
+    <a class="select2-choice"
+       href="#"
        onclick="return false"
        tabindex="-1"
        role="combobox"
@@ -21,7 +22,7 @@
               role="button"
         ></abbr>
         <span class="select2-arrow" aria-hidden="true"><b></b></span>
-    </div>
+    </a>
     <input class="select2-focusser select2-offscreen"
            type="text"
            role="combobox"
@@ -34,6 +35,8 @@
         <div class="select2-search">
             <input type="text"
                    autocomplete="off"
+                   autocorrect="off"
+                   autocapitilize="off"
                    spellcheck="false"
                    class="select2-input"
                    role="searchbox"
