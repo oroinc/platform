@@ -5,10 +5,12 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,12 +22,18 @@ class ModifyCreatedAndUpdatedPropertiesListener
 {
     use OptionalListenerTrait;
 
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
+    private ConfigManager $configManager;
+    private array $processedOwningEntities = [];
 
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
+    }
+
+    public function setEntityConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     public function onFlush(OnFlushEventArgs $args)
@@ -45,16 +53,70 @@ class ModifyCreatedAndUpdatedPropertiesListener
             }
         }
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
+            $this->updateOwningEntityForCollectionItem($entity, $em, $uow);
             if ($this->setUpdatedProperties($entity)) {
                 $this->updateChangeSets($entity, $em, $uow);
             }
         }
+        $this->processedOwningEntities = [];
     }
 
     /**
-     * @param object        $entity
+     * Updates collection owner updateAt when any of its children one-to-many was updated
+     */
+    protected function updateOwningEntityForCollectionItem($entity, EntityManager $em, UnitOfWork $uow)
+    {
+        if (!$this->configManager) {
+            return;
+        }
+
+        $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
+        foreach ($metadata->getAssociationMappings() as $associationMapping) {
+            if ($associationMapping['type'] === ClassMetadata::MANY_TO_ONE
+                && !empty($associationMapping['inversedBy'])
+            ) {
+                $ownerClass = $associationMapping['targetEntity'];
+                $collectionField = $associationMapping['inversedBy'];
+                if (!$this->isOwningEntityActualizationEnabled($ownerClass, $collectionField)) {
+                    continue;
+                }
+                $owningEntity = $metadata->getFieldValue($entity, $associationMapping['fieldName']);
+                if (!$owningEntity) {
+                    continue;
+                }
+
+                // Skip already processed owning entity
+                $entityKey = $this->getEntityKey($ownerClass, $owningEntity);
+                if (!empty($this->processedOwningEntities[$entityKey])) {
+                    continue;
+                }
+
+                if ($this->setUpdatedProperties($owningEntity)) {
+                    $this->updateChangeSets($owningEntity, $em, $uow);
+                }
+                $this->processedOwningEntities[$entityKey] = true;
+            }
+        }
+    }
+
+    private function isOwningEntityActualizationEnabled(string $entityClass, string $collectionField): bool
+    {
+        if (!$this->configManager->hasConfig($entityClass)) {
+            return false;
+        }
+        $fieldConfig = $this->configManager
+            ->getFieldConfig('entity', $entityClass, $collectionField);
+        if (!$fieldConfig->get('actualize_owning_side_on_change')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param object $entity
      * @param EntityManager $em
-     * @param UnitOfWork    $uow
+     * @param UnitOfWork $uow
      */
     protected function updateChangeSets($entity, EntityManager $em, UnitOfWork $uow)
     {
@@ -150,5 +212,16 @@ class ModifyCreatedAndUpdatedPropertiesListener
     protected function getNowDate()
     {
         return new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    private function getEntityKey(string $entityClass, object $entity): string
+    {
+        if (method_exists($entity, 'getId')) {
+            $idKey = $entity->getId();
+        } else {
+            $idKey = spl_object_hash($entity);
+        }
+
+        return $entityClass . ':' . $idKey;
     }
 }
