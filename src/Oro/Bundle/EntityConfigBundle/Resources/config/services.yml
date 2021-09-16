@@ -556,3 +556,6 @@ services:
             - '@oro_entity_config.config_manager'
             - '@router'
             - '@oro_entity.entity_class_name_helper'
+
+    oro_entity_config.tools.backup_manager.entity_config_backup_manager:
+        class: Oro\Bundle\EntityConfigBundle\Tools\BackupManager\NullEntityConfigBackupManager

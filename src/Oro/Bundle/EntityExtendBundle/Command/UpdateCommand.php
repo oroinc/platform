@@ -54,8 +54,7 @@ The <info>--dry-run</info> option can be used to print the changes without apply
 
 HELP
             )
-            ->addUsage('--dry-run')
-        ;
+            ->addUsage('--dry-run');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
