@@ -63,13 +63,9 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $value
-     * @param string $allowableTags
-     * @param string $expected
-     *
      * @dataProvider dataProvider
      */
-    public function testSanitize($value, $allowableTags, $expected): void
+    public function testSanitize(string $value, array $allowableTags, array $allowedRel, string $expected): void
     {
         $this->htmlTagProvider->expects($this->never())
             ->method('getIframeRegexp');
@@ -79,6 +75,9 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
             ->willReturn($allowableTags);
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedRel')
+            ->willReturn($allowedRel);
 
         $this->assertEquals($expected, $this->helper->sanitize($value));
     }
@@ -219,7 +218,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                     'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
                 'allowedElements' => ['iframe[id|allowfullscreen|src]'],
                 'allowedTags' => '<iframe></iframe>',
-                'expectedResult' => '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/'.
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/' .
                     'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>'
             ],
             'iframe invalid src' => [
@@ -249,45 +248,70 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
             '#x58&#x53&#x53&#x27&#x29>';
 
         return [
-            'image' => ['<IMG SRC="javascript:alert(\'XSS\');">', [], ''],
-            'script' => ['<script>alert(\'xss\');</script>', [], ''],
-            'coded' => [$str, [], ''],
-            'css expr' => ['<IMG STYLE="xss:expression(alert(\'XSS\'))">', [], '']
+            'image' => ['<IMG SRC="javascript:alert(\'XSS\');">', [], [], ''],
+            'script' => ['<script>alert(\'xss\');</script>', [], [], ''],
+            'coded' => [$str, [], [], ''],
+            'css expr' => ['<IMG STYLE="xss:expression(alert(\'XSS\'))">', [], [], '']
         ];
     }
 
     protected function sanitizeDataProvider(): array
     {
-        $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">'.
-            '<map name="planetmap">'.
-            '<area shape="rect" coords="0,0,82,126" href="sun.htm" alt="Sun" tabindex="-1">'.
-            '<area shape="circle" coords="90,58,3" href="mercur.htm" alt="Mercury" tabindex="0">'.
-            '<area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus" tabindex="1">'.
+        $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">' .
+            '<map name="planetmap">' .
+            '<area shape="rect" coords="0,0,82,126" href="sun.htm" alt="Sun" tabindex="-1">' .
+            '<area shape="circle" coords="90,58,3" href="mercur.htm" alt="Mercury" tabindex="0">' .
+            '<area shape="circle" coords="124,58,8" href="venus.htm" alt="Venus" tabindex="1">' .
             '</map>';
 
         return [
-            'default' => ['sometext', [], 'sometext'],
-            'not allowed tag' => ['<p>sometext</p>', ['a'], 'sometext'],
-            'allowed tag' => ['<p>sometext</p>', ['p'], '<p>sometext</p>'],
-            'mixed' => ['<p>sometext</p></br>', ['p'], '<p>sometext</p>'],
-            'attribute' => ['<p class="class">sometext</p>', ['p[class]'], '<p class="class">sometext</p>'],
+            'default' => ['sometext', [], [], 'sometext'],
+            'not allowed tag' => ['<p>sometext</p>', ['a'], [], 'sometext'],
+            'allowed tag' => ['<p>sometext</p>', ['p'], [], '<p>sometext</p>'],
+            'mixed' => ['<p>sometext</p></br>', ['p'], [], '<p>sometext</p>'],
+            'attribute' => ['<p class="class">sometext</p>', ['p[class]'], [], '<p class="class">sometext</p>'],
             'mixed attribute' => [
                 '<p class="class">sometext</p><span data-attr="mixed">',
                 ['p[class]'],
+                [],
                 '<p class="class">sometext</p>'
             ],
-            'prepare allowed' => ['<a>first text</a><c>second text</c>', ['a', 'b'], '<a>first text</a>second text'],
-            'prepare not allowed' => ['<p>sometext</p>', ['a[class]'], 'sometext'],
-            'prepare with allowed' => ['<p>sometext</p>', ['a', 'p[class]'], '<p>sometext</p>'],
-            'prepare attribute' => ['<p>sometext</p>', ['a[class]', 'p'], '<p>sometext</p>'],
-            'prepare attributes' => ['<p>sometext</p>', ['p[class|style]'], '<p>sometext</p>'],
-            'prepare or condition' => ['<p>sometext</p>', ['a[href|target=_blank]', 'b/p'], '<p>sometext</p>'],
-            'prepare empty' => ['<p>sometext</p>', ['[href|target=_blank],/'], 'sometext'],
-            'default attributes set' => ['<p>sometext</p>', ['@[style]', 'a'], 'sometext'],
-            'default attributes set with allowed' => ['<p>sometext</p>', ['@[style]', 'p'], '<p>sometext</p>'],
+            'prepare allowed' => [
+                '<a>first text</a><c>second text</c>',
+                ['a', 'b'],
+                [],
+                '<a>first text</a>second text'
+            ],
+            'rel attribute allowed' => [
+                '<a rel="alternate">first text</a>',
+                ['a[rel]'],
+                ['alternate'],
+                '<a rel="alternate">first text</a>'
+            ],
+            'rel attribute disallowed' => [
+                '<a rel="alternate">first text</a>',
+                ['a'],
+                ['alternate'],
+                '<a>first text</a>'
+            ],
+            'rel attribute not listed' => [
+                '<a rel="appendix">first text</a>',
+                ['a[rel]'],
+                ['alternate'],
+                '<a>first text</a>'
+            ],
+            'prepare not allowed' => ['<p>sometext</p>', ['a[class]'], [], 'sometext'],
+            'prepare with allowed' => ['<p>sometext</p>', ['a', 'p[class]'], [], '<p>sometext</p>'],
+            'prepare attribute' => ['<p>sometext</p>', ['a[class]', 'p'], [], '<p>sometext</p>'],
+            'prepare attributes' => ['<p>sometext</p>', ['p[class|style]'], [], '<p>sometext</p>'],
+            'prepare or condition' => ['<p>sometext</p>', ['a[href|target=_blank]', 'b/p'], [], '<p>sometext</p>'],
+            'prepare empty' => ['<p>sometext</p>', ['[href|target=_blank],/'], [], 'sometext'],
+            'default attributes set' => ['<p>sometext</p>', ['@[style]', 'a'], [], 'sometext'],
+            'default attributes set with allowed' => ['<p>sometext</p>', ['@[style]', 'p'], [], '<p>sometext</p>'],
             'id attribute' => [
                 '<div id="test" data-id="test2">sometext</div>',
                 ['div[id]'],
+                [],
                 '<div id="test">sometext</div>'
             ],
             'map element' => [
@@ -297,6 +321,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                     'map[name]',
                     'area[shape|coords|href|alt|tabindex]'
                 ],
+                [],
                 $mapHtml
             ]
         ];

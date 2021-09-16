@@ -39,12 +39,14 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'allowed_iframe_domains' => [],
                         'allowed_uri_schemes' => [],
                         'allowed_html_elements' => [],
+                        'allowed_rel' => []
                     ],
                     'scope_2' => [
                         'extends' => 'scope_1',
                         'allowed_iframe_domains' => [],
                         'allowed_uri_schemes' => [],
                         'allowed_html_elements' => [],
+                        'allowed_rel' => []
                     ],
                     'scope_3' => [
                         'extends' => null,
@@ -56,6 +58,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'hasClosingTag' => true
                             ]
                         ],
+                        'allowed_rel' => ['alternate' => true, 'canonical' => true]
                     ]
                 ]
             ],
@@ -70,7 +73,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'table' => [
                                 'attributes' => ['cellspacing', 'cellpadding']
                             ]
-                        ]
+                        ],
+                        'allowed_rel' => ['alternate', 'canonical']
                     ],
                 ]
             ]])
