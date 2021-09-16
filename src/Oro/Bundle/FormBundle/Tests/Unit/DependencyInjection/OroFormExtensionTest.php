@@ -20,7 +20,8 @@ class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
                         'allowed_html_elements' => [],
                         'extends' => null,
                         'allowed_iframe_domains' => [],
-                        'allowed_uri_schemes' => []
+                        'allowed_uri_schemes' => [],
+                        'allowed_rel' => []
                     ]
                 ]
             );
