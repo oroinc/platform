@@ -120,6 +120,7 @@ class HtmlTagHelper implements TranslatorAwareInterface
             // Disabled `rel` attribute transformer.
             $config->set('HTML.TargetNoopener', false);
             $config->set('HTML.TargetNoreferrer', false);
+            $config->set('Attr.AllowedRel', $this->htmlTagProvider->getAllowedRel($scope));
 
             // add inline data support
             $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));

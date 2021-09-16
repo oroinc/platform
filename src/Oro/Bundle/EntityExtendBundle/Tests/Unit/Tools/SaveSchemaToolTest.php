@@ -10,12 +10,17 @@ use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
+use Psr\Log\LoggerInterface;
 
 class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
@@ -26,11 +31,16 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
     /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
     private $schemaTool;
 
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->configuration = $this->createMock(Configuration::class);
         $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->em->expects($this->any())
             ->method('getConnection')
@@ -39,13 +49,18 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
+        $this->managerRegistry
+            ->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->em);
+
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
 
         $this->schemaTool = $this->getMockBuilder(SaveSchemaTool::class)
             ->onlyMethods(['getSchemaFromMetadata'])
-            ->setConstructorArgs([$this->em])
+            ->setConstructorArgs([$this->managerRegistry, $this->logger])
             ->getMock();
     }
 

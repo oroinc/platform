@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Extend;
 
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandler;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessor;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessorResult;
 
 class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,7 +25,7 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityExtendUpdateProcessor->expects(self::once())
             ->method('processUpdate')
-            ->willReturn(true);
+            ->willReturn(new EntityExtendUpdateProcessorResult(true));
 
         $result = $this->handler->update();
         self::assertTrue($result->isSuccessful());
@@ -35,7 +36,7 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityExtendUpdateProcessor->expects(self::once())
             ->method('processUpdate')
-            ->willReturn(false);
+            ->willReturn(new EntityExtendUpdateProcessorResult(false));
 
         $result = $this->handler->update();
         self::assertFalse($result->isSuccessful());

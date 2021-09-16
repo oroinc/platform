@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Command\UpdateCommand;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessor;
+use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessorResult;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 
 class UpdateCommandTest extends \PHPUnit\Framework\TestCase
@@ -36,7 +37,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityExtendUpdateProcessor->expects(self::once())
             ->method('processUpdate')
-            ->willReturn(true);
+            ->willReturn(new EntityExtendUpdateProcessorResult(true));
 
         $commandTester = $this->doExecuteCommand($this->command);
 
@@ -52,7 +53,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityExtendUpdateProcessor->expects(self::once())
             ->method('processUpdate')
-            ->willReturn(false);
+            ->willReturn(new EntityExtendUpdateProcessorResult(false));
 
         $commandTester = $this->doExecuteCommand($this->command);
 
