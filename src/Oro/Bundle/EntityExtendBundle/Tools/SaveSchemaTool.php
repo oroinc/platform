@@ -3,31 +3,34 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Psr\Log\LoggerInterface;
 
 /**
  * The schema tool to update database schemas.
  */
 class SaveSchemaTool extends SchemaTool
 {
-    /** @var \Doctrine\ORM\EntityManagerInterface */
-    protected $em;
-
-    /** @var \Doctrine\DBAL\Platforms\AbstractPlatform */
-    protected $platform;
+    protected ObjectManager|EntityManagerInterface $em;
+    protected AbstractPlatform $platform;
+    protected LoggerInterface $logger;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
     {
-        $this->em       = $em;
+        $this->em = $registry->getManager();
         $this->platform = $this->getConnection()->getDatabasePlatform();
+        $this->logger = $logger;
 
-        parent::__construct($em);
+        parent::__construct($this->em);
     }
 
     /**
