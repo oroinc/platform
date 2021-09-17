@@ -4,6 +4,10 @@ import manageFocus from 'oroui/js/tools/manage-focus';
 import _ from 'underscore';
 import $ from 'jquery';
 
+function getVisibleText($elem) {
+    return $elem.clone().find('.sr-only').remove().end().text().trim();
+}
+
 const AccessibilityPlugin = BasePlugin.extend({
     /**
      * @type {TableCellIterator}
@@ -25,7 +29,7 @@ const AccessibilityPlugin = BasePlugin.extend({
      * Selector for elements that have to be ignores during Entrusted element selection
      * @type {string}
      */
-    ignoreEntrusted: '[data-toggle], [data-trigger]',
+    ignoreEntrusted: '[data-toggle]',
 
     /**
      * Flag, says that an action happens during mouse click
@@ -46,6 +50,12 @@ const AccessibilityPlugin = BasePlugin.extend({
      */
     _forceInnerFocus: false,
 
+    /**
+     * Index of last focused cell
+     * @type {[number, number], null}
+     */
+    _lastIndex: null,
+
     constructor: function AccessibilityPlugin(main, options) {
         AccessibilityPlugin.__super__.constructor.call(this, main, options);
     },
@@ -53,12 +63,22 @@ const AccessibilityPlugin = BasePlugin.extend({
     initialize(main, options) {
         Object.assign(this, _.pick(options, 'ignoreEntrusted'));
 
+        this.listenTo(this.main.collection, {
+            beforeFetch() {
+                if (this.$table[0].contains(document.activeElement)) {
+                    this._lastIndex = this.iterator.index;
+                }
+            }
+        });
+
         this.listenTo(this.main, {
             'content:update'() {
                 if (!this.enabled) {
                     return;
                 }
-                if (!this.$table.find(this.iterator.$cell).length) {
+                if (this._lastIndex) {
+                    this._restoreCurrent();
+                } else if (!this.$table.find(this.iterator.$cell).length) {
                     // in case current cell is not available
                     this._resetCurrent();
                 }
@@ -166,20 +186,52 @@ const AccessibilityPlugin = BasePlugin.extend({
 
         // single use for the flag
         this._forceInnerFocus = false;
+        delete this._lastIndex;
     },
 
     onFocusout(e) {
-        if (!e.relatedTarget || !$.contains(this.$table[0], e.relatedTarget)) {
+        if (!e.relatedTarget || !this.$table[0].contains(e.relatedTarget)) {
             // focus goes out of the grid table
             this.$table.find('[aria-colindex]')
                 .removeAttr('data-ignore-tabbable');
 
             this._focusoutTimeoutID = setTimeout(() => {
+                if (this.disposed) {
+                    return;
+                }
                 // it might be a sequence of elemA.blur() and elemB.focus() custom events
                 // preserve the flag value for some time,
                 // in case the focus will be returned back to the table shortly
                 this._isFocusInside = false;
             }, 10);
+
+            if (!e.relatedTarget && $(document.activeElement).is('body')) {
+                // body element has received focus without defined related target,
+                // it means non specific focus target was established
+                const $target = $(e.target);
+                const $dropdownMenu = $target.closest('.dropdown-menu');
+                if ($dropdownMenu.length) {
+                    // it might be dropdown-menu close, therefore move focus back to dropdown toggler button
+                    this.focusElement($dropdownMenu.closest('.dropdown').find('[data-toggle="dropdown"]'));
+                } else {
+                    // cell content might been deleting, therefore schedule a restore for the current cell
+                    this._lastIndex = this.iterator.index;
+                    setTimeout(() => {
+                        this._restoreCurrent();
+                    });
+                }
+            }
+        }
+
+        const $dialog = $(e.relatedTarget).closest('[role="dialog"], [role="alertdialog"]');
+        if ($dialog.length) {
+            // a dialog has received focus, subscribe on dialog close to set focus back to current cell
+            this._lastIndex = this.iterator.index;
+            if ($dialog.is('.ui-dialog')) {
+                $dialog.one('dialogclose', this.onDialogClose.bind(this));
+            } else {
+                $dialog.one('hidden.bs.modal', this.onDialogClose.bind(this));
+            }
         }
 
         e.target.classList.remove('focus-via-arrows-keys');
@@ -267,17 +319,17 @@ const AccessibilityPlugin = BasePlugin.extend({
     onCurrentChange() {
         this._updateTabindexAttribute();
 
-        if ($.contains(this.$table[0], document.activeElement)) {
+        if (this.$table[0].contains(document.activeElement)) {
             const $elem = this.defineFocusElement({allowInnerFocus: true});
             this.focusElement($elem);
         }
     },
 
-    defineFocusElement({allowInnerFocus}) {
+    defineFocusElement({allowInnerFocus = false}) {
         const $entrusted = this.entrustedTabbable(this.iterator.$cell);
         if (
             allowInnerFocus &&
-            $.contains(this.iterator.$cell[0], document.activeElement) &&
+            this.iterator.$cell[0].contains(document.activeElement) &&
             !$entrusted.length
         ) {
             return $(document.activeElement);
@@ -289,7 +341,7 @@ const AccessibilityPlugin = BasePlugin.extend({
         return this.iterator.$cell;
     },
 
-    focusElement($elem) {
+    focusElement($elem, immediately = false) {
         const {$cell} = this.iterator;
 
         this.$table.find('[aria-colindex]')
@@ -300,9 +352,13 @@ const AccessibilityPlugin = BasePlugin.extend({
         }
 
         if (!$elem.is(document.activeElement)) {
-            _.delay(() => {
+            if (immediately) {
                 $elem.focus();
-            });
+            } else {
+                setTimeout(() => {
+                    $elem.focus();
+                });
+            }
         }
     },
 
@@ -313,7 +369,16 @@ const AccessibilityPlugin = BasePlugin.extend({
      */
     entrustedTabbable($cell) {
         const $tabbable = $cell.find(':tabbable');
-        return $tabbable.length === 1 && $tabbable.is(`:not(${this.ignoreEntrusted})`) ? $tabbable : $();
+
+        if (
+            $tabbable.length === 1 &&
+            $tabbable.is(`:not(${this.ignoreEntrusted})`) &&
+            getVisibleText($tabbable) === getVisibleText($cell)
+        ) {
+            return $tabbable;
+        }
+
+        return $();
     },
 
     /**
@@ -327,6 +392,10 @@ const AccessibilityPlugin = BasePlugin.extend({
             !$cell.is(document.activeElement) &&
             !this.entrustedTabbable($cell).is(document.activeElement)
         );
+    },
+
+    onDialogClose() {
+        this._restoreCurrent();
     },
 
     onDocumentMouseDown() {
@@ -369,6 +438,34 @@ const AccessibilityPlugin = BasePlugin.extend({
         }
         if (current.$cell.is('.action-cell')) {
             current.prev();
+        }
+    },
+
+    _restoreCurrent() {
+        if (!this._lastIndex) {
+            return;
+        }
+
+        let $cell;
+        let [row, col] = this._lastIndex;
+        delete this._lastIndex;
+
+        while ((!$cell || !$cell.length) && row >= 0) {
+            // try to find closest available cell
+            $cell = this.$table.find(`[aria-rowindex="${row}"] [aria-colindex="${col}"]`);
+            row -= 1;
+        }
+
+        if ($cell && $cell.length) {
+            this.iterator.setCurrentCell($cell);
+
+            if ($(document.activeElement).is('body')) {
+                // body element is focused,
+                // it means non specific focus target was established,
+                // therefore restore focus on current cell
+                const $elem = this.defineFocusElement({});
+                this.focusElement($elem, true);
+            }
         }
     }
 });

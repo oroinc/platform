@@ -146,13 +146,11 @@ define(function(require) {
             this.setElement(_.result(this, 'el'));
         }
     };
-
     Backbone.View.prototype._collectAttributes = function() {
         const attrsSet = tools.getAllPropertyVersions(this, '_attributes')
             .map(attrs => typeof attrs === 'function' ? attrs.call(this) : attrs);
         return Object.assign({}, ...attrsSet, _.result(this, 'attributes'));
-    },
-
+    };
     Backbone.View.prototype.setElement = _.wrap(Backbone.View.prototype.setElement, function(setElement, element) {
         if (this.$el) {
             this.disposePageComponents();

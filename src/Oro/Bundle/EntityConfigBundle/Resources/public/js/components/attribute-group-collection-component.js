@@ -62,7 +62,10 @@ define(function(require) {
             const confirmDialog = new Modal({
                 title: _.__('oro.attribute.remove_confirmation_title'),
                 content: _.__('oro.attribute.remove_confirmation_text'),
-                className: 'modal oro-modal-danger'
+                className: 'modal oro-modal-danger',
+                attributes: {
+                    role: 'alertdialog'
+                }
             });
 
             confirmDialog.on('ok', function() {
