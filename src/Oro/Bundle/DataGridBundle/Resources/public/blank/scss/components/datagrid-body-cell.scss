@@ -21,6 +21,7 @@
 
     &.action-cell {
         width: $datagrid-body-cell-action-cell-width;
+        padding-right: $datagrid-body-cell-action-offset;
 
         text-align: $datagrid-body-cell-action-cell-text-align;
     }
