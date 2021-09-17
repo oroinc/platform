@@ -187,3 +187,7 @@ oro:
             max_limit_message: >
                 The maximum number of records that can be exported at once is {{ max_limit }}.<br/>
                 Are you sure you want to export {{ total }} records?
+        cell:
+            blank:
+                aria_label: 'Blank'
+                placeholder: 'N/A'

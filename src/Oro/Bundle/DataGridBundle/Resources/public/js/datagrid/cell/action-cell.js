@@ -20,7 +20,6 @@ define(function(require, exports, module) {
      * @extends Backgrid.Cell
      */
     const ActionCell = Backgrid.Cell.extend({
-
         /** @property */
         className: 'action-cell',
 

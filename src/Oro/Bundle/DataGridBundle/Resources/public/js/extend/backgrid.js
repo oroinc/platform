@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const Backgrid = require('backgrid/lib/backgrid');
 
     Backgrid.Cell.prototype.optionNames = ['column'];
@@ -114,6 +115,19 @@ define(function(require) {
             const rowIndex = collection.indexOf(this.column);
             if (rowIndex !== -1 && (!this.model || this.model.get('isAuxiliary') !== true)) {
                 attrs['aria-colindex'] = rowIndex + 1;
+            }
+        }
+
+        if (this.model && this.model.get('isAuxiliary') !== true && !this.column.get('notMarkAsBlank')) {
+            const value = this.model && this.model.get(this.column.get('name'));
+
+            if (
+                value === void 0 ||
+                value === null ||
+                (_.isString(value) && value.trim().length === 0)
+            ) {
+                attrs['aria-label'] = __('oro.datagrid.cell.blank.aria_label');
+                attrs['data-blank-content'] = __('oro.datagrid.cell.blank.placeholder');
             }
         }
 

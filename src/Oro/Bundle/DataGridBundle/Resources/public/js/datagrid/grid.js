@@ -632,7 +632,10 @@ define(function(require) {
                 actions: this.rowActions,
                 massActions: this.massActions,
                 manageable: false,
-                order: Infinity
+                order: Infinity,
+                // Skip to add specific attributes if this cell has an empty value.
+                notMarkAsBlank: true
+
             });
             return column;
         },
@@ -653,7 +656,9 @@ define(function(require) {
                 manageable: false,
                 cell: this.selectRowCell,
                 headerCell: this.selectAllHeaderCell,
-                order: -Infinity
+                order: -Infinity,
+                // Skip to add specific attributes if this cell has an empty value.
+                notMarkAsBlank: true
             });
             return column;
         },
@@ -1060,7 +1065,6 @@ define(function(require) {
                 tableClassName: this.themeOptions.tableClassName || ''
             }));
             this.$grid = this.$(this.selectors.grid);
-
             this.renderToolbar();
             this.renderGrid();
             this.renderNoDataBlock();
