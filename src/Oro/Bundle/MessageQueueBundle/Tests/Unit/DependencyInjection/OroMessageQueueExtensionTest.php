@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\MessageQueueBundle\Controller\Api\Rest\JobController;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
@@ -16,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class OroMessageQueueExtensionTest extends ExtensionTestCase
 {
@@ -304,7 +306,7 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         );
     }
 
-    public function testLoadWithConsumerConfig()
+    public function testLoadWithConsumerConfig(): void
     {
         $configs = ['oro_message_queue' => ['consumer' => [
             'heartbeat_update_period' => 1823,
@@ -575,6 +577,8 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             // defined in extension
             'oro_message_queue.consumption.redelivery_message_extension',
             'oro_message_queue.consumption.signal_extension',
+            // REST API controllers
+            JobController::class,
         ];
     }
 
@@ -650,6 +654,12 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
                     \array_unshift($this->extensionConfigs[$name], $config);
                 }
             );
+        $containerBuilder
+            ->method('getReflectionClass')
+            ->willReturnCallback(static fn ($class) =>  new \ReflectionClass($class));
+        $containerBuilder->expects(self::any())
+            ->method('getParameterBag')
+            ->willReturn(new ParameterBag($this->actualParameters));
 
         return $containerBuilder;
     }

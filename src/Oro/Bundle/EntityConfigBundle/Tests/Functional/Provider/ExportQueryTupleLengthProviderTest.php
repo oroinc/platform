@@ -25,6 +25,14 @@ class ExportQueryTupleLengthProviderTest extends WebTestCase
         );
     }
 
+    public function testQueryJoin(): void
+    {
+        $query = $this->getUserExportQuery();
+        /** @var Query\AST\IdentificationVariableDeclaration $identificationVariable */
+        $identificationVariable = $query->getAST()->fromClause->identificationVariableDeclarations[0];
+        $this->assertEmpty($identificationVariable->joins);
+    }
+
     private function getUserExportQuery(): Query
     {
         /** @var EntityReader $entityReader */
@@ -42,7 +50,6 @@ class ExportQueryTupleLengthProviderTest extends WebTestCase
         $resultSetMapping = $parser->parse()->getResultSetMapping();
 
         return count($resultSetMapping->fieldMappings)
-            + count($resultSetMapping->metaMappings)
             + count($resultSetMapping->scalarMappings);
     }
 }

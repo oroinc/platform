@@ -5,6 +5,9 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Provider;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HtmlTagProvider */
@@ -26,6 +29,14 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetScopes()
     {
         self::assertEquals(['default', 'additional', 'extra'], $this->htmlTagProvider->getScopes());
+    }
+
+    /**
+     * @dataProvider allowedRelDataProvider
+     */
+    public function testGetAllowedRel(string $scope, array $expectedResult)
+    {
+        $this->assertEquals($expectedResult, $this->htmlTagProvider->getAllowedRel($scope));
     }
 
     /**
@@ -81,6 +92,35 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetUriSchemes($scope, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->htmlTagProvider->getUriSchemes($scope));
+    }
+
+    public function allowedRelDataProvider(): array
+    {
+        return [
+            'default scope' => [
+                'scope' => 'default',
+                'expectedResult' => []
+            ],
+            'additional scope' => [
+                'scope' => 'additional',
+                'expectedResult' => [
+                    'alternate',
+                    'author',
+                    'bookmark'
+                ]
+            ],
+            'extra scope' => [
+                'scope' => 'extra',
+                'expectedResult' => [
+                    'alternate',
+                    'author',
+                    'bookmark',
+                    'help',
+                    'nofollow',
+                    'opener'
+                ]
+            ]
+        ];
     }
 
     public function allowedElementsDataProvider(): array

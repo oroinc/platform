@@ -107,7 +107,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    private function mockClassMetadata(array $identifiers): void
+    private function mockClassMetadata(array $identifiers)
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $em = $this->createMock(EntityManagerInterface::class);
@@ -120,6 +120,11 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $metadata->expects($this->any())
             ->method('getIdentifier')
             ->willReturn($identifiers);
+        $metadata->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn(reset($identifiers));
+
+        return $metadata;
     }
 
     private function getSimpleDefinition(): array
@@ -169,7 +174,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    private function mockEntityMetadata(string $viewRoute): void
+    private function mockEntityMetadata(string $viewRoute)
     {
         $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = $viewRoute;
@@ -178,6 +183,8 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityMetadata')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
+
+        return $entityMetadata;
     }
 
     /**
@@ -282,8 +289,75 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider groupByDataProvider
+     */
+    public function testGetConfigurationExportOption(array $groupBy, int $associationType, bool $expected): void
+    {
+        $metadata = $this->mockClassMetadata(['sampleId1']);
+        $this->mockEntityMetadata('sample_route');
+
+        $metadata->expects($this->any())
+            ->method('getAssociationNames')
+            ->willReturn(['sampleColumn']);
+        $metadata->expects($this->any())
+            ->method('getAssociationMapping')
+            ->with('sampleColumn')
+            ->willReturn(['type' => $associationType]);
+
+        $gridName = 'sample-grid';
+        $this->builder->setGridName($gridName);
+
+        $definition = [
+            'columns' => [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
+            'grouping_columns' => $groupBy
+        ];
+        $this->builder->setSource($this->getReportEntity(\stdClass::class, $definition));
+        $config = $this->builder->getConfiguration()->toArray();
+        $this->assertEquals($expected, $config['options']['export']);
+    }
+
+    public function groupByDataProvider()
+    {
+        yield [
+            [['name' => 'sampleColumn']],
+            ClassMetadata::MANY_TO_MANY,
+            true
+        ];
+
+        yield [
+            [['name' => 'sampleColumn']],
+            ClassMetadata::ONE_TO_ONE,
+            true
+        ];
+
+        yield [
+            [['name' => 'sampleColumn']],
+            ClassMetadata::ONE_TO_MANY,
+            true
+        ];
+
+        yield [
+            [['name' => 'sampleColumn']],
+            ClassMetadata::MANY_TO_ONE,
+            false
+        ];
+
+        yield [
+            [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
+            ClassMetadata::MANY_TO_ONE,
+            true
+        ];
+
+        yield [
+            [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
+            ClassMetadata::ONE_TO_MANY,
+            true
+        ];
+    }
+
+    /**
      * @param string $entityClass
-     * @param array  $definition
+     * @param array $definition
      *
      * @return Report|\PHPUnit\Framework\MockObject\MockObject
      */

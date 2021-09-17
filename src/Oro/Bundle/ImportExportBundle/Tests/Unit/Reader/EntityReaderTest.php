@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\Events;
@@ -38,6 +39,9 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadataProvider;
 
+    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $exportQueryProvider;
+
     /** @var EntityReaderTestAdapter */
     private $reader;
 
@@ -46,11 +50,13 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
         $this->reader = new EntityReaderTestAdapter(
             $this->contextRegistry,
             $this->managerRegistry,
-            $this->ownershipMetadataProvider
+            $this->ownershipMetadataProvider,
+            $this->exportQueryProvider
         );
     }
 
@@ -303,13 +309,15 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
                 'testSingle'   => ['fieldName' => 'testSingle'],
                 'testMultiple' => ['fieldName' => 'testMultiple'],
             ]);
-        $classMetadata->expects($this->exactly(2))
-            ->method('isAssociationWithSingleJoinColumn')
-            ->with(self::isType('string'))
+
+        $this->exportQueryProvider
+            ->expects($this->exactly(2))
+            ->method('isAssociationExportable')
             ->willReturnMap([
-                ['testSingle', true],
-                ['testMultiple', false],
+                [$classMetadata, 'testSingle', true],
+                [$classMetadata, 'testMultiple', false],
             ]);
+
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);

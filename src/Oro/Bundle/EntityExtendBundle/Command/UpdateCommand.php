@@ -54,8 +54,7 @@ The <info>--dry-run</info> option can be used to print the changes without apply
 
 HELP
             )
-            ->addUsage('--dry-run')
-        ;
+            ->addUsage('--dry-run');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -144,8 +143,14 @@ HELP
     {
         $io->text('Updating the database schema and all entity extend related caches ...');
 
-        if (!$this->entityExtendUpdateProcessor->processUpdate()) {
-            $io->error('The update failed.');
+        $updateResult = $this->entityExtendUpdateProcessor->processUpdate();
+        if (false === $updateResult->isSuccessful()) {
+            $failureMessage = 'The update failed.';
+            if ($updateResult->getInternalFailureMessage()) {
+                $failureMessage = $updateResult->getInternalFailureMessage();
+            }
+
+            $io->error($failureMessage);
 
             return 1;
         }

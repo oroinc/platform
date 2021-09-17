@@ -39,6 +39,20 @@ class Configuration implements ConfigurationInterface
                                 ->example('default')
                                 ->defaultNull()
                             ->end()
+                            ->arrayNode('allowed_rel')
+                                ->beforeNormalization()
+                                ->ifArray()
+                                ->then(static function (array $allowedRel) {
+                                    return array_fill_keys($allowedRel, true);
+                                })
+                                ->end()
+                                ->info(
+                                    'List of allowed forward document relationships in the rel attribute ' .
+                                    'for HTMLPurifier.'
+                                )
+                                ->example(['nofollow', 'alternate'])
+                                ->scalarPrototype()->end()
+                            ->end()
                             ->arrayNode('allowed_iframe_domains')
                                 ->info(
                                     'Only these domains will be allowed in iframes ' .

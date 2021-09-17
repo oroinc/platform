@@ -7,8 +7,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
  */
 class EntityExtendUpdateHandler implements EntityExtendUpdateHandlerInterface
 {
-    /** @var EntityExtendUpdateProcessor */
-    private $entityExtendUpdateProcessor;
+    private EntityExtendUpdateProcessor $entityExtendUpdateProcessor;
 
     public function __construct(EntityExtendUpdateProcessor $entityExtendUpdateProcessor)
     {
@@ -20,6 +19,8 @@ class EntityExtendUpdateHandler implements EntityExtendUpdateHandlerInterface
      */
     public function update(): EntityExtendUpdateResult
     {
-        return new EntityExtendUpdateResult($this->entityExtendUpdateProcessor->processUpdate());
+        $updateResult = $this->entityExtendUpdateProcessor->processUpdate();
+
+        return new EntityExtendUpdateResult($updateResult->isSuccessful());
     }
 }

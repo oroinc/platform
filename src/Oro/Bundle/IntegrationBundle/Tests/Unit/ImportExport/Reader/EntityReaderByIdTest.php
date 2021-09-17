@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
@@ -26,11 +27,15 @@ class EntityReaderByIdTest extends OrmTestCase
     /** @var EntityReaderById */
     private $reader;
 
+    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $exportQueryProvider;
+
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
         $this->em = $this->getTestEntityManager();
         $config = $this->em->getConfiguration();
@@ -43,7 +48,8 @@ class EntityReaderByIdTest extends OrmTestCase
         $this->reader = new EntityReaderById(
             $this->contextRegistry,
             $managerRegistry,
-            $ownershipMetadataProvider
+            $ownershipMetadataProvider,
+            $this->exportQueryProvider
         );
     }
 
