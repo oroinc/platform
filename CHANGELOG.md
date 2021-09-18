@@ -15,13 +15,22 @@ The current file describes significant changes in the code that may affect the u
   The `post_save_data` event is dispatched after the database transaction is committed.
   API processors for these events can be used to customize database update logic. 
 
+#### AssetsBundle
+* New assets versions strategy `Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy` was added. It uses the `public/build/build_version.txt` application file's content as an assets version.
+
 ### Changed
+* All application distributions' `config.xml` files were changed to point `Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy` assets version strategy to be used. 
 
 #### EntityBundle
 
 * Parent class for repositories as a services was changed to `Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository`.
 
+#### InstallBundle
+* The composer's assets version set script`Oro\Bundle\InstallerBundle\Composer\ScriptHandler::setAssetsVersion` was changed to store time base hash value into `public/build/build_version.txt` application file.
+
 ### Removed
+* `assets_version` and `assets_version_strategy` container parameters were removed from all application distributions.
+* Symfony's assets version strategy `framework.assets.version` and `framework.assets.version` keyed parameters were removed from `config.xml` file in all application distributions.
 
 #### UIBundle
 * Remove reset style for ordered and unordered list in `Resources/public/blank/scss/reset.scss`
