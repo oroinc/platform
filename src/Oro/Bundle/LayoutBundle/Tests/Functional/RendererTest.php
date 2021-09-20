@@ -99,15 +99,6 @@ class RendererTest extends LayoutTestCase
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
             ->add(
-                'external_style',
-                'head',
-                'style',
-                [
-                    'src' => '=data["asset"].getUrl("test.css")',
-                    'scoped' => '=false'
-                ]
-            )
-            ->add(
                 'script',
                 'head',
                 'script',
@@ -322,7 +313,6 @@ class RendererTest extends LayoutTestCase
         <style type="text/css" scoped="scoped">
             body { color: red; }
         </style>
-        <link rel="stylesheet" type="text/css" href="/test.css"/>
         <script type="text/javascript" async="async">
             alert('test');
         </script>

@@ -40,7 +40,6 @@ class AssetConfigCache implements WarmableInterface
     {
         $config['paths'] = $this->getBundlesPath();
         $config['devServerOptions'] = $this->webpackDevServerOptions;
-        $config['assetVersion'] = $this->kernel->getContainer()->getParameter('assets_version');
 
         $config['themes'] = array_keys($this->themeManager->getEnabledThemes());
 
