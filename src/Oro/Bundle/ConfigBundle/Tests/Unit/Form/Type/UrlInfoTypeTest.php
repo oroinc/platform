@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\MicrosoftIntegrationBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\MicrosoftIntegrationBundle\Form\Type\UrlInfoType;
+use Oro\Bundle\ConfigBundle\Form\Type\UrlInfoType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;

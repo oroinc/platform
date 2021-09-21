@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\MicrosoftIntegrationBundle\Form\Type;
+namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,15 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Type for displaying URL for certain route and params
+ * Form type for displaying URL for certain route and params for system configuration.
  */
 class UrlInfoType extends AbstractType
 {
-    public const DEFAULT_DISPLAY_ROUTE = 'oro_imap_microsoft_access_token';
+    public const DEFAULT_DISPLAY_ROUTE = '';
     public const DEFAULT_DISPLAY_ROUTE_PARAMS = [];
 
-    /** @var RouterInterface */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {
