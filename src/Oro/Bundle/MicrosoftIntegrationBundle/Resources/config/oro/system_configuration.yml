@@ -42,7 +42,7 @@ system_configuration:
         oro_microsoft_integration.redirect_url:
             data_type: string
             ui_only: true
-            type: Oro\Bundle\MicrosoftIntegrationBundle\Form\Type\UrlInfoType
+            type: Oro\Bundle\ConfigBundle\Form\Type\UrlInfoType
             options:
                 required: false
                 label: oro.microsoft_integration.system_configuration.fields.redirect_uri.label
@@ -50,6 +50,7 @@ system_configuration:
                 resettable: false
                 attr:
                     readonly: true
+                route: 'oro_imap_microsoft_access_token'
             priority: 1
 
     tree:

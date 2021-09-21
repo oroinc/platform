@@ -18,3 +18,6 @@ oro:
                     enable_sso.label: Enable
                     sso_domains.label: Domains
                     sso_domains.tooltip: Comma separated list of allowed domains
+                    redirect_uri.label: Redirect URI
+                    redirect_uri.tooltip: Copy this value and add it to your Google Application trusted redirect URIs
+

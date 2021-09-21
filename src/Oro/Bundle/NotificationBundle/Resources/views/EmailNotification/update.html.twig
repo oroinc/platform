@@ -3,7 +3,8 @@
     '@OroForm/Form/fields.html.twig',
     '@OroUser/Form/fields.html.twig',
     '@OroEmail/Form/fields.html.twig'
-]%}
+] %}
+
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
 {% endif %}
@@ -66,15 +67,18 @@
 
     {% set id = 'emailnotificaton-edit' %}
 
+    {% if form.recipientList.vars.errors|length == 0 -%}
+        {% set subblocks = [UI.renderHtmlProperty('', '* ' ~ 'oro.notification.form.recipient_list.empty'|trans)] %}
+    {% else %}
+        {% set subblocks = [UI.renderHtmlProperty('', form_errors(form.recipientList))] %}
+    {%- endif %}
+
     {% set recipientList = {
         'title': 'oro.notification.emailnotification.recipient_list.label'|trans,
         'class': '',
         'subblocks': [{
             'title': '',
-            'data': [
-                UI.renderHtmlProperty('', '* ' ~ 'oro.notification.form.recipient_list.empty'|trans),
-                form_widget(form.children.recipientList),
-            ]
+            'data': subblocks|default([])|merge([form_widget(form.recipientList)])
         }]
     } %}
 

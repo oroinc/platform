@@ -4,7 +4,7 @@
 Feature: Notify assigned Sales Representatives
   As an Administrator
   When I create email notification for Contact Request
-  I wan't select assigned Sales Reps from Contact Request to be notified.
+  I want the assigned Sales Reps from Contact Request to be notified.
 
   Scenario: Create email template
     Given I login as administrator
@@ -24,16 +24,19 @@ Feature: Notify assigned Sales Representatives
     Given go to System/ Emails/ Notification Rules
     And click "Create Notification Rule"
     And fill form with:
-      |Entity Name |Contact Request |
+      | Entity Name | Contact Request |
     And I save and close form
     Then I should see "This value should not be blank."
     And fill form with:
-      |Event Name  |Entity create   |
+      | Event Name | Entity create |
     And I save and close form
     Then I should see "This value should not be blank."
     And fill form with:
-      |Template    |Test Template   |
-      |Groups      |Administrators  |
+      | Template | Test Template |
+    When I save and close form
+    Then I should see "At least one Recipient must be specified."
+    And fill form with:
+      | Groups | Administrators |
     When I save and close form
     Then I should see "Notification Rule saved" flash message
 
