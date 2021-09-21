@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -60,8 +61,9 @@ class RecipientListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
+                'data_class' => RecipientList::class,
                 'csrf_token_id' => 'recipientlist',
+                'error_bubbling' => false,
             ]
         );
     }
