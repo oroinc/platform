@@ -6,3 +6,8 @@ services:
     oro_entity.tests.event_listener.user_preloading:
         parent: oro_entity.event_listener.default_preloading
         public: true
+
+    oro_entity.tests.migration_listener:
+        class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }

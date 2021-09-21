@@ -141,3 +141,8 @@ services:
             - [addDoctrineTypeMapping, ['money_value', 'float']]
         tags:
             - { name: oro.action.extension.doctrine_type_mapping }
+
+    oro_currency.listener.orm.fix_money_changeset_listener:
+        class: 'Oro\Bundle\CurrencyBundle\EventListener\ORM\FixMoneyChangeSetListener'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, priority: 255 } # Should be the first called

@@ -195,7 +195,7 @@ class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
     /**
      * @var float
      *
-     * @ORM\Column(name="decimal_property", type="decimal", nullable=true)
+     * @ORM\Column(name="decimal_property", type="decimal", nullable=true, precision=19, scale=4)
      * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     private $decimalProperty;
