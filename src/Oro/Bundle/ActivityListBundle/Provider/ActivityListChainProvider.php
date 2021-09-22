@@ -328,7 +328,7 @@ class ActivityListChainProvider implements ResetInterface
             $entityConfig = $entityConfigProvider->getConfig($activityClass);
             $templates[$this->routingHelper->getUrlSafeClassName($activityClass)] = [
                 'icon'         => $entityConfig->get('icon'),
-                'label'        => $this->translator->trans($entityConfig->get('label')),
+                'label'        => $this->translator->trans((string) $entityConfig->get('label')),
                 'template'     => $template,
                 'has_comments' => $hasComment
             ];

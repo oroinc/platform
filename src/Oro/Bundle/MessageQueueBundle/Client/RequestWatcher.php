@@ -34,7 +34,7 @@ class RequestWatcher implements EventSubscriberInterface
 
     public function onRequestStart(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
         if (!$this->producer->isBufferingEnabled()) {
@@ -44,9 +44,6 @@ class RequestWatcher implements EventSubscriberInterface
 
     public function onRequestEnd(TerminateEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
         if ($this->producer->isBufferingEnabled() && $this->producer->hasBufferedMessages()) {
             $this->producer->flushBuffer();
         }

@@ -6,7 +6,6 @@ use Oro\Bundle\UserBundle\Exception\BadCredentialsException;
 
 class BadCredentialsExceptionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BadCredentialsException */
     private $exception;
 
     protected function setUp(): void
@@ -14,24 +13,23 @@ class BadCredentialsExceptionTest extends \PHPUnit\Framework\TestCase
         $this->exception = new BadCredentialsException();
     }
 
-    public function testMessageKey()
+    public function testMessageKey(): void
     {
-        $this->assertNull($this->exception->getMessageKey());
+        self::assertNull($this->exception->getMessageKey());
 
         $this->exception->setMessageKey('test.message.key');
 
-        $this->assertEquals('test.message.key', $this->exception->getMessageKey());
+        self::assertEquals('test.message.key', $this->exception->getMessageKey());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->exception->setMessageKey('test.message.key');
 
-        $string = $this->exception->serialize();
+        $string = serialize($this->exception);
 
-        $exception = new BadCredentialsException();
-        $exception->unserialize($string);
+        $exception = unserialize($string);
 
-        $this->assertEquals($this->exception, $exception);
+        self::assertEquals($this->exception, $exception);
     }
 }

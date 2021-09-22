@@ -88,7 +88,7 @@ class GroupController extends AbstractController
     protected function update(Request $request, Group $entity)
     {
         if ($this->get(GroupHandler::class)->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.user.controller.group.message.saved')
             );

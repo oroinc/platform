@@ -28,7 +28,10 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -338,9 +341,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $tokenId
      * @return CsrfToken
      */
-    protected function getCsrfToken($tokenId)
+    protected function getCsrfToken($tokenId): CsrfToken
     {
-        return $this->getContainer()->get('security.csrf.token_manager')->getToken($tokenId);
+        $this->ensureSessionIsAvailable();
+
+        return self::getContainer()->get('security.csrf.token_manager')->getToken($tokenId);
     }
 
     /**
@@ -359,11 +364,11 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @param string $email
      */
-    protected function updateUserSecurityToken($email)
+    protected function updateUserSecurityToken(string $email): void
     {
         $user = $this->getUser($email);
         $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
-        $this->getContainer()->get('security.token_storage')->setToken($token);
+        self::getContainer()->get('security.token_storage')->setToken($token);
     }
 
     /**
@@ -750,16 +755,6 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::getContainer()->get('router')->generate($name, $parameters, $referenceType);
-    }
-
-    /**
-     * Get an instance of the dependency injection container.
-     *
-     * @return ContainerInterface
-     */
-    protected static function getContainer()
-    {
-        return self::$container;
     }
 
     /**
@@ -1263,5 +1258,37 @@ abstract class WebTestCase extends BaseWebTestCase
             0 !== strpos($path, '/')
             && 0 !== strpos($path, '@')
             && false === strpos($path, ':');
+    }
+
+    protected function getSession(): ?SessionInterface
+    {
+        $this->ensureSessionIsAvailable();
+
+        return self::getContainer()->get('request_stack')->getSession();
+    }
+
+    protected function ensureSessionIsAvailable(): void
+    {
+        $container = self::getContainer();
+        $requestStack = $container->get('request_stack');
+
+        try {
+            $requestStack->getSession();
+        } catch (SessionNotFoundException $e) {
+            $session = $container->has('session')
+                ? $container->get('session')
+                : $container->get('session.factory')->createSession();
+
+            $masterRequest = new Request();
+            $masterRequest->setSession($session);
+
+            $requestStack->push($masterRequest);
+
+            $session->start();
+            $session->save();
+
+            $cookie = new Cookie($session->getName(), $session->getId());
+            self::getClientInstance()->getCookieJar()->set($cookie);
+        }
     }
 }

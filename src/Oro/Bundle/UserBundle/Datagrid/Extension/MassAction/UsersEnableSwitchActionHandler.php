@@ -55,8 +55,8 @@ class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
         TokenStorageInterface $tokenStorage,
         TranslatorInterface $translator,
         $isEnabled,
-        $successMessage,
-        $errorMessage
+        string $successMessage,
+        string $errorMessage
     ) {
         $this->aclHelper      = $aclHelper;
         $this->tokenStorage   = $tokenStorage;

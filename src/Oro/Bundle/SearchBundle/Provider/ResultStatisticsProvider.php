@@ -86,7 +86,7 @@ class ResultStatisticsProvider
         $entityConfigId = new EntityConfigId('entity', $className);
         $entityConfig = $this->configManager->getConfig($entityConfigId);
         if ($entityConfig->has('plural_label')) {
-            $group['label'] = $this->translator->trans($entityConfig->get('plural_label'));
+            $group['label'] = $this->translator->trans((string) $entityConfig->get('plural_label'));
         }
         if ($entityConfig->has('icon')) {
             $group['icon'] = $entityConfig->get('icon');

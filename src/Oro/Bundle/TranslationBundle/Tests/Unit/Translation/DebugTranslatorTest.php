@@ -16,7 +16,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array
      */
-    protected $messages = [
+    private $messages = [
         'fr' => [
             'jsmessages' => [
                 'foo' => 'foo (FR)',
@@ -46,7 +46,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * @param string $expected
      * @dataProvider transDataProvider
      */
-    public function testTrans($locale, $domain, $source, $expected)
+    public function testTrans($locale, $domain, $source, array $parameters, $expected): void
     {
         $locales = array_keys($this->messages);
         foreach ($locales as $key => $value) {
@@ -59,72 +59,38 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         $translator->setLocale($locale);
         $translator->setFallbackLocales(array_slice($locales, array_search($locale, $locales, true) + 1));
 
-        $this->assertEquals($expected, $translator->trans($source, [], $domain));
+        $this->assertEquals($expected, $translator->trans($source, $parameters, $domain));
     }
 
-    /**
-     * @return array
-     */
-    public function transDataProvider()
+    public function transDataProvider(): array
     {
         return [
             'translated' => [
                 'locale' => 'en',
                 'domain' => 'messages',
                 'source' => 'foo',
+                'parameters' => [],
                 'expected' => '[foo messages (EN)]',
             ],
             'not translated' => [
                 'locale' => 'fr',
                 'domain' => 'jsmessages',
                 'source' => 'baz',
+                'parameters' => [],
                 'expected' => '!!!---baz---!!!',
-            ]
-        ];
-    }
-
-    /**
-     * @param string $locale
-     * @param string $domain
-     * @param string $source
-     * @param int    $number
-     * @param string $expected
-     * @dataProvider transChoiceDataProvider
-     */
-    public function testTransChoice($locale, $domain, $source, $number, $expected)
-    {
-        $locales = array_keys($this->messages);
-        foreach ($locales as $key => $value) {
-            if ($value === $locale) {
-                unset($locales[$key]);
-            }
-        }
-        $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locales));
-        $locale = $locale ?: reset($locales);
-        $translator->setLocale($locale);
-        $translator->setFallbackLocales(array_slice($locales, array_search($locale, $locales, true) + 1));
-
-        $this->assertEquals($expected, $translator->transChoice($source, $number, [], $domain));
-    }
-
-    /**
-     * @return array
-     */
-    public function transChoiceDataProvider()
-    {
-        return [
-            'translated' => [
+            ],
+            'translated choice' => [
                 'locale' => 'en',
                 'domain' => 'validators',
                 'source' => 'choice',
-                'number' => 2,
+                'parameters' => ['%count%' => 2],
                 'expected' => '[choice inf (EN)]',
             ],
-            'not translated' => [
+            'not translated choice' => [
                 'locale' => 'fr',
                 'domain' => 'validators',
                 'source' => 'item',
-                'number' => 1,
+                'parameters' => ['%count%' => 1],
                 'expected' => '!!!---item---!!!',
             ]
         ];
@@ -137,7 +103,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * @param array $dictionary
      * @return MessageCatalogue
      */
-    public function getCatalogue($locale, $dictionary)
+    private function getCatalogue($locale, $dictionary): MessageCatalogue
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($dictionary as $domain => $messages) {
@@ -153,7 +119,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getLoader()
+    private function getLoader()
     {
         $messages = $this->messages;
         $loader = $this->createMock(LoaderInterface::class);
@@ -170,7 +136,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * @param array $fallbackLocales
      * @return TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getStrategyProvider(array $fallbackLocales = [])
+    private function getStrategyProvider(array $fallbackLocales = [])
     {
         $strategy = $this->createMock(TranslationStrategyInterface::class);
         $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
@@ -198,7 +164,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * @param TranslationStrategyProvider $strategyProvider
      * @return ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getContainer($loader, $strategyProvider)
+    private function getContainer($loader, $strategyProvider)
     {
         $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
         $valueMap = [
@@ -222,8 +188,11 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * @param array $options
      * @return DebugTranslator
      */
-    public function getTranslator($loader, TranslationStrategyProvider $strategyProvider, $options = [])
-    {
+    private function getTranslator(
+        $loader,
+        TranslationStrategyProvider $strategyProvider,
+        array $options = []
+    ): DebugTranslator {
         $translator = new DebugTranslator(
             $this->getContainer($loader, $strategyProvider),
             new MessageFormatter(),

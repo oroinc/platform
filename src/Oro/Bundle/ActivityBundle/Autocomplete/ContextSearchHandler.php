@@ -316,7 +316,7 @@ class ContextSearchHandler implements ConverterInterface
             return null;
         }
 
-        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+        $label = (string) $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }

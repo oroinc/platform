@@ -22,14 +22,19 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const TIMEZONE = 'Asia/Tokyo';
 
-    /** @var DateFilterSubscriber */
-    private $subscriber;
+    private DateFilterSubscriber $subscriber;
 
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);
         $translatorMock = $this->createMock(TranslatorInterface::class);
         $providerMock = $this->createMock(DateModifierProvider::class);
+        $providerMock->expects(self::any())
+            ->method('getVariableKey')
+            ->willReturnCallback(function ($variable) {
+                return DateModifierInterface::LABEL_VAR_PREFIX . DateModifierInterface::VAR_THIS_YEAR;
+            });
+
         $modifier = new DateFilterModifier(
             new Compiler(new Lexer($translatorMock, $providerMock), new Parser($localeSettings))
         );
@@ -151,7 +156,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
      * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         $weekDateTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $weekDateTime->modify('this week');
@@ -289,7 +294,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSubmitWithNullData()
+    public function testSubmitWithNullData(): void
     {
         $form = $this->createMock(FormInterface::class);
         $event = new FormEvent($form, null);
@@ -302,7 +307,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         self::assertNull($event->getData());
     }
 
-    public function testSubmitWithoutStoredSubmittedValues()
+    public function testSubmitWithoutStoredSubmittedValues(): void
     {
         $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00Z']];
         $submitContext = new DateFilterSubmitContext();
@@ -323,7 +328,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $event->getData());
     }
 
-    public function testSubmitWithStoredSubmittedValues()
+    public function testSubmitWithStoredSubmittedValues(): void
     {
         $submittedStartValue = '2001-01-01 12:00:00';
         $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00Z']];

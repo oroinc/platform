@@ -54,7 +54,7 @@ class StatusController extends AbstractController
                 return new Response((string) $result);
             }
         } elseif ($result) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.user.controller.status.message.saved')
             );
@@ -71,12 +71,12 @@ class StatusController extends AbstractController
      * @Route("/delete/{id}", name="oro_user_status_delete", requirements={"id"="\d+"})
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Status $status)
+    public function deleteAction(Status $status, Request $request)
     {
         if ($this->get(StatusManager::class)->deleteStatus($this->getUser(), $status, true)) {
-            $this->get('session')->getFlashBag()->add('success', 'Status deleted');
+            $request->getSession()->getFlashBag()->add('success', 'Status deleted');
         } else {
-            $this->get('session')->getFlashBag()->add('alert', 'Status is not deleted');
+            $request->getSession()->getFlashBag()->add('alert', 'Status is not deleted');
         }
 
         return $this->redirect($this->generateUrl('oro_user_status_list'));
@@ -86,10 +86,10 @@ class StatusController extends AbstractController
      * @Route("/set-current/{id}", name="oro_user_status_set_current", requirements={"id"="\d+"})
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function setCurrentStatusAction(Status $status)
+    public function setCurrentStatusAction(Status $status, Request $request)
     {
         $this->get(StatusManager::class)->setCurrentStatus($this->getUser(), $status);
-        $this->get('session')->getFlashBag()->add('success', 'Status set');
+        $request->getSession()->getFlashBag()->add('success', 'Status set');
 
         return $this->redirect($this->generateUrl('oro_user_status_list'));
     }
@@ -98,10 +98,10 @@ class StatusController extends AbstractController
      * @Route("/clear-current", name="oro_user_status_clear_current")
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function clearCurrentStatusAction()
+    public function clearCurrentStatusAction(Request $request)
     {
         $this->get(StatusManager::class)->setCurrentStatus($this->getUser());
-        $this->get('session')->getFlashBag()->add('success', 'Status unset');
+        $request->getSession()->getFlashBag()->add('success', 'Status unset');
 
         return $this->redirect($this->generateUrl('oro_user_status_list'));
     }

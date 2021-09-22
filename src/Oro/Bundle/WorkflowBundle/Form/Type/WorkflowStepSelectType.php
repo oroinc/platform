@@ -19,6 +19,9 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type provides functionality to select a WorkflowStep.
+ */
 class WorkflowStepSelectType extends AbstractType
 {
     const NAME = 'oro_workflow_step_select';
@@ -96,11 +99,12 @@ class WorkflowStepSelectType extends AbstractType
     }
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return string
      */
-    private function getTranslation($value)
+    private function getTranslation(?string $value): string
     {
+        $value = (string) $value;
         if ($this->hasTranslation($value, WorkflowTranslationHelper::TRANSLATION_DOMAIN)) {
             $value = $this->translator->trans($value, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
         }

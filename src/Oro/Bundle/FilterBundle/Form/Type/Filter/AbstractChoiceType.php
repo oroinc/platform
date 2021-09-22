@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Translates choices
+ */
 abstract class AbstractChoiceType extends AbstractType
 {
     /**
@@ -50,11 +53,7 @@ abstract class AbstractChoiceType extends AbstractType
             // translate choice values
             /** @var $choiceView ChoiceView */
             foreach ($valueFormView->vars['choices'] as $key => $choiceView) {
-                $choiceView->label = $this->translator->trans(
-                    $choiceView->label,
-                    array(),
-                    $translationDomain
-                );
+                $choiceView->label = $this->translator->trans((string) $choiceView->label, [], $translationDomain);
                 $valueFormView->vars['choices'][$key] = $choiceView;
             }
         }

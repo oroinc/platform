@@ -46,7 +46,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
     /**
      * Test adding to spool/queueing message
      */
-    public function testQueueMessage()
+    public function testQueueMessage(): void
     {
         $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $this->spool->setLogType('log type');
@@ -63,7 +63,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->spool->queueMessage($message));
     }
 
-    public function testFlushMessage()
+    public function testFlushMessage(): void
     {
         $transport = $this->createMock(\Swift_Transport::class);
 
@@ -114,7 +114,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($spoolItem, $event->getSpoolItem());
                 self::assertEquals(1, $event->getSentCount());
 
-                return true;
+                return $event;
             });
 
         $this->spool->setTimeLimit(-100);
@@ -122,7 +122,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(1, $count);
     }
 
-    public function testFlushMessageZeroEmails()
+    public function testFlushMessageZeroEmails(): void
     {
         $transport = $this->createMock(\Swift_Transport::class);
 

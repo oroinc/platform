@@ -82,7 +82,7 @@ class OrganizationBasicAuthenticationListener
      * @param RequestEvent $event A RequestEvent instance
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function handle(RequestEvent $event): void
+    public function __invoke(RequestEvent $event): void
     {
         $request = $event->getRequest();
 

@@ -43,7 +43,7 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         $this->dataFixturesExecutor = new DataFixturesExecutor($this->em, $this->eventDispatcher);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $logMessages = [];
         $logger = function ($message) use (&$logMessages) {
@@ -67,11 +67,15 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
                     self::assertSame($this->em, $event->getObjectManager());
                     self::assertEquals('test', $event->getFixturesType());
                     $event->log('pre load');
+
+                    return $event;
                 }),
                 new ReturnCallback(function (MigrationDataFixturesEvent $event) {
                     self::assertSame($this->em, $event->getObjectManager());
                     self::assertEquals('test', $event->getFixturesType());
                     $event->log('post load');
+
+                    return $event;
                 })
             );
 
@@ -108,7 +112,7 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteWhenFlushAndRollbackFailed()
+    public function testExecuteWhenFlushAndRollbackFailed(): void
     {
         $logMessages = [];
         $logger = function ($message) use (&$logMessages) {
@@ -125,6 +129,8 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
                 self::assertSame($this->em, $event->getObjectManager());
                 self::assertEquals('test', $event->getFixturesType());
                 $event->log('pre load');
+
+                return $event;
             });
 
         $this->connection->expects(self::once())

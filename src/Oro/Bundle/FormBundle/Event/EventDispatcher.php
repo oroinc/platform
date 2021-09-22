@@ -4,19 +4,17 @@ namespace Oro\Bundle\FormBundle\Event;
 
 use Oro\Bundle\FormBundle\Event\FormHandler\FormAwareInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
-use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Extends ImmutableEventDispatcher with dispatching extra event for FormAwareInterface
+ */
 class EventDispatcher extends ImmutableEventDispatcher
 {
     /**
-     * @param Event $event
-     * @param string|null $eventName
-     * @return Event|null
+     * {@inheritdoc}
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch(object $event, string $eventName = null): object
     {
-        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
-
         parent::dispatch($event, $eventName);
 
         if ($event instanceof FormAwareInterface) {

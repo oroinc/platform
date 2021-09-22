@@ -27,7 +27,7 @@ class ActionProcessorDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['name'] = $this->logger->getSectionName();
         $this->data['actions'] = $this->logger->getActions();

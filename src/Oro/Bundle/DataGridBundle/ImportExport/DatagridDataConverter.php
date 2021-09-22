@@ -72,7 +72,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         foreach ($columns as $columnName => $column) {
             $val = array_key_exists($columnName, $exportedRecord) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
-            $columnLabel = $this->translator->trans($column['label']);
+            $columnLabel = isset($column['label']) ? $this->translator->trans($column['label']) : '';
 
             $label = $columnLabel;
             if (array_key_exists($columnLabel, $result)) {

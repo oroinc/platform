@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ActionBundle\Tests\Functional\OperationAwareTestTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
@@ -14,6 +15,8 @@ use Symfony\Component\DomCrawler\Form;
 
 class LocalizationControllerTest extends WebTestCase
 {
+    use OperationAwareTestTrait;
+
     const NAME = 'Localization name';
     const DEFAULT_TITLE = 'Default localization title';
     const LANGUAGE_CODE = 'es_MX';
@@ -245,31 +248,5 @@ class LocalizationControllerTest extends WebTestCase
             ->get('doctrine')
             ->getManagerForClass('OroLocaleBundle:Localization')
             ->getRepository('OroLocaleBundle:Localization');
-    }
-
-    /**
-     * @param $operationName
-     * @param $entityId
-     * @param $entityClass
-     *
-     * @return array
-     */
-    protected function getOperationExecuteParams($operationName, $entityId, $entityClass)
-    {
-        $actionContext = [
-            'entityId'    => $entityId,
-            'entityClass' => $entityClass,
-            'datagrid'    => null
-        ];
-        $container = static::getContainer();
-        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
-        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
-
-        $tokenData = $container
-            ->get('oro_action.operation.execution.form_provider')
-            ->createTokenData($operation, $actionData);
-        $container->get('session')->save();
-
-        return $tokenData;
     }
 }

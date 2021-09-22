@@ -23,12 +23,7 @@ class ConfigTranslationHelper
         $this->translator = $translator;
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @return bool
-     */
-    public function isTranslationEqual($key, $value)
+    public function isTranslationEqual(string $key, string $value): bool
     {
         return $value === $this->translator->trans($key);
     }

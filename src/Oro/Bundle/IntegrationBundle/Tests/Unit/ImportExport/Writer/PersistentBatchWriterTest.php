@@ -49,7 +49,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationProvider
      */
-    public function testWrite(array $configuration)
+    public function testWrite(array $configuration): void
     {
         $this->entityManager->expects($this->once())
             ->method('beginTransaction');
@@ -94,7 +94,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider writeErrorProvider
      */
-    public function testWriteRollback($couldBeSkipped)
+    public function testWriteRollback($couldBeSkipped): void
     {
         $fooItem = $this->createMock(\stdClass::class);
         $barItem = $this->createMock(\ArrayObject::class);
@@ -122,6 +122,8 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->willReturnCallback(function (WriterErrorEvent $event) use ($couldBeSkipped) {
                 $event->setCouldBeSkipped($couldBeSkipped);
+
+                return $event;
             });
 
         if ($couldBeSkipped) {
@@ -140,10 +142,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function writeErrorProvider()
+    public function writeErrorProvider(): array
     {
         return [
             'could be skipped'     => [true],
@@ -151,10 +150,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function configurationProvider()
+    public function configurationProvider(): array
     {
         return [
             'no clear flag'    => [[]],

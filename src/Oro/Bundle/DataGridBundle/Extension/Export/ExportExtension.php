@@ -53,8 +53,10 @@ class ExportExtension extends AbstractExtension
         );
         // translate labels
         foreach ($options as &$option) {
-            $option['label'] = $this->translator->trans($option['label']);
+            $option['label'] = isset($option['label']) ? $this->translator->trans((string) $option['label']) : '';
         }
+        unset($option);
+
         // push options back to config
         $config->offsetSetByPath(self::EXPORT_OPTION_PATH, $options);
 

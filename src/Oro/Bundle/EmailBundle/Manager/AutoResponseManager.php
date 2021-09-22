@@ -152,13 +152,7 @@ class AutoResponseManager
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $label
-     *
-     * @return array
-     */
-    protected function createField($name, $label)
+    protected function createField(string $name, string $label): array
     {
         return [
             'label' => $this->translator->trans($label),

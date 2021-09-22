@@ -421,7 +421,7 @@ class ActivityManager
                 'className'       => $activityClassName,
                 'associationName' => $associationName,
                 'label'           => $entityConfig->get('plural_label'),
-                'route'           => (string) $activityConfig->get('route', false, '')
+                'route'           => (string) $activityConfig->get('route')
             ];
 
             $priority = $activityConfig->get('priority');

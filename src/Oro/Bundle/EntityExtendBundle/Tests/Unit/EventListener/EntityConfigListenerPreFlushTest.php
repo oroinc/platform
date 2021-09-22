@@ -17,7 +17,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test create new field (entity state is 'NEW', owner - Custom)
      *  Nothing should be persisted
      */
-    public function testNewFieldNewEntity()
+    public function testNewFieldNewEntity(): void
     {
         $entityConfig = $this->getEntityConfig();
         $fieldConfig = $this->getEventConfigNewField();
@@ -52,7 +52,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testNewFieldActiveEntityUpdateRequired()
+    public function testNewFieldActiveEntityUpdateRequired(): void
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -82,6 +82,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
             )
             ->willReturnCallback(function (PreSetRequireUpdateEvent $event, string $eventName) {
                 $event->setUpdateRequired(true);
+
+                return $event;
             });
 
         $listener = new EntityConfigListener($this->eventDispatcher);
@@ -95,7 +97,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         );
     }
 
-    public function testNewFieldActiveEntityUpdateNotRequired()
+    public function testNewFieldActiveEntityUpdateNotRequired(): void
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -123,6 +125,8 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
             )
             ->willReturnCallback(function (PreSetRequireUpdateEvent $event, string $eventName) {
                 $event->setUpdateRequired(false);
+
+                return $event;
             });
 
         $listener = new EntityConfigListener($this->eventDispatcher);
@@ -140,7 +144,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test flush new field (entity state is 'Active')
      *  The entity state should not be changed
      */
-    public function testSavingNewFieldActiveEntity()
+    public function testSavingNewFieldActiveEntity(): void
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -181,7 +185,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *
      * @return Config
      */
-    protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend')
+    protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend'): Config
     {
         $resultValues = [
             'owner'      => ExtendScope::OWNER_CUSTOM,
@@ -208,7 +212,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      * @param string $scope
      * @return Config
      */
-    protected function getEntityConfig($values = [], $scope = 'extend')
+    protected function getEntityConfig($values = [], $scope = 'extend'): Config
     {
         $resultValues = [
             'owner'       => ExtendScope::OWNER_CUSTOM,

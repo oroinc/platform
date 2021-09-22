@@ -15,6 +15,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type provides functionality to select a Workflow.
+ */
 class WorkflowSelectType extends AbstractType
 {
     /**
@@ -108,7 +111,7 @@ class WorkflowSelectType extends AbstractType
         /** @var ChoiceView $choiceView */
         foreach ($view->vars['choices'] as $choiceView) {
             $choiceView->label = $this->translator->trans(
-                $choiceView->label,
+                (string) $choiceView->label,
                 [],
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN
             );

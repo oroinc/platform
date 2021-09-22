@@ -120,7 +120,7 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
             return $fieldName;
         }
 
-        $fieldLabel = $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
+        $fieldLabel = (string) $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
 
         return $this->translator->trans($fieldLabel);
     }

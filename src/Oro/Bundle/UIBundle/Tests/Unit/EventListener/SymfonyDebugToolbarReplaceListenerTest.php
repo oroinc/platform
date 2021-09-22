@@ -3,62 +3,63 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\UIBundle\EventListener\SymfonyDebugToolbarReplaceListener;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class SymfonyDebugToolbarReplaceListenerTest extends TestCase
 {
-    /**
-     * @var SymfonyDebugToolbarReplaceListener
-     */
-    private $listener;
+    private SymfonyDebugToolbarReplaceListener $listener;
 
-    /**
-     * @var MockObject|KernelInterface
-     */
-    private $kernel;
+    private KernelInterface|\PHPUnit\Framework\MockObject\MockObject $kernel;
 
-    /**
-     * @var MockObject|ResponseEvent
-     */
-    protected $event;
+    private ResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);
         $this->listener = new SymfonyDebugToolbarReplaceListener($this->kernel);
-
-        $this->event = $this->createMock(ResponseEvent::class);
     }
 
     public function testOnKernelResponseNoDebug(): void
     {
+        $response = new Response();
+
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
+
         $this->kernel->method('isDebug')
             ->willReturn(false);
 
-        $this->event->expects($this->never())
-            ->method('getResponse');
+        $this->listener->onKernelResponse($event);
 
-        $this->listener->onKernelResponse($this->event);
+        self::assertNull($response->headers->get('Symfony-Debug-Toolbar-Replace'));
     }
 
     public function testOnKernelResponseNotAjaxRequest(): void
     {
+        $response = new Response();
+
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
+
         $this->kernel->method('isDebug')
             ->willReturn(true);
 
-        $request = new Request();
-        $request->headers->set('x-oro-hash-navigation', 1);
-        $this->event->method('getRequest')
-            ->willReturn($request);
-        $this->event->expects($this->never())
-            ->method('getResponse');
+        $this->listener->onKernelResponse($event);
 
-        $this->listener->onKernelResponse($this->event);
+        self::assertNull($response->headers->get('Symfony-Debug-Toolbar-Replace'));
     }
 
     public function testOnKernelResponseNotHashNavigation(): void
@@ -67,12 +68,20 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
             ->willReturn(true);
 
         $request = new Request();
-        $this->event->method('getRequest')
-            ->willReturn($request);
-        $this->event->expects($this->never())
-            ->method('getResponse');
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
-        $this->listener->onKernelResponse($this->event);
+        $response = new Response();
+
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
+
+        $this->listener->onKernelResponse($event);
+
+        self::assertNull($response->headers->get('Symfony-Debug-Toolbar-Replace'));
     }
 
     public function testOnKernelResponseWithHashNavigationHeader(): void
@@ -84,14 +93,17 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
         $request->headers->set('x-oro-hash-navigation', 1);
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
         $response = new Response();
-        $this->event->method('getRequest')
-            ->willReturn($request);
-        $this->event->method('getResponse')
-            ->willReturn($response);
 
-        $this->listener->onKernelResponse($this->event);
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
 
-        $this->assertEquals(1, $this->event->getResponse()->headers->get('Symfony-Debug-Toolbar-Replace'));
+        $this->listener->onKernelResponse($event);
+
+        $this->assertEquals(1, $response->headers->get('Symfony-Debug-Toolbar-Replace'));
     }
 
     public function testOnKernelResponse(): void
@@ -103,13 +115,16 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
         $request->request->set('x-oro-hash-navigation', 1);
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
         $response = new Response();
-        $this->event->method('getRequest')
-            ->willReturn($request);
-        $this->event->method('getResponse')
-            ->willReturn($response);
 
-        $this->listener->onKernelResponse($this->event);
+        $event = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
 
-        $this->assertEquals(1, $this->event->getResponse()->headers->get('Symfony-Debug-Toolbar-Replace'));
+        $this->listener->onKernelResponse($event);
+
+        $this->assertEquals(1, $response->headers->get('Symfony-Debug-Toolbar-Replace'));
     }
 }

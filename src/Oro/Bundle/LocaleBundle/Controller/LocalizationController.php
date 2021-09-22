@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -64,7 +65,7 @@ class LocalizationController extends AbstractController
      *
      * @return array|RedirectResponse
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
         $response = $this->update(new Localization());
 
@@ -75,7 +76,7 @@ class LocalizationController extends AbstractController
                     '%path%' => $this->generateUrl('oro_translation_translation_index'),
                 ]
             );
-            $this->get('session')->getFlashBag()->add('warning', $message);
+            $request->getSession()->getFlashBag()->add('warning', $message);
         }
 
         return $response;

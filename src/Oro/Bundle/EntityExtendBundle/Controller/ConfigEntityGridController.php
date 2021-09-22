@@ -137,7 +137,7 @@ class ConfigEntityGridController extends AbstractController
 
             if ($form->isSubmitted() && $form->isValid()) {
                 //persist data inside the form
-                $this->get('session')->getFlashBag()->add(
+                $request->getSession()->getFlashBag()->add(
                     'success',
                     $this->get(TranslatorInterface::class)
                         ->trans('oro.entity_extend.controller.config_entity.message.saved')

@@ -19,6 +19,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Activity Contexts select form type.
+ */
 class ContextsSelectType extends AbstractType
 {
     const NAME = 'oro_activity_contexts_select';
@@ -150,7 +153,7 @@ class ContextsSelectType extends AbstractType
             return null;
         }
 
-        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+        $label = (string) $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }
