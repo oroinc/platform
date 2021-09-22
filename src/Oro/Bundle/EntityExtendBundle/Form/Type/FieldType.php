@@ -237,8 +237,8 @@ class FieldType extends AbstractType
             /** @var FieldConfigId $targetFieldId */
             $targetFieldId = $relation['target_field_id'];
 
-            $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
-            $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
+            $entityLabel = (string) $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
+            $fieldLabel  = (string) $entityProvider->getConfigById($targetFieldId)->get('label');
             $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
 
             $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();

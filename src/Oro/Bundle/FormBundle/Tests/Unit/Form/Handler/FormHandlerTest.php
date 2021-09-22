@@ -41,7 +41,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
     }
 
-    public function testHandleUpdateWorksWithInvalidForm()
+    public function testHandleUpdateWorksWithInvalidForm(): void
     {
         $entity = (object)[];
         $this->form->expects($this->once())
@@ -66,7 +66,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(false, $this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testHandleUpdateWorksWithValidForm()
+    public function testHandleUpdateWorksWithValidForm(): void
     {
         $entity = (object)[];
         $this->form->expects($this->once())
@@ -110,7 +110,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testHandleUpdateWorksWhenFormFlushFailed()
+    public function testHandleUpdateWorksWhenFormFlushFailed(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Test flush exception');
@@ -149,7 +149,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process($entity, $this->form, $this->request);
     }
 
-    public function testHandleUpdateBeforeFormDataSetInterrupted()
+    public function testHandleUpdateBeforeFormDataSetInterrupted(): void
     {
         $entity = (object)[];
         $this->request->setMethod('POST');
@@ -162,13 +162,15 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function (FormProcessEvent $event, $name) {
                     $event->interruptFormProcess();
+
+                    return $event;
                 }
             );
 
         $this->assertFalse($this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testProcessFalseNotRequiredRequestMethod()
+    public function testProcessFalseNotRequiredRequestMethod(): void
     {
         $entity = (object)[];
         $this->request->setMethod('GET');
@@ -183,7 +185,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($entity, $this->form, $this->request));
     }
 
-    public function testHandleUpdateInterruptedBeforeFormSubmit()
+    public function testHandleUpdateInterruptedBeforeFormSubmit(): void
     {
         $entity = (object)[];
         $this->request->setMethod('POST');
@@ -197,10 +199,13 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
                 [$this->anything(), Events::BEFORE_FORM_SUBMIT]
             )
             ->willReturnOnConsecutiveCalls(
-                new ReturnCallback(function () {
+                new ReturnCallback(function (FormProcessEvent $event) {
+                    return $event;
                 }),
                 new ReturnCallback(function (FormProcessEvent $event) {
                     $event->interruptFormProcess();
+
+                    return $event;
                 })
             );
 

@@ -7,6 +7,8 @@ use Oro\Bundle\MessageQueueBundle\Client\CommandWatcher;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class CommandWatcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,12 +27,13 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher = new CommandWatcher($this->bufferedProducer);
     }
 
-    public function testShouldDoNothingOnCommandStartIfCommandIsNull()
+    public function testShouldDoNothingOnCommandStartIfCommandIsNull(): void
     {
-        $event = $this->createMock(ConsoleCommandEvent::class);
-        $event->expects(self::once())
-            ->method('getCommand')
-            ->willReturn(null);
+        $event = new ConsoleCommandEvent(
+            null,
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class)
+        );
         $this->bufferedProducer->expects(self::never())
             ->method('isBufferingEnabled')
             ->willReturn(false);
@@ -40,12 +43,13 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher->onCommandStart($event);
     }
 
-    public function testShouldDoNothingOnCommandStartIfCommandIsConsumeMessagesCommand()
+    public function testShouldDoNothingOnCommandStartIfCommandIsConsumeMessagesCommand(): void
     {
-        $event = $this->createMock(ConsoleCommandEvent::class);
-        $event->expects(self::once())
-            ->method('getCommand')
-            ->willReturn($this->createMock(ConsumeMessagesCommand::class));
+        $event = new ConsoleCommandEvent(
+            $this->createMock(ConsumeMessagesCommand::class),
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class)
+        );
         $this->bufferedProducer->expects(self::never())
             ->method('isBufferingEnabled')
             ->willReturn(false);
@@ -55,12 +59,13 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher->onCommandStart($event);
     }
 
-    public function testShouldEnableBufferingOnCommandStartIfBufferingIsNotEnabledYet()
+    public function testShouldEnableBufferingOnCommandStartIfBufferingIsNotEnabledYet(): void
     {
-        $event = $this->createMock(ConsoleCommandEvent::class);
-        $event->expects(self::once())
-            ->method('getCommand')
-            ->willReturn($this->createMock(Command::class));
+        $event = new ConsoleCommandEvent(
+            $this->createMock(Command::class),
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class)
+        );
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
             ->willReturn(false);
@@ -70,12 +75,13 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher->onCommandStart($event);
     }
 
-    public function testShouldNotEnableBufferingOnCommandStartIfBufferingIsAlreadyEnabled()
+    public function testShouldNotEnableBufferingOnCommandStartIfBufferingIsAlreadyEnabled(): void
     {
-        $event = $this->createMock(ConsoleCommandEvent::class);
-        $event->expects(self::once())
-            ->method('getCommand')
-            ->willReturn($this->createMock(Command::class));
+        $event = new ConsoleCommandEvent(
+            $this->createMock(Command::class),
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class)
+        );
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
             ->willReturn(true);
@@ -85,7 +91,7 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher->onCommandStart($event);
     }
 
-    public function testShouldFlushBufferOnCommandEndIfBufferingIsEnabledAndHasMessagesInBuffer()
+    public function testShouldFlushBufferOnCommandEndIfBufferingIsEnabledAndHasMessagesInBuffer(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -99,7 +105,7 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher->onCommandEnd();
     }
 
-    public function testShouldNotFlushBufferOnCommandEndIfBufferingIsEnabledButNoMessagesInBuffer()
+    public function testShouldNotFlushBufferOnCommandEndIfBufferingIsEnabledButNoMessagesInBuffer(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -113,7 +119,7 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
         $this->commandWatcher->onCommandEnd();
     }
 
-    public function testShouldNotFlushBufferOnCommandEndIfBufferingIsNotEnabled()
+    public function testShouldNotFlushBufferOnCommandEndIfBufferingIsNotEnabled(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')

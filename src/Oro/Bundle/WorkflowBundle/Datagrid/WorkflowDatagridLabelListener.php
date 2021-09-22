@@ -66,13 +66,13 @@ class WorkflowDatagridLabelListener
     /**
      * Used only internally, please use WorkflowTranslationHelper or '@translator.default'
      *
-     * @param $id
+     * @param mixed $id
      *
      * @return string
      */
-    public function trans($id)
+    public function trans(mixed $id): string
     {
-        return $this->translator->trans($id, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        return $this->translator->trans((string) $id, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 
     /**

@@ -289,7 +289,9 @@ class WidgetConfigs
     protected function loadDefaultValue($options, $widgetConfig)
     {
         if (!isset($options['title']) || !$options['title']['title'] || $options['title']['useDefault']) {
-            $options['title']['title'] = $this->translator->trans($widgetConfig['label']);
+            $options['title']['title'] = isset($widgetConfig['label'])
+                ? $this->translator->trans((string) $widgetConfig['label'])
+                : '';
             $options['title']['useDefault'] = true;
         }
 

@@ -126,7 +126,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
                 continue;
             }
 
-            $fieldLabel = $entityConfigProvider->getConfig($entityClass, $fieldName)->get('label');
+            $fieldLabel = (string) $entityConfigProvider->getConfig($entityClass, $fieldName)->get('label');
 
             $var = [
                 'type'  => $fieldId->getFieldType(),

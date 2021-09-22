@@ -430,9 +430,9 @@ services:
             - 'public_mediacache'
             - '%kernel.project_dir%/public/media/cache'
 
-    oro_attachment.liip_imagine.filter.loader.watermark:
+    oro_attachment.liip_imagine.filter.loader.watermark_image:
         class: Liip\ImagineBundle\Imagine\Filter\Loader\WatermarkFilterLoader
-        decorates: liip_imagine.filter.loader.watermark
+        decorates: liip_imagine.filter.loader.watermark_image
         arguments:
             - '@liip_imagine'
             - 'gaufrette:/' # One slash instead of two used intentionally due to specifics of WatermarkFilterLoader

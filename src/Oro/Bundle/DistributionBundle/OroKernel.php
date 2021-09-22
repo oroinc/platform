@@ -55,7 +55,7 @@ abstract class OroKernel extends Kernel
         }
         CumulativeResourceManager::getInstance()
             ->setBundles($bundles)
-            ->setAppRootDir($this->rootDir);
+            ->setAppRootDir($this->getProjectDir());
     }
 
     /**

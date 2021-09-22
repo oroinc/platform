@@ -6,7 +6,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Listener\RememberMeListener;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -49,8 +48,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         $listener = $container
             ->register($listenerId, RememberMeListener::class)
             ->setArguments([
-                new Reference($innerListenerId),
-                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+                new Reference($innerListenerId)
             ])
             ->addMethodCall('setCsrfRequestManager', [new Reference('oro_security.csrf_request_manager')]);
         // point if listener processes CSRF protected AJAX requests only

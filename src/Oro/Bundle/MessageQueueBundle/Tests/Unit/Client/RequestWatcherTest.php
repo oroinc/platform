@@ -4,8 +4,11 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Client\RequestWatcher;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class RequestWatcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,11 +27,11 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
         $this->requestWatcher = new RequestWatcher($this->bufferedProducer);
     }
 
-    public function testShouldDoNothingOnRequestStartForNotMasterRequest()
+    public function testShouldDoNothingOnRequestStartForNotMasterRequest(): void
     {
         $event = $this->createMock(RequestEvent::class);
         $event->expects(self::once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(false);
         $this->bufferedProducer->expects(self::never())
             ->method('isBufferingEnabled');
@@ -38,11 +41,11 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
         $this->requestWatcher->onRequestStart($event);
     }
 
-    public function testShouldEnableBufferingOnRequestStartIfBufferingIsNotEnabledYet()
+    public function testShouldEnableBufferingOnRequestStartIfBufferingIsNotEnabledYet(): void
     {
         $event = $this->createMock(RequestEvent::class);
         $event->expects(self::once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -53,11 +56,11 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
         $this->requestWatcher->onRequestStart($event);
     }
 
-    public function testShouldNotEnableBufferingOnRequestStartIfBufferingIsAlreadyEnabled()
+    public function testShouldNotEnableBufferingOnRequestStartIfBufferingIsAlreadyEnabled(): void
     {
         $event = $this->createMock(RequestEvent::class);
         $event->expects(self::once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -68,28 +71,14 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
         $this->requestWatcher->onRequestStart($event);
     }
 
-    public function testShouldDoNothingOnRequestEndForNotMasterRequest()
+    public function testShouldFlushBufferOnRequestEndIfBufferingIsEnabledAndHasMessagesInBuffer(): void
     {
-        $event = $this->createMock(TerminateEvent::class);
-        $event->expects(self::once())
-            ->method('isMasterRequest')
-            ->willReturn(false);
-        $this->bufferedProducer->expects(self::never())
-            ->method('isBufferingEnabled');
-        $this->bufferedProducer->expects(self::never())
-            ->method('hasBufferedMessages');
-        $this->bufferedProducer->expects(self::never())
-            ->method('flushBuffer');
+        $event = new TerminateEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            new Response()
+        );
 
-        $this->requestWatcher->onRequestEnd($event);
-    }
-
-    public function testShouldFlushBufferOnRequestEndIfBufferingIsEnabledAndHasMessagesInBuffer()
-    {
-        $event = $this->createMock(TerminateEvent::class);
-        $event->expects(self::once())
-            ->method('isMasterRequest')
-            ->willReturn(true);
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
             ->willReturn(true);
@@ -102,12 +91,14 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
         $this->requestWatcher->onRequestEnd($event);
     }
 
-    public function testShouldNotFlushBufferOnRequestEndIfBufferingIsEnabledButNoMessagesInBuffer()
+    public function testShouldNotFlushBufferOnRequestEndIfBufferingIsEnabledButNoMessagesInBuffer(): void
     {
-        $event = $this->createMock(TerminateEvent::class);
-        $event->expects(self::once())
-            ->method('isMasterRequest')
-            ->willReturn(true);
+        $event = new TerminateEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            new Response()
+        );
+
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
             ->willReturn(true);
@@ -120,12 +111,14 @@ class RequestWatcherTest extends \PHPUnit\Framework\TestCase
         $this->requestWatcher->onRequestEnd($event);
     }
 
-    public function testShouldNotFlushBufferOnRequestEndIfBufferingIsNotEnabled()
+    public function testShouldNotFlushBufferOnRequestEndIfBufferingIsNotEnabled(): void
     {
-        $event = $this->createMock(TerminateEvent::class);
-        $event->expects(self::once())
-            ->method('isMasterRequest')
-            ->willReturn(true);
+        $event = new TerminateEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            new Response()
+        );
+
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
             ->willReturn(false);

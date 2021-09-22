@@ -85,7 +85,7 @@ In your controller:
         $message = $driver->getMessageUnlock($driver->unlock());
     }
 
-    $this->get('session')->setFlash('maintenance', $message);
+    $this->get('request_stack')->getSession()->setFlash('maintenance', $message);
 
     return new RedirectResponse($this->generateUrl('_demo'));
 

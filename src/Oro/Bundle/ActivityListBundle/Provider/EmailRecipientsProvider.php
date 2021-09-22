@@ -121,7 +121,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSection()
+    public function getSection(): string
     {
         return 'oro.email.autocomplete.contexts';
     }

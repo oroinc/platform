@@ -917,15 +917,15 @@ class EntityFieldProvider
     /**
      * Translates the given message according to the set or default locale
      *
-     * @param string $messageId
+     * @param string|null $messageId
      * @param bool   $translate
      *
      * @return string The translated string
      */
-    protected function getLocalizedValue($messageId, $translate)
+    protected function getLocalizedValue(?string $messageId, bool $translate): string
     {
         if ($translate) {
-            return $this->translator->trans($messageId, [], null, $this->locale);
+            return $this->translator->trans((string) $messageId, [], null, $this->locale);
         }
 
         return $messageId;

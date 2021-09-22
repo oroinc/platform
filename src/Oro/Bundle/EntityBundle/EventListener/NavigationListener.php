@@ -12,6 +12,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds child menu items for all available configurable entities to the `entities_list` item.
+ */
 class NavigationListener
 {
     /** @var AuthorizationCheckerInterface */
@@ -62,7 +65,7 @@ class NavigationListener
                     }
 
                     $children[$config->get('label')] = [
-                        'label'   => $this->translator->trans($config->get('label')),
+                        'label'   => $this->translator->trans((string) $config->get('label')),
                         'options' => [
                             'route'           => 'oro_entity_index',
                             'routeParameters' => [

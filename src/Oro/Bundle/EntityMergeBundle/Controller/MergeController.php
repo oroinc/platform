@@ -77,14 +77,13 @@ class MergeController extends AbstractController
             $className = $entityData->getClassName();
         }
 
+        $flashBag = $request->getSession()->getFlashBag();
+
         $constraintViolations = $this->getValidator()->validate($entityData, null, ['validateCount']);
         if ($constraintViolations->count()) {
             foreach ($constraintViolations as $violation) {
                 /* @var ConstraintViolation $violation */
-                $this->get('session')->getFlashBag()->add(
-                    'error',
-                    $violation->getMessage()
-                );
+                $flashBag->add('error', $violation->getMessage());
             }
 
             return $this->redirect($this->generateUrl($this->getEntityIndexRoute($entityData->getClassName())));
@@ -113,14 +112,11 @@ class MergeController extends AbstractController
                 } catch (ValidationException $exception) {
                     foreach ($exception->getConstraintViolations() as $violation) {
                         /* @var ConstraintViolation $violation */
-                        $this->get('session')->getFlashBag()->add(
-                            'error',
-                            $violation->getMessage()
-                        );
+                        $flashBag->add('error', $violation->getMessage());
                     }
                 }
 
-                $this->get('session')->getFlashBag()->add(
+                $flashBag->add(
                     'success',
                     $this->get(TranslatorInterface::class)->trans('oro.entity_merge.controller.merged_successful')
                 );

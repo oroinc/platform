@@ -85,9 +85,9 @@ class ButtonStub implements ButtonInterface
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->buttonOptions['label'];
+        return (string) $this->buttonOptions['label'];
     }
 
     /** {@inheritdoc} */

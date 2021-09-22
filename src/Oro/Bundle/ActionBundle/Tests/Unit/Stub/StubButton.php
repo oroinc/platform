@@ -83,9 +83,9 @@ class StubButton implements ButtonInterface
     }
 
     /** {@inheritdoc} */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->label;
+        return (string) $this->label;
     }
 
     /** {@inheritdoc} */

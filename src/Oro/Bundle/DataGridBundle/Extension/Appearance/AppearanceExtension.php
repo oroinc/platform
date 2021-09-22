@@ -8,6 +8,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Appearance datagrid extension.
+ */
 class AppearanceExtension extends AbstractExtension
 {
     const APPEARANCE_CONFIG_PATH = 'appearances';
@@ -85,7 +88,9 @@ class AppearanceExtension extends AbstractExtension
                 if (isset($options[Configuration::DEFAULT_PROCESSING_KEY]) &&
                     $options[Configuration::DEFAULT_PROCESSING_KEY]) {
                     unset($options[Configuration::DEFAULT_PROCESSING_KEY]);
-                    $options['label'] = $this->translator->trans($options['label']);
+                    $options['label'] = isset($options['label'])
+                        ? $this->translator->trans((string) $options['label'])
+                        : '';
                     $processedOptions[] = array_merge(['type' => $type], $options);
                 }
             }

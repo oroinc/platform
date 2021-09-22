@@ -317,7 +317,8 @@ class WorkflowAttributesType extends AbstractType
             }
 
             $label = $attributeOptions['options']['label'];
-            if ($this->translator->trans($label, [], $domain) === $label) {
+            $translatedLabel =  $this->translator->trans((string) $label, [], $domain);
+            if ($translatedLabel === $label) {
                 $attributeOptions['options']['label'] = $attribute->getLabel();
             }
         } else {

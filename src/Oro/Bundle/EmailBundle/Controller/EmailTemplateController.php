@@ -58,9 +58,9 @@ class EmailTemplateController extends AbstractController
      * )
      * @Template("@OroEmail/EmailTemplate/update.html.twig")
      */
-    public function updateAction(EmailTemplate $entity, $isClone = false)
+    public function updateAction(EmailTemplate $entity, Request $request)
     {
-        return $this->update($entity, $isClone);
+        return $this->update($entity, $request, false);
     }
 
     /**
@@ -73,9 +73,9 @@ class EmailTemplateController extends AbstractController
      * )
      * @Template("@OroEmail/EmailTemplate/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new EmailTemplate());
+        return $this->update(new EmailTemplate(), $request);
     }
 
     /**
@@ -83,9 +83,9 @@ class EmailTemplateController extends AbstractController
      * @AclAncestor("oro_email_emailtemplate_create")
      * @Template("@OroEmail/EmailTemplate/update.html.twig")
      */
-    public function cloneAction(EmailTemplate $entity)
+    public function cloneAction(EmailTemplate $entity, Request $request)
     {
-        return $this->update(clone $entity, true);
+        return $this->update(clone $entity, $request, true);
     }
 
     /**
@@ -133,13 +133,14 @@ class EmailTemplateController extends AbstractController
 
     /**
      * @param EmailTemplate $entity
+     * @param Request $request
      * @param bool $isClone
      * @return array
      */
-    protected function update(EmailTemplate $entity, $isClone = false)
+    protected function update(EmailTemplate $entity, Request $request, $isClone = false)
     {
         if ($this->get(EmailTemplateHandler::class)->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.email.controller.emailtemplate.saved.message')
             );

@@ -42,7 +42,7 @@ class ConfigurationController extends AbstractController
     {
         $provider = $this->get(SystemConfigurationFormProvider::class);
 
-        list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
+        [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
 
         $jsTree = $provider->getJsTree();
         $form = false;
@@ -51,7 +51,7 @@ class ConfigurationController extends AbstractController
             $form = $provider->getForm($activeSubGroup);
 
             if ($this->get(ConfigHandler::class)->process($form, $request)) {
-                $this->get('session')->getFlashBag()->add(
+                $request->getSession()->getFlashBag()->add(
                     'success',
                     $this->get(TranslatorInterface::class)->trans('oro.config.controller.config.saved.message')
                 );

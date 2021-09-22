@@ -29,7 +29,7 @@ class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
         $this->step = new MergeFieldsStep($this->strategy, $this->eventDispatcher);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
         $foo = $this->createMock(FieldData::class);
         $bar = $this->createMock(FieldData::class);
@@ -57,6 +57,8 @@ class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
                     $field = 'bar';
                 }
                 $calls[] = $eventName . ' - ' . $field;
+
+                return $event;
             });
 
         $this->step->run($data);

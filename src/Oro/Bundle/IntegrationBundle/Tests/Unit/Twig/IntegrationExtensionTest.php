@@ -29,7 +29,7 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new IntegrationExtension($container);
     }
 
-    public function testGetThemesShouldReturnDefaultThemeIfNoListenerIsRegistered()
+    public function testGetThemesShouldReturnDefaultThemeIfNoListenerIsRegistered(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
@@ -44,7 +44,7 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetThemesShouldReturnEventThemesIfListenerIsRegistered()
+    public function testGetThemesShouldReturnEventThemesIfListenerIsRegistered(): void
     {
         $themes = ['1', '2', '3'];
 
@@ -57,6 +57,8 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(static::anything(), LoadIntegrationThemesEvent::NAME)
             ->willReturnCallback(function (LoadIntegrationThemesEvent $event) use ($themes) {
                 $event->setThemes($themes);
+
+                return $event;
             });
 
         $this->assertEquals(

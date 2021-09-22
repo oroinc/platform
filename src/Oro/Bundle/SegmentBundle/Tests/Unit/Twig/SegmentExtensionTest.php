@@ -12,11 +12,9 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EventDispatcherInterface */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    /** @var SegmentExtension */
-    private $segmentExtension;
+    private SegmentExtension $segmentExtension;
 
     protected function setUp(): void
     {
@@ -29,7 +27,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->segmentExtension = new SegmentExtension($container);
     }
 
-    public function testUpdateSegmentWidgetOptionsShouldReturnOriginalOptionsIfThereAreNoListeners()
+    public function testUpdateSegmentWidgetOptionsShouldReturnOriginalOptionsIfThereAreNoListeners(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
@@ -41,7 +39,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($originalWidgetOptions, $options);
     }
 
-    public function testUpdateSegmentConditionBuilderOptionsShouldReturnOriginalOptionsIfThereAreNoListeners()
+    public function testUpdateSegmentConditionBuilderOptionsShouldReturnOriginalOptionsIfThereAreNoListeners(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
@@ -53,7 +51,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($originalWidgetOptions, $options);
     }
 
-    public function testUpdateSegmentWidgetOptionsShouldReturnOptionsFromListener()
+    public function testUpdateSegmentWidgetOptionsShouldReturnOptionsFromListener(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
@@ -64,8 +62,10 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(static::anything(), WidgetOptionsLoadEvent::EVENT_NAME)
-            ->willReturnCallback(function ($event, $eventName) use ($eventOptions) {
+            ->willReturnCallback(function ($event) use ($eventOptions) {
                 $event->setWidgetOptions($eventOptions);
+
+                return $event;
             });
 
         $originalWidgetOptions = ['opt1' => 'val1'];
@@ -73,7 +73,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($eventOptions, $options);
     }
 
-    public function testUpdateSegmentConditionBuilderOptionsShouldReturnOptionsFromListener()
+    public function testUpdateSegmentConditionBuilderOptionsShouldReturnOptionsFromListener(): void
     {
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
@@ -86,6 +86,8 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(static::anything(), ConditionBuilderOptionsLoadEvent::EVENT_NAME)
             ->willReturnCallback(function ($event, $eventName) use ($eventOptions) {
                 $event->setOptions($eventOptions);
+
+                return $event;
             });
 
         $originalWidgetOptions = ['opt1' => 'val1'];

@@ -80,7 +80,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         return new Query($em);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $config = $this->getConfig();
         $datagrid = $this->createMock(DatagridInterface::class);
@@ -115,7 +115,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->datasource->getCountQueryHints());
     }
 
-    public function testProcessWithHints()
+    public function testProcessWithHints(): void
     {
         $config = $this->getConfig();
         $config['hints'] = ['some_hint'];
@@ -153,7 +153,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config['count_hints'], $this->datasource->getCountQueryHints());
     }
 
-    public function testGetResults()
+    public function testGetResults(): void
     {
         $config = $this->getConfig();
         $config['hints'] = ['some_hint'];
@@ -189,13 +189,17 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
                 [self::isInstanceOf(OrmResultAfter::class), OrmResultAfter::NAME]
             )
             ->willReturnOnConsecutiveCalls(
-                new ReturnCallback(function () {
+                new ReturnCallback(function (OrmResultBeforeQuery $event) {
+                    return $event;
                 }),
-                new ReturnCallback(function () {
+                new ReturnCallback(function (OrmResultBefore $event) {
+                    return $event;
                 }),
                 new ReturnCallback(function (OrmResultAfter $event) use ($records, $recordsAfterEvent) {
                     self::assertEquals($records, $event->getRecords());
                     $event->setRecords($recordsAfterEvent);
+
+                    return $event;
                 })
             );
 
@@ -205,7 +209,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         self::assertSame($recordsAfterEvent, $resultRecords);
     }
 
-    public function testBindParametersWorks()
+    public function testBindParametersWorks(): void
     {
         $parameters = ['foo'];
         $append = true;
@@ -226,7 +230,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $this->datasource->bindParameters($parameters, $append);
     }
 
-    public function testBindParametersFailsWhenDatagridIsEmpty()
+    public function testBindParametersFailsWhenDatagridIsEmpty(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Method is not allowed when datasource is not processed.');
@@ -234,7 +238,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $this->datasource->bindParameters(['foo']);
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = $this->getConfig();
         $datagrid = $this->createMock(DatagridInterface::class);
@@ -262,7 +266,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($countQb, $this->datasource->getCountQb());
     }
 
-    public function testCloneWithoutCountQueryBuilder()
+    public function testCloneWithoutCountQueryBuilder(): void
     {
         $config = $this->getConfig();
         $datagrid = $this->createMock(DatagridInterface::class);

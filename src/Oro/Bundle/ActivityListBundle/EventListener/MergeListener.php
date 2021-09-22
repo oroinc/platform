@@ -89,10 +89,10 @@ class MergeListener
      *
      * @return string
      */
-    protected function getAliasByActivityClass($className)
+    protected function getAliasByActivityClass($className): string
     {
         $config = $this->configProvider->getConfig($className);
 
-        return $config->get(self::TRANSLATE_KEY);
+        return (string) $config->get(self::TRANSLATE_KEY);
     }
 }

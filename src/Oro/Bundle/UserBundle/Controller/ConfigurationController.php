@@ -12,8 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -38,13 +37,14 @@ class ConfigurationController extends AbstractController
      * )
      *
      * @param User $entity
-     * @param null $activeGroup
-     * @param null $activeSubGroup
+     * @param Request $request
+     * @param string|null $activeGroup
+     * @param string|null $activeSubGroup
      * @return array
      */
-    public function userConfigAction(User $entity, $activeGroup = null, $activeSubGroup = null)
+    public function userConfigAction(User $entity, Request $request, $activeGroup = null, $activeSubGroup = null)
     {
-        $result = $this->config($entity, $activeGroup, $activeSubGroup);
+        $result = $this->config($entity, $request, $activeGroup, $activeSubGroup);
         $result['routeName'] = 'oro_user_config';
         $result['routeParameters'] = ['id' => $entity->getId()];
 
@@ -56,13 +56,14 @@ class ConfigurationController extends AbstractController
      * @Template("@OroUser/Configuration/userConfig.html.twig")
      * @AclAncestor("update_own_configuration")
      *
-     * @param null $activeGroup
-     * @param null $activeSubGroup
+     * @param Request $request
+     * @param string|null $activeGroup
+     * @param string|null $activeSubGroup
      * @return array
      */
-    public function userProfileConfigAction($activeGroup = null, $activeSubGroup = null)
+    public function userProfileConfigAction(Request $request, $activeGroup = null, $activeSubGroup = null)
     {
-        $result = $this->config($this->getUser(), $activeGroup, $activeSubGroup);
+        $result = $this->config($this->getUser(), $request, $activeGroup, $activeSubGroup);
         $result['routeName'] = 'oro_user_profile_configuration';
         $result['routeParameters'] = [];
 
@@ -71,11 +72,12 @@ class ConfigurationController extends AbstractController
 
     /**
      * @param User $entity
+     * @param Request $request
      * @param string|null $activeGroup
      * @param string|null $activeSubGroup
      * @return array
      */
-    protected function config(User $entity, $activeGroup = null, $activeSubGroup = null)
+    protected function config(User $entity, Request $request, $activeGroup = null, $activeSubGroup = null)
     {
         $provider = $this->get(UserConfigurationFormProvider::class);
         /** @var ConfigManager $manager */
@@ -84,7 +86,7 @@ class ConfigurationController extends AbstractController
         //update scope id to match currently configured user
         $manager->setScopeIdFromEntity($entity);
 
-        list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
+        [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
 
         $jsTree = $provider->getJsTree();
         $form = false;
@@ -94,9 +96,9 @@ class ConfigurationController extends AbstractController
 
             if ($this->get(ConfigHandler::class)
                 ->setConfigManager($manager)
-                ->process($form, $this->get(RequestStack::class)->getCurrentRequest())
+                ->process($form, $request)
             ) {
-                $this->get(SessionInterface::class)->getFlashBag()->add(
+                $request->getSession()->getFlashBag()->add(
                     'success',
                     $this->get(TranslatorInterface::class)->trans('oro.config.controller.config.saved.message')
                 );
@@ -134,8 +136,6 @@ class ConfigurationController extends AbstractController
             parent::getSubscribedServices(),
             [
                 'oro_config.user' => ConfigManager::class,
-                RequestStack::class,
-                SessionInterface::class,
                 TranslatorInterface::class,
                 TagGeneratorInterface::class,
                 UserConfigurationFormProvider::class,

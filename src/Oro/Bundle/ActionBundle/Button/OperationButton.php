@@ -59,9 +59,9 @@ class OperationButton implements ButtonInterface
     /**
      * {@inheritdoc}
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->operation->getDefinition()->getLabel();
+        return (string) $this->operation->getDefinition()->getLabel();
     }
 
     /**

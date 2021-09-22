@@ -99,7 +99,8 @@ abstract class AbstractHandler
     protected function getEntityPluralName($entityClass)
     {
         if ($this->entityConfigProvider->hasConfig($entityClass)) {
-            $label = $this->entityConfigProvider->getConfig($entityClass)->get('plural_label', false, 'entitites');
+            $label = (string) $this->entityConfigProvider
+                ->getConfig($entityClass)->get('plural_label', false, 'entitites');
             $label = mb_strtolower($this->translator->trans($label));
         } else {
             $label = $this->translator->trans('oro.importexport.message.entities.label');

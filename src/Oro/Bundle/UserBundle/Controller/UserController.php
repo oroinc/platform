@@ -69,9 +69,9 @@ class UserController extends AbstractController
      * @Template("@OroUser/User/Profile/update.html.twig")
      * @AclAncestor("update_own_profile")
      */
-    public function updateProfileAction()
+    public function updateProfileAction(Request $request)
     {
-        return $this->update($this->getUser());
+        return $this->update($this->getUser(), $request);
     }
 
     /**
@@ -126,11 +126,11 @@ class UserController extends AbstractController
      *      permission="CREATE"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
         $user = $this->get(UserManager::class)->createUser();
 
-        return $this->update($user);
+        return $this->update($user, $request);
     }
 
     /**
@@ -146,11 +146,12 @@ class UserController extends AbstractController
      * )
      *
      * @param User $entity
+     * @param Request $request
      * @return array|RedirectResponse
      */
-    public function updateAction(User $entity)
+    public function updateAction(User $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -171,14 +172,15 @@ class UserController extends AbstractController
     }
 
     /**
-     * @param User  $entity
+     * @param User $entity
+     * @param Request $request
      *
      * @return RedirectResponse|array
      */
-    private function update(User $entity)
+    private function update(User $entity, Request $request)
     {
         if ($this->get(UserHandler::class)->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.user.controller.user.message.saved')
             );

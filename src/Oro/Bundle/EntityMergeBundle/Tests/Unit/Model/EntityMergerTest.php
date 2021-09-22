@@ -39,12 +39,14 @@ class EntityMergerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnCallback(function (EntityDataEvent $event) use ($data) {
                 $this->assertSame($data, $event->getEntityData());
+
+                return $event;
             });
 
         return [$step1, $step2];
     }
 
-    public function testMergeWhenStepsAreArray()
+    public function testMergeWhenStepsAreArray(): void
     {
         $data = $this->createMock(EntityData::class);
         $steps = $this->setMergeExpectations($data);
@@ -53,7 +55,7 @@ class EntityMergerTest extends \PHPUnit\Framework\TestCase
         $merger->merge($data);
     }
 
-    public function testMergeWhenStepsAreTraversable()
+    public function testMergeWhenStepsAreTraversable(): void
     {
         $data = $this->createMock(EntityData::class);
         $steps = $this->setMergeExpectations($data);

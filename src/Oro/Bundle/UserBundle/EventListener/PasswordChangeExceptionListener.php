@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\EventListener;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Add password_changed flash message to flash bag on PasswordChangedException.

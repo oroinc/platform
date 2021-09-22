@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\ApiDoc\LogoutSuccessHandler;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Configures the success handler for API sandbox logout.
@@ -24,7 +23,7 @@ class ApiDocLogoutCompilerPass implements CompilerPassInterface
 
         foreach ($securityConfigs[0]['firewalls'] as $name => $config) {
             if ($this->isLogoutFirewall($config)) {
-                $this->configureLogoutHandler($container, $name);
+                $this->addLogoutListener($container, $name);
             }
         }
     }
@@ -40,23 +39,12 @@ class ApiDocLogoutCompilerPass implements CompilerPassInterface
             && !empty($firewallConfig['logout']['path']);
     }
 
-    private function configureLogoutHandler(ContainerBuilder $container, string $firewallName): void
+    private function addLogoutListener(ContainerBuilder $container, string $firewallName): void
     {
-        $listenerId = 'security.logout_listener.' . $firewallName;
-        if (!$container->hasDefinition($listenerId)) {
-            return;
-        }
-
-        // decorate the logout success handler
-        $successHandlerId = (string)$container->getDefinition($listenerId)->getArgument(2);
-        $successHandlerDecoratorId = 'oro_api.api_doc.' . $successHandlerId;
+        $firewallEventDispatcherId = 'security.event_dispatcher.' . $firewallName;
+        $logoutListenerId = 'oro_api.api_doc.security.logout_listener.' . $firewallName;
         $container
-            ->register($successHandlerDecoratorId, LogoutSuccessHandler::class)
-            ->setArguments([
-                new Reference($successHandlerDecoratorId . '.inner'),
-                new Reference('oro_api.rest.doc_url_generator')
-            ])
-            ->setDecoratedService($successHandlerId)
-            ->setPublic(false);
+            ->setDefinition($logoutListenerId, new ChildDefinition('oro_api.security.event_listener.logout_listener'))
+            ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
     }
 }

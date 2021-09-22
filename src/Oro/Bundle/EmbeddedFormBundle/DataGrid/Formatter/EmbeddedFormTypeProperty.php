@@ -7,6 +7,9 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Translates embedded form names
+ */
 class EmbeddedFormTypeProperty extends AbstractProperty
 {
     /**
@@ -32,6 +35,8 @@ class EmbeddedFormTypeProperty extends AbstractProperty
      */
     protected function getRawValue(ResultRecordInterface $record)
     {
-        return $this->translator->trans($this->manager->getLabelByType($record->getValue('formType')));
+        $label = (string) $this->manager->getLabelByType($record->getValue('formType'));
+
+        return $this->translator->trans($label);
     }
 }

@@ -81,7 +81,7 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
                 continue;
             }
 
-            $definition['title'] = $translator->trans($definition['title']);
+            $definition['title'] = isset($definition['title']) ? $translator->trans((string) $definition['title']) : '';
             if (!empty($definition['icon'])) {
                 $definition['icon'] = $assetHelper->getUrl($definition['icon']);
             }

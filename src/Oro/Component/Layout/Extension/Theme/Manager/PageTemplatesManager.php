@@ -38,9 +38,8 @@ class PageTemplatesManager
 
                 $routes[$routeName]['label'] = $titles[$routeName] ?? $routeName;
                 $routes[$routeName]['choices'][$pageTemplate->getKey()] = $pageTemplate->getLabel();
-                $routes[$routeName]['descriptions'][$pageTemplate->getKey()] = $this->translator->trans(
-                    $pageTemplate->getDescription()
-                );
+                $routes[$routeName]['descriptions'][$pageTemplate->getKey()]
+                    = $this->translator->trans((string) $pageTemplate->getDescription());
             }
         }
 

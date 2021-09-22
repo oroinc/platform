@@ -249,7 +249,7 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
         $translator = $this->getContainer()->get('translator');
 
-        $this->assertEquals($translator->trans($fieldConfig->get('label')), $newLabel);
+        $this->assertEquals($translator->trans((string) $fieldConfig->get('label')), $newLabel);
     }
 
     /**

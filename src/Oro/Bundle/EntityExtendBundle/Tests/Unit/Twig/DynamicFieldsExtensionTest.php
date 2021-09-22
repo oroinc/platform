@@ -98,7 +98,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         return $fieldModel;
     }
 
-    public function testGetFieldWhenAccessDenied()
+    public function testGetFieldWhenAccessDenied(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -118,7 +118,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWhenFieldInvisible()
+    public function testGetFieldWhenFieldInvisible(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -144,6 +144,8 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldVisibility(false);
+
+                return $event;
             });
 
         self::assertSame(
@@ -152,7 +154,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWhenFieldValueIsChangedByListener()
+    public function testGetFieldWhenFieldValueIsChangedByListener(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -181,6 +183,8 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldViewValue('new value');
+
+                return $event;
             });
 
         self::assertSame(
@@ -193,7 +197,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWhenNoLabelAndViewType()
+    public function testGetFieldWhenNoLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -231,7 +235,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldWithLabelAndViewType()
+    public function testGetFieldWithLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -269,7 +273,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForSystemField()
+    public function testGetFieldsForSystemField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -292,7 +296,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForNotAccessibleField()
+    public function testGetFieldsForNotAccessibleField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -315,7 +319,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForNotDisplayableField()
+    public function testGetFieldsForNotDisplayableField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -344,7 +348,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForNotAccessibleRelation()
+    public function testGetFieldsForNotAccessibleRelation(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -382,7 +386,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForAccessibleRelation()
+    public function testGetFieldsForAccessibleRelation(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -419,7 +423,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWhenAccessDenied()
+    public function testGetFieldsWhenAccessDenied(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -450,7 +454,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsForInvisibleField()
+    public function testGetFieldsForInvisibleField(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -486,6 +490,8 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldVisibility(false);
+
+                return $event;
             });
 
         self::assertSame(
@@ -494,7 +500,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWhenFieldValueIsChangedByListener()
+    public function testGetFieldsWhenFieldValueIsChangedByListener(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -531,6 +537,8 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldViewValue('new value');
+
+                return $event;
             });
 
         self::assertSame(
@@ -545,7 +553,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWhenNoLabelAndViewType()
+    public function testGetFieldsWhenNoLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entityClass = TestProduct::class;
@@ -593,7 +601,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWithLabelAndViewType()
+    public function testGetFieldsWithLabelAndViewType(): void
     {
         $entity = new TestProduct();
         $entity->setName('test');
@@ -647,7 +655,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsShouldBeInOriginalOrderIfNoPriority()
+    public function testGetFieldsShouldBeInOriginalOrderIfNoPriority(): void
     {
         $entity = new TestProduct();
         $entity->setId(123);
@@ -717,7 +725,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsShouldBeSortedByPriority()
+    public function testGetFieldsShouldBeSortedByPriority(): void
     {
         $entity = new TestProduct();
         $entity->setId(123);

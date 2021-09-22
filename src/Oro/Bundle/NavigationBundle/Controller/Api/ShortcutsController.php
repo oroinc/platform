@@ -52,7 +52,7 @@ class ShortcutsController extends AbstractFOSRestController
         /** @var ItemInterface $item */
         foreach ($iterator as $item) {
             if ($this->isItemAllowed($item)) {
-                $key = $translator->trans($item->getLabel());
+                $key = $translator->trans((string) $item->getLabel());
                 if (str_contains(strtolower($key), strtolower($query))) {
                     $this->uris[] = $item->getUri();
                     $result[$key] = $this->getData($item);

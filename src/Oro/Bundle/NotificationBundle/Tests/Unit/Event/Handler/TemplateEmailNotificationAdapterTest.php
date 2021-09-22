@@ -67,7 +67,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         unset($this->adapter, $this->entity, $this->emailNotification, $this->em);
     }
 
-    public function testGetTemplateCriteria()
+    public function testGetTemplateCriteria(): void
     {
         $emailTemplate = (new EmailTemplate('template_name'))->setEntityName('Entity/User');
 
@@ -81,7 +81,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRecipients()
+    public function testGetRecipients(): void
     {
         $recipients = [new EmailAddressWithContext('email1@mail.com')];
         $this->mockRecipients(new RecipientList(), $recipients);
@@ -98,12 +98,14 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
                 $eventName
             ) use ($transformedRecipients) {
                 $event->setRecipients($transformedRecipients);
+
+                return $event;
             });
 
         $this->assertEquals($transformedRecipients, $this->adapter->getRecipients());
     }
 
-    public function testGetRecipientsFromAdditionalAssociations()
+    public function testGetRecipientsFromAdditionalAssociations(): void
     {
         $subHolder1 = new EmailHolderStub('test1@example.com');
         $subHolder2 = new EmailHolderStub('test2@example.com');
@@ -135,7 +137,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRecipients, $this->adapter->getRecipients());
     }
 
-    public function testGetRecipientsFromAdditionalAssociationsAndUsers()
+    public function testGetRecipientsFromAdditionalAssociationsAndUsers(): void
     {
         $subHolder1 = new EmailHolderStub('test1@example.com');
         $subHolder2 = new EmailHolderStub('test2@example.com');
@@ -171,7 +173,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider emailValuesDataProvider
      */
-    public function testGetRecipientsFromEntityEmails($email, $expected)
+    public function testGetRecipientsFromEntityEmails($email, $expected): void
     {
         $recipientList = new RecipientList();
         $recipientList->setEntityEmails(['getEmail']);
@@ -183,10 +185,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actualResult);
     }
 
-    /**
-     * @return array
-     */
-    public function emailValuesDataProvider()
+    public function emailValuesDataProvider(): array
     {
         $testEmail = 'test1@example.com';
         $emailHolderStub = new EmailHolderStub($testEmail);
@@ -245,7 +244,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
      * @param RecipientList $recipientList
      * @param array|EmailHolderInterface[] $recipients
      */
-    private function mockRecipients(RecipientList $recipientList, $recipients)
+    private function mockRecipients(RecipientList $recipientList, $recipients): void
     {
         $repository = $this->createMock(RecipientListRepository::class);
         $repository->expects($this->once())
