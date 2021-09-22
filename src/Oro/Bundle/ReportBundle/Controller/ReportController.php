@@ -24,6 +24,8 @@ use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -149,9 +151,9 @@ class ReportController extends AbstractController
      *      class="OroReportBundle:Report"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Report());
+        return $this->update(new Report(), $request);
     }
 
     /**
@@ -166,13 +168,14 @@ class ReportController extends AbstractController
      * )
      *
      * @param Report $entity
+     * @param Request $request
      * @return array
      */
-    public function updateAction(Report $entity)
+    public function updateAction(Report $entity, Request $request)
     {
         $this->checkReport($entity);
 
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -183,7 +186,7 @@ class ReportController extends AbstractController
      * @param Report $entity
      * @return array
      */
-    public function cloneAction(Report $entity)
+    public function cloneAction(Report $entity, Request $request)
     {
         $this->checkReport($entity);
 
@@ -197,7 +200,7 @@ class ReportController extends AbstractController
             )
         );
 
-        return $this->update($clonedEntity);
+        return $this->update($clonedEntity, $request);
     }
 
     /**
@@ -218,9 +221,10 @@ class ReportController extends AbstractController
 
     /**
      * @param Report $entity
-     * @return array
+     * @param Request $request
+     * @return array|RedirectResponse
      */
-    protected function update(Report $entity)
+    protected function update(Report $entity, Request $request)
     {
         $reportForm = $this->get('form.factory')->createNamed(
             'oro_report_form',
@@ -229,7 +233,7 @@ class ReportController extends AbstractController
         );
         $this->get(EntityNameProvider::class)->setCurrentItem($entity);
         if ($this->get(ReportHandler::class)->process($entity, $reportForm)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('Report saved')
             );

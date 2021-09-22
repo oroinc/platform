@@ -116,7 +116,7 @@ class MenuItemStub implements ItemInterface
      */
     public function getLabel(): ?string
     {
-        return $this->label ? $this->label : $this->getName();
+        return $this->label ?: $this->getName();
     }
 
     /**

@@ -1,4 +1,6 @@
 security:
+    enable_authenticator_manager: false
+
     access_decision_manager:
         strategy: unanimous
         allow_if_all_abstain: true

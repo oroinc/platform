@@ -8,6 +8,9 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
+/**
+ * Provider for email recipient list based on User.
+ */
 class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
     /** @var Registry */
@@ -40,7 +43,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSection()
+    public function getSection(): string
     {
         return 'oro.user.entity_plural_label';
     }

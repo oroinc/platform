@@ -8,19 +8,21 @@ use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * DataGrid event dispatcher
+ */
 class EventDispatcher extends ImmutableEventDispatcher
 {
     /**
-     * @param GridEventInterface|GridConfigurationEventInterface|Event $event
-     * @param string|null $eventName
+     * {@inheritdoc}
      *
-     * @return Event
+     * @param GridEventInterface|GridConfigurationEventInterface|Event $event
+     * @return GridEventInterface|GridConfigurationEventInterface|Event
+     *
      * @throws InvalidArgumentException
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch(object $event, string $eventName = null): object
     {
-        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
-
         /** @var DatagridConfiguration $config */
         if ($event instanceof GridEventInterface) {
             $config = $event->getDatagrid()->getConfig();

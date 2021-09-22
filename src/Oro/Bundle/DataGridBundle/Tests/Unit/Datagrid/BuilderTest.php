@@ -59,7 +59,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $extensionsMocks = [],
         $minifiedParams = [],
         $additionalParams = []
-    ) {
+    ): void {
         $config->setDatasourceType(self::TEST_DATASOURCE_TYPE);
         $builder = $this->getBuilder(
             [self::TEST_DATASOURCE_TYPE => $this->createMock(DatasourceInterface::class)],
@@ -91,7 +91,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
                     $this->assertInstanceOf($resultFQCN, $event->getDatagrid());
                 }
 
-                return true;
+                return $event;
             });
         }
         $this->eventDispatcher->expects($this->exactly(count($raisedEvents)))
@@ -107,10 +107,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount($extensionsCount, $result->getAcceptor()->getExtensions());
     }
 
-    /**
-     * @return array
-     */
-    public function buildProvider()
+    public function buildProvider(): array
     {
         $stubDatagridClass = Datagrid::class;
         $baseEventList = [
@@ -189,7 +186,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $dataSources = [],
         array $expectedException = null,
         $processCallExpects = 0
-    ) {
+    ): void {
         $builder = $this->getBuilder($dataSources);
         $grid = $this->createMock(DatagridInterface::class);
 
@@ -211,10 +208,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         ReflectionUtil::callMethod($builder, 'buildDataSource', [$grid, $config]);
     }
 
-    /**
-     * @return array
-     */
-    public function buildDatasourceProvider()
+    public function buildDatasourceProvider(): array
     {
         return [
             'Datasource not configured, exceptions should be thrown' => [

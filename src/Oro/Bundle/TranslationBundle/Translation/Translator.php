@@ -144,7 +144,7 @@ class Translator extends BaseTranslator
      *
      * @return array
      */
-    public function getTranslations(array $domains = array(), $locale = null)
+    public function getTranslations(array $domains = [], $locale = null)
     {
         // if new strategy was selected
         if ($this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
@@ -188,7 +188,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
     {
         try {
             return parent::trans($id, $parameters, $domain, $locale);
@@ -202,20 +202,6 @@ class Translator extends BaseTranslator
             }
 
             return $this->trans($id, $parameters, $domain, $locale) . $count;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-    {
-        try {
-            return parent::transChoice($id, $number, $parameters, $domain, $locale);
-        } catch (InvalidArgumentException $e) {
-            $this->logger->warning($e->getMessage(), ['exception' => $e]);
-
-            return $this->trans($id, $parameters, $domain, $locale) . ' ' . $number;
         }
     }
 
@@ -256,7 +242,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function addLoader($format, LoaderInterface $loader)
+    public function addLoader(string $format, LoaderInterface $loader)
     {
         if (null !== $this->resourceCache) {
             // wrap a resource loader by a caching loader to prevent loading of the same resource several times
@@ -270,7 +256,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function getCatalogue($locale = null)
+    public function getCatalogue(string $locale = null)
     {
         // if new strategy was selected
         if ($this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
@@ -283,7 +269,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function addResource($format, $resource, $locale, $domain = null)
+    public function addResource(string $format, $resource, string $locale, string $domain = null)
     {
         if (is_string($resource)) {
             $this->resourceFiles[$locale][] = $resource;
@@ -295,7 +281,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir)
     {
         // skip warmUp when translator doesn't use cache
         if (null === $this->options['cache_dir']) {

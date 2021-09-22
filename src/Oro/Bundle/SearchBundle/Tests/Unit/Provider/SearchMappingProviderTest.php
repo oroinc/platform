@@ -53,7 +53,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->testMapping);
     }
 
-    public function testGetEntitiesListAliases()
+    public function testGetEntitiesListAliases(): void
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
@@ -61,7 +61,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAliases()
+    public function testGetEntityAliases(): void
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
@@ -69,7 +69,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAliasesForUnknownEntity()
+    public function testGetEntityAliasesForUnknownEntity(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -81,7 +81,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAliasesForEmptyClassNames()
+    public function testGetEntityAliasesForEmptyClassNames(): void
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
@@ -89,7 +89,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAlias()
+    public function testGetEntityAlias(): void
     {
         $this->assertEquals(
             'test_entity',
@@ -97,14 +97,14 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAliasForUnknownEntity()
+    public function testGetEntityAliasForUnknownEntity(): void
     {
         $this->assertNull(
             $this->getProvider()->getEntityAlias('Oro\TestBundle\Entity\UnknownEntity')
         );
     }
 
-    public function testGetEntityClasses()
+    public function testGetEntityClasses(): void
     {
         $this->assertEquals(
             ['Oro\TestBundle\Entity\TestEntity'],
@@ -112,7 +112,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsClassSupported()
+    public function testIsClassSupported(): void
     {
         $provider = $this->getProvider();
 
@@ -120,7 +120,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($provider->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
     }
 
-    public function testHasFieldsMapping()
+    public function testHasFieldsMapping(): void
     {
         $provider = $this->getProvider();
 
@@ -128,7 +128,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
     }
 
-    public function testGetEntityMapParameter()
+    public function testGetEntityMapParameter(): void
     {
         $provider = $this->getProvider();
 
@@ -141,7 +141,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         $this->assertEquals(
             'Oro\TestBundle\Entity\TestEntity',
@@ -149,14 +149,14 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassForUnknownAlias()
+    public function testGetEntityClassForUnknownAlias(): void
     {
         $this->assertNull(
             $this->getProvider()->getEntityClass('unknown_entity')
         );
     }
 
-    public function testGetMappingConfigCached()
+    public function testGetMappingConfigCached(): void
     {
         $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
@@ -164,7 +164,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->testMapping, $this->getProvider()->getMappingConfig());
     }
 
-    public function testGetMappingConfigWhenConfigurationNotLoaded()
+    public function testGetMappingConfigWhenConfigurationNotLoaded(): void
     {
         $configTimestamp = 20;
 
@@ -186,6 +186,8 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
                 $this->assertEquals($this->testMapping, $event->getMappingConfig());
 
                 $event->setMappingConfig([]);
+
+                return $event;
             });
 
         $this->cache->expects($this->once())
@@ -197,7 +199,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $provider->getMappingConfig());
     }
 
-    public function testGetMappingConfigWhenConfigurationChanged()
+    public function testGetMappingConfigWhenConfigurationChanged(): void
     {
         $cacheTimestamp = 10;
         $configTimestamp = 20;
@@ -222,6 +224,8 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
                 $this->assertEquals($this->testMapping, $event->getMappingConfig());
 
                 $event->setMappingConfig([]);
+
+                return $event;
             });
 
         $this->cache->expects($this->once())
@@ -233,7 +237,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $provider->getMappingConfig());
     }
 
-    public function testGetMappingConfigWhenConfigurationNotChanged()
+    public function testGetMappingConfigWhenConfigurationNotChanged(): void
     {
         $cacheTimestamp = 10;
 
@@ -260,7 +264,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $provider->getMappingConfig());
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $this->cache->expects(static::once())
             ->method('delete')
@@ -269,8 +273,10 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->method('fetch')->willReturn(false);
         $this->eventDispatcher->expects(static::once())
             ->method('dispatch')
-            ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
+            ->willReturnCallback(function (SearchMappingCollectEvent $event) {
                 $event->setMappingConfig($this->testMapping);
+
+                return $event;
             });
         $this->configProvider->expects(static::never())->method('clearCache');
         $this->configProvider->expects(static::never())->method('warmUpCache');
@@ -280,7 +286,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($this->testMapping, $provider->getMappingConfig());
     }
 
-    public function testWarmUpCache()
+    public function testWarmUpCache(): void
     {
         $this->cache->expects(static::once())->method('delete')->with('oro_search.mapping_config');
         $this->cache->expects(static::once())->method('fetch')->with('oro_search.mapping_config')->willReturn(false);
@@ -295,8 +301,10 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
                 ),
                 'oro_search.search_mapping_collect'
             )
-            ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
+            ->willReturnCallback(function (SearchMappingCollectEvent $event) {
                 $event->setMappingConfig($this->testMapping);
+
+                return $event;
             });
 
         $provider = $this->getProvider(false);
@@ -305,12 +313,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         static::assertEquals($this->testMapping, $provider->getMappingConfig());
     }
 
-    /**
-     * @param bool $mockFetch
-     *
-     * @return SearchMappingProvider
-     */
-    protected function getProvider($mockFetch = true)
+    protected function getProvider(bool $mockFetch = true): SearchMappingProvider
     {
         $provider = new SearchMappingProvider(
             $this->eventDispatcher,

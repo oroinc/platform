@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Test\Unit\Utils;
+namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Utils\SecureErrorMessageHelper;
 

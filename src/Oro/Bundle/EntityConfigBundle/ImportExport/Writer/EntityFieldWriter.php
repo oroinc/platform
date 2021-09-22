@@ -126,10 +126,10 @@ class EntityFieldWriter implements ItemWriterInterface
         foreach ($data as $code => $value) {
             if (in_array($code, $translatable, true)) {
                 // check if a label text was changed
-                $labelKey = $config->get($code);
+                $labelKey = (string) $config->get($code);
 
                 if ($state === ExtendScope::STATE_NEW ||
-                    !$this->translationHelper->isTranslationEqual($labelKey, $value)
+                    !$this->translationHelper->isTranslationEqual($labelKey, (string) $value)
                 ) {
                     $translations[$labelKey] = $value;
                 }

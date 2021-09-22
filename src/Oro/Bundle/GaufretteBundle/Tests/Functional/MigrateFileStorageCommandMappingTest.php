@@ -12,13 +12,13 @@ class MigrateFileStorageCommandMappingTest extends WebTestCase
     {
         self::bootKernel();
 
-        $command = self::$container->get(MigrateFileStorageCommand::class);
+        $command = self::getContainer()->get(MigrateFileStorageCommand::class);
         $mappings = ReflectionUtil::getPropertyValue($command, 'mappings');
         $fileManagers = ReflectionUtil::getPropertyValue($command, 'fileManagers');
 
-        $skippedFilesystemsProvider = self::$container->get('oro_gaufrette.tests.skipped_file_systems');
+        $skippedFilesystemsProvider = self::getContainer()->get('oro_gaufrette.tests.skipped_file_systems');
 
-        $gaufretteFileSystemMap = self::$container->get('knp_gaufrette.filesystem_map');
+        $gaufretteFileSystemMap = self::getContainer()->get('knp_gaufrette.filesystem_map');
         foreach ($gaufretteFileSystemMap->getIterator() as $fileSystemName => $fileSystem) {
             if (str_starts_with($fileSystemName, 'test_')
                 || $skippedFilesystemsProvider->isFileSystemSkipped($fileSystemName)

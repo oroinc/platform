@@ -39,7 +39,7 @@ class ResetController extends AbstractController
     public function sendEmailAction(Request $request)
     {
         if (!$this->isCsrfTokenValid('oro-user-password-reset-request', $request->get('_csrf_token'))) {
-            $this->get('session')->getFlashBag()
+            $request->getSession()->getFlashBag()
                 ->add('warn', 'The CSRF token is invalid. Please try to resubmit the form.');
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
         }
@@ -65,7 +65,7 @@ class ResetController extends AbstractController
                         'Unable to sent the reset password email.',
                         ['email' => $email, 'exception' => $e]
                     );
-                    $this->get('session')->getFlashBag()
+                    $request->getSession()->getFlashBag()
                         ->add(
                             'warn',
                             $this->get(TranslatorInterface::class)->trans('oro.email.handler.unable_to_send_email')
@@ -84,7 +84,7 @@ class ResetController extends AbstractController
             );
         }
 
-        $this->get('session')->set(static::SESSION_EMAIL, $inputData);
+        $request->getSession()->set(static::SESSION_EMAIL, $inputData);
 
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
     }
@@ -133,7 +133,7 @@ class ResetController extends AbstractController
         $em = $this->get('doctrine')->getManagerForClass(User::class);
         $em->flush();
 
-        $flashBag = $this->get('session')->getFlashBag();
+        $flashBag = $request->getSession()->getFlashBag();
 
         if ($resetPasswordSuccess) {
             $flashBag->add(
@@ -187,9 +187,9 @@ class ResetController extends AbstractController
      * @Route("/check-email", name="oro_user_reset_check_email", methods={"GET"})
      * @Template
      */
-    public function checkEmailAction()
+    public function checkEmailAction(Request $request)
     {
-        $session = $this->get('session');
+        $session = $request->getSession();
         $email = $session->get(static::SESSION_EMAIL);
 
         $session->remove(static::SESSION_EMAIL);
@@ -210,10 +210,10 @@ class ResetController extends AbstractController
      * @Route("/reset/{token}", name="oro_user_reset_reset", requirements={"token"="\w+"}, methods={"GET", "POST"})
      * @Template
      */
-    public function resetAction($token)
+    public function resetAction(string $token, Request $request)
     {
         $user = $this->getUserManager()->findUserByConfirmationToken($token);
-        $session = $this->get('session');
+        $session = $request->getSession();
 
         if (null === $user) {
             throw $this->createNotFoundException(

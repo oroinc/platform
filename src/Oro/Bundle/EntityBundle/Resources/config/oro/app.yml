@@ -29,6 +29,7 @@ doctrine:
                 year:           Oro\ORM\Query\AST\Functions\SimpleFunction
                 sign:           Oro\ORM\Query\AST\Functions\Numeric\Sign
                 pow:            Oro\ORM\Query\AST\Functions\Numeric\Pow
+                round:          Oro\ORM\Query\AST\Functions\Numeric\Round
             string_functions:
                 group_concat:   Oro\ORM\Query\AST\Functions\String\GroupConcat
                 concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs

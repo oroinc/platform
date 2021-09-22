@@ -476,13 +476,16 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 [$this->isInstanceOf(PrepareEntityMapEvent::class), PrepareEntityMapEvent::EVENT_NAME]
             )
             ->willReturnOnConsecutiveCalls(
-                new ReturnCallback(function () {
+                new ReturnCallback(function (SearchMappingCollectEvent $event) {
+                    return $event;
                 }),
                 new ReturnCallback(function (PrepareEntityMapEvent $event) {
                     $data = $event->getData();
                     $data[Query::TYPE_TEXT]['name'] = 'test product with changed title';
                     $data[Query::TYPE_TEXT]['all_text'] = 'custom text';
                     $event->setData($data);
+
+                    return $event;
                 })
             );
 

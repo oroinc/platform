@@ -39,6 +39,8 @@ oro:
                         label.tooltip: To keep the attribute content unlabeled on the Front Store, prefix the label text with an underscore (e.g. _Video Review, _Img Front View, _Img Rare View).
                         description: Description
                         description.tooltip: When filled in, description will be used as a field tooltip on entity forms
+                        actualize_owning_side_on_change: Actualize relation-owning entity on update
+                        actualize_owning_side_on_change.tooltip: Actualize "Updated At" and "Updated By" fields of the owning entity when related items are updated
             datagrid:
                 field:
                     items:

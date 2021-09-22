@@ -262,7 +262,9 @@ class ConfigController extends AbstractController
         foreach ($uniqueKeys['keys'] as $index => $uniqueKey) {
             $uniqueKeys['keys'][$index]['key'] = array_map(
                 function ($fieldName) use ($entityConfigProvider, $className, $translator) {
-                    return $translator->trans($entityConfigProvider->getConfig($className, $fieldName)->get('label'));
+                    return $translator->trans(
+                        (string) $entityConfigProvider->getConfig($className, $fieldName)->get('label')
+                    );
                 },
                 $uniqueKey['key']
             );

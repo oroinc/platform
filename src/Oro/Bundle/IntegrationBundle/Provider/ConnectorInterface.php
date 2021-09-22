@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+/**
+ * Provides a connector interface for integrations.
+ */
 interface ConnectorInterface
 {
     const CONTEXT_CONNECTOR_DATA_KEY = 'connectorData';
@@ -11,7 +14,7 @@ interface ConnectorInterface
      *
      * @return string
      */
-    public function getLabel();
+    public function getLabel(): string;
 
     /**
      * Returns entity name that will be used for matching "import processor"

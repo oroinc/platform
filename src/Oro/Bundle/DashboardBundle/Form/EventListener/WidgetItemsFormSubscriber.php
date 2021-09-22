@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Prepare data for form based on widgetDataItems attribute.
+ */
 class WidgetItemsFormSubscriber implements EventSubscriberInterface
 {
     /** @var WidgetConfigs $manager */
@@ -46,7 +49,7 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
 
             $data[$id] = [
                 'id'    => $id,
-                'label' => $this->translator->trans($item['label']),
+                'label' => isset($item['label']) ? $this->translator->trans((string) $item['label']) : '',
                 'show'  => $oldItem ? $oldItem['show'] : !$originalData,
                 'order' => $oldItem ? $oldItem['order'] : $order,
             ];

@@ -86,7 +86,7 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testFlush()
+    public function testFlush(): void
     {
         $model = new EntityConfigModel(self::ENTITY_CLASS);
         $fieldModel = new FieldConfigModel('field1', 'string');
@@ -228,7 +228,7 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('label', $model->getIndexedValues()[2]->getCode());
     }
 
-    public function testFlushWithPersistConfigsChanged()
+    public function testFlushWithPersistConfigsChanged(): void
     {
         $model = new EntityConfigModel(self::ENTITY_CLASS);
 
@@ -310,10 +310,14 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
                     $configManager = $event->getConfigManager();
                     $configManager->persist($testConfig);
                     $configManager->calculateConfigChangeSet($testConfig);
+
+                    return $event;
                 }),
                 new ReturnCallback(function (PreFlushConfigEvent $event) {
+                    return $event;
                 }),
                 new ReturnCallback(function (PostFlushConfigEvent $event) {
+                    return $event;
                 })
             );
 

@@ -40,7 +40,7 @@ class AjaxController extends AbstractController
 
             $routeName = $request->get('route');
             if (null !== $routeName && !$request->isXmlHttpRequest()) {
-                return $this->handleFailedNonAjaxResponse($message, $routeName);
+                return $this->handleFailedNonAjaxResponse($request->getSession(), $message, $routeName);
             }
 
             return new JsonResponse(
@@ -74,12 +74,12 @@ class AjaxController extends AbstractController
             $response['refreshGrid'] = $actionData->getRefreshGrid();
             $routeName = $request->get('route');
             if (null !== $routeName && !$request->isXmlHttpRequest()) {
-                return $this->handleFailedNonAjaxResponse($response['message'], $routeName);
+                return $this->handleFailedNonAjaxResponse($request->getSession(), $response['message'], $routeName);
             }
         } else {
             if (!$response['pageReload'] || $actionData->getRefreshGrid()) {
                 $response['refreshGrid'] = $actionData->getRefreshGrid();
-                $response['flashMessages'] = $this->get(SessionInterface::class)->getFlashBag()->all();
+                $response['flashMessages'] = $request->getSession()->getFlashBag()->all();
             } elseif ($actionData->getRedirectUrl()) {
                 if ($request->isXmlHttpRequest()) {
                     $response['redirectUrl'] = $actionData->getRedirectUrl();
@@ -104,7 +104,9 @@ class AjaxController extends AbstractController
         $translator = $this->get(TranslatorInterface::class);
         $result = [];
         foreach ($messages as $message) {
-            $result[] = $translator->trans($message['message'], $message['parameters']);
+            $result[] = isset($message['message'])
+                ? $translator->trans((string) $message['message'], (array) $message['parameters'])
+                : '';
         }
 
         return $result;
@@ -113,9 +115,12 @@ class AjaxController extends AbstractController
     /**
      * Handle failed response non ajax requests
      */
-    protected function handleFailedNonAjaxResponse(string $message, string $routeName): RedirectResponse
-    {
-        $this->get(SessionInterface::class)->getFlashBag()->add('error', $message);
+    protected function handleFailedNonAjaxResponse(
+        SessionInterface $session,
+        string $message,
+        string $routeName
+    ): RedirectResponse {
+        $session->getFlashBag()->add('error', $message);
 
         try {
             return $this->redirect($this->generateUrl($routeName));
@@ -133,7 +138,6 @@ class AjaxController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                SessionInterface::class,
                 OperationRegistry::class,
                 ExecuteOperationHandler::class,
             ]

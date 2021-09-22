@@ -30,7 +30,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private const USER_ID = 24;
 
-    public function testShouldConstructWithRequiredArguments()
+    public function testShouldConstructWithRequiredArguments(): void
     {
         new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
@@ -43,7 +43,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldBeSubscribedForTopics()
+    public function testShouldBeSubscribedForTopics(): void
     {
         $expectedSubscribedTopics = [
             Topics::SEND_MASS_NOTIFICATION_EMAIL,
@@ -52,7 +52,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedSubscribedTopics, SendMassEmailMessageProcessor::getSubscribedTopics());
     }
 
-    public function testShouldRejectIfBodyEmpty()
+    public function testShouldRejectIfBodyEmpty(): void
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -86,7 +86,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectIfSenderNotSet()
+    public function testShouldRejectIfSenderNotSet(): void
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -119,7 +119,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectIfRecepientNotSet()
+    public function testShouldRejectIfRecepientNotSet(): void
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -153,7 +153,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectIfTemplatePassedButBodyIsNotArray()
+    public function testShouldRejectIfTemplatePassedButBodyIsNotArray(): void
     {
         $logger = $this->createLoggerMock();
         $logger
@@ -188,7 +188,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectIfSendingFailed()
+    public function testShouldRejectIfSendingFailed(): void
     {
         $mailer = $this->createMailerMock();
         $mailer
@@ -208,6 +208,8 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (NotificationSentEvent $event, $eventName) {
                 self::assertEquals(NotificationSentEvent::NAME, $eventName);
                 self::assertEquals(0, $event->getSentCount());
+                
+                return $event;
             });
 
         $processor = new SendMassEmailMessageProcessor(
@@ -237,7 +239,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldSendEmailAndReturmACKIfAllParametersCorrect()
+    public function testShouldSendEmailAndReturmACKIfAllParametersCorrect(): void
     {
         $mailer = $this->createMailerMock();
         $mailer->expects($this->once())
@@ -254,6 +256,8 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (NotificationSentEvent $event, $eventName) {
                 self::assertEquals(NotificationSentEvent::NAME, $eventName);
                 self::assertEquals(1, $event->getSentCount());
+
+                return $event;
             });
 
         $processor = new SendMassEmailMessageProcessor(
@@ -283,7 +287,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldRenderCorrectEmailTemplate()
+    public function testShouldRenderCorrectEmailTemplate(): void
     {
         $emailTemplate = $this->createMock(EmailTemplate::class);
 
@@ -341,7 +345,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->process($message, $this->createSessionMock());
     }
 
-    public function testShouldThrowExceptionIfTemplateNotFound()
+    public function testShouldThrowExceptionIfTemplateNotFound(): void
     {
         $this->expectException(\RuntimeException::class);
         $repository = $this->createMock(EmailTemplateRepository::class);
@@ -396,7 +400,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->process($message, $this->createSessionMock());
     }
 
-    public function testProcessWhenMessageIsTranslatableAndMessageSent()
+    public function testProcessWhenMessageIsTranslatableAndMessageSent(): void
     {
         $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
         $processor = new SendMassEmailMessageProcessor(
@@ -448,7 +452,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $processor->process($message, $this->createSessionMock()));
     }
 
-    public function testProcessWhenMessageIsTranslatableAndMessageNotSent()
+    public function testProcessWhenMessageIsTranslatableAndMessageNotSent(): void
     {
         $sender = From::emailAddress('from@email.com');
         $messageBody = [

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
@@ -30,21 +31,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DashboardController extends AbstractController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return array_merge(parent::getSubscribedServices(), [
-            WidgetConfigs::class,
-            TranslatorInterface::class,
-            Router::class,
-            WidgetConfigurationFormProvider::class,
-            Manager::class,
-            ConfigurationProviderInterface::class
-        ]);
-    }
-
     /**
      * @Route(
      *      ".{_format}",
@@ -162,7 +148,7 @@ class DashboardController extends AbstractController
     {
         $dashboardModel = $this->getDashboardManager()->getDashboardModel($dashboard);
 
-        return $this->update($request, $dashboardModel);
+        return $this->update($dashboardModel, $request);
     }
 
     /**
@@ -181,15 +167,15 @@ class DashboardController extends AbstractController
     {
         $dashboardModel = $this->getDashboardManager()->createDashboardModel();
 
-        return $this->update($request, $dashboardModel);
+        return $this->update($dashboardModel, $request);
     }
 
     /**
-     * @param Request $request
      * @param DashboardModel $dashboardModel
+     * @param Request $request
      * @return array
      */
-    protected function update(Request $request, DashboardModel $dashboardModel)
+    protected function update(DashboardModel $dashboardModel, Request $request)
     {
         $form = $this->createForm(
             DashboardType::class,
@@ -203,7 +189,7 @@ class DashboardController extends AbstractController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->getDashboardManager()->save($dashboardModel, true);
-                $this->get('session')->getFlashBag()->add(
+                $request->getSession()->getFlashBag()->add(
                     'success',
                     $this->get(TranslatorInterface::class)->trans('oro.dashboard.saved_message')
                 );
@@ -393,7 +379,7 @@ class DashboardController extends AbstractController
      */
     protected function findView($id)
     {
-        return $this->getDoctrine()->getRepository('OroDataGridBundle:GridView')->find($id);
+        return $this->getDoctrine()->getRepository(GridView::class)->find($id);
     }
 
     /**
@@ -409,6 +395,21 @@ class DashboardController extends AbstractController
      */
     protected function getDashboardRepository()
     {
-        return $this->getDoctrine()->getRepository('OroDashboardBundle:Dashboard');
+        return $this->getDoctrine()->getRepository(Dashboard::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            WidgetConfigs::class,
+            TranslatorInterface::class,
+            Router::class,
+            WidgetConfigurationFormProvider::class,
+            Manager::class,
+            ConfigurationProviderInterface::class
+        ]);
     }
 }

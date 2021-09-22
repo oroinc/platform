@@ -1,0 +1,5 @@
+services:
+    oro_currency.tests.migration_listener:
+        class: Oro\Bundle\CurrencyBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }

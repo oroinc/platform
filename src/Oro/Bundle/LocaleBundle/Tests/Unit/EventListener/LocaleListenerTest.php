@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RequestContext;
@@ -142,25 +145,12 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnConsoleCommand(): void
     {
-        $event = $this
-            ->getMockBuilder('Symfony\Component\Console\Event\ConsoleCommandEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $input = $this
-            ->getMockBuilder('Symfony\Component\Console\Input\InputInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects(self::once())
-            ->method('getInput')
-            ->willReturn($input);
-
-        $input
-            ->expects(self::once())
+        $input = $this->createMock(InputInterface::class);
+        $input->expects(self::once())
             ->method('hasParameterOption')
             ->willReturn(false);
+
+        $event = new ConsoleCommandEvent(null, $input, $this->createMock(OutputInterface::class));
 
         $this->localeSettings
             ->expects(self::once())

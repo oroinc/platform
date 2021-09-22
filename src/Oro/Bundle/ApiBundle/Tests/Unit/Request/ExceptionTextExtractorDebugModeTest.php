@@ -19,8 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExceptionTextExtractor */
-    private $exceptionTextExtractor;
+    private ExceptionTextExtractor $exceptionTextExtractor;
 
     protected function setUp(): void
     {
@@ -45,14 +44,10 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param \Exception|null $innerException
-     * @param string          $processorId
-     *
-     * @return ExecutionFailedException
-     */
-    private function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
-    {
+    private function createExecutionFailedException(
+        \Exception $innerException = null,
+        string $processorId = 'processor1'
+    ): ExecutionFailedException {
         return new ExecutionFailedException(
             $processorId,
             null,
@@ -64,7 +59,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionStatusCodeDataProvider()
      */
-    public function testGetExceptionStatusCode(\Exception $exception, $expectedStatusCode)
+    public function testGetExceptionStatusCode(\Exception $exception, $expectedStatusCode): void
     {
         self::assertEquals(
             $expectedStatusCode,
@@ -72,7 +67,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getExceptionStatusCodeDataProvider()
+    public function getExceptionStatusCodeDataProvider(): array
     {
         return [
             [new \UnexpectedValueException(), 500],
@@ -90,7 +85,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetExceptionCode()
+    public function testGetExceptionCode(): void
     {
         self::assertNull($this->exceptionTextExtractor->getExceptionCode(new \Exception()));
     }
@@ -98,7 +93,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionTypeDataProvider
      */
-    public function testExceptionType(\Exception $exception, $expectedType)
+    public function testExceptionType(\Exception $exception, $expectedType): void
     {
         self::assertEquals(
             $expectedType,
@@ -106,7 +101,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getExceptionTypeDataProvider()
+    public function getExceptionTypeDataProvider(): array
     {
         return [
             [new \Exception(), 'exception'],
@@ -130,7 +125,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionTextDataProvider
      */
-    public function testExceptionText(\Exception $exception, $expectedType)
+    public function testExceptionText(\Exception $exception, $expectedType): void
     {
         self::assertEquals(
             $expectedType,
@@ -138,7 +133,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getExceptionTextDataProvider()
+    public function getExceptionTextDataProvider(): array
     {
         return [
             [
@@ -212,7 +207,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 new UsernameNotFoundException('Reason.'),
-                'translated: Username could not be found. ({{ username }}).'
+                'translated: Username could not be found. ({{ username }},{{ user_identifier }}).'
             ],
             [
                 new ResourceNotAccessibleException(),

@@ -140,13 +140,6 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getRootDir()
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getStartTime()
     {
     }

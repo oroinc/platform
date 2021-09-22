@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Security\Http\Firewall;
 
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -22,18 +21,14 @@ class ContextListener
 
     private TokenStorageInterface $tokenStorage;
 
-    private ?SessionInterface $session;
-
     private CsrfRequestManager $csrfRequestManager;
 
     public function __construct(
         object $innerListener,
-        TokenStorageInterface $tokenStorage,
-        SessionInterface $session = null
+        TokenStorageInterface $tokenStorage
     ) {
         $this->innerListener = $innerListener;
         $this->tokenStorage = $tokenStorage;
-        $this->session = $session;
     }
 
     public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager): void
@@ -67,8 +62,8 @@ class ContextListener
         $isGetRequest = $request->isMethod('GET');
 
         return
-            null !== $this->session
-            && $request->cookies->has($this->session->getName())
+            $request->hasSession()
+            && $request->cookies->has($request->getSession()->getName())
             && (
                 (!$isGetRequest && $this->csrfRequestManager->isRequestTokenValid($request))
                 || ($isGetRequest && $request->headers->has(CsrfRequestManager::CSRF_HEADER))

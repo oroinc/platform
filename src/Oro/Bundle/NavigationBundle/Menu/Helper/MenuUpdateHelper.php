@@ -46,11 +46,11 @@ class MenuUpdateHelper
         if ($values instanceof Collection && $values->count() <= 0) {
             // Default translation for menu must always has value for English locale, because out of the box app has
             // translations only for English language.
-            $defaultValue = $this->translator->trans($value, [], null, Configuration::DEFAULT_LOCALE);
+            $defaultValue = $this->translator->trans((string) $value, [], null, Configuration::DEFAULT_LOCALE);
             $this->getPropertyAccessor()->setValue($entity, 'default_' . $name, $defaultValue);
             foreach ($this->localizationHelper->getLocalizations() as $localization) {
                 $locale = $localization->getLanguageCode();
-                $translatedValue = $this->translator->trans($value, [], null, $locale);
+                $translatedValue = $this->translator->trans((string) $value, [], null, $locale);
                 $fallbackValue = new LocalizedFallbackValue();
                 $fallbackValue->setLocalization($localization);
 

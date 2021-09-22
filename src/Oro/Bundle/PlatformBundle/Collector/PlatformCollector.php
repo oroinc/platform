@@ -14,7 +14,7 @@ class PlatformCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null): void
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
     }
 

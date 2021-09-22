@@ -202,10 +202,37 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
                 continue;
             }
 
-            $updates[$entity] = $uow->getEntityChangeSet($entity);
+            $changeSet = $uow->getEntityChangeSet($entity);
+            if (!empty($changeSet) || $this->hasAssociationUpdates($em, $entity)) {
+                $updates[$entity] = $changeSet;
+            }
         }
 
         $this->saveChanges($this->allUpdates, $em, $updates);
+    }
+
+    private function hasAssociationUpdates(EntityManager $em, object $entity): bool
+    {
+        $uow = $em->getUnitOfWork();
+        $ownerSplHash = spl_object_hash($entity);
+
+        $collectionChanges = static function () use ($uow) {
+            yield from $uow->getScheduledCollectionDeletions();
+            yield from $uow->getScheduledCollectionUpdates();
+        };
+
+        /** @var PersistentCollection $collection */
+        foreach ($collectionChanges() as $collection) {
+            if (!$this->auditConfigProvider->isAuditableEntity($collection->getTypeClass()->getName())) {
+                continue;
+            }
+
+            if (spl_object_hash($collection->getOwner()) === $ownerSplHash) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function findAuditableDeletions(EntityManager $em)

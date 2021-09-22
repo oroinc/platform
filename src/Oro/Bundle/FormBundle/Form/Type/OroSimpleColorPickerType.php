@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * SimpleColorPicker form type
+ */
 class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
 {
     /** @var TranslatorInterface */
@@ -61,7 +64,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
                 $pickerData,
                 [
                     'id'    => $options['empty_color'],
-                    'text'  => $this->translator->trans($options['empty_value']),
+                    'text'  => $this->translator->trans((string) $options['empty_value']),
                     'class' => 'empty-color'
                 ],
                 []

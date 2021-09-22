@@ -19,7 +19,6 @@ services:
 
     oro_integration.action_handler.channel_error:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorHandler'
-        public: false
         arguments:
             - '@session'
 

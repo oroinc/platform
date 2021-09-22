@@ -49,3 +49,7 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
+
+    Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy:
+        arguments:
+            - '%kernel.project_dir%/public/build/build_version.txt'

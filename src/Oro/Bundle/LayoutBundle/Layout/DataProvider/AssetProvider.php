@@ -4,6 +4,10 @@ namespace Oro\Bundle\LayoutBundle\Layout\DataProvider;
 
 use Symfony\Component\Asset\Packages;
 
+/**
+ * Layout data provider that provides proper URL for given asset's path with assets package(optional value)
+ * and normalized asset's path(Symfony resource like path).
+ */
 class AssetProvider
 {
     /** @var Packages */

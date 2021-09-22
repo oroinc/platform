@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionTestCase extends WebTestCase
 {
+    use OperationAwareTestTrait;
+
     /** @var ActionGroupRegistry */
     private $actionGroupRegistry;
 
@@ -201,35 +203,5 @@ abstract class ActionTestCase extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         static::assertStringContainsString($message, $crawler->html());
-    }
-
-    /**
-     * @param $operationName
-     * @param $entityId
-     * @param $entityClass
-     * @param $datagrid
-     *
-     * @return array
-     */
-    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid = null)
-    {
-        $actionContext = [
-            'entityId'    => $entityId,
-            'entityClass' => $entityClass,
-            'datagrid'    => $datagrid
-        ];
-        $container = self::getContainer();
-        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
-        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
-
-        $tokenData = $container
-            ->get('oro_action.operation.execution.form_provider')
-            ->createTokenData($operation, $actionData);
-        // this is done because of unclear behaviour symfony mocked token session storage
-        // which do not save data before embedded request done and created data do not available in sub request
-        // in the test environment
-        $container->get('session')->save();
-
-        return $tokenData;
     }
 }

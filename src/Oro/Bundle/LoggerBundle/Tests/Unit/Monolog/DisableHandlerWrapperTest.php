@@ -8,7 +8,10 @@ use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\SwiftMailerHandler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DisableHandlerWrapperTest extends TestCase
 {
@@ -70,7 +73,11 @@ class DisableHandlerWrapperTest extends TestCase
 
     public function testMagicCall(): void
     {
-        $event = $this->createMock(TerminateEvent::class);
+        $event = new TerminateEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            new Response()
+        );
         $mailerHandler = $this->createMock(SwiftMailerHandler::class);
         $mailerHandler->expects(self::once())
             ->method('onKernelTerminate')

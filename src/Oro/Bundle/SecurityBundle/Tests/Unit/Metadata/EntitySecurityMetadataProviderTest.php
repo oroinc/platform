@@ -57,10 +57,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return EntitySecurityMetadata
-     */
-    private function getEntitySecurityMetadata()
+    private function getEntitySecurityMetadata(): EntitySecurityMetadata
     {
         return new EntitySecurityMetadata(
             EntitySecurityMetadataProvider::ACL_SECURITY_TYPE,
@@ -99,7 +96,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return Config
      */
-    private function getEntityConfig($scope, $entityClass, $values = [])
+    private function getEntityConfig($scope, $entityClass, $values = []): Config
     {
         return new Config(
             new EntityConfigId($scope, $entityClass),
@@ -123,10 +120,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $entityClass
-     */
-    private function expectClassMetadata($entityClass)
+    private function expectClassMetadata(string $entityClass): void
     {
         $metadata = new ClassMetadata($entityClass);
         $metadata->identifier = ['id'];
@@ -144,10 +138,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($manager);
     }
 
-    /**
-     * @return EntitySecurityMetadata
-     */
-    private function expectLoadMetadata()
+    private function expectLoadMetadata(): EntitySecurityMetadata
     {
         $entitySecurityMetadata = $this->getEntitySecurityMetadata();
 
@@ -190,7 +181,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($this->isInstanceOf(LoadFieldsMetadata::class), LoadFieldsMetadata::NAME)
-            ->willReturnCallback(function (LoadFieldsMetadata $event, $eventName) {
+            ->willReturnCallback(function (LoadFieldsMetadata $event) {
                 $fields = $event->getFields();
                 $lastNameField = $fields['lastName'];
                 $fields['lastName'] = new FieldSecurityMetadata(
@@ -202,6 +193,8 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
                     $lastNameField->isHidden()
                 );
                 $event->setFields($fields);
+
+                return $event;
             });
 
         $this->cache->expects($this->exactly(2))
@@ -220,7 +213,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         return $entitySecurityMetadata;
     }
 
-    public function testIsProtectedEntityWithoutCache()
+    public function testIsProtectedEntityWithoutCache(): void
     {
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -241,7 +234,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isProtectedEntityDataProvider
      */
-    public function testIsProtectedEntity($entityClass, $entityGroup, $group, $expected)
+    public function testIsProtectedEntity($entityClass, $entityGroup, $group, $expected): void
     {
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -293,7 +286,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetProtectedFieldNameWithoutCache()
+    public function testGetProtectedFieldNameWithoutCache(): void
     {
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -316,7 +309,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getProtectedFieldNameDataProvider
      */
-    public function testGetProtectedFieldName($entityClass, $fieldName, $fieldAliases, $expected)
+    public function testGetProtectedFieldName($entityClass, $fieldName, $fieldAliases, $expected): void
     {
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -358,7 +351,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetEntitiesWithoutCache()
+    public function testGetEntitiesWithoutCache(): void
     {
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -372,7 +365,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
     }
 
-    public function testGetEntitiesWithCache()
+    public function testGetEntitiesWithCache(): void
     {
         $entitySecurityMetadata = $this->getEntitySecurityMetadata();
 

@@ -40,7 +40,7 @@ class SimpleArrayFormatter implements FormatterInterface
                 if ($template) {
                     $item = sprintf($template, $item);
                 }
-                $items[] = $this->translator->trans($item, [], $domain);
+                $items[] = $this->translator->trans((string) $item, [], $domain);
             }
             $value = $items;
         }

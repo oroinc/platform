@@ -93,7 +93,7 @@ class FallbackPropertyType extends AbstractType
                     $choices[FallbackType::PARENT_LOCALIZATION] = sprintf(
                         '%s [%s]',
                         $options['parent_localization'],
-                        $this->translator->trans($choices[FallbackType::PARENT_LOCALIZATION])
+                        $this->translator->trans((string) $choices[FallbackType::PARENT_LOCALIZATION])
                     );
                 }
 

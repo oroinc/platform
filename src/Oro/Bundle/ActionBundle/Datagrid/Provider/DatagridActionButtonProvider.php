@@ -245,7 +245,7 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $config = array_merge(
             [
                 'type' => 'button-widget',
-                'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
+                'label' => $this->getTranslatedButtonLabel($button),
                 'rowAction' => false,
                 'link' => '#',
                 'icon' => $icon,
@@ -287,7 +287,7 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
             } elseif (!empty($datagridOptions['mass_action'])) {
                 $actions[$button->getName()] = array_merge(
                     [
-                        'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
+                        'label' => $this->getTranslatedButtonLabel($button),
                     ],
                     $datagridOptions['mass_action']
                 );
@@ -313,5 +313,10 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         }
 
         return $context;
+    }
+
+    private function getTranslatedButtonLabel(ButtonInterface $button): string
+    {
+        return $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain());
     }
 }

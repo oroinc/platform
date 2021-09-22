@@ -113,7 +113,6 @@ services:
     # sync processor
     oro_integration.sync.processor:
         class: Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
-        public: true
         arguments:
           - '@doctrine'
           - '@oro_importexport.processor.registry'
@@ -122,6 +121,9 @@ services:
           - '@event_dispatcher'
           - '@oro_integration.logger.strategy'
         lazy: true
+
+    Oro\Bundle\IntegrationBundle\Provider\SyncProcessor:
+        alias: oro_integration.sync.processor
 
     oro_integration.importexport.processor.import:
         class: Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor

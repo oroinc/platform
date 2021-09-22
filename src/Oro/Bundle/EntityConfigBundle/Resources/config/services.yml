@@ -559,3 +559,6 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider
         tags:
             - { name: oro_entity_config.field_config_constraints_provider, type: string }
+
+    oro_entity_config.tools.backup_manager.entity_config_backup_manager:
+        class: Oro\Bundle\EntityConfigBundle\Tools\BackupManager\NullEntityConfigBackupManager

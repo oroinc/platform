@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser as BaseKernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Request as InternalRequest;
 use Symfony\Component\BrowserKit\Response as InternalResponse;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -144,6 +145,12 @@ class Client extends BaseKernelBrowser
 
             $request = Request::create($this->getUrl($route, $gridParameters));
             $container->get('request_stack')->push($request);
+
+            $session = $container->has('session')
+                ? $container->get('session')
+                : $container->get('session.factory')->createSession();
+            $request->setSession($session);
+
             /** @var Manager $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');
             $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
@@ -323,11 +330,15 @@ class Client extends BaseKernelBrowser
      */
     private function getSessionName()
     {
-        $session = $this->getContainer()->get('session');
+        $container = $this->getContainer();
 
-        return null !== $session
-            ? $session->getName()
-            : null;
+        try {
+            $session = $container->get('request_stack')->getSession();
+        } catch (SessionNotFoundException $exception) {
+            $session = $container->has('session') ? $container->get('session') : null;
+        }
+
+        return $session?->getName();
     }
 
     private function setSessionCookie(array &$server)

@@ -56,9 +56,9 @@ class IntegrationController extends AbstractController
      * )
      * @Template("@OroIntegration/Integration/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Integration());
+        return $this->update(new Integration(), $request);
     }
 
     /**
@@ -71,9 +71,9 @@ class IntegrationController extends AbstractController
      * )
      * @Template()
      */
-    public function updateAction(Integration $integration)
+    public function updateAction(Request $request, Integration $integration)
     {
-        return $this->update($integration);
+        return $this->update($integration, $request);
     }
 
     /**
@@ -135,12 +135,12 @@ class IntegrationController extends AbstractController
      *
      * @return array
      */
-    protected function update(Integration $integration)
+    protected function update(Integration $integration, Request $request)
     {
         $formHandler = $this->get(ChannelHandler::class);
 
         if ($formHandler->process($integration)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->getTranslator()->trans('oro.integration.controller.integration.message.saved')
             );

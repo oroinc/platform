@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -32,9 +33,9 @@ class RoleController extends AbstractController
      * @Route("/create", name="oro_user_role_create")
      * @Template("@OroUser/Role/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Role());
+        return $this->update(new Role(), $request);
     }
 
     /**
@@ -82,9 +83,9 @@ class RoleController extends AbstractController
      *
      * @return array
      */
-    public function updateAction(Role $entity)
+    public function updateAction(Role $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -111,17 +112,18 @@ class RoleController extends AbstractController
 
     /**
      * @param Role $role
+     * @param Request $request
      *
      * @return array
      */
-    protected function update(Role $role)
+    protected function update(Role $role, Request $request)
     {
         /** @var AclRoleHandler $aclRoleHandler */
         $aclRoleHandler = $this->get(AclRoleHandler::class);
         $aclRoleHandler->createForm($role);
 
         if ($aclRoleHandler->process($role)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.user.controller.role.message.saved')
             );

@@ -4,22 +4,21 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\UserBundle\EventListener\PasswordChangeExceptionListener;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SessionInterface */
-    private $session;
+    private SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
 
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var PasswordChangeExceptionListener */
-    private $listener;
+    private PasswordChangeExceptionListener $listener;
 
     protected function setUp(): void
     {
@@ -32,12 +31,14 @@ class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnKernelExceptionNotPasswordChanged()
+    public function testOnKernelExceptionNotPasswordChanged(): void
     {
-        $event = $this->createMock(ExceptionEvent::class);
-        $event->expects($this->once())
-            ->method('getThrowable')
-            ->willReturn(new \Exception());
+        $event = new ExceptionEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            new \Exception()
+        );
 
         $this->session->expects($this->never())
             ->method($this->anything());
@@ -45,12 +46,14 @@ class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelException($event);
     }
 
-    public function testOnKernelExceptionPasswordChanged()
+    public function testOnKernelExceptionPasswordChanged(): void
     {
-        $event = $this->createMock(ExceptionEvent::class);
-        $event->expects($this->once())
-            ->method('getThrowable')
-            ->willReturn(new PasswordChangedException());
+        $event = new ExceptionEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            new PasswordChangedException()
+        );
 
         $this->translator->expects($this->once())
             ->method('trans')

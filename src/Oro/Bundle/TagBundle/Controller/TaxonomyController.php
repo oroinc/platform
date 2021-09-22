@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -51,9 +52,9 @@ class TaxonomyController extends AbstractController
      * )
      * @Template("@OroTag/Taxonomy/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Taxonomy());
+        return $this->update(new Taxonomy(), $request);
     }
 
     /**
@@ -66,9 +67,9 @@ class TaxonomyController extends AbstractController
      * )
      * @Template
      */
-    public function updateAction(Taxonomy $entity)
+    public function updateAction(Taxonomy $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -102,12 +103,13 @@ class TaxonomyController extends AbstractController
 
     /**
      * @param Taxonomy $entity
+     * @param Request $request
      * @return array|RedirectResponse
      */
-    protected function update(Taxonomy $entity)
+    protected function update(Taxonomy $entity, Request $request)
     {
         if ($this->get(TaxonomyHandler::class)->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
             );

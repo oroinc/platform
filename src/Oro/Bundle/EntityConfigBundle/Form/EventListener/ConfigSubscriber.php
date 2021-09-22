@@ -106,7 +106,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                     }
                     if (in_array($code, $translatable, true)) {
                         // check if a label text was changed
-                        $labelKey = $config->get($code);
+                        $labelKey = (string) $config->get($code);
                         if (!$configModel->getId()) {
                             $labelsToBeUpdated[$labelKey] = $value;
                         } elseif ($value != $this->translator->trans($labelKey)) {

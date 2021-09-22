@@ -86,7 +86,7 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
         }
 
         return $this->translator->trans(
-            $this->entityConfigProvider->getConfig($entityClass, $fieldName)->get('label')
+            (string) $this->entityConfigProvider->getConfig($entityClass, $fieldName)->get('label')
         );
     }
 

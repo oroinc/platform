@@ -6,6 +6,9 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Returns string representation of entity fields converted value
+ */
 class WidgetSortByConverter extends ConfigValueConverterAbstract
 {
     /** @var ConfigProvider */
@@ -40,7 +43,7 @@ class WidgetSortByConverter extends ConfigValueConverterAbstract
         return sprintf(
             '%s %s',
             $this->translator->trans(
-                $this->entityConfigProvider
+                (string) $this->entityConfigProvider
                     ->getConfig($value['className'], $value['property'])
                     ->get('label')
             ),

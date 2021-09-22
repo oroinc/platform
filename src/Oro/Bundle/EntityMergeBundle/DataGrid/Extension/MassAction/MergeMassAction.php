@@ -8,6 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Mass merge action
+ *
+ * Usage:
+ * merge:
+ *     type: merge
+ *     entity_name: 'Oro\Bundle\FooBundle\Entity\Bar'
+ *     data_identifier: b.id
+ */
 class MergeMassAction extends AbstractMassAction
 {
     /** @var ConfigProvider */
@@ -57,7 +66,7 @@ class MergeMassAction extends AbstractMassAction
 
             $options['label'] = $this->translator->trans(
                 'oro.entity_merge.action.merge',
-                ['{{ label }}' => $this->translator->trans($entityConfig->get('label'))]
+                ['{{ label }}' => $this->translator->trans((string) $entityConfig->get('label'))]
             );
         }
 

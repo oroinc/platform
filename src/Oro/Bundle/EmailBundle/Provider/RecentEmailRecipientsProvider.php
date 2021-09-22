@@ -12,6 +12,9 @@ use Oro\Bundle\EmailBundle\Model\RecipientEntity;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Provider for email recipient list based on email that was used in last 30 days.
+ */
 class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
     /** @var TokenAccessorInterface */
@@ -116,7 +119,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSection()
+    public function getSection(): string
     {
         return 'oro.email.autocomplete.recently_used';
     }
