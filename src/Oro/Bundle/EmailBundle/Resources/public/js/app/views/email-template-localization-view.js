@@ -29,14 +29,14 @@ define([
         fields: null,
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
          */
         constructor: function EmailTemplateLocalizationView(options) {
             EmailTemplateLocalizationView.__super__.constructor.call(this, options);
         },
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -152,7 +152,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

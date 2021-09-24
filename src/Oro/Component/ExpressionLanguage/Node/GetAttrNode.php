@@ -2,8 +2,7 @@
 
 namespace Oro\Component\ExpressionLanguage\Node;
 
-use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
@@ -25,7 +24,6 @@ class GetAttrNode extends Node
      * @var PropertyAccessor
      */
     protected static $propertyAccessor;
-    private Inflector $inflector;
 
     /**
      * @param Node $node
@@ -39,7 +37,6 @@ class GetAttrNode extends Node
             ['node' => $node, 'attribute' => $attribute, 'arguments' => $arguments],
             ['type' => $type]
         );
-        $this->inflector = (new InflectorFactory())->build();
     }
 
     public function compile(Compiler $compiler)
@@ -334,7 +331,7 @@ class GetAttrNode extends Node
      */
     protected function getSingularizeName($name)
     {
-        $singular = $this->inflector->singularize($name);
+        $singular = InflectorFactory::create()->singularize($name);
         if ($singular === $name) {
             return $name.'Item';
         }

@@ -41,7 +41,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function LayoutSubtreeView(options) {
             LayoutSubtreeView.__super__.constructor.call(this, options);

@@ -13,6 +13,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\Events;
@@ -39,26 +40,25 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipMetadataProviderInterface|MockObject */
     protected $ownershipMetadataProvider;
 
+    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $exportQueryProvider;
+
     /** @var EntityReaderTestAdapter */
     protected $reader;
 
     protected function setUp(): void
     {
-        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getByStepExecution'])
-            ->getMock();
-
-        $this->ownershipMetadataProvider = $this->getMockBuilder(OwnershipMetadataProviderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
         $this->reader = new EntityReaderTestAdapter(
             $this->contextRegistry,
             $this->managerRegistry,
             $this->ownershipMetadataProvider
         );
+
+        $this->reader->setExportQueryProvider($this->exportQueryProvider);
     }
 
     public function testReadMockIterator()
@@ -258,16 +258,17 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $classMetadata->expects(static::once())
             ->method('getAssociationMappings')
             ->willReturn([
-                'testSingle'   => ['fieldName' => 'testSingle'],
+                'testSingle' => ['fieldName' => 'testSingle'],
                 'testMultiple' => ['fieldName' => 'testMultiple'],
             ]);
-        $classMetadata->expects($this->exactly(2))
-            ->method('isAssociationWithSingleJoinColumn')
-            ->with(static::isType('string'))
+        $this->exportQueryProvider
+            ->expects($this->exactly(2))
+            ->method('isAssociationExportable')
             ->willReturnMap([
-                ['testSingle', true],
-                ['testMultiple', false],
+                [$classMetadata, 'testSingle', true],
+                [$classMetadata, 'testMultiple', false],
             ]);
+
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -318,6 +319,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed $context
+     *
      * @return MockObject|StepExecution
      */
     protected function getMockStepExecution($context)

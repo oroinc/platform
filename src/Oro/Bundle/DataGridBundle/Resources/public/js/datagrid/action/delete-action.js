@@ -28,7 +28,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DeleteAction(options) {
             DeleteAction.__super__.constructor.call(this, options);

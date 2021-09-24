@@ -43,15 +43,6 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicable()
-    {
-        $config = DatagridConfiguration::create([Configuration::BASE_CONFIG_KEY => ['enable' => true]]);
-        $this->assertTrue($this->extension->isApplicable($config));
-
-        $config = DatagridConfiguration::create([Configuration::BASE_CONFIG_KEY => ['enable' => false]]);
-        $this->assertFalse($this->extension->isApplicable($config));
-    }
-
     public function testIsNotApplicableInImportExportMode()
     {
         $params = new ParameterBag();

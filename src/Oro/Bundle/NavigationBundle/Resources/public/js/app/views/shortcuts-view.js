@@ -27,14 +27,14 @@ define(function(require) {
         entityId: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ShortcutsView(options) {
             ShortcutsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = options || {};
@@ -46,7 +46,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const $input = this.getTypeaheadInput();

@@ -61,14 +61,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartJsPlumbAreaView(options) {
             FlowchartJsPlumbAreaView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.defaultsChartOptions = _.extend(

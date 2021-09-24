@@ -13,14 +13,14 @@ define(function(require) {
      */
     const MultiGridView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiGridView(options) {
             MultiGridView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = options;

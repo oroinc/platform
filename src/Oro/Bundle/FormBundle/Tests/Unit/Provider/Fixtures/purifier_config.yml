@@ -23,6 +23,7 @@ default:
         - 'http'
         - 'https'
         - 'ftp'
+    allowed_rel: []
 
 additional:
     extends: default
@@ -35,6 +36,10 @@ additional:
         - 'maps.google.com'
     allowed_uri_schemes:
         - 'tel'
+    allowed_rel:
+        - 'alternate'
+        - 'author'
+        - 'bookmark'
 
 extra:
     extends: additional
@@ -45,3 +50,7 @@ extra:
         - 'example.com'
     allowed_uri_schemes:
         - 'mailto'
+    allowed_rel:
+        - 'help'
+        - 'nofollow'
+        - 'opener'

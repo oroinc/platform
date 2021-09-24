@@ -13,14 +13,14 @@ define(function(require) {
      */
     const DatagridManageFilterView = DatagridModuleManagerView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridManageFilterView(options) {
             DatagridManageFilterView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param options
          */
         initialize: function(options) {
@@ -33,7 +33,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'sync', this._onSync);

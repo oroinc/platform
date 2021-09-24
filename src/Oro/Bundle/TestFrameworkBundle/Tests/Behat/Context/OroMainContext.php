@@ -2112,6 +2112,127 @@ JS;
     }
 
     /**
+     * Presses Enter|Space|ESC|UpArrow|DownArrow|LeftArrow|RightArrow key on specified element
+     * Keys can be pressed with modifiers 'Shift', 'Alt', 'Ctrl' or 'Meta'
+     *
+     * Example: When I press "Shift+Enter" key on "Default Addresses" element
+     * Example: And I press "ESC" key on "Default Addresses" element
+     *
+     * @When /^(?:|I )press "(?P<key>[^"]*)" key on "(?P<elementName>[\w\s]*)" element$/
+     * @param string $key
+     * @param string $elementName
+     */
+    public function pressKeyboardKey(string $key, string $elementName)
+    {
+        $keyMap = [
+            'Backspace' => 8,
+            'Tab' => 9,
+            'Enter' => 13,
+            'ESC' => 27,
+            'Space' => 32,
+            'PageUp' => 33,
+            'PageDown' => 34,
+            'End' => 35,
+            'Home' => 36,
+            'LeftArrow' => 37,
+            'UpArrow' => 38,
+            'RightArrow' => 39,
+            'DownArrow' => 40,
+            'Insert' => 45,
+            'Delete' => 46,
+        ];
+
+        $parts = explode("+", $key);
+
+        if (count($parts) === 1) {
+            $modifier = null;
+            $keyName = $parts[0];
+        } else {
+            $modifier = strtolower($parts[0]);
+            $keyName = $parts[1];
+        }
+
+        if (!array_key_exists($keyName, $keyMap)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Key "%s" is not supported, see supported keys: "%s"',
+                $keyName,
+                implode('", "', array_keys($keyMap))
+            ));
+        }
+
+        $keyCode = $keyMap[$keyName];
+
+        $xpath = $this->elementFactory->createElement($elementName)->getXpath();
+        $this->getSession()->getDriver()->keyDown($xpath, $keyMap[$keyName], $modifier);
+    }
+
+    /**
+     * Checks if the corresponding element is focused
+     * Example: Then I should see "Some" element focused
+     *
+     * @Then /^(?:|I )should see "(?P<elementName>[\w\s]*)" element focused$/
+     *
+     * @param string $elementName
+     */
+    public function iShouldSeeElementFocused(string $elementName)
+    {
+        $xpath = $this->elementFactory->createElement($elementName)->getXpath();
+        $driver = $this->getSession()->getDriver();
+        self::assertTrue(
+            $driver->executeJsOnXpath($xpath, "return document.activeElement.isSameNode({{ELEMENT}})")
+        );
+    }
+
+    /**
+     * Checks if the corresponding element is not focused
+     * Example: Then I should not see "Some" element focused
+     *
+     * @Then /^(?:|I )should not see "(?P<elementName>[\w\s]*)" element focused$/
+     *
+     * @param string $elementName
+     */
+    public function iShouldNotSeeElementFocused(string $elementName)
+    {
+        $xpath = $this->elementFactory->createElement($elementName)->getXpath();
+        $driver = $this->getSession()->getDriver();
+        self::assertFalse(
+            $driver->executeJsOnXpath($xpath, "return document.activeElement.isSameNode({{ELEMENT}})")
+        );
+    }
+
+    /**
+     * Checks if the corresponding element is focused or is a container for focused element
+     * Example: Then I should see focus within "Some" element
+     *
+     * @Then /^(?:|I )should see focus within "(?P<elementName>[\w\s]*)" element$/
+     *
+     * @param string $elementName
+     */
+    public function iShouldSeeFocusWithinElement(string $elementName)
+    {
+        $xpath = $this->elementFactory->createElement($elementName)->getXpath();
+        $driver = $this->getSession()->getDriver();
+        $js = "return document.activeElement.isSameNode({{ELEMENT}}) || {{ELEMENT}}.contains(document.activeElement)";
+        self::assertTrue($driver->executeJsOnXpath($xpath, $js));
+    }
+
+    /**
+     * Checks if the corresponding element is not focused and is not a container for focused element
+     * Example: Then I should not see focus within "Some" element
+     *
+     * @Then /^(?:|I )should not see focus within "(?P<elementName>[\w\s]*)" element$/
+     *
+     * @param string $elementName
+     */
+    public function iShouldNotSeeFocusWithinElement(string $elementName)
+    {
+        $xpath = $this->elementFactory->createElement($elementName)->getXpath();
+        $driver = $this->getSession()->getDriver();
+        $js = "return document.activeElement.isSameNode({{ELEMENT}}) || {{ELEMENT}}.contains(document.activeElement)";
+        self::assertFalse($driver->executeJsOnXpath($xpath, $js));
+    }
+
+    /**
      * @Then /^(?:|I )should see "(?P<title>[\w\s]*)" button$/
      */
     public function iShouldSeeButton($title)

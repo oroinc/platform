@@ -17,14 +17,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailAttachmentCollectionView(options) {
             EmailAttachmentCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             BaseCollectionView.__super__.initialize.call(this, options);

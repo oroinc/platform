@@ -18,7 +18,7 @@ define(function(require) {
 
     const CardView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'card-view',
 
@@ -30,12 +30,12 @@ define(function(require) {
         cardActionsElementSelector: '[data-placeholder-for="actions"]',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: require('tpl-loader!../../../../templates/board/card-view.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         keepElement: false,
 
@@ -47,28 +47,28 @@ define(function(require) {
         earlyTransitionStatusChangeTimeout: 2000,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-action="navigate"]': 'navigate'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change model': 'render'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CardView(options) {
             CardView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             CardView.__super__.initialize.call(this, options);
@@ -82,7 +82,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const templateData = CardView.__super__.getTemplateData.call(this);
@@ -93,7 +93,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             CardView.__super__.render.call(this);

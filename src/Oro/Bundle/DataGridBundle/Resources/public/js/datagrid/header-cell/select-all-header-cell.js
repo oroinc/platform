@@ -35,7 +35,7 @@ define(function(require) {
         selectState: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectAllHeaderCell(options) {
             SelectAllHeaderCell.__super__.constructor.call(this, options);
@@ -60,7 +60,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

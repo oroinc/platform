@@ -10,19 +10,19 @@ define(function(require) {
 
     const DemoPopupView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         keepElement: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         className: 'demo-popup',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
@@ -33,7 +33,7 @@ define(function(require) {
         showDelay: 6000,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="close"]': 'onClose',
@@ -41,14 +41,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DemoPopupView(options) {
             DemoPopupView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (options.url) {
@@ -75,7 +75,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DemoPopupView.__super__.render.call(this);
@@ -104,7 +104,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = DemoPopupView.__super__.getTemplateData.call(this);

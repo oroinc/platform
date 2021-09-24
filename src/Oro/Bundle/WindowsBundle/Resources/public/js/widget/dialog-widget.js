@@ -73,7 +73,7 @@ define(function(require, exports, module) {
         loadingBar: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DialogWidget(options) {
             this.resetDialogPosition = _.debounce(this.resetDialogPosition.bind(this), 10);
@@ -215,7 +215,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -349,7 +349,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getLayoutElement: function() {
             // covers not only widget body, but whole .ui-dialog, including .ui-dialog-buttonpane

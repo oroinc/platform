@@ -103,6 +103,30 @@ class FieldHelper
     }
 
     /**
+     * @see \Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getEntityFields
+     *
+     * @param string $entityName
+     * @param int $options Bit mask of options, see EntityFieldProvider::OPTION_*
+     *
+     * @return array
+     */
+    public function getEntityFields(string $entityName, int $options = EntityFieldProvider::OPTION_TRANSLATE): array
+    {
+        $args = func_get_args();
+        $locale = $this->fieldProvider->getLocale();
+        if ($options & EntityFieldProvider::OPTION_TRANSLATE && null !== $locale) {
+            $args[] = $locale;
+        }
+
+        $cacheKey = implode(':', $args);
+        if (!array_key_exists($cacheKey, $this->fieldsCache)) {
+            $this->fieldsCache[$cacheKey] = $this->fieldProvider->getEntityFields($entityName, $options);
+        }
+
+        return $this->fieldsCache[$cacheKey];
+    }
+
+    /**
      * @see \Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getRelations
      *
      * @param string $entityName

@@ -55,7 +55,7 @@ define(function(require) {
         autoUpdateRangeFilterType: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NumberRangeFilter(options) {
             NumberRangeFilter.__super__.constructor.call(this, options);
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         isEmptyValue: function() {
             if (!this.isApplicable(this.value.type)) {
@@ -93,7 +93,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _applyValueAndHideCriteria: function() {
             this._beforeApply();
@@ -101,17 +101,20 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _updateValueField: function() {
             NumberRangeFilter.__super__._updateValueField.call(this);
 
             const type = this.$(this.criteriaValueSelectors.type).val();
             const filterEnd = this.$('.filter-separator, .filter-end');
+            const {inputFieldAriaLabel, rangeStartFieldAriaLabel} = this.getTemplateDataProps();
 
             if (this.isApplicable(type)) {
+                this.$(this.criteriaValueSelectors.value).attr('aria-label', rangeStartFieldAriaLabel);
                 filterEnd.show();
             } else {
+                this.$(this.criteriaValueSelectors.value).attr('aria-label', inputFieldAriaLabel);
                 filterEnd.hide();
 
                 this.value.value_end = this.emptyValue.value_end;
@@ -152,7 +155,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getCriteriaHint: function(...args) {
             if (this.isEmptyValue()) {
@@ -209,7 +212,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(data) {
             NumberRangeFilter.__super__._writeDOMValue.call(this, data);
@@ -246,7 +249,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             const data = NumberRangeFilter.__super__._readDOMValue.call(this);
@@ -288,7 +291,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatRawValue: function(data) {
             const formatted = NumberRangeFilter.__super__._formatRawValue.call(this, data);
@@ -299,7 +302,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatDisplayValue: function(data) {
             const formatted = NumberRangeFilter.__super__._formatDisplayValue.call(this, data);
@@ -310,7 +313,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {boolean}
          * @private
          */
@@ -323,6 +326,20 @@ define(function(require) {
             } else {
                 return NumberRangeFilter.__super__._isValid.call(this);
             }
+        },
+
+        getTemplateDataProps() {
+            const data = NumberRangeFilter.__super__.getTemplateDataProps.call(this);
+
+            return {
+                ...data,
+                rangeStartFieldAriaLabel: __('oro.filter.range_fields.start_field.aria_label', {
+                    label: this.label
+                }),
+                rangeEndFieldAriaLabel: __('oro.filter.range_fields.end_field.aria_label', {
+                    label: this.label
+                })
+            };
         }
     });
 

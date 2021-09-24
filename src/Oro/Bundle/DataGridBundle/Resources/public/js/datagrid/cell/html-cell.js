@@ -19,7 +19,7 @@ define(function(require) {
         formatter: new Backgrid.CellFormatter(),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HtmlCell(options) {
             HtmlCell.__super__.constructor.call(this, options);

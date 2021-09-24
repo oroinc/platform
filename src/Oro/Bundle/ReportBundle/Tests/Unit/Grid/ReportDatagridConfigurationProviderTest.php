@@ -161,6 +161,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $metadata->expects($this->any())
             ->method('getIdentifier')
             ->willReturn(['id']);
+        $metadata->expects($this->any())
+            ->method('getAssociationNames')
+            ->willReturn([]);
 
         $report = $this->getReportEntity($entity, $definition);
         $this->prepareRepository($report);
@@ -249,6 +252,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $metadata->expects($this->once())
             ->method('getIdentifier')
             ->willReturn([$expectedIdName]);
+        $metadata->expects($this->any())
+            ->method('getAssociationNames')
+            ->willReturn([]);
 
         $definition = [
             'columns'          => [
@@ -337,6 +343,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $metadata->expects($this->once())
             ->method('getIdentifier')
             ->willReturn([$expectedIdName]);
+        $metadata->expects($this->any())
+            ->method('getAssociationNames')
+            ->willReturn([]);
 
         $definition = [
             'columns'          => [

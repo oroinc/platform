@@ -21,14 +21,14 @@ define(function(require) {
         template: require('tpl-loader!../../../../templates/sql-query-view.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SqlQueryView(options) {
             SqlQueryView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.sql = options.sql;
@@ -49,7 +49,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this.removeSubview('clipboard-view');

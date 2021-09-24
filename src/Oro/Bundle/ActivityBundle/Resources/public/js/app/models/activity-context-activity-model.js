@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextActivityModel(...args) {
             ActivityContextActivityModel.__super__.constructor.apply(this, args);

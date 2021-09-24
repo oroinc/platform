@@ -27,14 +27,14 @@ define(function(require) {
         defaultActive: 'desktop',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DeviceInnerPageView(options) {
             DeviceInnerPageView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.data.showSwitcher = navigator.cookieEnabled && !window.frameElement;
@@ -47,7 +47,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = DeviceInnerPageView.__super__.getTemplateData.call(this);

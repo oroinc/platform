@@ -123,6 +123,22 @@ entity_config:
                             block:          general
                             required:       false
                             strip_tags:     true
+                actualize_owning_side_on_change:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                        allowed_type: [ref-many, oneToMany]
+                    form:
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        options:
+                            label: oro.entity.entity_config.entity.field.items.actualize_owning_side_on_change
+                            tooltip: oro.entity.entity_config.entity.field.items.actualize_owning_side_on_change.tooltip
+                            choices:
+                                No: 0
+                                Yes: 1
+                            placeholder: false
+                            required: false
+                            block: other
     datagrid:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#datagrid
         field:

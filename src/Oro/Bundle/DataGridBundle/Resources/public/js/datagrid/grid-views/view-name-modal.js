@@ -12,21 +12,21 @@ define(function(require) {
         nameErrorTemplate: nameErrorTemplate,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'keydown [data-role="grid-view-input"]': 'onKeyDown'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ViewNameModal(options) {
             ViewNameModal.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};

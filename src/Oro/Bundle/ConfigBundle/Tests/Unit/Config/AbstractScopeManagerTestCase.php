@@ -17,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Abstract test case for scope manager unit tests.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -263,6 +265,59 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals('updated value', $this->manager->getSettingValue('oro_user.update'));
         $this->assertNull($this->manager->getSettingValue('oro_user.remove'));
         $this->assertEquals('new value', $this->manager->getSettingValue('oro_user.add'));
+    }
+
+    public function testCachedDataTypes(): void
+    {
+        $scopeId = null;
+        $settings = [
+            'oro_user.integer' => ['value' => '1', 'use_parent_scope_value' => false],
+            'oro_user.decimal' => ['value' => '1', 'use_parent_scope_value' => false],
+            'oro_user.boolean' => ['value' => '1', 'use_parent_scope_value' => false],
+        ];
+
+        $this->configBag
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn([
+                'fields' => [
+                    'oro_user.integer' => ['data_type' => 'integer'],
+                    'oro_user.decimal' => ['data_type' => 'decimal'],
+                    'oro_user.boolean' => ['data_type' => 'boolean']
+                ]
+            ]);
+
+        $key = sprintf('%s_%s', $this->getScopedEntityName(), (int) $scopeId);
+        $this->assertFalse($this->cache->contains($key));
+        $this->manager->save($settings);
+        $this->assertTrue($this->cache->contains($key));
+
+        $cachedResult = $this->cache->fetch($key);
+        $this->assertSame(
+            [
+                'oro_user' => [
+                    'integer' => [
+                        'value' => 1,
+                        'use_parent_scope_value' => false,
+                        'createdAt' => null,
+                        'updatedAt' => null
+                    ],
+                    'decimal' => [
+                        'value' => 1.0,
+                        'use_parent_scope_value' => false,
+                        'createdAt' => null,
+                        'updatedAt' => null
+                    ],
+                    'boolean' => [
+                        'value' => true,
+                        'use_parent_scope_value' => false,
+                        'createdAt' => null,
+                        'updatedAt' => null
+                    ],
+                ]
+            ],
+            $cachedResult
+        );
     }
 
     public function testGetScopedEntityName()

@@ -38,6 +38,18 @@ system_configuration:
                 resettable: false
                 required: false
             priority: 10
+        oro_google_integration.redirect_url:
+            data_type: string
+            ui_only: true
+            type: Oro\Bundle\GoogleIntegrationBundle\Form\Type\UrlInfoType
+            options:
+                required: false
+                label: oro.google_integration.system_configuration.fields.redirect_uri.label
+                tooltip: oro.google_integration.system_configuration.fields.redirect_uri.tooltip
+                resettable: false
+                attr:
+                    readonly: true
+            priority: 10
         oro_google_integration.enable_sso:
             data_type: boolean
             type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
@@ -70,6 +82,7 @@ system_configuration:
                                             - oro_google_integration.client_id
                                             - oro_google_integration.client_secret
                                             - oro_google_integration.google_api_key
+                                            - oro_google_integration.redirect_url
                                     google_sso_settings:
                                         children:
                                             - oro_google_integration.enable_sso

@@ -21,14 +21,14 @@ define(function(require) {
         component: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetPickerModalView(options) {
             WidgetPickerModalView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, 'availableWidgets', 'sidebarPosition', 'widgetCollection'));
@@ -42,7 +42,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         open: function(cb) {
             WidgetPickerModalView.__super__.open.call(this, cb);
@@ -58,7 +58,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         close: function() {
             this.component.dispose();

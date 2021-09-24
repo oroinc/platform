@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
@@ -39,6 +40,9 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
     /** @var AclHelper */
     protected $aclHelper;
+
+    /** @var ExportQueryProvider */
+    protected $exportQueryProvider;
 
     public function __construct(
         ContextRegistry $contextRegistry,
@@ -94,6 +98,11 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         $this->setSourceQuery($this->applyAcl($qb));
     }
 
+    public function setExportQueryProvider(ExportQueryProvider $exportQueryProvider): void
+    {
+        $this->exportQueryProvider = $exportQueryProvider;
+    }
+
     /**
      * @param $entityName
      * @param Organization|null $organization
@@ -113,8 +122,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
         $metadata = $entityManager->getClassMetadata($entityName);
         foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {
-            // can't join with *-to-many relations because they affects query pagination
-            if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
+            if ($this->exportQueryProvider->isAssociationExportable($metadata, $fieldName)) {
                 $alias = '_' . $fieldName;
                 $qb->addSelect($alias);
                 $qb->leftJoin('o.' . $fieldName, $alias);

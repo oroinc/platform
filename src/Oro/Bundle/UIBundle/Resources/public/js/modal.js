@@ -69,7 +69,7 @@ define(function(require, exports, module) {
         suspended: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: function() {
             const events = {};
@@ -89,12 +89,12 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         defaults: config.defaults,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         attributes: function() {
             const attrs = {};
@@ -108,14 +108,14 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ModalView(options) {
             ModalView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.defaults);
@@ -128,7 +128,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             ModalView.__super__.render.call(this);
@@ -153,7 +153,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = ModalView.__super__.getTemplateData.call(this);
@@ -357,7 +357,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateEvents: function(events) {
             ModalView.__super__.delegateEvents.call(this, events);
@@ -380,7 +380,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         undelegateEvents: function() {
             ModalView.__super__.undelegateEvents.call(this);
@@ -391,7 +391,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.isOpen()) {

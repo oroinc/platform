@@ -12,6 +12,7 @@ class HtmlTagProvider
     private const ALLOWED_HTML_ELEMENTS = 'allowed_html_elements';
     private const ALLOWED_IFRAME_DOMAINS = 'allowed_iframe_domains';
     private const ALLOWED_URI_SCHEMES = 'allowed_uri_schemes';
+    private const ALLOWED_REL = 'allowed_rel';
 
     /** @var array */
     private $purifierConfig = [];
@@ -45,6 +46,14 @@ class HtmlTagProvider
         }
 
         return $allowedElements;
+    }
+
+    /**
+     * Returns an array of allowed rel attribute values.
+     */
+    public function getAllowedRel(string $scope): array
+    {
+        return $this->getPurifierConfigByKey($scope, self::ALLOWED_REL);
     }
 
     /**
@@ -104,6 +113,7 @@ class HtmlTagProvider
             self::ALLOWED_HTML_ELEMENTS => [],
             self::ALLOWED_IFRAME_DOMAINS => [],
             self::ALLOWED_URI_SCHEMES => [],
+            self::ALLOWED_REL => []
         ];
 
         if (array_key_exists($scope, $this->purifierConfig)) {

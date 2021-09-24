@@ -8,13 +8,13 @@ define(function(require) {
 
     const DefaultFieldValueView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @property
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         optionNames: BaseView.prototype.optionNames.concat(['prepareTinymce', 'fieldSelector', 'checkboxSelector']),
 
@@ -29,21 +29,21 @@ define(function(require) {
         checkboxSelector: '[data-role="changeUseDefault"]',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'change [data-role="changeUseDefault"]': 'onDefaultCheckboxChange'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DefaultFieldValueView(options) {
             DefaultFieldValueView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {*}
          */
         render: function() {

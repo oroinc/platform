@@ -13,7 +13,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AccountTypeView(options) {
             AccountTypeView.__super__.constructor.call(this, options);

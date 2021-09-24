@@ -25,14 +25,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailTemplateEditorView(options) {
             EmailTemplateEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             EmailTemplateEditorView.__super__.initialize.call(this, options);
@@ -129,15 +129,14 @@ define(function(require) {
                         !_.isNull(this.options.emailVariableView)
                     ) {
                         const tinymceInstance = component.view.tinymceInstance;
-                        $(tinymceInstance.getBody()).on(
-                            'blur',
-                            _.bind(
-                                function(e) {
-                                    $(tinymceInstance.targetElm).trigger(e);
-                                },
-                                this
-                            )
-                        );
+                        if (!tinymceInstance) {
+                            return;
+                        }
+                        $(tinymceInstance.getBody())
+                            .off(`blur${component.view.eventNamespace()}`)
+                            .on(`blur${component.view.eventNamespace()}`, e => {
+                                $(tinymceInstance.targetElm).trigger(e);
+                            });
                     }
                 });
             }

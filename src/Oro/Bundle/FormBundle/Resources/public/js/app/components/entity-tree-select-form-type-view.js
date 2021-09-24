@@ -16,7 +16,7 @@ define(function(require) {
         $fieldSelector: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityTreeSelectFormTypeView(options) {
             EntityTreeSelectFormTypeView.__super__.constructor.call(this, options);

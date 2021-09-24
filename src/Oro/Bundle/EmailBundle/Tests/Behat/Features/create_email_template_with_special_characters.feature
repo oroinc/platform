@@ -15,3 +15,14 @@ Feature: Create email template with special characters
     Then I should see "Template saved" flash message
     When I click "Preview"
     Then I should see "ľščťžýáíéúä" inside "Preview Email" iframe
+    And I close ui dialog
+    And fill form with:
+      | Type          | Html  |
+    When I click "Preview"
+    Then I should see "ľščťžýáíéúä" inside "Preview Email" iframe
+    And I close ui dialog
+    And fill form with:
+      | Type          | Plain Text  |
+    When I click "Preview"
+    Then I should see "ľščťžýáíéúä" inside "Preview Email" iframe
+    And I close ui dialog

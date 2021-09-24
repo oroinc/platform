@@ -31,7 +31,7 @@ define(function(require) {
         defaultPagesize: 10,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enable: function() {
             const boardPlugin = this;
@@ -127,7 +127,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disable: function() {
             this.main.$el.find('.board').hide();

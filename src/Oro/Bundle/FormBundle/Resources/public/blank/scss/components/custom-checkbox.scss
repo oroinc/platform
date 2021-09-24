@@ -45,6 +45,14 @@
                 background-color: $checkbox-icon-bg-color-focus-state;
             }
         }
+
+        @include element-state('disabled') {
+            ~ .custom-checkbox__icon {
+                color: $checkbox-icon-color-disabled-state;
+
+                @include base-disabled-style(.55);
+            }
+        }
     }
 
     &__icon {

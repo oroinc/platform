@@ -4,7 +4,7 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
 
     const SimpleColorPickerView = BaseSimpleColorPickerView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SimpleColorPickerView(options) {
             SimpleColorPickerView.__super__.constructor.call(this, options);
@@ -19,7 +19,7 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _processOptions: function(options) {
             SimpleColorPickerView.__super__._processOptions.call(this, options);
@@ -48,7 +48,7 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getSimpleColorPickerOptions: function(options) {
             options = SimpleColorPickerView.__super__._getSimpleColorPickerOptions.call(this, options);
@@ -58,14 +58,14 @@ define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getPickerOptions: function(options) {
             return SimpleColorPickerView.__super__._getPickerOptions.call(this, options.custom_color);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getPicker: function() {
             return this.$parent.find('span.custom-color');

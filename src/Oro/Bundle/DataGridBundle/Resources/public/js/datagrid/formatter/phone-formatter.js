@@ -16,7 +16,7 @@ define(['underscore', 'backgrid'
 
     _.extend(PhoneFormatter.prototype, {
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param {string|number} rawData
          * @return {string}
          */

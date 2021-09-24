@@ -10,7 +10,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ComponentNeedsB(options) {
             ComponentNeedsB.__super__.constructor.call(this, options);
@@ -24,7 +24,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ComponentNeedsCE(options) {
             ComponentNeedsCE.__super__.constructor.call(this, options);
@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ComponentNeedsA(options) {
             ComponentNeedsA.__super__.constructor.call(this, options);
@@ -50,7 +50,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ComponentExtendNoNeedA(options) {
             ComponentExtendNoNeedA.__super__.constructor.call(this, options);
@@ -59,7 +59,7 @@ define(function(require) {
 
     const ComponentNoNeeds = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ComponentNoNeeds(options) {
             ComponentNoNeeds.__super__.constructor.call(this, options);

@@ -30,14 +30,14 @@ define(function(require) {
         loadingMaskView: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function IntegrationConnectionCheckerComponent(options) {
             IntegrationConnectionCheckerComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$button = options._sourceElement;

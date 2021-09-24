@@ -11,12 +11,22 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class TwigTemplateCacheWarmerPass implements CompilerPassInterface
 {
+    private const TWIG_TEMPLATE_CACHE_WARMER = 'twig.template_cache_warmer';
+
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $container->getDefinition('twig.template_cache_warmer')
+        if (!$container->hasDefinition(self::TWIG_TEMPLATE_CACHE_WARMER)) {
+            /**
+             * the Symfony does not register the Twig template cache warmer when Twig cache is disabled
+             * @see \Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension
+             */
+            return;
+        }
+
+        $container->getDefinition(self::TWIG_TEMPLATE_CACHE_WARMER)
             ->setClass(TwigTemplateCacheWarmer::class);
     }
 }

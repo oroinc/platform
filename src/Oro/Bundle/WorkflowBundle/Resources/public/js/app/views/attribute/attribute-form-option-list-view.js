@@ -20,14 +20,14 @@ define(function(require) {
         requiredOptions: ['fieldsChoiceView', 'workflow', 'entityFieldsProvider'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeFormOptionListView(options) {
             AttributeFormOptionListView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};

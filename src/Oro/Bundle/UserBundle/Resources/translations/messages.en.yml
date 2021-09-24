@@ -371,6 +371,7 @@ oro:
         security:
             password_changed.message: Your password was updated by an administrator. New password was sent to you by email.
             password_reseted.message: Your password was successfully reset. You may log in now.
+            confirmation_link_expired_or_used.message: This confirmation link may have already been used or is expired. Please contact us if you have issues with registration.
         user_bar_settings:
             title: User bar
         image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and the file must be less than %file_size% in size

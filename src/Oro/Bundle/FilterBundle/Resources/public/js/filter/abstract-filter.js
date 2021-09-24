@@ -94,6 +94,13 @@ define(function(require, exports, module) {
         buttonActiveClass: 'open-filter',
 
         /**
+         * Criteria trigger expand class
+         *
+         * @property {String}
+         */
+        buttonExpandClass: 'active',
+
+        /**
          * Element enclosing a criteria dropdown
          *
          * @property {Array.<string|jQuery|HTMLElement>}
@@ -122,7 +129,7 @@ define(function(require, exports, module) {
         outerHintContainer: void 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractFilter(options) {
             AbstractFilter.__super__.constructor.call(this, options);
@@ -177,7 +184,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -523,18 +530,31 @@ define(function(require, exports, module) {
         },
 
         /**
-         * Set filter button class
+         * Set filter parent button class
          *
          * @param {Object} element
          * @param {Boolean} status
          * @protected
          */
         _setButtonPressed: function(element, status) {
+            this._setButtonExpanded(status);
+
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
             } else {
                 element.parent().removeClass(this.buttonActiveClass);
             }
+        },
+
+        /**
+         * Set filter button class
+         *
+         * @param {Boolean} state
+         * @protected
+         */
+        _setButtonExpanded: function(state) {
+            this.$('.filter-criteria-selector')
+                .toggleClass(this.buttonExpandClass, state).attr('aria-expanded', state);
         },
 
         /**
@@ -564,6 +584,32 @@ define(function(require, exports, module) {
                 label: this.label,
                 hint: this._getCriteriaHint()
             };
+        },
+
+        /**
+         * Get properties related to filter criteria
+         *
+         * @return {Object}
+         */
+        getTemplateDataProps() {
+            return {
+                criteriaLabel: this.label,
+                criteriaLongLabel: `${__('oro.filter.by')} ${this.label}`,
+                inputFieldAriaLabel: __('oro.filter.input_field.aria_label', {label: this.label}),
+                choiceAriaLabel: __('oro.filter.select_field.aria_label', {label: this.label}),
+                updateButtonAriaLabel: __('oro.filter.updateButton.aria_label', {
+                    label: `${__('oro.filter.by')} ${this.label}`}
+                )
+            };
+        },
+
+        /**
+         * Detect is filter has dropdown mode
+         * If renderMode is empty equals `dropdown-mode`
+         * @returns {boolean}
+         */
+        isDropdownRenderMode() {
+            return this.renderMode === 'dropdown-mode';
         }
     }));
 

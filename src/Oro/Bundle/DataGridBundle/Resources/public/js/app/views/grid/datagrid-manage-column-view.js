@@ -21,21 +21,21 @@ define(function(require) {
         defaultState: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'dropdown-launcher:hide mediator': '_onDatagridSettingsHide'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridManageColumnView(options) {
             DatagridManageColumnView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param options
          */
         initialize: function(options) {
@@ -50,7 +50,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);

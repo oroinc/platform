@@ -115,6 +115,8 @@ services:
         class: Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener
         arguments:
             - '@security.token_storage'
+        calls:
+            - ['setEntityConfigManager', ['@oro_entity_config.config_manager']]
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 100 }
 
@@ -288,6 +290,11 @@ services:
             - '%database_driver%'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
+
+    oro_entity.listener.orm.fix_decimal_changeset_listener:
+        class: 'Oro\Bundle\EntityBundle\EventListener\ORM\FixDecimalChangeSetListener'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, priority: 255 } # Should be the first called
 
     oro_entity.migration.extension.change_type:
         class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension

@@ -16,7 +16,16 @@ class TwigTemplateCacheWarmerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new TwigTemplateCacheWarmerPass();
     }
 
-    public function testNoTaggedServicesFound()
+    public function testTwigCacheDisabled()
+    {
+        $container = new ContainerBuilder();
+
+        $this->compiler->process($container);
+
+        $this->assertFalse($container->hasDefinition('twig.template_cache_warmer'));
+    }
+
+    public function testConfigureTwigCacheWarmer()
     {
         $container = new ContainerBuilder();
         $cacheWarmerDef = $container->register('twig.template_cache_warmer', TemplateCacheWarmer::class);

@@ -12,17 +12,17 @@ define(function(require) {
      */
     const DatagridSettingsListFilterView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'input [data-role="datagrid-settings-search"]': 'onSearch',
@@ -32,21 +32,21 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change model': 'updateView'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsListFilterView(options) {
             DatagridSettingsListFilterView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.onSearch = _.debounce(this.onSearch, 100);

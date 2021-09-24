@@ -5,10 +5,12 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class EntityReaderByIdTest extends OrmTestCase
 {
@@ -26,35 +28,30 @@ class EntityReaderByIdTest extends OrmTestCase
     /** @var EntityReaderById */
     protected $reader;
 
+    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $exportQueryProvider;
+
     protected function setUp(): void
     {
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getByStepExecution'))
-            ->getMock();
-
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->managerRegistry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
-        $reader                = new AnnotationReader();
-        $metadataDriver        = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\IntegrationBundle\Entity'
-        );
-
-        $ownershipMetadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $reader = new AnnotationReader();
+        $metadataDriver = new AnnotationDriver($reader, 'Oro\Bundle\IntegrationBundle\Entity');
+        $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
         $this->em = $this->getTestEntityManager();
-        $config   = $this->em->getConfiguration();
+        $config = $this->em->getConfiguration();
         $config->setMetadataDriverImpl($metadataDriver);
         $config->setEntityNamespaces(['OroIntegrationBundle' => 'Oro\Bundle\IntegrationBundle\Entity']);
 
         $this->reader = new EntityReaderById(
             $this->contextRegistry,
-            $this->managerRegistry,
+            $managerRegistry,
             $ownershipMetadataProvider
         );
+        $this->reader->setExportQueryProvider($this->exportQueryProvider);
     }
 
     protected function tearDown(): void
@@ -65,7 +62,7 @@ class EntityReaderByIdTest extends OrmTestCase
     public function testInitialization()
     {
         $entityName = 'OroIntegrationBundle:Channel';
-        $qb         = $this->em->createQueryBuilder()
+        $qb = $this->em->createQueryBuilder()
             ->select('e')
             ->from($entityName, 'e');
 

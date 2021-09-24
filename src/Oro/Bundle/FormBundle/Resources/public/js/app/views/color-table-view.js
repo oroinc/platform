@@ -4,7 +4,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
 
     const ColorTableView = BaseSimpleColorPickerView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColorTableView(options) {
             ColorTableView.__super__.constructor.call(this, options);
@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getSimpleColorPickerOptions: function(options) {
             options = ColorTableView.__super__._getSimpleColorPickerOptions.call(this, options);
@@ -27,7 +27,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getPickerOptions: function(options) {
             options = ColorTableView.__super__._getPickerOptions.call(this, options.picker);
@@ -43,7 +43,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getPicker: function() {
             const pickerId = this.$el.prop('id') + '_picker';
@@ -52,7 +52,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _addPickerHandlers: function() {
             this.$parent.on('click.' + this.cid, 'span.color', _.bind(function(e) {

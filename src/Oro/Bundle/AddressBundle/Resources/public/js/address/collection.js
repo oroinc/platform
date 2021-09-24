@@ -14,14 +14,14 @@ define([
         model: AddressModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AddressCollection(...args) {
             AddressCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             this.on('change:active', this.onActiveChange, this);

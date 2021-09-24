@@ -7,7 +7,12 @@ use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
+/**
+ * The schema tool to update database schemas.
+ */
 class SaveSchemaTool extends SchemaTool
 {
     /** @var \Doctrine\ORM\EntityManagerInterface */
@@ -16,6 +21,9 @@ class SaveSchemaTool extends SchemaTool
     /** @var \Doctrine\DBAL\Platforms\AbstractPlatform */
     protected $platform;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * {@inheritdoc}
      */
@@ -23,8 +31,17 @@ class SaveSchemaTool extends SchemaTool
     {
         $this->em       = $em;
         $this->platform = $this->getConnection()->getDatabasePlatform();
+        $this->logger = new NullLogger();
 
         parent::__construct($em);
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**

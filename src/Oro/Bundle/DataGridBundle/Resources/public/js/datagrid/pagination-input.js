@@ -34,7 +34,7 @@ define([
         windowSize: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PaginationInput(options) {
             PaginationInput.__super__.constructor.call(this, options);

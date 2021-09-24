@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Oro\Component\PhpUtils\ClassLoader;
+use Oro\Component\PhpUtils\OneFileClassLoader;
 
 /**
  * A set of reusable static methods related to extended entity proxy classes registration.
@@ -42,6 +42,17 @@ class ExtendClassLoadingUtils
     }
 
     /**
+     * Returns directory where extended entities should be located.
+     *
+     * @param string $cacheDir
+     * @return string
+     */
+    public static function getEntityClassesPath($cacheDir)
+    {
+        return self::getEntityCacheDir($cacheDir) . DIRECTORY_SEPARATOR . 'classes.php';
+    }
+
+    /**
      * Returns a path of a configuration file contains class aliases for extended entities.
      *
      * @param string $cacheDir
@@ -70,9 +81,9 @@ class ExtendClassLoadingUtils
      */
     public static function registerClassLoader($cacheDir)
     {
-        $loader = new ClassLoader(
+        $loader = new OneFileClassLoader(
             self::getEntityNamespace() . '\\',
-            $cacheDir . DIRECTORY_SEPARATOR . 'oro_entities'
+            self::getEntityClassesPath($cacheDir)
         );
         $loader->register();
     }
@@ -100,17 +111,12 @@ class ExtendClassLoadingUtils
      */
     public static function getAliases($cacheDir)
     {
-        $aliasesPath = self::getAliasesPath($cacheDir);
-        if (file_exists($aliasesPath)) {
-            $aliases = unserialize(
-                file_get_contents($aliasesPath, FILE_USE_INCLUDE_PATH)
-            );
-            if (is_array($aliases)) {
-                return $aliases;
-            }
+        $aliases = @include self::getAliasesPath($cacheDir);
+        if (false === $aliases || !\is_array($aliases)) {
+            $aliases = [];
         }
 
-        return [];
+        return $aliases;
     }
 
     /**
@@ -122,10 +128,8 @@ class ExtendClassLoadingUtils
      */
     public static function ensureDirExists($dir)
     {
-        if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $dir));
-            }
+        if (!is_dir($dir) && false === @mkdir($dir, 0777, true)) {
+            throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $dir));
         }
     }
 }

@@ -8,14 +8,14 @@ define(function(require) {
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FormLoadingView(options) {
             FormLoadingView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.subview('loadingMaskView', new LoadingMaskView({

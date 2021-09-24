@@ -11,3 +11,10 @@ services:
         class: Oro\Bundle\GoogleIntegrationBundle\EventListener\UserEmailChangeListener
         tags:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: preUpdate }
+
+    oro_google_integration.form.type.google_oauth_redirect_url:
+        class: Oro\Bundle\GoogleIntegrationBundle\Form\Type\UrlInfoType
+        arguments:
+            - '@router'
+        tags:
+            - { name: form.type }

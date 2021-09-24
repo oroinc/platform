@@ -9,7 +9,7 @@ define(function(require) {
 
     const AttributeGroupTabsComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeGroupTabsComponent(options) {
             AttributeGroupTabsComponent.__super__.constructor.call(this, options);

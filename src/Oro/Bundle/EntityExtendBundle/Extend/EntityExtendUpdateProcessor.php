@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+use Oro\Bundle\EntityConfigBundle\Tools\BackupManager\EntityConfigBackupManagerInterface;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
@@ -29,6 +30,9 @@ class EntityExtendUpdateProcessor
     /** @var Profiler|null */
     private $profiler;
 
+    /** @var EntityConfigBackupManagerInterface */
+    protected $entityConfigBackupManager;
+
     public function __construct(
         MaintenanceMode $maintenance,
         CommandExecutor $commandExecutor,
@@ -41,6 +45,14 @@ class EntityExtendUpdateProcessor
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->profiler = $profiler;
+    }
+
+    /**
+     * @param EntityConfigBackupManagerInterface $entityConfigBackupManager
+     */
+    public function setEntityConfigBackupManager(EntityConfigBackupManagerInterface $entityConfigBackupManager)
+    {
+        $this->entityConfigBackupManager = $entityConfigBackupManager;
     }
 
     /**
@@ -58,8 +70,33 @@ class EntityExtendUpdateProcessor
 
         try {
             $this->maintenance->activate();
-            $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true]);
-            $this->executeCommand('oro:entity-extend:cache:warmup');
+            if ($this->entityConfigBackupManager->isEnabled()) {
+                $this->entityConfigBackupManager->makeBackup();
+                try {
+                    $this->applyChangesToDatabase();
+                } catch (\Throwable $e) {
+                    $this->entityConfigBackupManager->restoreFromBackup();
+                    $this->executeCommand('oro:entity-extend:cache:clear');
+
+                    $this->logger->error(
+                        'Failed to update the database schema!' .
+                        ' All changes in the schema were reverted and cache cleared.',
+                        [
+                            'exception' => $e
+                        ]
+                    );
+
+                    return false;
+                }
+                $this->entityConfigBackupManager->dropBackup();
+            } else {
+                $this->applyChangesToDatabase();
+            }
+
+            /**
+             * Process enum sync without wrapping in transactional flow,
+             * because this changes won't break the system on fail
+             */
             $this->executeCommand('oro:entity-extend:update-schema');
             $this->executeCommand('oro:entity-config:cache:warmup');
             $this->executeCommand('validator:cache:clear');
@@ -77,6 +114,15 @@ class EntityExtendUpdateProcessor
         }
 
         return true;
+    }
+
+    protected function applyChangesToDatabase(): void
+    {
+        $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true]);
+        $this->executeCommand('oro:entity-extend:cache:warmup');
+        $this->executeCommand('oro:entity-extend:update-schema', [
+            '--skip-enum-sync' => true
+        ]);
     }
 
     private function executeCommand(string $command, array $options = []): void

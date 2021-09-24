@@ -15,14 +15,14 @@ define(function(require) {
         fieldItemView: FieldView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionPermissionsRowView(options) {
             ActionPermissionsRowView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ActionPermissionsRowView.__super__.initialize.call(this, options);

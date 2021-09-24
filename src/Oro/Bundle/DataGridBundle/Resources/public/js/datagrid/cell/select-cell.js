@@ -19,14 +19,14 @@ define(function(require) {
         optionValues: [],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectCell(options) {
             SelectCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.expanded && !this.multiple) {
@@ -52,7 +52,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             if (_.isEmpty(this.optionValues)) {
@@ -68,7 +68,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         exitEditMode: function() {
             this.$el.removeClass('error');

@@ -2,18 +2,18 @@
 
 .ui-timepicker-wrapper {
     z-index: z('dropdown') + 1;
-}
 
-.ui-timepicker-list {
     height: 158px;
     overflow-y: auto;
 
     border: 1px solid get-color('additional', 'middle');
     box-shadow: 0 5px 10px rgba(0,0,0,.2);
-    border-radius: 4px;
+    border-radius: $base-ui-element-border-radius;;
 
     background: get-color('additional', 'ultra');
+}
 
+.ui-timepicker-list {
     li {
         padding: 4px 9px;
 
@@ -23,6 +23,7 @@
 
         cursor: pointer;
 
+        &.ui-timepicker-selected,
         &:hover {
             background: get-color('ui', 'focus');;
             color: get-color('additional', 'ultra');

@@ -19,7 +19,7 @@ define(function(require) {
         className: 'workflow-flowchart-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartEditorWorkflowView(options) {
             FlowchartEditorWorkflowView.__super__.constructor.call(this, options);

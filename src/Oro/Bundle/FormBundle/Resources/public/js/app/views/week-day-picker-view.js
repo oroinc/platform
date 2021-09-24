@@ -7,7 +7,7 @@ define(function(require) {
 
     const WeekDayPickerView = MultiCheckboxView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WeekDayPickerView(options) {
             WeekDayPickerView.__super__.constructor.call(this, options);

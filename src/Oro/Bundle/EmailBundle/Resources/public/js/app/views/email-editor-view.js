@@ -22,7 +22,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailEditorView(options) {
             EmailEditorView.__super__.constructor.call(this, options);

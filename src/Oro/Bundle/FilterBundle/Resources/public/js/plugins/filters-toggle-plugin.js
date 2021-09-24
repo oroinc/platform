@@ -16,7 +16,7 @@ define(function(require, exports, module) {
 
     const FiltersTogglePlugin = BasePlugin.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enable: function() {
             this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
@@ -24,7 +24,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         onBeforeToolbarInit: function(toolbarOptions) {
             const options = {

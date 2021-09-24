@@ -177,7 +177,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Grid(options) {
             Grid.__super__.constructor.call(this, options);
@@ -492,7 +492,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -528,7 +528,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateEvents: function(events) {
             Grid.__super__.delegateEvents.call(this, events);
@@ -564,7 +564,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         undelegateEvents: function() {
             Grid.__super__.undelegateEvents.call(this);

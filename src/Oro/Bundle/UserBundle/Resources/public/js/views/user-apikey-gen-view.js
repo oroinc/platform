@@ -32,7 +32,7 @@ define([
         $submitBtn: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UserApiKeyGenView(options) {
             UserApiKeyGenView.__super__.constructor.call(this, options);

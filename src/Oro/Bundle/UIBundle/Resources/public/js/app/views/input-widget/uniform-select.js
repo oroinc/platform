@@ -23,14 +23,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UniformSelectInputWidget(options) {
             UniformSelectInputWidget.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initializeWidget: function(options) {
             // support for readonly attr
@@ -58,7 +58,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disposeWidget: function() {
             this.$el.uniform.restore(this.$el);
@@ -66,14 +66,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         findContainer: function() {
             return this.$el.parent('.selector');
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         width: function(width) {
             UniformSelectInputWidget.__super__.width.call(this, width);
@@ -81,7 +81,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         isInitialized: function() {
             return this.$el.data('uniformed') ? true : false;

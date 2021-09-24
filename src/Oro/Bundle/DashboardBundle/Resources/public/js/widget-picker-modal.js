@@ -32,14 +32,14 @@ define(function(require) {
         component: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetPickerModal(options) {
             WidgetPickerModal.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.defaultOptions);
@@ -48,7 +48,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         open: function(cb) {
             WidgetPickerModal.__super__.open.call(this, cb);

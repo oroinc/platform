@@ -8,14 +8,14 @@ define(function(require) {
 
     const StickyElementView = BaseView.extend(_.extend({}, stickyElementMixin, {
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StickyElementView(options) {
             StickyElementView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             StickyElementView.__super__.initialize.call(this, options);
@@ -27,7 +27,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

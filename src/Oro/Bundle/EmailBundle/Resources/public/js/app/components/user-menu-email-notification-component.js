@@ -30,14 +30,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UserMenuEmailNotificationComponent(options) {
             UserMenuEmailNotificationComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             let emails = options.emails || [];

@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BooleanCell(options) {
             BooleanCell.__super__.constructor.call(this, options);
@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             if (this.isEditableColumn()) {
@@ -51,7 +51,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enterEditMode: function() {
             BooleanCell.__super__.enterEditMode.call(this);

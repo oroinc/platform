@@ -64,14 +64,14 @@ define(function(require) {
         className: 'number-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NumberEditorView(options) {
             NumberEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const formatOptions = {};

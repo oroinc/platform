@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Helper\ConfigModelConstraintsHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -94,7 +95,10 @@ class ConfigScopeType extends AbstractType
             }
 
             if (isset($config['constraints'])) {
-                $options['constraints'] = $config['constraints'];
+                $options['constraints'] = ConfigModelConstraintsHelper::configureConstraintsWithConfigModel(
+                    $config['constraints'],
+                    $this->configModel
+                );
             }
 
             $this->setAttr($options, 'data-property_id', $this->config->getId()->toString() . $code);

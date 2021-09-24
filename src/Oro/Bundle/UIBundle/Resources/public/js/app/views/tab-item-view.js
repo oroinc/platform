@@ -28,7 +28,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TabItemView(options) {
             TabItemView.__super__.constructor.call(this, options);

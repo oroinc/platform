@@ -31,7 +31,7 @@ define(function(require) {
         context: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TreeManageView(options) {
             TreeManageView.__super__.constructor.call(this, options);

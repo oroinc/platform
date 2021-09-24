@@ -54,11 +54,9 @@ class ClassLoader
         }
 
         $file = $this->path . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
-        if (!is_file($file)) {
+        if (false === @include $file) {
             return false;
         }
-
-        require $file;
 
         return true;
     }

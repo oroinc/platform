@@ -54,7 +54,7 @@ define(function(require) {
         emptyClassName: 'input--empty',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatePickerView(options) {
             DatePickerView.__super__.constructor.call(this, options);
@@ -148,6 +148,7 @@ define(function(require) {
             this.$frontDateField.attr('data-fake-front-field', '');
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$frontDateField.on('keypress keyup change focus blur', _.bind(this.checkEmpty, this));
+            this.syncPickerState();
             this.checkEmpty();
             this.$el.after(this.$frontDateField);
             this.$el.attr('data-format', 'backend');
@@ -166,9 +167,14 @@ define(function(require) {
             this.$frontDateField.datepicker(widgetOptions);
             // fix incorrect behaviour with early datepicker dispose
             $('#ui-datepicker-div').css({display: 'none'});
-            if (this.$el.attr('disabled') || this.$el.attr('readonly')) {
-                this.$frontDateField.datepicker('disable');
-            }
+        },
+
+        /**
+         * Sync enabled\disabled state with native datepicker
+         */
+        syncPickerState: function() {
+            const state = this.$el.prop('disabled') || this.$el.prop('readonly');
+            this.$frontDateField.prop('disabled', state);
         },
 
         /**

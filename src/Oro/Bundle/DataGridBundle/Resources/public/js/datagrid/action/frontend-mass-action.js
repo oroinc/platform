@@ -16,14 +16,14 @@ define([
      */
     const FrontendMassAction = MassAction.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FrontendMassAction(options) {
             FrontendMassAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         execute: function() {
             const selectionState = this.datagrid.getSelectionState();
@@ -36,7 +36,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

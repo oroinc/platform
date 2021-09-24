@@ -32,7 +32,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
 
     public const REQUIRED_CURL_VERSION = '7.0';
 
-    public const REQUIRED_NODEJS_VERSION  = '>=12.0';
+    public const REQUIRED_NODEJS_VERSION  = '>=12.0,<15.0';
 
     protected Connection $connection;
 
@@ -510,8 +510,8 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
     {
         $collection->addRequirement(
             NodeJsVersionChecker::satisfies($nodeExecutable, self::REQUIRED_NODEJS_VERSION),
-            sprintf('NodeJS "%s" version must be installed.', self::REQUIRED_NODEJS_VERSION),
-            sprintf('Upgrade <strong>NodeJS</strong> to "%s" version.', self::REQUIRED_NODEJS_VERSION)
+            'NodeJS version 12 - 14 must be installed.',
+            'Switch <strong>NodeJS</strong> to version 12 - 14.'
         );
     }
 
@@ -790,7 +790,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
     {
         $library = null;
         try {
-            [$library, ] = $this->getImageProcessorLibrary($libraryName, $this->imageProcessorConfig);
+            $library = $this->getImageProcessorLibrary($libraryName, $this->imageProcessorConfig);
         } catch (ProcessorsException $exception) {
             return;
         } catch (ProcessorsVersionException $exception) {

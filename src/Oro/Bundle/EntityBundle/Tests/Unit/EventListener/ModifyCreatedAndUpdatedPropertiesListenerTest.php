@@ -9,29 +9,36 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
 use Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
+
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
     /** @var ModifyCreatedAndUpdatedPropertiesListener */
     protected $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    protected $tokenStorage;
 
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->listener = new ModifyCreatedAndUpdatedPropertiesListener($this->tokenStorage);
+        $this->listener->setEntityConfigManager($this->configManager);
     }
 
     /**
      * @dataProvider userDataProvider
      *
-     * @param object  $user
+     * @param object $user
      * @param boolean $expectedCallSetUpdatedBy
      */
     public function testModifyCreatedAndUpdatedPropertiesForNewEntity($user, $expectedCallSetUpdatedBy)
@@ -101,7 +108,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     /**
      * @dataProvider userDataProvider
      *
-     * @param object  $user
+     * @param object $user
      * @param boolean $expectedCallSetUpdatedBy
      */
     public function testModifyCreatedAndUpdatedPropertiesForExistingEntity($user, $expectedCallSetUpdatedBy)
@@ -149,19 +156,83 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     public function userDataProvider()
     {
         return [
-            'realUser'    => [
-                'user'                     => $this->createMock(User::class),
+            'realUser' => [
+                'user' => $this->createMock(User::class),
                 'expectedCallSetUpdatedBy' => true
             ],
             'anotherUser' => [
-                'user'                     => new \stdClass(),
+                'user' => new \stdClass(),
                 'expectedCallSetUpdatedBy' => false
             ],
         ];
     }
 
+    public function testModifyCreatedAndUpdatedPropertiesForOwningEntity()
+    {
+        $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
+        $datesAwareEntity->expects($this->once())
+            ->method('isUpdatedAtSet')
+            ->willReturn(false);
+        $datesAwareEntity->expects($this->once())
+            ->method('setUpdatedAt')
+            ->with(self::equalToWithDelta(new \DateTime(), 1.0));
+        $collectionItem = $this->createMock(User::class);
+
+        $fieldConfig = $this->createMock(ConfigInterface::class);
+        $fieldConfig->expects($this->once())
+            ->method('get')
+            ->with('actualize_owning_side_on_change')
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with(User::class)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('entity', User::class, 'children')
+            ->willReturn($fieldConfig);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([
+                [
+                    'type' => ClassMetadata::MANY_TO_ONE,
+                    'inversedBy' => 'children',
+                    'fieldName' => 'owner',
+                    'targetEntity' => User::class
+                ]
+            ]);
+        $metadata->expects($this->once())
+            ->method('getFieldValue')
+            ->with($collectionItem, 'owner')
+            ->willReturn($datesAwareEntity);
+
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork);
+
+        $unitOfWork->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->willReturn([]);
+        $unitOfWork->expects($this->once())
+            ->method('getScheduledEntityUpdates')
+            ->willReturn([$collectionItem]);
+        $unitOfWork->expects($this->once())
+            ->method('recomputeSingleEntityChangeSet');
+
+        $args = new OnFlushEventArgs($entityManager);
+
+        $this->listener->onFlush($args);
+    }
+
     /**
-     * @param int      $countOfRecompute
+     * @param int $countOfRecompute
      * @param object[] $scheduledForInsert
      * @param object[] $scheduledForUpdate
      *
@@ -172,6 +243,9 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
         $entityManager = $this->createMock(EntityManager::class);
         $unitOfWork = $this->createMock(UnitOfWork::class);
         $metadataStub = $this->createMock(ClassMetadata::class);
+        $metadataStub->expects($this->any())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
 
         $entityManager->expects($this->any())
             ->method('getClassMetadata')

@@ -20,14 +20,14 @@ define(function(require, exports, module) {
         initializeMessenger: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlashMessageView(options) {
             FlashMessageView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.initializeMessenger) {
@@ -53,7 +53,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             _.each(this.messages, function(message) {

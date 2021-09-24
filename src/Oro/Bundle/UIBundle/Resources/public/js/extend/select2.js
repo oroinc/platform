@@ -6,6 +6,7 @@ define(function(require) {
     const Select2 = require('jquery.select2');
     const tools = require('oroui/js/tools');
     const __ = require('orotranslation/js/translator');
+    const KEY_CODES = require('oroui/js/tools/keyboard-key-codes').default;
     const singleChoiceTpl = require('tpl-loader!oroui/templates/select2/single-choice.html');
     const multipleChoiceTpl = require('tpl-loader!oroui/templates/select2/multiple-choice.html');
 
@@ -257,6 +258,11 @@ define(function(require) {
             return;
         }
         dropMask.style.display = '';
+    }
+
+    function killEvent(e) {
+        e.preventDefault();
+        e.stopPropagation();
     }
 
     const overrideMethods = {
@@ -601,6 +607,7 @@ define(function(require) {
         });
     }(Select2['class'].abstract.prototype));
 
+    // Override methods of SingleSelect2 class
     (function(prototype) {
         const clear = prototype.clear;
         const isPlaceholderOptionSelected = prototype.isPlaceholderOptionSelected;
@@ -715,6 +722,21 @@ define(function(require) {
                     this.clearSearch();
                 }
             }));
+            // Open dropdown by SPACE key
+            // Solution resolved in a way as it does by ENTER key https://github.com/select2/select2/blob/3.5.4/select2.js#L2354-L2367
+            this.focusser.on('keydown', e => {
+                if (this.opts.openOnEnter === false && e.keyCode === KEY_CODES.SPACE) {
+                    killEvent(e);
+                    return;
+                }
+                if (e.keyCode === KEY_CODES.SPACE && this.opts.openOnEnter) {
+                    if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
+                        return;
+                    }
+                    this.open();
+                    killEvent(e);
+                }
+            });
 
             this.search.off('blur');
             this.search.on('blur', this.bind(function(e) {
@@ -742,11 +764,6 @@ define(function(require) {
     // Override methods of MultiSelect2 class
     // Fix is valid for version 3.4.1
     (function(prototype) {
-        function killEvent(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
         function indexOf(value, array) {
             let i = 0;
             const l = array.length;

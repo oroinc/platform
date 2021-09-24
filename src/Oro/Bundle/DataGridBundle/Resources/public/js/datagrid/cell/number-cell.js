@@ -20,14 +20,14 @@ define(function(require) {
         style: 'decimal',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NumberCell(options) {
             NumberCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, options);
@@ -45,7 +45,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const render = NumberCell.__super__.render.call(this);
@@ -57,7 +57,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
@@ -66,7 +66,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         exitEditMode: function() {
             if (!this.isEditableColumn()) {

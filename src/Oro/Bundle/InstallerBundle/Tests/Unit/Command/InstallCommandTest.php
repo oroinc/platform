@@ -57,8 +57,8 @@ class InstallCommandTest extends TestCase
             ->with('installed')
             ->willReturn(true);
         $container->method('getParameter')
-            ->with('installed')
-            ->willReturn('2020-01-01T01:01:01-08:00');
+            ->withConsecutive(['kernel.environment'], ['installed'])
+            ->willReturnOnConsecutiveCalls(['dev'], ['2020-01-01T01:01:01-08:00']);
         $this->command->setContainer($container);
     }
 }

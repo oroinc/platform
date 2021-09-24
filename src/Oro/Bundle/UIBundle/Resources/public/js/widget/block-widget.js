@@ -30,7 +30,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BlockWidgetView(options) {
             BlockWidgetView.__super__.constructor.call(this, options);

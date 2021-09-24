@@ -22,7 +22,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PermissionView(options) {
             PermissionView.__super__.constructor.call(this, options);

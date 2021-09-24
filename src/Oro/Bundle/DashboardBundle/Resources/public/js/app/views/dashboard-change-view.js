@@ -12,7 +12,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardChangeView(options) {
             DashboardChangeView.__super__.constructor.call(this, options);

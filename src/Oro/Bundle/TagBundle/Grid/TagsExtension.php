@@ -5,6 +5,7 @@ namespace Oro\Bundle\TagBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as InlineEditingConfiguration;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\Tag;
@@ -13,10 +14,14 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Enables grid inline editing feature to provide tags inline editing.
+ * Adds tag column and filter for entities with enabled tag functionality.
+ */
 class TagsExtension extends AbstractTagsExtension
 {
     const TAGS_ROOT_PARAM = '_tags';
-    const DISABLED_PARAM  = '_disabled';
+    const DISABLED_PARAM = '_disabled';
 
     const COLUMN_NAME = 'tags';
 
@@ -100,8 +105,9 @@ class TagsExtension extends AbstractTagsExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
+        $this->enableInlineEditingForGrid($config);
         $columns = $config->offsetGetByPath('[columns]', []);
-        $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
+        $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
         $config->offsetSetByPath('[columns]', array_merge($columns, $column));
 
         // do not add tag filter if $filters are empty(case when they are disabled).
@@ -121,7 +127,7 @@ class TagsExtension extends AbstractTagsExtension
      */
     protected function getColumnDefinition(DatagridConfiguration $config)
     {
-        $className        = $this->getEntity($config);
+        $className = $this->getEntity($config);
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
 
         $permissions = [
@@ -129,29 +135,29 @@ class TagsExtension extends AbstractTagsExtension
         ];
 
         return [
-            'label'          => 'oro.tag.tags_label',
-            'type'           => 'callback',
-            'frontend_type'  => 'tags',
-            'callable'       => function (ResultRecordInterface $record) {
+            'label' => 'oro.tag.tags_label',
+            'type' => 'callback',
+            'frontend_type' => 'tags',
+            'callable' => function (ResultRecordInterface $record) {
                 return $record->getValue(self::COLUMN_NAME);
             },
-            'editable'       => false,
-            'translatable'   => true,
-            'renderable'     => $this->taggableHelper->isEnableGridColumn($className),
+            'editable' => false,
+            'translatable' => true,
+            'renderable' => $this->taggableHelper->isEnableGridColumn($className),
             'inline_editing' => [
-                'enable'                    => $this->authorizationChecker->isGranted(
+                'enable' => $this->authorizationChecker->isGranted(
                     TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
                 ),
-                'editor'                    => [
-                    'view'         => 'orotag/js/app/views/editor/tags-editor-view',
+                'editor' => [
+                    'view' => 'orotag/js/app/views/editor/tags-editor-view',
                     'view_options' => [
                         'permissions' => $permissions
                     ]
                 ],
-                'save_api_accessor'         => [
-                    'route'                       => 'oro_api_post_taggable',
-                    'http_method'                 => 'POST',
-                    'default_route_parameters'    => [
+                'save_api_accessor' => [
+                    'route' => 'oro_api_post_taggable',
+                    'http_method' => 'POST',
+                    'default_route_parameters' => [
                         'entity' => $urlSafeClassName
                     ],
                     'route_parameters_rename_map' => [
@@ -159,9 +165,9 @@ class TagsExtension extends AbstractTagsExtension
                     ]
                 ],
                 'autocomplete_api_accessor' => [
-                    'class'               => 'oroui/js/tools/search-api-accessor',
+                    'class' => 'oroui/js/tools/search-api-accessor',
                     'search_handler_name' => 'tags',
-                    'label_field_name'    => 'name'
+                    'label_field_name' => 'name'
                 ]
             ]
         ];
@@ -179,6 +185,7 @@ class TagsExtension extends AbstractTagsExtension
         $className = $this->getEntity($config);
         $dataName = sprintf('%s.%s', $config->getOrmQuery()->getRootAlias(), 'id');
         $enabled = $this->taggableHelper->isEnableGridFilter($className);
+
         return [
             'type' => 'tag',
             'data_name' => $dataName,
@@ -197,13 +204,31 @@ class TagsExtension extends AbstractTagsExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows    = $result->getData();
+        $rows = $result->getData();
         $idField = 'id';
-        $tags    = $this->getTagsForEntityClass(
+        $tags = $this->getTagsForEntityClass(
             $this->getEntity($config),
             $this->extractEntityIds($rows, $idField)
         );
 
         $this->addTagsToData($rows, $tags, $idField, self::COLUMN_NAME);
+    }
+
+    /**
+     * Enable inline editing where possible when tags are enabled for entity to provide an ability to edit tags.
+     * Switch inline editing behaviour to enable_selected.
+     */
+    private function enableInlineEditingForGrid(DatagridConfiguration $config): void
+    {
+        $isInlineEditingSupported = $config->offsetGetByPath('[extended_entity_name]')
+            || $config->offsetGetByPath('[inline_editing][entity_name]');
+
+        if ($isInlineEditingSupported && !$config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH)) {
+            $config->offsetSetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH, true);
+            $config->offsetSetByPath(
+                InlineEditingConfiguration::BEHAVIOUR_CONFIG_PATH,
+                InlineEditingConfiguration::BEHAVIOUR_ENABLE_SELECTED
+            );
+        }
     }
 }

@@ -36,14 +36,14 @@ define(function(require) {
         ERROR_HTML: '<span style="color:red">' + __('Unexpected format') + '</span>',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiSelectCell(options) {
             MultiSelectCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             let value = this.model.get(this.column.get('name'));

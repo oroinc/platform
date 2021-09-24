@@ -5,7 +5,7 @@ define(function(require) {
 
     const Select2AclUserMultiselectComponent = Select2AclUserAutocompleteComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2AclUserMultiselectComponent(options) {
             Select2AclUserMultiselectComponent.__super__.constructor.call(this, options);

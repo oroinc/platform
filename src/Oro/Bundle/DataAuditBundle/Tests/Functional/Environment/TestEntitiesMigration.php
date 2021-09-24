@@ -79,7 +79,11 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
             'datetimetz',
             ['notnull' => false, 'comment' => '(DC2Type:datetimetz)']
         );
-        $table->addColumn('decimal_property', 'decimal', ['notnull' => false, 'comment' => '(DC2Type:decimal)']);
+        $table->addColumn(
+            'decimal_property',
+            'decimal',
+            ['notnull' => false, 'comment' => '(DC2Type:decimal)', 'precision' => 19, 'scale' => 4]
+        );
         $table->addColumn('duration_property', 'duration', ['notnull' => false, 'comment' => '(DC2Type:duration)']);
         $table->addColumn('float_property', 'float', ['notnull' => false, 'comment' => '(DC2Type:float)']);
         $table->addColumn('guid_property', 'guid', ['notnull' => false, 'comment' => '(DC2Type:guid)']);

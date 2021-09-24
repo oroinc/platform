@@ -1,0 +1,5 @@
+services:
+    oro_locale.tests.tools.localized_fields_sanitizer:
+        parent: oro_locale.tools.localized_fields_sanitizer
+        decorates: oro_locale.tools.localized_fields_sanitizer
+        public: true

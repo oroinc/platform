@@ -6,14 +6,14 @@ define(function(require) {
 
     const Select2EntityFieldChoiceComponent = Select2EntityFieldComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2EntityFieldChoiceComponent(options) {
             Select2EntityFieldChoiceComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.util = new EntityFieldUtil(options._sourceElement);

@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource;
 
-use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -18,7 +17,6 @@ class ResultRecord implements ResultRecordInterface
 
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
-    private Inflector $inflector;
 
     /**
      * @param mixed $data
@@ -26,7 +24,6 @@ class ResultRecord implements ResultRecordInterface
     public function __construct($data)
     {
         $this->addData($data);
-        $this->inflector = (new InflectorFactory())->build();
     }
 
     /**
@@ -68,7 +65,7 @@ class ResultRecord implements ResultRecordInterface
             } elseif (is_object($data)) {
                 $this->getPropertyAccessor()->setValue(
                     $this->valueContainers[$key],
-                    $this->inflector->camelize($name),
+                    InflectorFactory::create()->camelize($name),
                     $value
                 );
             }
@@ -89,7 +86,10 @@ class ResultRecord implements ResultRecordInterface
                 }
             } elseif (is_object($data)) {
                 try {
-                    return $this->getPropertyAccessor()->getValue($data, $this->inflector->camelize($name));
+                    return $this->getPropertyAccessor()->getValue(
+                        $data,
+                        InflectorFactory::create()->camelize($name)
+                    );
                 } catch (ExceptionInterface $e) {
                     return null;
                 }

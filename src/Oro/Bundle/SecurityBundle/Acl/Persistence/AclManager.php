@@ -282,14 +282,9 @@ class AclManager extends AbstractAclManager
             return $this->doFindAcls($oids, array($sid));
         } catch (AclNotFoundException $ex) {
             if ($ex instanceof NotAllAclsFoundException) {
-                $partialResultException = $ex;
-            } else {
-                $partialResultException = new NotAllAclsFoundException(
-                    'The provider could not find ACLs for all object identities.'
-                );
-                $partialResultException->setPartialResult(new \SplObjectStorage());
+                throw $ex;
             }
-            throw $partialResultException;
+            throw $this->createNotAllAclsFoundException(new \SplObjectStorage());
         }
     }
 
@@ -935,13 +930,7 @@ class AclManager extends AbstractAclManager
                 if (1 === count($oids)) {
                     throw new AclNotFoundException(sprintf('No ACL found for %s.', $oid));
                 }
-
-                $partialResultEx = new NotAllAclsFoundException(
-                    'The provider could not find ACLs for all object identities.'
-                );
-                $partialResultEx->setPartialResult($result);
-
-                throw $partialResultEx;
+                throw $this->createNotAllAclsFoundException($result);
             }
         }
 
@@ -1024,5 +1013,15 @@ class AclManager extends AbstractAclManager
                 'Seems that ACL is not enabled. Please check "security/acl" parameter in "config/security.yml"'
             );
         }
+    }
+
+    private function createNotAllAclsFoundException(\SplObjectStorage $partialResult): NotAllAclsFoundException
+    {
+        $exception = new NotAllAclsFoundException(
+            'The provider could not find ACLs for all object identities.'
+        );
+        $exception->setPartialResult($partialResult);
+
+        return $exception;
     }
 }
