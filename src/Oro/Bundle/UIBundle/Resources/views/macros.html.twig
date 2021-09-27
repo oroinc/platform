@@ -703,49 +703,49 @@
 #}
 {% macro clientControlAttrs(parameters) %}
     {% import _self as UIMacro %}
-    {%- if (parameters.class is defined) -%}
+    {% if (parameters.class is defined) %}
         class="{{ parameters.class }}"
-    {%- endif -%}
-    {%- if (parameters.id is defined) -%}
+    {% endif %}
+    {% if (parameters.id is defined) %}
         id="{{ parameters.id }}"
-    {%- endif -%}
+    {% endif %}
     {% if (parameters.title is defined) %}
         title="{{ parameters.title }}"
     {% endif %}
-    {%- if (parameters.dataId is defined) -%}
+    {% if (parameters.dataId is defined) %}
         data-id="{{ parameters.dataId }}"
-    {%- endif -%}
-    {%- if (parameters.dataIntention is defined) -%}
+    {% endif %}
+    {% if (parameters.dataIntention is defined) %}
         data-intention="{{ parameters.dataIntention }}"
-    {%- endif -%}
-    {%- if (parameters.successMessage is defined) -%}
+    {% endif %}
+    {% if (parameters.successMessage is defined) %}
         data-success-message="{{ parameters.successMessage }}"
-    {%- endif -%}
-    {%- if parameters.dataRedirect is defined -%}
+    {% endif %}
+    {% if parameters.dataRedirect is defined %}
         data-redirect="{{ parameters.dataRedirect }}"
-    {%- endif -%}
-    {%- if parameters.role is defined -%}
+    {% endif %}
+    {% if parameters.role is defined %}
         role="{{ parameters.role }}"
-    {%- endif -%}
-    {%- if parameters.dir is defined -%}
+    {% endif %}
+    {% if parameters.dir is defined %}
         dir="{{ parameters.dir }}"
-    {%- endif -%}
-    {%- if parameters.ariaSelected is defined -%}
+    {% endif %}
+    {% if parameters.ariaSelected is defined %}
         aria-selected="{{ parameters.ariaSelected }}"
-    {%- endif -%}
-    {%- if parameters.ariaControls is defined -%}
+    {% endif %}
+    {% if parameters.ariaControls is defined %}
         aria-controls="{{ parameters.ariaControls }}"
-    {%- endif -%}
+    {% endif %}
     {% if (parameters.ariaLabel is defined) %}
         aria-label="{{ parameters.ariaLabel }}"
     {% endif %}
     {% if (parameters.ariaHaspopup is defined) %}
         aria-haspopup="{{ parameters.ariaHaspopup ? 'true' : 'false' }}"
     {% endif %}
-    {%- if (parameters.visible is defined and not parameters.visible) -%}
+    {% if (parameters.visible is defined and not parameters.visible) %}
         style="display: none"
-    {%- endif -%}
-    {%- if parameters.widget is defined and parameters.widget|length -%}
+    {% endif %}
+    {% if parameters.widget is defined and parameters.widget|length %}
         {% set options = parameters.widget %}
         {%- if (options.createOnEvent is not defined) -%}
             {% set options = options|merge({
@@ -753,7 +753,7 @@
             }) %}
         {%- endif -%}
         {{ UIMacro.renderWidgetAttributes(options) }}
-    {%- endif -%}
+    {% endif %}
     {%- if parameters.pageComponent is defined -%}
         {{ UIMacro.renderPageComponentAttributes(parameters.pageComponent) }}
     {%- endif -%}

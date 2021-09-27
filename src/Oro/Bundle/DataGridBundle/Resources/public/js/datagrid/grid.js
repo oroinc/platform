@@ -1097,11 +1097,11 @@ define(function(require) {
             if (this.header) {
                 this.$grid.append(this.header.render().$el);
             }
-            if (this.body) {
-                this.$grid.append(this.body.render().$el);
-            }
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
+            }
+            if (this.body) {
+                this.$grid.append(this.body.render().$el);
             }
 
             mediator.trigger('grid_load:complete', this.collection, this.$grid);
