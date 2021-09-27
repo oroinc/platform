@@ -1317,6 +1317,7 @@ define(function(require) {
          */
         showLoading: function() {
             this.loadingMask.show();
+            this.trigger('loading-mask:show');
         },
 
         /**
@@ -1331,6 +1332,7 @@ define(function(require) {
          * Hide loading mask
          */
         hideLoading: function() {
+            this.trigger('loading-mask:hide');
             this.loadingMask.hide();
         },
 

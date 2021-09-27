@@ -152,5 +152,43 @@ define(function(require) {
         return attrs;
     };
 
+    Backgrid.BooleanCellEditor.prototype.attributes = {
+        type: 'checkbox'
+    };
+
+    Backgrid.BooleanCellEditor.prototype.initialize = function(options) {
+        this.formatter = options.formatter;
+        this.column = options.column;
+        if (!(this.column instanceof Backgrid.Column)) {
+            this.column = new Backgrid.Column(this.column);
+        }
+    };
+
+    Backgrid.BooleanCellEditor.prototype.saveOrCancel = function(e) {
+        const model = this.model;
+        const column = this.column;
+        const formatter = this.formatter;
+        const command = new Backgrid.Command(e);
+        // skip ahead to `change` when space is pressed
+        if (command.passThru() && e.type !== 'change') return true;
+        if (command.cancel()) {
+            e.stopPropagation();
+            model.trigger('backgrid:edited', model, column, command);
+        }
+
+        const $el = this.$el;
+        if (command.save()) {
+            e.preventDefault();
+            e.stopPropagation();
+            const val = formatter.toRaw($el.prop('checked'), model);
+            model.set(column.get('name'), val);
+            model.trigger('backgrid:edited', model, column, command);
+        } else if (e.type === 'change') {
+            const val = formatter.toRaw($el.prop('checked'), model);
+            model.set(column.get('name'), val);
+            $el.focus();
+        }
+    };
+
     return Backgrid;
 });

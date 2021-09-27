@@ -15,7 +15,7 @@ class TableCellIterator {
 
     setCurrentCell($cell) {
         // Set a new cell only if it is a child of current iterable table
-        if (!this.$table[0].contains($cell[0]) || !$cell.is('[aria-colindex]')) {
+        if (!this.$table[0].contains($cell[0]) || !$cell.is('[aria-colindex]') || $cell.is(this._$cell)) {
             return this;
         }
 
@@ -46,7 +46,7 @@ class TableCellIterator {
     }
 
     prev() {
-        const $cell = this.$cell.prevAll('[aria-colindex]:first');
+        const $cell = this.$cell.prevAll('[aria-colindex]:visible:first');
         if ($cell.length) {
             this.setCurrentCell($cell);
         }
@@ -54,7 +54,7 @@ class TableCellIterator {
     }
 
     next() {
-        const $cell = this.$cell.nextAll('[aria-colindex]:first');
+        const $cell = this.$cell.nextAll('[aria-colindex]:visible:first');
         if ($cell.length) {
             this.setCurrentCell($cell);
         }
@@ -62,7 +62,7 @@ class TableCellIterator {
     }
 
     firstInRow() {
-        const $cell = this.$row.find('[aria-colindex]:first');
+        const $cell = this.$row.find('[aria-colindex]:visible:first');
         if (!this.$cell.is($cell)) {
             this.setCurrentCell($cell);
         }
@@ -70,7 +70,7 @@ class TableCellIterator {
     }
 
     lastInRow() {
-        const $cell = this.$row.find('[aria-colindex]:last');
+        const $cell = this.$row.find('[aria-colindex]:visible:last');
         if (!this.$cell.is($cell)) {
             this.setCurrentCell($cell);
         }
@@ -94,7 +94,7 @@ class TableCellIterator {
     }
 
     _goToRow(step) {
-        const $rows = this.$table.find('[aria-rowindex]');
+        const $rows = this.$table.find('[aria-rowindex]:visible');
         const place = $rows.index(this.$row);
         let goTo;
         let $cell;
@@ -118,7 +118,7 @@ class TableCellIterator {
             goTo < $rows.length &&
             !$cell
         ) {
-            $cell = $rows.eq(goTo).find(`[aria-colindex="${this.colindex}"]:first`);
+            $cell = $rows.eq(goTo).find(`[aria-colindex="${this.colindex}"]:visible:first`);
             if (!$cell.length) {
                 goTo += step;
                 $cell = null;

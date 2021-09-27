@@ -5,11 +5,14 @@ define(function(require) {
     const TableCellIterator = require('orodatagrid/js/datagrid/table-cell-iterator').default;
     const mockGid = `
         <style>
-            [role="grid"] [aria-rowindex] {
+            [aria-rowindex] {
                 display: flex;
             }
             [aria-rowindex] div:not([aria-colindex]){
                 text-decoration: line-through
+            }
+            .hidden {
+                display: none;
             }
         </style>
         <div role="grid">
@@ -17,16 +20,25 @@ define(function(require) {
                 <div aria-colindex="1">(1,1)</div>
                 <div aria-colindex="2">(1,2)</div>
                 <div aria-colindex="3">(1,3)</div>
+                <div aria-colindex="4">(1,4)</div>
             </div>
             <div aria-rowindex="2">
                 <div aria-colindex="1">(2,1)</div>
-                <div>(2,3)</div>
-                <div aria-colindex="3">(2,4)</div>
+                <div>(2,2)</div>
+                <div aria-colindex="3" class="hidden">(2,3)</div>
+                <div aria-colindex="4">(2,4)</div>
             </div>
-            <div aria-rowindex="3">
+            <div aria-rowindex="3" class="hidden">
                 <div aria-colindex="1">(3,1)</div>
                 <div aria-colindex="2">(3,2)</div>
-                <div>(3,3)</div>
+                <div aria-colindex="3">(3,3)</div>
+                <div aria-colindex="4">(3,4)</div>
+            </div>
+            <div aria-rowindex="4">
+                <div aria-colindex="1">(4,1)</div>
+                <div aria-colindex="2">(4,2)</div>
+                <div aria-colindex="3">(4,3)</div>
+                <div>(4,4)</div>
             </div>
         </div>`;
 
@@ -80,7 +92,6 @@ define(function(require) {
         it('check "next" method', function() {
             let $previousCell = tableCellIterator.$cell;
             tableCellIterator.next();
-
             expect(tableCellIterator.index).toEqual([1, 2]);
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
@@ -97,9 +108,12 @@ define(function(require) {
             ]);
 
             tableCellIterator.next();
+            expect(tableCellIterator.index).toEqual([1, 4]);
+            expect(changeCurrentHandler.calls.count()).toEqual(3);
 
-            expect(tableCellIterator.index).toEqual([1, 3]);
-            expect(changeCurrentHandler.calls.count()).toEqual(2);
+            tableCellIterator.next();
+            expect(tableCellIterator.index).toEqual([1, 4]);
+            expect(changeCurrentHandler.calls.count()).toEqual(3);
         });
 
         it('check "prev" method', function() {
@@ -151,15 +165,32 @@ define(function(require) {
             const $previousCell = tableCellIterator.$cell;
 
             tableCellIterator.lastInRow();
-            expect(tableCellIterator.index).toEqual([1, 3]);
+            expect(tableCellIterator.index).toEqual([1, 4]);
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
                 $previousCell
             ]);
 
             tableCellIterator.lastInRow();
-            expect(tableCellIterator.index).toEqual([1, 3]);
+            expect(tableCellIterator.index).toEqual([1, 4]);
             expect(changeCurrentHandler.calls.count()).toEqual(1);
+        });
+
+        it('check "nextRow" method', function() {
+            tableCellIterator.nextRow();
+
+            expect(tableCellIterator.index).toEqual([2, 1]);
+            expect(changeCurrentHandler).toHaveBeenCalled();
+
+            tableCellIterator.nextRow();
+            // it's [4, 1] cell, cause 3rd row was skipped as hidden
+            expect(tableCellIterator.index).toEqual([4, 1]);
+            expect(changeCurrentHandler).toHaveBeenCalled();
+
+            tableCellIterator.nextRow();
+
+            expect(tableCellIterator.index).toEqual([4, 1]);
+            expect(changeCurrentHandler.calls.count()).toEqual(2);
         });
 
         it('check "prevRow" method', function() {
@@ -170,23 +201,10 @@ define(function(require) {
 
             tableCellIterator.nextRow();
             tableCellIterator.nextRow();
+            expect(tableCellIterator.index).toEqual([4, 1]);
 
             tableCellIterator.prevRow();
-            expect(tableCellIterator.colindex).toBe(1);
-            expect(tableCellIterator.rowindex).toBe(2);
-        });
-
-        it('check "nextRow" method', function() {
-            tableCellIterator.nextRow();
-
             expect(tableCellIterator.index).toEqual([2, 1]);
-            expect(changeCurrentHandler).toHaveBeenCalled();
-
-            tableCellIterator.nextRow();
-
-            expect(tableCellIterator.index).toEqual([3, 1]);
-            expect(changeCurrentHandler).toHaveBeenCalled();
-            expect(changeCurrentHandler.calls.count()).toEqual(2);
         });
 
         it('check "firstRow" method', function() {
@@ -214,7 +232,7 @@ define(function(require) {
             const $previousCell = tableCellIterator.$cell;
 
             tableCellIterator.lastRow();
-            expect(tableCellIterator.index).toEqual([3, 1]);
+            expect(tableCellIterator.index).toEqual([4, 1]);
 
             expect(changeCurrentHandler.calls.mostRecent().args).toEqual([
                 tableCellIterator.$cell,
@@ -226,19 +244,19 @@ define(function(require) {
             it('check "lastRow" and "lastInRow" methods', function() {
                 tableCellIterator.lastRow();
                 tableCellIterator.lastInRow();
-                expect(tableCellIterator.index).toEqual([3, 2]);
+                expect(tableCellIterator.index).toEqual([4, 3]);
             });
 
             it('check "lastInRow" and "lastRow" methods', function() {
                 tableCellIterator.lastInRow();
                 tableCellIterator.lastRow();
-                expect(tableCellIterator.index).toEqual([2, 3]);
+                expect(tableCellIterator.index).toEqual([2, 4]);
             });
 
             it('check "next" and "nextRow" methods', function() {
                 tableCellIterator.next();
                 tableCellIterator.nextRow();
-                expect(tableCellIterator.index).toEqual([3, 2]);
+                expect(tableCellIterator.index).toEqual([4, 2]);
             });
 
             it('check "lastInRow", "nextRow" and "prev" methods', function() {
@@ -258,7 +276,7 @@ define(function(require) {
             it('check "nextRow" and "next" methods', function() {
                 tableCellIterator.nextRow();
                 tableCellIterator.next();
-                expect(tableCellIterator.index).toEqual([2, 3]);
+                expect(tableCellIterator.index).toEqual([2, 4]);
             });
         });
     });

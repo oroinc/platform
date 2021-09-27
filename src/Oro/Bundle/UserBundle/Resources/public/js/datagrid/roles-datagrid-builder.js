@@ -55,6 +55,7 @@ define(function(require) {
                 _.extend(currentCategory, category);
                 grid.body.filter();
                 grid.$el.toggle(grid.body.visibleItems.length > 0);
+                grid.trigger('content:update');
             });
         }
     };

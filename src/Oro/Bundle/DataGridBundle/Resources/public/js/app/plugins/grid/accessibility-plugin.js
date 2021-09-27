@@ -21,7 +21,8 @@ const AccessibilityPlugin = BasePlugin.extend({
             },
             'focusin table.grid': 'onFocusin',
             'focusout table.grid': 'onFocusout',
-            'keydown table.grid': 'onKeyDown'
+            'keydown table.grid': 'onKeyDown',
+            'keyup table.grid': 'onKeyUp'
         };
     },
 
@@ -63,27 +64,14 @@ const AccessibilityPlugin = BasePlugin.extend({
     initialize(main, options) {
         Object.assign(this, _.pick(options, 'ignoreEntrusted'));
 
-        this.listenTo(this.main.collection, {
-            beforeFetch() {
-                if (this.$table[0].contains(document.activeElement)) {
-                    this._lastIndex = this.iterator.index;
-                }
-            }
-        });
-
         this.listenTo(this.main, {
             'content:update'() {
-                if (!this.enabled) {
-                    return;
+                if (this.enabled && !this.suspended && this.$table.is(':visible')) {
+                    this._resumeNavigation();
                 }
-                if (this._lastIndex) {
-                    this._restoreCurrent();
-                } else if (!this.$table.find(this.iterator.$cell).length) {
-                    // in case current cell is not available
-                    this._resetCurrent();
-                }
-                this._updateTabindexAttribute();
-            }
+            },
+            'loading-mask:show': this._suspendNavigation,
+            'loading-mask:hide': this._resumeNavigation
         });
 
         this.listenToOnce(this.main, 'rendered', () => {
@@ -159,9 +147,16 @@ const AccessibilityPlugin = BasePlugin.extend({
         const $targetElem = this.$table.find(e.target);
         const $targetCell = $targetElem.closest('[aria-colindex]');
         const allowInnerFocus =
-            this._isFocusInside ||
             this._isDocumentClick ||
-            this._forceInnerFocus;
+            ( // focus changed by program or it's inner focus movement
+                !e.relatedTarget ||
+                this.$table[0].contains(e.relatedTarget)
+            ) && (
+                // focus already inside cell or focus set on mouseover
+                !$targetCell.is('[data-ignore-tabbable]') ||
+                this._isFocusInside ||
+                this._forceInnerFocus
+            );
 
         let $newCell;
 
@@ -180,7 +175,7 @@ const AccessibilityPlugin = BasePlugin.extend({
             this.focusElement($elem);
         }
 
-        if (!this.isInnerFocus()) {
+        if (!this.isInnerFocus() && $targetElem.is(document.activeElement)) {
             e.target.classList.add('focus-via-arrows-keys');
         }
 
@@ -191,10 +186,6 @@ const AccessibilityPlugin = BasePlugin.extend({
 
     onFocusout(e) {
         if (!e.relatedTarget || !this.$table[0].contains(e.relatedTarget)) {
-            // focus goes out of the grid table
-            this.$table.find('[aria-colindex]')
-                .removeAttr('data-ignore-tabbable');
-
             this._focusoutTimeoutID = setTimeout(() => {
                 if (this.disposed) {
                     return;
@@ -203,6 +194,7 @@ const AccessibilityPlugin = BasePlugin.extend({
                 // preserve the flag value for some time,
                 // in case the focus will be returned back to the table shortly
                 this._isFocusInside = false;
+                this.removeIgnoreTabbableAttributes();
             }, 10);
 
             if (!e.relatedTarget && $(document.activeElement).is('body')) {
@@ -212,8 +204,9 @@ const AccessibilityPlugin = BasePlugin.extend({
                 const $dropdownMenu = $target.closest('.dropdown-menu');
                 if ($dropdownMenu.length) {
                     // it might be dropdown-menu close, therefore move focus back to dropdown toggler button
-                    this.focusElement($dropdownMenu.closest('.dropdown').find('[data-toggle="dropdown"]'));
-                } else {
+                    const $toggler = $dropdownMenu.parent().find('[data-toggle="dropdown"]');
+                    this.focusElement($toggler.is(':tabbable') ? $toggler : $toggler.find(':tabbable:first'));
+                } else if (!this.suspended) {
                     // cell content might been deleting, therefore schedule a restore for the current cell
                     this._lastIndex = this.iterator.index;
                     setTimeout(() => {
@@ -256,6 +249,9 @@ const AccessibilityPlugin = BasePlugin.extend({
         }
 
         switch (e.key) {
+            case 'Tab':
+                this.addIgnoreTabbableAttributes();
+                break;
             case 'ArrowLeft':
                 this.iterator.prev();
                 e.preventDefault();
@@ -316,6 +312,12 @@ const AccessibilityPlugin = BasePlugin.extend({
         }
     },
 
+    onKeyUp(e) {
+        if (e.key === 'Tab') {
+            this.removeIgnoreTabbableAttributes();
+        }
+    },
+
     onCurrentChange() {
         this._updateTabindexAttribute();
 
@@ -323,6 +325,16 @@ const AccessibilityPlugin = BasePlugin.extend({
             const $elem = this.defineFocusElement({allowInnerFocus: true});
             this.focusElement($elem);
         }
+    },
+
+    addIgnoreTabbableAttributes() {
+        this.$table.find('[aria-colindex]')
+            .attr('data-ignore-tabbable', '');
+    },
+
+    removeIgnoreTabbableAttributes() {
+        this.$table.find('[aria-colindex]')
+            .removeAttr('data-ignore-tabbable');
     },
 
     defineFocusElement({allowInnerFocus = false}) {
@@ -341,24 +353,15 @@ const AccessibilityPlugin = BasePlugin.extend({
         return this.iterator.$cell;
     },
 
-    focusElement($elem, immediately = false) {
+    focusElement($elem) {
         const {$cell} = this.iterator;
-
-        this.$table.find('[aria-colindex]')
-            .attr('data-ignore-tabbable', '');
 
         if (!$cell.is($elem)) {
             $cell.removeAttr('data-ignore-tabbable');
         }
 
         if (!$elem.is(document.activeElement)) {
-            if (immediately) {
-                $elem.focus();
-            } else {
-                setTimeout(() => {
-                    $elem.focus();
-                });
-            }
+            $elem.focus();
         }
     },
 
@@ -464,9 +467,33 @@ const AccessibilityPlugin = BasePlugin.extend({
                 // it means non specific focus target was established,
                 // therefore restore focus on current cell
                 const $elem = this.defineFocusElement({});
-                this.focusElement($elem, true);
+                this.focusElement($elem);
             }
         }
+    },
+
+    _suspendNavigation() {
+        this.suspended = true;
+        if (this.$table[0].contains(document.activeElement)) {
+            this._lastIndex = this.iterator.index;
+            document.activeElement.blur();
+        }
+    },
+
+    _resumeNavigation() {
+        this.suspended = false;
+
+        if (!this.enabled) {
+            return;
+        }
+
+        if (this._lastIndex) {
+            this._restoreCurrent();
+        } else if (!this.$table.find(this.iterator.$cell).is(':visible')) {
+            // in case current cell is not available
+            this._resetCurrent();
+        }
+        this._updateTabindexAttribute();
     }
 });
 
