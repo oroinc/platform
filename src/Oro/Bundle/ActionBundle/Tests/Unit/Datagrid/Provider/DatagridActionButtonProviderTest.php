@@ -103,7 +103,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         ButtonsCollection $buttonCollection,
         bool $expected,
         array $expectedConfiguration = []
-    ) {
+    ): void {
         $this->buttonProvider->expects($this->once())
             ->method('match')
             ->willReturn($buttonCollection);
@@ -141,7 +141,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         ButtonsCollection $buttonsCollection,
         array $expectedActions,
         array $groups = null
-    ) {
+    ): void {
         $this->buttonProvider->expects($this->any())
             ->method('match')
             ->willReturn($buttonsCollection);
@@ -409,7 +409,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnConfigureActionsWithFewDatagrids()
+    public function testOnConfigureActionsWithFewDatagrids(): void
     {
         $config1 = DatagridConfiguration::create([
             'name' => 'datagrid1',

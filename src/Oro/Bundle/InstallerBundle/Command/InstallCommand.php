@@ -190,6 +190,17 @@ HELP
         parent::configure();
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
+            $this->presetTestEnvironmentOptions($input, $output);
+        }
+    }
+
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -838,5 +849,38 @@ HELP
         }
 
         return $this->assetsCommandProcess->getExitCode();
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    private function presetTestEnvironmentOptions(InputInterface $input, OutputInterface $output): void
+    {
+        $testEnvDefaultOptionValuesMap = [
+            'user-name'         => 'admin',
+            'user-email'        => 'admin@example.com',
+            'user-firstname'    => 'John',
+            'user-lastname'     => 'Doe',
+            'user-password'     => 'admin',
+            'sample-data'       => 'n',
+            'organization-name' => 'OroInc',
+            'application-url'   => 'http://localhost/',
+            'skip-assets'       => true,
+            'skip-translations' => true,
+            'timeout'           => '600',
+            'language'          => 'en',
+            'formatting-code'   => 'en_US'
+        ];
+
+        foreach ($testEnvDefaultOptionValuesMap as $optionName => $optionValue) {
+            if ($input->hasParameterOption('--' . $optionName)) {
+                continue;
+            }
+
+            $input->setOption($optionName, $optionValue);
+        }
+
+        $input->setInteractive(false);
     }
 }

@@ -170,7 +170,7 @@ class AttributeAssembler extends BaseAbstractAssembler
     {
         $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
 
-        if ($this->translator->trans($options['label'], [], $domain) === $options['label']) {
+        if ($this->translator->trans((string) $options['label'], [], $domain) === $options['label']) {
             $options['label'] = $attributeParameters['label'];
         }
 

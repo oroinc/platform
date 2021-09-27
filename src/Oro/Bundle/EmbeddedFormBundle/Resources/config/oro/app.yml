@@ -4,7 +4,6 @@ security:
             pattern:   ^/embedded-form/(submit|success)
             provider:  chain_provider
             anonymous: true
-            logout_on_user_change: true
 
 # X-Frame-Options header should be removed from embedded forms
 # OroEmbeddedForm bundle has lower priority than OroSecurityBundle

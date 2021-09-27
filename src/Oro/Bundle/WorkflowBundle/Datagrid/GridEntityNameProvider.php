@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides workflow definition related entities.
+ */
 class GridEntityNameProvider
 {
     /**
@@ -68,7 +71,7 @@ class GridEntityNameProvider
                 $label = $className;
                 if ($this->configProvider->hasConfig($className)) {
                     $config = $this->configProvider->getConfig($className);
-                    $label = $this->translator->trans($config->get('label'));
+                    $label = $this->translator->trans((string) $config->get('label'));
                 }
 
                 $this->relatedEntities[$label] = $className;

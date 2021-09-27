@@ -75,7 +75,7 @@ class MultiFileBlockListener
 
             $scrollData->addNamedBlock(
                 $blockKey,
-                $this->translator->trans($config->get('label')),
+                $this->translator->trans((string) $config->get('label')),
                 $sectionPriority
             );
 
@@ -123,7 +123,7 @@ class MultiFileBlockListener
 
             $scrollData->addNamedBlock(
                 $newBlockKey,
-                $this->translator->trans($config->get('label')),
+                $this->translator->trans((string) $config->get('label')),
                 $sectionPriority
             );
 

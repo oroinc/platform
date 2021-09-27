@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds UniqueEntity constraint to the class metadata.
+ */
 class UniqueEntityExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -69,7 +72,7 @@ class UniqueEntityExtension extends AbstractTypeExtension
 
             $labels = array_map(
                 function ($fieldName) use ($className) {
-                    $label = $this
+                    $label = (string) $this
                         ->entityConfigProvider
                         ->getConfig($className, $fieldName)
                         ->get('label');

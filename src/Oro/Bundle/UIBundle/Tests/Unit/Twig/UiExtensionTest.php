@@ -78,6 +78,8 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($data, $event->getScrollData());
                 self::assertEquals($formView, $event->getFormView());
                 $event->setScrollData($alteredData);
+
+                return $event;
             });
 
         $entity = new \stdClass();
@@ -137,6 +139,8 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 self::assertSame($formView, $event->getForm());
                 self::assertSame($formData, $event->getFormData());
                 self::assertSame($entity, $event->getEntity());
+
+                return $event;
             });
 
         self::assertSame(
@@ -166,6 +170,8 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 self::assertSame($formView, $event->getForm());
                 self::assertSame($formData, $event->getFormData());
                 self::assertNull($event->getEntity());
+
+                return $event;
             });
 
         self::assertSame(

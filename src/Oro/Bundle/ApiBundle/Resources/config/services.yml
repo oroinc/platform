@@ -1140,3 +1140,9 @@ services:
         tags:
             - { name: oro_entity.delete_handler, entity: Oro\Bundle\ApiBundle\Entity\AsyncOperation }
             - { name: monolog.logger, channel: api }
+
+    oro_api.security.event_listener.logout_listener:
+        class: Oro\Bundle\ApiBundle\Security\EventListener\LogoutListener
+        arguments:
+            - '@security.http_utils'
+            - '@oro_api.rest.doc_url_generator'

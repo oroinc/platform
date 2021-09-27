@@ -19,6 +19,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides useful methods for dynamic fields.
+ */
 class DynamicFieldsHelper
 {
     /** @var ConfigManager */
@@ -181,7 +184,7 @@ class DynamicFieldsHelper
         foreach ($entities as $entity) {
             $extraData = [];
             foreach ($extendConfig->get('target_grid') as $fieldName) {
-                $label = $this->configManager->getProvider('entity')
+                $label = (string) $this->configManager->getProvider('entity')
                     ->getConfig($className, $fieldName)
                     ->get('label');
 

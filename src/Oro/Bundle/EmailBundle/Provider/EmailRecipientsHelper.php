@@ -414,7 +414,7 @@ class EmailRecipientsHelper
             return null;
         }
         $entityConfig = new EntityConfigId('entity', $className);
-        $label        = $this->configManager->getConfig($entityConfig)->get('label');
+        $label        = (string) $this->configManager->getConfig($entityConfig)->get('label');
 
         return $this->translator->trans($label);
     }

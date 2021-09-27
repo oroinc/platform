@@ -12,7 +12,6 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -152,15 +151,14 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 new Reference('oro_security.context_listener.main'),
-                new Reference('security.token_storage'),
-                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+                new Reference('security.token_storage')
             ],
             $contextFirewallListener->getArguments()
         );
         self::assertTrue($contextFirewallListener->hasMethodCall('setCsrfRequestManager'));
         self::assertEquals(ExceptionListener::class, $exceptionListenerDefinition->getClass());
 
-        $listeners = $contextFirewallContext->getArgument(0);
+        $listeners = $contextFirewallContext->getArgument(0)->getValues();
         self::assertCount(2, $listeners);
         // the context listener should be before the access listener
         self::assertEquals('oro_security.context_listener.main.testFirewall', (string)$listeners[0]);
@@ -199,7 +197,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFirewallMap();
 
-        $listeners = $contextFirewallContext->getArgument(0);
+        $listeners = $contextFirewallContext->getArgument(0)->getValues();
         self::assertCount(3, $listeners);
         // the context listener should be before the access listener or remember me listener
         self::assertEquals('oro_security.context_listener.main.testFirewall', (string)$listeners[0]);

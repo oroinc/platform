@@ -124,7 +124,7 @@ class OptionsHelper
     protected function getTitle(ButtonInterface $button, array $frontendOptions)
     {
         return $this->translator->trans(
-            $frontendOptions['title'] ?? $button->getLabel(),
+            (string) ($frontendOptions['title'] ?? $button->getLabel()),
             $frontendOptions['title_parameters'] ?? [],
             $button->getTranslationDomain()
         );

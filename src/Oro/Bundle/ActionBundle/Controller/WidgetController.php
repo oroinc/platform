@@ -47,7 +47,7 @@ class WidgetController extends AbstractController
     {
         $handler = $this->get(OperationFormHandler::class);
 
-        $result = $handler->process($operationName, $request, $this->get('session')->getFlashBag());
+        $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
 
         return $result instanceof Response ? $result : $this->render($this->getFormTemplate($result), $result);
     }

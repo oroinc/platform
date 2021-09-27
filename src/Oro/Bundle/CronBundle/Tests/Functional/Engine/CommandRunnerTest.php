@@ -12,40 +12,31 @@ class CommandRunnerTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testShouldAllowToTakeFromContainerAsService()
+    public function testShouldAllowToTakeFromContainerAsService(): void
     {
-        $runner = $this->getContainer()->get('oro_cron.engine.command_runner');
+        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
         self::assertInstanceOf(CommandRunner::class, $runner);
     }
 
-    public function testShouldRunCommandAndReturnOutput()
+    public function testShouldRunCommandAndReturnOutput(): void
     {
-        /** @var CommandRunner $runner */
-        $runner = $this->getContainer()->get('oro_cron.engine.command_runner');
+        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
-        $result = $runner->run('debug:router');
+        $result = $runner->run('about');
 
-        static::assertStringContainsString('Name', $result);
-        static::assertStringContainsString('Method', $result);
-        static::assertStringContainsString('Scheme', $result);
-        static::assertStringContainsString('Host', $result);
-        static::assertStringContainsString('Path', $result);
+        static::assertStringContainsString('Symfony', $result);
+        static::assertStringContainsString('Kernel', $result);
+        static::assertStringContainsString('PHP', $result);
     }
 
-    public function testShouldAcceptCommandArguments()
+    public function testShouldAcceptCommandArguments(): void
     {
-        /** @var CommandRunner $runner */
-        $runner = $this->getContainer()->get('oro_cron.engine.command_runner');
+        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
-        $result = $runner->run('debug:router', ['--help']);
+        $result = $runner->run('about', ['--help']);
 
-        static::assertStringNotContainsString('Name', $result);
-        static::assertStringNotContainsString('Method', $result);
-        static::assertStringNotContainsString('Scheme', $result);
-        static::assertStringNotContainsString('Host', $result);
-        static::assertStringNotContainsString('Path', $result);
         static::assertStringContainsString('Help:', $result);
-        static::assertStringContainsString('The debug:router displays the configured routes:', $result);
+        static::assertStringContainsString('Display information about the current project', $result);
     }
 }

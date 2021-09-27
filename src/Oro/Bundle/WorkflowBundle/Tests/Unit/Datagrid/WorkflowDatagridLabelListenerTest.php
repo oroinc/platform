@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDatagridLabelListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
@@ -13,28 +14,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var WorkflowDatagridLabelListener
-     */
-    protected $listener;
+    private WorkflowDatagridLabelListener $listener;
 
     protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->listener = new WorkflowDatagridLabelListener($this->translator);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->translator, $this->listener);
-    }
-
-    public function testTrans()
+    public function testTrans(): void
     {
         $this->translator
             ->expects($this->atLeastOnce())
@@ -44,14 +34,15 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
                 $this->anything(),
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN,
                 $this->anything()
-            );
+            )
+            ->willReturnArgument(0);
         $this->listener->trans('ANY_STRING');
     }
 
-    public function testOnBuildBefore()
+    public function testOnBuildBefore(): void
     {
         $datagridConfiguration = $this->getStubConfiguration();
-        $mockEvent = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildBefore')
+        $mockEvent = $this->getMockBuilder(BuildBefore::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockEvent->expects($this->atLeastOnce())->method('getConfig')->willReturn($datagridConfiguration);
@@ -127,7 +118,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function getStubConfiguration()
+    private function getStubConfiguration(): DatagridConfiguration
     {
         return DatagridConfiguration::create(
             [

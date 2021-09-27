@@ -20,7 +20,7 @@ class Label
      * @param string $name
      * @param string|null $domain
      */
-    public function __construct($name, $domain = null)
+    public function __construct(string $name, string $domain = null)
     {
         $this->name = $name;
         $this->domain = $domain;

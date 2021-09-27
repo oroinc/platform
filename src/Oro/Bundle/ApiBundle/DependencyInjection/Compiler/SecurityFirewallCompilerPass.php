@@ -10,7 +10,6 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -80,8 +79,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             ->register($apiContextListenerId, ContextListener::class)
             ->setArguments([
                 new Reference($listenerId),
-                new Reference('security.token_storage'),
-                new Reference('session', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+                new Reference('security.token_storage')
             ])
             ->addMethodCall('setCsrfRequestManager', [new Reference('oro_security.csrf_request_manager')]);
         $contextListeners = [];
@@ -103,7 +101,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             $contextListeners[] = $listener;
         }
 
-        $contextDef->replaceArgument(0, $contextListeners);
+        $contextDef->replaceArgument(0, new IteratorArgument($contextListeners));
 
         // replace the exception listener class
         $exceptionListenerDef = $container->getDefinition($contextDef->getArgument(1));

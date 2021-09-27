@@ -150,7 +150,7 @@ class GridViewsExtension extends AbstractExtension
         } else {
             $defaultViewId = $this->getDefaultViewId($gridName);
 
-            return $defaultViewId ? $defaultViewId : self::DEFAULT_VIEW_ID;
+            return $defaultViewId ?: self::DEFAULT_VIEW_ID;
         }
     }
 

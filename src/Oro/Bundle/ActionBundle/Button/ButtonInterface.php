@@ -18,7 +18,7 @@ interface ButtonInterface
     /**
      * @return string
      */
-    public function getLabel();
+    public function getLabel(): string;
 
     public function getAriaLabel(): ?string;
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
@@ -65,5 +66,14 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(
             new AddTransactionWatcherCompilerPass('oro.doctrine.connection.transaction_watcher')
         );
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(
+                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                    ['Oro\Bundle\EntityBundle\Tests\Functional\Environment\Entity'],
+                    [$this->getPath() . '/Tests/Functional/Environment/Entity']
+                )
+            );
+        }
     }
 }

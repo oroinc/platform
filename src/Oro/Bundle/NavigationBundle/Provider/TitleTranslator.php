@@ -5,6 +5,9 @@ namespace Oro\Bundle\NavigationBundle\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Translates each part of the title template individually.
+ */
 class TitleTranslator
 {
     /** @var TranslatorInterface */
@@ -36,7 +39,7 @@ class TitleTranslator
         $delimiter  = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
         $transItems = explode($delimiter, $titleTemplate);
         foreach ($transItems as $key => $transItem) {
-            $transItems[$key] = $this->translator->trans($transItem, $params);
+            $transItems[$key] = $this->translator->trans((string) $transItem, $params);
         }
 
         return implode($delimiter, $transItems);

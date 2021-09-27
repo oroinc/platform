@@ -131,6 +131,13 @@ services:
         tags:
             - { name: form.type }
 
+    oro_config.type.url_info_type:
+        class: Oro\Bundle\ConfigBundle\Form\Type\UrlInfoType
+        arguments:
+            - '@router'
+        tags:
+            - { name: form.type }
+
     oro_config.form.handler.config:
         class: Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler
         public: true

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
+/**
+ * Transition key template.
+ */
 class TransitionTemplate extends WorkflowTemplate
 {
     const NAME = 'transition';
@@ -9,7 +12,7 @@ class TransitionTemplate extends WorkflowTemplate
     /**
      * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return parent::getTemplate() . '.transition.{{ transition_name }}';
     }

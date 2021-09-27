@@ -4,22 +4,25 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LexerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Lexer */
-    protected $lexer;
+    private Lexer $lexer;
 
     protected function setUp(): void
     {
-        $translatorMock = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
-        $providerMock   = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
-        $this->lexer    = new Lexer($translatorMock, $providerMock);
-    }
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $providerMock   = $this->createMock(DateModifierProvider::class);
+        $providerMock->expects(self::any())
+            ->method('getVariableKey')
+            ->willReturnCallback(function ($variable) {
+                return DateModifierInterface::LABEL_VAR_PREFIX . DateModifierInterface::VAR_THIS_YEAR;
+            });
 
-    protected function tearDown(): void
-    {
-        unset($this->lexer);
+        $this->lexer = new Lexer($translatorMock, $providerMock);
     }
 
     /**
@@ -29,7 +32,7 @@ class LexerTest extends \PHPUnit\Framework\TestCase
      * @param array       $expectedTokens
      * @param null|string $expectedException
      */
-    public function testTokenize($input, array $expectedTokens, $expectedException = null)
+    public function testTokenize($input, array $expectedTokens, $expectedException = null): void
     {
         if (null !== $expectedException) {
             $this->expectException($expectedException);
@@ -37,18 +40,15 @@ class LexerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->lexer->tokenize($input);
 
-        $this->assertIsArray($result);
-        $this->assertCount(count($expectedTokens), $result);
+        self::assertIsArray($result);
+        self::assertCount(count($expectedTokens), $result);
 
         foreach ($result as $key => $token) {
-            $this->assertEquals($expectedTokens[$key], $token);
+            self::assertEquals($expectedTokens[$key], $token);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function tokenizeProvider()
+    public function tokenizeProvider(): array
     {
         return [
             'should parse time token'                                     => [

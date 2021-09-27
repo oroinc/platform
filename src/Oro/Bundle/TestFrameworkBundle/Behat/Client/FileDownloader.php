@@ -44,7 +44,13 @@ class FileDownloader
         $cookies = $session->getDriver()->getWebDriverSession()->getAllCookies();
         $cookieJar = new CookieJar(true, $cookies);
         foreach ($cookies as $cookieData) {
-            $setCookie = new SetCookie();
+            $data = [];
+            if (isset($cookieData['sameSite'])) {
+                // Sets SameSite via $data constructor argument because setSameSite() is not present in SetCookie.
+                $data['SameSite'] = $cookieData['sameSite'];
+                unset($cookieData['sameSite']);
+            }
+            $setCookie = new SetCookie($data);
             foreach ($cookieData as $name => $value) {
                 if ($name === 'expiry') {
                     # The "expiry" option in Selenium matches "expires" option in Guzzle

@@ -15,7 +15,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -40,7 +39,7 @@ class ConfigFieldGridController extends AbstractController
     public function createAction(Request $request, EntityConfigModel $entityConfigModel)
     {
         if (!$this->getExtendConfigProvider()->getConfig($entityConfigModel->getClassName())->is('is_extend')) {
-            $this->get(SessionInterface::class)->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'error',
                 $entityConfigModel->getClassName() . 'isn\'t extend'
             );
@@ -162,7 +161,6 @@ class ConfigFieldGridController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                SessionInterface::class,
                 RemoveRestoreConfigFieldHandler::class,
                 CreateUpdateConfigFieldHandler::class,
                 ConfigManager::class,

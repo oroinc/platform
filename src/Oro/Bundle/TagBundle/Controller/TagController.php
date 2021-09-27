@@ -53,9 +53,9 @@ class TagController extends AbstractController
      * )
      * @Template("@OroTag/Tag/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Tag());
+        return $this->update(new Tag(), $request);
     }
 
     /**
@@ -68,9 +68,9 @@ class TagController extends AbstractController
      * )
      * @Template
      */
-    public function updateAction(Tag $entity)
+    public function updateAction(Tag $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -104,12 +104,13 @@ class TagController extends AbstractController
 
     /**
      * @param Tag $entity
+     * @param Request $request
      * @return array|RedirectResponse
      */
-    protected function update(Tag $entity)
+    protected function update(Tag $entity, Request $request)
     {
         if ($this->get(TagHandler::class)->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.tag.controller.tag.saved.message')
             );

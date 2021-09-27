@@ -73,17 +73,17 @@ abstract class AbstractEntityClassNameProvider
      * @param string $entityClass
      * @param bool   $isPlural
      *
-     * @return string|null
+     * @return string
      */
-    protected function getLabelName($entityClass, $isPlural = false)
+    protected function getLabelName($entityClass, $isPlural = false): string
     {
         if (!$this->configManager->hasConfig($entityClass)
             || $this->configManager->isHiddenModel($entityClass)
         ) {
-            return null;
+            return '';
         }
 
-        return $this->configManager->getEntityConfig('entity', $entityClass)
+        return (string) $this->configManager->getEntityConfig('entity', $entityClass)
             ->get($isPlural ? 'plural_label' : 'label');
     }
 
@@ -91,17 +91,17 @@ abstract class AbstractEntityClassNameProvider
      * @param string $entityClass
      * @param string $fieldName
      *
-     * @return string|null
+     * @return string
      */
-    protected function getFieldLabelName($entityClass, $fieldName)
+    protected function getFieldLabelName($entityClass, $fieldName): string
     {
         if (!$this->configManager->hasConfig($entityClass, $fieldName)
             || $this->configManager->isHiddenModel($entityClass, $fieldName)
         ) {
-            return null;
+            return '';
         }
 
-        return $this->configManager->getFieldConfig('entity', $entityClass, $fieldName)
+        return (string) $this->configManager->getFieldConfig('entity', $entityClass, $fieldName)
             ->get('label');
     }
 }

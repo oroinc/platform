@@ -44,7 +44,6 @@ security:
             guard: # see "main" firewall
                 authenticators:
                     - oro_user.impersonation_authenticator
-            logout_on_user_change: true
 
 knp_gaufrette:
     adapters:

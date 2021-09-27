@@ -72,7 +72,7 @@ class MailboxController extends AbstractController
         $handler = $this->get(MailboxHandler::class);
 
         if ($handler->process($mailbox)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans(
                     'oro.email.mailbox.action.saved',

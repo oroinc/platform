@@ -54,7 +54,7 @@ class PrepareResultItemListener
 
         if (!$item->getEntityLabel()) {
             $className = $item->getEntityName();
-            $label = $this->configManager->getEntityConfig('entity', $className)->get('label');
+            $label = (string) $this->configManager->getEntityConfig('entity', $className)->get('label');
             $item->setEntityLabel($this->translator->trans($label));
         }
     }

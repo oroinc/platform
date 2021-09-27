@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
@@ -315,5 +316,60 @@ class SendUpdatedEntitiesToMessageQueueTest extends WebTestCase
                 'entity_id' => $child->getId(),
             ]],
         ], $insertedEntity['change_set']);
+    }
+
+    public function testShouldNotSendWhenMoneyPropertyNotChanged()
+    {
+        $owner = new TestAuditDataOwner();
+        $owner->setMoneyProperty(1.01);
+
+        $em = $this->saveOwnerAndClearMessages($owner);
+        $em->clear();
+        /** @var TestAuditDataOwner $owner */
+        $owner = $em->getRepository(TestAuditDataOwner::class)->findOneBy(['id' => $owner->getId()]);
+        $owner->setMoneyProperty(1.01);
+        $em->flush();
+
+        self::assertSame([], self::getSentMessages());
+    }
+
+    public function testShouldNotSendWhenDecimalPropertyNotChanged()
+    {
+        $owner = new TestAuditDataOwner();
+        $owner->setDecimalProperty(1.01);
+
+        $em = $this->saveOwnerAndClearMessages($owner);
+        $em->clear();
+        /** @var TestAuditDataOwner $owner */
+        $owner = $em->getRepository(TestAuditDataOwner::class)->findOneBy(['id' => $owner->getId()]);
+        $owner->setDecimalProperty(1.01);
+        $em->flush();
+
+        self::assertSame([], self::getSentMessages());
+    }
+
+    public function testShouldNotSendWhenMoneyValuePropertyNotChanged()
+    {
+        $owner = new TestAuditDataOwner();
+        $owner->setMoneyValueProperty('1.01');
+
+        $em = $this->saveOwnerAndClearMessages($owner);
+        $em->clear();
+        /** @var TestAuditDataOwner $owner */
+        $owner = $em->getRepository(TestAuditDataOwner::class)->findOneBy(['id' => $owner->getId()]);
+        $owner->setMoneyValueProperty('1.01');
+        $em->flush();
+
+        self::assertSame([], self::getSentMessages());
+    }
+
+    private function saveOwnerAndClearMessages(TestAuditDataOwner $owner): EntityManagerInterface
+    {
+        $em = $this->getEntityManager();
+        $em->persist($owner);
+        $em->flush();
+        $this->getMessageCollector()->clear();
+
+        return $em;
     }
 }

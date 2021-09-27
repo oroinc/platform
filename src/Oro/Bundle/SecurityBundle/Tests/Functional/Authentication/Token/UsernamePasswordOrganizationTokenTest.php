@@ -17,7 +17,7 @@ class UsernamePasswordOrganizationTokenTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->session = $this->getContainer()->get('session');
+        $this->session = $this->getSession();
     }
 
     public function testSerializeReferenceWithoutError()

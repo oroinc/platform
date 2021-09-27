@@ -225,8 +225,8 @@ class EntityProvider
     {
         $result[] = [
             'name'         => $name,
-            'label'        => $translate ? $this->translator->trans($label) : $label,
-            'plural_label' => $translate ? $this->translator->trans($pluralLabel) : $pluralLabel,
+            'label'        => $translate ? $this->translator->trans((string) $label) : $label,
+            'plural_label' => $translate ? $this->translator->trans((string) $pluralLabel) : $pluralLabel,
             'icon'         => $icon
         ];
     }

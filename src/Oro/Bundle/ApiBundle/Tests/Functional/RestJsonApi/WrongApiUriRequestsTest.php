@@ -51,7 +51,7 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
                 'status' => '404',
                 'title'  => 'not found http exception',
                 'detail' => sprintf(
-                    'No route found for "GET %1$s/api/testapientity1/..%2$s/api/users/1".',
+                    'No route found for "GET http://localhost%1$s/api/testapientity1/..%2$s/api/users/1".',
                     $this->getWebBackendPrefix(),
                     $this->getWebBackendPrefixPath()
                 )
@@ -75,7 +75,7 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
                 'status' => '404',
                 'title'  => 'not found http exception',
                 'detail' => sprintf(
-                    'No route found for "GET %1$s/api/testapientity1/../users/1"'
+                    'No route found for "GET http://localhost%1$s/api/testapientity1/../users/1"'
                     . ' (from "http://localhost%1$s/api/testapientity1/..%2$s/api/users/1").',
                     $this->getWebBackendPrefix(),
                     $this->getWebBackendPrefixPath()
@@ -104,7 +104,7 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
                 'status' => '404',
                 'title'  => 'not found http exception',
                 'detail' => sprintf(
-                    'No route found for "GET %1$s/api/testapientity1/..%2$s/user/view/1"'
+                    'No route found for "GET http://localhost%1$s/api/testapientity1/..%2$s/user/view/1"'
                     . ' (from "http://localhost%1$s/api/testapientity1/../users/1").',
                     $this->getWebBackendPrefix(),
                     $this->getWebBackendPrefixPath()

@@ -133,18 +133,20 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
 
     private function getListener(OrigRememberMeListener $innerListener): RememberMeListener
     {
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects(self::any())
-            ->method('getName')
-            ->willReturn(self::SESSION_NAME);
-
-        return new RememberMeListener($innerListener, $sessionMock);
+        return new RememberMeListener($innerListener);
     }
 
     private function createMasterRequestEvent(bool $isXmlHttpRequest = false): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);
+        $session = $this->createMock(SessionInterface::class);
+        $session
+            ->expects(self::any())
+            ->method('getName')
+            ->willReturn(self::SESSION_NAME);
+        $request->setSession($session);
+        
         if ($isXmlHttpRequest) {
             $request->headers->set('X-Requested-With', 'XMLHttpRequest');
         }

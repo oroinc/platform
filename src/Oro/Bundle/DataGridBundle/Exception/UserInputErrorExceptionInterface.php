@@ -2,21 +2,24 @@
 
 namespace Oro\Bundle\DataGridBundle\Exception;
 
+/**
+ * Datagrid Exception for user input error
+ */
 interface UserInputErrorExceptionInterface extends DatagridException
 {
-    const TYPE = 'user_input_error';
+    public const TYPE = 'user_input_error';
 
     /**
      * Get error message translation key
      *
      * @return string
      */
-    public function getMessageTemplate();
+    public function getMessageTemplate(): string;
 
     /**
      * Get error  message translation params
      *
-     * @return mixed
+     * @return array
      */
-    public function getMessageParams();
+    public function getMessageParams(): array;
 }

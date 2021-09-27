@@ -76,7 +76,7 @@ class ActivityWidgetProvider implements WidgetProviderInterface
                 $widget = [
                     'widgetType' => 'block',
                     'alias'      => $alias,
-                    'label'      => $this->translator->trans($item['label']),
+                    'label'      => isset($item['label']) ? $this->translator->trans((string) $item['label']) : '',
                     'url'        => $url
                 ];
                 if (isset($item['priority'])) {

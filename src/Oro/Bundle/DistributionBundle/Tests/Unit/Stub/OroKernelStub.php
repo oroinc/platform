@@ -31,14 +31,6 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getRootDir()
-    {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFixturesDir()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR;

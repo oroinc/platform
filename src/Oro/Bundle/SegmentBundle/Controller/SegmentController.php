@@ -18,6 +18,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -89,9 +90,9 @@ class SegmentController extends AbstractController
      *      class="OroSegmentBundle:Segment"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Segment());
+        return $this->update(new Segment(), $request);
     }
 
     /**
@@ -106,13 +107,14 @@ class SegmentController extends AbstractController
      * )
      *
      * @param Segment $entity
+     * @param Request $request
      * @return array
      */
-    public function updateAction(Segment $entity)
+    public function updateAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
 
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -121,9 +123,10 @@ class SegmentController extends AbstractController
      * @AclAncestor("oro_segment_create")
      *
      * @param Segment $entity
+     * @param Request $request
      * @return array
      */
-    public function cloneAction(Segment $entity)
+    public function cloneAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
 
@@ -137,7 +140,7 @@ class SegmentController extends AbstractController
             )
         );
 
-        return $this->update($clonedEntity);
+        return $this->update($clonedEntity, $request);
     }
 
     /**
@@ -145,16 +148,17 @@ class SegmentController extends AbstractController
      * @AclAncestor("oro_segment_update")
      *
      * @param Segment $entity
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function refreshAction(Segment $entity)
+    public function refreshAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
 
         if ($entity->isStaticType()) {
             $this->get(StaticSegmentManager::class)->run($entity);
 
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.segment.refresh_dialog.success')
             );
@@ -165,16 +169,17 @@ class SegmentController extends AbstractController
 
     /**
      * @param Segment $entity
+     * @param Request $request
      *
      * @return array
      */
-    protected function update(Segment $entity)
+    protected function update(Segment $entity, Request $request)
     {
         $form = $this->get('form.factory')
             ->createNamed('oro_segment_form', SegmentType::class);
 
         if ($this->get(SegmentHandler::class)->process($form, $entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.segment.entity.saved')
             );

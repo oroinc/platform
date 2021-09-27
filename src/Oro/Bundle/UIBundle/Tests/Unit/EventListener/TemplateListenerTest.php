@@ -8,7 +8,9 @@ use Oro\Bundle\UIBundle\EventListener\TemplateListener;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
@@ -29,10 +31,12 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->request = Request::create('/test/url');
 
-        $this->event = $this->createMock(ViewEvent::class);
-        $this->event->expects(self::any())
-            ->method('getRequest')
-            ->willReturn($this->request);
+        $this->event = new ViewEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $this->request,
+            HttpKernelInterface::MAIN_REQUEST,
+            new Response()
+        );
 
         $this->twig = $this->createMock(Environment::class);
 

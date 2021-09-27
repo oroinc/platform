@@ -198,32 +198,36 @@ class ScriptHandler
     }
 
     /**
-     * Sets the global assets version
+     * Sets the global assets version.
      *
      * @param Event $event A instance
      */
-    public static function setAssetsVersion(Event $event)
+    public static function setAssetsVersion(Event $event): void
     {
-        $options = self::getOptions($event);
+        $assetsVersion = substr(md5(date('c')), 0, 8);
 
-        $parametersFile = self::getParametersFile($options);
-        if (is_file($parametersFile) && is_writable($parametersFile)) {
-            $values               = self::loadParametersFile($parametersFile);
-            $parametersKey        = self::getParametersKey($options);
-            $assetsVersionHandler = new AssetsVersionHandler($event->getIO());
-            if (isset($values[$parametersKey])
-                && $assetsVersionHandler->setAssetsVersion($values[$parametersKey], $options)
-            ) {
-                self::saveParametersFile($parametersFile, $values);
-            }
-        } else {
-            $event->getIO()->write(
-                sprintf(
-                    '<comment>Cannot set assets version because "%s" file does not exist or not writable</comment>',
-                    $parametersFile
-                )
-            );
+        self::saveAssetsVersion($assetsVersion);
+    }
+
+    protected static function saveAssetsVersion(string $version): void
+    {
+        $filesystem    = new Filesystem();
+        $filePath      = self::getAssetsVersionFile();
+        $directoryPath = pathinfo($filePath, PATHINFO_DIRNAME);
+
+        if (!is_dir($directoryPath)) {
+            $filesystem->remove($directoryPath);
         }
+        if (!file_exists($directoryPath)) {
+            $filesystem->mkdir($directoryPath);
+        }
+
+        file_put_contents($filePath, $version);
+    }
+
+    protected static function getAssetsVersionFile(): string
+    {
+        return 'public/build/build_version.txt';
     }
 
     protected static function loadParametersFile(string $parametersFile): array

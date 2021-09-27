@@ -11,6 +11,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,9 +34,9 @@ class BusinessUnitController extends AbstractController
      *      permission="CREATE"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new BusinessUnit());
+        return $this->update(new BusinessUnit(), $request);
     }
 
     /**
@@ -87,9 +88,9 @@ class BusinessUnitController extends AbstractController
      *      permission="EDIT"
      * )
      */
-    public function updateAction(BusinessUnit $entity)
+    public function updateAction(BusinessUnit $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -109,12 +110,13 @@ class BusinessUnitController extends AbstractController
 
     /**
      * @param BusinessUnit $entity
+     * @param Request $request
      * @return array
      */
-    private function update(BusinessUnit $entity)
+    private function update(BusinessUnit $entity, Request $request)
     {
         if ($this->get(BusinessUnitHandler::class)->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.business_unit.controller.message.saved')
             );

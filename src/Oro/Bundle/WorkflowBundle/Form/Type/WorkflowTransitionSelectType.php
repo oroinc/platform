@@ -13,6 +13,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Covers logic of selecting Workflow Transitions.
+ */
 class WorkflowTransitionSelectType extends AbstractType
 {
     const NAME = 'oro_workflow_transition_select';
@@ -65,7 +68,7 @@ class WorkflowTransitionSelectType extends AbstractType
         /** @var ChoiceView $choiceView */
         foreach ($view->vars['choices'] as $choiceView) {
             $translatedLabel = $this->translator->trans(
-                $choiceView->label,
+                (string) $choiceView->label,
                 [],
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN
             );

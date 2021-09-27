@@ -25,7 +25,7 @@ class TranslatableProperty extends FieldProperty
     {
         $value = parent::getRawValue($record);
         if (!$value) {
-            $value = $this->getOr(self::TRANS_KEY);
+            $value = (string) $this->getOr(self::TRANS_KEY, '');
         }
 
         return $this->translator->trans(

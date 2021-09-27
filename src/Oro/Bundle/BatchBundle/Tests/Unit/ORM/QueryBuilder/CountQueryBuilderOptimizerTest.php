@@ -649,6 +649,8 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                             $event->removeJoinFromOptimizedQuery($deletedJoin);
                         }
                     }
+                    
+                    return $event;
                 }
             );
         $optimizer->setEventDispatcher($eventDispatcher);

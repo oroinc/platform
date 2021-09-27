@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('cookie_httponly')->defaultFalse()->end()
                     ->enumNode('cookie_samesite')
                         ->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])
-                        ->defaultNull()
+                        ->defaultValue(Cookie::SAMESITE_LAX)
                         ->end()
                 ->end()
             ->end()

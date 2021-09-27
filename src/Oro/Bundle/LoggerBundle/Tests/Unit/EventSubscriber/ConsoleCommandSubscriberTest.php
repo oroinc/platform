@@ -10,14 +10,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConsoleCommandSubscriber */
-    protected $subscriber;
+    private ConsoleCommandSubscriber $subscriber;
 
-    /** @var Logger|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private Logger|\PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * {@inheritdoc}
@@ -29,9 +29,9 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new ConsoleCommandSubscriber($this->logger);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConsoleEvents::COMMAND => [['onConsoleCommand', -1]],
                 ConsoleEvents::ERROR => [['onConsoleError', -1]]
@@ -40,19 +40,16 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnConsoleCommandNotRun()
+    public function testOnConsoleCommandNotRun(): void
     {
-        /** @var ConsoleCommandEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(ConsoleCommandEvent::class);
-        $event->expects($this->once())
-            ->method('commandShouldRun')
-            ->will($this->returnValue(false));
+        $event = new ConsoleCommandEvent(
+            null,
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class)
+        );
+        $event->disableCommand();
 
-        $event->expects($this->never())
-            ->method('getInput');
-
-        $this->logger
-            ->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('info');
 
         $this->subscriber->onConsoleCommand($event);
@@ -61,19 +58,15 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider consoleCommandProvider
      */
-    public function testOnConsoleCommand(array $arguments, array $options)
+    public function testOnConsoleCommand(array $arguments, array $options): void
     {
         $input = new InputStub('test:command', $arguments, $options);
 
-        /** @var ConsoleCommandEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(ConsoleCommandEvent::class);
-        $event->expects($this->once())
-            ->method('commandShouldRun')
-            ->will($this->returnValue(true));
-
-        $event->expects($this->once())
-            ->method('getInput')
-            ->will($this->returnValue($input));
+        $event = new ConsoleCommandEvent(
+            new Command('test:command'),
+            $input,
+            $this->createMock(OutputInterface::class)
+        );
 
         $context = [];
 
@@ -85,8 +78,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             $context['options'] = $options;
         }
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(sprintf('Launched command "%s"', 'test:command'), $context);
 
@@ -96,7 +88,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider consoleCommandProvider
      */
-    public function testOnConsoleError(array $arguments, array $options)
+    public function testOnConsoleError(array $arguments, array $options): void
     {
         $input = new InputStub('test:command', $arguments, $options);
 
@@ -114,8 +106,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             $context['options'] = $options;
         }
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 sprintf(
@@ -129,10 +120,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onConsoleError($event);
     }
 
-    /**
-     * @return array
-     */
-    public function consoleCommandProvider()
+    public function consoleCommandProvider(): array
     {
         return [
             'without arguments and options' => [

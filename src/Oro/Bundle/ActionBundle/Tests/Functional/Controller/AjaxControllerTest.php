@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
+use Oro\Bundle\ActionBundle\Tests\Functional\OperationAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -13,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AjaxControllerTest extends WebTestCase
 {
+    use OperationAwareTestTrait;
+
     private const MESSAGE_DEFAULT = 'test message';
     private const MESSAGE_NEW = 'new test message';
 
@@ -109,7 +112,10 @@ class AjaxControllerTest extends WebTestCase
             $this->assertTrue($result->isRedirect($location));
         }
 
-        $this->assertEquals($flashMessages, $this->getContainer()->get('session')->getFlashBag()->all());
+        $this->assertEquals(
+            $flashMessages,
+            $this->getSession()->getFlashBag()->all()
+        );
 
         if ($statusCode === Response::HTTP_FORBIDDEN) {
             $response = self::getJsonResponseContent($result, Response::HTTP_FORBIDDEN);
@@ -323,34 +329,8 @@ class AjaxControllerTest extends WebTestCase
         $this->assertResponseStatusCodeEquals($result, Response::HTTP_NOT_FOUND);
         $this->assertEquals(
             ['error' => ['Operation with name "oro_action_test_action" not found']],
-            $this->getContainer()->get('session')->getFlashBag()->all()
+            $this->getSession()->getFlashBag()->all()
         );
-    }
-
-    /**
-     * @param $operationName
-     * @param $entityId
-     * @param $entityClass
-     * @param $datagrid
-     *
-     * @return array
-     */
-    private function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid)
-    {
-        $actionContext = [
-            'entityId'    => $entityId,
-            'entityClass' => $entityClass,
-            'datagrid'    => $datagrid
-        ];
-        $container = self::getContainer();
-        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
-        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
-
-        $tokenData = $container->get('oro_action.operation.execution.form_provider')
-            ->createTokenData($operation, $actionData);
-        $container->get('session')->save();
-
-        return $tokenData;
     }
 
     private function setOperationsConfig(array $operations)

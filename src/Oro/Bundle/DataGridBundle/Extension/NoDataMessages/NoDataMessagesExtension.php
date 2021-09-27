@@ -48,7 +48,7 @@ class NoDataMessagesExtension extends AbstractExtension
         $this->translateEmptyGridMessageIfExist($config);
         $this->translateEmptyFilteredGridMessageIfExist($config);
 
-        $entityHintTranslationKey = $config->offsetGetByPath(DatagridConfiguration::ENTITY_HINT_PATH);
+        $entityHintTranslationKey = (string) $config->offsetGetByPath(DatagridConfiguration::ENTITY_HINT_PATH);
         if ($entityHintTranslationKey) {
             $config->offsetSetByPath(
                 DatagridConfiguration::ENTITY_HINT_PATH,
@@ -71,7 +71,7 @@ class NoDataMessagesExtension extends AbstractExtension
 
     private function translateEmptyGridMessageIfExist(DatagridConfiguration $config): void
     {
-        $emptyGridTranslationKey = $config->offsetGetByPath(DatagridConfiguration::EMPTY_GRID_MESSAGE_PATH);
+        $emptyGridTranslationKey = (string) $config->offsetGetByPath(DatagridConfiguration::EMPTY_GRID_MESSAGE_PATH);
         if ($emptyGridTranslationKey) {
             $config->offsetSetByPath(
                 DatagridConfiguration::EMPTY_GRID_MESSAGE_PATH,
@@ -82,7 +82,7 @@ class NoDataMessagesExtension extends AbstractExtension
 
     private function translateEmptyFilteredGridMessageIfExist(DatagridConfiguration $config): void
     {
-        $emptyFilteredGridTranslationKey = $config
+        $emptyFilteredGridTranslationKey = (string) $config
             ->offsetGetByPath(DatagridConfiguration::EMPTY_FILTERED_GRID_MESSAGE_PATH);
         if ($emptyFilteredGridTranslationKey) {
             $config->offsetSetByPath(

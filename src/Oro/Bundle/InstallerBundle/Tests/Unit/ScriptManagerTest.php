@@ -14,7 +14,6 @@ class ScriptManagerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $kernel = $this->getMockBuilder(KernelInterface::class)
-            ->addMethods(['getProjectDir'])
             ->getMockForAbstractClass();
 
         $kernel

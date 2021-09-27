@@ -30,11 +30,11 @@ layout:
                 styles:
                     blockType: style
                     options:
-                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
+                        src: '=data["theme"].getStylesOutput(context["theme"])'
                 print_styles:
                     blockType: style
                     options:
-                        src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"], "print_styles"))'
+                        src: '=data["theme"].getStylesOutput(context["theme"], "print_styles")'
                         media: 'print'
                 body:
                     blockType: body

@@ -11,7 +11,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,21 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class OrganizationController extends AbstractController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedServices()
-    {
-        return array_merge(parent::getSubscribedServices(), [
-            TokenStorageInterface::class,
-            OrganizationHandler::class,
-            FormFactoryInterface::class,
-            SessionInterface::class,
-            TranslatorInterface::class,
-            Router::class
-        ]);
-    }
-
     /**
      * Edit organization form
      *
@@ -48,20 +33,21 @@ class OrganizationController extends AbstractController
      *      permission="EDIT"
      * )
      */
-    public function updateCurrentAction()
+    public function updateCurrentAction(Request $request)
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->get(TokenStorageInterface::class)->getToken();
         $organization = $token->getOrganization();
 
-        return $this->update($organization);
+        return $this->update($organization, $request);
     }
 
     /**
      * @param Organization $entity
+     * @param Request $request
      * @return array
      */
-    protected function update(Organization $entity)
+    protected function update(Organization $entity, Request $request)
     {
         $organizationForm = $this->get(FormFactoryInterface::class)->createNamed(
             'oro_organization_form',
@@ -70,7 +56,7 @@ class OrganizationController extends AbstractController
         );
 
         if ($this->get(OrganizationHandler::class)->process($entity, $organizationForm)) {
-            $this->get(SessionInterface::class)->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.organization.controller.message.saved')
             );
@@ -82,5 +68,19 @@ class OrganizationController extends AbstractController
             'entity' => $entity,
             'form' => $organizationForm->createView(),
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            TokenStorageInterface::class,
+            OrganizationHandler::class,
+            FormFactoryInterface::class,
+            TranslatorInterface::class,
+            Router::class
+        ]);
     }
 }

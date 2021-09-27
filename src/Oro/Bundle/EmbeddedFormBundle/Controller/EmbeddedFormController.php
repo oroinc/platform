@@ -12,6 +12,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -41,9 +42,9 @@ class EmbeddedFormController extends AbstractController
      *      class="OroEmbeddedFormBundle:EmbeddedForm"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update();
+        return $this->update(new EmbeddedForm(), $request);
     }
 
     /**
@@ -95,9 +96,9 @@ class EmbeddedFormController extends AbstractController
      *      class="OroEmbeddedFormBundle:EmbeddedForm"
      * )
      */
-    public function updateAction(EmbeddedForm $entity)
+    public function updateAction(EmbeddedForm $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -131,15 +132,12 @@ class EmbeddedFormController extends AbstractController
     }
 
     /**
-     * @param EmbeddedForm|null $entity
+     * @param EmbeddedForm $entity
+     * @param Request $request
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function update(EmbeddedForm $entity = null)
+    protected function update(EmbeddedForm $entity, Request $request)
     {
-        if (!$entity) {
-            $entity = new EmbeddedForm();
-        }
-
         $form = $this->createForm(EmbeddedFormType::class, $entity);
         $form->handleRequest($this->get('request_stack')->getCurrentRequest());
         if ($form->isSubmitted() && $form->isValid()) {
@@ -148,7 +146,7 @@ class EmbeddedFormController extends AbstractController
             $em->persist($entity);
             $em->flush();
 
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
                 $this->get(TranslatorInterface::class)->trans('oro.embeddedform.controller.saved_message')
             );

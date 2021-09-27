@@ -6,10 +6,10 @@ Oro\Bundle\NotificationBundle\Entity\EmailNotification:
             - NotBlank: ~
         entityName:
             - NotBlank: ~
+        recipientList:
+            - Oro\Bundle\NotificationBundle\Validator\Constraints\RecipientListNotEmpty: ~
 
 Oro\Bundle\NotificationBundle\Entity\RecipientList:
     properties:
         email:
             - Email: ~
-    constraints:
-        - Callback: isValid

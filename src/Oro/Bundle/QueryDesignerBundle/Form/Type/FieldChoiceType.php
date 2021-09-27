@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Field choice form type.
+ */
 class FieldChoiceType extends AbstractType
 {
     const NAME = 'oro_field_choice';
@@ -27,7 +30,9 @@ class FieldChoiceType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $componentOptions = $options['page_component_options'];
-        $componentOptions['select2']['placeholder'] = $this->translator->trans($options['placeholder']);
+        $componentOptions['select2']['placeholder'] = isset($options['placeholder'])
+            ? $this->translator->trans((string) $options['placeholder'])
+            : '';
 
         if (isset($options['include_fields'])) {
             $componentOptions['include'] = $options['include_fields'];

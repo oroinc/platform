@@ -75,7 +75,7 @@ class DefaultGridViewLoadListener
         }
 
         if ($allLabelTranslationKey || $commonTranslationKey) {
-            $label = $this->translator->trans($allLabelTranslationKey ?: $commonTranslationKey, $parameters);
+            $label = $this->translator->trans((string) ($allLabelTranslationKey ?: $commonTranslationKey), $parameters);
 
             if ($label !== $commonTranslationKey) {
                 // Returns label for All grid view if allLabel option is specified or common translation key
@@ -94,7 +94,7 @@ class DefaultGridViewLoadListener
             return '';
         }
 
-        return $this->translator->trans($provider->getConfig($className)->get('plural_label', false, ''));
+        return $this->translator->trans((string) $provider->getConfig($className)->get('plural_label'));
     }
 
     protected function getAllGridViewTranslationKey(string $className): string
@@ -104,7 +104,7 @@ class DefaultGridViewLoadListener
             return '';
         }
 
-        return $provider->getConfig($className)->get('grid_all_view_label', false, '');
+        return (string) $provider->getConfig($className)->get('grid_all_view_label');
     }
 
     protected function getEntityClassNameFromQuery(DatagridConfiguration $config): ?string

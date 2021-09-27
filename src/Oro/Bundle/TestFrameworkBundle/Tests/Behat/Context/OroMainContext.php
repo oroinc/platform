@@ -338,6 +338,30 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I close all flash messages
+     *
+     * @Then /^(?:|I )close all flash messages$/
+     *
+     * @param string $flashMessageElement
+     * @param int $timeLimit
+     */
+    public function iCloseAllFlashMessages($flashMessageElement = 'Flash Message', $timeLimit = 30)
+    {
+        $flashMessages = $this->spin(
+            function (OroMainContext $context) use ($flashMessageElement) {
+                return $context->findAllElements($flashMessageElement);
+            },
+            $timeLimit
+        ) ?: [];
+
+        /** @var NodeElement $closeButton */
+        foreach ($flashMessages as $flashMessage) {
+            $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
+            $closeButton->press();
+        }
+    }
+
+    /**
      * @Then I should not see flash messages
      *
      * @param string $flashMessageElement
@@ -2733,7 +2757,7 @@ JS;
         $matches = [];
         $versionedMatches = [];
         preg_match_all('/(\w+\.' . $format . ')/i', $content, $matches);
-        preg_match_all('/(\w+\.' . $format . ')\?\w*version=\w+/i', $content, $versionedMatches);
+        preg_match_all('/(\w+\.' . $format . ')\?v=\w+/i', $content, $versionedMatches);
 
         $this->assertArrayHasKey(0, $matches);
         $this->assertArrayHasKey(1, $matches);
