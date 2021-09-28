@@ -335,3 +335,11 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_translation.formatter.translator_formatter:
+        class: Oro\Bundle\TranslationBundle\Formatter\TranslatorFormatter
+        public: false
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro_formatter, formatter: oro_translation.translator_formatter }
