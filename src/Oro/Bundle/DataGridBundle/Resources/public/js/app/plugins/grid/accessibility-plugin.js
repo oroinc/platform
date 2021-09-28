@@ -206,7 +206,7 @@ const AccessibilityPlugin = BasePlugin.extend({
                     // it might be dropdown-menu close, therefore move focus back to dropdown toggler button
                     const $toggler = $dropdownMenu.parent().find('[data-toggle="dropdown"]');
                     this.focusElement($toggler.is(':tabbable') ? $toggler : $toggler.find(':tabbable:first'));
-                } else if (!this.suspended) {
+                } else if (!this.suspended && !this._isDocumentClick) {
                     // cell content might been deleting, therefore schedule a restore for the current cell
                     this._lastIndex = this.iterator.index;
                     setTimeout(() => {
