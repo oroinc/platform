@@ -635,7 +635,6 @@ define(function(require) {
                 order: Infinity,
                 // Skip to add specific attributes if this cell has an empty value.
                 notMarkAsBlank: true
-
             });
             return column;
         },

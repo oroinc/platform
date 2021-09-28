@@ -26,6 +26,10 @@
         text-align: $datagrid-body-cell-action-cell-text-align;
     }
 
+    &.dropdown-action-cell {
+        padding-right: $datagrid-body-cell-dropdown-action-offset;
+    }
+
     &-poNumber,
     &-identifier,
     &-email,

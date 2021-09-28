@@ -191,3 +191,5 @@ oro:
             blank:
                 aria_label: 'Blank'
                 placeholder: 'N/A'
+            action_header:
+                aria_label: 'Row actions'
