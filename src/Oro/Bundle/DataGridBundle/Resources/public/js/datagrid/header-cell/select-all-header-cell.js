@@ -21,7 +21,9 @@ define(function(require) {
      * @extends BaseView
      */
     const SelectAllHeaderCell = BaseView.extend({
-        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
 
         keepElement: false,
         /** @property */
@@ -88,7 +90,6 @@ define(function(require) {
          */
         render: function() {
             this.$el.html(this.getTemplateFunction()(this.getTemplateData()));
-            this.setAriaAttrs();
             this.delegateEvents();
             return this;
         },

@@ -7,6 +7,8 @@ define(function(require) {
     const ColumnRendererComponent = require('../app/components/column-renderer-component');
 
     const HeaderRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -87,8 +89,6 @@ define(function(require) {
                 HeaderRow.__super__.render.call(this);
             }
             this._resolveDeferredRender();
-
-            this.setAriaAttrs();
             return this;
         },
 
@@ -126,12 +126,10 @@ define(function(require) {
             return this;
         },
 
-        setAriaAttrs() {
-            if (this.disposed) {
-                return;
-            }
-
-            this.$el.attr('aria-rowindex', this.ariaRowIndex);
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         }
     });
 

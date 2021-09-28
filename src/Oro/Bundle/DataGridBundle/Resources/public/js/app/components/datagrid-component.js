@@ -21,7 +21,8 @@ define(function(require) {
         FullscreenPlugin: 'orodatagrid/js/app/plugins/grid/fullscreen-plugin',
         DatagridSettingsPlugin: 'orodatagrid/js/app/plugins/grid/datagrid-settings-plugin',
         ToolbarMassActionPlugin: 'orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin',
-        StickedScrollbarPlugin: 'orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin'
+        StickedScrollbarPlugin: 'orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin',
+        AccessibilityPlugin: 'orodatagrid/js/app/plugins/grid/accessibility-plugin'
     };
 
     const helpers = {
@@ -274,6 +275,10 @@ define(function(require) {
                     modules.StickedScrollbarPlugin = pluginModules.StickedScrollbarPlugin;
                 }
             }
+
+            if (this.themeOptions.enabledAccessibilityPlugin) {
+                modules.AccessibilityPlugin = pluginModules.AccessibilityPlugin;
+            }
         },
 
         /**
@@ -446,7 +451,8 @@ define(function(require) {
                 'FloatingHeaderPlugin',
                 'FullscreenPlugin',
                 'DatagridSettingsPlugin',
-                'ToolbarMassActionPlugin'
+                'ToolbarMassActionPlugin',
+                'AccessibilityPlugin'
             ])).forEach(plugin => plugins.push(plugin));
 
             if (modules.StickedScrollbarPlugin) {

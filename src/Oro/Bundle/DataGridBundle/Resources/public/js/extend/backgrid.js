@@ -2,7 +2,10 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const Backgrid = require('backgrid/lib/backgrid');
+
+    Backgrid.Cell.prototype.optionNames = ['column'];
 
     /**
      * Cells should be removed durung dispose cycle
@@ -105,20 +108,86 @@ define(function(require) {
         return Backgrid.callByNeed(this.column.editable(), this.column, this.model);
     };
 
-    Backgrid.Cell.prototype.setAriaAttrs = function() {
-        if (this.disposed) {
-            return;
-        }
-
-        const {collection, cid} = this.column || {};
-        let rowIndex = -1;
+    Backgrid.Cell.prototype._attributes = function() {
+        const attrs = {};
+        const {collection} = this.column || {};
 
         if (collection && collection.length) {
-            rowIndex = collection.findIndex(model => model.cid === cid);
+            const rowIndex = collection.indexOf(this.column);
+            if (rowIndex !== -1 && (!this.model || this.model.get('isAuxiliary') !== true)) {
+                attrs['aria-colindex'] = rowIndex + 1;
+            }
         }
 
-        if (rowIndex !== -1) {
-            this.$el.attr('aria-colindex', rowIndex + 1);
+        if (this.model && this.model.get('isAuxiliary') !== true && !this.column.get('notMarkAsBlank')) {
+            const value = this.model && this.model.get(this.column.get('name'));
+
+            if (
+                value === void 0 ||
+                value === null ||
+                (_.isString(value) && value.trim().length === 0)
+            ) {
+                attrs['aria-label'] = __('oro.datagrid.cell.blank.aria_label');
+                attrs['data-blank-content'] = __('oro.datagrid.cell.blank.placeholder');
+            }
+        }
+
+        return attrs;
+    };
+
+    Backgrid.HeaderCell.prototype.optionNames = ['column'];
+
+    Backgrid.HeaderCell.prototype._attributes = function() {
+        const attrs = {};
+
+        if (this.column && this.column.get('label')) {
+            const {collection} = this.column;
+            if (collection && collection.length) {
+                const rowIndex = collection.indexOf(this.column);
+                if (rowIndex !== -1) {
+                    attrs['aria-colindex'] = rowIndex + 1;
+                }
+            }
+        }
+
+        return attrs;
+    };
+
+    Backgrid.BooleanCellEditor.prototype.attributes = {
+        type: 'checkbox'
+    };
+
+    Backgrid.BooleanCellEditor.prototype.initialize = function(options) {
+        this.formatter = options.formatter;
+        this.column = options.column;
+        if (!(this.column instanceof Backgrid.Column)) {
+            this.column = new Backgrid.Column(this.column);
+        }
+    };
+
+    Backgrid.BooleanCellEditor.prototype.saveOrCancel = function(e) {
+        const model = this.model;
+        const column = this.column;
+        const formatter = this.formatter;
+        const command = new Backgrid.Command(e);
+        // skip ahead to `change` when space is pressed
+        if (command.passThru() && e.type !== 'change') return true;
+        if (command.cancel()) {
+            e.stopPropagation();
+            model.trigger('backgrid:edited', model, column, command);
+        }
+
+        const $el = this.$el;
+        if (command.save()) {
+            e.preventDefault();
+            e.stopPropagation();
+            const val = formatter.toRaw($el.prop('checked'), model);
+            model.set(column.get('name'), val);
+            model.trigger('backgrid:edited', model, column, command);
+        } else if (e.type === 'change') {
+            const val = formatter.toRaw($el.prop('checked'), model);
+            model.set(column.get('name'), val);
+            $el.focus();
         }
     };
 

@@ -14,7 +14,9 @@ define(function(require) {
      * @extends BaseView
      */
     const SelectRowCell = BaseView.extend({
-        setAriaAttrs: Backgrid.Cell.prototype.setAriaAttrs,
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
 
         /** @property */
         className: 'select-row-cell renderable',
@@ -50,7 +52,6 @@ define(function(require) {
          * @param {Backbone.Model} options.model
          */
         initialize: function(options) {
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
@@ -105,7 +106,6 @@ define(function(require) {
             this.$el.html(this.template({
                 checked: state.selected
             }));
-            this.setAriaAttrs();
             this.$checkbox = this.$el.find(this.checkboxSelector);
 
             this.$checkbox.inputWidget('isInitialized')

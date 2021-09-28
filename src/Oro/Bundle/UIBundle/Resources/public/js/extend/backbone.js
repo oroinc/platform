@@ -13,6 +13,7 @@ define(function(require) {
 
     const OriginalBackboneView = Backbone.View;
     Backbone.View = function(options) {
+        Object.assign(this, _.pick(options, this.optionNames));
         this.subviews = [];
         this.subviewsByName = {};
         OriginalBackboneView.call(this, options);
@@ -21,6 +22,7 @@ define(function(require) {
         RENDERING_TIMEOUT: 30000 // 30s
     });
     Backbone.View.prototype = OriginalBackboneView.prototype;
+    Backbone.View.prototype.constructor = Backbone.View;
 
     const original = _.pick(Backbone.View.prototype, 'remove');
 
@@ -123,13 +125,33 @@ define(function(require) {
         this.disposed = true;
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
-    Backbone.View.prototype._ensureElement = _.wrap(Backbone.View.prototype._ensureElement, function(_ensureElement) {
-        // if the element was passed with options -- preserve it in the DOM, if `keepElement` is not set to `false`
-        if (this.el && this.keepElement !== false) {
-            this.keepElement = true;
+
+    /**
+     * Copied original `_ensureElement` method and changed:
+     *  - added with support extra `_attributes` set, collected from prototype chain
+     *  - `keepElement` is true by default, is the element was passed within options
+     */
+    Backbone.View.prototype._ensureElement = function() {
+        if (!this.el) {
+            const attrs = this._collectAttributes();
+            if (this.id) attrs.id = _.result(this, 'id');
+            if (this.className) attrs['class'] = _.result(this, 'className');
+            this.setElement(this._createElement(_.result(this, 'tagName')));
+            this._setAttributes(attrs);
+        } else {
+            // if the element was passed within options -- preserve it in the DOM
+            if (this.keepElement !== false) {
+                this.keepElement = true;
+            }
+            this.setElement(_.result(this, 'el'));
         }
-        return _ensureElement.call(this);
-    });
+    };
+    Backbone.View.prototype._collectAttributes = function() {
+        const attrsSet = tools.getAllPropertyVersions(this, '_attributes')
+            .map(attrs => typeof attrs === 'function' ? attrs.call(this) : attrs);
+        return Object.assign({}, ...attrsSet, _.result(this, 'attributes'));
+    };
+
     Backbone.View.prototype.setElement = _.wrap(Backbone.View.prototype.setElement, function(setElement, element) {
         if (this.$el) {
             this.disposePageComponents();

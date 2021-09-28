@@ -13,6 +13,7 @@ define(function(require) {
         processDatagridOptions: function(deferred, options) {
             const reg = /\\/g;
             options.themeOptions.rowView = options.themeOptions.readonly ? ReadonlyRowView : RowView;
+            options.themeOptions.enabledAccessibilityPlugin = false;
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel
@@ -54,6 +55,7 @@ define(function(require) {
                 _.extend(currentCategory, category);
                 grid.body.filter();
                 grid.$el.toggle(grid.body.visibleItems.length > 0);
+                grid.trigger('content:update');
             });
         }
     };

@@ -101,17 +101,14 @@ define(function(require) {
                     this.$el.append(row.$el);
                 }, this);
             }
-            this.setAriaAttrs();
             this.delegateEvents();
             return this;
         },
 
-        setAriaAttrs() {
-            if (this.disposed) {
-                return;
-            }
-
-            this.$el.attr('aria-hidden', this.renderable ? null : true);
+        _attributes() {
+            return {
+                'aria-hidden': this.renderable ? null : true
+            };
         },
 
         /**

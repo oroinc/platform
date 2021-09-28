@@ -1313,12 +1313,14 @@ define(function(require) {
          */
         showLoading: function() {
             this.loadingMask.show();
+            this.trigger('loading-mask:show');
         },
 
         /**
          * Disable toolbar
          */
         lockToolBar: function() {
+            this.trigger('loading-mask:hide');
             this.callToolbar('disable');
             this.trigger('disable');
         },
