@@ -450,3 +450,14 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_action.condition, alias: is_default_language }
+
+    oro_locale.formatter.localized_fallback_value_formatter:
+        class: Oro\Bundle\LocaleBundle\Formatter\LocalizedFallbackValueFormatter
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+            - '@translator'
+            - '@property_accessor'
+        tags:
+            - { name: oro_formatter, formatter: oro_locale.localized_fallback_value_formatter }
