@@ -423,7 +423,8 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
             $this->createMock(MetadataFactory::class),
             new ConfigModelManager($doctrine, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
-            new ConfigCache(new ArrayCache(), new ArrayCache(), ['test' => 'test'])
+            new ConfigCache(new ArrayCache(), new ArrayCache(), ['test' => 'test']),
+            Validation\Mock\ConfigurationValidatorMock::getInstance()
         );
     }
 

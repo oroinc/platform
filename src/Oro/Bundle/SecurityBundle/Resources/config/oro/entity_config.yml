@@ -16,10 +16,10 @@ entity_config:
                         default_value: false
                         required_properties:
                             -
-                               config_id:
-                                  scope:  security
-                               code:      field_acl_supported
-                               value:     true
+                                config_id:
+                                    scope:  security
+                                code:      field_acl_supported
+                                value:     true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
@@ -32,10 +32,10 @@ entity_config:
                         default_value: false
                         required_properties:
                             -
-                               config_id:
-                                  scope:  security
-                               code:      field_acl_supported
-                               value:     true
+                                config_id:
+                                    scope:  security
+                                code:      field_acl_supported
+                                value:     true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
