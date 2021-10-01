@@ -147,7 +147,7 @@ services:
             - '@stof_doctrine_extensions.listener.translatable'
             - '@translator'
             - '@router'
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: kernel.event_subscriber }
 

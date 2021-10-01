@@ -36,9 +36,6 @@ parameters:
     session_handler: null
     locale: en
     secret: ThisTokenIsNotSoSecretChangeIt
-    installed: null
-    assets_version: '540e7031'
-    assets_version_strategy: time_hash
     enterprise_licence: null
     message_queue_transport: dbal
     message_queue_transport_config: null

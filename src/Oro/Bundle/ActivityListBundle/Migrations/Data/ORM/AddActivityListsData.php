@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -47,8 +48,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $ownerField = '',
         $organizationField = ''
     ) {
-        $isApplicationInstalled = $this->container->hasParameter('installed')
-            && $this->container->getParameter('installed');
+        $isApplicationInstalled = $this->container->get(ApplicationState::class)->isInstalled();
 
         if ($isApplicationInstalled && !$this->hasRecordsInActivityList($activityClass)) {
             $provider     = $this->container->get('oro_activity_list.provider.chain');

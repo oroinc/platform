@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\EventListener;
 
 use Doctrine\DBAL\DBALException;
 use Gedmo\Translatable\TranslatableListener;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
@@ -20,26 +21,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LocaleListener implements EventSubscriberInterface
 {
-    /** @var LocaleSettings */
-    private $localeSettings;
+    private LocaleSettings $localeSettings;
 
-    /** @var LocalizationProviderInterface */
-    private $currentLocalizationProvider;
+    private LocalizationProviderInterface $currentLocalizationProvider;
 
-    /** @var TranslatableListener */
-    private $translatableListener;
+    private TranslatableListener $translatableListener;
 
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /** @var RequestContextAwareInterface|null */
-    private $router;
+    private ?RequestContextAwareInterface $router;
 
-    /** @var bool */
-    private $installed;
+    private bool $installed;
 
-    /** @var string */
-    private $currentLanguage;
+    private ?string $currentLanguage = null;
 
     /**
      * @param LocaleSettings $localeSettings
@@ -47,7 +41,7 @@ class LocaleListener implements EventSubscriberInterface
      * @param TranslatableListener $translatableListener
      * @param TranslatorInterface $translator
      * @param RequestContextAwareInterface|null $router
-     * @param string|bool|null $installed
+     * @param ApplicationState $applicationState
      */
     public function __construct(
         LocaleSettings $localeSettings,
@@ -55,14 +49,14 @@ class LocaleListener implements EventSubscriberInterface
         TranslatableListener $translatableListener,
         TranslatorInterface $translator,
         RequestContextAwareInterface $router,
-        $installed
+        ApplicationState $applicationState
     ) {
         $this->localeSettings = $localeSettings;
         $this->currentLocalizationProvider = $currentLocalizationProvider;
         $this->translatableListener = $translatableListener;
         $this->translator = $translator;
         $this->router = $router;
-        $this->installed = (bool) $installed;
+        $this->installed = $applicationState->isInstalled();
     }
 
     public function onKernelRequest(RequestEvent $event): void

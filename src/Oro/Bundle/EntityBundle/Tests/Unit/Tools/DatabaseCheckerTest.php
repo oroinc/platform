@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 
 class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
@@ -12,14 +13,18 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
+    private ApplicationState $applicationState;
+
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
     }
 
     public function testCheckDatabaseForInstalledApplication()
     {
-        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], '2017-01-01');
+        $this->applicationState->method('isInstalled')->willReturn(true);
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
 
         // test that the result is cached
         $this->doctrine->expects(self::never())
@@ -35,7 +40,8 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], '2017-01-01');
+        $this->applicationState->method('isInstalled')->willReturn(true);
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         $databaseChecker->clearCheckDatabase();
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is cached
@@ -51,7 +57,8 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is cached
         $this->doctrine->expects(self::never())
@@ -66,7 +73,9 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         self::assertFalse($databaseChecker->checkDatabase());
         // test that the result is cached
         $this->doctrine->expects(self::never())

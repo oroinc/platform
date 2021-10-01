@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\TranslationBundle\EventListener\JsTranslationDumpDemoDataListener;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
@@ -9,20 +10,16 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
     private $jsTranslationDumper;
 
-    /**
-     * @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $languageProvider;
 
-    /**
-     * @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject */
     private $event;
+
+    private ApplicationState $applicationState;
 
     /**
      * {@inheritDoc}
@@ -31,6 +28,7 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->jsTranslationDumper = $this->createMock(JsTranslationDumper::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
 
         $this->event = $this->createMock(MigrationDataFixturesEvent::class);
     }
@@ -60,7 +58,13 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
             ->method('dumpTranslations')
             ->with(['fr_FR']);
 
-        $listener = new JsTranslationDumpDemoDataListener($this->jsTranslationDumper, $this->languageProvider, true);
+        $this->applicationState->method('isInstalled')->willReturn(true);
+
+        $listener = new JsTranslationDumpDemoDataListener(
+            $this->jsTranslationDumper,
+            $this->languageProvider,
+            $this->applicationState
+        );
         $listener->onPostLoad($this->event);
     }
 
@@ -84,7 +88,13 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->jsTranslationDumper->expects($this->never())
             ->method('dumpTranslations');
 
-        $listener = new JsTranslationDumpDemoDataListener($this->jsTranslationDumper, $this->languageProvider, true);
+        $this->applicationState->method('isInstalled')->willReturn(true);
+
+        $listener = new JsTranslationDumpDemoDataListener(
+            $this->jsTranslationDumper,
+            $this->languageProvider,
+            $this->applicationState
+        );
         $listener->onPostLoad($this->event);
     }
 
@@ -99,7 +109,13 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->jsTranslationDumper->expects($this->never())
             ->method($this->anything());
 
-        $listener = new JsTranslationDumpDemoDataListener($this->jsTranslationDumper, $this->languageProvider, false);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $listener = new JsTranslationDumpDemoDataListener(
+            $this->jsTranslationDumper,
+            $this->languageProvider,
+            $this->applicationState
+        );
         $listener->onPostLoad($this->event);
     }
 
@@ -115,7 +131,13 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->jsTranslationDumper->expects($this->never())
             ->method($this->anything());
 
-        $listener = new JsTranslationDumpDemoDataListener($this->jsTranslationDumper, $this->languageProvider, true);
+        $this->applicationState->method('isInstalled')->willReturn(true);
+
+        $listener = new JsTranslationDumpDemoDataListener(
+            $this->jsTranslationDumper,
+            $this->languageProvider,
+            $this->applicationState
+        );
         $listener->onPostLoad($this->event);
     }
 }

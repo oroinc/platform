@@ -4,11 +4,15 @@ namespace Oro\Bundle\ImapBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Send to the message queue 'clear inactive mailboxes' if application is installed
+ */
 class ClearInactiveMailboxes extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
@@ -18,7 +22,7 @@ class ClearInactiveMailboxes extends AbstractFixture implements ContainerAwareIn
      */
     public function load(ObjectManager $manager)
     {
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             $this->getProducer()->send(Topics::CLEAR_INACTIVE_MAILBOX, []);
         }
     }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\EventListener;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -12,17 +13,23 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class RequestListener
 {
     private bool $debug;
+    private ApplicationState $applicationState;
 
     /**
      * @param bool $debug
      */
-    public function __construct($debug = false)
+    public function __construct(ApplicationState $applicationState, bool $debug = false)
     {
-        $this->debug = (bool) $debug;
+        $this->applicationState = $applicationState;
+        $this->debug = $debug;
     }
 
     public function onRequest(RequestEvent $event): void
     {
+        if ($this->applicationState->isInstalled()) {
+            return;
+        }
+
         if (!$event->isMasterRequest()) {
             return;
         }
