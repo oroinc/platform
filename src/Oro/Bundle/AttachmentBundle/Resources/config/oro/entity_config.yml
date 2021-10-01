@@ -29,8 +29,8 @@ entity_config:
                         - NotBlank:         ~
                         - Type:             integer
                         - Range:
-                              min:            1
-                              max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
+                            min:            1
+                            max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType
                         options:
@@ -73,8 +73,8 @@ entity_config:
                         - NotBlank:         ~
                         - Type:             integer
                         - Range:
-                              min:            1
-                              max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
+                            min:            1
+                            max:            2047 # in bytes equivalents to ~2147483647 which max allowed value for fileSize column of File entity
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:

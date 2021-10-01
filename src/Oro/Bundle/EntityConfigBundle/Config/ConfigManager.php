@@ -7,7 +7,6 @@ use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Validation\ConfigurationValidator;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -45,9 +44,6 @@ class ConfigManager
     /** @var ConfigCache */
     protected $cache;
 
-    /** @var ConfigurationValidator */
-    protected $configurationService;
-
     /** @var AuditManager */
     protected $auditManager;
 
@@ -71,15 +67,13 @@ class ConfigManager
         MetadataFactory $metadataFactory,
         ConfigModelManager $modelManager,
         AuditManager $auditManager,
-        ConfigCache $cache,
-        ConfigurationValidator $configurationService
+        ConfigCache $cache
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->metadataFactory = $metadataFactory;
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
         $this->cache = $cache;
-        $this->configurationService = $configurationService;
     }
 
     /**
@@ -505,12 +499,6 @@ class ConfigManager
      */
     public function persist(ConfigInterface $config)
     {
-        $configType = ConfigurationValidator::CONFIG_ENTITY_TYPE;
-        if ($config->getId() instanceof FieldConfigId) {
-            $configType = ConfigurationValidator::CONFIG_FIELD_TYPE;
-        }
-        $this->configurationService->validate($configType, $config->getId()->getScope(), $config->getValues());
-
         $configKey = $this->buildConfigKey($config->getId());
 
         $this->persistConfigs[$configKey] = $config;

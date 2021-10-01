@@ -1321,11 +1321,3 @@ services:
             - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
-
-    Oro\Bundle\EmailBundle\Config\Validation\EmailFieldConfiguration:
-        tags:
-            - oro_entity_config.validation.entity_config
-
-    Oro\Bundle\EmailBundle\Config\Validation\AttachmentEntityConfiguration:
-        tags:
-            - oro_entity_config.validation.entity_config

@@ -115,7 +115,3 @@ services:
         parent: oro_entity.event_listener.default_preloading
         tags:
             - { name: kernel.event_listener, event: oro_entity.preload_entity.digitalasset, method: onPreload }
-
-    Oro\Bundle\DigitalAssetBundle\Config\Validation\AttachmentFieldConfiguration:
-        tags:
-            - oro_entity_config.validation.entity_config
