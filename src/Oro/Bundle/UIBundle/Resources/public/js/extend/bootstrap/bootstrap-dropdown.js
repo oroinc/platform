@@ -43,7 +43,7 @@ define(function(require, exports, module) {
         DATA_TOGGLE: '[data-toggle="dropdown"]',
         FORM_CHILD: '.click',
         MENU: '.dropdown-menu',
-        VISIBLE_ITEMS: '.dropdown-menu .dropdown-item:not(.disabled):not(:disabled)'
+        VISIBLE_ITEMS: '.dropdown-menu .dropdown-item:visible:not(.disabled):not(:disabled)'
     };
     config = _.extend({
         displayArrow: true,
@@ -399,7 +399,7 @@ define(function(require, exports, module) {
             return;
         }
 
-        const items = [].slice.call(parent.querySelectorAll(Selector.VISIBLE_ITEMS));
+        const items = [].slice.call($(parent).find(Selector.VISIBLE_ITEMS).get());
 
         if (items.length === 0) {
             return;

@@ -45,8 +45,6 @@ define(function(require) {
                 this.$el.append('<span>').text(text);
                 this.delegateEvents();
             }
-
-            this.setAriaAttrs();
             return this;
         },
 

@@ -5,5 +5,7 @@ styles:
         - 'bundles/orodatagrid/blank/scss/variables/datagrid-header-cell-config.scss'
         - 'bundles/orodatagrid/blank/scss/variables/datagrid-body-cell-config.scss'
         - 'bundles/orodatagrid/blank/scss/variables/more-bar-holder-config.scss'
+        - 'bundles/orodatagrid/blank/scss/variables/data-blank-content-config.scss'
 
+        - 'bundles/orodatagrid/blank/scss/components/data-blank-content.scss'
         - 'bundles/orodatagrid/blank/scss/styles.scss'

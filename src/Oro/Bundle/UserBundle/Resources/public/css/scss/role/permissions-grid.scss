@@ -72,6 +72,12 @@
         min-width: $role-collapse-action-container-width;
     }
 }
+
+.action-permissions-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .field-less .collapse-action {
     display: none;
 }
@@ -83,7 +89,7 @@
 
     padding: $entity-permission-container-offset 0;
 
-    .action-permissions {
+    .action-permissions-container {
         flex-grow: 1;
         flex-wrap: wrap;
     }
@@ -105,6 +111,8 @@
 .action-permissions {
     display: flex;
     align-items: center;
+    flex-grow: 1;
+    flex-wrap: wrap;
     margin: 0;
 
     list-style: none;

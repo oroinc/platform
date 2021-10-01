@@ -117,7 +117,7 @@ class TableCellIterator {
             goTo >= 0 &&
             goTo < $rows.length &&
             !$cell
-            ) {
+        ) {
             $cell = $rows.eq(goTo).find(`[aria-colindex="${this.colindex}"]:visible:first`);
             if (!$cell.length) {
                 goTo += step;

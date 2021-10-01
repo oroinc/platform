@@ -632,7 +632,9 @@ define(function(require) {
                 actions: this.rowActions,
                 massActions: this.massActions,
                 manageable: false,
-                order: Infinity
+                order: Infinity,
+                // Skip to add specific attributes if this cell has an empty value.
+                notMarkAsBlank: true
             });
             return column;
         },
@@ -653,7 +655,9 @@ define(function(require) {
                 manageable: false,
                 cell: this.selectRowCell,
                 headerCell: this.selectAllHeaderCell,
-                order: -Infinity
+                order: -Infinity,
+                // Skip to add specific attributes if this cell has an empty value.
+                notMarkAsBlank: true
             });
             return column;
         },
@@ -1120,7 +1124,7 @@ define(function(require) {
         setGridAriaAttrs() {
             this.$grid.attr({
                 'aria-rowcount': this.gridRowsCounter.getGridRowsCount(),
-                'aria-colcount': this.columns.length
+                'aria-colcount': this.columns.filter(model => model.renderable).length
             });
         },
 
@@ -1320,7 +1324,6 @@ define(function(require) {
          * Disable toolbar
          */
         lockToolBar: function() {
-            this.trigger('loading-mask:hide');
             this.callToolbar('disable');
             this.trigger('disable');
         },
@@ -1330,6 +1333,7 @@ define(function(require) {
          */
         hideLoading: function() {
             this.loadingMask.hide();
+            this.trigger('loading-mask:hide');
         },
 
         /**

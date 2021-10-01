@@ -24,7 +24,6 @@
             }
         }
 
-        &.focus-visible,
         &:focus {
             ~ .custom-checkbox__icon {
                 border-color: $checkbox-icon-border-color-focus-state;

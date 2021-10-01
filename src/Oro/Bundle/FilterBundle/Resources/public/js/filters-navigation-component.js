@@ -35,6 +35,8 @@ const FiltersNavigationComponent = BaseComponent.extend({
 
         const filterListeners = {
             keydownOnToggle: this.onFilterKeyDownToggle,
+            focusinOnToggle: this.onFilterFocusInToggle,
+            focusoutOnToggle: this.onFilterFocusOutToggle,
             enable: this.onFilterVisibilityChange,
             disable: this.onFilterVisibilityChange,
             showCriteria: this.setFilterAsCurrent
@@ -75,6 +77,14 @@ const FiltersNavigationComponent = BaseComponent.extend({
                 e.stopPropagation();
                 break;
         }
+    },
+
+    onFilterFocusInToggle(e) {
+        e.target.classList.add('focus-via-arrows-keys');
+    },
+
+    onFilterFocusOutToggle(e) {
+        e.target.classList.remove('focus-via-arrows-keys');
     },
 
     onFilterVisibilityChange() {

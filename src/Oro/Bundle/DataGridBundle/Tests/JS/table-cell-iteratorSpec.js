@@ -77,7 +77,8 @@ define(function(require) {
             tableCellIterator.setCurrentCell($newCell);
 
             expect(tableCellIterator.$cell).toEqual($newCell);
-            expect(changeCurrentHandler).toHaveBeenCalledOnceWith($newCell, $previousCell);
+            expect(changeCurrentHandler).toHaveBeenCalledWith($newCell, $previousCell);
+            expect(changeCurrentHandler.calls.count()).toEqual(1);
         });
 
         it('check "setCurrentCell" method with invalid arguments', function() {

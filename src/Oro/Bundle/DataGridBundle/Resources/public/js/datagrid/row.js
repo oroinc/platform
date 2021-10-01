@@ -116,7 +116,7 @@ define(function(require) {
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
             this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
             this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
-            this.listenTo(this.dataCollection, 'add remove reset', this.setAriaAttrs);
+            this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -224,12 +224,11 @@ define(function(require) {
             return classes.join(' ');
         },
 
-        attributes: function() {
-            const attributes = {};
-            if (this.model.get('row_attributes')) {
-                Object.assign(attributes, this.model.get('row_attributes'));
-            }
-            return attributes;
+        _attributes: function() {
+            return {
+                ...this.model.get('row_attributes'),
+                'aria-rowindex': this.getAriaRowIndex()
+            };
         },
 
         /**
@@ -356,7 +355,6 @@ define(function(require) {
             const state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.toggleClass('row-selected', state.selected);
-            this.setAriaAttrs();
 
             if (this.$el.data('layout') === 'separate') {
                 const options = {};
@@ -422,16 +420,22 @@ define(function(require) {
         },
 
         /**
-         * Add aria attributes to view element
+         * Sync attributes for view element
          */
-        setAriaAttrs() {
+        _updateAttributes() {
             if (this.disposed) {
                 return;
             }
+            this._setAttributes(this._collectAttributes());
+        },
 
+        /**
+         * @return {null|number}
+         */
+        getAriaRowIndex() {
             let ariaRowIndex = null;
             const indexInCollection = this.dataCollection
-                .filter(model => model.get('isFake') !== true)
+                .filter(model => model.get('isAuxiliary') !== true)
                 .findIndex(model => model.cid === this.model.cid);
 
             if (indexInCollection !== -1) {
@@ -441,7 +445,7 @@ define(function(require) {
                 ariaRowIndex = indexInCollection + this.ariaRowsIndexShift + indexInPage + 1;
             }
 
-            this.$el.attr('aria-rowindex', ariaRowIndex);
+            return ariaRowIndex;
         }
     });
 

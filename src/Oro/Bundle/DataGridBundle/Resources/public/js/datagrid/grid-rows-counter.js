@@ -31,7 +31,7 @@ class GridRowsCounter {
      * @return {number}
      */
     getTotalRowsCount() {
-        return this.grid.collection.state.totalRecords;
+        return this.grid.collection.filter(model => model.isAuxiliary !== true).length;
     }
 
     /**

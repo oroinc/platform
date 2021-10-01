@@ -62,7 +62,6 @@ define(function(require) {
             const render = SelectCell.__super__.render.call(this);
 
             this.enterEditMode();
-            this.setAriaAttrs();
 
             return render;
         },

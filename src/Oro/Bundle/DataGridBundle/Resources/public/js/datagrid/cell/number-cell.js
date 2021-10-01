@@ -51,7 +51,6 @@ define(function(require) {
             const render = NumberCell.__super__.render.call(this);
 
             this.enterEditMode();
-            this.setAriaAttrs();
 
             return render;
         },

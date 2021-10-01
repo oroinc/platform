@@ -31,7 +31,6 @@ define(function(require) {
             const render = StringCell.__super__.render.call(this);
 
             this.enterEditMode();
-            this.setAriaAttrs();
 
             return render;
         },

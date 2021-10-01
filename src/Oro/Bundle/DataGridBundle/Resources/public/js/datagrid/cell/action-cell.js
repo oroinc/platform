@@ -290,7 +290,6 @@ define(function(require, exports, module) {
             }
 
             this.$el.html(this.baseMarkup(this.getTemplateData()));
-            this.setAriaAttrs();
             this.isLauncherListFilled = false;
 
             if (isSimplifiedMarkupApplied) {
