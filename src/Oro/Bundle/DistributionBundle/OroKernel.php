@@ -238,12 +238,7 @@ abstract class OroKernel extends Kernel
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if ($container->getParameter('installed')
-            && class_exists('ProxyManager\Configuration')
-            && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')
-        ) {
-            $dumper->setProxyDumper(new ProxyDumper());
-        }
+        $dumper->setProxyDumper(new ProxyDumper());
 
         $content = $dumper->dump([
             'class' => $class,

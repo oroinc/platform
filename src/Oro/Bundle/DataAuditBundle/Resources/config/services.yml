@@ -38,6 +38,7 @@ services:
             - '@oro_dataaudit.audit_config_provider'
             - '@logger'
             - '@oro_dataaudit.provider.audit_message_body_provider'
+            - '@oro_distribution.handler.application_status'
         calls:
             - [setEntityNameResolver, ['@oro_entity.entity_name_resolver']]
             - [setPropertyAccessor, ['@property_accessor']]

@@ -51,4 +51,22 @@ class EntityFieldFallbackValueRepository extends EntityRepository
         }
         return $result;
     }
+
+    /**
+     * Checks whether an EntityFieldFallbackValue with the given ID is assigned
+     * to the given field of the given entity and if so, returns the ID of this entity object.
+     */
+    public function findEntityId(string $entityClass, string $fieldName, int $entityFieldFallbackValueId): ?int
+    {
+        $rows = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->from($entityClass, 'e')
+            ->select('e.id')
+            ->where(sprintf('e.%s = :value', $fieldName))
+            ->setParameter('value', $entityFieldFallbackValueId)
+            ->getQuery()
+            ->getArrayResult();
+
+        return $rows[0]['id'] ?? null;
+    }
 }

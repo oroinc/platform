@@ -5,6 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 use Doctrine\Common\Cache\CacheProvider;
 use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -23,20 +24,20 @@ class LogLevelConfig implements ResetInterface
 
     private ?ConfigManager $configManager;
 
-    private bool $installed;
+    private ApplicationState $applicationState;
 
     private ?int $logLevel = null;
 
     public function __construct(
-        CacheProvider $loggerCache,
-        ?ConfigManager $configManager,
-        ?string $installed,
+        CacheProvider    $loggerCache,
+        ?ConfigManager   $configManager,
+        ApplicationState $applicationState,
         $defaultLevel = Logger::ERROR
     ) {
         $this->configManager = $configManager;
         $this->loggerCache = $loggerCache;
         $this->defaultLevel = Logger::toMonologLevel($defaultLevel);
-        $this->installed = (bool)$installed;
+        $this->applicationState = $applicationState;
     }
 
     public function isActive(): bool
@@ -71,7 +72,7 @@ class LogLevelConfig implements ResetInterface
     {
         $logLevel = $this->defaultLevel;
         $lifeTime = 0;
-        if ($this->configManager && $this->installed) {
+        if ($this->configManager && $this->applicationState->isInstalled()) {
             $curTimestamp = time();
             $endTimestamp = $this->configManager
                 ->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));

@@ -18,8 +18,5 @@ class OroInstallerExtension extends Extension
 
         $loader->load('services.yml');
         $loader->load('commands.yml');
-        if (!$container->hasParameter('installed') || !$container->getParameter('installed')) {
-            $loader->load('services_not_installed.yml');
-        }
     }
 }

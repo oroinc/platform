@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Migration;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -22,7 +23,7 @@ abstract class AbstractRenameField extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager): void
     {
-        if (!$this->container->hasParameter('installed') || !$this->container->getParameter('installed')) {
+        if (!$this->container->get(ApplicationState::class)->isInstalled()) {
             return;
         }
 

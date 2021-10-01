@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_0\RenameExtendTablesAndColumns;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -23,7 +24,7 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
     public function up(Schema $schema, QueryBag $queries)
     {
         // rename should not be performed during a fresh installation
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             parent::up($schema, $queries);
         }
 

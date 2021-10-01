@@ -4,6 +4,7 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
@@ -19,15 +20,15 @@ class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubs
     use OptionalListenerTrait;
 
     private ContainerInterface $container;
-    private bool $installed;
+    private ApplicationState $applicationState;
     private array $skipTrackingFor = [];
     private array $collectedTags = [];
     private array $processedEntities = [];
 
-    public function __construct(ContainerInterface $container, ?string $installed)
+    public function __construct(ContainerInterface $container, ApplicationState $applicationState)
     {
         $this->container = $container;
-        $this->installed = (bool)$installed;
+        $this->applicationState = $applicationState;
     }
 
     /**
@@ -35,7 +36,7 @@ class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubs
      */
     public function onFlush(OnFlushEventArgs $event): void
     {
-        if (!$this->enabled || !$this->installed) {
+        if (!$this->enabled || !$this->applicationState->isInstalled()) {
             return;
         }
 
@@ -62,7 +63,7 @@ class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubs
      */
     public function postFlush(): void
     {
-        if (!$this->enabled || !$this->installed) {
+        if (!$this->enabled || !$this->applicationState->isInstalled()) {
             return;
         }
         if (!$this->collectedTags) {
