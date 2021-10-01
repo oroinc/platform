@@ -33,7 +33,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
 
     public const REQUIRED_CURL_VERSION = '7.0';
 
-    public const REQUIRED_NODEJS_VERSION  = '>=12.0';
+    public const REQUIRED_NODEJS_VERSION  = '>=14 ^16';
 
     protected Connection $connection;
     protected string $projectDirectory;
