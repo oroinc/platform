@@ -11,6 +11,7 @@ use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 
 class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
@@ -166,7 +167,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldThrowExceptionIfUserNotFound()
     {
-        $this->expectException(DisabledException::class);
+        $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The user does not exist.');
 
         $userResponse = $this->getUserResponse();
