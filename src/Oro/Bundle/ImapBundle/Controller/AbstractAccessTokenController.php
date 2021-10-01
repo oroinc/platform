@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The base class for controllers to receive OAuth access token.
@@ -42,7 +43,7 @@ abstract class AbstractAccessTokenController extends AbstractController
 
     protected function trans(string $id): string
     {
-        return $this->container->get('translator')->trans($id);
+        return $this->get(TranslatorInterface::class)->trans($id);
     }
 
     protected function getAccessTokenScopes(string $state): ?array
@@ -73,5 +74,18 @@ abstract class AbstractAccessTokenController extends AbstractController
         $decoded = base64_decode($state, true);
 
         return false !== $decoded ? $decoded: $state;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+            ]
+        );
     }
 }

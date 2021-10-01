@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Oro\Bundle\ImapBundle\Provider\GoogleOAuthProvider;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
 
 /**
@@ -15,5 +16,18 @@ class GmailAccessTokenController extends AbstractAccessTokenController
     protected function getOAuthProvider(): OAuthProviderInterface
     {
         return $this->get('oro_imap.google_oauth_provider');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_imap.google_oauth_provider' => GoogleOAuthProvider::class
+            ]
+        );
     }
 }
