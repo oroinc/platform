@@ -247,6 +247,9 @@ HELP
             if (!$skipAssets) {
                 $buildAssetsProcessExitCode = $this->getBuildAssetsProcessExitCode($output);
             }
+            // cache clear must be done after assets build process finished,
+            // otherwise, it could lead to unpredictable errors
+            $this->clearCache($commandExecutor, $input);
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
@@ -589,11 +592,21 @@ HELP
              */
             $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
         }
-        $commandExecutor->runCommand('cache:warmup', ['--process-isolation' => true]);
-
         $output->writeln('');
 
         return $this;
+    }
+
+    protected function clearCache(CommandExecutor $commandExecutor, InputInterface $input): void
+    {
+        $cacheClearOptions = ['--process-isolation' => true];
+        if ($commandExecutor->getDefaultOption('no-debug')) {
+            $cacheClearOptions['--no-debug'] = true;
+        }
+        if ($input->getOption('env')) {
+            $cacheClearOptions['--env'] = $input->getOption('env');
+        }
+        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
     }
 
     protected function processInstallerScripts(OutputInterface $output, CommandExecutor $commandExecutor): void
