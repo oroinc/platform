@@ -510,7 +510,8 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $collection->addRequirement(
             NodeJsVersionChecker::satisfies($nodeExecutable, self::REQUIRED_NODEJS_VERSION),
             sprintf('NodeJS "%s" version must be installed.', self::REQUIRED_NODEJS_VERSION),
-            sprintf('Upgrade <strong>NodeJS</strong> to "%s" version.', self::REQUIRED_NODEJS_VERSION)
+            sprintf('Upgrade <strong>NodeJS</strong> to "%s" version.', htmlentities(self::REQUIRED_NODEJS_VERSION)),
+            sprintf('Upgrade NodeJS to "%s" version.', self::REQUIRED_NODEJS_VERSION)
         );
     }
 

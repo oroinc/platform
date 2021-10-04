@@ -5,10 +5,11 @@ namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
-use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\PhpUtils\ReflectionClassHelper;
+use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Generate layout updates from config files
@@ -24,15 +25,17 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
     protected ?ReflectionClassHelper $helper = null;
 
-    private ExpressionValidator $expressionValidator;
-
     private ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer;
 
+    private ValidatorInterface $validator;
+
+    private ?ExpressionLanguageSyntax $constraint = null;
+
     public function __construct(
-        ExpressionValidator $expressionValidator,
+        ValidatorInterface $validator,
         ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer
     ) {
-        $this->expressionValidator = $expressionValidator;
+        $this->validator = $validator;
         $this->expressionLanguageCacheWarmer = $expressionLanguageCacheWarmer;
     }
 
@@ -174,13 +177,31 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             if (\is_string($value) && '=' === $value[0]) {
                 $expression = substr($value, 1);
-                try {
-                    $this->expressionValidator->validate($expression);
-                    $this->expressionLanguageCacheWarmer->collect($expression);
-                } catch (\Throwable $e) {
-                    throw new SyntaxException($e->getMessage(), $source, $path . $key, $e);
+                $violationList = $this->validator->validate($expression, $this->getConstraint());
+
+                if ($violationList->count()) {
+                    $messages = [];
+                    foreach ($violationList as $violation) {
+                        $messages[] = $violation->getMessage();
+                    }
+
+                    throw new SyntaxException(implode("\n", $messages), $source, $path . $key);
                 }
+
+                $this->expressionLanguageCacheWarmer->collect($expression);
             }
         }
+    }
+
+    private function getConstraint(): ExpressionLanguageSyntax
+    {
+        if (!$this->constraint) {
+            $this->constraint = new ExpressionLanguageSyntax([
+                'service' => 'oro_layout.expression_language.expression_validator',
+                'message' => '{{ syntax_error }}',
+            ]);
+        }
+
+        return $this->constraint;
     }
 }
