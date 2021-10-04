@@ -292,7 +292,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
         });
-        validateContainer($listContainer);
+
+        if ($(this).data('validate-collection') !== false) {
+            validateContainer($listContainer);
+        }
     });
 
     // TODO: implement clone row

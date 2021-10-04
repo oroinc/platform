@@ -100,7 +100,11 @@ services:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator
 
     oro_layout.expression_language.expression_validator:
-        class: Oro\Component\Layout\ExpressionLanguage\ExpressionValidator
+        class: Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator
+        arguments:
+            - '@oro_layout.expression_language'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_layout.expression_language.expression_validator }
 
     oro_layout.expression.json_encoder:
         class: Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder

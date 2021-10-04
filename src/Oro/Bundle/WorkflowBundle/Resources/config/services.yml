@@ -219,7 +219,7 @@ services:
         arguments:
             - '@doctrine'
             - ['oro_workflow_entity_acl', 'oro_workflow_entity_acl_ident', 'oro_workflow_restriction', 'oro_workflow_restriction_ident']
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: oro_entity.database_checker }
 

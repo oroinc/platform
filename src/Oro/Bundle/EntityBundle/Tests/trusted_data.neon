@@ -9,6 +9,10 @@ trusted_data:
         Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor:
             execute:
                 columnNamesWithNonNamedParameters: true
+        Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValueRepository:
+            findEntityId:
+                entityClass: true
+                fieldName: true
     properties:
         Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler:
             searchEntities:

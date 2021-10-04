@@ -4,6 +4,7 @@ namespace Oro\Bundle\GoogleIntegrationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ConfigBundle\Migration\RenameConfigNameQuery;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -28,7 +29,7 @@ class OroGoogleIntegrationInstaller implements Installation, ContainerAwareInter
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->updateUserEntity($schema);
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             $this->renameGoogleSsoConfigOptions($queries);
         }
     }

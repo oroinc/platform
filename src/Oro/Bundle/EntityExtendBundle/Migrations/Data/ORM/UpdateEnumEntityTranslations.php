@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
@@ -48,7 +49,7 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
      */
     public function load(ObjectManager $manager)
     {
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             $this->configManager = $this->container->get('oro_entity_config.config_manager');
             $this->translationManager = $this->container->get('oro_translation.manager.translation');
             $this->extendEntityConfigProvider =

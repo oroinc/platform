@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -32,6 +33,8 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 
     private CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject $currentLocalizationProvider;
 
+    private ApplicationState|\PHPUnit\Framework\MockObject\MockObject $applicationState;
+
     private string $defaultLocale;
 
     protected function setUp(): void
@@ -41,6 +44,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         $this->transListener = $this->createMock(TranslatableListener::class);
         $this->router = $this->createMock(RequestContextAwareInterface::class);
         $this->currentLocalizationProvider = $this->createMock(CurrentLocalizationProvider::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
 
         $this->defaultLocale = \Locale::getDefault();
     }
@@ -84,13 +88,19 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
             $this->localeSettings->expects(self::never())->method('getLocale');
         }
 
+        if ($installed) {
+            $this->applicationState->method('isInstalled')->willReturn(true);
+        } else {
+            $this->applicationState->method('isInstalled')->willReturn(false);
+        }
+
         $listener = new LocaleListener(
             $this->localeSettings,
             $this->currentLocalizationProvider,
             $this->transListener,
             $this->translator,
             $this->router,
-            $installed
+            $this->applicationState
         );
 
         $listener->onKernelRequest($this->createRequestEvent($request));
@@ -108,12 +118,6 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
     public function onKernelRequestDataProvider(): array
     {
         return [
-            'application not installed with null' => [
-                'installed' => null,
-                'isSetLocale' => false,
-                'language' => 'ru',
-                'localization' => null,
-            ],
             'application not installed with false' => [
                 'installed' => false,
                 'isSetLocale' => false,
@@ -126,14 +130,8 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
                 'language' => 'ru',
                 'localization' => null,
             ],
-            'application installed with date' => [
-                'installed' => '2012-12-12T12:12:12+02:00',
-                'isSetLocale' => true,
-                'language' => 'ru',
-                'localization' => null,
-            ],
-            'application installed and localization' => [
-                'installed' => '2012-12-12T12:12:12+02:00',
+            'application installed with localization' => [
+                'installed' => true,
                 'isSetLocale' => true,
                 'language' => 'en_US',
                 'localization' => (new Localization())->setLanguage(
@@ -164,13 +162,15 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
             ->expects(self::once())
             ->method('setTranslatableLocale');
 
+        $this->applicationState->method('isInstalled')->willReturn(true);
+
         $listener = new LocaleListener(
             $this->localeSettings,
             $this->currentLocalizationProvider,
             $this->transListener,
             $this->translator,
             $this->router,
-            true
+            $this->applicationState
         );
         $listener->onConsoleCommand($event);
     }

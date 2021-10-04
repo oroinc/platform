@@ -42,7 +42,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
 
         $user = $userProvider->findUser($response);
         if (null === $user) {
-            throw new DisabledException('The user does not exist.');
+            throw new BadCredentialsException('The user does not exist.');
         }
         if (!$user->isEnabled()) {
             throw new DisabledException('The user is disabled.');

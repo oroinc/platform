@@ -4,23 +4,27 @@ declare(strict_types=1);
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
-use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     protected ConfigLayoutUpdateGenerator $generator;
     protected ExpressionLanguageCacheWarmer|MockObject $cacheWarmer;
+    private ValidatorInterface|MockObject $expressionValidator;
 
     protected function setUp(): void
     {
-        $expressionValidator = $this->createMock(ExpressionValidator::class);
+        $this->expressionValidator = $this->createMock(ValidatorInterface::class);
         $this->cacheWarmer = $this->createMock(ExpressionLanguageCacheWarmer::class);
-        $this->generator = new ConfigLayoutUpdateGenerator($expressionValidator, $this->cacheWarmer);
+        $this->generator = new ConfigLayoutUpdateGenerator($this->expressionValidator, $this->cacheWarmer);
     }
 
     protected function tearDown(): void
@@ -28,7 +32,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         unset($this->generator);
     }
 
-    public function testShouldCallExtensions()
+    public function testShouldCallExtensions(): void
     {
         $source = ['actions' => []];
 
@@ -49,7 +53,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resourceDataProvider
      */
-    public function testShouldValidateData($data, ?string $exception = null)
+    public function testShouldValidateData($data, ?string $exception = null): void
     {
         if (null !== $exception) {
             $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
@@ -105,8 +109,54 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testShouldCollectExpressions()
+    public function testShouldValidateExpressionLanguageSyntax(): void
     {
+        $constraintErrorMessage = '"Unclosed "[" around position 4 for expression `data[["foo"].bar()`."';
+        $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
+        $this->expectExceptionMessage(
+            'Syntax error: ' . $constraintErrorMessage . ' at "actions.0.@setOption.optionValue"'
+        );
+
+        $violationsList = new ConstraintViolationList([
+            new ConstraintViolation(
+                $constraintErrorMessage,
+                '',
+                [],
+                '',
+                '',
+                ''
+            ),
+        ]);
+        $this->expressionValidator->expects($this->once())
+            ->method('validate')
+            ->willReturn($violationsList);
+
+        $data = [
+            'actions' => [
+                [
+                    '@setOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '=data[["foo"].bar()',
+                    ],
+                ],
+            ],
+        ];
+        $this->cacheWarmer->expects($this->never())
+            ->method('collect');
+        $this->generator->generate('testClassName', new GeneratorData($data));
+    }
+
+    public function testShouldCollectExpressions(): void
+    {
+        $violationsList = $this->createMock(ConstraintViolationListInterface::class);
+        $violationsList->expects($this->exactly(5))
+            ->method('count')
+            ->willReturn(0);
+        $this->expressionValidator->expects($this->exactly(5))
+            ->method('validate')
+            ->willReturn($violationsList);
+
         $data = [
             'actions' => [
                 [
@@ -148,7 +198,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
-    public function testForEmptyStringValue()
+    public function testForEmptyStringValue(): void
     {
         $data = [
             'actions' => [
@@ -167,7 +217,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     }
 
     // @codingStandardsIgnoreStart
-    public function testGenerate()
+    public function testGenerate(): void
     {
         static::assertSame(
             <<<'CODE'

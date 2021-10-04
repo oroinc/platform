@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
@@ -18,13 +19,16 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
      */
     protected $strategy;
 
+    private ApplicationState $applicationState;
+
     protected function setUp(): void
     {
         $this->languageProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Provider\LanguageProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new DefaultTranslationStrategy($this->languageProvider, '2016-05-10T14:57:01+00:00');
+        $this->applicationState = $this->createMock(ApplicationState::class);
+        $this->strategy = new DefaultTranslationStrategy($this->languageProvider, $this->applicationState);
     }
 
     public function testGetName()
@@ -39,6 +43,10 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLocaleFallbacks(): void
     {
+        $this->applicationState->method('isInstalled')->willReturn(true);
+
+        $this->strategy = new DefaultTranslationStrategy($this->languageProvider, $this->applicationState);
+
         $currentLanguagesCodes = ['fr_FR', 'uk_UA',];
 
         $this->languageProvider->expects(static::once())
@@ -58,13 +66,15 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLocaleFallbacksNotInstalledApp()
     {
-        $this->strategy = new DefaultTranslationStrategy($this->languageProvider, null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $strategy = new DefaultTranslationStrategy($this->languageProvider, $this->applicationState);
 
         $this->assertEquals(
             [
                 Configuration::DEFAULT_LOCALE => [],
             ],
-            $this->strategy->getLocaleFallbacks()
+            $strategy->getLocaleFallbacks()
         );
     }
 }

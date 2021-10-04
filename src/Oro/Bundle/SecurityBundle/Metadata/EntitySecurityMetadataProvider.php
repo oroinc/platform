@@ -360,9 +360,13 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
      */
     private function getClassMetadata($className)
     {
-        return $this->doctrine
-            ->getManagerForClass($className)
-            ->getMetadataFactory()
+        $manager = $this->doctrine
+            ->getManagerForClass($className);
+        if ($manager == null) {
+            throw new \LogicException(sprintf('There is no manager for %s', $className));
+        }
+
+        return $manager->getMetadataFactory()
             ->getMetadataFor($className);
     }
 }

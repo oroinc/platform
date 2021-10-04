@@ -27,7 +27,7 @@ services:
         arguments:
             - '@oro_logger.cache'
             - '@?oro_config.user'
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
             - '%oro_logger.detailed_logs_default_level%'
 
     oro_logger.message_factory:

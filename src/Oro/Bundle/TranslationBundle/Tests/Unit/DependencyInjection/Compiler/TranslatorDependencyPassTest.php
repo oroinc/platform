@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslatorDependencyPass;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,6 +20,10 @@ class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
         $container->register('oro_translation.provider.translation_domain');
         $container->register('event_dispatcher');
         $container->register('logger');
+
+        $applicationState = $this->createMock(ApplicationState::class);
+        $container->register('oro_distribution.handler.application_status');
+        $container->set('oro_distribution.handler.application_status', $applicationState);
 
         $translator = new Definition();
         $translator->setPublic(false);
@@ -40,7 +45,7 @@ class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
                 ['setTranslationDomainProvider', [new Reference('oro_translation.provider.translation_domain')]],
                 ['setEventDispatcher', [new Reference('event_dispatcher')]],
                 ['setLogger', [new Reference('logger')]],
-                ['setInstalled', [false]],
+                ['setApplicationState', [new Reference('oro_distribution.handler.application_status')]],
             ],
             $translator->getMethodCalls()
         );

@@ -26,8 +26,6 @@ class ParametersHandler
   \t\tvhost: '/'}" \\
   \tredis_dsn_cache='%env(ORO_REDIS_URL)%/1' \\
   \tredis_dsn_doctrine='%env(ORO_REDIS_URL)%/2'
-  <comment>Mark application as not installed:</comment>
-  composer set-parameters installed=null
 <info>Database:</info>
 <info>---------</info>
   <comment>Postgres:</comment>

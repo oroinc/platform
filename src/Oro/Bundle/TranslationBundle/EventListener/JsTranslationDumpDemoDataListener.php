@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\EventListener;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
@@ -21,24 +22,21 @@ class JsTranslationDumpDemoDataListener
      */
     private $languageProvider;
 
-    /**
-     * @var bool
-     */
-    private $installed;
+    private ApplicationState $applicationState;
 
     /**
      * @param JsTranslationDumper $jsTranslationDumper
      * @param LanguageProvider $languageProvider
-     * @param bool|string|null $installed
+     * @param ApplicationState $applicationState
      */
     public function __construct(
         JsTranslationDumper $jsTranslationDumper,
         LanguageProvider $languageProvider,
-        $installed
+        ApplicationState $applicationState
     ) {
         $this->jsTranslationDumper = $jsTranslationDumper;
         $this->languageProvider = $languageProvider;
-        $this->installed = (bool )$installed;
+        $this->applicationState = $applicationState;
     }
 
     /**
@@ -46,7 +44,7 @@ class JsTranslationDumpDemoDataListener
      */
     public function onPostLoad(MigrationDataFixturesEvent $event): void
     {
-        if ($this->installed && $event->isDemoFixtures()) {
+        if ($this->applicationState->isInstalled() && $event->isDemoFixtures()) {
             $this->rebuildLocaleTranslations($event);
         }
     }
