@@ -20,8 +20,8 @@ class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\Tes
     {
         $event = new LoadEntityRulesAndBackendHeadersEvent(EntityFieldFallbackValue::class, [], [], ':', 'full', true);
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
-        $this->assertSame([['value' => 'value']], $event->getHeaders());
-        $this->assertSame(['value' => ['value' => 'value']], $event->getRules());
+        $this->assertSame([['value' => 'value', 'order' => 10005]], $event->getHeaders());
+        $this->assertSame(['value' => ['value' => 'value', 'order' => 10005]], $event->getRules());
     }
 
     public function testAfterLoadEntityRulesAndBackendHeadersDuplicateHeader()
@@ -35,9 +35,17 @@ class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\Tes
             true
         );
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
-        $this->assertSame([['headerName' => 'headerTitle'], ['value' => 'value']], $event->getHeaders());
+        $this->assertSame([
+            ['headerName' => 'headerTitle'],
+            ['value' => 'value'],
+            ['value' => 'value', 'order' => 10005]
+        ], $event->getHeaders());
         $this->assertSame(
-            [['someRule' => ['headerName' => 'headerTitle']], ['value' => ['value' => 'value']]],
+            [
+                ['someRule' => ['headerName' => 'headerTitle']],
+                ['value' => ['value' => 'value']],
+                'value' => ['value' => 'value', 'order' => 10005]
+            ],
             $event->getRules()
         );
     }
