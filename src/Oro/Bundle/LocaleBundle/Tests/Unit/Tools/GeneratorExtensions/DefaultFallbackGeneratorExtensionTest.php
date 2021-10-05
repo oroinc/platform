@@ -3,43 +3,45 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Tools\GeneratorExtensions;
 
-use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use Nette\PhpGenerator\Parameter;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider;
 use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
 use Oro\Component\PhpUtils\ClassGenerator;
 
 class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    private Inflector $inflector;
+    private DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider;
 
     protected function setUp(): void
     {
-        $this->inflector = InflectorFactory::create()->build();
+        $this->defaultFallbackMethodsNamesProvider = new DefaultFallbackMethodsNamesProvider(
+            InflectorFactory::create()->build()
+        );
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $extension = new DefaultFallbackGeneratorExtension([
             'testClass' => []
-        ], $this->inflector);
+        ], $this->defaultFallbackMethodsNamesProvider);
         static::assertTrue($extension->supports(['class' => 'testClass']));
     }
 
-    public function testSupportsWithoutClass()
+    public function testSupportsWithoutClass(): void
     {
-        $extension = new DefaultFallbackGeneratorExtension([], $this->inflector);
+        $extension = new DefaultFallbackGeneratorExtension([], $this->defaultFallbackMethodsNamesProvider);
         static::assertFalse($extension->supports([]));
     }
 
-    public function testSupportsWithoutExtension()
+    public function testSupportsWithoutExtension(): void
     {
-        $extension = new DefaultFallbackGeneratorExtension([], $this->inflector);
+        $extension = new DefaultFallbackGeneratorExtension([], $this->defaultFallbackMethodsNamesProvider);
         static::assertFalse($extension->supports(['class' => 'testClass']));
     }
 
-    public function testMethodNotGenerated()
+    public function testMethodNotGenerated(): void
     {
         $this->expectException(\Nette\InvalidArgumentException::class);
         $class = new ClassGenerator('Test\Entity');
@@ -47,13 +49,13 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             'class' => 'Test\Entity'
         ];
 
-        $extension = new DefaultFallbackGeneratorExtension([], $this->inflector);
+        $extension = new DefaultFallbackGeneratorExtension([], $this->defaultFallbackMethodsNamesProvider);
         $extension->generate($schema, $class);
 
         $class->getMethod('defaultTestGetter');
     }
 
-    public function testMethodNotGeneratedIncompleteFields()
+    public function testMethodNotGeneratedIncompleteFields(): void
     {
         $this->expectException(\TypeError::class);
         $class = new ClassGenerator('Test\Entity');
@@ -63,27 +65,27 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new DefaultFallbackGeneratorExtension([
             'Test\Entity' => ['testField']
-        ], $this->inflector);
+        ], $this->defaultFallbackMethodsNamesProvider);
         $extension->generate($schema, $class);
 
         $class->getMethod('getDefaultTestField');
     }
 
-    public function testGenerateWithoutFields()
+    public function testGenerateWithoutFields(): void
     {
         $class = new ClassGenerator('Test\Entity');
         $clonedClass = clone $class;
 
         $extension = new DefaultFallbackGeneratorExtension([
             'Test\Entity' => []
-        ], $this->inflector);
+        ], $this->defaultFallbackMethodsNamesProvider);
         $extension->generate(['class' => 'Test\Entity'], $class);
 
         static::assertEquals($class, $clonedClass);
         static::assertEmpty($class->getMethods());
     }
 
-    public function testMethodGenerated()
+    public function testMethodGenerated(): void
     {
         $class = new ClassGenerator('Test\Entity');
         $schema = [
@@ -92,7 +94,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new DefaultFallbackGeneratorExtension([
             'Test\Entity' => ['name'=> 'names']
-        ], $this->inflector);
+        ], $this->defaultFallbackMethodsNamesProvider);
         $extension->generate($schema, $class);
 
         $this->assertMethod(
