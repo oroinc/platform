@@ -220,3 +220,162 @@ datagrids:
                 emailRecipient:
                     type: string
                     data_name: emailRecipient
+
+    oro-notification-alerts-grid:
+        acl_resource: oro_notification_alert_view
+        source:
+            type: orm
+            query:
+                select:
+                    - alert.id
+                    - alert.sourceType
+                    - alert.resourceType
+                    - alert.alertType
+                    - alert.operation
+                    - alert.step as operationStep
+                    - alert.itemId
+                    - alert.externalId
+                    - alert.resolved
+                    - alert.message
+                    - CONCAT_WS(' ', user.firstName, user.lastName) as userName
+                    - alert.createdAt
+                    - alert.updatedAt
+                from:
+                    - { table: 'Oro\Bundle\NotificationBundle\Entity\NotificationAlert', alias: alert }
+                join:
+                    left:
+                        - { join: alert.user, alias: user }
+        properties:
+            id: ~
+        inline_editing:
+            enable: false
+        columns:
+            id:
+                label: oro.notification.notificationalert.id.label
+                frontend_type: string
+                order: 10
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+                order: 20
+            updatedAt:
+                label: oro.ui.updated_at
+                frontend_type: datetime
+                order: 30
+            userName:
+                label: oro.notification.notificationalert.user.label
+                frontend_type: relation
+                order: 40
+            message:
+                label: oro.notification.notificationalert.message.label
+                frontend_type: string
+                order: 50
+            sourceType:
+                label: oro.notification.notificationalert.source_type.label
+                frontend_type: string
+                order: 60
+            resourceType:
+                label: oro.notification.notificationalert.resource_type.label
+                frontend_type: string
+                order: 70
+            alertType:
+                label: oro.notification.notificationalert.alert_type.label
+                frontend_type: string
+                order: 80
+            operation:
+                label: oro.notification.notificationalert.operation.label
+                frontend_type: string
+                order: 90
+            operationStep:
+                label: oro.notification.notificationalert.step.label
+                frontend_type: string
+                order: 100
+            itemId:
+                label: oro.notification.notificationalert.item_id.label
+                frontend_type: string
+                order: 110
+            externalId:
+                label: oro.notification.notificationalert.external_id.label
+                type: twig
+                frontend_type: html
+                template: OroNotificationBundle:NotificationAlert:Property/externalId.html.twig
+                order: 120
+            resolved:
+                label: oro.notification.notificationalert.resolved.label
+                frontend_type: boolean
+                order: 130
+        sorters:
+            columns:
+                id:
+                    data_name: alert.id
+                createdAt:
+                    data_name: alert.createdAt
+                updatedAt:
+                    data_name: alert.updatedAt
+                userName:
+                    data_name: userName
+                message:
+                    data_name: alert.message
+                sourceType:
+                    data_name: alert.sourceType
+                resourceType:
+                    data_name: alert.resourceType
+                alertType:
+                    data_name: alert.alertType
+                operation:
+                    data_name: alert.operation
+                operationStep:
+                    data_name: operationStep
+                itemId:
+                    data_name: alert.itemId
+                externalId:
+                    data_name: alert.externalId
+                resolved:
+                    data_name: alert.resolved
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                id:
+                    type: string
+                    data_name: alert.id
+                createdAt:
+                    type: datetime
+                    data_name: alert.createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: alert.updatedAt
+                userName:
+                    type: string
+                    data_name: userName
+                message:
+                    type: string
+                    data_name: alert.message
+                sourceType:
+                    type: string
+                    data_name: alert.sourceType
+                resourceType:
+                    type: string
+                    data_name: alert.resourceType
+                alertType:
+                    type: string
+                    data_name: alert.alertType
+                operation:
+                    type: string
+                    data_name: alert.operation
+                operationStep:
+                    type: string
+                    data_name: operationStep
+                itemId:
+                    data_name: alert.itemId
+                    type: number
+                externalId:
+                    data_name: alert.externalId
+                    type: string
+                resolved:
+                    data_name: alert.resolved
+                    type: boolean
+        options:
+            entityHint: oro.notification.notificationalert.entity_plural_label
+            export: true
+        views_list: "@oro_notification.notification_alert.datagrid_view_list"
