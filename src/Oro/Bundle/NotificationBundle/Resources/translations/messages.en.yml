@@ -2,6 +2,7 @@ oro:
     notification:
         menu:
             emailnotification_list.description: List of email notifications
+            notification_alerts.label: Alerts
 
         controller:
             emailnotification:
@@ -64,6 +65,25 @@ oro:
             processed_at.label:   Sent At
             action:               View Maintenance Notifications
             block.info:           Notification Details
+
+        notificationalert:
+            entity_label:                   Notification Alert
+            entity_plural_label:            Notification Alerts
+            entity_description:             Represents a storage of a notification alerts
+            entity_grid_all_view_label:     'All %entity_plural_label%'
+            entity_grid_unresolved_view_label: 'Unresolved %entity_plural_label%'
+            id.label:                       ID
+            source_type.label:              Source
+            resource_type.label:            Resource
+            alert_type.label:               Alert Type
+            operation.label:                Operation
+            step.label:                     Step
+            item_id.label:                  Item ID
+            external_id.label:              External ID
+            resolved.label:                 Resolved
+            user.label:                     User
+            message.label:                  Message
+            organization.label:             Organization
 
         system_configuration:
             email_notification_sender_email: Sender Email

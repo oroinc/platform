@@ -18,9 +18,6 @@ class GmailAccessTokenController extends AbstractAccessTokenController
         return $this->get('oro_imap.google_oauth_provider');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return array_merge(

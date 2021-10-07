@@ -11,7 +11,6 @@ navigation:
                 position: 10
                 extras:
                     routes:  'oro_integration_*'
-
         tree:
             application_menu:
                 children:
@@ -20,7 +19,6 @@ navigation:
                             integrations_submenu:
                                 children:
                                     integrations_list: ~
-
     titles:
         oro_integration_index:  ~
         oro_integration_update: '%integration.name%'
