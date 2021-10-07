@@ -110,9 +110,6 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         return new JsonResponse($response);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return array_merge(
