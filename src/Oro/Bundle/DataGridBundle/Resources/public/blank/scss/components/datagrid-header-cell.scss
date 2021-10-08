@@ -20,7 +20,7 @@
 
             &::before {
                 position: absolute;
-                top: $datagrid-header-cell-link-font-size / 2;
+                top: $datagrid-header-cell-link-font-size * .5;
                 left: $datagrid-header-cell-sortable-icon-left;
 
                 content: '';

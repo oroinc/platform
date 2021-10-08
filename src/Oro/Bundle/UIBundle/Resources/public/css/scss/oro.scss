@@ -684,8 +684,8 @@ iframe.email-body {
     min-height: 5em;
     font-family: $font-family-monospace;
     color: $primary;
-    padding: ($line-height-base - 1) / 2;
-    margin: 0 0 $line-height-base / 2;
+    padding: ($line-height-base - 1) * .5;
+    margin: 0 0 $line-height-base * .5;
     display: block;
     // 14px to 13px
     font-size: $base-font-size - 1;

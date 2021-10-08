@@ -1,12 +1,14 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 $capabilities-offset: 8px !default;
 
 $role-capability-color: $primary-860 !default;
 $role-capability-offset: 0 0 28px 16px !default;
 $role-capability-bottom-offset: 10px !default;
 
-$role-capability-item-width: 100% / 3 !default;
+$role-capability-item-width: math.div(100%, 3) !default;
 $role-capability-item-offset: 18px 68px 0 0 !default;
 
 $role-capability-label-line-height: 1.5;

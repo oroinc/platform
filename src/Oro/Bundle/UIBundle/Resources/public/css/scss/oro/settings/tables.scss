@@ -71,7 +71,7 @@ $table-tbody-td-border-bottom: 1px solid $primary-860 !default;
 $table-tbody-td-offset: $content-padding-small !default;
 
 $table-tfoot-th-background: $primary-200 !default;
-$table-tfoot-th-inner-offset: ($content-padding-small / 2) $content-padding-small !default;
+$table-tfoot-th-inner-offset: ($content-padding-small * .5) $content-padding-small !default;
 
 $table-dl-offset: 0 0 15px !default;
 $table-checkbox-vertical-align: -3px !default;

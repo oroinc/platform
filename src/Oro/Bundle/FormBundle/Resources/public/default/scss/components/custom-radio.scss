@@ -13,7 +13,7 @@
     &__control,
     input[type='radio'] {
         position: absolute;
-        top: $custom-radio-icon-size / 2;
+        top: $custom-radio-icon-size * .5;
         left: $custom-radio-icon-size + 2px;
 
         height: 2px;

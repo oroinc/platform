@@ -470,7 +470,7 @@
         flex-basis: 100%;
 
         .items-selector-widget {
-            margin-bottom: $dashboard-configuration-items-table-margin-y / 2;
+            margin-bottom: $dashboard-configuration-items-table-margin-y * .5;
         }
 
         .actions-wrap {

@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 .ui-datepicker {
     width: $datepicker-width;
     padding: $datepicker-padding;
@@ -119,11 +121,11 @@
                 height: $datepicker-calendar-active-dot-size;
                 left: 50%;
                 bottom: 0;
-                margin-left: $datepicker-calendar-active-dot-size / -2;
+                margin-left: math.div($datepicker-calendar-active-dot-size, -2);
                 margin-bottom: $datepicker-calendar-active-dot-v-shift;
                 background-color: $datepicker-calendar-active-background-color;
                 border: $datepicker-calendar-active-dot-border;
-                border-radius: $datepicker-calendar-active-dot-size / 2;
+                border-radius: $datepicker-calendar-active-dot-size * .5;
             }
         }
 

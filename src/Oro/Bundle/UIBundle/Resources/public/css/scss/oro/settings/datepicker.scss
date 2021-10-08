@@ -31,7 +31,7 @@ $datepicker-calendar-cell-link-padding: 0 !default;
 $datepicker-calendar-cell-link-margin-bottom: 2px !default;
 $datepicker-calendar-cell-link-width: 28px !default;
 $datepicker-calendar-cell-link-height: 28px !default;
-$datepicker-calendar-cell-link-border-radius: $datepicker-calendar-cell-link-height / 2 !default;
+$datepicker-calendar-cell-link-border-radius: $datepicker-calendar-cell-link-height * .5 !default;
 $datepicker-datevariables-padding: 10px 16px !default;
 $datepicker-datevariables-title-font-size: 16px !default;
 $datepicker-datevariables-title-font-weight: font-weight('bold') !default;

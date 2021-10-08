@@ -2,11 +2,13 @@
 
 /* stylelint-disable no-descending-specificity */
 
+@use 'sass:math';
+
 .inline-actions-element {
     display: inline-flex;
     align-items: flex-start;
-    margin: (-$content-padding-small / 2 - 2px) (-$content-padding-small / 2) (-$content-padding-small / 2 - 3px);
-    padding: ($content-padding-small / 2) ($content-padding-small / 2);
+    margin: (-$content-padding-small * .5 - 2px) (-$content-padding-small * .5) (-$content-padding-small * .5 - 3px);
+    padding: ($content-padding-small * .5) ($content-padding-small * .5);
 
     transition: $hover-transition;
 
@@ -29,8 +31,8 @@
     .inline-actions-element_wrapper {
         word-break: break-all;
         display: inline-block;
-        padding: ($content-padding-small / 2) 0 ($content-padding-small / 2) ($content-padding-small / 2);
-        margin: (-$content-padding-small / 2) 0 (-$content-padding-small / 2) (-$content-padding-small / 2);
+        padding: ($content-padding-small * .5) 0 ($content-padding-small * .5) ($content-padding-small * .5);
+        margin: (-$content-padding-small * .5) 0 (-$content-padding-small * .5) (-$content-padding-small * .5);
     }
 
     &.truncate {
@@ -78,7 +80,7 @@
             line-height: 1;
 
             &::before {
-                font: $base-font-size/26px $fa-font-family;
+                font: math.div($base-font-size, 26px) $fa-font-family;
                 color: $inline-action-color;
                 font-size: 15px;
                 line-height: 22px;

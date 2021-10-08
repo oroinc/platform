@@ -130,7 +130,7 @@ $oro-datagrid-editable-loader-size: 14px !default;
 $oro-datagrid-editable-loader-width: 2px !default;
 $oro-datagrid-editable-loader-top: $oro-datagrid-body-cell-inner-top +
     (absolute-line-height($oro-datagrid-font-size, $oro-datagrid-body-cell-line-height) -
-    $oro-datagrid-editable-loader-size) / 2;
+    $oro-datagrid-editable-loader-size) * .5;
 $oro-datagrid-editable-loader-end: $oro-datagrid-body-cell-inner-horizontal;
 
 $oro-datagrid-editable-action-offset: $input-border-width 6px !default;

@@ -8,7 +8,7 @@ $select-caret-offset-end: 10px !default;
 
 $input-field-border-radius: 2px !default;
 $input-background-color: $primary-inverse !default;
-$input-inner-offset: ($content-padding-small / 2) $content-padding-small !default;
+$input-inner-offset: ($content-padding-small * .5) $content-padding-small !default;
 $input-box-shadow: none !default;
 $input-font-size: 16px !default;
 $input-font-family: $font-family-sans-serif !default;

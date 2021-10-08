@@ -126,22 +126,22 @@
 
             &.jsplumb-source-top-left {
                 top: -$jsplumb-source-radius;
-                left: $jsplumb-source-radius / 2;
+                left: $jsplumb-source-radius * .5;
             }
 
             &.jsplumb-source-top-right {
                 top: -$jsplumb-source-radius;
-                right: $jsplumb-source-radius / 2;
+                right: $jsplumb-source-radius * .5;
             }
 
             &.jsplumb-source-bottom-right {
                 bottom: -$jsplumb-source-radius;
-                right: $jsplumb-source-radius / 2;
+                right: $jsplumb-source-radius * .5;
             }
 
             &.jsplumb-source-bottom-left {
                 bottom: -$jsplumb-source-radius;
-                left: $jsplumb-source-radius / 2;
+                left: $jsplumb-source-radius * .5;
             }
         }
 

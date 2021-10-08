@@ -1,12 +1,12 @@
 /* @theme: admin.oro; */
 
 .form-layout {
-    margin-right: -$content-padding-medium / 2;
-    margin-left: -$content-padding-medium / 2;
+    margin-right: -$content-padding-medium * .5;
+    margin-left: -$content-padding-medium * .5;
 
     &__row {
-        padding-right: $content-padding-medium / 2;
-        padding-left: $content-padding-medium / 2;
+        padding-right: $content-padding-medium * .5;
+        padding-left: $content-padding-medium * .5;
     }
 
     &__part {
@@ -24,11 +24,11 @@
 
             .form-layout__part {
                 &:nth-child(odd) {
-                    padding-right: $content-padding-small / 2;
+                    padding-right: $content-padding-small * .5;
                 }
 
                 &:nth-child(even) {
-                    padding-left: $content-padding-small / 2;
+                    padding-left: $content-padding-small * .5;
                 }
 
                 &:only-child {

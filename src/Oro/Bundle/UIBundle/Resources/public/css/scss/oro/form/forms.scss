@@ -193,7 +193,7 @@
 .choice-widget-expanded {
     &__item {
         &:not(:last-child) {
-            margin-bottom: $content-padding-small / 2;
+            margin-bottom: $content-padding-small * .5;
         }
     }
 }
@@ -210,7 +210,7 @@
     }
 
     .control-label {
-        margin-bottom: $form-container-control-row-space / 2;
+        margin-bottom: $form-container-control-row-space * .5;
     }
 }
 
@@ -236,7 +236,7 @@ input[type='checkbox'] + label {
 }
 
 .form-row {
-    padding: 0 0 $margin-bottom-box/2;
+    padding: 0 0 $margin-bottom-box*.5;
 }
 
 label {

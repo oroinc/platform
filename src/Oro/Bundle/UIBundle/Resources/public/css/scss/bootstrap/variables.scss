@@ -81,7 +81,7 @@ $nav-link-padding-x: 16px;
 // Alert
 $alert-border-radius: 2px;
 $alert-border-width: 1px;
-$alert-padding-y: $content-padding-small / 2;
+$alert-padding-y: $content-padding-small * .5;
 $alert-padding-x: $content-padding-small;
 
 // Pagination
@@ -304,7 +304,7 @@ $large-screen: 1920px;
 // );
 
 // Bootstrap and its default variables
-@import '~bootstrap/scss/variables';
+@import '~@oroinc/bootstrap/scss/variables';
 
 // Remove unnecessary default theme colors
 // $theme-colors: map-remove($theme-colors, "info", "light", "dark");
