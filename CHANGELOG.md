@@ -1,3 +1,31 @@
+
+### Changed
+
+#### UIBundle
+
+Third party dependencies such as [Font Awesome](https://fontawesome.com/v4.7/) and [Bootstrap](https://getbootstrap.com/docs/4.6/getting-started/introduction/) where forked. As a result, you need to update your `scss` and configuration files.
+
+    **assets.yml**
+    ```diff
+    # ...
+        inputs:
+    -        - '~bootstrap/scss/nav'
+    +        - '~@oroinc/bootstrap/scss/nav'
+    ```
+    **\*.scss**
+    ```diff     
+    
+    - @import "~bootstrap/scss/variables";
+    + @import "~@oroinc/bootstrap/scss/variables";
+    ```
+
+    **jsmodules.yml**
+    ```diff
+    # ...
+    - bootstrap-alert$: bootstrap/js/dist/alert
+    + bootstrap-alert$: '@oroinc/bootstrap/js/dist/alert'
+    ```
+
 The upgrade instructions are available at [Oro documentation website](https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/).
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
