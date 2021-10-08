@@ -12,25 +12,31 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OAuthUserProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $userProvider;
 
+    /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userChecker;
+
     /** @var OAuthUserProvider */
     private $provider;
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(OAuthUserProviderInterface::class);
+        $this->userProvider = self::createMock(OAuthUserProviderInterface::class);
+        $this->userChecker = self::createMock(UserCheckerInterface::class);
 
         $userProviders = TestContainerBuilder::create()
             ->add('test_resource_owner', $this->userProvider)
             ->getContainer($this);
 
         $this->provider = new OAuthUserProvider($userProviders);
+        $this->provider->setSecurityUserChecker($this->userChecker);
     }
 
     private function getUserResponse(
@@ -38,19 +44,19 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         string $email = 'username@example.com',
         string $resourceOwner = 'test_resource_owner'
     ): UserResponseInterface {
-        $userResponse = $this->createMock(UserResponseInterface::class);
-        $userResponse->expects($this->any())
+        $userResponse = self::createMock(UserResponseInterface::class);
+        $userResponse->expects(self::any())
             ->method('getUsername')
             ->willReturn($username);
-        $userResponse->expects($this->any())
+        $userResponse->expects(self::any())
             ->method('getEmail')
             ->willReturn($email);
 
-        $resourceOwnerInstance = $this->createMock(ResourceOwnerInterface::class);
-        $userResponse->expects($this->any())
+        $resourceOwnerInstance = self::createMock(ResourceOwnerInterface::class);
+        $userResponse->expects(self::any())
             ->method('getResourceOwner')
             ->willReturn($resourceOwnerInstance);
-        $resourceOwnerInstance->expects($this->any())
+        $resourceOwnerInstance->expects(self::any())
             ->method('getName')
             ->willReturn($resourceOwner);
 
@@ -72,7 +78,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(ResourceOwnerNotAllowedException::class);
         $this->expectExceptionMessage('SSO is not enabled.');
 
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('isEnabled')
             ->willReturn(false);
 
@@ -86,19 +92,19 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
         $userResponse = $this->getUserResponse();
 
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('isEnabled')
             ->willReturn(true);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('getAllowedDomains')
             ->willReturn([]);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('findUser')
-            ->with($this->identicalTo($userResponse))
+            ->with(self::identicalTo($userResponse))
             ->willReturn($user);
 
         $loadedUser = $this->provider->loadUserByOAuthUserResponse($userResponse);
-        $this->assertSame($user, $loadedUser);
+        self::assertSame($user, $loadedUser);
     }
 
     public function testShouldReturnUserByOAuthIdWhenUserFoundAndEmailIsAllowed()
@@ -108,19 +114,19 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
         $userResponse = $this->getUserResponse();
 
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('isEnabled')
             ->willReturn(true);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('getAllowedDomains')
             ->willReturn(['example.com']);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('findUser')
-            ->with($this->identicalTo($userResponse))
+            ->with(self::identicalTo($userResponse))
             ->willReturn($user);
 
         $loadedUser = $this->provider->loadUserByOAuthUserResponse($userResponse);
-        $this->assertSame($user, $loadedUser);
+        self::assertSame($user, $loadedUser);
     }
 
     public function testShouldThrowExceptionWhenEmailIsNotAllowed()
@@ -128,13 +134,13 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(EmailDomainNotAllowedException::class);
         $this->expectExceptionMessage('The user email is not allowed.');
 
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('isEnabled')
             ->willReturn(true);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('getAllowedDomains')
             ->willReturn(['another.com']);
-        $this->userProvider->expects($this->never())
+        $this->userProvider->expects(self::never())
             ->method('findUser');
 
         $this->provider->loadUserByOAuthUserResponse($this->getUserResponse());
@@ -142,8 +148,8 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldThrowExceptionIfUserIsDisabled()
     {
-        $this->expectException(DisabledException::class);
-        $this->expectExceptionMessage('The user is disabled.');
+        $this->expectException(LockedException::class);
+        $this->expectExceptionMessage('Account is locked.');
 
         $user = new User();
         $user->addRole(new Role());
@@ -151,16 +157,24 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
         $userResponse = $this->getUserResponse();
 
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('isEnabled')
             ->willReturn(true);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('getAllowedDomains')
             ->willReturn([]);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('findUser')
-            ->with($this->identicalTo($userResponse))
+            ->with(self::identicalTo($userResponse))
             ->willReturn($user);
+
+        $exception = new LockedException('Account is locked.');
+        $exception->setUser($user);
+
+        $this->userChecker->expects(self::once())
+            ->method('checkPreAuth')
+            ->with($user)
+            ->willThrowException($exception);
 
         $this->provider->loadUserByOAuthUserResponse($userResponse);
     }
@@ -172,15 +186,15 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 
         $userResponse = $this->getUserResponse();
 
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('isEnabled')
             ->willReturn(true);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('getAllowedDomains')
             ->willReturn([]);
-        $this->userProvider->expects($this->once())
+        $this->userProvider->expects(self::once())
             ->method('findUser')
-            ->with($this->identicalTo($userResponse))
+            ->with(self::identicalTo($userResponse))
             ->willReturn(null);
 
         $this->provider->loadUserByOAuthUserResponse($userResponse);

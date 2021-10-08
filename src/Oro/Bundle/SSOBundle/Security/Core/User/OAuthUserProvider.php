@@ -8,19 +8,29 @@ use Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException;
 use Oro\Bundle\SSOBundle\Security\Core\Exception\ResourceOwnerNotAllowedException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 /**
  * The user provider for OAuth single sign-on authentication.
  */
 class OAuthUserProvider implements OAuthAwareUserProviderInterface
 {
-    /** @var ContainerInterface */
-    private $userProviders;
+    private ContainerInterface $userProviders;
+    private UserCheckerInterface $userChecker;
 
     public function __construct(ContainerInterface $userProviders)
     {
         $this->userProviders = $userProviders;
+    }
+
+    /**
+     * @deprecated
+     *
+     * @param UserCheckerInterface $userChecker
+     */
+    public function setSecurityUserChecker(UserCheckerInterface $userChecker)
+    {
+        $this->userChecker = $userChecker;
     }
 
     /**
@@ -44,9 +54,9 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         if (null === $user) {
             throw new BadCredentialsException('The user does not exist.');
         }
-        if (!$user->isEnabled()) {
-            throw new DisabledException('The user is disabled.');
-        }
+
+        $this->userChecker->checkPreAuth($user);
+        $this->userChecker->checkPostAuth($user);
 
         return $user;
     }
