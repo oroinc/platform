@@ -38,6 +38,7 @@ class ImapEmailRepository extends EntityRepository
      * @param ImapEmailFolder $imapFolder
      *
      * @return int
+     * @deprecated
      */
     public function findLastUidByFolder(ImapEmailFolder $imapFolder)
     {

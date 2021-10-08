@@ -101,8 +101,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->emailEntityBuilder->setFolder($folder);
 
                 // sync emails using this search query
-                $lastSynchronizedAt = $this->syncEmails($origin, $imapFolder);
+                [$lastSynchronizedAt, $uid] = $this->syncEmails($origin, $imapFolder);
+
                 $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
+                $imapFolder->setLastUid($uid);
 
                 $startDate = $folder->getSynchronizedAt();
                 $checkStartDate = clone $startDate;
@@ -115,6 +117,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             } catch (UnselectableFolderException $e) {
                 $this->processUnselectableFolderException($folder);
             }
+            $this->em->flush($imapFolder);
             $this->em->flush($folder);
 
             $this->cleanUp(true, $imapFolder->getFolder());
@@ -158,10 +161,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param EmailOrigin $origin
      * @param ImapEmailFolder $imapFolder
      *
-     * @return \DateTime The max sent date
+     * @return array [The max sent date, the max UID]
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function syncEmails(EmailOrigin $origin, ImapEmailFolder $imapFolder)
     {
+        $uid = 0;
         $folder             = $imapFolder->getFolder();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
         $emails = $this->getEmailIterator($origin, $imapFolder, $folder);
@@ -170,9 +177,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails->setLogger($this->logger);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setConvertErrorCallback(
-            function (\Exception $e, $messageUID = '', $messageSubject = '') use (&$invalid) {
+            function (\Exception $e, $messageUID = '', $messageSubject = '') use (&$invalid, &$uid) {
                 $invalid++;
                 $this->logException($e, $messageUID, $messageSubject);
+                if ($messageUID && $uid < (int)$messageUID) {
+                    $uid = (int)$messageUID;
+                }
             }
         );
 
@@ -197,6 +207,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             if ($email->getSentAt() > $lastSynchronizedAt) {
                 $lastSynchronizedAt = $email->getSentAt();
+            }
+
+            if ($uid < $email->getId()->getUid()) {
+                $uid = $email->getId()->getUid();
             }
 
             $count++;
@@ -227,7 +241,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             );
         }
 
-        return $lastSynchronizedAt;
+        return [$lastSynchronizedAt, $uid];
     }
 
     /**
@@ -535,7 +549,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     ) {
         $lastUid = null;
         if (false === $this->getSettings()->isForceMode()) {
-            $lastUid = $this->em->getRepository(ImapEmail::class)->findLastUidByFolder($imapFolder);
+            $lastUid = $imapFolder->getLastUid() ?: 0;
         }
 
         if (!$lastUid && $origin->getMailbox() && $folder->getSyncStartDate()) {
