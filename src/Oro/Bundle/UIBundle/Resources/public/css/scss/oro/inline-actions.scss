@@ -2,7 +2,7 @@
 
 /* stylelint-disable no-descending-specificity */
 
-@use 'sass:math';
+@use 'sass:list';
 
 .inline-actions-element {
     display: inline-flex;
@@ -80,7 +80,7 @@
             line-height: 1;
 
             &::before {
-                font: math.div($base-font-size, 26px) $fa-font-family;
+                font: list.slash($base-font-size, 26px) $fa-font-family;
                 color: $inline-action-color;
                 font-size: 15px;
                 line-height: 22px;
