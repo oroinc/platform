@@ -38,6 +38,13 @@ class ImapEmailFolder
     protected $uidValidity;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="last_uid", type="integer", nullable=true)
+     */
+    private $lastUid;
+
+    /**
      * Get id
      *
      * @return integer
@@ -91,6 +98,18 @@ class ImapEmailFolder
     public function setUidValidity($uidValidity)
     {
         $this->uidValidity = $uidValidity;
+
+        return $this;
+    }
+
+    public function getLastUid(): ?int
+    {
+        return $this->lastUid;
+    }
+
+    public function setLastUid(int $lastUid): ImapEmailFolder
+    {
+        $this->lastUid = $lastUid;
 
         return $this;
     }

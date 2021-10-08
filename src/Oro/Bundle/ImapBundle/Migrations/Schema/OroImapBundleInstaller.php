@@ -18,7 +18,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_10';
     }
 
     /**
@@ -70,6 +70,7 @@ class OroImapBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('folder_id', 'integer', []);
         $table->addColumn('uid_validity', 'integer', []);
+        $table->addColumn('last_uid', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['folder_id'], 'UNIQ_EC4034F9162CB942');
     }
