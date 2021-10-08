@@ -7,7 +7,10 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * Adds new field called "rtl_mode" to the Localization entity.
+ * Migration versions of previous platform version(4.1) cannot be larger than version of current platform,
+ * it is BC break.
+ *
+ * See: Oro\Bundle\LocaleBundle\Migrations\Schema\v1_4_3\AddRtlModeToLocalizationEntity.
  */
 class AddRtlModeToLocalizationEntity implements Migration
 {
@@ -16,12 +19,5 @@ class AddRtlModeToLocalizationEntity implements Migration
      */
     public function up(Schema $schema, QueryBag $queries): void
     {
-        $table = $schema->getTable('oro_localization');
-
-        if ($table->hasColumn('rtl_mode')) {
-            return;
-        }
-
-        $table->addColumn('rtl_mode', 'boolean', ['default' => false]);
     }
 }
