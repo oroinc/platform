@@ -36,7 +36,7 @@ class CheckConnectionController extends AbstractController
 
     private function getConnectionManager(): ConnectionControllerManager
     {
-        return $this->get('oro_imap.manager.controller.connection');
+        return $this->get(ConnectionControllerManager::class);
     }
 
     public static function getSubscribedServices()
@@ -44,7 +44,7 @@ class CheckConnectionController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                'oro_imap.manager.controller.connection' => ConnectionControllerManager::class
+                ConnectionControllerManager::class,
             ]
         );
     }

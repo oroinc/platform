@@ -10,7 +10,6 @@ use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterfa
 
 /**
  * Interface which must be implemented by ImportExport serializer.
- * TODO: Rename to ImportExportSerializer?
  */
 interface SerializerInterface extends
     SymfonySerializerInterface,
