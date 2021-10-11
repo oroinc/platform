@@ -70,7 +70,7 @@ abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirements
         $requiredPrivileges = $this->getRequiredPrivileges();
 
         if ($this->getCurrentPlatformName($connection) === $this->getTargetPlatformName()) {
-            $platformVersion = $this->getCurrentPlatformVersion($connection);
+            $platformVersion = $this->getCurrentPlatformVersion($connection) ?? 'undefined';
             $grantedPrivileges = $this->getGrantedPrivileges($connection);
             $privilegesDiff = array_diff($requiredPrivileges, $grantedPrivileges);
 
