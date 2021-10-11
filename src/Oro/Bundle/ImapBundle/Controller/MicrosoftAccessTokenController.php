@@ -35,7 +35,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
      */
     protected function getOAuthProvider(): OAuthProviderInterface
     {
-        return $this->get('oro_imap.microsoft_oauth_provider');
+        return $this->get(MicrosoftOAuthProvider::class);
     }
 
     /**
@@ -64,7 +64,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
 
     private function getOAuthScopeProvider(): OAuthScopeProviderInterface
     {
-        return $this->get('oro_imap.microsoft_oauth_scope_provider');
+        return $this->get(MicrosoftOAuthScopeProvider::class);
     }
 
     private function storeResponse(SessionInterface $session, Response $response): Response
@@ -115,8 +115,8 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                'oro_imap.microsoft_oauth_provider' => MicrosoftOAuthProvider::class,
-                'oro_imap.microsoft_oauth_scope_provider' => MicrosoftOAuthScopeProvider::class,
+                MicrosoftOAuthProvider::class,
+                MicrosoftOAuthScopeProvider::class,
             ]
         );
     }
