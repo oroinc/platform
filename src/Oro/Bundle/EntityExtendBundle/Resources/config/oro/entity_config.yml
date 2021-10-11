@@ -224,11 +224,11 @@ entity_config:
                     constraints:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
-                              min:            1
-                              max:            255
+                            min:            1
+                            max:            255
                         - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotLessThanOriginalValue:
-                              scope:          extend
-                              option:         length
+                            scope:          extend
+                            option:         length
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
@@ -251,7 +251,7 @@ entity_config:
                     constraints:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
-                              min:            0
+                            min:            0
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
@@ -274,9 +274,9 @@ entity_config:
                     constraints:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
-                              min:            0
-                              maxPropertyPath: parent[precision].data
-                              notInRangeMessage: oro.entity_extend.validator.scale.range.not_in_range
+                            min:            0
+                            maxPropertyPath: parent[precision].data
+                            notInRangeMessage: oro.entity_extend.validator.scale.range.not_in_range
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:

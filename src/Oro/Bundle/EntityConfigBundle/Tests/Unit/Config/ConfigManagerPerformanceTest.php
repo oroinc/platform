@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
@@ -416,15 +417,18 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
             ->willReturn($em);
 
         $lockObject = new LockObject();
-        $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], true);
+        $applicationState = $this->createMock(ApplicationState::class);
+
+        $applicationState->method('isInstalled')->willReturn(true);
+
+        $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], $applicationState);
 
         return new ConfigManager(
             $this->createMock(EventDispatcher::class),
             $this->createMock(MetadataFactory::class),
             new ConfigModelManager($doctrine, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
-            new ConfigCache(new ArrayCache(), new ArrayCache(), ['test' => 'test']),
-            Validation\Mock\ConfigurationValidatorMock::getInstance()
+            new ConfigCache(new ArrayCache(), new ArrayCache(), ['test' => 'test'])
         );
     }
 

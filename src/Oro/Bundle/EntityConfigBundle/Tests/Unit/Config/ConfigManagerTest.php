@@ -24,7 +24,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\Config\Validation\Mock\ConfigurationValidatorMock;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -75,8 +74,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             $this->metadataFactory,
             $this->modelManager,
             $this->createMock(AuditManager::class),
-            $this->configCache,
-            ConfigurationValidatorMock::getInstance()
+            $this->configCache
         );
         $this->setProviderBag([$this->configProvider]);
     }

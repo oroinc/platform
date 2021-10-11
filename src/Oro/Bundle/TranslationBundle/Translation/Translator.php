@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
@@ -84,6 +85,8 @@ class Translator extends BaseTranslator
     /** @var array */
     private $cacheVary;
 
+    private ApplicationState $applicationState;
+
     /**
      * @param ContainerInterface $container
      * @param MessageFormatter $formatter
@@ -127,9 +130,10 @@ class Translator extends BaseTranslator
         $this->logger = $logger;
     }
 
-    public function setInstalled($installed)
+    public function setApplicationState(ApplicationState $applicationState)
     {
-        $this->installed = $installed;
+        $this->applicationState = $applicationState;
+        $this->installed = $applicationState->isInstalled();
     }
 
     /**
@@ -356,7 +360,7 @@ class Translator extends BaseTranslator
             $translator->setStrategyProvider($this->strategyProvider);
             $translator->setTranslationDomainProvider($this->translationDomainProvider);
             $translator->setEventDispatcher($this->eventDispatcher);
-            $translator->setInstalled($this->installed);
+            $translator->setApplicationState($this->applicationState);
             $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
 
             $translator->warmUp($tmpDir);

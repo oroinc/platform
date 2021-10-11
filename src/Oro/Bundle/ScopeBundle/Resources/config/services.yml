@@ -76,7 +76,7 @@ services:
         class: Oro\Bundle\ScopeBundle\EventListener\PostUpMigrationListener
         arguments:
             - '@oro_scope.migration.add_comment_to_row_hash_manager'
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -260 }
 

@@ -146,7 +146,3 @@ services:
         class: 'Oro\Bundle\CurrencyBundle\EventListener\ORM\FixMoneyChangeSetListener'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 255 } # Should be the first called
-
-    Oro\Bundle\CurrencyBundle\Config\Validation\MulticurrencyFieldConfiguration:
-        tags:
-            - oro_entity_config.validation.entity_config

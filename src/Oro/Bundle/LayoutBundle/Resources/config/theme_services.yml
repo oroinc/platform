@@ -140,7 +140,7 @@ services:
     oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
         arguments:
-            - '@oro_layout.expression_language.expression_validator'
+            - '@validator'
             - '@oro_layout.expression_language.compiled_cache_warmer'
         calls:
             - [addExtension, ['@oro_layout.layout_update_generator.extension.theme_relative_path']]

@@ -219,7 +219,7 @@ services:
         arguments:
             - '@doctrine'
             - ['oro_workflow_entity_acl', 'oro_workflow_entity_acl_ident', 'oro_workflow_restriction', 'oro_workflow_restriction_ident']
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: oro_entity.database_checker }
 
@@ -686,7 +686,3 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
-
-    Oro\Bundle\WorkflowBundle\Config\Validation\WorkflowEntityConfiguration:
-        tags:
-            - oro_entity_config.validation.entity_config

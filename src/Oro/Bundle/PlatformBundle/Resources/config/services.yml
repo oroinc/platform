@@ -156,3 +156,15 @@ services:
 
     Doctrine\Inflector\Inflector:
         factory: [ !service { class: Doctrine\Inflector\Rules\English\InflectorFactory }, 'build' ]
+
+    oro_platform.orm.configuration.configurator:
+        class: Oro\Bundle\PlatformBundle\Configurator\OrmConfigurationConfigurator
+        arguments:
+            - '@oro_distribution.handler.application_status'
+
+    # Overrides the service from doctrine to add the configurator that changes the Configuration->autoGenerateProxyClasses option value to true if the application isn't installed
+    doctrine.orm.configuration:
+        class: '%doctrine.orm.configuration.class%'
+        abstract: true
+        public: false
+        configurator: ['@oro_platform.orm.configuration.configurator', 'configure']

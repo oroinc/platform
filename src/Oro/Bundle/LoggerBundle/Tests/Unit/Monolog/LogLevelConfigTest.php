@@ -5,6 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 use Doctrine\Common\Cache\CacheProvider;
 use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 
 class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
@@ -17,6 +18,8 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
 
     private LogLevelConfig $config;
 
+    private ApplicationState $applicationState;
+
     /**
      * {@inheritdoc}
      */
@@ -24,21 +27,27 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->loggerCache = $this->createMock(CacheProvider::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
+
+        $this->applicationState->method('isInstalled')->willReturn(true);
 
         $this->config = new LogLevelConfig(
             $this->loggerCache,
             $this->configManager,
-            1,
+            $this->applicationState,
             'warning'
         );
     }
 
     public function testGetMinLevelApplicationIsNotInstalled()
     {
+        $applicationState = $this->createMock(ApplicationState::class);
+        $applicationState->method('isInstalled')->willReturn(false);
+
         $config = new LogLevelConfig(
             $this->loggerCache,
             $this->configManager,
-            null,
+            $applicationState,
             'warning'
         );
         $this->loggerCache->expects(self::once())

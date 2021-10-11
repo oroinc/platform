@@ -8,11 +8,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
-use Oro\Bundle\InstallerBundle\Persister\YamlPersister;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
@@ -42,23 +42,23 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
     private Process $assetsCommandProcess;
     private InputOptionProvider $inputOptionProvider;
-    private YamlPersister $yamlPersister;
+    private ApplicationState $applicationState;
     private ScriptManager $scriptManager;
     private Registry $doctrine;
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        ContainerInterface $container,
-        Registry $doctrine,
+        ContainerInterface       $container,
+        Registry                 $doctrine,
         EventDispatcherInterface $eventDispatcher,
-        YamlPersister $yamlPersister,
-        ScriptManager $scriptManager
+        ApplicationState         $applicationState,
+        ScriptManager            $scriptManager
     ) {
         parent::__construct($container);
 
         $this->doctrine = $doctrine;
         $this->eventDispatcher = $eventDispatcher;
-        $this->yamlPersister = $yamlPersister;
+        $this->applicationState = $applicationState;
         $this->scriptManager = $scriptManager;
     }
 
@@ -211,7 +211,7 @@ HELP
             $this->validate($input);
         }
 
-        if ($this->isInstalled()) {
+        if ($this->isInstalled() && !$input->getOption('drop-database')) {
             $this->alreadyInstalledMessageShow($input, $output);
 
             return 1;
@@ -267,7 +267,6 @@ HELP
         $io->error('An Oro application is already installed.');
         $io->text('To proceed with the installation:');
         $io->listing([
-            'set <info>installed: false</info> in <info>config/parameters.yml</info>,',
             'remove caches in <info>var/cache</info> folder manually,',
             'drop the database manually or reinstall with the <info>--drop-database</info> option.',
         ]);
@@ -585,8 +584,7 @@ HELP
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 
-        // set installed flag in DI container
-        $this->updateInstalledFlag(date('c'));
+        $this->applicationState->setInstalled();
 
         if (!$skipAssets) {
             /**
@@ -594,22 +592,9 @@ HELP
              */
             $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
         }
-
         $output->writeln('');
 
         return $this;
-    }
-
-    /**
-     * Update installed flag in parameters.yml
-     *
-     * @param bool|string $installed
-     */
-    protected function updateInstalledFlag($installed): void
-    {
-        $params                        = $this->yamlPersister->parse();
-        $params['system']['installed'] = $installed;
-        $this->yamlPersister->dump($params);
     }
 
     protected function clearCache(CommandExecutor $commandExecutor, InputInterface $input): void
@@ -638,8 +623,7 @@ HELP
 
     protected function isInstalled(): bool
     {
-        return $this->getContainer()->hasParameter('installed')
-            && $this->getContainer()->getParameter('installed');
+        return $this->applicationState->isInstalled();
     }
 
     protected function processTranslations(InputInterface $input, CommandExecutor $commandExecutor): void

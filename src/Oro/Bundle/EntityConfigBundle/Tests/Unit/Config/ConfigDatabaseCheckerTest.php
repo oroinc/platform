@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 
@@ -16,15 +17,24 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var LockObject|\PHPUnit\Framework\MockObject\MockObject */
     private $lockObject;
 
+    private ApplicationState $applicationState;
+
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->lockObject = $this->createMock(LockObject::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
     }
 
     public function testCheckDatabaseForInstalledApplication()
     {
-        $databaseChecker = new ConfigDatabaseChecker($this->lockObject, $this->doctrine, ['test_table'], '2017-01-01');
+        $this->applicationState->method('isInstalled')->willReturn(true);
+        $databaseChecker = new ConfigDatabaseChecker(
+            $this->lockObject,
+            $this->doctrine,
+            ['test_table'],
+            $this->applicationState
+        );
         $this->lockObject->expects(self::never())
             ->method('isLocked');
         $this->doctrine->expects(self::never())
@@ -43,7 +53,13 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(false);
 
-        $databaseChecker = new ConfigDatabaseChecker($this->lockObject, $this->doctrine, ['test_table'], '2017-01-01');
+        $this->applicationState->method('isInstalled')->willReturn(true);
+        $databaseChecker = new ConfigDatabaseChecker(
+            $this->lockObject,
+            $this->doctrine,
+            ['test_table'],
+            $this->applicationState
+        );
         $databaseChecker->clearCheckDatabase();
 
         self::assertTrue($databaseChecker->checkDatabase());
@@ -61,7 +77,14 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(true);
 
-        $databaseChecker = new ConfigDatabaseChecker($this->lockObject, $this->doctrine, ['test_table'], '2017-01-01');
+        $this->applicationState->method('isInstalled')->willReturn(true);
+
+        $databaseChecker = new ConfigDatabaseChecker(
+            $this->lockObject,
+            $this->doctrine,
+            ['test_table'],
+            $this->applicationState
+        );
         $databaseChecker->clearCheckDatabase();
 
         self::assertTrue($databaseChecker->checkDatabase());
@@ -81,7 +104,14 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(false);
 
-        $databaseChecker = new ConfigDatabaseChecker($this->lockObject, $this->doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $databaseChecker = new ConfigDatabaseChecker(
+            $this->lockObject,
+            $this->doctrine,
+            ['test_table'],
+            $this->applicationState
+        );
 
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is cached
@@ -98,7 +128,14 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(true);
 
-        $databaseChecker = new ConfigDatabaseChecker($this->lockObject, $this->doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $databaseChecker = new ConfigDatabaseChecker(
+            $this->lockObject,
+            $this->doctrine,
+            ['test_table'],
+            $this->applicationState
+        );
 
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is not cached
@@ -120,7 +157,14 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(false);
 
-        $databaseChecker = new ConfigDatabaseChecker($this->lockObject, $this->doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $databaseChecker = new ConfigDatabaseChecker(
+            $this->lockObject,
+            $this->doctrine,
+            ['test_table'],
+            $this->applicationState
+        );
 
         self::assertFalse($databaseChecker->checkDatabase());
         // test that the result is cached

@@ -219,9 +219,13 @@ class ImapEmailManager
             $messageId = $this->getMessageId($headers, 'Message-ID');
             // Some messages can have no 'Message-ID' header. In this case calculate the id from Received header.
             if ($messageId === '') {
-                $header = $headers->get('Received');
-                $header->rewind();
-                $messageId = md5($header->current()->getFieldValue());
+                if ($headers->has('Received')) {
+                    $header = $headers->get('Received');
+                    $header->rewind();
+                    $messageId = md5($header->current()->getFieldValue());
+                } elseif ($headers->has('InternalDate')) {
+                    $messageId = md5($headers->get('InternalDate')->getFieldValue());
+                }
             }
             $email->setMessageId($messageId);
 

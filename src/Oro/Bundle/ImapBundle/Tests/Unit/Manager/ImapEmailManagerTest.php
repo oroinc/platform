@@ -16,6 +16,9 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImapEmailManagerTest extends TestCase
 {
     /** @var ImapConnector|\PHPUnit\Framework\MockObject\MockObject */
@@ -48,7 +51,7 @@ class ImapEmailManagerTest extends TestCase
      * @dataProvider getEmailsDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetEmails(string $strDate)
+    public function testGetEmails(string $strDate): void
     {
         $toAddress = $this->createMock(AddressInterface::class);
         $toAddress->expects($this->once())
@@ -187,7 +190,7 @@ class ImapEmailManagerTest extends TestCase
         $this->assertEquals('bccEmail', $bccRecipients[0]);
     }
 
-    public function testGetUnseenEmailUIDs()
+    public function testGetUnseenEmailUIDs(): void
     {
         $startDate = new DateTime('29-05-2015');
 
@@ -198,7 +201,7 @@ class ImapEmailManagerTest extends TestCase
         $this->manager->getUnseenEmailUIDs($startDate);
     }
 
-    public function testConvertToEmailWithUnexpectedMultiValueHeader()
+    public function testConvertToEmailWithUnexpectedMultiValueHeader(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -225,7 +228,7 @@ class ImapEmailManagerTest extends TestCase
         $this->manager->convertToEmail($msg);
     }
 
-    public function testConvertToEmailWithMultiValueMessageId()
+    public function testConvertToEmailWithMultiValueMessageId(): void
     {
         $msg = $this->getMessageMock(
             [
@@ -245,7 +248,7 @@ class ImapEmailManagerTest extends TestCase
         $this->assertCount(2, $email->getMultiMessageId());
     }
 
-    public function testConvertToEmailWithMultiValueAcceptLanguage()
+    public function testConvertToEmailWithMultiValueAcceptLanguage(): void
     {
         $msg = $this->getMessageMock(
             [
@@ -264,7 +267,7 @@ class ImapEmailManagerTest extends TestCase
         $this->assertEquals('en-US', $email->getAcceptLanguageHeader());
     }
 
-    public function testConvertToEmailWithLongSubject()
+    public function testConvertToEmailWithLongSubject(): void
     {
         $msg = $this->getMessageMock(
             [
@@ -280,7 +283,7 @@ class ImapEmailManagerTest extends TestCase
         $this->assertEquals(998, mb_strlen($email->getSubject()));
     }
 
-    public function testConvertToEmailWithSeveralSubjects()
+    public function testConvertToEmailWithSeveralSubjects(): void
     {
         $msg = $this->getMessageMock(
             [
@@ -307,7 +310,7 @@ class ImapEmailManagerTest extends TestCase
         ];
     }
 
-    public function testConvertToEmailWithReceivedHeader()
+    public function testConvertToEmailWithReceivedHeader(): void
     {
         $msg = $this->getMessageMock(
             [
@@ -325,7 +328,7 @@ class ImapEmailManagerTest extends TestCase
         );
     }
 
-    public function testConvertToEmailWithoutReceivedHeader()
+    public function testConvertToEmailWithoutReceivedHeader(): void
     {
         $msg = $this->getMessageMock(
             [
@@ -339,6 +342,23 @@ class ImapEmailManagerTest extends TestCase
         $this->assertEquals(
             new DateTime('Fri, 31 Jun 2011 10:59:59 +1100', new \DateTimeZone('UTC')),
             $email->getReceivedAt()
+        );
+    }
+
+    public function testConvertToEmailWithoutReceivedAndMessageIDHeadersAndWithInternalDateHeader(): void
+    {
+        $msg = $this->getMessageMock(
+            [
+                $this->getHeader('UID', '123'),
+                $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
+                $this->getHeader('InternalDate', 'Fri, 25 Jun 2011 10:59:59 +1100')
+            ]
+        );
+
+        $email = $this->manager->convertToEmail($msg);
+        $this->assertEquals(
+            md5('Fri, 25 Jun 2011 10:59:59 +1100'),
+            $email->getMessageId()
         );
     }
 

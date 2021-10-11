@@ -10,7 +10,7 @@ services:
         class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
         arguments:
             - '@Psr\Container\ContainerInterface'
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }

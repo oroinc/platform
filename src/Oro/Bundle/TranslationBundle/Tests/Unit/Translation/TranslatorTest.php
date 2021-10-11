@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
@@ -285,6 +286,8 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $locale = 'en';
         $container  = $this->createMock(ContainerInterface::class);
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $applicationState = $this->createMock(ApplicationState::class);
+
         $strategyProvider = $this->getStrategyProvider($locale);
 
         $translator = $this->getMockBuilder(Translator::class)
@@ -300,7 +303,10 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
-        $translator->setInstalled(true);
+
+        $applicationState->method('isInstalled')->willReturn(true);
+
+        $translator->setApplicationState($applicationState);
         $translator->setEventDispatcher($this->getEventDispatcher());
 
         $translator->setLocale($locale);
@@ -321,6 +327,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $container = $this->createMock(ContainerInterface::class);
+        $applicationState = $this->createMock(ApplicationState::class);
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $translationDomainProvider->expects($this->once())
             ->method('getAvailableDomainsForLocales')
@@ -343,7 +350,9 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
         $translator->setEventDispatcher($this->getEventDispatcher());
-        $translator->setInstalled(true);
+        $applicationState->method('isInstalled')->willReturn(true);
+
+        $translator->setApplicationState($applicationState);
 
         $translator->setLocale($locale);
         $translator->setDatabaseMetadataCache($databaseCache);
@@ -445,6 +454,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         array $options = []
     ): Translator {
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $applicationState = $this->createMock(ApplicationState::class);
 
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())
@@ -462,7 +472,9 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
-        $translator->setInstalled(true);
+        $applicationState->method('isInstalled')->willReturn(true);
+
+        $translator->setApplicationState($applicationState);
         $translator->setEventDispatcher($eventDispatcher);
 
         $translator->addResource('loader', 'foo', 'fr');

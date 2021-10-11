@@ -42,7 +42,8 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
- *              "type"="ACL"
+ *              "type"="ACL",
+ *              "group"=""
  *          },
  *          "dataaudit"={
  *              "auditable"=false,

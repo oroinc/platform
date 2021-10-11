@@ -236,3 +236,9 @@ services:
             - '@oro_locale.provider.preferred_localization_provider'
         tags:
             - { name: oro_locale.preferred_localization_provider }
+
+    oro_notification.notification_alert.datagrid_view_list:
+        class: Oro\Bundle\NotificationBundle\Datagrid\NotificationAlertViewList
+        public: true
+        arguments:
+            - '@translator'

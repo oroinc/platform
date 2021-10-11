@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\ScopeBundle\EventListener\PostUpMigrationListener;
 use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
@@ -11,19 +12,21 @@ use PHPUnit\Framework\TestCase;
 
 class PostUpMigrationListenerTest extends TestCase
 {
-    /**
-     * @var AddCommentToRowHashManager
-     */
-    private $manager;
+    private AddCommentToRowHashManager $manager;
+
+    private ApplicationState $applicationState;
 
     protected function setUp(): void
     {
         $this->manager = $this->createMock(AddCommentToRowHashManager::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
     }
 
     public function testInstalled(): void
     {
-        $listener = new PostUpMigrationListener($this->manager, 'true');
+        $this->applicationState->method('isInstalled')
+            ->willReturn(true);
+        $listener = new PostUpMigrationListener($this->manager, $this->applicationState);
 
         $event = $this->createMock(PostMigrationEvent::class);
         $event->expects($this->once())
@@ -35,7 +38,9 @@ class PostUpMigrationListenerTest extends TestCase
 
     public function testNotInstalled(): void
     {
-        $listener = new PostUpMigrationListener($this->manager, null);
+        $this->applicationState->method('isInstalled')
+            ->willReturn(false);
+        $listener = new PostUpMigrationListener($this->manager, $this->applicationState);
 
         $event = $this->createMock(PostMigrationEvent::class);
 

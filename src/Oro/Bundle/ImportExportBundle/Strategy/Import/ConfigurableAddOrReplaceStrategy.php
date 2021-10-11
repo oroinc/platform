@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\ORMInvalidArgumentException;
+use ErrorException;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -130,6 +131,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param bool $entityIsRelation
      *
      * @return null|object
+     * @throws ErrorException
      */
     protected function processEntity(
         $entity,
@@ -198,6 +200,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param bool $entityIsRelation
      * @param mixed|array|null $itemData
      * @return object|null
+     * @throws ErrorException
      */
     protected function importEntityFields($entity, $existingEntity, $isFullData, $entityIsRelation, $itemData)
     {
@@ -271,6 +274,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param array|null $itemData
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @throws ErrorException
      */
     protected function updateRelations($entity, array $itemData = null)
     {
@@ -570,6 +574,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param object $entity
      * @param string $fieldName
      * @return mixed
+     * @throws ErrorException
      */
     protected function getObjectValue($entity, $fieldName)
     {
@@ -579,12 +584,20 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             $methodName = 'getObjectValueWithReflection';
         }
 
+        $importedEntity = $this->fieldHelper->$methodName($entity, $fieldName);
         if ($this->isEntityFieldFallbackValue(ClassUtils::getClass($entity), $fieldName)) {
-            return $this->fieldHelper->$methodName($this->processingEntity, $fieldName) ?:
-                $this->fieldHelper->$methodName($entity, $fieldName);
+            $existedEntity = $this->fieldHelper->$methodName($this->processingEntity, $fieldName);
+
+            if ($existedEntity && $importedEntity) {
+                $this->fieldHelper->setObjectValue(
+                    $importedEntity,
+                    'id',
+                    $this->fieldHelper->getObjectValue($existedEntity, 'id')
+                );
+            }
         }
 
-        return $this->fieldHelper->$methodName($entity, $fieldName);
+        return $importedEntity;
     }
 
     /**
