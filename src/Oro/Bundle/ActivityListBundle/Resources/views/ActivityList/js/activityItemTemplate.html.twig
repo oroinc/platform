@@ -1,7 +1,7 @@
 {% extends 'OroActivityListBundle:ActivityList/js:view.html.twig' %}
 
 {% block activityIcon %}
-    <span class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}" aria-hidden="true"></span>
+    <span class="{{ oro_entity_config_value(entityClass|default(), 'icon')|e('html_attr') }}" aria-hidden="true"></span>
 {% endblock %}
 
 {% block activityActions %}

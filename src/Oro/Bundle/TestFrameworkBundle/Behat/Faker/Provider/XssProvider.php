@@ -121,6 +121,17 @@ class XssProvider extends BaseProvider
     }
 
     /**
+     * @param string $identifier
+     * @param string|null $payloadType
+     * @param null|string $elementId
+     * @return string
+     */
+    public function xssBase64($identifier = 'XSS', $payloadType = null, $elementId = null)
+    {
+        return base64_encode($this->xss($identifier, $payloadType, $elementId));
+    }
+
+    /**
      * @param string $prefix
      * @return XssProvider
      */

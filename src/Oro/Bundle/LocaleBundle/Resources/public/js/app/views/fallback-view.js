@@ -85,6 +85,7 @@ define(function(require) {
             this.initLayout().done(function() {
                 this.handleLayoutInit();
                 this._resolveDeferredRender();
+                this.bindEvents();
             }.bind(this));
 
             return this;
@@ -94,9 +95,13 @@ define(function(require) {
             this.initSubviews = false;
             this.$(this.options.selectors.childItem).removeAttr('data-layout');
 
+            const self = this;
+            const valueElements = this.getValueEl(this.$el);
             this.initLayout().done(function() {
-                this.bindEvents();
-            }.bind(this));
+                valueElements.each(function() {
+                    self.cloneValueToChildren(self.getItemEl(this));
+                });
+            });
         },
 
         /**

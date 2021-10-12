@@ -55,6 +55,7 @@ system_configuration:
             type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             options:
                 label: oro.google_integration.system_configuration.fields.enable_sso.label
+                tooltip: oro.google_integration.system_configuration.fields.enable_sso.tooltip
                 required: false
                 resettable: false
             priority: 10

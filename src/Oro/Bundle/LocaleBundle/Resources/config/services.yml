@@ -466,3 +466,14 @@ services:
             - '@oro_locale.provider.localized_fallback_value_field'
         tags:
             - { name: oro_security.fields_sanitizer }
+
+    oro_locale.formatter.localized_fallback_value_formatter:
+        class: Oro\Bundle\LocaleBundle\Formatter\LocalizedFallbackValueFormatter
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+            - '@translator'
+            - '@property_accessor'
+        tags:
+            - { name: oro_formatter, formatter: oro_locale.localized_fallback_value_formatter }

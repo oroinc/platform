@@ -38,10 +38,7 @@ class OroIntegrationBundleInstaller implements Installation
         $this->addOroIntegrationChannelStatusForeignKeys($schema);
     }
 
-    /**
-     * Create oro_integration_change_set table
-     */
-    protected function createOroIntegrationFieldsChangesTable(Schema $schema)
+    protected function createOroIntegrationFieldsChangesTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_fields_changes');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -52,10 +49,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addIndex(['entity_id', 'entity_class'], 'oro_integration_fields_changes_idx', []);
     }
 
-    /**
-     * Create oro_integration_channel table
-     */
-    protected function createOroIntegrationChannelTable(Schema $schema)
+    protected function createOroIntegrationChannelTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_channel');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -79,10 +73,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('previously_enabled', 'boolean', ['notnull' => false]);
     }
 
-    /**
-     * Create oro_integration_channel_status table
-     */
-    protected function createOroIntegrationChannelStatusTable(Schema $schema)
+    protected function createOroIntegrationChannelStatusTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_channel_status');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -98,10 +89,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addIndex(['connector', 'code'], 'oro_intch_con_state_idx', []);
     }
 
-    /**
-     * Create oro_integration_transport table
-     */
-    protected function createOroIntegrationTransportTable(Schema $schema)
+    protected function createOroIntegrationTransportTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_transport');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -110,10 +98,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->setPrimaryKey(['id']);
     }
 
-    /**
-     * Add oro_integration_channel foreign keys.
-     */
-    protected function addOroIntegrationChannelForeignKeys(Schema $schema)
+    protected function addOroIntegrationChannelForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_integration_channel');
         $table->addForeignKeyConstraint(
@@ -142,10 +127,7 @@ class OroIntegrationBundleInstaller implements Installation
         );
     }
 
-    /**
-     * Add oro_integration_channel_status foreign keys.
-     */
-    protected function addOroIntegrationChannelStatusForeignKeys(Schema $schema)
+    protected function addOroIntegrationChannelStatusForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_integration_channel_status');
         $table->addForeignKeyConstraint(

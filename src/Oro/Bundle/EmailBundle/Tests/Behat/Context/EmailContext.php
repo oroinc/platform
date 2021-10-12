@@ -18,6 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTra
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Feature context to work with emails
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -25,8 +26,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
 {
     use AssertTrait, KernelDictionary, MessageQueueProcessorAwareTrait;
 
-    /** @var DirectMailerDecorator */
-    private $mailer;
+    private ?DirectMailer $mailer = null;
 
     /** @var string */
     private $downloadedFile;
@@ -462,8 +462,9 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext, Mess
      */
     private function getMailer()
     {
-        if (!$this->mailer) {
-            $this->mailer = $this->getContainer()->get('oro_email.direct_mailer');
+        $container = $this->getContainer();
+        if (!$this->mailer && $container) {
+            $this->mailer = $container->get('oro_email.direct_mailer');
         }
 
         return $this->mailer;

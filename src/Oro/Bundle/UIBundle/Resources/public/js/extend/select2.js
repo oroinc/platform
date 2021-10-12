@@ -419,22 +419,34 @@ define(function(require) {
             positionDropdown.call(this);
 
             if (this.dropdownFixedMode) {
-                let top = this.container[0].getBoundingClientRect().top;
+                const dropdownCss = {
+                    top: this.container[0].getBoundingClientRect().top,
+                    position: 'fixed'
+                };
 
                 if (this.dropdown.hasClass('select2-drop-above')) {
-                    top -= this.dropdown.height();
+                    dropdownCss.top -= this.dropdown.height();
                 } else {
-                    top += this.container.outerHeight(false);
+                    dropdownCss.top += this.container.outerHeight(false);
                 }
 
                 // Fix bug on iOS with incorrect value of getBoundingClientRect
                 // when keyboard is appeared and window inner height is smaller than viewport height
                 if (tools.isIOS()) {
-                    const correction = document.documentElement.offsetHeight - window.innerHeight;
-                    top += correction;
+                    const fakeDiv = document.createElement('div');
+                    Object.assign(fakeDiv.style, {
+                        width: '1px',
+                        height: '100%',
+                        position: 'fixed',
+                        top: 0,
+                        left: 0
+                    });
+                    document.body.append(fakeDiv);
+                    dropdownCss.top += fakeDiv.offsetHeight - window.innerHeight;
+                    fakeDiv.remove();
                 }
 
-                this.dropdown.css({position: 'fixed', top: top});
+                this.dropdown.css(dropdownCss);
             } else if (this.dropdown.css('position') === 'fixed') {
                 this.dropdown.css('position', '');
             }

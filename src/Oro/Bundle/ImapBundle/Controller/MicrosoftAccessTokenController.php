@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthProvider;
+use Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthScopeProvider;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
 use Oro\Bundle\ImapBundle\Provider\OAuthScopeProviderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -106,5 +108,16 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         $response['email_address'] = $userInfo->getEmail();
 
         return new JsonResponse($response);
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_imap.microsoft_oauth_provider' => MicrosoftOAuthProvider::class,
+                'oro_imap.microsoft_oauth_scope_provider' => MicrosoftOAuthScopeProvider::class,
+            ]
+        );
     }
 }

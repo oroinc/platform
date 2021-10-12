@@ -1,0 +1,22 @@
+{% if value %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% set collapseView = {
+        storageKey: 'collapseBlock[' ~ record.getValue('sourceType') ~ ']',
+        uid: record.getValue('id'),
+        animationSpeed: 0,
+        closeClass: 'overflows',
+        forcedState: false,
+        checkOverflow: false,
+        rowsCount: 5,
+        visibleRows: 1,
+        open: false,
+        keepState: false
+    } %}
+    <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}" style="width:260px">
+        <div class="control-label" data-collapse-container>
+            {{ value|split('', 31)|join(' ') }}
+        </div>
+        <a href="#" class="control-label toggle-more" data-collapse-trigger>{{ 'Show more'|trans }}</a>
+        <a href="#" class="control-label toggle-less" data-collapse-trigger>{{ 'Show less'|trans }}</a>
+    </div>
+{% endif %}
