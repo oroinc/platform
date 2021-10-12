@@ -8,6 +8,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;
@@ -38,6 +39,8 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->dataUpdateTopicSender = $this->createMock(DataUpdateTopicSender::class);
         $this->em = $this->createMock(EntityManager::class);
         $this->uow = $this->createMock(UnitOfWork::class);
+        $applicationState = $this->createMock(ApplicationState::class);
+        $applicationState->method('isInstalled')->willReturn(true);
 
         $this->em->expects(self::any())
             ->method('getUnitOfWork')
@@ -48,7 +51,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
             ->add('oro_sync.content.data_update_topic_sender', $this->dataUpdateTopicSender)
             ->getContainer($this);
 
-        $this->eventListener = new DoctrineTagEventListener($container, true);
+        $this->eventListener = new DoctrineTagEventListener($container, $applicationState);
     }
 
     private function createPersistentCollection(object $owner): PersistentCollection

@@ -163,9 +163,10 @@ class GridRow extends TableRow
         if ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle')) {
             $showMoreLink->mouseOver();
             $link = $this->spin(function () use ($action) {
-                return $this->elementFactory
+                $link = $this->elementFactory
                     ->createElement('GridRowActionMenu')
                     ->find('named', ['link', ucfirst($action)]);
+                return $link->isVisible() ? $link : null;
             }, 5);
         } else {
             $link = $this->find('named', ['link', ucfirst($action)]);

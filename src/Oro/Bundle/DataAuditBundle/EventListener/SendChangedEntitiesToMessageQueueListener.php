@@ -12,6 +12,7 @@ use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
@@ -81,6 +82,8 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
+    private ApplicationState $applicationState;
+
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $tokenStorage,
@@ -88,7 +91,8 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         EntityToEntityChangeArrayConverter $entityToArrayConverter,
         AuditConfigProvider $auditConfigProvider,
         LoggerInterface $logger,
-        AuditMessageBodyProvider $auditMessageBodyProvider
+        AuditMessageBodyProvider $auditMessageBodyProvider,
+        ApplicationState $applicationState
     ) {
         $this->messageProducer = $messageProducer;
         $this->tokenStorage = $tokenStorage;
@@ -97,6 +101,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->auditConfigProvider = $auditConfigProvider;
         $this->logger = $logger;
         $this->auditMessageBodyProvider = $auditMessageBodyProvider;
+        $this->applicationState = $applicationState;
 
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
@@ -105,9 +110,17 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->allTokens = new \SplObjectStorage;
     }
 
+    private function isEnabled(): bool
+    {
+        if (!$this->applicationState->isInstalled()) {
+            return false;
+        }
+        return $this->enabled;
+    }
+
     public function onFlush(OnFlushEventArgs $eventArgs)
     {
-        if (!$this->enabled) {
+        if (!$this->isEnabled()) {
             return;
         }
 
@@ -126,7 +139,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
     public function postFlush(PostFlushEventArgs $eventArgs)
     {
-        if (!$this->enabled) {
+        if (!$this->isEnabled()) {
             return;
         }
 

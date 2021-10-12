@@ -17,7 +17,6 @@ class TranslatorDependencyPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $translatorDef = $container->getDefinition('translator.default');
-        $translatorDef->setPublic(true);
 
         $translatorDef->setClass('Oro\Bundle\TranslationBundle\Translation\Translator');
         $translatorDef->addMethodCall(
@@ -46,8 +45,10 @@ class TranslatorDependencyPass implements CompilerPassInterface
 
         $translatorDef->addMethodCall('setLogger', [new Reference('logger')]);
 
-        $isInstalled = $container->hasParameter('installed') && $container->getParameter('installed');
-        $translatorDef->addMethodCall('setInstalled', [$isInstalled]);
+        $translatorDef->addMethodCall(
+            'setApplicationState',
+            [new Reference('oro_distribution.handler.application_status')]
+        );
         $translatorDef->setPublic(true);
     }
 }

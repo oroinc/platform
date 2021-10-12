@@ -42,3 +42,11 @@ services:
             - '@doctrine'
         tags:
             - { name: oro.requirements_provider }
+
+    kernel.listener.install.event:
+        class: Oro\Bundle\InstallerBundle\EventListener\RequestListener
+        arguments:
+            - '@oro_distribution.handler.application_status'
+            - '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }

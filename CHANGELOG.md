@@ -29,6 +29,7 @@ The current file describes significant changes in the code that may affect the u
 * The composer's assets version set script`Oro\Bundle\InstallerBundle\Composer\ScriptHandler::setAssetsVersion` was changed to store time base hash value into `public/build/build_version.txt` application file.
 
 ### Removed
+* `installed` container parameter was removed from all application distributions. You can get the installation state by calling the `isInstalled` method of the `Oro\Bundle\DistributionBundle\Handler\ApplicationState` service.
 * `assets_version` and `assets_version_strategy` container parameters were removed from all application distributions.
 * Symfony's assets version strategy `framework.assets.version` and `framework.assets.version` keyed parameters were removed from `config.xml` file in all application distributions.
 

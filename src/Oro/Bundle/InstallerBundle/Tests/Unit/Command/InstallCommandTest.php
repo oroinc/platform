@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\InstallCommand;
-use Oro\Bundle\InstallerBundle\Persister\YamlPersister;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 use Oro\Component\Testing\TempDirExtension;
@@ -37,19 +37,18 @@ class InstallCommandTest extends TestCase
     protected function setUp(): void
     {
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('hasParameter')
-            ->with('installed')
-            ->willReturn(true);
-        $container->method('getParameter')
-            ->withConsecutive(['kernel.environment'], ['installed'])
-            ->willReturnOnConsecutiveCalls(['dev'], ['2020-01-01T01:01:01-08:00']);
+
+        $applicationState = $this->createMock(ApplicationState::class);
+        $applicationState->method('isInstalled')->willReturn(true);
+
+        $container->set('oro_distribution.handler.application_status', $applicationState);
 
         /** @noinspection PhpParamsInspection */
         $this->command = new InstallCommand(
             $container,
             $this->createMock(Registry::class),
             $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(YamlPersister::class),
+            $applicationState,
             $this->createMock(ScriptManager::class)
         );
 

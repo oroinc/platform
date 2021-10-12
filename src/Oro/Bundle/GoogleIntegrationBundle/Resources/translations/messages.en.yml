@@ -16,6 +16,7 @@ oro:
                     client_secret.label: Client secret
                     google_api_key.label: Google API Key
                     enable_sso.label: Enable
+                    enable_sso.tooltip: Google Integration Settings must be provided for the SSO button to appear on the login form
                     sso_domains.label: Domains
                     sso_domains.tooltip: Comma separated list of allowed domains
                     redirect_uri.label: Redirect URI

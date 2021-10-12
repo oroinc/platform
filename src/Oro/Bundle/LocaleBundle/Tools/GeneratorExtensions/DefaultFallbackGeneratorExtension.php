@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions;
 
-use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
+use Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider;
 use Oro\Component\PhpUtils\ClassGenerator;
 
 /**
@@ -18,15 +18,17 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     /** @var array [class name => [singular field name => field name, ...], ...] */
     private array $fieldMap;
 
-    private Inflector $inflector;
+    private DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider;
 
     /**
      * @param array $fieldMap [class name => [singular field name => field name, ...], ...]
      */
-    public function __construct(array $fieldMap, Inflector $inflector)
-    {
+    public function __construct(
+        array $fieldMap,
+        DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider
+    ) {
         $this->fieldMap = $fieldMap;
-        $this->inflector = $inflector;
+        $this->defaultFallbackMethodsNamesProvider = $defaultFallbackMethodsNamesProvider;
     }
 
     public function supports(array $schema): bool
@@ -59,7 +61,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     protected function generateGetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $class->addMethod($this->getMethodName($singularName, 'get'))
+        $class->addMethod($this->defaultFallbackMethodsNamesProvider->getGetterMethodName($singularName))
             ->addBody(\sprintf('return $this->getFallbackValue($this->%s, $localization);', $fieldName))
             ->addComment(
                 $this->generateDocblock(
@@ -75,7 +77,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     protected function generateDefaultGetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $class->addMethod($this->getMethodName($singularName, 'getDefault'))
+        $class->addMethod($this->defaultFallbackMethodsNamesProvider->getDefaultGetterMethodName($singularName))
             ->addBody(\sprintf('return $this->getDefaultFallbackValue($this->%s);', $fieldName))
             ->addComment($this->generateDocblock([], \sprintf('\%s|null', LocalizedFallbackValue::class)));
     }
@@ -85,7 +87,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     protected function generateDefaultSetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $class->addMethod($this->getMethodName($singularName, 'setDefault'))
+        $class->addMethod($this->defaultFallbackMethodsNamesProvider->getDefaultSetterMethodName($singularName))
             ->addBody(\sprintf('return $this->setDefaultFallbackValue($this->%s, $value);', $fieldName))
             ->addComment($this->generateDocblock(['string' =>  '$value'], '$this'))
             ->addParameter('value');
@@ -104,10 +106,5 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
         }
 
         return \implode("\n", $parts);
-    }
-
-    protected function getMethodName(string $fieldName, string $prefix): string
-    {
-        return $prefix . \ucfirst($this->inflector->camelize($fieldName));
     }
 }

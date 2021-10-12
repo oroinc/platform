@@ -147,7 +147,7 @@ services:
             - '@stof_doctrine_extensions.listener.translatable'
             - '@translator'
             - '@router'
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -361,7 +361,7 @@ services:
         class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
         arguments:
             - [] # a map of default fallback fields
-            - '@Doctrine\Inflector\Inflector'
+            - '@oro_locale.provider.default_fallback_methods_names'
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
@@ -450,3 +450,18 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_action.condition, alias: is_default_language }
+
+    oro_locale.provider.default_fallback_methods_names:
+        class: Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider
+        arguments:
+            - '@Doctrine\Inflector\Inflector'
+
+    oro_locale.formatter.localized_fallback_value_formatter:
+        class: Oro\Bundle\LocaleBundle\Formatter\LocalizedFallbackValueFormatter
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+            - '@translator'
+            - '@property_accessor'
+        tags:
+            - { name: oro_formatter, formatter: oro_locale.localized_fallback_value_formatter }

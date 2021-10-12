@@ -13,7 +13,7 @@ services:
             - '@service_container'
             - '@doctrine'
             - '@event_dispatcher'
-            - '@oro_installer.yaml_persister'
+            - '@oro_distribution.handler.application_status'
             - '@oro_installer.script_manager'
         tags:
             - { name: console.command }

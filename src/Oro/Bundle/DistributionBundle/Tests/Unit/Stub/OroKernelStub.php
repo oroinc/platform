@@ -4,7 +4,6 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\DistributionBundle\OroKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroKernelStub extends OroKernel
 {
@@ -21,10 +20,6 @@ class OroKernelStub extends OroKernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(function (ContainerBuilder $container) {
-            $container->setParameter('installed', true);
-        });
-
         $loader->load($this->getProjectDir() . '/config/config_' . $this->getEnvironment() . '.yml');
     }
 

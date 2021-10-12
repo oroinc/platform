@@ -39,7 +39,7 @@ services:
             - '@oro_entity_config.config_model_lock_object'
             - '@doctrine'
             - ['oro_entity_config', 'oro_entity_config_field', 'oro_entity_config_index_value']
-            - '%installed%'
+            - '@oro_distribution.handler.application_status'
         tags:
             - { name: oro_entity.database_checker }
 

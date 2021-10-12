@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\EventListener;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
 use Oro\Bundle\ScopeBundle\Migration\Schema\AddTriggerToRowHashColumn;
@@ -15,20 +16,14 @@ use Oro\Bundle\ScopeBundle\Migration\Schema\UpdateScopeRowHashColumn;
  */
 class PostUpMigrationListener
 {
-    /**
-     * @var AddCommentToRowHashManager
-     */
-    protected $manager;
+    protected AddCommentToRowHashManager $manager;
 
-    /**
-     * @var bool
-     */
-    protected $installed;
+    private ApplicationState $applicationState;
 
-    public function __construct(AddCommentToRowHashManager $manager, ?string $installed)
+    public function __construct(AddCommentToRowHashManager $manager, ApplicationState $applicationState)
     {
         $this->manager = $manager;
-        $this->installed = (bool)$installed;
+        $this->applicationState = $applicationState;
     }
 
     /**
@@ -37,7 +32,7 @@ class PostUpMigrationListener
     public function onPostUp(PostMigrationEvent $event): void
     {
         // After installing the application created trigger and fill row_hash
-        if (!$this->installed) {
+        if (!$this->applicationState->isInstalled()) {
             $event->addMigration(new AddTriggerToRowHashColumn($this->manager));
             return;
         }

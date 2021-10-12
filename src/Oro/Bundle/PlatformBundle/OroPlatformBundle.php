@@ -27,7 +27,6 @@ class OroPlatformBundle extends Bundle
         $container->addCompilerPass(new Compiler\LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new Compiler\OptionalListenersCompilerPass());
         $container->addCompilerPass(new ServiceLinkCompilerPass('oro_service_link', ServiceLink::class));
-        $container->addCompilerPass(new Compiler\UpdateDoctrineConfigurationPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new Compiler\LazyDoctrineOrmListenersPass());
             $container->moveCompilerPassBefore(

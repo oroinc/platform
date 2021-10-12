@@ -98,7 +98,7 @@
                     <br />
                 {% elseif trigger.cron %}
                     {{ 'oro.workflow.block.view.process.trigger.cron.description'|trans({
-                        '{{ cron }}': '<b>' ~ trigger.cron ~ '</b>'
+                        '{{ cron }}': '<b>' ~ trigger.cron|oro_html_sanitize ~ '</b>'
                     })|raw }}
                     <br />
                 {% endif %}

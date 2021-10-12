@@ -4,6 +4,7 @@ services:
         public: true
         arguments:
             - ~ # service locator for user providers
+            - '@security.user_checker'
 
     oro_sso.token.factory.oauth:
         class: Oro\Bundle\SSOBundle\Security\OAuthTokenFactory

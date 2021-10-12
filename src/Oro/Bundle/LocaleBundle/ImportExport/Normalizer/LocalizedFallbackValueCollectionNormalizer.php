@@ -70,38 +70,60 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         if (!is_array($data)) {
             return new ArrayCollection();
         }
+
         $itemType = $this->getItemType($type);
         if (!$itemType) {
             return new ArrayCollection($data);
         }
+
         $result = new ArrayCollection();
+        if (!isset($data[LocalizationCodeFormatter::DEFAULT_LOCALIZATION])) {
+            // Default localized fallback value should be always present.
+            $data[LocalizationCodeFormatter::DEFAULT_LOCALIZATION] = [];
+        }
+
         foreach ($data as $localizationName => $item) {
-            // Create new object instead of clone because cloned object could have extended fields with excessive data
-            /** @var AbstractLocalizedFallbackValue $object */
-            $object = new $itemType();
-
-            if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION) {
-                if (!array_key_exists($localizationName, $this->localizations)) {
-                    $this->localizations[$localizationName] = clone $this->localization;
-                    $this->localizations[$localizationName]->setName($localizationName);
-                }
-                $object->setLocalization($this->localizations[$localizationName]);
-            }
-
-            if (array_key_exists('fallback', $item)) {
-                $object->setFallback($item['fallback'] ? (string)$item['fallback'] : null);
-            }
-            if (array_key_exists('text', $item)) {
-                $object->setText((string)$item['text']);
-            }
-            if (array_key_exists('string', $item)) {
-                $object->setString((string)$item['string']);
-            }
-
-            $result->set($localizationName, $object);
+            $result->set($localizationName, $this->createLocalizedFallbackValue($itemType, $item, $localizationName));
         }
 
         return $result;
+    }
+
+    protected function createLocalizedFallbackValue(
+        string $className,
+        array $item,
+        string $localizationName
+    ): AbstractLocalizedFallbackValue {
+        // Creates new object instead of clone because cloned object could have extended fields with excessive data.
+        /** @var AbstractLocalizedFallbackValue $object */
+        $object = new $className();
+
+        $object->setLocalization($this->getLocalization($localizationName));
+
+        if (array_key_exists('fallback', $item)) {
+            $object->setFallback($item['fallback'] ? (string)$item['fallback'] : null);
+        }
+
+        if (array_key_exists('text', $item)) {
+            $object->setText((string)$item['text']);
+        }
+
+        if (array_key_exists('string', $item)) {
+            $object->setString((string)$item['string']);
+        }
+
+        return $object;
+    }
+
+    protected function getLocalization(string $localizationName): ?Localization
+    {
+        if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION
+            && !array_key_exists($localizationName, $this->localizations)) {
+            $this->localizations[$localizationName] = clone $this->localization;
+            $this->localizations[$localizationName]->setName($localizationName);
+        }
+
+        return $this->localizations[$localizationName] ?? null;
     }
 
     /** {@inheritdoc} */
