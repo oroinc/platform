@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_35\EmailMessageIdIndexQuery;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -19,7 +20,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_34';
+        return 'v1_35';
     }
 
     /**
@@ -59,6 +60,8 @@ class OroEmailBundleInstaller implements Installation
         $this->addOroEmailForeignKeys($schema);
         $this->addOroEmailAutoResponseRuleForeignKeys($schema);
         $this->addOroEmailTemplateLocalizedForeignKeys($schema);
+
+        $queries->addPostQuery(new EmailMessageIdIndexQuery());
     }
 
     /**
@@ -294,7 +297,7 @@ class OroEmailBundleInstaller implements Installation
         $table->addColumn('sent', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('importance', 'integer');
         $table->addColumn('internaldate', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('message_id', 'string', ['length' => 255]);
+        $table->addColumn('message_id', 'string', ['length' => 512]);
         $table->addColumn('x_message_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('x_thread_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_head', 'boolean', ['default' => true]);
@@ -303,7 +306,6 @@ class OroEmailBundleInstaller implements Installation
         $table->addColumn('acceptlanguageheader', 'text', ['notnull' => false]);
         $table->addColumn('body_synced', 'boolean', ['default' => false, 'notnull' => false]);
         $table->addIndex(['sent'], 'idx_sent');
-        $table->addIndex(['message_id'], 'idx_email_message_id');
         $table->addIndex(['is_head'], 'oro_email_is_head');
         $table->addUniqueIndex(['email_body_id']);
         $table->setPrimaryKey(['id']);
