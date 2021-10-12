@@ -8,3 +8,24 @@ services:
             - '@logger'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\NotificationBundle\Command\NotificationAlertCleanupCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\NotificationBundle\Command\Cron\NotificationAlertCleanupCronCommand:
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\NotificationBundle\Command\NotificationAlertListCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_security.token_accessor'
+            - '@oro_locale.formatter.date_time'
+        tags:
+            - { name: console.command }

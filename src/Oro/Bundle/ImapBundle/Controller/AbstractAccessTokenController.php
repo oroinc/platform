@@ -76,9 +76,6 @@ abstract class AbstractAccessTokenController extends AbstractController
         return false !== $decoded ? $decoded: $state;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedServices()
     {
         return array_merge(

@@ -9,7 +9,7 @@
     <% if(is_head && !ignoreHead) { %>
         <span class="icon-email-thread" aria-hidden="true"></span>
     <% } else { %>
-        <span class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}" aria-hidden="true"></span>
+        <span class="{{ oro_entity_config_value(entityClass, 'icon')|e('html_attr') }}" aria-hidden="true"></span>
     <% } %>
 {% endblock %}
 
@@ -44,7 +44,7 @@
 
     {% set action %}
         {% if is_granted('oro_email_email_user_edit') %}
-            <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
+            <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|e('html_attr') }}"
                class="dropdown-item"
                data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass|replace({'\\': '_'}) }}' }) %>"
                     {{ UI.renderWidgetDataAttributes({
@@ -64,8 +64,8 @@
                             'height': 600
                         }
                     }
-                    }) }}><span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</span>
-                {{ 'oro.activity.contexts.placeholder'|trans|raw }}
+                    }) }}><span class="fa-link hide-text" aria-hidden="true">{{ 'oro.activity.contexts.placeholder'|trans }}</span>
+                {{ 'oro.activity.contexts.placeholder'|trans }}
             </a>
         {% endif %}
     {% endset %}
@@ -91,8 +91,8 @@
                         'width': 1000
                     }
                 }
-            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans|raw }}</span>
-                {{ 'oro.email.reply'|trans|raw }}
+            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans }}</span>
+                {{ 'oro.email.reply'|trans }}
             </a>
         {% endif %}
     {% endset %}
@@ -100,7 +100,7 @@
 
     {% set action %}
     {% if is_granted('oro_email_email_create') %}
-        <a href="#" title="{{ 'oro.email.reply_all'|trans|raw }}"
+        <a href="#" title="{{ 'oro.email.reply_all'|trans|e('html_attr') }}"
            class="dropdown-item"
            data-url="<%= routing.generate('oro_email_email_reply_all', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
                 {{ UI.renderWidgetDataAttributes({
@@ -118,8 +118,8 @@
                             'width': 1000
                         }
                     }
-                }) }}><span class="fa-reply-all hide-text" aria-hidden="true">{{ 'oro.email.reply_all'|trans|raw }}</span>
-            {{ 'oro.email.reply_all'|trans|raw }}
+                }) }}><span class="fa-reply-all hide-text" aria-hidden="true">{{ 'oro.email.reply_all'|trans }}</span>
+            {{ 'oro.email.reply_all'|trans }}
         </a>
     {% endif %}
     {% endset %}
@@ -145,8 +145,8 @@
                         'width': 1000
                     }
                 }
-            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans|raw }}</span>
-                {{ 'oro.email.forward'|trans|raw }}
+            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans }}</span>
+                {{ 'oro.email.forward'|trans }}
             </a>
         {% endif %}
     {% endset %}
@@ -155,9 +155,9 @@
     {% set action %}
         <a href="<%= routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
            class="dropdown-item"
-           title="{{ 'oro.email.view'|trans|raw }}"><span
-                class="fa-eye hide-text" aria-hidden="true">{{ 'oro.email.view'|trans|raw }}</span>
-            {{ 'oro.email.view'|trans|raw }}
+           title="{{ 'oro.email.view'|trans|e('html_attr') }}"><span
+                class="fa-eye hide-text" aria-hidden="true">{{ 'oro.email.view'|trans }}</span>
+            {{ 'oro.email.view'|trans }}
         </a>
     {% endset %}
     {% set actions = actions|merge([action]) %}
