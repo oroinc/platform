@@ -2,6 +2,8 @@ oro:
     entity_config:
         attributes_grid:
             delete_attribute.confirm_content: Are you sure you want to delete this attribute?
+        content_preview:
+            message_prevent_click: 'This click cannot be processed in the preview mode.'
     attribute:
         attributes_moved_to_default_group: System attributes were moved to default group
         move_from: move from
