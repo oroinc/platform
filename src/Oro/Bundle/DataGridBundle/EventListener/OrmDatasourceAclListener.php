@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Applies ACL restriction to the datagrid query.
+ */
 class OrmDatasourceAclListener
 {
-    const EDIT_SCOPE = 'edit';
-
-    /** @var AclHelper */
-    protected $aclHelper;
+    protected AclHelper $aclHelper;
 
     public function __construct(AclHelper $aclHelper)
     {
@@ -19,25 +19,9 @@ class OrmDatasourceAclListener
 
     public function onResultBefore(OrmResultBefore $event)
     {
-        $dataGrid = $event->getDatagrid();
-        $config = $dataGrid->getConfig();
+        $config = $event->getDatagrid()->getConfig();
         if (!$config->isDatasourceSkipAclApply()) {
-            $permission = $this->getPermission($dataGrid->getScope());
-            $this->aclHelper->apply($event->getQuery(), $permission);
+            $this->aclHelper->apply($event->getQuery(), $config->getDatasourceAclApplyPermission());
         }
-    }
-
-    /**
-     * @param string|null $scope
-     *
-     * @return string
-     */
-    protected function getPermission($scope)
-    {
-        if (self::EDIT_SCOPE === $scope) {
-            return 'EDIT';
-        }
-
-        return 'VIEW';
     }
 }
