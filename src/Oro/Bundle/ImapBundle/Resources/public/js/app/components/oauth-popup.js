@@ -42,8 +42,8 @@ define(function(require) {
             try {
                 this
                     .whenWindowClosed(this.openPopup(url, config || {}))
-                    .done(function() {
-                        windowDefer.resolve();
+                    .done(() => {
+                        windowDefer.resolve(this.isAuthorized);
                     });
             } catch (e) {
                 windowDefer.reject();
@@ -67,7 +67,8 @@ define(function(require) {
                 }
             }, 500);
 
-            this.whenCallbackLoaded(win).done(function() {
+            this.whenCallbackLoaded(win).done(() => {
+                this.isAuthorized = true;
                 win.close();
             });
 

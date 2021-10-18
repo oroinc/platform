@@ -94,35 +94,34 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function buildTestTree()
+    private function buildTestTree(): void
     {
         /**
+         * owners structure:
          * org1  org2     org3         org4
          *                |            |
          *  bu1   bu2     +-bu3        +-bu4
          *        |       | |            |
          *        |       | +-bu31       |
-         *        |       | | |          |
-         *        |       | | +-user31   |
-         *        |       | |            |
-         *  user1 +-user2 | +-user3      +-user4
-         *                |                |
-         *                +-bu3a           +-bu3
-         *                  |              +-bu4
-         *                  +-bu3a1          |
-         *                                   +-bu41
-         *                                     |
-         *                                     +-bu411
-         *                                       |
-         *                                       +-user411
-         *
-         * user1 user2 user3 user31 user4 user411
-         *
-         * org1  org2  org3  org3   org4  org4
-         * org2        org2
-         *
-         * bu1   bu2   bu3   bu31   bu4   bu411
-         * bu2         bu2
+         *        |       | | |          +-bu41-->--+
+         *        |       | | +-user31   |          | bu41 have bu411 as subordinate business unit
+         *        |       | |            |          V (looped owners between bu4, bu411 and bu41)
+         *  user1 +-user2 | +-user3      +-bu411--<-+
+         *                |              |  |
+         *                +-bu3a         |  +-user411
+         *                  |            |  +-user411_1
+         *                  +-bu3a1      |  +-user411_2
+         *                               +-user4
+         * user access:
+         *                      +-------+-------+-------+--------+-------+---------+-----------+-----------+
+         * users                | user1 | user2 | user3 | user31 | user4 | user411 | user411_1 | user411_2 |
+         *                      +-------+-------+-------+--------+-------+---------+-----------+-----------+
+         * user organizations   | org1  | org2  | org3  | org3   | org4  | org4    | org4      | org4      |
+         *                      | org2  |       | org2  |        |       |         |           |           |
+         *                      |       |       |       |        |       |         |           |           |
+         * user business units  | bu1   | bu2   | bu3   | bu31   | bu4   | bu411   | bu411     | bu411     |
+         *                      | bu2   |       | bu2   |        |       |         |           |           |
+         *                      +-------+-------+-------+--------+-------+---------+-----------+-----------+
          */
         $this->tree->addBusinessUnit('bu1', null);
         $this->tree->addBusinessUnit('bu2', null);
@@ -134,7 +133,10 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->tree->addBusinessUnit('bu41', 'org4');
         $this->tree->addBusinessUnit('bu411', 'org4');
 
-        $this->buildTree();
+        $this->tree->setSubordinateBusinessUnitIds('bu3', ['bu31']);
+        $this->tree->setSubordinateBusinessUnitIds('bu3a', ['bu3a1']);
+        $this->tree->setSubordinateBusinessUnitIds('bu41', ['bu411']);
+        $this->tree->setSubordinateBusinessUnitIds('bu4', ['bu41', 'bu411']);
 
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');
@@ -143,6 +145,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->tree->addUser('user4', 'bu4');
         $this->tree->addUser('user41', 'bu41');
         $this->tree->addUser('user411', 'bu411');
+        $this->tree->addUser('user411_1', 'bu411');
+        $this->tree->addUser('user411_2', 'bu411');
 
         $this->tree->addUserOrganization('user1', 'org1');
         $this->tree->addUserOrganization('user1', 'org2');
@@ -152,6 +156,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->tree->addUserOrganization('user31', 'org3');
         $this->tree->addUserOrganization('user4', 'org4');
         $this->tree->addUserOrganization('user411', 'org4');
+        $this->tree->addUserOrganization('user411_1', 'org4');
+        $this->tree->addUserOrganization('user411_2', 'org4');
 
         $this->tree->addUserBusinessUnit('user1', 'org1', 'bu1');
         $this->tree->addUserBusinessUnit('user1', 'org2', 'bu2');
@@ -161,6 +167,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
         $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
+        $this->tree->addUserBusinessUnit('user411_1', 'org4', 'bu411');
+        $this->tree->addUserBusinessUnit('user411_2', 'org4', 'bu411');
     }
 
     /**
@@ -175,7 +183,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         string $targetEntityClassName,
         ?array $expectedConstraint,
         string $expectedGroup = ''
-    ) {
+    ) : void {
         $this->buildTestTree();
 
         if ($ownerType !== null) {
@@ -235,7 +243,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedConstraint, $result);
     }
 
-    public function testGetUserIdWithNonLoginUser()
+    public function testGetUserIdWithNonLoginUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
@@ -357,7 +365,37 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
                 self::TEST_ENTITY,
                 [
                     'owner',
-                    ['user4', 'user411'],
+                    ['user4', 'user411', 'user411_1', 'user411_2'],
+                    'organization',
+                    'org4',
+                    false
+                ]
+            ],
+            'for the TEST entity with LOCAL ACL for user411_1 user, grant and USER ownerType' => [
+                'user411_1',
+                'org4',
+                true,
+                AccessLevel::LOCAL_LEVEL,
+                'USER',
+                self::TEST_ENTITY,
+                [
+                    'owner',
+                    [0 => 'user411_1', 1 => 'user411', 2 => 'user411_2'],
+                    'organization',
+                    'org4',
+                    false
+                ]
+            ],
+            'for the TEST entity with DEEP ACL for user411_1 user, grant and USER ownerType' => [
+                'user411_1',
+                'org4',
+                true,
+                AccessLevel::DEEP_LEVEL,
+                'USER',
+                self::TEST_ENTITY,
+                [
+                    'owner',
+                    [0 => 'user411_1', 1 => 'user411', 2 => 'user411_2'],
                     'organization',
                     'org4',
                     false
@@ -525,7 +563,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetUserInCaseOfDifferentUsersInToken()
+    public function testGetUserInCaseOfDifferentUsersInToken(): void
     {
         $user1 = new User(1);
         $user2 = new User(2);
@@ -543,19 +581,5 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         // at the second call should be the second user in token
         $user = $this->builder->getUser();
         $this->assertSame($user2, $user);
-    }
-
-    private function buildTree()
-    {
-        $subordinateBusinessUnits = [
-            'bu3'  => ['bu31'],
-            'bu3a' => ['bu3a1'],
-            'bu41' => ['bu411'],
-            'bu4'  => ['bu41', 'bu411'],
-        ];
-
-        foreach ($subordinateBusinessUnits as $parentBuId => $buIds) {
-            $this->tree->setSubordinateBusinessUnitIds($parentBuId, $buIds);
-        }
     }
 }

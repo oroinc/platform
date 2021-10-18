@@ -257,7 +257,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
         foreach ($this->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
             $userIds = $this->getTree()->getUsersAssignedToBusinessUnit($buId);
             if (!empty($userIds)) {
-                $result = array_unique(array_merge($result, $userIds));
+                $result = array_values(array_unique(array_merge($result, $userIds)));
             }
         }
     }
@@ -279,7 +279,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
         foreach ($buIds as $buId) {
             $userIds = $this->getTree()->getUsersAssignedToBusinessUnit($buId);
             if (!empty($userIds)) {
-                $result = array_unique(array_merge($result, $userIds));
+                $result = array_values(array_unique(array_merge($result, $userIds)));
             }
         }
     }

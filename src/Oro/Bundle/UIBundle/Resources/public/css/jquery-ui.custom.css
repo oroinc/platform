@@ -167,22 +167,18 @@
 }
 
 .ui-datepicker-rtl .ui-datepicker-prev {
-    right: 2px;
     left: auto;
 }
 
 .ui-datepicker-rtl .ui-datepicker-next {
-    left: 2px;
     right: auto;
 }
 
 .ui-datepicker-rtl .ui-datepicker-prev:hover {
-    right: 1px;
     left: auto;
 }
 
 .ui-datepicker-rtl .ui-datepicker-next:hover {
-    left: 1px;
     right: auto;
 }
 
