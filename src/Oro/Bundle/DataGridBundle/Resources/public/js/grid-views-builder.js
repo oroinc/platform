@@ -138,7 +138,7 @@ define(function(require, exports, module) {
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;
             options.gridViewsOptions = this.gridViewsOptions;
-            options.uniqueId = _.uniqueId(`grid-title-${options.gridName}`);
+            options.uniqueId = _.uniqueId(`grid-views-${options.gridName}`);
 
             return _.omit(options, ['views']);
         },
