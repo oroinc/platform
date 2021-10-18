@@ -59,7 +59,7 @@
 
 {% block content_data %}
     {% if jsmodules|length %}
-        <script type="text/javascript">
+        <script>
             loadModules({{ jsmodules|json_encode|raw }})
         </script>
     {% endif %}

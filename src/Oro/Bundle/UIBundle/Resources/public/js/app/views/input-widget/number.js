@@ -74,10 +74,20 @@ define(function(require) {
                 return;
             }
 
-            const oldType = this.$el.attr('type');
+            const initialAttr = {
+                type: this.$el.attr('type'),
+                step: this.$el.attr('step'),
+                min: this.$el.attr('min'),
+                max: this.$el.attr('max')
+            };
 
-            this.$el.attr('type', 'text')
-                .attr('pattern', this.precision === 0 ? '[0-9]*' : '');
+            this.$el.attr({
+                type: 'text',
+                pattern: this.precision === 0 ? '[0-9]*' : '',
+                step: null,
+                min: null,
+                max: null
+            });
 
             /**
              * Format value to localized value
@@ -89,7 +99,7 @@ define(function(require) {
 
             if (value !== '') {
                 // Convert localized value to number
-                if (oldType === 'text') {
+                if (initialAttr.type === 'text') {
                     value = NumberFormatter.unformatStrict(value);
                 }
                 const localizedFloat = NumberFormatter.formatDecimal(value, {

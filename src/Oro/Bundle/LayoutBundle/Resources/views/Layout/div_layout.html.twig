@@ -361,7 +361,6 @@
     {% spaceless %}
         <button{{ block('block_attributes') }}
                 type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
-            {%- if action in ['submit', 'reset'] %} type="{{ action }}"{% endif %}
             {%- if name is defined %} name="{{ name }}"{% endif %}
             {%- if value is defined %} value="{{ value }}"{% endif %}>
             {%- if icon is defined %}{{ block('icon_block') }}{% endif %}
