@@ -961,9 +961,15 @@ class OroMainContext extends MinkContext implements
             );
         }
 
+        $placeholder = $field->getAttribute('placeholder');
+
+        if ($placeholder === null) {
+            $placeholder = $field->getAttribute('data-placeholder');
+        }
+
         static::assertStringContainsString(
             $value,
-            $field->getAttribute('placeholder'),
+            $placeholder,
             \sprintf('Element %s does not contains placeholder %s', $locator, $value)
         );
     }

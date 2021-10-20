@@ -47,9 +47,9 @@ define(function(require) {
         },
 
         isTimepickerActive: function() {
-            const $list = $(this.el).parent().find('.timepicker-input').data('timepicker-list');
+            const {list} = this.$el.parent().find('.timepicker-input')[0].timepickerObj || {};
 
-            return $list && $list.is(':visible') && !$list.hasClass('ui-timepicker-positioned-top');
+            return list && list.is(':visible') && !list.hasClass('ui-timepicker-positioned-top');
         },
 
         onDatepickerDialogReposition: function(e, position) {
@@ -58,9 +58,7 @@ define(function(require) {
         },
 
         onTimepickerDialogToggle: function(e) {
-            const $list = this.$el.parent().find('.timepicker-input').data('timepicker-list');
-
-            this.active = $list && $list.is(':visible') && !$list.hasClass('ui-timepicker-positioned-top');
+            this.active = this.isTimepickerActive();
             this.update();
         },
 

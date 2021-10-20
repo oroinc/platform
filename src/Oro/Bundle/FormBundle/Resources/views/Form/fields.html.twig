@@ -96,7 +96,7 @@
 {% endblock form_row_collection %}
 
 {% block oro_ticker_symbol_widget %}
-    <script type="text/javascript">
+    <script>
         loadModules(['jquery', 'bootstrap'],
         function($){
             $(function() {
@@ -150,7 +150,7 @@
 
     <div id="{{ id }}-container"></div>
 
-    <script type="text/javascript">
+    <script>
         loadModules(['jquery',
             'oroform/js/multiple-entity', 'oroform/js/multiple-entity/collection', 'oroform/js/multiple-entity/model'
         ], function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel) {
@@ -567,7 +567,7 @@
         {{ form_widget(form.existing_entity) }}
         {{ form_widget(form.mode) }}
     </div>
-    <script type="text/javascript">
+    <script>
         loadModules(['jquery', 'oroform/js/create-select-type-handler'],
         function ($, createSelectTypeHandler) {
             $(function() {
