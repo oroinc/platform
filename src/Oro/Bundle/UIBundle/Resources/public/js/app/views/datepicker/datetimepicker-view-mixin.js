@@ -146,9 +146,8 @@ define(function(require) {
             const widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
             this.$frontTimeField.on('showTimepicker', function() {
-                const $el = $(this);
-                const isAbove = $el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
-                $el.parent()
+                const isAbove = this.timepickerObj.list.hasClass('ui-timepicker-positioned-top');
+                $(this).parent()
                     .toggleClass(TIMEPICKER_DROPDOWN_CLASS_NAME, !isAbove)
                     .toggleClass(TIMEPICKER_DROPUP_CLASS_NAME, isAbove);
             });
@@ -180,14 +179,14 @@ define(function(require) {
          * @returns {jQuery}
          */
         getTimePickerWidget: function() {
-            return this.$frontTimeField.data('timepicker-list');
+            return this.$frontTimeField[0].timepickerObj.list;
         },
 
         /**
          * Destroys picker widget
          */
         destroyTimePickerWidget: function() {
-            if (!this.$frontTimeField.data('timepicker-settings')) {
+            if (!this.$frontTimeField[0].timepickerObj) {
                 // the widget was already removed.
                 return;
             }
