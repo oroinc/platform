@@ -195,7 +195,7 @@
             "backgrid": "0.3.8",
             "numeral": "2.0.6",
             "jquery-form": "4.3.0",
-            "fuse.js": "3.2.*",
+            "fuse.js": "6.4.6",
             "jquery": "3.5.*",
             "jquery-ui": "1.13.*",
             "backbone": "1.4.*",
