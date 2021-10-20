@@ -19,9 +19,9 @@ define(function(require) {
         },
 
         isActive: function() {
-            const $list = this.$el.data('timepicker-list');
+            const {list} = this.$el[0].timepickerObj || {};
 
-            return $list && $list.is(':visible') && !$list.hasClass('ui-timepicker-positioned-top');
+            return list && list.is(':visible') && !list.hasClass('ui-timepicker-positioned-top');
         },
 
         getPopperReferenceElement: function() {

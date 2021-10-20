@@ -23,11 +23,10 @@ define(function(require) {
 
     $(document)
         .on('showTimepicker', function(e) {
-            const $input = $(e.target);
-            const zIndex = $input.data('timepicker-list').css('zIndex');
+            const zIndex = e.target.timepickerObj.list.css('zIndex');
             mask.show(zIndex - 1)
                 .onhide(function() {
-                    $input.timepicker('hide');
+                    $(e.target).timepicker('hide');
                 });
         })
         .on('hideTimepicker', function(e) {
