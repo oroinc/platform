@@ -26,23 +26,23 @@ class FileDriverTest extends WebTestCase
         $this->driver->unlock();
     }
 
-    public function testMaintenanceLockWithTtl(): void
+    public function testGetMessageLock(): void
     {
-        $this->driver->lock();
-        self::assertTrue($this->driver->hasTtl());
-        self::assertNotNull($this->driver->getTtl());
-        self::assertTrue($this->driver->isExists());
-        self::assertFalse($this->driver->isExpired());
+        self::assertEquals('Server is under maintenance.', $this->driver->getMessageLock($this->driver->lock()));
+        self::assertEquals(
+            'Server is already under maintenance.',
+            $this->driver->getMessageLock($this->driver->lock())
+        );
     }
 
-    public function testMaintenanceModeIsExpired(): void
+    public function testGetMessageUnlock(): void
     {
-        $this->driver->setTtl(1);
         $this->driver->lock();
-        self::assertTrue($this->driver->hasTtl());
-        self::assertNotNull($this->driver->getTtl());
-        self::assertTrue($this->driver->isExists());
-        sleep(2);
-        self::assertTrue($this->driver->isExpired());
+
+        self::assertEquals('Server is online.', $this->driver->getMessageUnlock($this->driver->unlock()));
+        self::assertEquals(
+            'Impossible to do this action.',
+            $this->driver->getMessageUnlock($this->driver->unlock())
+        );
     }
 }

@@ -15,8 +15,6 @@ you have several options for each driver.
 
 Here the complete configuration with the `example` of each pair of class / options.
 
-The ttl (time to live) option is optional everywhere, it is used to indicate the duration in `second` of the maintenance.
-
     #app/config.yml
     oro_maintenance:
         authorized:
@@ -28,8 +26,6 @@ The ttl (time to live) option is optional everywhere, it is used to indicate the
             route:                                                              # Optional. Authorized route name
             attributes:                                                         # Optional. Authorized route attributes
         driver:
-            ttl: 3600                                                                  # Optional ttl option, can be not set
-
              # File driver
             options: {file_path: %kernel.root_dir%/../var/cache/lock}                  # file_path is the complete path for create the file
 
@@ -44,21 +40,17 @@ The ttl (time to live) option is optional everywhere, it is used to indicate the
 
 There are two commands:
 
-    oro:maintenance:lock [--set-ttl]
+    oro:maintenance:lock
 
-This command will enable the maintenance according to your configuration. You can pass the time to live of the maintenance in parameter, ``this doesn't works with file driver``.
+This command will enable the maintenance according to your configuration.
 
     oro:maintenance:unlock
 
-This command will disable the maintenance
+This command will disable the maintenance.
 
 You can execute the lock without a warning message which you need to interact with:
 
     oro:maintenance:lock --no-interaction
-
-Or (with the optional ttl overwriting)
-
-    oro:maintenance:lock 3600 -n
 
 ## Custom error page 503
 
