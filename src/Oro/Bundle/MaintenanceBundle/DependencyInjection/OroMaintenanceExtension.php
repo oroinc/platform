@@ -29,10 +29,6 @@ class OroMaintenanceExtension extends Extension
 
     private function configureMaintenanceParameters(ContainerBuilder $container, array $config): void
     {
-        if (isset($config['driver']['ttl'])) {
-            $config['driver']['options']['ttl'] = $config['driver']['ttl'];
-        }
-
         $container->setParameter('oro_maintenance.driver', $config['driver']);
         $container->setParameter('oro_maintenance.authorized.path', $config['authorized']['path']);
         $container->setParameter('oro_maintenance.authorized.host', $config['authorized']['host']);

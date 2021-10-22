@@ -19,16 +19,6 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
         $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    public function testMaintenanceLockWithInvalidTtl(): void
-    {
-        $this->assertResponseCode(200);
-
-        $commandTester = $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName(), ['ttl' => 'invalid']);
-
-        $this->assertProducedError($commandTester, 'Time to live must be an integer');
-        $this->assertResponseCode(200);
-    }
-
     public function testMaintenanceLock(): void
     {
         $this->assertResponseCode(200);
