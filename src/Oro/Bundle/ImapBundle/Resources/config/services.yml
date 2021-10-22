@@ -179,9 +179,6 @@ services:
         tags:
             - { name: oro_imap.oauth_manager }
 
-    Oro\Bundle\ImapBundle\Provider\GoogleOAuthProvider:
-        alias: oro_imap.google_oauth_provider
-
     oro_imap.google_oauth_provider:
         class: Oro\Bundle\ImapBundle\Provider\GoogleOAuthProvider
         public: true
@@ -190,9 +187,6 @@ services:
             - '@hwi_oauth.resource_ownermap.main'
             - '@oro_config.global'
             - '@oro_security.encoder.default'
-
-    Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthProvider:
-        alias: oro_imap.microsoft_oauth_provider
 
     oro_imap.microsoft_oauth_provider:
         class: Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthProvider
@@ -203,9 +197,6 @@ services:
             - '@oro_config.global'
             - '@oro_security.encoder.default'
             - '@router'
-
-    Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthScopeProvider:
-        alias: oro_imap.microsoft_oauth_scope_provider
 
     oro_imap.microsoft_oauth_scope_provider:
         class: Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthScopeProvider

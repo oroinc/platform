@@ -9,6 +9,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Controller for IMAP configuration page
@@ -140,7 +142,7 @@ class ConnectionController extends AbstractController
         // Check if there are some nested errors
         if ($nestedErrors->count() || null === $form->getData()) {
             return [
-                $this->get('translator')->trans('oro.imap.connection.malformed_parameters.error')
+                $this->get(TranslatorInterface::class)->trans('oro.imap.connection.malformed_parameters.error')
             ];
         }
 
@@ -210,7 +212,9 @@ class ConnectionController extends AbstractController
                     sprintf('Could not retrieve folders via imap because of "%s"', $e->getMessage())
                 );
 
-                $response['errors'] = $this->get('translator')->trans('oro.imap.connection.retrieve_folders.error');
+                $response['errors'] = $this->get(TranslatorInterface::class)->trans(
+                    'oro.imap.connection.retrieve_folders.error'
+                );
             }
         }
 
@@ -224,5 +228,16 @@ class ConnectionController extends AbstractController
     private function getEntityManager(string $entityClass): EntityManagerInterface
     {
         return $this->getDoctrine()->getManagerForClass($entityClass);
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'oro_imap.manager.controller.connection' => ConnectionControllerManager::class,
+                TranslatorInterface::class
+            ]
+        );
     }
 }

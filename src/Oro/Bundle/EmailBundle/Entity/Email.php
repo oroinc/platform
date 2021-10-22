@@ -151,7 +151,7 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
-     * @ORM\Column(name="message_id", type="string", length=255)
+     * @ORM\Column(name="message_id", type="string", length=512)
      * @JMS\Type("string")
      */
     protected $messageId;

@@ -34,7 +34,8 @@ class ConsoleFatalErrorListener implements EventSubscriberInterface
             if ($handler instanceof ErrorHandler) {
                 $handler->setDefaultLogger(
                     $this->logger,
-                    E_USER_ERROR | E_RECOVERABLE_ERROR | E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR
+                    E_USER_ERROR | E_RECOVERABLE_ERROR | E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR,
+                    true // Forced override default logger. Message queue has personal logging channel (consumer).
                 );
             }
 

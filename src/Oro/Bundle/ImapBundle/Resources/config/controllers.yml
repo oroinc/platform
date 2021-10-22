@@ -7,6 +7,7 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_imap.manager.controller.connection' }
 
     Oro\Bundle\ImapBundle\Controller\AbstractAccessTokenController:
         calls:
@@ -19,15 +20,19 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_imap.microsoft_oauth_provider' }
+            - { name: container.service_subscriber, id: 'oro_imap.microsoft_oauth_scope_provider' }
 
     Oro\Bundle\ImapBundle\Controller\GmailAccessTokenController:
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_imap.google_oauth_provider' }
 
     Oro\Bundle\ImapBundle\Controller\CheckConnectionController:
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_imap.manager.controller.connection' }
