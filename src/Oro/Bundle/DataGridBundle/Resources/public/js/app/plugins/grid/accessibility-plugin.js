@@ -39,6 +39,12 @@ const AccessibilityPlugin = BasePlugin.extend({
     _isDocumentClick: false,
 
     /**
+     * Key that has been pressed on a page, or undefined
+     * @type {string}
+     */
+    _isDocumentKeyPressed: void 0,
+
+    /**
      * Flag, says that focus is on inner element of current cell and it is not entrusted element
      * @type {boolean}
      */
@@ -87,7 +93,9 @@ const AccessibilityPlugin = BasePlugin.extend({
         $(document).on({
             [`mousedown${this.ownEventNamespace()}`]: this.onDocumentMouseDown.bind(this),
             [`mouseup${this.ownEventNamespace()}`]: this.onDocumentMouseUp.bind(this),
-            [`dragstart${this.ownEventNamespace()}`]: this.onDocumentDragstart.bind(this)
+            [`dragstart${this.ownEventNamespace()}`]: this.onDocumentDragstart.bind(this),
+            [`keydown${this.ownEventNamespace()}`]: this.onDocumentKeyDown.bind(this),
+            [`keyup${this.ownEventNamespace()}`]: this.onDocumentKeyUp.bind(this)
         });
     },
 
@@ -148,7 +156,10 @@ const AccessibilityPlugin = BasePlugin.extend({
         const $targetCell = $targetElem.closest('[aria-colindex]');
         const allowInnerFocus =
             this._isDocumentClick ||
-            ( // focus changed by program or it's inner focus movement
+            ( // focus is not been inside and it is received not by pressing Tab key
+                this._isFocusInside ||
+                this._isDocumentKeyPressed !== 'Tab'
+            ) && ( // focus changed by program or it's inner focus movement
                 !e.relatedTarget ||
                 this.$table[0].contains(e.relatedTarget)
             ) && (
@@ -413,6 +424,14 @@ const AccessibilityPlugin = BasePlugin.extend({
         this._isDocumentClick = false;
     },
 
+    onDocumentKeyDown(e) {
+        this._isDocumentKeyPressed = e.key;
+    },
+
+    onDocumentKeyUp() {
+        delete this._isDocumentKeyPressed;
+    },
+
     _updateTabindexAttribute() {
         const {$cell} = this.iterator;
 
@@ -429,11 +448,14 @@ const AccessibilityPlugin = BasePlugin.extend({
 
     _resetCurrent() {
         const current = this.iterator;
-        this.iterator.setCurrentCell(this.$table.find('[aria-colindex]:first'));
+        this.iterator.setCurrentCell(this.$table.find('[aria-colindex]:visible:first'));
 
         if (this.$table.find('[aria-colindex]:not(th)').length) {
-            while (current.$cell.is('th')) {
-                current.nextRow();
+            while (
+                current.$cell.is('th') &&
+                current.$cell !== current.nextRow().$cell
+            ) {
+                // do nothing, the iteration is done in the condition
             }
         }
         if (current.$cell.is('.select-row-cell')) {
