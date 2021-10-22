@@ -74,6 +74,13 @@ define(function(require) {
         _resetCellDirection: function() {},
 
         /**
+         * There is no need to reset cell direction because of multiple sorting
+         *
+         * @private
+         */
+        removeCellDirection: function() {},
+
+        /**
          * Inits cell direction when collections loads first time.
          *
          * @param collection

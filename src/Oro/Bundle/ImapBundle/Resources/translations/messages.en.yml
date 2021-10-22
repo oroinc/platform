@@ -54,7 +54,7 @@ oro.imap:
             microsoft:
                 name: Office 365
                 error:
-                    token: Invalid token data or no token data available.
+                    token: Authentication was unsuccessful. If you provided invalid Microsoft credentials, please verify them with your system administrator. If you failed to grant Microsoft access to the application, please try connecting again to accept their access request.
 
     sync:
         flash_message:

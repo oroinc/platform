@@ -1,4 +1,4 @@
-<script type="text/javascript">
+<script>
     loadModules(['orowindows/js/dialog/state/model'],
     function(StateModel) {
         StateModel.prototype.urlRoot = {{ path(urlRootRoute|default('oro_api_get_windows'))|json_encode|raw }};
