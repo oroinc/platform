@@ -42,4 +42,13 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
 
         return $this->currentLocalization;
     }
+
+    /**
+     * Makes the given localization as the current one.
+     * When the given localization is NULL then reverts the current localization to a default localization.
+     */
+    public function setCurrentLocalization(?Localization $localization): void
+    {
+        $this->currentLocalization = $localization ?? false;
+    }
 }
