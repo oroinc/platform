@@ -248,6 +248,7 @@ const AccessibilityPlugin = BasePlugin.extend({
         if (this.isInnerFocus()) {
             switch (e.key) {
                 case 'Escape':
+                case 'Esc': // key name in IE11
                     this._isFocusInside = false;
                     this.focusElement($cell);
                     e.preventDefault();
@@ -264,18 +265,22 @@ const AccessibilityPlugin = BasePlugin.extend({
                 this.addIgnoreTabbableAttributes();
                 break;
             case 'ArrowLeft':
+            case 'Left': // key name in IE11
                 this.iterator.prev();
                 e.preventDefault();
                 break;
             case 'ArrowRight':
+            case 'Right': // key name in IE11
                 this.iterator.next();
                 e.preventDefault();
                 break;
             case 'ArrowUp':
+            case 'Up': // key name in IE11
                 this.iterator.prevRow();
                 e.preventDefault();
                 break;
             case 'ArrowDown':
+            case 'Down': // key name in IE11
                 this.iterator.nextRow();
                 e.preventDefault();
                 break;
