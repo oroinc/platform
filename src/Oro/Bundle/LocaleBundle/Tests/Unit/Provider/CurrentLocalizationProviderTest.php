@@ -59,4 +59,27 @@ class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         // test that the result is cached
         $this->assertNull($provider->getCurrentLocalization());
     }
+
+    public function testSetCurrentLocalization()
+    {
+        $localization1 = new Localization();
+        $localization2 = new Localization();
+
+        $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
+        $extension->expects(self::once())
+            ->method('getCurrentLocalization')
+            ->willReturn($localization1);
+
+        $provider = new CurrentLocalizationProvider([$extension]);
+
+        $provider->setCurrentLocalization($localization2);
+        $this->assertSame($localization2, $provider->getCurrentLocalization());
+        // test that the result is cached
+        $this->assertSame($localization2, $provider->getCurrentLocalization());
+
+        $provider->setCurrentLocalization(null);
+        $this->assertSame($localization1, $provider->getCurrentLocalization());
+        // test that the result is cached
+        $this->assertSame($localization1, $provider->getCurrentLocalization());
+    }
 }
