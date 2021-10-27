@@ -314,14 +314,15 @@ const AccessibilityPlugin = BasePlugin.extend({
             case ' ':
                 const $entrusted = this.entrustedTabbable($cell);
                 const $tabbable = $cell.find(':tabbable');
-                if (
-                    $target.is('[aria-colindex]') &&
-                    !$entrusted.length &&
-                    $tabbable.length
-                ) {
-                    // target is a cell with several tabbable elements -- focus goes inside a cell
-                    this._isFocusInside = true;
-                    this.focusElement($tabbable.first());
+                if ($target.is('[aria-colindex]') && !$entrusted.length) {
+                    if ($tabbable.length) {
+                        // target is a cell with several tabbable elements -- focus goes inside a cell
+                        this._isFocusInside = true;
+                        this.focusElement($tabbable.first());
+                    } else {
+                        // treat Enter/Space press as click to trigger row action
+                        $target.click();
+                    }
                     e.preventDefault();
                 }
                 break;
