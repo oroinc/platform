@@ -321,9 +321,7 @@ define(function(require) {
                 this.$el.removeClass('mouse-down');
                 delete this.clickTimeout;
             };
-            if (e.pointerType && !this.clickPermit) {
-                // check `clickPermit` only if it's real click event
-                // (program click `$el.click()` calls always permitted)
+            if (!this.clickPermit) {
                 return;
             }
             e.preventDefault();
