@@ -363,7 +363,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                "SELECT COUNT(alert.*) as notificationAlertCount\n"
+                "SELECT COUNT(alert.id) as notificationAlertCount\n"
                 . "                FROM oro_notification_alert AS alert\n"
                 . "                WHERE\n"
                 . "                 alert.source_type = :source_type\n"
@@ -428,7 +428,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->method('fetchOne')
             ->with(
                 <<<EOS
-SELECT COUNT(alert.*) as notificationAlertCount
+SELECT COUNT(alert.id) as notificationAlertCount
                 FROM oro_notification_alert AS alert
                 WHERE
                  alert.source_type = :source_type
