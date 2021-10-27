@@ -321,6 +321,10 @@ const AccessibilityPlugin = BasePlugin.extend({
                         this.focusElement($tabbable.first());
                     } else {
                         // treat Enter/Space press as click to trigger row action
+                        // trigger sequence of `mousedown`-`mouseup` events,
+                        // to pass the check for `clickPermit` in GridRow
+                        $target.trigger('mousedown');
+                        $target.trigger('mouseup');
                         $target.click();
                     }
                     e.preventDefault();
