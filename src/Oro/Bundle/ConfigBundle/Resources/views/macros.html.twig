@@ -205,6 +205,7 @@
 #}
 {% macro renderFieldset(block) %}
     {% import '@OroUI/macros.html.twig' as ui %}
+    {% if block.data|filter(v => v != "")|length > 0 %}
     <fieldset class="form-horizontal form-horizontal-large">
         {% if block.title is defined %}
         <h5 class="user-fieldset">
@@ -231,4 +232,5 @@
             {% endfor %}
         </div>
     </fieldset>
+    {% endif %}
 {% endmacro %}

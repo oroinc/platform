@@ -185,7 +185,7 @@ class NotificationAlertManager
         [$data, $types] = $this->prepareDbalCriteria($fields);
         $em = $this->getEntityManager();
         try {
-            $sql = 'SELECT COUNT(alert.*) as notificationAlertCount
+            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount
                 FROM %s AS alert
                 WHERE
                  alert.source_type = :source_type
@@ -207,7 +207,7 @@ class NotificationAlertManager
         [$data, $types] = $this->prepareDbalCriteria($fields);
         $em = $this->getEntityManager();
         try {
-            $sql = 'SELECT COUNT(alert.*) as notificationAlertCount
+            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount
                 FROM %s AS alert
                 WHERE
                  alert.source_type = :source_type

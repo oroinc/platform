@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Abstract realization of Configuration Form Provider.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractProvider implements ProviderInterface
@@ -232,8 +233,9 @@ abstract class AbstractProvider implements ProviderInterface
                 $nodes[$node->getName()] = $node;
             } else {
                 if ($level !== $correctFieldsLevel) {
+                    $field = is_string($node) ? $node : $name;
                     throw new \Exception(
-                        sprintf('Field "%s" will not be ever rendered. Please check nesting level', $node)
+                        sprintf('Field "%s" will not be ever rendered. Please check nesting level', $field)
                     );
                 }
                 $nodes[$name] = $this->buildFieldNode($node);
