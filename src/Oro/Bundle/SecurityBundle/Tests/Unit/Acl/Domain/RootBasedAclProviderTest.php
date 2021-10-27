@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\FullAccessFieldRootAclBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootAclWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider;
@@ -26,6 +27,9 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $underlyingCache;
 
+    /** @var FullAccessFieldRootAclBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $fullAccessFieldRootAclBuilder;
+
     protected function setUp(): void
     {
         $this->strategy = $this->getMockForAbstractClass(
@@ -35,12 +39,15 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->baseProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->fullAccessFieldRootAclBuilder = $this->createMock(FullAccessFieldRootAclBuilder::class);
+
         $this->provider     = new RootBasedAclProvider(
             new ObjectIdentityFactory(
                 TestHelper::get($this)->createAclExtensionSelector()
             ),
             new SecurityIdentityToStringConverter()
         );
+        $this->provider->setFullAccessFieldRootAclBuilder($this->fullAccessFieldRootAclBuilder);
         $this->provider->setBaseAclProvider($this->baseProvider);
         $this->underlyingCache = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache')
             ->disableOriginalConstructor()
@@ -91,6 +98,9 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
             ->method('cacheEmptyAcl');
         $this->underlyingCache->expects($this->never())
             ->method('cacheUnderlying');
+        $this->fullAccessFieldRootAclBuilder->expects($this->once())
+            ->method('fillFieldRootAces')
+            ->with($rootAcl, $sids);
 
         $this->setFindAclExpectation(
             [
@@ -162,6 +172,9 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->underlyingCache->expects($this->once())
             ->method('cacheUnderlying')
             ->with($oid);
+        $this->fullAccessFieldRootAclBuilder->expects($this->once())
+            ->method('fillFieldRootAces')
+            ->with($rootAcl, $sids);
 
         $this->setFindAclExpectation(
             [
@@ -206,6 +219,9 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
             ->method('cacheEmptyAcl');
         $this->underlyingCache->expects($this->never())
             ->method('cacheUnderlying');
+        $this->fullAccessFieldRootAclBuilder->expects($this->once())
+            ->method('fillFieldRootAces')
+            ->with($rootAcl, $sids);
 
         $this->setFindAclExpectation(
             [
@@ -247,6 +263,8 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->underlyingCache->expects($this->once())
             ->method('cacheUnderlying')
             ->with($oid);
+        $this->fullAccessFieldRootAclBuilder->expects($this->never())
+            ->method('fillFieldRootAces');
 
         $this->setFindAclExpectation(
             [
@@ -275,6 +293,8 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
             ->with($oid);
         $this->underlyingCache->expects($this->never())
             ->method('cacheUnderlying');
+        $this->fullAccessFieldRootAclBuilder->expects($this->never())
+            ->method('fillFieldRootAces');
 
         $this->setFindAclExpectation(
             [

@@ -15,17 +15,11 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class RootBasedAclProvider implements AclProviderInterface, ResetInterface
 {
-    /** @var AclProviderInterface */
-    private $baseAclProvider;
-
-    /** @var UnderlyingAclCache */
-    private $underlyingCache;
-
-    /** @var ObjectIdentityFactory */
-    private $objectIdentityFactory;
-
-    /** @var SecurityIdentityToStringConverterInterface */
-    private $sidConverter;
+    private AclProviderInterface $baseAclProvider;
+    private UnderlyingAclCache $underlyingCache;
+    private ObjectIdentityFactory $objectIdentityFactory;
+    private SecurityIdentityToStringConverterInterface $sidConverter;
+    private FullAccessFieldRootAclBuilder $fullAccessFieldRootAclBuilder;
 
     /** @var RootBasedAclWrapper[] */
     private $rootBasedAclWrappers = [];
@@ -39,6 +33,14 @@ class RootBasedAclProvider implements AclProviderInterface, ResetInterface
     ) {
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->sidConverter = $sidConverter;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setFullAccessFieldRootAclBuilder(FullAccessFieldRootAclBuilder $fullAccessFieldRootAclBuilder): void
+    {
+        $this->fullAccessFieldRootAclBuilder = $fullAccessFieldRootAclBuilder;
     }
 
     /**
@@ -138,6 +140,7 @@ class RootBasedAclProvider implements AclProviderInterface, ResetInterface
             return $acl;
         }
 
+        $this->fullAccessFieldRootAclBuilder->fillFieldRootAces($rootAcl, $sids);
         if ($this->baseAclProvider->isEmptyAcl($acl)) {
             return $rootAcl;
         }

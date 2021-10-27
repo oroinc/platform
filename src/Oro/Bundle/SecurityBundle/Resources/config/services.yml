@@ -120,6 +120,13 @@ services:
             - '@oro_security.acl.security_identity_to_string_converter'
         calls:
             - [setUnderlyingCache, ['@security.acl.underlying.cache']]
+            - [setFullAccessFieldRootAclBuilder, ['@oro_security.acl.full_access_field_root_acl_builder']]
+
+    oro_security.acl.full_access_field_root_acl_builder:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\FullAccessFieldRootAclBuilder
+        arguments:
+            - '@oro_security.acl.extension_selector'
 
     security.acl.underlying.cache:
         public: false

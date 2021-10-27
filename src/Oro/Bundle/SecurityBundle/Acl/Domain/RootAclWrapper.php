@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
+use Symfony\Component\Security\Acl\Domain\FieldEntry;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
@@ -13,6 +14,9 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  */
 class RootAclWrapper
 {
+    /** The field name used to store field root ACE */
+    public const ROOT_FIELD_NAME = '(root_field)';
+
     /** @var Acl */
     private $acl;
 
@@ -88,10 +92,41 @@ class RootAclWrapper
                 $rootAces = $this->acl->getClassFieldAces($field);
             }
 
+            if (empty($rootAces)) {
+                $rootAces = $this->getFieldRootAcesFromRootAce($field);
+            }
+
             return $rootAces;
         }
 
         return $this->acl->getObjectAces();
+    }
+
+    /**
+     * Copy the common root fields ACEs as the root ACEs for given field and returns them as field root ACEs.
+     */
+    private function getFieldRootAcesFromRootAce(string $field): array
+    {
+        $result = [];
+        $rootAces = $this->acl->getObjectFieldAces(self::ROOT_FIELD_NAME);
+        if (empty($rootAces)) {
+            $rootAces = $this->acl->getClassFieldAces(self::ROOT_FIELD_NAME);
+        }
+
+        if (!empty($rootAces)) {
+            $entryReflection = new \ReflectionClass(FieldEntry::class);
+            $fieldProperty = $entryReflection->getProperty('field');
+            $fieldProperty->setAccessible(true);
+
+            /** @var FieldEntry $rootAce */
+            foreach ($rootAces as $rootAce) {
+                $rootAceClone = clone $rootAce;
+                $fieldProperty->setValue($rootAceClone, $field);
+                $result[] = $rootAceClone;
+            }
+        }
+
+        return $result;
     }
 
     /**
