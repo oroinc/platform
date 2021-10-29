@@ -43,6 +43,9 @@ oro:
         pagesize:
             label: View per page
             labelShort: Per page
+        cell:
+            blank:
+                placeholder: 'N/A'
     grid:
         mass_action:
             label: Mass Actions

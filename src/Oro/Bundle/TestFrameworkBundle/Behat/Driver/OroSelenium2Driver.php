@@ -314,6 +314,40 @@ JS;
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function keyDown($xpath, $char, $modifier = null)
+    {
+        $charToKeyMap = [
+            8 => 'Backspace',
+            9 => 'Tab',
+            13 => 'Enter',
+            27 => 'Escape', // Esc
+            32 => ' ', // Space
+            33 => 'PageUp',
+            34 => 'PageDown',
+            35 => 'End',
+            36 => 'Home',
+            37 => 'ArrowLeft',
+            38 => 'ArrowUp',
+            39 => 'ArrowRight',
+            40 => 'ArrowDown',
+            45 => 'Insert',
+            46 => 'Delete',
+        ];
+        $options = json_decode(self::charToOptions($char, $modifier), true);
+
+        if (array_key_exists($char, $charToKeyMap)) {
+            $options['key'] = $charToKeyMap[$char];
+        }
+
+        $event = 'keydown';
+        $options = json_encode($options);
+        $script = 'Syn.trigger("' . $event . '", ' . $options . ', {{ELEMENT}})';
+        $this->withSyn()->executeJsOnXpath($xpath, $script);
+    }
+
+    /**
      * @param string $xpath
      *
      * @return Element

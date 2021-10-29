@@ -21,7 +21,8 @@ define(function(require) {
         FullscreenPlugin: 'orodatagrid/js/app/plugins/grid/fullscreen-plugin',
         DatagridSettingsPlugin: 'orodatagrid/js/app/plugins/grid/datagrid-settings-plugin',
         ToolbarMassActionPlugin: 'orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin',
-        StickedScrollbarPlugin: 'orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin'
+        StickedScrollbarPlugin: 'orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin',
+        AccessibilityPlugin: 'orodatagrid/js/app/plugins/grid/accessibility-plugin'
     };
 
     const helpers = {
@@ -274,6 +275,10 @@ define(function(require) {
                     modules.StickedScrollbarPlugin = pluginModules.StickedScrollbarPlugin;
                 }
             }
+
+            if (this.themeOptions.enabledAccessibilityPlugin) {
+                modules.AccessibilityPlugin = pluginModules.AccessibilityPlugin;
+            }
         },
 
         /**
@@ -423,7 +428,7 @@ define(function(require) {
             // columns
             const columns = _.map(metadata.columns, function(cell) {
                 const cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
-                    'order', 'manageable', 'required', 'shortenableLabel', 'cellClassName'];
+                    'order', 'manageable', 'required', 'shortenableLabel', 'cellClassName', 'notMarkAsBlank'];
                 const cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 const extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
                 let cellType = modules[helpers.cellType(cell.type)];
@@ -446,7 +451,8 @@ define(function(require) {
                 'FloatingHeaderPlugin',
                 'FullscreenPlugin',
                 'DatagridSettingsPlugin',
-                'ToolbarMassActionPlugin'
+                'ToolbarMassActionPlugin',
+                'AccessibilityPlugin'
             ])).forEach(plugin => plugins.push(plugin));
 
             if (modules.StickedScrollbarPlugin) {

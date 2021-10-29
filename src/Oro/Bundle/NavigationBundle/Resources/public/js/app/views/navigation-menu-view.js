@@ -24,6 +24,8 @@ const NavigationMenuView = BaseView.extend({
         return {
             'keydown': 'onKeyDown',
             [`focus ${this.options.focusableElements}`]: 'onFocus',
+            [`focusin ${this.options.focusableElements}`]: 'onFocusInToFocusable',
+            [`focusout ${this.options.focusableElements}`]: 'onFocusOutToFocusable',
             'focusout': 'onFocusOut',
             'show.bs.dropdown': 'onDropdownToggle',
             'hide.bs.dropdown': 'onDropdownToggle',
@@ -177,6 +179,20 @@ const NavigationMenuView = BaseView.extend({
         if ($(event.target).is(this.options.focusableElements)) {
             this.navigateTo(event);
         }
+    },
+
+    /**
+     * @param {Object} event
+     */
+    onFocusInToFocusable(event) {
+        this.toggleFocusableClass(event.target, true);
+    },
+
+    /**
+     * @param {Object} event
+     */
+    onFocusOutToFocusable(event) {
+        this.toggleFocusableClass(event.target, false);
     },
 
     /**
@@ -887,6 +903,14 @@ const NavigationMenuView = BaseView.extend({
                 this.hideSubMenu();
             }
         }
+    },
+
+    /**
+     * @param {HTMLElement} el
+     * @param {boolean} state
+     */
+    toggleFocusableClass(el, state) {
+        $(el).toggleClass('focus-via-arrows-keys', state);
     }
 });
 

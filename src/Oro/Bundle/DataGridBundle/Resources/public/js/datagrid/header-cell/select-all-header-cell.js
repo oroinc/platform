@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'backgrid',
-    '../select-state-model',
-    'oroui/js/app/views/base/view',
-    'tpl-loader!orodatagrid/templates/datagrid/select-all-header-cell.html'
-], function($, _, Backgrid, SelectStateModel, BaseView, template) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const SelectStateModel = require('../select-state-model');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/select-all-header-cell.html');
 
     /**
      * Contains mass-selection logic
@@ -21,6 +21,10 @@ define([
      * @extends BaseView
      */
     const SelectAllHeaderCell = BaseView.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         keepElement: false,
         /** @property */
         className: 'select-all-header-cell renderable',

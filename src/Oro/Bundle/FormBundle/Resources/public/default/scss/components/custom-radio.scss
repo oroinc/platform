@@ -35,7 +35,6 @@
             }
         }
 
-        &.focus-visible,
         &:focus {
             ~ .custom-radio__text {
                 &:before {
@@ -72,7 +71,7 @@
         vertical-align: middle;
 
         word-break: break-word;
-    
+
         cursor: $base-ui-element-cursor;
 
         &::before {

@@ -12,7 +12,13 @@ define(function(require) {
     const rolesDatagridBuilder = {
         processDatagridOptions: function(deferred, options) {
             const reg = /\\/g;
-            options.themeOptions.rowView = options.themeOptions.readonly ? ReadonlyRowView : RowView;
+            options.metadata.columns = options.metadata.columns.filter(column => column.renderable);
+            if (options.themeOptions.readonly) {
+                options.metadata.rowActions = {};
+                options.themeOptions.rowView = ReadonlyRowView;
+            } else {
+                options.themeOptions.rowView = RowView;
+            }
             _.each(options.data.data, function(item) {
                 item.permissions = new BaseCollection(item.permissions, {
                     model: PermissionModel
@@ -54,6 +60,7 @@ define(function(require) {
                 _.extend(currentCategory, category);
                 grid.body.filter();
                 grid.$el.toggle(grid.body.visibleItems.length > 0);
+                grid.trigger('content:update');
             });
         }
     };

@@ -1,13 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'chaplin',
-    'backbone',
-    'oroui/js/tools',
-    '../app/components/column-renderer-component',
-    './util'
-], function($, _, Chaplin, Backbone, tools, ColumnRendererComponent, util) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const Backbone = require('backbone');
+    const tools = require('oroui/js/tools');
+    const ColumnRendererComponent = require('../app/components/column-renderer-component');
 
     const document = window.document;
 
@@ -76,7 +75,8 @@ define([
          * @inheritdoc
          */
         constructor: function Row(options) {
-            _.extend(this, _.pick(options, ['rowClassName', 'themeOptions', 'template', 'columns']));
+            _.extend(this, _.pick(options, ['rowClassName', 'themeOptions', 'template', 'columns',
+                'dataCollection', 'ariaRowsIndexShift']));
             Row.__super__.constructor.call(this, options);
         },
 
@@ -116,6 +116,7 @@ define([
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
             this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
             this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
+            this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -223,12 +224,11 @@ define([
             return classes.join(' ');
         },
 
-        attributes: function() {
-            const attributes = {};
-            if (this.model.get('row_attributes')) {
-                Object.assign(attributes, this.model.get('row_attributes'));
-            }
-            return attributes;
+        _attributes: function() {
+            return {
+                ...this.model.get('row_attributes'),
+                'aria-rowindex': this.getAriaRowIndex()
+            };
         },
 
         /**
@@ -417,6 +417,35 @@ define([
                 });
             }
             return this;
+        },
+
+        /**
+         * Sync attributes for view element
+         */
+        _updateAttributes() {
+            if (this.disposed) {
+                return;
+            }
+            this._setAttributes(this._collectAttributes());
+        },
+
+        /**
+         * @return {null|number}
+         */
+        getAriaRowIndex() {
+            let ariaRowIndex = null;
+            const indexInCollection = this.dataCollection
+                .filter(model => model.get('isAuxiliary') !== true)
+                .findIndex(model => model.cid === this.model.cid);
+
+            if (indexInCollection !== -1) {
+                const {currentPage, pageSize} = this.dataCollection.state;
+                const indexInPage = (currentPage * pageSize) - pageSize;
+
+                ariaRowIndex = indexInCollection + this.ariaRowsIndexShift + indexInPage + 1;
+            }
+
+            return ariaRowIndex;
         }
     });
 

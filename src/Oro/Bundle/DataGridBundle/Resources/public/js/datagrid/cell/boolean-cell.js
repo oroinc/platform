@@ -45,7 +45,6 @@ define(function(require) {
                 this.$el.append('<span>').text(text);
                 this.delegateEvents();
             }
-
             return this;
         },
 

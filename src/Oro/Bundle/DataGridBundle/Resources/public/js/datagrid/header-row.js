@@ -1,13 +1,14 @@
-define([
-    'underscore',
-    './header-cell/header-cell',
-    'chaplin',
-    '../app/components/column-renderer-component',
-    './util'
-], function(_, HeaderCell, Chaplin, ColumnRendererComponent, util) {
+define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const HeaderCell = require('./header-cell/header-cell');
+    const Chaplin = require('chaplin');
+    const ColumnRendererComponent = require('../app/components/column-renderer-component');
+
     const HeaderRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -35,6 +36,7 @@ define([
         initialize: function(options) {
             this.columns = options.columns;
             this.dataCollection = options.dataCollection;
+            this.ariaRowIndex = options.ariaRowIndex;
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
@@ -87,7 +89,6 @@ define([
                 HeaderRow.__super__.render.call(this);
             }
             this._resolveDeferredRender();
-
             return this;
         },
 
@@ -123,6 +124,12 @@ define([
             }, this);
 
             return this;
+        },
+
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         }
     });
 

@@ -1,10 +1,12 @@
-define([
-    './footer-cell',
-    'chaplin'
-], function(FooterCell, Chaplin) {
+define(function(require) {
     'use strict';
 
+    const FooterCell = require('./footer-cell');
+    const Chaplin = require('chaplin');
+
     const FooterRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -24,6 +26,7 @@ define([
         initialize: function(options) {
             this.columns = options.columns;
             this.dataCollection = options.dataCollection;
+            this.ariaRowIndex = options.ariaRowIndex;
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
@@ -49,7 +52,26 @@ define([
                 };
             }
             FooterRow.__super__.initialize.call(this, options);
+            this.listenTo(this.dataCollection, 'add reset remove', this._updateAttributes);
             this.cells = this.subviews;
+        },
+
+        render() {
+            FooterRow.__super__.render.call(this);
+            return this;
+        },
+
+        _updateAttributes() {
+            if (this.disposed) {
+                return;
+            }
+            this._setAttributes(this._collectAttributes());
+        },
+
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         },
 
         /**

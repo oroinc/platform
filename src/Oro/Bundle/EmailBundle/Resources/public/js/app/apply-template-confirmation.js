@@ -13,6 +13,10 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
         /** @property {String} */
         className: 'modal oro-modal-danger',
 
+        _attributes: {
+            role: 'alertdialog'
+        },
+
         /**
          * @inheritdoc
          */

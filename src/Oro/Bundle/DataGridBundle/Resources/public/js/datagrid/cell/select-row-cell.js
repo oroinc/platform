@@ -14,6 +14,10 @@ define(function(require) {
      * @extends BaseView
      */
     const SelectRowCell = BaseView.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         /** @property */
         className: 'select-row-cell renderable',
 
@@ -48,7 +52,6 @@ define(function(require) {
          * @param {Backbone.Model} options.model
          */
         initialize: function(options) {
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
