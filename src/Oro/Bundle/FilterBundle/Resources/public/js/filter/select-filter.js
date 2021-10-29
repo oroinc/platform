@@ -138,7 +138,9 @@ define(function(require, exports, module) {
          */
         events: {
             'keydown select': '_preventEnterProcessing',
-            'keydown .filter-criteria-selector': 'onKeyDownCriteriaSelector',
+            'keydown .filter-criteria-selector': '_triggerEventOnCriteriaToggle',
+            'focusin .filter-criteria-selector': '_triggerEventOnCriteriaToggle',
+            'focusout .filter-criteria-selector': '_triggerEventOnCriteriaToggle',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
             'change select': '_onSelectChange',
@@ -439,8 +441,8 @@ define(function(require, exports, module) {
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
         },
 
-        onKeyDownCriteriaSelector(e) {
-            this.trigger('keydownOnToggle', e, this);
+        _triggerEventOnCriteriaToggle(e) {
+            this.trigger(`${e.type}OnToggle`, e, this);
         },
 
         focusCriteriaToggler() {

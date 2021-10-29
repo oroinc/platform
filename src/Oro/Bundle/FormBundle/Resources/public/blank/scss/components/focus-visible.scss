@@ -1,7 +1,7 @@
 /* @theme: blank; */
 
 @if $focus-visible-style {
-    .focus-visible {
+    .focus-visible:focus {
         box-shadow: $focus-visible-style;
 
         &[data-skip-focus-decoration],

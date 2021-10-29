@@ -266,6 +266,7 @@ define(function(require) {
          * Shows editor view (create first if it did not exist)
          */
         enterEditMode: function() {
+            this.options.grid.trigger('grid-cell:enter-edit-mode', this.options.cell);
             if (!this.view) {
                 this.options.cell.$el.removeClass('view-mode save-fail');
                 this.options.cell.$el.addClass('edit-mode');
@@ -294,6 +295,8 @@ define(function(require) {
                 this.stopListening(this.view);
                 delete this.view;
             }
+
+            this.options.grid.trigger('grid-cell:exit-edit-mode', this.options.cell);
 
             if (withDispose) {
                 this.dispose();

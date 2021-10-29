@@ -36,6 +36,10 @@ define(function(require) {
 
         okButtonClass: config.okButtonClass,
 
+        _attributes: {
+            role: 'alertdialog'
+        },
+
         /**
          * @inheritdoc
          */

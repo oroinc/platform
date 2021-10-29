@@ -1,9 +1,9 @@
-define([
-    'underscore',
-    'backgrid',
-    'orodatagrid/js/datagrid/formatter/number-formatter'
-], function(_, Backgrid, NumberFormatter) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const NumberFormatter = require('orodatagrid/js/datagrid/formatter/number-formatter');
 
     /**
      * Number column cell.

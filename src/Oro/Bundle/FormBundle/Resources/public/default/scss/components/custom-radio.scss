@@ -65,7 +65,6 @@
             }
         }
 
-        &.focus-visible,
         &:focus {
             ~ .custom-radio__text {
                 &::before {

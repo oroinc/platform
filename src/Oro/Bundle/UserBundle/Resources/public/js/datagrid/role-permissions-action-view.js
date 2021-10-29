@@ -26,7 +26,6 @@ define(function(require) {
 
         events: {
             'shown.bs.dropdown': 'onDropdownOpen',
-            'click': '_showDropdown',
             'mouseover .dropdown-toggle': '_showDropdown',
             'mouseleave': '_hideDropdown'
         },

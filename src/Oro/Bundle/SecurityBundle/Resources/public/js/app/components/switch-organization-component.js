@@ -129,7 +129,10 @@ define(function(require, exports, module) {
                         okButtonClass: 'btn btn-danger',
                         content: modalContentTemplate({
                             paragraphs: [this.modalLocalChangesText]
-                        })
+                        }),
+                        attributes: {
+                            role: 'alertdialog'
+                        }
                     };
 
                     break;
@@ -140,7 +143,10 @@ define(function(require, exports, module) {
                         okButtonClass: 'btn btn-danger',
                         content: modalContentTemplate({
                             paragraphs: [this.modalRemoteChangesText, this.modalQuestion]
-                        })
+                        }),
+                        attributes: {
+                            role: 'alertdialog'
+                        }
                     };
 
                     break;

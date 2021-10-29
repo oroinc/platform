@@ -124,6 +124,7 @@ fieldset:disabled a.btn {
     &.disabled {
         color: $btn-link-disabled-color;
         pointer-events: none;
+        background-color: transparent;
     }
 
     &:not(:disabled):not(.disabled):active,

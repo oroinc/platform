@@ -2140,11 +2140,11 @@ JS;
     }
 
     /**
-     * Presses Enter|Space|ESC|UpArrow|DownArrow|LeftArrow|RightArrow key on specified element
+     * Presses Enter|Space|ESC|ArrowUp|ArrowDown|ArrowLeft|ArrowRight key on specified element
      * Keys can be pressed with modifiers 'Shift', 'Alt', 'Ctrl' or 'Meta'
      *
      * Example: When I press "Shift+Enter" key on "Default Addresses" element
-     * Example: And I press "ESC" key on "Default Addresses" element
+     * Example: And I press "Esc" key on "Default Addresses" element
      *
      * @When /^(?:|I )press "(?P<key>[^"]*)" key on "(?P<elementName>[\w\s]*)" element$/
      * @param string $key
@@ -2156,16 +2156,16 @@ JS;
             'Backspace' => 8,
             'Tab' => 9,
             'Enter' => 13,
-            'ESC' => 27,
+            'Esc' => 27,
             'Space' => 32,
             'PageUp' => 33,
             'PageDown' => 34,
             'End' => 35,
             'Home' => 36,
-            'LeftArrow' => 37,
-            'UpArrow' => 38,
-            'RightArrow' => 39,
-            'DownArrow' => 40,
+            'ArrowLeft' => 37,
+            'ArrowUp' => 38,
+            'ArrowRight' => 39,
+            'ArrowDown' => 40,
             'Insert' => 45,
             'Delete' => 46,
         ];
@@ -2187,8 +2187,6 @@ JS;
                 implode('", "', array_keys($keyMap))
             ));
         }
-
-        $keyCode = $keyMap[$keyName];
 
         $xpath = $this->elementFactory->createElement($elementName)->getXpath();
         $this->getSession()->getDriver()->keyDown($xpath, $keyMap[$keyName], $modifier);

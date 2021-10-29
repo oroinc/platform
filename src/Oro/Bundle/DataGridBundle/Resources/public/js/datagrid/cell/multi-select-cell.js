@@ -1,9 +1,9 @@
-define([
-    'backgrid',
-    'underscore',
-    'orotranslation/js/translator'
-], function(Backgrid, _, __) {
+define(function(require) {
     'use strict';
+
+    const Backgrid = require('backgrid');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
 
     /**
      * Cell able to display multiselect values.
