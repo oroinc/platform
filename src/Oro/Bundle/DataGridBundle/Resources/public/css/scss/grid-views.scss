@@ -92,14 +92,15 @@
 
     @supports (-webkit-line-clamp: 2) {
         .grid-views-choice {
-            display: box;
+            // stylelint-disable-next-line value-no-vendor-prefix
+            display: -webkit-box;
             max-height: inherit;
 
             text-overflow: ellipsis;
 
             -webkit-line-clamp: 2;
-            // stylelint-disable-next-line property-no-unknown
-            box-orient: vertical;
+            // stylelint-disable-next-line property-no-vendor-prefix
+            -webkit-box-orient: vertical;
         }
     }
 

@@ -69,11 +69,11 @@ define(function(require) {
             const PROP = BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME;
             let dependencies = Chaplin.utils.getAllPropertyVersions(Component.prototype, PROP);
             dependencies.push(_.result(Component.prototype, PROP));
-            dependencies = _.extend.apply(null, [{}].concat(dependencies));
+            dependencies = Object.assign({}, ...dependencies);
 
             // remove dependencies without componentName
             // (the name was falsified in descendant component definition, means is doesn't require it anymore)
-            _.each(dependencies, function(componentName, dependencyName) {
+            Object.entries(dependencies).forEach(([dependencyName, componentName]) => {
                 if (!componentName) {
                     delete dependencies[dependencyName];
                 }

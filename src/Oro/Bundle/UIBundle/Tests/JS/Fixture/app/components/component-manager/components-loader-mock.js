@@ -66,12 +66,32 @@ define(function(require) {
         }
     });
 
+    const FooComponent = BaseComponent.extend({
+        /**
+         * @inheritdoc
+         */
+        constructor: function FooComponent(options) {
+            FooComponent.__super__.constructor.call(this, options);
+        }
+    });
+
+    const BarComponent = BaseComponent.extend({
+        /**
+         * @inheritdoc
+         */
+        constructor: function BarComponent(options) {
+            BarComponent.__super__.constructor.call(this, options);
+        }
+    });
+
     const components = {
         'js/needs-b-component': ComponentNeedsB,
         'js/needs-ce-component': ComponentNeedsCE,
         'js/needs-a-component': ComponentNeedsA,
         'js/extend-no-need-a-component': ComponentExtendNoNeedA,
-        'js/no-needs-component': ComponentNoNeeds
+        'js/no-needs-component': ComponentNoNeeds,
+        'js/foo-component': FooComponent,
+        'js/bar-component': BarComponent
     };
 
     return function(moduleName) {
