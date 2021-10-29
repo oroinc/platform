@@ -24,6 +24,12 @@ define(function(require) {
 
         fieldItemView: ReadonlyFieldView,
 
+        readonlyMode: true,
+
+        optionNames: BaseView.prototype.optionNames.concat([
+            'dataCollection', 'ariaRowsIndexShift'
+        ]),
+
         /**
          * @inheritdoc
          */
@@ -73,6 +79,39 @@ define(function(require) {
                 }));
             }
             return this;
+        },
+
+        getTemplateData: function() {
+            const data = ActionPermissionsReadonlyRowView.__super__.getTemplateData.call(this);
+
+            data.ariaRowIndex = this.getAriaRowIndex();
+            data.readonlyMode = this.readonlyMode;
+            data.columnsCount = this.collection.length;
+
+            return data;
+        },
+
+        _attributes: function() {
+            return {
+                'role': 'presentation',
+                'aria-rowindex': null
+            };
+        },
+
+        /**
+         * @return {null|number}
+         */
+        getAriaRowIndex() {
+            let ariaRowIndex = null;
+            const indexInCollection = this.dataCollection
+                .filter(model => model.get('isAuxiliary') !== true)
+                .findIndex(model => model.cid === this.model.cid);
+
+            if (indexInCollection !== -1) {
+                ariaRowIndex = indexInCollection + this.ariaRowsIndexShift;
+            }
+
+            return ariaRowIndex;
         }
     });
 

@@ -1,10 +1,12 @@
-define([
-    './footer-cell',
-    'chaplin'
-], function(FooterCell, Chaplin) {
+define(function(require) {
     'use strict';
 
+    const FooterCell = require('./footer-cell');
+    const Chaplin = require('chaplin');
+
     const FooterRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -49,7 +51,21 @@ define([
                 };
             }
             FooterRow.__super__.initialize.call(this, options);
+            this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
             this.cells = this.subviews;
+        },
+
+        _updateAttributes() {
+            if (this.disposed) {
+                return;
+            }
+            this._setAttributes(this._collectAttributes());
+        },
+
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         },
 
         /**

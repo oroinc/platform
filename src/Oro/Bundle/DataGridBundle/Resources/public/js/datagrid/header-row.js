@@ -1,13 +1,14 @@
-define([
-    'underscore',
-    './header-cell/header-cell',
-    'chaplin',
-    '../app/components/column-renderer-component',
-    './util'
-], function(_, HeaderCell, Chaplin, ColumnRendererComponent, util) {
+define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const HeaderCell = require('./header-cell/header-cell');
+    const Chaplin = require('chaplin');
+    const ColumnRendererComponent = require('../app/components/column-renderer-component');
+
     const HeaderRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -123,6 +124,12 @@ define([
             }, this);
 
             return this;
+        },
+
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         }
     });
 

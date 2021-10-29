@@ -1,12 +1,11 @@
-define([
-    'underscore',
-    'oroui/js/mediator',
-    'backbone',
-    'chaplin',
-    'backgrid',
-    './row'
-], function(_, mediator, Backbone, Chaplin, Backgrid, Row) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const Chaplin = require('chaplin');
+    const Backgrid = require('backgrid');
+    const Row = require('./row');
 
     /**
      * Grid body widget
@@ -46,7 +45,8 @@ define([
          * @inheritdoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
+            _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText',
+                'gridRowsCounter']));
             this.rows = this.subviews;
             if ('rowView' in options.themeOptions) {
                 this.itemView = options.themeOptions.rowView;
@@ -63,6 +63,7 @@ define([
             }
             delete this.columns;
             delete this.filteredColumns;
+            delete this.gridRowsCounter;
 
             Body.__super__.dispose.call(this);
         },
@@ -74,17 +75,19 @@ define([
         },
 
         initItemView: function(model) {
-            Row = this.row || this.itemView;
-            if (Row) {
+            const RowView = this.row || this.itemView;
+            if (RowView) {
                 const rowOptions = {
                     autoRender: false,
                     model: model,
+                    dataCollection: this.collection,
                     collection: this.filteredColumns,
                     columns: this.columns,
-                    rowClassName: this.rowClassName
+                    rowClassName: this.rowClassName,
+                    ariaRowsIndexShift: this.gridRowsCounter.getHeaderRowsCount()
                 };
-                this.columns.trigger('configureInitializeOptions', Row, rowOptions);
-                return new Row(rowOptions);
+                this.columns.trigger('configureInitializeOptions', RowView, rowOptions);
+                return new RowView(rowOptions);
             } else {
                 throw new Error('The one of Body#row or Body#itemView properties ' +
                     'must be defined or the initItemView() must be overridden.');

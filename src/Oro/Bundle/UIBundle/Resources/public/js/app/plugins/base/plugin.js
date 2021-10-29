@@ -4,6 +4,8 @@ define(function(require) {
     const _ = require('underscore');
     const Backbone = require('backbone');
 
+    const delegateEventSplitter = /^(\S+)\s*(.*)$/;
+
     function BasePlugin(main, manager, options) {
         this.cid = _.uniqueId(this.cidPrefix);
         this.main = main;
@@ -22,6 +24,37 @@ define(function(require) {
          * @param options {object=}
          */
         initialize: function(main, options) {},
+
+        /**
+         * Delegated event handlers to the element of the main. The same way as Backbone.View does
+         * @see https://backbonejs.org/#View-delegateEvents
+         * @return {BasePlugin}
+         */
+        delegateEvents() {
+            const events = _.result(this, 'events', {});
+            this.undelegateEvents();
+            for (let [key, method] of Object.entries(events)) {
+                if (typeof method === 'string') {
+                    method = this[method];
+                }
+                if (!method) {
+                    continue;
+                }
+                const [, event, selector] = key.match(delegateEventSplitter);
+                this.main.$el.on(`${event}${this.eventNamespace()}`, selector, method.bind(this));
+            }
+            return this;
+        },
+
+        /**
+         * Removes event handlers for the element of the main. The same way as Backbone.View does
+         * @see https://backbonejs.org/#View-undelegateEvents
+         * @return {BasePlugin}
+         */
+        undelegateEvents() {
+            this.main.$el.off(this.ownEventNamespace());
+            return this;
+        },
 
         eventNamespace: function() {
             return this.main.eventNamespace() + this.ownEventNamespace();
@@ -52,7 +85,6 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.disposed = true;
             this.trigger('disposed');
             this.off();
             this.stopListening();

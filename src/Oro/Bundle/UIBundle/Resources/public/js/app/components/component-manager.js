@@ -28,15 +28,15 @@ define(function(require) {
          * @param {jQuery?} $container
          * @return {Promise}
          */
-        init: function(options, $container) {
+        init(options, $container) {
             this.initOptions = options || {};
 
             const elements = this._collectElements($container);
             const elementsData = this._readElementsData(elements);
 
             // collect nested elements' data
-            _.each(elementsData, function(data) {
-                data.subElementsData = _.filter(elementsData, function(subElementData) {
+            elementsData.forEach(data => {
+                data.subElementsData = elementsData.filter(subElementData => {
                     return data.options._sourceElement.has(subElementData.options._sourceElement).length;
                 });
             });
@@ -45,17 +45,16 @@ define(function(require) {
             // (nested items have to be initialized first)
             elementsData.reverse();
 
-            const promises = _.map(elementsData, function(data) {
+            const promises = elementsData.map(data => {
                 // collect promises of dependencies
-                data.options._subPromises = _.object(_.map(data.subElementsData, function(subElementData) {
+                data.options._subPromises = Object.fromEntries(data.subElementsData.map(subElementData => {
                     return [subElementData.options.name, subElementData.promise];
                 }));
                 return (data.promise = this._loadAndInitializeComponent(data));
-            }, this);
-
-            return $.when(..._.compact(promises)).then(function(...args) {
-                return _.compact(args);
             });
+
+            return $.when(...promises.filter(Boolean))
+                .then((...args) => args.filter(Boolean));
         },
 
         /**
@@ -65,16 +64,14 @@ define(function(require) {
          *
          * @protected
          */
-        _bindContainerChangesEvents: function() {
-            const self = this;
-
+        _bindContainerChangesEvents() {
             // if the container catches content changed event -- updates its layout
             this.$el.on('content:changed' + this.eventNamespace, event => {
                 if (event.isDefaultPrevented()) {
                     return;
                 }
                 event.preventDefault();
-                this.init(this.initOptions).done(function() {
+                this.init(this.initOptions).done(() => {
                     $(event.target).trigger('content:initialized');
                 });
             });
@@ -85,9 +82,8 @@ define(function(require) {
                     return;
                 }
                 event.preventDefault();
-                $(event.target).find('[data-bound-component]').each(function() {
-                    const el = this;
-                    _.each(self.components, function(item) {
+                $(event.target).find('[data-bound-component]').toArray().forEach(el => {
+                    Object.values(this.components).forEach(item => {
                         if (item.el === el) {
                             item.component.dispose();
                         }
@@ -99,13 +95,13 @@ define(function(require) {
                 const tempNS = _.uniqueId('.tempEventNS');
                 const {oppositeEventName} = event.data;
                 const $target = $(event.target);
-                const $container = $(event.currentTarget);
-                $container.removeAttr('data-page-component-init-on');
+                const $initOnContainer = $(event.currentTarget);
+                $initOnContainer.removeAttr('data-page-component-init-on');
                 if (oppositeEventName) {
                     // listen to opposite event, and once it occurs -- invalidate initial event
                     $target.one(oppositeEventName + tempNS, () => event = null);
                 }
-                this.init(this.initOptions, $container)
+                this.init(this.initOptions, $initOnContainer)
                     .done(() => {
                         $target.off(tempNS);
                         if (event) { // re-trigger initial event if it's still valid after initialization
@@ -135,13 +131,11 @@ define(function(require) {
          * @returns {Array.<jQuery>} elements
          * @protected
          */
-        _collectElements: function($container) {
+        _collectElements($container) {
             const elements = [];
 
             const shortcuts = Object.values(ComponentShortcutsManager.getAll());
-            const selector = _.map(shortcuts, function(shortcut) {
-                return '[' + shortcut.dataAttr + ']';
-            });
+            const selector = shortcuts.map(shortcut => `[${shortcut.dataAttr}]`);
 
 
             ($container || this.$el)
@@ -149,14 +143,12 @@ define(function(require) {
                 .addBack(selector.join(','))
                 .each((i, elem) => {
                     const $elem = $(elem);
-                    if (!this._isReadyToInit($elem) || this._isInOwnLayout($elem)) {
+                    if (!this._isInLayout($elem) || !this._isReadyToInit($elem)) {
                         return;
                     }
 
                     const elemData = $elem.data();
-                    const shortcut = _.find(shortcuts, function(shortcut) {
-                        return shortcut.dataKey in elemData;
-                    });
+                    const shortcut = shortcuts.find(shortcut => shortcut.dataKey in elemData);
 
                     if (shortcut) {
                         const dataUpdate = ComponentShortcutsManager.getComponentData(shortcut, elemData);
@@ -179,11 +171,10 @@ define(function(require) {
          * @return {boolean}
          * @protected
          */
-        _isInOwnLayout: function($element) {
+        _isInLayout($element) {
             // find nearest marked container with separate layout
-            const $separateLayout = $element.parents('[data-layout="separate"]:first');
-            // collects container elements from current layout
-            return $separateLayout.length && _.contains($separateLayout.parents(), this.$el[0]);
+            const $layoutElement = $element.parent().closest('[data-layout="separate"]', this.$el);
+            return $layoutElement.is(this.$el);
         },
 
         /**
@@ -194,8 +185,11 @@ define(function(require) {
          * @return {boolean}
          * @protected
          */
-        _isReadyToInit: function($element) {
-            return !$element.is('[data-page-component-init-on], [data-page-component-init-on] *');
+        _isReadyToInit($element) {
+            const $initOnContainer = $element.closest('[data-page-component-init-on]', this.$el);
+
+            return !$initOnContainer.length || !this._isInLayout($initOnContainer) ||
+                $initOnContainer.is('[data-page-component-init-on="asap"]');
         },
 
         /**
@@ -205,8 +199,8 @@ define(function(require) {
          * @returns {Array.<{element: jQuery, module: string, options: Object}>}
          * @protected
          */
-        _readElementsData: function(elements) {
-            return _.compact(_.map(elements, function($elem) {
+        _readElementsData(elements) {
+            const elementsData = elements.map($elem => {
                 let data;
                 try {
                     data = this._readData($elem);
@@ -219,7 +213,13 @@ define(function(require) {
                 this._cleanupData(data.element);
 
                 return data;
-            }, this));
+            }).filter(Boolean);
+
+            this.$el.find('[data-page-component-init-on="asap"]')
+                .filter((i, el) => this._isInLayout($(el)))
+                .removeAttr('data-page-component-init-on');
+
+            return elementsData;
         },
 
         /**
@@ -229,7 +229,7 @@ define(function(require) {
          * @throws {Error}
          * @protected
          */
-        _readData: function($elem) {
+        _readData($elem) {
             const data = {
                 module: $elem.data('pageComponentModule'),
                 options: $.extend(true, {}, this.initOptions, $elem.data('pageComponentOptions'))
@@ -258,7 +258,7 @@ define(function(require) {
          * @param {jQuery} $elem
          * @protected
          */
-        _cleanupData: function($elem) {
+        _cleanupData($elem) {
             $elem
                 .removeData('pageComponentModule')
                 .removeData('pageComponentOptions')
@@ -273,7 +273,7 @@ define(function(require) {
          * @returns {Promise}
          * @protected
          */
-        _loadAndInitializeComponent: function(data) {
+        _loadAndInitializeComponent(data) {
             const initDeferred = $.Deferred();
 
             loadModules(data.module)
@@ -282,9 +282,9 @@ define(function(require) {
 
             const initPromise = initDeferred
                 .promise(Object.create({targetData: data}))
-                .always(function() {
+                .always(() => {
                     delete this.initPromises[data.options.name];
-                }.bind(this));
+                });
 
             this.initPromises[data.options.name] = {promise: initPromise, dependsOn: []};
 
@@ -301,7 +301,7 @@ define(function(require) {
          * @param {Function} Component
          * @protected
          */
-        _onComponentLoaded: function(initDeferred, options, Component) {
+        _onComponentLoaded(initDeferred, options, Component) {
             if (this.disposed) {
                 initDeferred.resolve();
                 return;
@@ -321,7 +321,7 @@ define(function(require) {
 
             let dependencies = this._getComponentDependencies(Component, options);
 
-            if (_.isEmpty(dependencies)) {
+            if (!Object.keys(dependencies).length) {
                 this._initializeComponent(initDeferred, options, Component);
             } else {
                 try {
@@ -333,10 +333,10 @@ define(function(require) {
                     return;
                 }
 
-                $.when(..._.values(dependencies)).then(function() {
+                $.when(...Object.values(dependencies)).then(() => {
                     options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME] = dependencies;
                     this._initializeComponent(initDeferred, options, Component);
-                }.bind(this));
+                });
             }
         },
 
@@ -348,7 +348,7 @@ define(function(require) {
          * @param {BaseComponent|Function} Component
          * @protected
          */
-        _initializeComponent: function(initDeferred, options, Component) {
+        _initializeComponent(initDeferred, options, Component) {
             const name = options.name;
             const $elem = options._sourceElement;
 
@@ -360,7 +360,7 @@ define(function(require) {
             if (component.deferredInit) {
                 component.deferredInit
                     .always(initDeferred.resolve.bind(initDeferred))
-                    .fail(function(error) {
+                    .fail(error => {
                         const componentModuleName = $elem.attr('data-bound-component');
                         const viewModuleName = $elem.attr('data-bound-view');
                         const widgetName = $elem.attr('data-bound-input-widget');
@@ -381,7 +381,7 @@ define(function(require) {
                         notes = notes.length ? ` (${notes.join(', ')})` : '';
                         const message = `Initialization has failed for component "${componentModuleName}"${notes}`;
                         this._handleError(message, error);
-                    }.bind(this));
+                    });
             } else {
                 initDeferred.resolve(component);
             }
@@ -395,12 +395,12 @@ define(function(require) {
          * @return {Object.<string, string>} where key is internal name for component's instance,
          *                                  value is component's name in componentManager
          */
-        _getComponentDependencies: function(Component, options) {
+        _getComponentDependencies(Component, options) {
             const dependencies = BaseComponent.getRelatedSiblingComponentNames(Component);
 
             // options can only change componentName of existing dependency, can not make it falsy
-            const updateFromOptions = _.result(options, BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME);
-            _.each(updateFromOptions, function(componentName, dependencyName) {
+            const updateFromOptions = _.result(options, BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME, {});
+            Object.entries(updateFromOptions).forEach(([dependencyName, componentName]) => {
                 if (componentName && dependencies[dependencyName]) {
                     dependencies[dependencyName] = componentName;
                 }
@@ -417,8 +417,8 @@ define(function(require) {
          * @throws error on circular dependency
          * @return {Object.<string, BaseComponent|Promise|undefined>}
          */
-        _resolveRelatedSiblings: function(componentName, dependencies) {
-            const deps = _.mapObject(dependencies, function(siblingComponentName, dependencyName) {
+        _resolveRelatedSiblings(componentName, dependencies) {
+            const deps = _.mapObject(dependencies, (siblingComponentName, dependencyName) => {
                 if (this.initPromises[siblingComponentName]) {
                     if (!this._hasCircularDependency(componentName, siblingComponentName)) {
                         this.initPromises[componentName].dependsOn.push(siblingComponentName);
@@ -427,7 +427,7 @@ define(function(require) {
                             '" component has circular dependency of sibling components');
                     }
                     return this.initPromises[siblingComponentName].promise
-                        .then(function(component) {
+                        .then(component => {
                             return (deps[dependencyName] = component);
                         });
                 } else if (this.get(siblingComponentName)) {
@@ -435,7 +435,7 @@ define(function(require) {
                 } else {
                     return void 0;
                 }
-            }, this);
+            });
 
             return deps;
         },
@@ -447,7 +447,7 @@ define(function(require) {
          * @param {string} siblingComponentName name of dependee component
          * @return {boolean}
          */
-        _hasCircularDependency: function(componentName, siblingComponentName) {
+        _hasCircularDependency(componentName, siblingComponentName) {
             let name;
             const checked = [];
             const queue = [siblingComponentName].concat(this.initPromises[componentName].dependsOn);
@@ -473,7 +473,7 @@ define(function(require) {
          * @param {Error} error
          * @protected
          */
-        _onComponentLoadError: function(initDeferred, error) {
+        _onComponentLoadError(initDeferred, error) {
             this._handleError(null, error);
             // prevent interface from blocking by loader
             initDeferred.resolve();
@@ -488,9 +488,9 @@ define(function(require) {
          * @param {Error} error
          * @protected
          */
-        _handleError: function(message, error) {
+        _handleError(message, error) {
             if (console && console.error) {
-                console.error(..._.compact([message, error]));
+                console.error(...[message, error].filter(Boolean));
             }
             if (!tools.debug) {
                 // if there is unhandled error -- show user message
@@ -504,7 +504,7 @@ define(function(require) {
          *
          * @param {string} name
          */
-        get: function(name) {
+        get(name) {
             if (name in this.components) {
                 return this.components[name].component;
             } else {
@@ -519,7 +519,7 @@ define(function(require) {
          * @param {BaseComponent} component to set
          * @param {HTMLElement} el
          */
-        add: function(name, component, el) {
+        add(name, component, el) {
             if (this.disposed) {
                 // in case the manager already disposed -- dispose passed component as well
                 component.dispose();
@@ -530,9 +530,9 @@ define(function(require) {
                 component: component,
                 el: el
             };
-            component.once('dispose', function() {
+            component.once('dispose', () => {
                 delete this.components[name];
-            }.bind(this));
+            });
             return component;
         },
 
@@ -541,7 +541,7 @@ define(function(require) {
          *
          * @param {string} name component name to remove
          */
-        remove: function(name) {
+        remove(name) {
             const item = this.components[name];
             delete this.components[name];
             if (item) {
@@ -552,16 +552,15 @@ define(function(require) {
         /**
          * Destroys all linked components
          */
-        removeAll: function() {
-            _.each(this.components, function(item, name) {
-                this.remove(name);
-            }, this);
+        removeAll() {
+            Object.keys(this.components)
+                .forEach(name => this.remove(name));
         },
 
         /**
          * Disposes component manager
          */
-        dispose: function() {
+        dispose() {
             this.$el.off(this.eventNamespace);
             this.removeAll();
             delete this.$el;
@@ -575,8 +574,8 @@ define(function(require) {
          * @param {Function} callback
          * @param {Object} context
          */
-        forEachComponent: function(callback, context) {
-            _.each(this.components, function(item) {
+        forEachComponent(callback, context) {
+            Object.values(this.components).forEach(item => {
                 callback.apply(context, [item.component]);
             });
         }

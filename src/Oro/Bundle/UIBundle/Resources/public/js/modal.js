@@ -96,15 +96,14 @@ define(function(require, exports, module) {
         /**
          * @inheritdoc
          */
-        attributes: function() {
-            const attrs = {};
-
-            attrs['class'] = 'modal oro-modal-normal';
-            attrs['role'] = 'modal';
-            attrs['tabindex'] = '-1';
-            attrs['aria-labelledby'] = this.cid;
-
-            return attrs;
+        _attributes: function() {
+            return {
+                'class': 'modal oro-modal-normal',
+                'role': 'dialog',
+                'aria-modal': 'true',
+                'tabindex': '-1',
+                'aria-labelledby': this.cid
+            };
         },
 
         /**

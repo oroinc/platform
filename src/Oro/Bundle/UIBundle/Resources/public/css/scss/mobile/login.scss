@@ -69,10 +69,6 @@
         padding-left: 0;
     }
 
-    &__oauth {
-        padding-left: 0;
-    }
-
     &__roles-item {
         display: block;
     }
@@ -141,6 +137,12 @@
 
     &--login.form-row-layout {
         .form-signin__footer {
+            padding-left: 0;
+        }
+    }
+
+    &.form-row-layout {
+        .form-signin__oauth {
             padding-left: 0;
         }
     }

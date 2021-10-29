@@ -16,10 +16,13 @@
                     dialog.remove();
                 }
                 dialog = new Modal({
-                    'content': __('oro.platform.maintenance_mode_on_message').replace(regExp, '<br/>'),
-                    'className': 'modal oro-modal-danger oro-modal-maintenance',
-                    'allowCancel': false,
-                    'title': __('oro.platform.maintenance_mode_on_title')
+                    content: __('oro.platform.maintenance_mode_on_message').replace(regExp, '<br/>'),
+                    className: 'modal oro-modal-danger oro-modal-maintenance',
+                    allowCancel: false,
+                    title: __('oro.platform.maintenance_mode_on_title'),
+                    attributes: {
+                        role: 'alertdialog'
+                    }
                 });
                 dialog.open();
             } else if (dialog) {

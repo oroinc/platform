@@ -203,6 +203,12 @@
     }
 }
 
+[data-blank-content] {
+    &::after {
+        content: attr(data-blank-content);
+    }
+}
+
 .grid-header,
 .grid-footer {
     text-transform: uppercase;

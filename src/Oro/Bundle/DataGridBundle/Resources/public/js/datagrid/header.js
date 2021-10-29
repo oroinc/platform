@@ -1,11 +1,11 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid',
-    './header-row',
-    './header-cell/header-cell'
-], function(_, Backbone, Backgrid, HeaderRow, HeaderCell) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Backgrid = require('backgrid');
+    const HeaderRow = require('./header-row');
+    const HeaderCell = require('./header-cell/header-cell');
 
     /**
      * Datagrid header widget
@@ -59,12 +59,22 @@ define([
                 columns: this.columns,
                 collection: this.filteredColumns,
                 dataCollection: this.collection,
-                headerCell: this.headerCell
+                headerCell: this.headerCell,
+                ariaRowIndex: 1
             };
             this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
             this.row = new this.row(rowOptions);
 
             this.subviews = [this.row];
+        },
+
+        /**
+         * Get a number of rendered rows in a header
+         *
+         * @return {number}
+         */
+        getRowsCount() {
+            return 1;
         },
 
         /**

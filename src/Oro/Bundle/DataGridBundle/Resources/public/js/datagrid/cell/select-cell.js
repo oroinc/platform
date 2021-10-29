@@ -1,10 +1,10 @@
-define([
-    'underscore',
-    'backgrid',
-    'orodatagrid/js/datagrid/editor/select-cell-radio-editor',
-    'oroui/js/tools/text-util'
-], function(_, Backgrid, SelectCellRadioEditor, textUtil) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const SelectCellRadioEditor = require('orodatagrid/js/datagrid/editor/select-cell-radio-editor');
+    const textUtil = require('oroui/js/tools/text-util');
 
     /**
      * Select column cell. Added missing behaviour.
