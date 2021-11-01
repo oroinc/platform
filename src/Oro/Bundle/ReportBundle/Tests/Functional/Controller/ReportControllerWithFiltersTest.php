@@ -113,8 +113,8 @@ class ReportControllerWithFiltersTest extends WebTestCase
             'expected' => ['Note1']
         ];
 
-        yield 'Date between with Europe/Guernsey timezone' => [
-            'timezone' => 'Europe/Guernsey', // (UTC +01:00)
+        yield 'Date between with Africa/Douala timezone' => [
+            'timezone' => 'Africa/Douala', // (UTC +01:00)
             'definition' => $this->buildFilter(AbstractDateFilterType::TYPE_BETWEEN, '+3 minutes'),
             'actual' => $this->buildEntities(['Note1' => ['-58 minutes'], 'Note2' => ['-56 minutes']]),
             'expected' => ['Note1']
