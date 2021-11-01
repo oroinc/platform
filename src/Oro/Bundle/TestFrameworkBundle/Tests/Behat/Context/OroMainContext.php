@@ -1100,6 +1100,14 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * @Given I wait for :number seconds
+     */
+    public function iWaitForSeconds($number)
+    {
+        sleep($number);
+    }
+
+    /**
      * Click on button or link
      * Example: Given I click "Edit"
      * Example: When I click "Save and Close"
