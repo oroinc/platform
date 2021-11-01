@@ -3,6 +3,9 @@
 @import 'role/permissions-grid';
 @import 'role/capabilities';
 
+/* mobile version */
+@import 'mobile/main';
+
 .api-block .btn {
     vertical-align: baseline;
 }
