@@ -8,34 +8,34 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputLoggerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OutputInterface */
-    protected $output;
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $output;
 
     protected function setUp(): void
     {
-        $this->output = $this->createMock('Symfony\Component\Console\Output\OutputInterface');
+        $this->output = $this->createMock(OutputInterface::class);
     }
 
     /**
      * @dataProvider itemProvider
-     * @param bool $expectWriteToOutput
-     * @param int $verbosity
-     * @param string $level
-     * @param string $message
-     * @param array $context
      */
-    public function testLog($expectWriteToOutput, $verbosity, $level, $message, $context)
-    {
+    public function testLog(
+        bool $expectWriteToOutput,
+        int $verbosity,
+        string $level,
+        string $message,
+        array $context
+    ) {
         $this->output->expects($this->any())
             ->method('getVerbosity')
-            ->will($this->returnValue($verbosity));
+            ->willReturn($verbosity);
 
         if ($expectWriteToOutput) {
             if (isset($context['exception']) && $context['exception'] instanceof \Exception) {
                 $this->output->expects($this->exactly(2))
                     ->method('writeln');
             } else {
-                $this->output->expects($this->exactly(1))
+                $this->output->expects($this->once())
                     ->method('writeln');
             }
         } else {
@@ -49,17 +49,14 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider withTagsProvider
-     * @param int $level
-     * @param string $message
-     * @param string $expected
      */
-    public function testLogWithTags($level, $message, $expected)
+    public function testLogWithTags(string $level, string $message, string $expected)
     {
         $this->output->expects($this->once())
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG));
+            ->willReturn(OutputInterface::VERBOSITY_DEBUG);
 
-        $this->output->expects($this->exactly(1))
+        $this->output->expects($this->once())
             ->method('writeln')
             ->with($expected);
 
@@ -67,10 +64,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
         $logger->log($level, $message);
     }
 
-    /**
-     * @return array
-     */
-    public function withTagsProvider()
+    public function withTagsProvider(): array
     {
         return [
             [LogLevel::EMERGENCY, 'test', '<error>[emergency]</error> test'],
@@ -79,10 +73,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function itemProvider()
+    public function itemProvider(): array
     {
         return [
             [
@@ -103,7 +94,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
                 OutputInterface::VERBOSITY_QUIET,
                 LogLevel::ALERT,
                 'test',
-                array('exception' => new \Exception())
+                ['exception' => new \Exception()]
             ],
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::ALERT, 'test', []],
             [false, OutputInterface::VERBOSITY_NORMAL, LogLevel::ALERT, 'test', []],

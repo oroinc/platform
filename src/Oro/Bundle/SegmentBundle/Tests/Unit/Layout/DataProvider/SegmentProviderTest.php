@@ -21,7 +21,7 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder(SegmentManager::class)->disableOriginalConstructor()->getMock();
+        $this->manager = $this->createMock(SegmentManager::class);
         $this->provider = new SegmentProvider($this->manager);
     }
 
@@ -29,12 +29,12 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
     {
         $segment = new Segment();
 
-        $query = $this->getMockBuilder(AbstractQuery::class)->disableOriginalConstructor()->getMock();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('getResult')
             ->willReturn(['result']);
 
-        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Asset;
 
+use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionStrategy;
 
 class DynamicAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
@@ -9,15 +10,14 @@ class DynamicAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyVersionProvider
      */
-    public function testApplyVersion($expectedPath, $path, $format = null, $dynamicVersion = '')
-    {
-        $assetVersionManager  = $this->getMockBuilder('Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $assetVersionStrategy = new DynamicAssetVersionStrategy(
-            '123',
-            $format
-        );
+    public function testApplyVersion(
+        string $expectedPath,
+        string $path,
+        ?string $format = null,
+        string $dynamicVersion = ''
+    ): void {
+        $assetVersionManager = $this->createMock(DynamicAssetVersionManager::class);
+        $assetVersionStrategy = new DynamicAssetVersionStrategy('123', $format);
         $assetVersionStrategy->setAssetVersionManager($assetVersionManager);
         $assetVersionStrategy->setAssetPackageName('test_package');
 
@@ -32,7 +32,7 @@ class DynamicAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function applyVersionProvider()
+    public function applyVersionProvider(): array
     {
         return [
             ['/css/test.css?123', '/css/test.css'],

@@ -12,17 +12,14 @@ use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    private $localeSettings;
 
     /** @var CalendarDateManager */
-    protected $calendarDateManager;
+    private $calendarDateManager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -40,9 +37,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
     public function testHandleCalendarDatesWithoutAppending()
     {
         $timezone = new \DateTimeZone('UTC');
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
         $this
             ->doctrineHelper
             ->expects($this->once())
@@ -66,9 +61,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
         $startDate = new \DateTime('tomorrow midnight - 10 days', $timezone);
         $calendarDate = new CalendarDate();
         $calendarDate->setDate($startDate);
-        $repository = $this->getMockBuilder(CalendarDateRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(CalendarDateRepository::class);
         $this
             ->doctrineHelper
             ->expects($this->once())
@@ -80,9 +73,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getDate')
             ->willReturn($calendarDate);
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
         $this
             ->doctrineHelper
             ->expects($this->once())
@@ -101,9 +92,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
     public function testHandleCalendarDatesWithEmptyTable()
     {
         $timezone = new \DateTimeZone('UTC');
-        $repository = $this->getMockBuilder(CalendarDateRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(CalendarDateRepository::class);
         $this
             ->doctrineHelper
             ->expects($this->once())
@@ -115,9 +104,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getDate')
             ->willReturn(null);
 
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
         $this
             ->doctrineHelper
             ->expects($this->once())

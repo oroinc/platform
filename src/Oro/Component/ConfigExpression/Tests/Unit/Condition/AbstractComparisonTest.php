@@ -6,16 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractComparison|MockObject */
-    protected $condition;
+    /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
 
-    /** @var MockObject|ContextAccessorInterface */
-    protected $contextAccessor;
+    /** @var AbstractComparison */
+    private $condition;
 
     protected function setUp(): void
     {
@@ -44,20 +43,16 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     * @param array $options
-     * @param array $context
-     * @param mixed $expectedValue
      */
-    public function testEvaluate(array $options, array $context, $expectedValue)
+    public function testEvaluate(array $options, array $context, bool $expectedValue)
     {
-        /** @var AbstractComparison|MockObject $condition */
-        $condition = $this->getMockBuilder(AbstractComparison::class)->getMockForAbstractClass();
+        $condition = $this->getMockForAbstractClass(AbstractComparison::class);
         $condition->setContextAccessor($this->contextAccessor);
 
         $condition->initialize($options);
 
-        $keys     = array_keys($context);
-        $leftKey  = reset($keys);
+        $keys = array_keys($context);
+        $leftKey = reset($keys);
         $rightKey = null;
         if (count($context) > 1) {
             $rightKey = end($keys);
@@ -74,21 +69,22 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
             $right = $options[1];
         }
 
-        $this->contextAccessor->method('hasValue')->willReturn(true);
+        $this->contextAccessor->expects(self::any())
+            ->method('hasValue')
+            ->willReturn(true);
 
-        $this->contextAccessor->method('getValue')
-            ->willReturnCallback(
-                function ($context, $value) {
-                    return $value instanceof PropertyPath ? $context[(string)$value] : $value;
-                }
-            );
+        $this->contextAccessor->expects(self::any())
+            ->method('getValue')
+            ->willReturnCallback(function ($context, $value) {
+                return $value instanceof PropertyPath ? $context[(string)$value] : $value;
+            });
 
-        $condition->expects(static::once())
+        $condition->expects(self::once())
             ->method('doCompare')
             ->with($left, $right)
             ->willReturn($expectedValue);
 
-        static::assertEquals($expectedValue, $condition->evaluate($context));
+        self::assertEquals($expectedValue, $condition->evaluate($context));
     }
 
     public function evaluateDataProvider(): array
@@ -131,9 +127,9 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->condition->initialize(['left' => 'foo', 'right' => 'bar']);
 
-        static::assertSame($this->condition, $result);
-        static::assertEquals('foo', $this->condition->xgetLeft());
-        static::assertEquals('bar', $this->condition->xgetRight());
+        self::assertSame($this->condition, $result);
+        self::assertEquals('foo', $this->condition->xgetLeft());
+        self::assertEquals('bar', $this->condition->xgetRight());
     }
 
     public function testInitializeFailsWithEmptyRightOption()
@@ -165,15 +161,13 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $context = ['foo' => 'fooValue', 'bar' => 'barValue'];
         $options = ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')];
 
-        $left  = $options['left'];
+        $left = $options['left'];
         $right = $options['right'];
 
-        $keys     = array_keys($context);
-        $rightKey = end($keys);
-        $leftKey  = reset($keys);
+        $leftKey = 'foo';
+        $rightKey = 'bar';
 
-        /** @var AbstractComparison|MockObject $condition */
-        $condition = $this->getMockBuilder(AbstractComparison::class)->getMockForAbstractClass();
+        $condition = $this->getMockForAbstractClass(AbstractComparison::class);
         $condition->setContextAccessor($this->contextAccessor);
 
         $condition->initialize($options);
@@ -181,25 +175,28 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $message = 'Compare {{ left }} with {{ right }}.';
         $condition->setMessage($message);
 
-        $this->contextAccessor->method('hasValue')->willReturn(true);
+        $this->contextAccessor->expects(self::any())
+            ->method('hasValue')
+            ->willReturn(true);
 
-        $this->contextAccessor->method('getValue')
+        $this->contextAccessor->expects(self::any())
+            ->method('getValue')
             ->willReturnMap([
-            [$context, $left, $context[$leftKey]],
-            [$context, $right, $context[$rightKey]],
-        ]);
+                [$context, $left, $context[$leftKey]],
+                [$context, $right, $context[$rightKey]],
+            ]);
 
-        $condition->expects(static::once())
+        $condition->expects(self::once())
             ->method('doCompare')
             ->with($context[$leftKey], $context[$rightKey])
             ->willReturn(false);
 
         $errors = new ArrayCollection();
 
-        static::assertFalse($condition->evaluate($context, $errors));
+        self::assertFalse($condition->evaluate($context, $errors));
 
-        static::assertCount(1, $errors);
-        static::assertEquals(
+        self::assertCount(1, $errors);
+        self::assertEquals(
             [
                 'message'    => $message,
                 'parameters' => ['{{ left }}' => $context[$leftKey], '{{ right }}' => $context[$rightKey]]

@@ -8,13 +8,11 @@ use Oro\Bundle\AttachmentBundle\Entity\Repository\FileRepository;
 use Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $fileUrlProvider;
 
@@ -56,7 +54,8 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadNotExistFile($file);
 
-        $this->fileUrlProvider->expects($this->never())->method('getFileUrl');
+        $this->fileUrlProvider->expects($this->never())
+            ->method('getFileUrl');
 
         $this->provider->getFileUrl($file->getUuid());
     }
@@ -85,7 +84,8 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadNotExistFile($file);
 
-        $this->fileUrlProvider->expects($this->never())->method('getResizedImageUrl');
+        $this->fileUrlProvider->expects($this->never())
+            ->method('getResizedImageUrl');
 
         $this->provider->getResizedImageUrl($file->getUuid(), 100, 300);
     }
@@ -114,19 +114,18 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadNotExistFile($file);
 
-        $this->fileUrlProvider->expects($this->never())->method('getFilteredImageUrl');
+        $this->fileUrlProvider->expects($this->never())
+            ->method('getFilteredImageUrl');
 
         $this->provider->getFilteredImageUrl($file->getUuid(), 'testFilter');
     }
 
     private function createFile(): File
     {
-        /** @var File $file */
-        $file = $this->getEntity(File::class, [
-            'id' => 42,
-            'filename' => 'test.jpg',
-            'uuid' => 'testuuid-uuid-uuid-testuuid',
-        ]);
+        $file = new File();
+        ReflectionUtil::setId($file, 42);
+        $file->setFilename('test.jpg');
+        $file->setUuid('testuuid-uuid-uuid-testuuid');
 
         return $file;
     }

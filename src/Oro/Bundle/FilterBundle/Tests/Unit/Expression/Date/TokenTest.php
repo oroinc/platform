@@ -6,23 +6,16 @@ use Oro\Bundle\FilterBundle\Expression\Date\Token;
 
 class TokenTest extends \PHPUnit\Framework\TestCase
 {
-    protected $testType;
-    protected $testValue;
-
-    /** @var Token */
-    protected $token;
+    private string $testType;
+    private int $testValue;
+    private Token $token;
 
     protected function setUp(): void
     {
-        $this->testType  = Token::TYPE_INTEGER;
+        $this->testType = Token::TYPE_INTEGER;
         $this->testValue = 123;
 
         $this->token = new Token($this->testType, $this->testValue);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->token);
     }
 
     public function testTokenInterface()

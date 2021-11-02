@@ -33,8 +33,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
     {
         $authenticationException = new AuthenticationException($msg = 'sample-message');
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('warning')
             ->with($msg);
 
@@ -43,19 +42,14 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(401, $response->getStatusCode());
 
         $this->assertMatchesRegularExpression(
-            sprintf(
-                '/^WSSE realm="%s", profile="%s"$/',
-                self::REALM_NAME,
-                self::PROFILE
-            ),
+            sprintf('/^WSSE realm="%s", profile="%s"$/', self::REALM_NAME, self::PROFILE),
             $response->headers->get('WWW-Authenticate')
         );
     }
 
     public function testStartWithNoException(): void
     {
-        $this->logger
-            ->expects($this->never())
+        $this->logger->expects($this->never())
             ->method('warning');
 
         $response = $this->entryPoint->start($this->request);
@@ -63,11 +57,7 @@ class WsseEntryPointTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(401, $response->getStatusCode());
 
         $this->assertMatchesRegularExpression(
-            sprintf(
-                '/^WSSE realm="%s", profile="%s"$/',
-                self::REALM_NAME,
-                self::PROFILE
-            ),
+            sprintf('/^WSSE realm="%s", profile="%s"$/', self::REALM_NAME, self::PROFILE),
             $response->headers->get('WWW-Authenticate')
         );
     }

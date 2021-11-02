@@ -6,7 +6,6 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Error;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -16,24 +15,20 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var HtmlTagHelper */
-    protected $helper;
-
     /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagProvider;
+    private $htmlTagProvider;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
-    /** @var string */
-    private $cachePath;
+    /** @var HtmlTagHelper */
+    private $helper;
 
     protected function setUp(): void
     {
-        $this->cachePath = $this->getTempDir('cache_test_data');
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
+        $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->getTempDir('cache_test_data'));
 
         $this->helper->setAttribute('img', 'usemap', 'CDATA');
         $this->helper->setAttribute('img', 'ismap', 'Bool');
@@ -54,12 +49,6 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->setAttribute('area', 'shape', 'Enum#rect,circle,poly,default');
         $this->helper->setAttribute('area', 'target', 'Enum#_blank,_self,_target,_top');
         $this->helper->setAttribute('area', 'tabindex', 'Text');
-    }
-
-    protected function tearDown(): void
-    {
-        $fileSystem = new Filesystem();
-        $fileSystem->remove($this->cachePath);
     }
 
     /**
@@ -92,13 +81,8 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider iframeDataProvider
-     *
-     * @param string $value
-     * @param array $allowedElements
-     * @param string $allowedTags
-     * @param string $expected
      */
-    public function testSanitizeIframe($value, array $allowedElements, $allowedTags, $expected)
+    public function testSanitizeIframe(string $value, array $allowedElements, string $allowedTags, string $expected)
     {
         $this->htmlTagProvider->expects($this->once())
             ->method('getIframeRegexp')
@@ -118,13 +102,9 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider errorCollectorWithoutErrorsDataProvider
-     *
-     * @param string $htmlValue
-     * @param array $allowedElements
-     * @param array $expectedResult
      */
     public function testGetLastErrorCollectorWithoutErrors(
-        $htmlValue,
+        string $htmlValue,
         array $allowedElements,
         array $expectedResult
     ): void {
@@ -133,13 +113,12 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider errorCollectorWithErrorsDataProvider
-     *
-     * @param string $htmlValue
-     * @param array $allowedElements
-     * @param array $expectedResult
      */
-    public function testGetLastErrorCollectorWithErrors($htmlValue, array $allowedElements, array $expectedResult): void
-    {
+    public function testGetLastErrorCollectorWithErrors(
+        string $htmlValue,
+        array $allowedElements,
+        array $expectedResult
+    ): void {
         $this->translator->expects($this->atLeastOnce())
             ->method('trans')
             ->willReturnCallback(function ($id) {
@@ -155,13 +134,11 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertLastErrorCollector($htmlValue, $allowedElements, $expectedResult);
     }
 
-    /**
-     * @param string $htmlValue
-     * @param array $allowedElements
-     * @param array $expectedResult
-     */
-    public function assertLastErrorCollector($htmlValue, array $allowedElements, array $expectedResult): void
-    {
+    public function assertLastErrorCollector(
+        string $htmlValue,
+        array $allowedElements,
+        array $expectedResult
+    ): void {
         $this->htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
             ->willReturn($allowedElements);
@@ -207,10 +184,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function iframeDataProvider()
+    public function iframeDataProvider(): array
     {
         return [
             'iframe allowed' => [
@@ -242,7 +216,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @link https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
      */
-    protected function xssDataProvider(): array
+    private function xssDataProvider(): array
     {
         $str = '<IMG SRC=&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&' .
             '#x58&#x53&#x53&#x27&#x29>';
@@ -255,7 +229,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function sanitizeDataProvider(): array
+    private function sanitizeDataProvider(): array
     {
         $mapHtml = '<img src="planets.gif" width="145" height="126" alt="Planets" usemap="#planetmap">' .
             '<map name="planetmap">' .
@@ -337,21 +311,14 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider shortStringProvider
-     *
-     * @param string $expected
-     * @param string $actual
-     * @param int $maxLength
      */
-    public function testGetShort($expected, $actual, $maxLength)
+    public function testGetShort(string $expected, string $actual, int $maxLength)
     {
         $shortBody = $this->helper->shorten($actual, $maxLength);
         $this->assertEquals($expected, $shortBody);
     }
 
-    /**
-     * @return array
-     */
-    public static function shortStringProvider()
+    public static function shortStringProvider(): array
     {
         return [
             ['абв абв абв', 'абв абв абв абв ', 12],
@@ -416,17 +383,14 @@ HTML;
     /**
      * @dataProvider longStringProvider
      */
-    public function testStripLongWords($value, $expected)
+    public function testStripLongWords(string $value, string $expected)
     {
         $result = $this->helper->stripLongWords($value);
 
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function longStringProvider()
+    public function longStringProvider(): array
     {
         return [
             [

@@ -6,12 +6,15 @@ use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActivityListFilterTypeTest extends TypeTestCase
 {
@@ -20,7 +23,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
         parent::setUp();
 
         $validator = $this->createMock(ValidatorInterface::class);
-        $validator->method('validate')->will($this->returnValue(new ConstraintViolationList()));
+        $validator->method('validate')->willReturn(new ConstraintViolationList());
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
@@ -29,16 +32,10 @@ class ActivityListFilterTypeTest extends TypeTestCase
                     $validator
                 )
             )
-            ->addTypeGuesser(
-                $this->getMockBuilder(
-                    'Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser'
-                )
-                    ->disableOriginalConstructor()
-                    ->getMock()
-            )
+            ->addTypeGuesser($this->createMock(ValidatorTypeGuesser::class))
             ->getFormFactory();
 
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
@@ -62,7 +59,7 @@ class ActivityListFilterTypeTest extends TypeTestCase
 
     protected function getExtensions()
     {
-        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $filterType = new FilterType($translator);
 

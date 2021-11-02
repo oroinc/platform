@@ -23,7 +23,6 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
     private IsLanguageTranslationInstallAvailableCondition $condition2;
     private IsLanguageTranslationInstallAvailableCondition $condition3;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $now = new \DateTime();
@@ -37,32 +36,38 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
         $this->languageInstalled = (new Language())->setCode($this->codeInstalled)->setInstalledBuildDate($now);
 
         $languageRepository = $this->createMock(LanguageRepository::class);
-        $languageRepository->method('findOneBy')->willReturnMap([
-            [['code' => $this->codeWithout], null, $this->languageWithoutTranslations],
-            [['code' => $this->codeNotInstalled], null, $this->languageNotInstalled],
-            [['code' => $this->codeInstalled], null, $this->languageInstalled],
-        ]);
+        $languageRepository->expects(self::any())
+            ->method('findOneBy')
+            ->willReturnMap([
+                [['code' => $this->codeWithout], null, $this->languageWithoutTranslations],
+                [['code' => $this->codeNotInstalled], null, $this->languageNotInstalled],
+                [['code' => $this->codeInstalled], null, $this->languageInstalled],
+            ]);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->method('getRepository')->willReturnMap([
-            [Language::class, null, $languageRepository]
-        ]);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->willReturnMap([
+                [Language::class, null, $languageRepository]
+            ]);
 
         $translationMetricsProvider = $this->createMock(TranslationMetricsProviderInterface::class);
-        $translationMetricsProvider->method('getForLanguage')->willReturnMap([
-            [
-                $this->codeWithout,
-                null
-            ],
-            [
-                $this->codeNotInstalled,
-                ['code' => $this->codeNotInstalled, 'lastBuildDate' => $now, 'translationStatus' => 90]
-            ],
-            [
-                $this->codeInstalled,
-                ['code' => $this->codeInstalled, 'lastBuildDate' => $now, 'translationStatus' => 90]
-            ],
-        ]);
+        $translationMetricsProvider->expects(self::any())
+            ->method('getForLanguage')
+            ->willReturnMap([
+                [
+                    $this->codeWithout,
+                    null
+                ],
+                [
+                    $this->codeNotInstalled,
+                    ['code' => $this->codeNotInstalled, 'lastBuildDate' => $now, 'translationStatus' => 90]
+                ],
+                [
+                    $this->codeInstalled,
+                    ['code' => $this->codeInstalled, 'lastBuildDate' => $now, 'translationStatus' => 90]
+                ],
+            ]);
 
         $this->condition1 = new IsLanguageTranslationInstallAvailableCondition($translationMetricsProvider, $doctrine);
         $this->condition2 = new IsLanguageTranslationInstallAvailableCondition($translationMetricsProvider, $doctrine);
@@ -76,18 +81,18 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
     {
         $context = [];
 
-        static::assertFalse($this->condition1->initialize([$this->codeWithout])->evaluate($context));
-        static::assertTrue($this->condition2->initialize([$this->codeNotInstalled])->evaluate($context));
-        static::assertFalse($this->condition3->initialize([$this->codeInstalled])->evaluate($context));
+        self::assertFalse($this->condition1->initialize([$this->codeWithout])->evaluate($context));
+        self::assertTrue($this->condition2->initialize([$this->codeNotInstalled])->evaluate($context));
+        self::assertFalse($this->condition3->initialize([$this->codeInstalled])->evaluate($context));
     }
 
     public function testWithEntityValue(): void
     {
         $context = [];
 
-        static::assertFalse($this->condition1->initialize([$this->languageWithoutTranslations])->evaluate($context));
-        static::assertTrue($this->condition2->initialize([$this->languageNotInstalled])->evaluate($context));
-        static::assertFalse($this->condition3->initialize([$this->languageInstalled])->evaluate($context));
+        self::assertFalse($this->condition1->initialize([$this->languageWithoutTranslations])->evaluate($context));
+        self::assertTrue($this->condition2->initialize([$this->languageNotInstalled])->evaluate($context));
+        self::assertFalse($this->condition3->initialize([$this->languageInstalled])->evaluate($context));
     }
 
     public function testWithPropertyPathToScalarValue(): void
@@ -102,9 +107,9 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
         $this->condition2->initialize([new PropertyPath('$.language2')]);
         $this->condition3->initialize([new PropertyPath('$.language3')]);
 
-        static::assertFalse($this->condition1->evaluate($context));
-        static::assertTrue($this->condition2->evaluate($context));
-        static::assertFalse($this->condition3->evaluate($context));
+        self::assertFalse($this->condition1->evaluate($context));
+        self::assertTrue($this->condition2->evaluate($context));
+        self::assertFalse($this->condition3->evaluate($context));
     }
 
     public function testWithPropertyPathToEntityValue(): void
@@ -119,8 +124,8 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
         $this->condition2->initialize([new PropertyPath('$.language2')]);
         $this->condition3->initialize([new PropertyPath('$.language3')]);
 
-        static::assertFalse($this->condition1->evaluate($context));
-        static::assertTrue($this->condition2->evaluate($context));
-        static::assertFalse($this->condition3->evaluate($context));
+        self::assertFalse($this->condition1->evaluate($context));
+        self::assertTrue($this->condition2->evaluate($context));
+        self::assertFalse($this->condition3->evaluate($context));
     }
 }

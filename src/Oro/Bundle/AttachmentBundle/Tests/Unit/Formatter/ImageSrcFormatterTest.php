@@ -4,21 +4,19 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImageSrcFormatter */
-    protected $formatter;
+    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    /** @var ImageSrcFormatter */
+    private $formatter;
 
     protected function setUp(): void
     {
-        $this->manager = $this
-            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(AttachmentManager::class);
 
         $this->formatter = new ImageSrcFormatter($this->manager);
     }
@@ -27,8 +25,7 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $file = new File();
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
             ->with($file, 100, 100)
             ->willReturn('http://test.com/image.png');

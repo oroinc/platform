@@ -17,25 +17,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AddLanguageTypeTest extends FormIntegrationTestCase
 {
-    protected AddLanguageType $formType;
-    protected LanguageRepository$repository;
-    protected LocaleSettings $localeSettings;
-    protected TranslationMetricsProviderInterface $translationStatisticProvider;
-    protected TranslatorInterface$translator;
+    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
+
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
+
+    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationStatisticProvider;
+
+    /** @var AddLanguageType */
+    private $formType;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(LanguageRepository::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->translationStatisticProvider = $this->createMock(TranslationMetricsProviderInterface::class);
-        $this->translator = $this->getMockForAbstractClass(TranslatorInterface::class);
-        $this->translator->method('trans')->willReturnArgument(0);
+
+        $translator = $this->getMockForAbstractClass(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
         $this->formType = new AddLanguageType(
             $this->repository,
             $this->localeSettings,
             $this->translationStatisticProvider,
-            $this->translator
+            $translator
         );
 
         parent::setUp();
@@ -43,12 +52,12 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
 
     public function testGetBlockPrefix(): void
     {
-        static::assertEquals('oro_translation_add_language', $this->formType->getBlockPrefix());
+        self::assertEquals('oro_translation_add_language', $this->formType->getBlockPrefix());
     }
 
     public function testGetParent(): void
     {
-        static::assertEquals(OroChoiceType::class, $this->formType->getParent());
+        self::assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
     public function testBuildForm(): void
@@ -56,35 +65,40 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
         $defaultLocale = 'de';
         $installedLanguages = ['en' => true, 'en_US' => true, 'uk_UA' => true];
         $allIntlLanguages = Locales::getNames($defaultLocale);
-        $this->repository->method('getAvailableLanguageCodesAsArrayKeys')->willReturn($installedLanguages);
-        $this->localeSettings->method('getLanguage')->willReturn($defaultLocale);
+        $this->repository->expects(self::any())
+            ->method('getAvailableLanguageCodesAsArrayKeys')
+            ->willReturn($installedLanguages);
+        $this->localeSettings->expects(self::any())
+            ->method('getLanguage')
+            ->willReturn($defaultLocale);
 
-        $this->translationStatisticProvider->method('getAll')->willReturn(OroTranslationServiceAdapterTest::METRICS);
+        $this->translationStatisticProvider->expects(self::any())
+            ->method('getAll')
+            ->willReturn(OroTranslationServiceAdapterTest::METRICS);
 
         $form = $this->factory->create(AddLanguageType::class);
         $choices = $form->getConfig()->getOption('choices');
 
-        $expectedWithTranslations = \array_diff_key(
-            \array_intersect_key($allIntlLanguages, OroTranslationServiceAdapterTest::METRICS),
+        $expectedWithTranslations = array_diff_key(
+            array_intersect_key($allIntlLanguages, OroTranslationServiceAdapterTest::METRICS),
             $installedLanguages
         );
-        $expectedWithoutTranslations = \array_diff_key(
+        $expectedWithoutTranslations = array_diff_key(
             $allIntlLanguages,
             $expectedWithTranslations,
             $installedLanguages
         );
 
-        static::assertSame(
-            \array_keys($expectedWithTranslations),
-            \array_values($choices['oro.translation.language.form.select.group.crowdin'])
+        self::assertSame(
+            array_keys($expectedWithTranslations),
+            array_values($choices['oro.translation.language.form.select.group.crowdin'])
         );
-        static::assertSame(
-            \array_keys($expectedWithoutTranslations),
-            \array_values($choices['oro.translation.language.form.select.group.intl'])
+        self::assertSame(
+            array_keys($expectedWithoutTranslations),
+            array_values($choices['oro.translation.language.form.select.group.intl'])
         );
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function getExtensions(): array
     {
         $choiceType = $this->getMockBuilder(OroChoiceType::class)
@@ -92,7 +106,9 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $choiceType->method('getParent')->willReturn(ChoiceType::class);
+        $choiceType->expects(self::any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return [
             new PreloadedExtension(

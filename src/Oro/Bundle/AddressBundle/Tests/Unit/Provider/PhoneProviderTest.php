@@ -29,7 +29,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return PhoneProvider
      */
-    private function getPhoneProvider(array $phoneProviders)
+    private function getPhoneProvider(array $phoneProviders): PhoneProvider
     {
         $map = [];
         $containerBuilder = TestContainerBuilder::create();
@@ -50,7 +50,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPhoneNumberProvider
      */
-    public function testGetPhoneNumber($object, $expected)
+    public function testGetPhoneNumber(object|string|null $object, ?string $expected)
     {
         $phoneProvider = $this->createMock(PhoneProviderInterface::class);
         $phoneProvider->expects($this->any())
@@ -66,7 +66,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPhoneNumbersProvider
      */
-    public function testGetPhoneNumbers($object, $expected)
+    public function testGetPhoneNumbers(object|string|null $object, array $expected)
     {
         $phoneProvider = $this->createMock(PhoneProviderInterface::class);
         $phoneProvider->expects($this->any())
@@ -88,12 +88,12 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extendConfigProvider->expects($this->never())
             ->method('getConfig');
 
         $provider = $this->getPhoneProvider([]);
-        $this->assertEquals(null, $provider->getPhoneNumber($object));
+        $this->assertNull($provider->getPhoneNumber($object));
     }
 
     public function testGetPhoneNumbersFromRelatedObjectNotConfigurableEntity()
@@ -105,7 +105,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extendConfigProvider->expects($this->never())
             ->method('getConfig');
 
@@ -145,11 +145,11 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $provider = $this->getPhoneProvider([]);
         $this->assertEquals(null, $provider->getPhoneNumber($object));
@@ -187,11 +187,11 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $provider = $this->getPhoneProvider([]);
         $this->assertSame([], $provider->getPhoneNumbers($object));
@@ -236,11 +236,11 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $provider = $this->getPhoneProvider([TestPhoneHolder::class => ['provider1' => $phoneProvider]]);
         $provider->addTargetEntity(TestUser::class);
@@ -290,11 +290,11 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $provider = $this->getPhoneProvider([TestPhoneHolder::class => ['provider1' => $phoneProvider]]);
         $provider->addTargetEntity(TestUser::class);
@@ -309,26 +309,17 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getPhoneNumberProvider()
+    public function getPhoneNumberProvider(): array
     {
-        return array(
-            'null'                                => array(null, null),
-            'not obj'                             => array(
-                TestPhoneHolder::class,
-                null
-            ),
-            'obj implements PhoneHolderInterface' => array(
-                new TestPhoneHolder('123-123'),
-                '123-123'
-            ),
-            'obj has getPhone method'             => array(
-                new TestUser('123-123'),
-                '123-123'
-            ),
-        );
+        return [
+            'null' => [null, null],
+            'not obj' => [TestPhoneHolder::class, null],
+            'obj implements PhoneHolderInterface' => [new TestPhoneHolder('123-123'), '123-123'],
+            'obj has getPhone method' => [new TestUser('123-123'), '123-123'],
+        ];
     }
 
-    public function getPhoneNumbersProvider()
+    public function getPhoneNumbersProvider(): array
     {
         $testPhoneHolder = new TestPhoneHolder('123-123');
         $testUser = new TestUser('123-123');
@@ -336,26 +327,10 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
 
         return [
             'null' => [null, []],
-            'not obj' => [
-                TestPhoneHolder::class,
-                []
-            ],
-            'obj implements PhoneHolderInterface' => [
-                $testPhoneHolder,
-                [
-                    ['123-123', $testPhoneHolder]
-                ]
-            ],
-            'obj has getPhone method' => [
-                $testUser,
-                [
-                    ['123-123', $testUser]
-                ]
-            ],
-            'obj has getPhone method and phone not exists' => [
-                $testUserWithoutPhone,
-                []
-            ]
+            'not obj' => [TestPhoneHolder::class, []],
+            'obj implements PhoneHolderInterface' => [$testPhoneHolder, [['123-123', $testPhoneHolder]]],
+            'obj has getPhone method' => [$testUser, [['123-123', $testUser]]],
+            'obj has getPhone method and phone not exists' => [$testUserWithoutPhone, []]
         ];
     }
 }

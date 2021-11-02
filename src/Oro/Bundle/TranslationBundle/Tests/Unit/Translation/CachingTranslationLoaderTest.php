@@ -4,20 +4,22 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $innerLoader;
+    /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerLoader;
 
     /** @var CachingTranslationLoader */
-    protected $cachingLoader;
+    private $cachingLoader;
 
     protected function setUp(): void
     {
-        $this->innerLoader = $this->createMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $this->innerLoader = $this->createMock(LoaderInterface::class);
 
         $this->cachingLoader = new CachingTranslationLoader(
             $this->innerLoader,
@@ -27,8 +29,8 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForStringResourceType()
     {
-        $locale   = 'fr';
-        $domain   = 'test';
+        $locale = 'fr';
+        $domain = 'test';
         $resource = 'test_resource';
 
         $catalogue = new MessageCatalogue($locale);
@@ -51,13 +53,10 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForSupportedObjectResourceType()
     {
-        $locale        = 'fr';
-        $domain        = 'test';
-        $metadataCache = $this
-            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $resource      = new OrmTranslationResource($locale, $metadataCache);
+        $locale = 'fr';
+        $domain = 'test';
+        $metadataCache = $this->createMock(DynamicTranslationMetadataCache::class);
+        $resource = new OrmTranslationResource($locale, $metadataCache);
 
         $catalogue = new MessageCatalogue($locale);
 
@@ -79,8 +78,8 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForUnsupportedResourceType()
     {
-        $locale   = 'fr';
-        $domain   = 'test';
+        $locale = 'fr';
+        $domain = 'test';
         $resource = new \stdClass();
 
         $catalogue = new MessageCatalogue($locale);
@@ -103,8 +102,8 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForEmptyStringResourceType()
     {
-        $locale   = 'fr';
-        $domain   = 'test';
+        $locale = 'fr';
+        $domain = 'test';
         $resource = '';
 
         $catalogue = new MessageCatalogue($locale);

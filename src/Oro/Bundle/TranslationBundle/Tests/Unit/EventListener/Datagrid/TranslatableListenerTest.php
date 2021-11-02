@@ -17,9 +17,6 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatableListener */
     private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->listener = new TranslatableListener();
@@ -31,23 +28,38 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
         $gedmoTranslatableListener->setTranslatableLocale('en');
 
         $eventManager = $this->createMock(EventManager::class);
-        $eventManager->expects(self::once())->method('getListeners')->willReturn([[$gedmoTranslatableListener]]);
+        $eventManager->expects(self::once())
+            ->method('getListeners')
+            ->willReturn([[$gedmoTranslatableListener]]);
 
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects(self::once())->method('getEventManager')->willReturn($eventManager);
+        $entityManager->expects(self::once())
+            ->method('getEventManager')
+            ->willReturn($eventManager);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects(self::once())->method('getEntityManager')->willReturn($entityManager);
+        $queryBuilder->expects(self::once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
 
         $dataSource = $this->createMock(OrmDatasource::class);
-        $dataSource->expects(self::once())->method('getQueryBuilder')->willReturn($queryBuilder);
+        $dataSource->expects(self::once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid->expects(self::once())->method('getDatasource')->willReturn($dataSource);
+        $datagrid->expects(self::once())
+            ->method('getDatasource')
+            ->willReturn($dataSource);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::once())->method('hasHint')->with('oro_translation.translatable')->willReturn(true);
-        $query->expects(self::once())->method('setHint')->with('gedmo.translatable.locale', 'en');
+        $query->expects(self::once())
+            ->method('hasHint')
+            ->with('oro_translation.translatable')
+            ->willReturn(true);
+        $query->expects(self::once())
+            ->method('setHint')
+            ->with('gedmo.translatable.locale', 'en');
 
         $ormResultBefore = new OrmResultBefore($datagrid, $query);
         $this->listener->onResultBefore($ormResultBefore);
@@ -56,11 +68,17 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnResultBeforeWithoutDatasource()
     {
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid->expects(self::once())->method('getDatasource')->willReturn(null);
+        $datagrid->expects(self::once())
+            ->method('getDatasource')
+            ->willReturn(null);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::never())->method('hasHint')->with('oro_translation.translatable');
-        $query->expects(self::never())->method('setHint')->with('gedmo.translatable.locale', 'en');
+        $query->expects(self::never())
+            ->method('hasHint')
+            ->with('oro_translation.translatable');
+        $query->expects(self::never())
+            ->method('setHint')
+            ->with('gedmo.translatable.locale', 'en');
 
         $ormResultBefore = new OrmResultBefore($datagrid, $query);
         $this->listener->onResultBefore($ormResultBefore);
@@ -71,17 +89,28 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
         $entityManager = $this->createMock(EntityManager::class);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects(self::once())->method('getEntityManager')->willReturn($entityManager);
+        $queryBuilder->expects(self::once())
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
 
         $dataSource = $this->createMock(OrmDatasource::class);
-        $dataSource->expects(self::once())->method('getQueryBuilder')->willReturn($queryBuilder);
+        $dataSource->expects(self::once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid->expects(self::once())->method('getDatasource')->willReturn($dataSource);
+        $datagrid->expects(self::once())
+            ->method('getDatasource')
+            ->willReturn($dataSource);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::once())->method('hasHint')->with('oro_translation.translatable')->willReturn(false);
-        $query->expects(self::never())->method('setHint')->with('gedmo.translatable.locale', 'en');
+        $query->expects(self::once())
+            ->method('hasHint')
+            ->with('oro_translation.translatable')
+            ->willReturn(false);
+        $query->expects(self::never())
+            ->method('setHint')
+            ->with('gedmo.translatable.locale', 'en');
 
         $ormResultBefore = new OrmResultBefore($datagrid, $query);
         $this->listener->onResultBefore($ormResultBefore);

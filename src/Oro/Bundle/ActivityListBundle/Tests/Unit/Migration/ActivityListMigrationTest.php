@@ -3,33 +3,27 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigration;
+use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery;
+use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class ActivityListMigrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testUp()
     {
-        $provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $activityListExtension = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $nameGenerator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $schema = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $provider = $this->createMock(ActivityListChainProvider::class);
+        $activityListExtension = $this->createMock(ActivityListExtension::class);
+        $metadataHelper = $this->createMock(EntityMetadataHelper::class);
+        $nameGenerator = $this->createMock(ExtendDbIdentifierNameGenerator::class);
+        $schema = $this->createMock(ExtendSchema::class);
+        $configManager = $this->createMock(ConfigManager::class);
 
-        $queries   = new QueryBag();
+        $queries = new QueryBag();
         $migration = new ActivityListMigration(
             $provider,
             $activityListExtension,
@@ -41,6 +35,6 @@ class ActivityListMigrationTest extends \PHPUnit\Framework\TestCase
         $migration->up($schema, $queries);
         $postQuery = $queries->getPostQueries()[0];
 
-        $this->assertInstanceOf('Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery', $postQuery);
+        $this->assertInstanceOf(ActivityListMigrationQuery::class, $postQuery);
     }
 }

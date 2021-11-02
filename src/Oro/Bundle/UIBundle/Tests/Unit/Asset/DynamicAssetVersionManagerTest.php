@@ -7,7 +7,7 @@ use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 
 class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var DynamicAssetVersionManager */

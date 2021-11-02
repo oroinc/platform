@@ -10,14 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 class DateRangeTypeTest extends AbstractTypeTestCase
 {
     /** @var DateRangeType */
-    protected $type;
+    private $type;
 
     /** @var string */
-    protected $defaultLocale = 'en';
-
-    /**
-     * @var string
-     */
     protected $defaultTimezone = 'Pacific/Honolulu';
 
     protected function setUp(): void

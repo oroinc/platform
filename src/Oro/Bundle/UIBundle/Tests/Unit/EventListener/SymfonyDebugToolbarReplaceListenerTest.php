@@ -12,15 +12,16 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class SymfonyDebugToolbarReplaceListenerTest extends TestCase
 {
-    private SymfonyDebugToolbarReplaceListener $listener;
+    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $kernel;
 
-    private KernelInterface|\PHPUnit\Framework\MockObject\MockObject $kernel;
-
-    private ResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event;
+    /** @var SymfonyDebugToolbarReplaceListener */
+    private $listener;
 
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);
+
         $this->listener = new SymfonyDebugToolbarReplaceListener($this->kernel);
     }
 
@@ -35,7 +36,8 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
             $response
         );
 
-        $this->kernel->method('isDebug')
+        $this->kernel->expects(self::any())
+            ->method('isDebug')
             ->willReturn(false);
 
         $this->listener->onKernelResponse($event);
@@ -54,7 +56,8 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
             $response
         );
 
-        $this->kernel->method('isDebug')
+        $this->kernel->expects(self::any())
+            ->method('isDebug')
             ->willReturn(true);
 
         $this->listener->onKernelResponse($event);
@@ -64,7 +67,8 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
 
     public function testOnKernelResponseNotHashNavigation(): void
     {
-        $this->kernel->method('isDebug')
+        $this->kernel->expects(self::any())
+            ->method('isDebug')
             ->willReturn(true);
 
         $request = new Request();
@@ -86,7 +90,8 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
 
     public function testOnKernelResponseWithHashNavigationHeader(): void
     {
-        $this->kernel->method('isDebug')
+        $this->kernel->expects(self::any())
+            ->method('isDebug')
             ->willReturn(true);
 
         $request = new Request();
@@ -108,7 +113,8 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
 
     public function testOnKernelResponse(): void
     {
-        $this->kernel->method('isDebug')
+        $this->kernel->expects(self::any())
+            ->method('isDebug')
             ->willReturn(true);
 
         $request = new Request();

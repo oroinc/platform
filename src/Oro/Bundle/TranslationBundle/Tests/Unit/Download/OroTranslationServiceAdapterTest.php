@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Download;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -11,7 +12,6 @@ use GuzzleHttp\Utils;
 use Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
 use Oro\Bundle\TranslationBundle\Test\TranslationArchiveGenerator;
-use Oro\Component\Log\Test\LogAndThrowExceptionTestTrait;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -24,7 +24,6 @@ use Symfony\Component\Yaml\Yaml;
 class OroTranslationServiceAdapterTest extends TestCase
 {
     use TempDirExtension;
-    use LogAndThrowExceptionTestTrait;
 
     public const METRICS = [
         'uk_UA' => [
@@ -55,14 +54,20 @@ class OroTranslationServiceAdapterTest extends TestCase
     private const PACKAGES = ['PackageA', 'PackageB'];
     private const API_KEY = 'SOME-API-KEY';
 
-    private Client $client;
-    private OroTranslationServiceAdapter $adapter;
+    /** @var Client|\PHPUnit\Framework\MockObject\MockObject */
+    private $client;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var OroTranslationServiceAdapter */
+    private $adapter;
+
     protected function setUp(): void
     {
         $this->client = $this->createMock(Client::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->adapter = new OroTranslationServiceAdapter(
             $this->client,
             $this->logger,
@@ -78,24 +83,35 @@ class OroTranslationServiceAdapterTest extends TestCase
      */
     public function testFetchTranslationMetrics(): void
     {
-        $response = new Response(200, [], Utils::jsonEncode(\array_values(self::METRICS)));
-        $this->client->method('send')->willReturn($response);
+        $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
-        static::assertEquals(self::METRICS, $this->adapter->fetchTranslationMetrics());
+        self::assertEquals(self::METRICS, $this->adapter->fetchTranslationMetrics());
     }
 
     /** @covers ::fetchTranslationMetrics */
     public function testFetchMetricsThrowsExceptionIfResponseStatusCodeIsNotOk(): void
     {
         $response = new Response(504);
-        $this->client->method('send')->willReturn($response);
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Translations service not available (status code: 504).',
-            'Translations service not available (status code: {response_status_code}).',
-            ['response_status_code' => 504]
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Translations service not available (status code: 504).');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Translations service not available (status code: {response_status_code}).',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('response_status_code'),
+                    self::callback(fn (array $val) => $val['response_status_code'] === 504),
+                    self::arrayHasKey('called_in')
+                )
+            );
 
         $this->adapter->fetchTranslationMetrics();
     }
@@ -104,15 +120,25 @@ class OroTranslationServiceAdapterTest extends TestCase
     public function testFetchMetricsThrowsExceptionIfReceivedNotJson(): void
     {
         $response = new Response(200, [], 'not JSON');
-        $this->client->method('send')->willReturn($response);
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Cannot decode the translation metrics response.',
-            'Cannot decode the translation metrics response.',
-            ['response_body_contents' => 'not JSON'],
-            \GuzzleHttp\Exception\InvalidArgumentException::class
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Cannot decode the translation metrics response.');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Cannot decode the translation metrics response.',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('response_body_contents'),
+                    self::callback(fn (array $val) => $val['response_body_contents'] === 'not JSON'),
+                    self::arrayHasKey('called_in'),
+                    self::arrayHasKey('exception'),
+                    self::callback(fn (array $val) => $val['exception'] instanceof InvalidArgumentException),
+                )
+            );
 
         $this->adapter->fetchTranslationMetrics();
     }
@@ -120,16 +146,24 @@ class OroTranslationServiceAdapterTest extends TestCase
     /** @covers ::fetchTranslationMetrics */
     public function testFetchMetricsThrowsExceptionIfReceivedNotArray(): void
     {
-        /** @noinspection JsonEncodingApiUsageInspection */
-        $response = new Response(200, [], \json_encode('not array'));
-        $this->client->method('send')->willReturn($response);
+        $response = new Response(200, [], json_encode('not array', JSON_THROW_ON_ERROR));
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Received malformed translation metrics response.',
-            'Received malformed translation metrics response.',
-            ['decoded_response' => 'not array']
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Received malformed translation metrics response.');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Received malformed translation metrics response.',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('decoded_response'),
+                    self::callback(fn (array $val) => $val['decoded_response'] === 'not array'),
+                    self::arrayHasKey('called_in')
+                )
+            );
 
         $this->adapter->fetchTranslationMetrics();
     }
@@ -143,14 +177,23 @@ class OroTranslationServiceAdapterTest extends TestCase
             ['translationStatus' => 100, 'lastBuildDate' => '2020-12-31T20:08:24+0300'], // no code
         ];
         $response = new Response(200, [], Utils::jsonEncode($incompleteMetrics));
-        $this->client->method('send')->willReturn($response);
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'No valid translation metrics for any language.',
-            'No valid translation metrics for any language.',
-            ['decoded_response' => $incompleteMetrics]
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('No valid translation metrics for any language.');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'No valid translation metrics for any language.',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('decoded_response'),
+                    self::callback(fn (array $val) => $val['decoded_response'] === $incompleteMetrics),
+                    self::arrayHasKey('called_in')
+                )
+            );
 
         $this->adapter->fetchTranslationMetrics();
     }
@@ -169,10 +212,12 @@ class OroTranslationServiceAdapterTest extends TestCase
         $originalMetrics['fr_CA']['RealCode'] = 'xyz'; // should be ignored because altCode is already present
         $expectedMetrics['fr_CA']['altCode'] = 'abc';
 
-        $response = new Response(200, [], Utils::jsonEncode(\array_values($originalMetrics)));
-        $this->client->method('send')->willReturn($response);
+        $response = new Response(200, [], Utils::jsonEncode(array_values($originalMetrics)));
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
-        static::assertEquals($expectedMetrics, $this->adapter->fetchTranslationMetrics());
+        self::assertEquals($expectedMetrics, $this->adapter->fetchTranslationMetrics());
     }
 
     /**
@@ -189,11 +234,10 @@ class OroTranslationServiceAdapterTest extends TestCase
             . '&language=uk-UA'
             . '&key=SOME-API-KEY'
         ;
-        $this->client
-            ->expects(static::once())
+        $this->client->expects(self::once())
             ->method('send')
             ->with(
-                static::callback(static fn (Request $request) => (string)$request->getUri() === $expectedUriString),
+                self::callback(static fn (Request $request) => (string)$request->getUri() === $expectedUriString),
                 ['sink' => $filePath]
             )
             ->willReturn(new Response(200));
@@ -204,41 +248,62 @@ class OroTranslationServiceAdapterTest extends TestCase
     /** @covers ::downloadLanguageTranslationsArchive */
     public function testDownloadLanguageTranslationsArchiveThrowsExceptionIfCannotDeleteExistingFile(): void
     {
-        $filePath = $this->getTempFile('download_' . \uniqid('', true), 'tmp', 'translations.uk_UA.zip');
-        $tmpDir = \dirname($filePath);
-        \touch($filePath);
-        if (false === \chmod($filePath, 0444) || false === \chmod($tmpDir, 0555)) {
-            static::fail('Cannot set the directory permissions necessary for this test.');
+        $filePath = $this->getTempFile('download_' . uniqid('', true), 'tmp', 'translations.uk_UA.zip');
+        $tmpDir = dirname($filePath);
+        touch($filePath);
+        if (false === chmod($filePath, 0444) || false === chmod($tmpDir, 0555)) {
+            self::fail('Cannot set the directory permissions necessary for this test.');
         }
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Cannot overwrite the existing file "' . $filePath . '".',
-            'Cannot overwrite the existing file "{actual_file_path}".',
-            ['actual_file_path' => $filePath],
-            null
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Cannot overwrite the existing file "' . $filePath . '".');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Cannot overwrite the existing file "{actual_file_path}".',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('actual_file_path'),
+                    self::callback(fn (array $val) => $val['actual_file_path'] === $filePath),
+                    self::arrayHasKey('called_in')
+                )
+            );
+
         try {
-            $this->client->method('send')->willReturn(new Response(200));
+            $this->client->expects(self::any())
+                ->method('send')
+                ->willReturn(new Response(200));
 
             $this->adapter->downloadLanguageTranslationsArchive('uk_UA', $filePath);
         } finally {
-            \chmod($tmpDir, 0755);
-            \chmod($filePath, 0744);
-            \unlink($filePath);
+            chmod($tmpDir, 0755);
+            chmod($filePath, 0744);
+            unlink($filePath);
         }
     }
 
     /** @covers ::downloadLanguageTranslationsArchive */
     public function testDownloadLanguageTranslationsArchiveThrowsExceptionIfResponseStatusCodeIsNotOk(): void
     {
-        $this->client->method('send')->willReturn(new Response(504));
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Failed to download translations for "uk-UA" (status code: 504).',
-            'Failed to download translations for "{language_code}" (status code: {response_status_code}).',
-            ['language_code' => 'uk-UA', 'response_status_code' => 504]
-        );
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn(new Response(504));
+
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Failed to download translations for "uk-UA" (status code: 504).');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Failed to download translations for "{language_code}" (status code: {response_status_code}).',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('language_code'),
+                    self::callback(fn (array $val) => $val['language_code'] === 'uk-UA'),
+                    self::arrayHasKey('called_in'),
+                    self::arrayHasKey('response_status_code'),
+                    self::callback(fn (array $val) => $val['response_status_code'] === 504)
+                )
+            );
 
         $this->adapter->downloadLanguageTranslationsArchive('uk_UA', $this->getTempFile('download'));
     }
@@ -247,13 +312,9 @@ class OroTranslationServiceAdapterTest extends TestCase
     public function testNormalizeFilePathFullReturnsAsIs(): void
     {
         $filePath = '/some/dir/file.zip';
-        $this->client
-            ->expects(static::once())
+        $this->client->expects(self::once())
             ->method('send')
-            ->with(
-                static::anything(),
-                ['sink' => $filePath]
-            )
+            ->with(self::anything(), ['sink' => $filePath])
             ->willReturn(new Response(200));
 
         $this->adapter->downloadLanguageTranslationsArchive('uk_UA', $filePath);
@@ -265,13 +326,9 @@ class OroTranslationServiceAdapterTest extends TestCase
         $originalFilePath = '/some/dir/';
         $expectedFilePath = '/some/dir/translations.zip';
 
-        $this->client
-            ->expects(static::once())
+        $this->client->expects(self::once())
             ->method('send')
-            ->with(
-                static::anything(),
-                ['sink' => $expectedFilePath]
-            )
+            ->with(self::anything(), ['sink' => $expectedFilePath])
             ->willReturn(new Response(200));
 
         $this->adapter->downloadLanguageTranslationsArchive('uk_UA', $originalFilePath);
@@ -283,13 +340,9 @@ class OroTranslationServiceAdapterTest extends TestCase
         $originalFilePath = '/some/dir/file.ext';
         $expectedFilePath = '/some/dir/file.ext.zip';
 
-        $this->client
-            ->expects(static::once())
+        $this->client->expects(self::once())
             ->method('send')
-            ->with(
-                static::anything(),
-                ['sink' => $expectedFilePath]
-            )
+            ->with(self::anything(), ['sink' => $expectedFilePath])
             ->willReturn(new Response(200));
 
         $this->adapter->downloadLanguageTranslationsArchive('uk_UA', $originalFilePath);
@@ -308,31 +361,38 @@ class OroTranslationServiceAdapterTest extends TestCase
         $targetDir = $this->getTempDir('extract_translations');
 
         $this->adapter->extractTranslationsFromArchive($filePath, $targetDir);
-        $messagesPath = $targetDir . \DIRECTORY_SEPARATOR . 'messages.uk_UA.yml';
-        $validationPath = $targetDir . \DIRECTORY_SEPARATOR . 'validation.uk_UA.yml';
-        static::assertFileExists($messagesPath);
-        static::assertFileExists($validationPath);
+        $messagesPath = $targetDir . DIRECTORY_SEPARATOR . 'messages.uk_UA.yml';
+        $validationPath = $targetDir . DIRECTORY_SEPARATOR . 'validation.uk_UA.yml';
+        self::assertFileExists($messagesPath);
+        self::assertFileExists($validationPath);
         $actualTranslations = [
             'messages' => Yaml::parseFile($messagesPath),
             'validation' => Yaml::parseFile($validationPath),
         ];
-        static::assertEquals($expectedTranslations, $actualTranslations);
+        self::assertEquals($expectedTranslations, $actualTranslations);
     }
 
     /** @covers ::extractTranslationsFromArchive */
     public function testExtractTranslationsFromArchiveThrowsExceptionIfCannotOpenZip(): void
     {
         $filePath = $this->getTempFile('download', 'tmp', 'uk_UA.zip');
-        \file_put_contents($filePath, 'xxx'); // not a zip
+        file_put_contents($filePath, 'xxx'); // not a zip
 
         $targetDir = $this->getTempDir('extract_translations');
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Cannot open the translation archive "' . $filePath . '".',
-            'Cannot open the translation archive "{actual_file_path}".',
-            ['actual_file_path' => $filePath]
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Cannot open the translation archive "' . $filePath . '".');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Cannot open the translation archive "{actual_file_path}".',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('actual_file_path'),
+                    self::callback(fn (array $val) => $val['actual_file_path'] === $filePath),
+                    self::arrayHasKey('called_in')
+                )
+            );
 
         $this->adapter->extractTranslationsFromArchive($filePath, $targetDir);
     }
@@ -348,22 +408,30 @@ class OroTranslationServiceAdapterTest extends TestCase
         );
 
         $targetDir = $this->getTempDir('extract_translations');
-        if (false === \chmod($targetDir, 0555)) {
-            static::fail('Cannot set the directory permissions necessary for this test.');
+        if (false === chmod($targetDir, 0555)) {
+            self::fail('Cannot set the directory permissions necessary for this test.');
         }
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Failed to extract "' . $filePath . '" to "' . $targetDir . '".',
-            'Failed to extract "{actual_file_path}" to "{directory_path_to_extract_to}".',
-            ['actual_file_path' => $filePath, 'directory_path_to_extract_to' => $targetDir],
-            null
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Failed to extract "' . $filePath . '" to "' . $targetDir . '".');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Failed to extract "{actual_file_path}" to "{directory_path_to_extract_to}".',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('actual_file_path'),
+                    self::callback(fn (array $val) => $val['actual_file_path'] === $filePath),
+                    self::arrayHasKey('called_in'),
+                    self::arrayHasKey('directory_path_to_extract_to'),
+                    self::callback(fn (array $val) => $val['directory_path_to_extract_to'] === $targetDir)
+                )
+            );
 
         try {
             $this->adapter->extractTranslationsFromArchive($filePath, $targetDir);
         } finally {
-            \chmod($targetDir, 0755);
+            chmod($targetDir, 0755);
         }
     }
 
@@ -380,12 +448,11 @@ class OroTranslationServiceAdapterTest extends TestCase
             . '?packages=PackageA,PackageB'
             . '&version=' . OroTranslationServiceAdapter::TRANSLATIONS_VERSION
         ;
-        $response = new Response(200, [], Utils::jsonEncode(\array_values(self::METRICS)));
-        $this->client
-            ->expects(static::once())
+        $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
+        $this->client->expects(self::once())
             ->method('send')
             ->with(
-                static::callback(static fn (Request $request) => (string)$request->getUri() === $expectedUriString),
+                self::callback(static fn (Request $request) => (string)$request->getUri() === $expectedUriString),
             )
             ->willReturn($response);
 
@@ -395,8 +462,10 @@ class OroTranslationServiceAdapterTest extends TestCase
     /** @covers ::request */
     public function testRequestApiKeyObfuscatedForLogging(): void
     {
-        $response = new Response(200, [], Utils::jsonEncode(\array_values(self::METRICS)));
-        $this->client->method('send')->willReturn($response);
+        $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn($response);
 
         $expectedLogUri = 'https://translations.oroinc.com/api/stats'
             . '?packages=PackageA,PackageB'
@@ -409,22 +478,25 @@ class OroTranslationServiceAdapterTest extends TestCase
             'key' => '********'
         ];
 
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'Requesting data from "{uri}".',
                 ['uri' => $expectedLogUri, 'data' => $expectedLogData]
             );
+
         $this->adapter->fetchTranslationMetrics();
     }
 
     /** @covers ::request */
     public function testRequestLogsDebugStatusCode(): void
     {
-        $this->client->method('send')->willReturn(new Response(567));
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willReturn(new Response(567));
 
         $this->expectException(TranslationServiceAdapterException::class);
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with(
                 'The translation service responded with status code {status_code}.',
@@ -440,15 +512,17 @@ class OroTranslationServiceAdapterTest extends TestCase
         $request = new Request('GET', 'https://example.com');
         $response = new Response(567);
         $requestException = new RequestException('test message', $request, $response);
-        $this->client->method('send')->willThrowException($requestException);
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willThrowException($requestException);
 
-        $this->logger->expects(static::once())
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->logger->expects(self::once())
             ->method('warning')
             ->with(
                 'test message',
                 ['exception' => $requestException]
             );
-        $this->expectException(TranslationServiceAdapterException::class);
 
         $this->adapter->fetchTranslationMetrics();
     }
@@ -456,16 +530,26 @@ class OroTranslationServiceAdapterTest extends TestCase
     /** @covers ::request */
     public function testRequestThrowsExceptionOnGenericGuzzleException(): void
     {
-        $guzzleException = new \GuzzleHttp\Exception\InvalidArgumentException('test message');
-        $this->client->method('send')->willThrowException($guzzleException);
+        $guzzleException = new InvalidArgumentException('test message');
+        $this->client->expects(self::any())
+            ->method('send')
+            ->willThrowException($guzzleException);
 
-        $this->expectThrowErrorException(
-            TranslationServiceAdapterException::class,
-            'Request to the translation service failed: test message.',
-            'Request to the translation service failed: {original_message}.',
-            ['original_message' => 'test message'],
-            \get_class($guzzleException)
-        );
+        $this->expectException(TranslationServiceAdapterException::class);
+        $this->expectExceptionMessage('Request to the translation service failed: test message.');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Request to the translation service failed: {original_message}.',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('original_message'),
+                    self::callback(fn (array $val) => $val['original_message'] === 'test message'),
+                    self::arrayHasKey('called_in'),
+                    self::arrayHasKey('exception'),
+                    self::callback(fn (array $val) => $val['exception'] === $guzzleException)
+                )
+            );
 
         $this->adapter->fetchTranslationMetrics();
     }

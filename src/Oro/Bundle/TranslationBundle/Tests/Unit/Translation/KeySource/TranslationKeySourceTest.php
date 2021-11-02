@@ -11,7 +11,10 @@ class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
     {
         $data = ['some_key' => 'someValue'];
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
-        $templateMock->expects($this->once())->method('getRequiredKeys')->willReturn(['some_key']);
+        $templateMock->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn(['some_key']);
+
         $source = new TranslationKeySource($templateMock, $data);
         $this->assertEquals($data, $source->getData());
     }
@@ -24,18 +27,25 @@ class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         );
 
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
-        $templateMock->expects($this->once())->method('getRequiredKeys')->willReturn(['some_key']);
+        $templateMock->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn(['some_key']);
+
         new TranslationKeySource($templateMock, ['some_other_key' => 'someValue']);
     }
 
     public function testGetTemplate()
     {
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
-        $templateMock->expects($this->once())->method('getRequiredKeys')->willReturn([]);
+        $templateMock->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn([]);
 
-        $templateMock->expects($this->once())->method('getTemplate')->willReturn('templateString');
+        $templateMock->expects($this->once())
+            ->method('getTemplate')
+            ->willReturn('templateString');
+
         $source = new TranslationKeySource($templateMock);
-
         $this->assertEquals('templateString', $source->getTemplate());
     }
 
@@ -43,7 +53,9 @@ class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
     {
         $data = ['some_key' => 'someValue'];
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
-        $templateMock->expects($this->once())->method('getRequiredKeys')->willReturn([]);
+        $templateMock->expects($this->once())
+            ->method('getRequiredKeys')
+            ->willReturn([]);
 
         $source = new TranslationKeySource($templateMock, $data);
         $this->assertEquals($data, $source->getData());

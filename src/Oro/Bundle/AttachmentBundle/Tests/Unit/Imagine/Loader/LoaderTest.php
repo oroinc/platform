@@ -15,11 +15,8 @@ class LoaderTest extends \PHPUnit\Framework\TestCase
 
     private const TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
 
-    /** @var string  */
-    private $directory;
-
-    /** @var SymfonyFilesystem */
-    private $fileSystem;
+    private string $directory;
+    private SymfonyFilesystem $fileSystem;
 
     protected function setUp(): void
     {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\TranslationBundle\Download\TranslationDownloader;
@@ -19,25 +19,33 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     use CommandTestingTrait;
     use TempDirExtension;
 
-    private TranslationDownloader $translationDownloader;
-    private LoggerInterface $logger;
-    private LanguageRepository $languageRepository;
-    private OroTranslationUpdateCommand $command;
+    /** @var TranslationDownloader|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationDownloader;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $languageRepository;
+
+    /** @var OroTranslationUpdateCommand */
+    private $command;
+
     protected function setUp(): void
     {
         $this->translationDownloader = $this->createMock(TranslationDownloader::class);
-        $doctrine = $this->createMock(ManagerRegistry::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-
         $this->languageRepository = $this->createMock(LanguageRepository::class);
-        $doctrine->method('getRepository')->willReturnMap([
-            [Language::class, null, $this->languageRepository]
-        ]);
-        $doctrine->method('getManagerForClass')->willReturnMap([
-            [Language::class, $this->createMock(EntityManager::class)]
-        ]);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($this->languageRepository);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(Language::class)
+            ->willReturn($this->createMock(EntityManagerInterface::class));
 
         $this->command = new OroTranslationUpdateCommand(
             $this->translationDownloader,
@@ -48,10 +56,12 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteWithoutOptions(): void
     {
-        $this->languageRepository->method('findAll')->willReturn([
-            (new Language())->setCode('en_US'),
-            (new Language())->setCode('uk_UA'),
-        ]);
+        $this->languageRepository->expects(self::once())
+            ->method('findAll')
+            ->willReturn([
+                (new Language())->setCode('en_US'),
+                (new Language())->setCode('uk_UA'),
+            ]);
 
         $commandTester = $this->doExecuteCommand($this->command);
 
@@ -63,60 +73,65 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     public function testExecute(): void
     {
         $langCode = 'fr_FR';
-        $this->languageRepository->method('findOneBy')->willReturnMap([
-            [['code' => $langCode], null, (new Language())->setCode($langCode)]
-        ]);
+        $this->languageRepository->expects(self::once())
+            ->method('findOneBy')
+            ->with(['code' => $langCode])
+            ->willReturn((new Language())->setCode($langCode));
 
-        $this->translationDownloader->method('fetchLanguageMetrics')->willReturnMap([
-            [$langCode, ['code' => $langCode, 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]]
-        ]);
+        $this->translationDownloader->expects(self::once())
+            ->method('fetchLanguageMetrics')
+            ->with($langCode)
+            ->willReturn(['code' => $langCode, 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]);
 
-        $this->translationDownloader->expects(static::once())
+        $this->translationDownloader->expects(self::once())
             ->method('downloadTranslationsArchive')
-            ->with($langCode, static::isType('string'));
+            ->with($langCode, self::isType('string'));
 
-        $this->translationDownloader->expects(static::once())
+        $this->translationDownloader->expects(self::once())
             ->method('loadTranslationsFromArchive')
-            ->with(static::isType('string'), $langCode);
+            ->with(self::isType('string'), $langCode);
 
         $commandTester = $this->doExecuteCommand($this->command, ['language' => $langCode]);
 
         $langName = Locales::getName($langCode, 'en');
-        $this->assertOutputContains($commandTester, \sprintf('%s (%s):', $langName, $langCode));
+        $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
         $this->assertOutputContains($commandTester, 'Checking availability...');
         $this->assertOutputContains($commandTester, 'Downloading translations...');
         $this->assertOutputContains($commandTester, 'Applying translations...');
-        $this->assertOutputContains($commandTester, \sprintf('Update completed for "%s" language.', $langName));
+        $this->assertOutputContains($commandTester, sprintf('Update completed for "%s" language.', $langName));
     }
 
     public function testForLanguageWithoutTranslations(): void
     {
         $langCode = 'fr_FR';
-        $this->languageRepository->method('findOneBy')->willReturnMap([
-            [['code' => $langCode], null, (new Language())->setCode($langCode)]
-        ]);
+        $this->languageRepository->expects(self::once())
+            ->method('findOneBy')
+            ->with(['code' => $langCode])
+            ->willReturn((new Language())->setCode($langCode));
 
-        $this->translationDownloader->method('fetchLanguageMetrics')->willReturn(null);
+        $this->translationDownloader->expects(self::once())
+            ->method('fetchLanguageMetrics')
+            ->willReturn(null);
 
         $commandTester = $this->doExecuteCommand($this->command, ['language' => $langCode]);
 
         $langName = Locales::getName($langCode, 'en');
-        $this->assertOutputContains($commandTester, \sprintf('%s (%s):', $langName, $langCode));
+        $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
         $this->assertOutputContains($commandTester, 'Checking availability...');
         $this->assertProducedError(
             $commandTester,
-            \sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode)
+            sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode)
         );
     }
 
     public function testWithNotInstalledLanguage(): void
     {
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'Language "{language}" is not installed.'
                 . ' Translations can be updated only for an already installed language.',
-                static::callback(static fn ($context) => 'WR_ONG' === $context['language'])
+                self::callback(static fn ($context) => 'WR_ONG' === $context['language'])
             );
 
         $commandTester = $this->doExecuteCommand($this->command, ['language' => 'WR_ONG']);
@@ -129,57 +144,58 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testWithAllOption(): void
     {
-        $langCodes = ['de_DE', 'fr_FR', 'uk_UA'];
+        $codes = ['de_DE', 'fr_FR', 'uk_UA'];
         $languages = [
-            (new Language())->setCode($langCodes[0]),
-            (new Language())->setCode($langCodes[1]),
-            (new Language())->setCode($langCodes[2]),
+            (new Language())->setCode($codes[0]),
+            (new Language())->setCode($codes[1]),
+            (new Language())->setCode($codes[2]),
         ];
 
-        $this->languageRepository->method('findAll')->willReturn($languages);
-        $this->languageRepository->method('findOneBy')->willReturnMap([
-            [['code' => $langCodes[0]], null, $languages[0]],
-            [['code' => $langCodes[1]], null, $languages[1]],
-            [['code' => $langCodes[2]], null, $languages[2]],
-        ]);
+        $this->languageRepository->expects(self::once())
+            ->method('findAll')
+            ->willReturn($languages);
+        $this->languageRepository->expects(self::never())
+            ->method('findOneBy');
 
-        $this->translationDownloader->method('fetchLanguageMetrics')->willReturnMap([
-            [$langCodes[0], ['code' => $langCodes[0], 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]],
-            [$langCodes[1], null], // no translations available
-            [$langCodes[2], ['code' => $langCodes[1], 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]],
-        ]);
+        $this->translationDownloader->expects(self::exactly(3))
+            ->method('fetchLanguageMetrics')
+            ->willReturnMap([
+                [$codes[0], ['code' => $codes[0], 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]],
+                [$codes[1], null], // no translations available
+                [$codes[2], ['code' => $codes[1], 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]],
+            ]);
 
-        $this->translationDownloader->expects(static::exactly(2))
+        $this->translationDownloader->expects(self::exactly(2))
             ->method('downloadTranslationsArchive')
             ->withConsecutive(
-                [$langCodes[0], static::isType('string')],
+                [$codes[0], self::isType('string')],
                 // skipping 1 because no available translations
-                [$langCodes[2], static::isType('string')]
+                [$codes[2], self::isType('string')]
             );
 
-        $this->translationDownloader->expects(static::exactly(2))
+        $this->translationDownloader->expects(self::exactly(2))
             ->method('loadTranslationsFromArchive')
             ->withConsecutive(
-                [static::isType('string'), $langCodes[0]],
+                [self::isType('string'), $codes[0]],
                 // skipping 1 because no available translations
-                [static::isType('string'), $langCodes[2]],
+                [self::isType('string'), $codes[2]],
             );
 
         $commandTester = $this->doExecuteCommand($this->command, ['--all' => true]);
 
-        foreach ($langCodes as $index => $langCode) {
+        foreach ($codes as $index => $langCode) {
             $langName = Locales::getName($langCode, 'en');
-            $this->assertOutputContains($commandTester, \sprintf('%s (%s):', $langName, $langCode));
+            $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
             $this->assertOutputContains($commandTester, 'Checking availability...');
             if (1 === $index) {
                 $this->assertOutputContains(
                     $commandTester,
-                    \sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode)
+                    sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode)
                 );
             } else {
                 $this->assertOutputContains($commandTester, 'Downloading translations...');
                 $this->assertOutputContains($commandTester, 'Applying translations...');
-                $this->assertOutputContains($commandTester, \sprintf('Update completed for "%s" language.', $langName));
+                $this->assertOutputContains($commandTester, sprintf('Update completed for "%s" language.', $langName));
             }
         }
     }
@@ -188,18 +204,18 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     {
         $language = 'fr_FR';
 
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'The --all option and the language argument ("{language}") cannot be used together.',
-                static::callback(static fn ($context) => $context['language'] === $language)
+                self::callback(static fn ($context) => $context['language'] === $language)
             );
 
         $commandTester = $this->doExecuteCommand($this->command, ['language' => $language, '--all' => true]);
 
         $this->assertProducedError(
             $commandTester,
-            \sprintf('The --all option and the language argument ("%s") cannot be used together.', $language)
+            sprintf('The --all option and the language argument ("%s") cannot be used together.', $language)
         );
     }
 }

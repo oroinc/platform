@@ -26,19 +26,26 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    private TwigContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
+    /** @var TwigContentProviderManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $contentProviderManager;
 
-    private UserAgentProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userAgentProvider;
+    /** @var UserAgentProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userAgentProvider;
 
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    private UiExtension $extension;
+    /** @var UiExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -98,9 +105,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $testTemplate = 'testTemplate';
         $expected = 'result';
-        $template = $this->getMockBuilder(Template::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $template = $this->createMock(Template::class);
 
         $this->environment->expects(self::once())
             ->method('loadTemplate')
@@ -126,9 +131,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $formData = ['test'];
 
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
         $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
@@ -157,9 +160,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $formData = ['test'];
 
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
         $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
@@ -601,8 +602,12 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider skypeButtonProvider
      */
-    public function testGetSkypeButton($username, $options, $expectedOptions, $expectedTemplate): void
-    {
+    public function testGetSkypeButton(
+        string $username,
+        array $options,
+        array $expectedOptions,
+        string $expectedTemplate
+    ): void {
         $this->environment->expects(self::once())
             ->method('render')
             ->with($expectedTemplate, $this->anything())
@@ -653,7 +658,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ceilProvider
      */
-    public function testCeil($expected, $testValue): void
+    public function testCeil(int $expected, float $testValue): void
     {
         self::assertEquals(
             $expected,

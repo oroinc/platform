@@ -139,10 +139,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($windowState->isRenderedSuccessfully());
     }
 
-    /**
-     * @return array
-     */
-    public function renderFragmentDataProvider()
+    public function renderFragmentDataProvider(): array
     {
         return [
             'url_without_parameters'           => [
@@ -171,7 +168,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->fragmentHandler->expects($this->once())
             ->method('render')
             ->with($cleanUrl)
-            ->will($this->throwException(new NotFoundHttpException()));
+            ->willThrowException(new NotFoundHttpException());
 
         $this->stateManagerRegistry->expects($this->once())
             ->method('getManager')

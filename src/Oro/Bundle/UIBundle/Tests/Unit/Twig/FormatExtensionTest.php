@@ -6,20 +6,19 @@ use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormatterManager|\PHPUnit\Framework\MockObject\MockObject */
     private $formatterManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var UrlWithoutFrontControllerProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $urlProvider;
 
     /** @var FormatExtension */
@@ -27,7 +26,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->formatterManager = $this->createMock(FormatterManager::class);
         $this->urlProvider = $this->createMock(UrlWithoutFrontControllerProvider::class);
 
@@ -79,7 +78,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatFilenameProvider
      */
-    public function testFormatFilename($filename, $result)
+    public function testFormatFilename(string $filename, string $result)
     {
         $this->assertEquals(
             $result,
@@ -87,7 +86,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function formatFilenameProvider()
+    public function formatFilenameProvider(): array
     {
         return [
             [
@@ -124,7 +123,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ageDataProvider
      */
-    public function testGetAge($date, $options, $age)
+    public function testGetAge(\DateTime|string|null $date, array $options, ?int $age)
     {
         $this->assertEquals(
             $age,
@@ -161,7 +160,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function ageDataProvider()
+    public function ageDataProvider(): array
     {
         $isFeb29 = date('md') === '0229';
         $oneYearAgo = new \DateTime('-1 year' . ($isFeb29 ? ' -1 day' : ''), new \DateTimeZone('UTC'));

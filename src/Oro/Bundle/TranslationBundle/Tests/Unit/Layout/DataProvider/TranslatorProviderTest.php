@@ -7,13 +7,16 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private Translator|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private TranslatorProvider $translatorProvider;
+    /** @var TranslatorProvider */
+    private $translatorProvider;
 
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
+
         $this->translatorProvider = new TranslatorProvider($this->translator);
     }
 

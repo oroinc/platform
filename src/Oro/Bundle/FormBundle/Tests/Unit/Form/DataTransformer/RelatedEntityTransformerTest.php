@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
@@ -15,17 +16,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassNameHelper;
+    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassNameHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
     /** @var RelatedEntityTransformer */
-    protected $transformer;
+    private $transformer;
 
     protected function setUp(): void
     {
@@ -43,21 +44,19 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform($value, $expectedValue)
+    public function testTransform(?object $value, ?array $expectedValue)
     {
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($value))
-            ->willReturnCallback(
-                function ($entity) {
-                    return $entity->id;
-                }
-            );
+            ->willReturnCallback(function ($entity) {
+                return $entity->id;
+            });
 
         $this->assertSame($expectedValue, $this->transformer->transform($value));
     }
 
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             [
@@ -66,7 +65,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 new ItemStub(['id' => 123]),
-                ['id' => 123, 'entity' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub']
+                ['id' => 123, 'entity' => ItemStub::class]
             ],
             [
                 new ItemStubProxy(['id' => 123]),
@@ -84,12 +83,12 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformForEmptyValueDataProvider
      */
-    public function testReverseTransformForEmptyValue($value)
+    public function testReverseTransformForEmptyValue(mixed $value)
     {
         $this->assertNull($this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformForEmptyValueDataProvider()
+    public function reverseTransformForEmptyValueDataProvider(): array
     {
         return [
             [null],
@@ -101,12 +100,12 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformForNonTransformableValueDataProvider
      */
-    public function testReverseTransformForNonTransformableValue($value)
+    public function testReverseTransformForNonTransformableValue(mixed $value)
     {
         $this->assertSame($value, $this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformForNonTransformableValueDataProvider()
+    public function reverseTransformForNonTransformableValueDataProvider(): array
     {
         return [
             [new \stdClass()],
@@ -125,9 +124,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
             ->with($value['entity'])
             ->willReturn($value['entity']);
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with($value['entity'])
@@ -155,9 +152,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
             ->with('alias')
             ->willReturn('Test\Entity');
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with('Test\Entity')
@@ -184,9 +179,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
             ->with($value['entity'])
             ->willReturn($value['entity']);
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with($value['entity'])
@@ -214,7 +207,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with($value['entity'])
-            ->will($this->throwException(new NotManageableEntityException($value['entity'])));
+            ->willThrowException(new NotManageableEntityException($value['entity']));
 
         $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
@@ -232,9 +225,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
             ->with($value['entity'])
             ->willReturn($value['entity']);
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with($value['entity'])

@@ -7,11 +7,11 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class DynamicTranslationMetadataCacheTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheImpl;
+
     /** @var DynamicTranslationMetadataCache */
     private $metadataCache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $cacheImpl;
 
     protected function setUp(): void
     {

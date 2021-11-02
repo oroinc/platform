@@ -7,34 +7,24 @@ use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
 class ConfigSettingsUpdateEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
-     */
-    protected $configManager;
+    private const SETTINGS = ['a' => 'b'];
 
-    /**
-     * @var array
-     */
-    protected $settings;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var ConfigSettingsUpdateEvent
-     */
-    protected $event;
+    /** @var ConfigSettingsUpdateEvent */
+    private $event;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->settings = ['a' => 'b'];
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->event = new ConfigSettingsUpdateEvent($this->configManager, $this->settings);
+        $this->event = new ConfigSettingsUpdateEvent($this->configManager, self::SETTINGS);
     }
 
     public function testSettings()
     {
-        $this->assertEquals($this->settings, $this->event->getSettings());
+        $this->assertEquals(self::SETTINGS, $this->event->getSettings());
         $newSettings = ['c' => true];
         $this->event->setSettings($newSettings);
         $this->assertEquals($newSettings, $this->event->getSettings());

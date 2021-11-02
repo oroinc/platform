@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityProvider;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as UserConfig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -57,12 +57,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->testActivityProvider = new TestActivityProvider();
     }
 
-    /**
-     * @param string|null $testActivityAclClass
-     *
-     * @return ActivityListChainProvider
-     */
-    private function getActivityListChainProvider(string $testActivityAclClass = null)
+    private function getActivityListChainProvider(string $testActivityAclClass = null): ActivityListChainProvider
     {
         $activityAclClasses = [];
         if ($testActivityAclClass) {
@@ -190,7 +185,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($testEntity)
-            ->willReturn('\stdClass');
+            ->willReturn(\stdClass::class);
 
         $provider = $this->getActivityListChainProvider();
         $this->assertFalse($provider->isSupportedEntity($testEntity));

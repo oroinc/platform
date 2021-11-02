@@ -39,9 +39,6 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('ControllerClassProvider');

@@ -21,11 +21,8 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getValueDataProvider
-     * @param object|array $context
-     * @param string|PropertyPath $value
-     * @param string $expectedValue
      */
-    public function testGetValue($context, $value, $expectedValue)
+    public function testGetValue(object|array $context, string|PropertyPath $value, ?string $expectedValue)
     {
         $this->assertEquals($expectedValue, $this->contextAccessor->getValue($context, $value));
     }
@@ -64,13 +61,13 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setValueDataProvider
      * @depends      testGetValue
-     * @param object|array $context
-     * @param PropertyPath $property
-     * @param string|PropertyPath $value
-     * @param string $expectedValue
      */
-    public function testSetValue($context, PropertyPath $property, $value, $expectedValue)
-    {
+    public function testSetValue(
+        object|array $context,
+        PropertyPath $property,
+        string|PropertyPath $value,
+        ?string $expectedValue
+    ) {
         $this->contextAccessor->setValue($context, $property, $value);
         $actualValue = $this->contextAccessor->getValue($context, $property);
         $this->assertEquals($expectedValue, $actualValue);
@@ -128,12 +125,8 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hasValueDataProvider
-     *
-     * @param mixed $context
-     * @param mixed $value
-     * @param mixed $expectedValue
      */
-    public function testHasValue($context, $value, $expectedValue)
+    public function testHasValue(object $context, PropertyPath $value, bool $expectedValue)
     {
         $this->contextAccessor->hasValue($context, $value);
         $actualValue = $this->contextAccessor->hasValue($context, $value);
@@ -185,7 +178,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         $propertyAccessor->expects($this->once())
             ->method('getValue')
             ->with($context, $value)
-            ->will($this->throwException(new NoSuchPropertyException('No such property')));
+            ->willThrowException(new NoSuchPropertyException('No such property'));
 
         ReflectionUtil::setPropertyValue($this->contextAccessor, 'propertyAccessor', $propertyAccessor);
 

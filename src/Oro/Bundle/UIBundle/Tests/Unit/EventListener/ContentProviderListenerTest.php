@@ -10,11 +10,14 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private RequestEvent|\PHPUnit\Framework\MockObject\MockObject $event;
+    /** @var RequestEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    private ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
+    /** @var ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $contentProviderManager;
 
-    private ContentProviderListener $listener;
+    /** @var ContentProviderListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -40,6 +43,7 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($request);
         $this->contentProviderManager->expects(self::never())
             ->method(self::anything());
+
         $this->listener->onKernelRequest($this->event);
     }
 

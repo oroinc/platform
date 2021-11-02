@@ -12,13 +12,13 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_PLACEHOLDER = 'test_placeholder';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResolverInterface */
+    /** @var ResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $resolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
     protected function setUp(): void
@@ -34,9 +34,11 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testOnlyTemplateDefined()
     {
-        $items = ['placeholder_item' => [
+        $items = [
+            'placeholder_item' => [
                 'template' => 'template'
-        ]];
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -56,10 +58,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testTemplateAndDataDefined()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'data' => '@service->getData($entity$)'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'data'     => '@service->getData($entity$)'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -79,10 +83,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplicableStringConditionSuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'applicable' => '@service1->isApplicable($entity$)'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template'   => 'template',
+                'applicable' => '@service1->isApplicable($entity$)'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -111,10 +117,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplicableArrayConditionsSuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template'   => 'template',
+                'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -146,10 +154,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplicableArrayConditionsFail()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template'   => 'template',
+                'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -166,10 +176,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionStringSuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => 'acl_ancestor'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => 'acl_ancestor'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -186,10 +198,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionStringFail()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => 'acl_ancestor'
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => 'acl_ancestor'
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -206,10 +220,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionArraySuccess()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => ['acl_ancestor1', 'acl_ancestor2']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -231,10 +247,12 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAclConditionArrayFail()
     {
-        $items = ['placeholder_item' => [
-            'template' => 'template',
-            'acl' => ['acl_ancestor1', 'acl_ancestor2']
-        ]];
+        $items = [
+            'placeholder_item' => [
+                'template' => 'template',
+                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
+            ]
+        ];
 
         $variables = ['foo' => 'bar'];
 
@@ -249,11 +267,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $actual);
     }
 
-    /**
-     * @param array $items
-     * @return PlaceholderProvider
-     */
-    private function createProvider(array $items)
+    private function createProvider(array $items): PlaceholderProvider
     {
         $configProvider = $this->createMock(PlaceholderConfigurationProvider::class);
         $configProvider->expects(self::any())

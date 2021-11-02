@@ -21,17 +21,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var MultiFileBlockListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
@@ -209,29 +206,25 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects(self::once())
             ->method('getIds')
             ->with(TestEntity1::class)
-            ->willReturn([
-                $fieldConfigId,
-                $multiFileConfigId,
-                $multiImageConfigId,
-            ]);
+            ->willReturn([$fieldConfigId, $multiFileConfigId, $multiImageConfigId]);
 
         $this->configProvider->expects(self::exactly(2))
             ->method('getConfig')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [TestEntity1::class, 'multiFileField', $multiFileConfig],
                 [TestEntity1::class, 'multiImageField', $multiImageConfig],
-            ]));
+            ]);
 
         $this->translator->expects(self::exactly(2))
             ->method('trans')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['multiFileLabel', [], null, null, 'translated multiFileLabel'],
                 ['multiImageLabel', [], null, null, 'translated multiImageLabel'],
-            ]));
+            ]);
 
         $twig->expects(self::exactly(2))
             ->method('render')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [
                     '@OroAttachment/Twig/dynamicField.html.twig',
                     ['data' => ['entity' => $entity, 'fieldConfigId' => $multiFileConfigId]],
@@ -242,7 +235,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
                     ['data' => ['entity' => $entity, 'fieldConfigId' => $multiImageConfigId]],
                     'multiImage html'
                 ],
-            ]));
+            ]);
 
         $this->listener->onBeforeViewRender($event);
 
@@ -357,25 +350,21 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects(self::once())
             ->method('getIds')
             ->with(TestEntity1::class)
-            ->willReturn([
-                $fieldConfigId,
-                $multiFileConfigId,
-                $multiImageConfigId,
-            ]);
+            ->willReturn([$fieldConfigId, $multiFileConfigId, $multiImageConfigId]);
 
         $this->configProvider->expects(self::exactly(2))
             ->method('getConfig')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [TestEntity1::class, 'multiFileField', $multiFileConfig],
                 [TestEntity1::class, 'multiImageField', $multiImageConfig],
-            ]));
+            ]);
 
         $this->translator->expects(self::exactly(2))
             ->method('trans')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['multiFileLabel', [], null, null, 'translated multiFileLabel'],
                 ['multiImageLabel', [], null, null, 'translated multiImageLabel'],
-            ]));
+            ]);
 
         $this->listener->onBeforeFormRender($event);
 
