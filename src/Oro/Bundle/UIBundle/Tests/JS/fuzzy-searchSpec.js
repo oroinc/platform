@@ -12,7 +12,8 @@ define(function(require) {
 
         it('check getMatches', function() {
             expect(FuzzySearch.getMatches('Localization', 'locl')).toEqual([{
-                item: 0,
+                item: 'Localization',
+                refIndex: 0,
                 score: 0.25
             }]);
             expect(FuzzySearch.getMatches('Localization', 'loclux')).toEqual([]);

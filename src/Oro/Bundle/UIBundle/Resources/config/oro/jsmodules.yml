@@ -4,16 +4,16 @@ aliases:
     backbone$: backbone/backbone
     base64$: oroui/js/extend/base64
     bootstrap$: oroui/js/bootstrap
-    bootstrap-alert$: bootstrap/js/dist/alert
-    bootstrap-collapse$: bootstrap/js/dist/collapse
-    bootstrap-dropdown$: bootstrap/js/dist/dropdown
-    bootstrap-modal$: bootstrap/js/dist/modal
-    bootstrap-popover$: bootstrap/js/dist/popover
-    bootstrap-scrollspy$: bootstrap/js/dist/scrollspy
-    bootstrap-tab$: bootstrap/js/dist/tab
-    bootstrap-tooltip$: bootstrap/js/dist/tooltip
-    bootstrap-typeahead$: oroui/lib/bootstrap/bootstrap-typeahead
-    bootstrap-util$: bootstrap/js/dist/util
+    bootstrap-alert$: '@oroinc/bootstrap/js/dist/alert'
+    bootstrap-collapse$: '@oroinc/bootstrap/js/dist/collapse'
+    bootstrap-dropdown$: '@oroinc/bootstrap/js/dist/dropdown'
+    bootstrap-modal$: '@oroinc/bootstrap/js/dist/modal'
+    bootstrap-popover$: '@oroinc/bootstrap/js/dist/popover'
+    bootstrap-scrollspy$: '@oroinc/bootstrap/js/dist/scrollspy'
+    bootstrap-tab$: '@oroinc/bootstrap/js/dist/tab'
+    bootstrap-tooltip$: '@oroinc/bootstrap/js/dist/tooltip'
+    bootstrap-typeahead$: 'oroui/lib/bootstrap/bootstrap-typeahead'
+    bootstrap-util$: '@oroinc/bootstrap/js/dist/util'
     chaplin$: oroui/lib/chaplin
     controllers/page-controller$: oroui/js/app/controllers/page-controller
     cryptojs/core$: crypto-js/core
@@ -180,7 +180,7 @@ map:
         popper.js: popper
         scriptjs: oroui/js/extend/scriptjs
         scrollspy.js: bootstrap-scrollspy
-        tab.js: bootstrap-tab
+        tab.js: '@oroinc/bootstrap-tab'
         tooltip.js: bootstrap-tooltip
         underscore: oroui/js/extend/underscore
         util.js: bootstrap-util

@@ -24,7 +24,7 @@
 
     &__input {
         position: absolute;
-        top: $checkbox-icon-size / 2;
+        top: $checkbox-icon-size * .5;
         left: $checkbox-icon-size + 2px;
 
         height: 2px;

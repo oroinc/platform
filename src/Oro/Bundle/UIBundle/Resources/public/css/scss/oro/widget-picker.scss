@@ -94,7 +94,7 @@
                     @include loader($widget-picker-loading-size, $widget-picker-loading-border-size);
 
                     content: '';
-                    margin: ($btn-line-height - $widget-picker-loading-size) / 2  auto;
+                    margin: ($btn-line-height - $widget-picker-loading-size) * .5  auto;
 
                     display: block;
                 }

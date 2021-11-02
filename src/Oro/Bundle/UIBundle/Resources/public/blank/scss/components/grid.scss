@@ -1,5 +1,7 @@
 /* @theme: blank; */
 
+@use 'sass:math';
+
 .grid {
     &__row {
         margin-bottom: $offset-y;
@@ -43,7 +45,7 @@
         &-half {
             float: left;
 
-            width: (100% - $grid-offset) / 2;
+            width: (100% - $grid-offset) * .5;
 
             &:first-child {
                 margin-right: $grid-offset;
@@ -97,7 +99,7 @@
 
     @for $i from 1 through $grid-count {
         &__column--#{$i} {
-            width: (($i* 100%) / $grid-count);
+            width: math.div($i* 100%, $grid-count);
         }
     }
 }

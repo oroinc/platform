@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 .quick-launchpad-toolbar {
     margin: 0;
     padding: 16px;
@@ -61,7 +63,7 @@
 
     @for $i from 1 through 7 {
         &--with-#{$i}-items &__item {
-            width: floor(100% / $i);
+            width: floor(math.div(100%, $i));
         }
     }
 }
@@ -98,7 +100,7 @@
 
         background: $dashboard-launchpad-icon-bg;
 
-        border-radius: $quick-launchpad-item-icon-size / 2;
+        border-radius: $quick-launchpad-item-icon-size * .5;
     }
 
     &__label {

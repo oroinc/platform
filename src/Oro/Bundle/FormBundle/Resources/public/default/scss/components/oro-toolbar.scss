@@ -82,7 +82,7 @@
     }
 
     &__currency {
-        margin-right: $offset-y-m / 2;
+        margin-right: $offset-y-m * .5;
     }
 
     // toolbar open

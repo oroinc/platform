@@ -2,6 +2,8 @@
 
 /* stylelint-disable no-descending-specificity */
 
+@use 'sass:math';
+
 .input,
 .selector,
 .uneditable-input {
@@ -49,7 +51,7 @@
     }
 
     .filename {
-        padding: 0 12px 0 12px 0;
+        padding: 0 12px;
     }
 }
 
@@ -161,14 +163,14 @@
 .clearable-input {
     &__container--clear .clearable-input__placeholder-icon {
         font-size: $icon-font-size;
-        top: ($input-size - $icon-font-size) / -2;
+        top: math.div($input-size - $icon-font-size, -2);
         width: $input-size;
         height: $input-size;
         line-height: $input-size;
     }
 
     &__clear {
-        top: ($input-size - $icon-font-size) / -2;
+        top: math.div($input-size - $icon-font-size, -2);
     }
 
     &__container > input {

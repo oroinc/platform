@@ -229,7 +229,7 @@ body.backdrop {
                 top: 50%;
                 right: 8px;
 
-                margin-top: -$base-font-size--m / 2;
+                margin-top: -$base-font-size--m * .5;
                 font-size: $base-font-size--m;
                 line-height: 1;
             }
@@ -285,7 +285,7 @@ body.backdrop {
                 @include oro-page-menu-items;
 
                 top: auto;
-                left: none;
+                left: initial;
                 position: relative;
                 border: none;
                 box-shadow: none;

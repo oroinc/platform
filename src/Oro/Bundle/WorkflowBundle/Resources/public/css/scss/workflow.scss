@@ -57,7 +57,7 @@ table.grid {
 
 .workflow-collapse {
     width: $icon-font-size;
-    padding-top: $content-padding-medium / 2;
+    padding-top: $content-padding-medium * .5;
     line-height: $workflow-widget-row-height;
 
     float: left;
@@ -69,7 +69,7 @@ table.grid {
 
 .workflow-entity {
     display: flex;
-    padding: $content-padding-medium / 2 0;
+    padding: $content-padding-medium * .5 0;
 
     .workflow-label {
         padding: 0 6px;
@@ -157,8 +157,8 @@ table.grid {
         height: 0;
         width: 0;
         border-left: $workflow-widget-arrow-skew solid transparent;
-        border-top: $workflow-widget-row-height / 2 solid $workflow-step-background-color;
-        border-bottom: $workflow-widget-row-height / 2 solid $workflow-step-background-color;
+        border-top: $workflow-widget-row-height * .5 solid $workflow-step-background-color;
+        border-bottom: $workflow-widget-row-height * .5 solid $workflow-step-background-color;
         line-height: 0;
     }
 
@@ -172,8 +172,8 @@ table.grid {
         height: 0;
         width: 0;
         border-left: $workflow-widget-arrow-skew solid $workflow-step-background-color;
-        border-top: $workflow-widget-row-height / 2 solid transparent;
-        border-bottom: $workflow-widget-row-height / 2 solid transparent;
+        border-top: $workflow-widget-row-height * .5 solid transparent;
+        border-bottom: $workflow-widget-row-height * .5 solid transparent;
         line-height: 0;
     }
 

@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-$dam-offset-global: $content-padding-small / 2 !default;
+$dam-offset-global: $content-padding-small * .5 !default;
 $dam-section-width: $field-width !default;
 
 $dam-file-offset-top: $dam-offset-global !default;

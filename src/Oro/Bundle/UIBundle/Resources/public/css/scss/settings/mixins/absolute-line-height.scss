@@ -1,10 +1,12 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 // Remove the unit of a length
 // @return number
 // Use: $value: strip-units(10px); -> 10
 @function strip-units($value) {
-    @return $value / ($value * 0 + 1);
+    @return math.div($value, $value * 0 + 1);
 }
 
 // Returns absolute value of line-height in font-size units, if it's given in relative units
@@ -20,7 +22,7 @@
     @if $line-unit == '' or $line-unit == 'em' or $line-unit == 'rem' {
         @return $line-value * $font-size;
     } @else if $line-unit == '%' {
-        @return ($line-value / 100) * $font-size;
+        @return ($line-value * .01) * $font-size;
     } @else {
         @return $line-height;
     }
