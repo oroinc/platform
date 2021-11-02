@@ -11,13 +11,12 @@ use Twig\Environment;
 class ControllerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    protected $twig;
+    private $twig;
 
-    /** @var array */
-    protected $translations = [
+    private array $translations = [
         'jsmessages' => [
             'foo' => 'Foo',
             'bar' => 'Bar',
@@ -61,7 +60,6 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
             []
         );
 
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
         $request->expects(self::once())
             ->method('getMimeType')
@@ -78,26 +76,20 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderRenderJsTranslationContent
      */
-    public function testRenderJsTranslationContent($params, $expected): void
+    public function testRenderJsTranslationContent(array $params, array $expected): void
     {
-        $this->twig
-            ->expects(self::any())
+        $this->twig->expects(self::any())
             ->method('render')
-            ->willReturnCallback(
-                function () {
-                    $params = func_get_arg(1);
-                    return $params['json'];
-                }
-            );
+            ->willReturnCallback(function (string $name, array $context) {
+                return $context['json'];
+            });
 
         $this->translator
             ->expects(self::any())
             ->method('getTranslations')
-            ->willReturnCallback(
-                function ($domains) {
-                    return array_intersect_key($this->translations, array_flip($domains));
-                }
-            );
+            ->willReturnCallback(function ($domains) {
+                return array_intersect_key($this->translations, array_flip($domains));
+            });
 
         $controller = new Controller(
             $this->translator,

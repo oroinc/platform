@@ -13,10 +13,10 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 class TranslationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
+    private $provider;
 
     /** @var TranslationListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {
@@ -29,7 +29,9 @@ class TranslationListenerTest extends \PHPUnit\Framework\TestCase
         $language = new Language();
         $event = $this->getEvent();
 
-        $this->provider->expects($this->once())->method('getDefaultLanguage')->willReturn($language);
+        $this->provider->expects($this->once())
+            ->method('getDefaultLanguage')
+            ->willReturn($language);
 
         $this->assertNull($event->getDatagrid()->getParameters()->get(TranslationListener::PARAM));
 
@@ -38,10 +40,7 @@ class TranslationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($language, $event->getDatagrid()->getParameters()->get(TranslationListener::PARAM));
     }
 
-    /**
-     * @return BuildBefore
-     */
-    protected function getEvent()
+    private function getEvent(): BuildBefore
     {
         $config = DatagridConfiguration::create([]);
         $datagrid = new Datagrid('test', $config, new ParameterBag());

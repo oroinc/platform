@@ -4,34 +4,31 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
     /** @var ImageLinkFormatter */
-    protected $formatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    private $formatter;
 
     protected function setUp(): void
     {
-        $this->manager = $this
-            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(AttachmentManager::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
-            ->getMock();
-        $this->formatter  = new ImageLinkFormatter($this->manager, $this->translator);
+        $this->formatter = new ImageLinkFormatter($this->manager, $this->translator);
     }
 
     public function testGetDefaultValue()
     {
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.attachment.formatter.image_link.default')
             ->willReturn('test');
@@ -43,8 +40,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $file->setOriginalFilename('test.png');
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
             ->with($file, 100, 100)
             ->willReturn('http://test.com/image.png');
@@ -60,8 +56,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $height = 30;
         $title = 'test title';
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
             ->with($file, $width, $height)
             ->willReturn('http://test.com/image.png');

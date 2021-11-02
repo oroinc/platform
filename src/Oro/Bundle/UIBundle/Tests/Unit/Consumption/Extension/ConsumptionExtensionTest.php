@@ -12,7 +12,6 @@ use Symfony\Component\Routing\RequestContext;
 
 class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var string */
     private const URL = 'https://test.host:444/index.php/admin/path';
 
     private RequestContext $requestContext;
@@ -24,7 +23,7 @@ class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->requestContext = new RequestContext();
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager
+        $configManager->expects($this->any())
             ->method('get')
             ->with('oro_ui.application_url')
             ->willReturn(self::URL);

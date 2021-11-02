@@ -3,28 +3,28 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Helper;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityInheritanceTargetsHelper */
-    protected $activityInheritanceTargetsHelper;
+    private $activityInheritanceTargetsHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
-    protected $registry;
+    private $registry;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->registry = $this->createMock(Registry::class);
 
         $this->activityInheritanceTargetsHelper = new ActivityInheritanceTargetsHelper(
             $this->configManager,
@@ -48,8 +48,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasInheritancesEmptyValues()
     {
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('getValues')->willReturn([]);
 
@@ -64,8 +63,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasInheritancesNullValues()
     {
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('getValues')->willReturn(null);
 
@@ -80,8 +78,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasInheritancesNotConfigured()
     {
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('getValues')->willReturn(['some']);
 
@@ -96,8 +93,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHasInheritancesConfigured()
     {
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('getValues')->willReturn(['inheritance_targets' => ['test']]);
 
@@ -137,14 +133,9 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedDQL, $mainQb->getDQL());
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    protected function prepareMock()
+    private function prepareMock(): QueryBuilder
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $expr = new Expr();
         $em->expects($this->any())->method('getExpressionBuilder')->willReturn($expr);
 

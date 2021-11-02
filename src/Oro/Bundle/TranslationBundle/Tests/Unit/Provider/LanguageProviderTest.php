@@ -13,17 +13,25 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class LanguageProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private LanguageRepository$repository;
-    private AclHelper $aclHelper;
-    private LanguageProvider $provider;
+    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
+
+    /** @var LanguageProvider */
+    private $provider;
+
     protected function setUp(): void
     {
         $this->repository = $this->createMock(LanguageRepository::class);
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->method('getRepository')->willReturnMap([[Language::class, null, $this->repository]]);
         $this->aclHelper = $this->createMock(AclHelper::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($this->repository);
 
         $this->provider = new LanguageProvider(
             $doctrine,
@@ -37,45 +45,49 @@ class LanguageProviderTest extends \PHPUnit\Framework\TestCase
         $allLanguages = ['en' => true, 'de_DE' => true, 'uk_UA' => true];
         $enabledLanguages = ['en' => true, 'uk_UA' => true];
 
-        $this->repository->method('getAvailableLanguageCodesAsArrayKeys')->willReturnMap([
-            [false, $allLanguages],
-            [true, $enabledLanguages],
-        ]);
+        $this->repository->expects(self::any())
+            ->method('getAvailableLanguageCodesAsArrayKeys')
+            ->willReturnMap([
+                [false, $allLanguages],
+                [true, $enabledLanguages],
+            ]);
 
-        static::assertSame(\array_keys($allLanguages), $this->provider->getAvailableLanguageCodes(false));
-        static::assertSame(\array_keys($enabledLanguages), $this->provider->getAvailableLanguageCodes(true));
+        self::assertSame(array_keys($allLanguages), $this->provider->getAvailableLanguageCodes(false));
+        self::assertSame(array_keys($enabledLanguages), $this->provider->getAvailableLanguageCodes(true));
     }
 
     public function testGetAvailableLanguagesByCurrentUser(): void
     {
         $expectedLanguages = [new Language()];
 
-        $this->repository->expects(static::once())
+        $this->repository->expects(self::once())
             ->method('getAvailableLanguagesByCurrentUser')
             ->with($this->aclHelper)
             ->willReturn($expectedLanguages);
 
-        static::assertSame($expectedLanguages, $this->provider->getAvailableLanguagesByCurrentUser());
+        self::assertSame($expectedLanguages, $this->provider->getAvailableLanguagesByCurrentUser());
     }
 
     public function testGetLanguages(): void
     {
         $expectedLanguages = [new Language()];
 
-        $this->repository->expects(static::once())->method('getLanguages')->willReturn($expectedLanguages);
+        $this->repository->expects(self::once())
+            ->method('getLanguages')
+            ->willReturn($expectedLanguages);
 
-        static::assertSame($expectedLanguages, $this->provider->getLanguages());
+        self::assertSame($expectedLanguages, $this->provider->getLanguages());
     }
 
     public function testGetDefaultLanguage(): void
     {
         $language = new Language();
 
-        $this->repository->expects(static::once())
+        $this->repository->expects(self::once())
             ->method('findOneBy')
             ->with(['code' => Translator::DEFAULT_LOCALE])
             ->willReturn($language);
 
-        static::assertSame($language, $this->provider->getDefaultLanguage());
+        self::assertSame($language, $this->provider->getDefaultLanguage());
     }
 }

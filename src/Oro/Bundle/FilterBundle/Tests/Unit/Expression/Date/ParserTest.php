@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 use Carbon\Carbon;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
+use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
@@ -12,32 +13,20 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /** @var Parser */
     private $parser;
 
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
     protected function setUp(): void
     {
-        $this->localeSettings = $this->createMock(LocaleSettings::class);
-        $this->localeSettings
-            ->expects($this->any())
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $localeSettings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $this->parser = new Parser($this->localeSettings);
-    }
 
-    protected function tearDown(): void
-    {
-        unset($this->parser);
+        $this->parser = new Parser($localeSettings);
     }
 
     /**
      * @dataProvider parseProvider
-     *
-     * @param array $tokens
-     * @param mixed $expectedResult
-     * @param null|string $expectedException
      */
-    public function testParse($tokens, $expectedResult, $expectedException = null)
+    public function testParse(array $tokens, mixed $expectedResult, ?string $expectedException = null)
     {
         if (null !== $expectedException) {
             $this->expectException($expectedException);
@@ -47,10 +36,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function parseProvider()
+    public function parseProvider(): array
     {
         return [
             'should merge date and time' => [
@@ -89,7 +75,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_INTEGER, 1),
                 ],
                 null,
-                '\LogicException'
+                \LogicException::class
             ],
             'should check parentheses syntax close w/o open' => [
                 [
@@ -97,7 +83,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_PUNCTUATION, ')'),
                 ],
                 null,
-                '\LogicException'
+                \LogicException::class
             ],
             'one variable are allowed per expression' => [
                 [
@@ -106,7 +92,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_VARIABLE, 3),
                 ],
                 null,
-                'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
+                SyntaxException::class
             ]
         ];
     }

@@ -21,8 +21,13 @@
 
     &.action-cell {
         width: $datagrid-body-cell-action-cell-width;
+        padding-right: $datagrid-body-cell-action-offset;
 
         text-align: $datagrid-body-cell-action-cell-text-align;
+    }
+
+    &.dropdown-action-cell {
+        padding-right: $datagrid-body-cell-dropdown-action-offset;
     }
 
     &-poNumber,

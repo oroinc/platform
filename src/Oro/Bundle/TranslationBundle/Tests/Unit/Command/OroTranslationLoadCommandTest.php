@@ -13,35 +13,28 @@ use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $languageProvider;
+    private $languageProvider;
 
     /** @var OrmTranslationLoader */
-    protected $translationLoader;
+    private $translationLoader;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
+    private $input;
 
     /** @var OutputStub */
-    protected $output;
+    private $output;
 
     /** @var OroTranslationLoadCommand */
-    protected $command;
+    private $command;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
@@ -55,15 +48,19 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         $language = new Language();
 
         $entityRepository = $this->createMock(EntityRepository::class);
-        $entityRepository->expects($this->any())->method('findOneBy')->willReturn($language);
+        $entityRepository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturn($language);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
-        $managerRegistry->expects($this->any())->method('getRepository')->willReturn($entityRepository);
+        $managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
+        $managerRegistry->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($entityRepository);
 
-        /** @var DatabasePersister|\PHPUnit\Framework\MockObject\MockObject $databasePersister */
         $databasePersister = $this->createMock(DatabasePersister::class);
 
         $this->input = $this->createMock(InputInterface::class);
@@ -78,23 +75,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset(
-            $this->translator,
-            $this->languageProvider,
-            $this->translationManager,
-            $this->translationLoader,
-            $this->container,
-            $this->input,
-            $this->output,
-            $this->command
-        );
-    }
-
     public function testConfigure()
     {
         $this->assertNotEmpty($this->command->getDescription());
@@ -105,12 +85,12 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute()
     {
-        $this->input->expects($this->exactly(3))->method('getOption')->willReturnMap(
-            [
+        $this->input->expects($this->exactly(3))
+            ->method('getOption')
+            ->willReturnMap([
                 ['languages', []],
                 ['rebuild-cache', 0]
-            ]
-        );
+            ]);
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguageCodes')
@@ -135,18 +115,19 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteWithLanguageAndRebuildCache()
     {
-        $this->input->expects($this->any())->method('getOption')->willReturnMap(
-            [
+        $this->input->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
                 ['languages', ['locale1']],
                 ['rebuild-cache', 1]
-            ]
-        );
+            ]);
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguageCodes')
             ->willReturn(['locale1', 'currentLocale']);
 
-        $this->translator->expects($this->exactly(2))->method('rebuildCache');
+        $this->translator->expects($this->exactly(2))
+            ->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
@@ -164,10 +145,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    protected function getCatalogueMap()
+    private function getCatalogueMap(): array
     {
         return [
             [

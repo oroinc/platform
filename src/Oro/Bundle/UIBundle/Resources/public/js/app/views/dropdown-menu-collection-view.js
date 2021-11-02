@@ -5,6 +5,7 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     const BaseView = require('oroui/js/app/views/base/view');
+    const itemTemplate = require('tpl-loader!oroui/templates/dropdown-menu-collection--item.html');
 
     /**
      * DropdownMenuCollectionView renders dropdown element based on passed items collection
@@ -66,8 +67,8 @@ define(function(require) {
         },
 
         template: _.template([
-            '<div class="dropdown-item" data-name="fallback"><%= fallbackText %></div>',
-            '<div class="dropdown-item" data-name="loading"><%= loadingText %></div>',
+            '<div class="dropdown-item" data-name="fallback"><%- fallbackText %></div>',
+            '<div class="dropdown-item" data-name="loading"><%- loadingText %></div>',
             '<ul class="list-unstyled" data-name="list" role="menu"></ul>'
         ].join('')),
 
@@ -102,7 +103,7 @@ define(function(require) {
 
         itemView: BaseView.extend({// eslint-disable-line oro/named-constructor
             tagName: 'li',
-            template: _.template('<a href="#" class="dropdown-item" data-value="<%= id %>"><%= text %></a>')
+            template: itemTemplate
         }),
 
         onItemClick: function(e) {

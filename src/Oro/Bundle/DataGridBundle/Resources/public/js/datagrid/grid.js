@@ -24,6 +24,7 @@ define(function(require) {
     const PluginManager = require('oroui/js/app/plugins/plugin-manager');
     const scrollHelper = require('oroui/js/tools/scroll-helper');
     const PageableCollection = require('../pageable-collection');
+    const GridRowsCounter = require('./grid-rows-counter').default;
     const util = require('./util');
     const tools = require('oroui/js/tools');
 
@@ -294,24 +295,25 @@ define(function(require) {
          * @param options
          */
         backgridInitialize: function(options) {
-            const filteredOptions = _.omit(
+            const gridRowsCounter = this.gridRowsCounter = new GridRowsCounter(this);
+            const filteredOptions = Object.assign({gridRowsCounter}, _.omit(
                 options,
                 ['el', 'id', 'attributes', 'className', 'tagName', 'events', 'themeOptions']
-            );
+            ));
 
             this.header = options.header || this.header;
-            const headerOptions = _.extend({}, filteredOptions);
+            const headerOptions = Object.assign({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.header, headerOptions);
             if (headerOptions.themeOptions.hide) {
                 this.header = null;
             }
 
             this.body = options.body || this.body;
-            const bodyOptions = _.extend({}, filteredOptions);
+            const bodyOptions = Object.assign({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
 
             this.footer = options.footer || this.footer;
-            const footerOptions = _.extend({}, filteredOptions);
+            const footerOptions = Object.assign({}, filteredOptions);
             this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
             if (footerOptions.themeOptions.hide) {
                 this.footer = null;
@@ -508,6 +510,7 @@ define(function(require) {
             delete this.refreshAction;
             delete this.resetAction;
             delete this.exportAction;
+            delete this.gridRowsCounter;
 
             const subviews = ['header', 'body', 'footer', 'loadingMask'];
             _.each(subviews, function(viewName) {
@@ -629,7 +632,9 @@ define(function(require) {
                 actions: this.rowActions,
                 massActions: this.massActions,
                 manageable: false,
-                order: Infinity
+                order: Infinity,
+                // Skip to add specific attributes if this cell has an empty value.
+                notMarkAsBlank: true
             });
             return column;
         },
@@ -650,7 +655,9 @@ define(function(require) {
                 manageable: false,
                 cell: this.selectRowCell,
                 headerCell: this.selectAllHeaderCell,
-                order: -Infinity
+                order: -Infinity,
+                // Skip to add specific attributes if this cell has an empty value.
+                notMarkAsBlank: true
             });
             return column;
         },
@@ -917,6 +924,7 @@ define(function(require) {
             });
 
             this.listenTo(this.collection, 'remove', this._onRemove);
+            this.listenTo(this.collection, 'add reset', this.setGridAriaAttrs);
 
             this.listenTo(this.collection, 'change', function(model) {
                 this.$el.trigger('datagrid:change:' + this.name, model);
@@ -1056,7 +1064,6 @@ define(function(require) {
                 tableClassName: this.themeOptions.tableClassName || ''
             }));
             this.$grid = this.$(this.selectors.grid);
-
             this.renderToolbar();
             this.renderGrid();
             this.renderNoDataBlock();
@@ -1097,14 +1104,27 @@ define(function(require) {
             if (this.header) {
                 this.$grid.append(this.header.render().$el);
             }
-            if (this.footer) {
-                this.$grid.append(this.footer.render().$el);
-            }
             if (this.body) {
                 this.$grid.append(this.body.render().$el);
             }
+            if (this.footer) {
+                this.$grid.append(this.footer.render().$el);
+            }
+
+            this.$grid.attr('role', 'grid');
+            this.setGridAriaAttrs();
 
             mediator.trigger('grid_load:complete', this.collection, this.$grid);
+        },
+
+        /**
+         * Set aria attributes for grid
+         */
+        setGridAriaAttrs() {
+            this.$grid.attr({
+                'aria-rowcount': this.gridRowsCounter.getGridRowsCount(),
+                'aria-colcount': this.columns.filter(model => model.renderable).length
+            });
         },
 
         /**
@@ -1296,6 +1316,7 @@ define(function(require) {
          */
         showLoading: function() {
             this.loadingMask.show();
+            this.trigger('loading-mask:show');
         },
 
         /**
@@ -1310,6 +1331,7 @@ define(function(require) {
          * Hide loading mask
          */
         hideLoading: function() {
+            this.trigger('loading-mask:hide');
             this.loadingMask.hide();
         },
 
@@ -1359,6 +1381,7 @@ define(function(require) {
                 }
             }
 
+            this.setGridAriaAttrs();
             mediator.trigger('datagrid:afterRemoveRow:' + this.name);
         },
 

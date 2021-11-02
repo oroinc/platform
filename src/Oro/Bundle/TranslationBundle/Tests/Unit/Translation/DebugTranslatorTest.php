@@ -6,17 +6,14 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var array
-     */
-    private $messages = [
+    private array $messages = [
         'fr' => [
             'jsmessages' => [
                 'foo' => 'foo (FR)',
@@ -40,14 +37,15 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @param string $locale
-     * @param string $domain
-     * @param string $source
-     * @param string $expected
      * @dataProvider transDataProvider
      */
-    public function testTrans($locale, $domain, $source, array $parameters, $expected): void
-    {
+    public function testTrans(
+        string $locale,
+        string $domain,
+        string $source,
+        array $parameters,
+        string $expected
+    ): void {
         $locales = array_keys($this->messages);
         foreach ($locales as $key => $value) {
             if ($value === $locale) {
@@ -96,14 +94,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * Create a catalog and fills it in with messages
-     *
-     * @param string $locale
-     * @param array $dictionary
-     * @return MessageCatalogue
-     */
-    private function getCatalogue($locale, $dictionary): MessageCatalogue
+    private function getCatalogue(string $locale, array $dictionary): MessageCatalogue
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($dictionary as $domain => $messages) {
@@ -114,29 +105,20 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         return $catalogue;
     }
 
-    /**
-     * Creates a mock of Loader
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getLoader()
+    private function getLoader(): LoaderInterface
     {
         $messages = $this->messages;
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
             ->method('load')
-            ->willReturnCallback(function ($resource, $locale, $domain) use ($messages) {
+            ->willReturnCallback(function ($resource, $locale) use ($messages) {
                 return $this->getCatalogue($locale, $messages[$locale]);
             });
 
         return $loader;
     }
 
-    /**
-     * @param array $fallbackLocales
-     * @return TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getStrategyProvider(array $fallbackLocales = [])
+    private function getStrategyProvider(array $fallbackLocales = []): TranslationStrategyProvider
     {
         $strategy = $this->createMock(TranslationStrategyInterface::class);
         $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
@@ -157,62 +139,26 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         return $strategyProvider;
     }
 
-    /**
-     * Creates a mock of Container
-     *
-     * @param LoaderInterface $loader
-     * @param TranslationStrategyProvider $strategyProvider
-     * @return ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getContainer($loader, $strategyProvider)
-    {
-        $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-        $valueMap = [
-            ['loader', $exceptionFlag, $loader],
-            ['oro_translation.strategy.provider', $exceptionFlag, $strategyProvider]
-        ];
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturnMap($valueMap);
-
-        return $container;
-    }
-
-    /**
-     * Creates instance of Translator
-     *
-     * @param $loader
-     * @param TranslationStrategyProvider $strategyProvider
-     * @param array $options
-     * @return DebugTranslator
-     */
     private function getTranslator(
-        $loader,
+        LoaderInterface $loader,
         TranslationStrategyProvider $strategyProvider,
         array $options = []
     ): DebugTranslator {
+        $container = TestContainerBuilder::create()
+            ->add('loader', $loader)
+            ->add('oro_translation.strategy.provider', $strategyProvider)
+            ->getContainer($this);
+
         $translator = new DebugTranslator(
-            $this->getContainer($loader, $strategyProvider),
+            $container,
             new MessageFormatter(),
             'en',
             ['loader' => ['loader']],
             array_merge(['resource_files' => []], $options)
         );
 
-        $strategy = $this->createMock(TranslationStrategyInterface::class);
-
-        $strategyProvider->expects($this->any())
-            ->method('getStrategy')
-            ->willReturn($strategy);
-        $strategyProvider->expects($this->any())
-            ->method('getFallbackLocales')
-            ->willReturn([]);
-
         $translator->setStrategyProvider($strategyProvider);
 
-        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $translator->setTranslationDomainProvider($translationDomainProvider);
 

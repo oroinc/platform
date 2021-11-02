@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PriceTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -27,10 +27,13 @@ class PriceTypeTest extends FormIntegrationTestCase
         $localeSettings = $this->createMock(LocaleSettings::class);
         $currencyNameHelper = $this->createMock(CurrencyNameHelper::class);
 
+        $priceType = new PriceType();
+        $priceType->setDataClass(Price::class);
+
         return [
             new PreloadedExtension(
                 [
-                    PriceType::class => PriceTypeGenerator::createPriceType($this),
+                    PriceType::class => $priceType,
                     CurrencySelectionType::class => new CurrencySelectionType(
                         $currencyProvider,
                         $localeSettings,
@@ -55,7 +58,7 @@ class PriceTypeTest extends FormIntegrationTestCase
         self::assertEquals(2432765.98, $form->getData()->getValue());
     }
 
-    public function testValueWhenDeutchLocale()
+    public function testValueWhenGermanLocale()
     {
         $previousLocale = \Locale::getDefault();
         try {
@@ -74,15 +77,15 @@ class PriceTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param bool $isValid
-     * @param mixed $defaultData
-     * @param array $submittedData
-     * @param mixed $expectedData
-     * @param array $options
      * @dataProvider submitProvider
      */
-    public function testSubmit($isValid, $defaultData, $submittedData, $expectedData, array $options = [])
-    {
+    public function testSubmit(
+        bool $isValid,
+        mixed $defaultData,
+        array $submittedData,
+        mixed $expectedData,
+        array $options = []
+    ) {
         $form = $this->factory->create(PriceType::class, $defaultData, $options);
 
         $this->assertEquals($defaultData, $form->getData());
@@ -92,10 +95,7 @@ class PriceTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             'price without value' => [
@@ -173,9 +173,6 @@ class PriceTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * Test getName
-     */
     public function testGetName()
     {
         $formType = $this->factory->create(PriceType::class);

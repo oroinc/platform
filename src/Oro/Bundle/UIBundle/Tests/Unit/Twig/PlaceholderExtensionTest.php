@@ -20,17 +20,14 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
     private const ACTION_NAME = 'Foo\Bundle\BarBundle\Controller\TestController::testAction';
     private const DELIMITER = '<br/>';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $environment;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var PlaceholderProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $placeholderProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $kernelExtension;
 
     /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $fragmentHandler;
@@ -38,8 +35,7 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderExtension */
     private $extension;
 
-    /** @var array */
-    private $placeholders = [
+    private array $placeholders = [
         self::PLACEHOLDER_NAME => [
             'items' => [
                 ['template' => self::TEMPLATE_NAME],
@@ -111,8 +107,6 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    //@codingStandardsIgnoreStart
-    //@codingStandardsIgnoreEnd
     public function testRenderPlaceholderFails()
     {
         $this->expectException(\RuntimeException::class);

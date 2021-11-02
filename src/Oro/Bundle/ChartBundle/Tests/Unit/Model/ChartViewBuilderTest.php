@@ -14,7 +14,7 @@ use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Twig\Environment;
 
 /**
@@ -22,71 +22,66 @@ use Twig\Environment;
  */
 class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEMPLATE = 'template.twig.html';
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    /** @var ConfigProvider|MockObject */
-    protected $configProvider;
+    /** @var TransformerFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $transformerFactory;
 
-    /** @var TransformerFactory|MockObject */
-    protected $transformerFactory;
-
-    /** @var Environment|MockObject */
-    protected $twig;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
     /** @var ChartViewBuilder */
-    protected $builder;
+    private $builder;
 
     protected function setUp(): void
     {
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
-        $this->transformerFactory = $this
-            ->getMockBuilder(TransformerFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->transformerFactory = $this->createMock(TransformerFactory::class);
         $this->twig = $this->createMock(Environment::class);
 
-        $this->builder = new class(
+        $this->builder = new ChartViewBuilder(
             $this->configProvider,
             $this->transformerFactory,
             $this->twig
-        ) extends ChartViewBuilder {
-            public function xgetData(): DataInterface
-            {
-                return $this->data;
-            }
+        );
+    }
 
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
+    private function getData(ChartViewBuilder $builder): DataInterface
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'data');
+    }
 
-            public function xgetDatagridColumnsDefinition(): array
-            {
-                return $this->datagridColumnsDefinition;
-            }
+    private function getOptions(ChartViewBuilder $builder): array
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'options');
+    }
 
-            public function xgetDataMapping(): ?array
-            {
-                return $this->dataMapping;
-            }
-        };
+    private function getDatagridColumnsDefinition(ChartViewBuilder $builder): array
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'datagridColumnsDefinition');
+    }
+
+    private function getDataMapping(ChartViewBuilder $builder): ?array
+    {
+        return ReflectionUtil::getPropertyValue($builder, 'dataMapping');
     }
 
     public function testSetData()
     {
         $data = $this->createMock(DataInterface::class);
 
-        static::assertSame($this->builder, $this->builder->setData($data));
-        static::assertEquals($data, $this->builder->xgetData());
+        self::assertSame($this->builder, $this->builder->setData($data));
+        self::assertEquals($data, $this->getData($this->builder));
     }
 
     public function testSetArrayData()
     {
         $result = $this->builder->setArrayData(['foo' => 'bar']);
 
-        static::assertSame($this->builder, $result);
-        static::assertInstanceOf(ArrayData::class, $this->builder->xgetData());
-        static::assertEquals(new ArrayData(['foo' => 'bar']), $this->builder->xgetData());
+        self::assertSame($this->builder, $result);
+        self::assertInstanceOf(ArrayData::class, $this->getData($this->builder));
+        self::assertEquals(new ArrayData(['foo' => 'bar']), $this->getData($this->builder));
     }
 
     public function testSetDataGrid()
@@ -95,14 +90,16 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $columnsDefinition = ['foo' => ['foo' => 'bar']];
         $config = DatagridConfiguration::create(['columns' => $columnsDefinition]);
 
-        $datagrid->expects(static::once())->method('getConfig')->willReturn($config);
+        $datagrid->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($config);
 
         $result = $this->builder->setDataGrid($datagrid);
 
-        static::assertSame($this->builder, $result);
-        static::assertInstanceOf(DataGridData::class, $this->builder->xgetData());
-        static::assertEquals(new DataGridData($datagrid), $this->builder->xgetData());
-        static::assertEquals($columnsDefinition, $this->builder->xgetDatagridColumnsDefinition());
+        self::assertSame($this->builder, $result);
+        self::assertInstanceOf(DataGridData::class, $this->getData($this->builder));
+        self::assertEquals(new DataGridData($datagrid), $this->getData($this->builder));
+        self::assertEquals($columnsDefinition, $this->getDatagridColumnsDefinition($this->builder));
     }
 
     public function testSetDataMapping()
@@ -111,8 +108,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setDataMapping($dataMapping);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals($dataMapping, $this->builder->xgetDataMapping());
+        self::assertSame($this->builder, $result);
+        self::assertEquals($dataMapping, $this->getDataMapping($this->builder));
     }
 
     public function testSetDataMappingIgnored()
@@ -121,8 +118,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setDataMapping($dataMapping);
 
-        static::assertSame($this->builder, $result);
-        static::assertEmpty($this->builder->xgetDataMapping());
+        self::assertSame($this->builder, $result);
+        self::assertEmpty($this->getDataMapping($this->builder));
     }
 
     public function testSetOptions()
@@ -136,8 +133,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setOptions($options);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals($expectedOptions, $this->builder->xgetOptions());
+        self::assertSame($this->builder, $result);
+        self::assertEquals($expectedOptions, $this->getOptions($this->builder));
     }
 
     public function testSetOptionsWithDataGridColumnsDefinitionMerge()
@@ -147,7 +144,9 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $config = DatagridConfiguration::create(['columns' => $columnsDefinition]);
 
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid->expects(static::once())->method('getConfig')->willReturn($config);
+        $datagrid->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($config);
 
         $options = ['name' => 'foo', 'data_schema' => ['foo' => 'bar'], 'settings' => []];
         $expectedOptions = $options;
@@ -161,8 +160,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setDataGrid($datagrid)->setOptions($options);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals($expectedOptions, $this->builder->xgetOptions());
+        self::assertSame($this->builder, $result);
+        self::assertEquals($expectedOptions, $this->getOptions($this->builder));
     }
 
     public function testSetOptionsWithoutName()
@@ -174,8 +173,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setOptions($options);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals($options, $this->builder->xgetOptions());
+        self::assertSame($this->builder, $result);
+        self::assertEquals($options, $this->getOptions($this->builder));
     }
 
     public function testSetOptionsWithoutDataSchema()
@@ -187,8 +186,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setOptions($options);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals($options, $this->builder->xgetOptions());
+        self::assertSame($this->builder, $result);
+        self::assertEquals($options, $this->getOptions($this->builder));
     }
 
     public function testSetOptionsWithDataMapping()
@@ -204,8 +203,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setOptions($options);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals(['foo' => 'bar'], $this->builder->xgetDataMapping());
+        self::assertSame($this->builder, $result);
+        self::assertEquals(['foo' => 'bar'], $this->getDataMapping($this->builder));
     }
 
     public function testSetOptionsWithDataMappingFromDataSchema()
@@ -220,8 +219,8 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->setOptions($options);
 
-        static::assertSame($this->builder, $result);
-        static::assertEquals(['label' => 'foo', 'value' => 'value'], $this->builder->xgetDataMapping());
+        self::assertSame($this->builder, $result);
+        self::assertEquals(['label' => 'foo', 'value' => 'value'], $this->getDataMapping($this->builder));
     }
 
     public function testGetView()
@@ -249,7 +248,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
             'config' => $chartConfig
         ];
 
-        $this->configProvider->expects(static::once())
+        $this->configProvider->expects(self::once())
             ->method('getChartConfig')
             ->with($chartName)
             ->willReturn($chartConfig);
@@ -259,13 +258,13 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
             ->getView();
 
         // assertions
-        static::assertInstanceOf(ChartView::class, $chartView);
+        self::assertInstanceOf(ChartView::class, $chartView);
 
-        $this->twig->expects(static::once())
+        $this->twig->expects(self::once())
             ->method('render')
             ->with(
-                static::equalTo($chartTemplate),
-                static::equalTo(\array_merge($expectedVars, ['data' => $data->toArray()]))
+                $chartTemplate,
+                array_merge($expectedVars, ['data' => $data->toArray()])
             );
 
         $chartView->render();
@@ -288,16 +287,16 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 
         $options = ['name' => $chartName, 'settings' => ['foo' => 'bar']];
 
-        $this->configProvider->expects(static::once())
+        $this->configProvider->expects(self::once())
             ->method('getChartConfig')
             ->with($chartName)
             ->willReturn($chartConfig);
 
-        $this->transformerFactory->expects(static::once())
+        $this->transformerFactory->expects(self::once())
             ->method('createTransformer')
             ->willReturn($dataTransformer);
 
-        $dataTransformer->expects(static::once())
+        $dataTransformer->expects(self::once())
             ->method('transform')
             ->with($data, $options)
             ->willReturn(new ArrayData([]));
@@ -307,13 +306,13 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
             ->getView();
 
         // assertions
-        static::assertInstanceOf(ChartView::class, $chartView);
+        self::assertInstanceOf(ChartView::class, $chartView);
 
-        $this->twig->expects(static::once())
+        $this->twig->expects(self::once())
             ->method('render')
             ->with(
-                static::anything(),
-                static::equalTo(['options' => $options, 'config' => $chartConfig, 'data' => $data->toArray()])
+                self::anything(),
+                ['options' => $options, 'config' => $chartConfig, 'data' => $data->toArray()]
             );
 
         $chartView->render();
@@ -324,7 +323,10 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Config of chart "chart_name" must have "template" key.');
 
-        $this->configProvider->expects(static::once())->method('getChartConfig')->with('chart_name')->willReturn([]);
+        $this->configProvider->expects(self::once())
+            ->method('getChartConfig')
+            ->with('chart_name')
+            ->willReturn([]);
 
         $this->builder->setOptions(['name' => 'chart_name'])->setData(new ArrayData([]))->getView();
     }
@@ -342,7 +344,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("Can't build result when setData() was not called.");
 
-        $this->configProvider->expects(ChartViewBuilderTest::once())
+        $this->configProvider->expects(self::once())
             ->method('getChartConfig')
             ->with('chart_name')
             ->willReturn([

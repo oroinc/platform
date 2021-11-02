@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
+use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,46 +13,28 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChartTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ChartType
-     */
-    protected $type;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $formBuilder;
+    /** @var ChartType */
+    private $type;
 
     protected function setUp(): void
     {
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mock = $this
-            ->getMockBuilder('Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener')
-            ->getMock();
-
-        $eventListener = new MutableFormEventSubscriber($mock);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $this->type = new ChartType($this->configProvider);
-        $this->type->setEventListener($eventListener);
+        $this->type->setEventListener(
+            new MutableFormEventSubscriber($this->createMock(ChartTypeEventListener::class))
+        );
 
         parent::setUp();
     }
 
     /**
-     * @param array $chartConfigs
-     *
      * @dataProvider chartConfigsProvider
      */
-    public function testBuildForm($chartConfigs)
+    public function testBuildForm(array $chartConfigs)
     {
         $this->configProvider->expects($this->once())
             ->method('getChartNames')
@@ -61,7 +45,7 @@ class ChartTypeTest extends FormIntegrationTestCase
                 return $chartConfigs[$name];
             });
 
-        $form = $this->factory->create(ChartType::class, null, []);
+        $form = $this->factory->create(ChartType::class);
 
         $this->assertTrue($form->has('name'));
         $this->assertTrue($form->has('settings'));
@@ -71,10 +55,7 @@ class ChartTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function chartConfigsProvider()
+    public function chartConfigsProvider(): array
     {
         return [
             'name' => [
@@ -111,7 +92,7 @@ class ChartTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {

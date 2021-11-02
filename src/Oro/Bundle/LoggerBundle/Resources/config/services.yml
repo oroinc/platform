@@ -65,3 +65,11 @@ services:
             - '@?monolog.handler.deduplicated'
         tags:
             - { name: kernel.cache_warmer, priority: -1000 }
+
+    oro_logger.event_listener.console_error:
+        public: false
+        class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleErrorSubscriber
+        arguments:
+            - '@monolog.logger.console'
+        tags:
+            - { name: kernel.event_subscriber }

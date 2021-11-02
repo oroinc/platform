@@ -11,9 +11,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
     /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $languageRepository;
 
@@ -28,17 +25,17 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->languageRepository = $this->createMock(LanguageRepository::class);
         $this->stepExecution = $this->createMock(StepExecution::class);
         $this->context = $this->createMock(ContextInterface::class);
 
-        $this->contextRegistry->expects($this->any())
+        $contextRegistry = $this->createMock(ContextRegistry::class);
+        $contextRegistry->expects($this->any())
             ->method('getByStepExecution')
             ->with($this->stepExecution)
             ->willReturn($this->context);
 
-        $this->reader = new TranslationReader($this->contextRegistry, $this->languageRepository);
+        $this->reader = new TranslationReader($contextRegistry, $this->languageRepository);
         $this->reader->setStepExecution($this->stepExecution);
     }
 

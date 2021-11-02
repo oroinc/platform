@@ -13,6 +13,7 @@ use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -224,7 +225,8 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testUserEmptyToken()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
+
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn(null);
@@ -234,7 +236,8 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testUserEmptyUser()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
+
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')

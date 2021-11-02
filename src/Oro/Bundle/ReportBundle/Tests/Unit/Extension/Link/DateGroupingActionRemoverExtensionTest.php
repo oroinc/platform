@@ -9,16 +9,12 @@ use Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension;
 
 class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $config;
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
+    private $config;
 
     protected function setUp(): void
     {
-        $this->config = $this->getMockBuilder(DatagridConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->config = $this->createMock(DatagridConfiguration::class);
     }
 
     public function testIsApplicableFalse()
@@ -79,13 +75,9 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($inputRows);
         $result->expects($this->once())
             ->method('setData')
-            ->will(
-                $this->returnCallback(
-                    function ($newRows) use ($expectedRows) {
-                        $this->assertSame($expectedRows, $newRows);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($newRows) use ($expectedRows) {
+                $this->assertSame($expectedRows, $newRows);
+            });
 
         $extension = new DateGroupingActionRemoverExtension('');
         $extension->setParameters(new ParameterBag());

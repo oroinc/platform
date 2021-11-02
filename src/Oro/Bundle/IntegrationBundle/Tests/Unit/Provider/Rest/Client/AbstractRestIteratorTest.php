@@ -103,7 +103,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedItems, $actualItems);
     }
 
-    public function iteratorDataProvider()
+    public function iteratorDataProvider(): array
     {
         return [
             'two pages, 7 records' => [
@@ -169,7 +169,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCount, $this->iterator->count());
     }
 
-    public function countDataProvider()
+    public function countDataProvider(): array
     {
         return [
             'normal'         => [

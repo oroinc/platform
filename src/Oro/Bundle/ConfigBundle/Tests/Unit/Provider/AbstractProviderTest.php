@@ -86,7 +86,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
@@ -147,7 +147,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     {
         // check good_definition.yml for further details
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
-        $form     = $provider->getForm('third_group');
+        $form = $provider->getForm('third_group');
         $this->assertInstanceOf(FormInterface::class, $form);
 
         // test that fields were added
@@ -363,7 +363,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     {
         $subscriber = $this->getMockBuilder(ConfigSubscriber::class)
             ->onlyMethods(['__construct'])
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $container = $this->createMock(ContainerInterface::class);
 
         $formType = new FormType($subscriber, $container);

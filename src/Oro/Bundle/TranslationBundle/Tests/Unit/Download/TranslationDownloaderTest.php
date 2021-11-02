@@ -15,7 +15,6 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Exception\TranslationDownloaderException;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Component\Log\Test\LogAndThrowExceptionTestTrait;
 use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -24,7 +23,6 @@ use Symfony\Component\Translation\Reader\TranslationReader;
 /** @coversDefaultClass \Oro\Bundle\TranslationBundle\Download\TranslationDownloader */
 class TranslationDownloaderTest extends \PHPUnit\Framework\TestCase
 {
-    use LogAndThrowExceptionTestTrait;
     use TempDirExtension;
 
     /**
@@ -57,19 +55,32 @@ YAML
         'escaping "double" quotes' => 'escaping "double" quotes',
     ];
 
-    private TranslationServiceAdapterInterface $translationServiceAdapter;
-    private TranslationMetricsProviderInterface $translationMetricsProvider;
-    private JsTranslationDumper $jsTranslationDumper;
-    private TranslationReader $translationReader;
-    private TranslationDownloader $downloader;
-    private DatabasePersister $databasePersister;
-    private ManagerRegistry $doctrine;
-    private LoggerInterface $logger;
+    /** @var TranslationServiceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationServiceAdapter;
 
-    private string $className = TranslationDownloader::class;
+    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationMetricsProvider;
+
+    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
+    private $jsTranslationDumper;
+
+    /** @var TranslationReader */
+    private $translationReader;
+
+    /** @var DatabasePersister|\PHPUnit\Framework\MockObject\MockObject */
+    private $databasePersister;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var TranslationDownloader */
+    private $downloader;
+
     private string $kernelCacheDir;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $this->translationServiceAdapter = $this->createMock(TranslationServiceAdapterInterface::class);
@@ -104,12 +115,12 @@ YAML
             'lastBuildDate' => new \DateTime()
         ];
 
-        $this->translationMetricsProvider->expects(static::once())
+        $this->translationMetricsProvider->expects(self::once())
             ->method('getForLanguage')
             ->with($languageCode)
             ->willReturn($metrics);
 
-        static::assertSame($metrics, $this->downloader->fetchLanguageMetrics($languageCode));
+        self::assertSame($metrics, $this->downloader->fetchLanguageMetrics($languageCode));
     }
 
     /** @covers ::downloadAndApplyTranslations */
@@ -126,27 +137,36 @@ YAML
         ];
 
         $em = $this->createMock(EntityManager::class);
-        $this->doctrine->method('getManagerForClass')->willReturnMap([[Language::class, $em]]);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Language::class)
+            ->willReturn($em);
         $repository = $this->createMock(LanguageRepository::class);
-        $em->method('getRepository')->willReturnMap([[Language::class, $repository]]);
-        $this->translationMetricsProvider->method('getForLanguage')->willReturnMap([[$languageCode, $metrics]]);
+        $em->expects(self::once())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($repository);
+        $this->translationMetricsProvider->expects(self::once())
+            ->method('getForLanguage')
+            ->with($languageCode)
+            ->willReturn($metrics);
 
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('findOneBy')
             ->with(['code' => $languageCode])
             ->willReturn($languageEntity);
 
-        $this->translationServiceAdapter->expects(static::once())
+        $this->translationServiceAdapter->expects(self::once())
             ->method('downloadLanguageTranslationsArchive')
-            ->with($languageCode, static::isType('string'));
+            ->with($languageCode, self::isType('string'));
 
-        $this->jsTranslationDumper->expects(static::once())
+        $this->jsTranslationDumper->expects(self::once())
             ->method('dumpTranslations')
             ->with([$languageCode]);
 
-        $em->expects(static::once())
+        $em->expects(self::once())
             ->method('flush')
-            ->with(static::callback(static fn (Language $lang) => $lang->getInstalledBuildDate() === $lastBuildDate));
+            ->with(self::callback(static fn (Language $lang) => $lang->getInstalledBuildDate() === $lastBuildDate));
 
         $this->downloader->downloadAndApplyTranslations($languageCode);
     }
@@ -157,17 +177,32 @@ YAML
         $languageCode = 'uk_UA';
 
         $em = $this->createMock(EntityManager::class);
-        $this->doctrine->method('getManagerForClass')->willReturnMap([[Language::class, $em]]);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Language::class)
+            ->willReturn($em);
         $repository = $this->createMock(LanguageRepository::class);
-        $em->method('getRepository')->willReturnMap([[Language::class, $repository]]);
-        $repository->method('findOneBy')->willReturn(null);
+        $em->expects(self::once())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($repository);
+        $repository->expects(self::once())
+            ->method('findOneBy')
+            ->willReturn(null);
 
-        $this->expectThrowErrorException(
-            TranslationDownloaderException::class,
-            'Language with code "' . $languageCode . '" should be added first.',
-            'Language with code "{language_code}" should be added first.',
-            ['language_code' => $languageCode]
-        );
+        $this->expectException(TranslationDownloaderException::class);
+        $this->expectExceptionMessage('Language with code "' . $languageCode . '" should be added first.');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Language with code "{language_code}" should be added first.',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('language_code'),
+                    self::callback(fn (array $val) => $val['language_code'] === $languageCode),
+                    self::arrayHasKey('called_in')
+                )
+            );
 
         $this->downloader->downloadAndApplyTranslations($languageCode);
     }
@@ -179,18 +214,36 @@ YAML
         $languageEntity = new Language();
 
         $em = $this->createMock(EntityManager::class);
-        $this->doctrine->method('getManagerForClass')->willReturnMap([[Language::class, $em]]);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Language::class)
+            ->willReturn($em);
         $repository = $this->createMock(LanguageRepository::class);
-        $em->method('getRepository')->willReturnMap([[Language::class, $repository]]);
-        $repository->method('findOneBy')->willReturnMap([[['code' => $languageCode], null, $languageEntity]]);
-        $this->translationMetricsProvider->method('getForLanguage')->willReturn(null);
+        $em->expects(self::once())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($repository);
+        $repository->expects(self::once())
+            ->method('findOneBy')
+            ->with(['code' => $languageCode])
+            ->willReturn($languageEntity);
+        $this->translationMetricsProvider->expects(self::once())
+            ->method('getForLanguage')
+            ->willReturn(null);
 
-        $this->expectThrowErrorException(
-            TranslationDownloaderException::class,
-            'No available translations found for "' . $languageCode . '".',
-            'No available translations found for "{language_code}".',
-            ['language_code' => $languageCode]
-        );
+        $this->expectException(TranslationDownloaderException::class);
+        $this->expectExceptionMessage('No available translations found for "' . $languageCode . '".');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'No available translations found for "{language_code}".',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('language_code'),
+                    self::callback(fn (array $val) => $val['language_code'] === $languageCode),
+                    self::arrayHasKey('called_in')
+                )
+            );
 
         $this->downloader->downloadAndApplyTranslations($languageCode);
     }
@@ -209,22 +262,44 @@ YAML
         ];
 
         $em = $this->createMock(EntityManager::class);
-        $this->doctrine->method('getManagerForClass')->willReturnMap([[Language::class, $em]]);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Language::class)
+            ->willReturn($em);
         $repository = $this->createMock(LanguageRepository::class);
-        $em->method('getRepository')->willReturnMap([[Language::class, $repository]]);
-        $repository->method('findOneBy')->willReturnMap([[['code' => $languageCode], null, $languageEntity]]);
-        $this->translationMetricsProvider->method('getForLanguage')->willReturnMap([[$languageCode, $metrics]]);
+        $em->expects(self::once())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($repository);
+        $repository->expects(self::once())
+            ->method('findOneBy')
+            ->with(['code' => $languageCode])
+            ->willReturn($languageEntity);
+        $this->translationMetricsProvider->expects(self::once())
+            ->method('getForLanguage')
+            ->with($languageCode)
+            ->willReturn($metrics);
 
         $ormException = new ORMException('text', 12345);
-        $em->method('flush')->willThrowException($ormException);
+        $em->expects(self::once())
+            ->method('flush')
+            ->willThrowException($ormException);
 
-        $this->expectThrowErrorException(
-            TranslationDownloaderException::class,
-            'Cannot update installed build date for "' . $languageCode . '".',
-            'Cannot update installed build date for "{language_code}".',
-            ['language_code' => $languageCode],
-            $ormException
-        );
+        $this->expectException(TranslationDownloaderException::class);
+        $this->expectExceptionMessage('Cannot update installed build date for "' . $languageCode . '".');
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'Cannot update installed build date for "{language_code}".',
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('language_code'),
+                    self::callback(fn (array $val) => $val['language_code'] === $languageCode),
+                    self::arrayHasKey('called_in'),
+                    self::arrayHasKey('exception'),
+                    self::callback(fn (array $val) => $val['exception'] === $ormException)
+                )
+            );
 
         $this->downloader->downloadAndApplyTranslations($languageCode);
     }
@@ -232,9 +307,9 @@ YAML
     public function testDownloadTranslationsArchive(): void
     {
         $languageCode = 'uk_UA';
-        $filePathToSaveDownloadedArchive = \uniqid('', false);
+        $filePathToSaveDownloadedArchive = uniqid('', false);
 
-        $this->translationServiceAdapter->expects(static::once())
+        $this->translationServiceAdapter->expects(self::once())
             ->method('downloadLanguageTranslationsArchive')
             ->with($languageCode, $filePathToSaveDownloadedArchive);
 
@@ -250,26 +325,26 @@ YAML
     {
         $pathToArchiveFile = $this->getTempFile('archive_');
         $langCode = 'uk_UA';
-        $expectedPart = \DIRECTORY_SEPARATOR . 'extracted_' . $langCode;
+        $expectedPart = DIRECTORY_SEPARATOR . 'extracted_' . $langCode;
         $expectedTranslations = [
             'messages' => self::PARSED_YAML_TRANSLATIONS,
             'validation' => ['key1' => 'tr1', 'key2' => 'tr2']
         ];
         $rememberedDir = '';
 
-        $this->translationServiceAdapter->expects(static::once())
+        $this->translationServiceAdapter->expects(self::once())
             ->method('extractTranslationsFromArchive')
             ->with(
                 $pathToArchiveFile,
-                static::callback(
+                self::callback(
                     static function (string $directoryPathToExtractTo) use ($langCode, $expectedPart, &$rememberedDir) {
                         $rememberedDir = $directoryPathToExtractTo;
-                        \file_put_contents(
-                            $directoryPathToExtractTo . \DIRECTORY_SEPARATOR . "messages.$langCode.yml",
+                        file_put_contents(
+                            $directoryPathToExtractTo . DIRECTORY_SEPARATOR . "messages.$langCode.yml",
                             self::WEIRD_YAML_TRANSLATIONS
                         );
-                        \file_put_contents(
-                            $directoryPathToExtractTo . \DIRECTORY_SEPARATOR . "validation.$langCode.yml",
+                        file_put_contents(
+                            $directoryPathToExtractTo . DIRECTORY_SEPARATOR . "validation.$langCode.yml",
                             "'key1': tr1\n'key2': tr2"
                         );
                         return str_contains($directoryPathToExtractTo, $expectedPart);
@@ -277,18 +352,18 @@ YAML
                 )
             );
 
-        $this->databasePersister->expects(static::once())
+        $this->databasePersister->expects(self::once())
             ->method('persist')
             ->with($langCode, $expectedTranslations, Translation::SCOPE_INSTALLED);
-        $this->jsTranslationDumper->expects(static::once())
+        $this->jsTranslationDumper->expects(self::once())
             ->method('dumpTranslations')
             ->with([$langCode]);
 
         $this->downloader->loadTranslationsFromArchive($pathToArchiveFile, $langCode);
 
-        static::assertFileDoesNotExist($rememberedDir . \DIRECTORY_SEPARATOR . "messages.$langCode.yml");
-        static::assertFileDoesNotExist($rememberedDir . \DIRECTORY_SEPARATOR . "validation.$langCode.yml");
-        static::assertDirectoryDoesNotExist($rememberedDir);
+        self::assertFileDoesNotExist($rememberedDir . DIRECTORY_SEPARATOR . "messages.$langCode.yml");
+        self::assertFileDoesNotExist($rememberedDir . DIRECTORY_SEPARATOR . "validation.$langCode.yml");
+        self::assertDirectoryDoesNotExist($rememberedDir);
     }
 
     /**
@@ -298,26 +373,26 @@ YAML
     public function testLoadTranslationsFromArchiveLoadsEnUsAsEn(): void
     {
         $pathToArchiveFile = $this->getTempFile('archive_');
-        $expectedPart = \DIRECTORY_SEPARATOR . 'extracted_en';
+        $expectedPart = DIRECTORY_SEPARATOR . 'extracted_en';
         $expectedTranslations = [
             'messages' => self::PARSED_YAML_TRANSLATIONS,
             'validation' => ['key1' => 'tr1', 'key2' => 'tr2']
         ];
         $rememberedDir = '';
 
-        $this->translationServiceAdapter->expects(static::once())
+        $this->translationServiceAdapter->expects(self::once())
             ->method('extractTranslationsFromArchive')
             ->with(
                 $pathToArchiveFile,
-                static::callback(
+                self::callback(
                     static function (string $directoryPathToExtractTo) use ($expectedPart, &$rememberedDir) {
                         $rememberedDir = $directoryPathToExtractTo;
-                        \file_put_contents(
-                            $directoryPathToExtractTo . \DIRECTORY_SEPARATOR . 'messages.en_US.yml',
+                        file_put_contents(
+                            $directoryPathToExtractTo . DIRECTORY_SEPARATOR . 'messages.en_US.yml',
                             self::WEIRD_YAML_TRANSLATIONS
                         );
-                        \file_put_contents(
-                            $directoryPathToExtractTo . \DIRECTORY_SEPARATOR . 'validation.en_US.yml',
+                        file_put_contents(
+                            $directoryPathToExtractTo . DIRECTORY_SEPARATOR . 'validation.en_US.yml',
                             "'key1': tr1\n'key2': tr2"
                         );
                         return str_contains($directoryPathToExtractTo, $expectedPart);
@@ -325,39 +400,39 @@ YAML
                 )
             );
 
-        $this->databasePersister->expects(static::once())
+        $this->databasePersister->expects(self::once())
             ->method('persist')
             ->with('en', $expectedTranslations, Translation::SCOPE_INSTALLED);
-        $this->jsTranslationDumper->expects(static::once())
+        $this->jsTranslationDumper->expects(self::once())
             ->method('dumpTranslations')
             ->with(['en']);
 
         $this->downloader->loadTranslationsFromArchive($pathToArchiveFile, 'en');
 
-        static::assertFileDoesNotExist($rememberedDir . \DIRECTORY_SEPARATOR . 'messages.en.yml');
-        static::assertFileDoesNotExist($rememberedDir . \DIRECTORY_SEPARATOR . 'validation.en.yml');
-        static::assertDirectoryDoesNotExist($rememberedDir);
+        self::assertFileDoesNotExist($rememberedDir . DIRECTORY_SEPARATOR . 'messages.en.yml');
+        self::assertFileDoesNotExist($rememberedDir . DIRECTORY_SEPARATOR . 'validation.en.yml');
+        self::assertDirectoryDoesNotExist($rememberedDir);
     }
 
     /** @covers ::getTmpDir */
     public function testGetTmpDir(): void
     {
         $expectedParent = $this->kernelCacheDir
-            . \DIRECTORY_SEPARATOR . 'translations'
-            . \DIRECTORY_SEPARATOR . 'test_prefix';
+            . DIRECTORY_SEPARATOR . 'translations'
+            . DIRECTORY_SEPARATOR . 'test_prefix';
 
         $dir = $this->downloader->getTmpDir('test_prefix');
 
-        static::assertStringStartsWith($expectedParent, $dir);
-        static::assertDirectoryIsReadable($dir);
+        self::assertStringStartsWith($expectedParent, $dir);
+        self::assertDirectoryIsReadable($dir);
     }
 
     /** @covers ::getTmpDir */
     public function testGetTmpDirThrowsExceptionIfDirectoryCannotBeCreated(): void
     {
         $readOnlyDir = $this->getTempDir('read_only_directory');
-        if (false === \chmod($readOnlyDir, 0555)) {
-            static::fail('Cannot set the directory permissions necessary for this test.');
+        if (false === chmod($readOnlyDir, 0555)) {
+            self::fail('Cannot set the directory permissions necessary for this test.');
         }
 
         $downloader = new TranslationDownloader(
@@ -373,21 +448,21 @@ YAML
 
         $this->expectException(TranslationDownloaderException::class);
         $this->expectExceptionMessageMatches('/Directory "(.+)" cannot be created or accessed./');
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'Directory "{path}" cannot be created or accessed.',
-                static::logicalAnd(
-                    static::isType('array'),
-                    static::arrayHasKey('path'),
-                    static::arrayHasKey('called_in')
+                self::logicalAnd(
+                    self::isType('array'),
+                    self::arrayHasKey('path'),
+                    self::arrayHasKey('called_in')
                 )
             );
 
         try {
             $downloader->getTmpDir('test_prefix');
         } finally {
-            \chmod($readOnlyDir, 0755);
+            chmod($readOnlyDir, 0755);
         }
     }
 }

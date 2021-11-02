@@ -20,42 +20,42 @@ define(function(require) {
      * @class   oro.datagrid.cell.TagsCell
      * @extends oro.datagrid.cell.StringCell
      */
-    const TagsCell = Backgrid.StringCell.extend(_.extend(
-        _.pick(TagsView.prototype, [
-            'template',
-            'getTemplateFunction',
-            'getTemplateData',
-            'render'
-        ]), {
+    const TagsCell = Backgrid.StringCell.extend({
+        template: TagsView.prototype.template,
 
-            showDefault: false,
-            /**
-             * @property {string}
-             */
-            type: 'tags',
+        getTemplateFunction: TagsView.prototype.getTemplateFunction,
 
-            /**
-             * @property {string}
-             */
-            className: 'tags-cell tags-container',
+        getTemplateData: TagsView.prototype.getTemplateData,
 
-            initialize: function(options) {
-                Backgrid.StringCell.__super__.initialize.call(this, options);
-                this.fieldName = this.column.get('name');
-                // TODO move url generation to server side
-                let tags = this.model.get(this.fieldName);
-                tags = _.map(tags, function(tag) {
-                    if (!tag.hasOwnProperty('url')) {
-                        tag.url = routing.generate('oro_tag_search', {
-                            id: tag.id
-                        });
-                    }
-                    return tag;
-                });
-                this.model.set(this.fieldName, tags);
-            }
-        })
-    );
+        render: TagsView.prototype.render,
+
+        showDefault: false,
+        /**
+         * @property {string}
+         */
+        type: 'tags',
+
+        /**
+         * @property {string}
+         */
+        className: 'tags-cell tags-container',
+
+        initialize: function(options) {
+            Backgrid.StringCell.__super__.initialize.call(this, options);
+            this.fieldName = this.column.get('name');
+            // Needs to move url generation to server side
+            let tags = this.model.get(this.fieldName);
+            tags = _.map(tags, function(tag) {
+                if (!tag.hasOwnProperty('url')) {
+                    tag.url = routing.generate('oro_tag_search', {
+                        id: tag.id
+                    });
+                }
+                return tag;
+            });
+            this.model.set(this.fieldName, tags);
+        }
+    });
 
     return TagsCell;
 });

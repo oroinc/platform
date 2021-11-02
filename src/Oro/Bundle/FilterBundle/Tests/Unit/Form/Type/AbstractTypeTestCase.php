@@ -13,25 +13,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {
-    /**
-     * @var \Symfony\Component\Form\FormFactory
-     */
+    /** @var \Symfony\Component\Form\FormFactory */
     protected $factory;
 
-    /**
-     * @var string
-     */
-    protected $defaultTimezone = null;
+    /** @var string */
+    protected $defaultTimezone;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $oldTimezone;
 
-    /**
-     * @var FormExtensionInterface[]
-     */
-    protected $formExtensions = array();
+    /** @var FormExtensionInterface[] */
+    protected $formExtensions = [];
 
     protected function setUp(): void
     {
@@ -55,11 +47,11 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function createMockTranslator()
     {
-        $translator = $this->getMockForAbstractClass('Symfony\Contracts\Translation\TranslatorInterface');
+        $translator = $this->getMockForAbstractClass(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->with($this->anything(), array())
-            ->will($this->returnArgument(0));
+            ->with($this->anything(), [])
+            ->willReturnArgument(0);
 
         return $translator;
     }
@@ -69,9 +61,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function createMockOptionsResolver()
     {
-        return $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(OptionsResolver::class);
     }
 
     /**
@@ -82,11 +72,17 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         $resolver = $this->createMockOptionsResolver();
 
         if ($defaultOptions) {
-            $resolver->expects($this->once())->method('setDefaults')->with($defaultOptions)->will($this->returnSelf());
+            $resolver->expects($this->once())
+                ->method('setDefaults')
+                ->with($defaultOptions)
+                ->willReturnSelf();
         }
 
         if ($requiredOptions) {
-            $resolver->expects($this->once())->method('setRequired')->with($requiredOptions)->will($this->returnSelf());
+            $resolver->expects($this->once())
+                ->method('setRequired')
+                ->with($requiredOptions)
+                ->willReturnSelf();
         }
 
         $this->getTestFormType()->configureOptions($resolver);
@@ -106,7 +102,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         array $bindData,
         array $formData,
         array $viewData,
-        array $customOptions = array()
+        array $customOptions = []
     ) {
         $form = $this->factory->create(get_class($this->getTestFormType()), null, $customOptions);
 
@@ -154,9 +150,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     public function getMockSubscriber($class, array $events = [])
     {
-        $mock = $this->getMockBuilder($class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock = $this->createMock($class);
 
         $eventListener = new MutableFormEventSubscriber($mock);
         $eventListener->setSubscribedEvents($events);

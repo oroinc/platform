@@ -9,13 +9,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private UserAgentProvider $userAgentProvider;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var UserAgentProvider */
+    private $userAgentProvider;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);

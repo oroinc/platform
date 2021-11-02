@@ -12,19 +12,17 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    private $repository;
 
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
+    private $cache;
 
     /** @var TranslationDomainProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {
-        $this->repository = $this->getMockBuilder(TranslationKeyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repository = $this->createMock(TranslationKeyRepository::class);
 
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
@@ -38,14 +36,9 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
             ->with(TranslationKey::class)
             ->willReturn($manager);
 
-        $this->cache = $this->getMockBuilder(CacheProvider::class)->disableOriginalConstructor()->getMock();
+        $this->cache = $this->createMock(CacheProvider::class);
 
         $this->provider = new TranslationDomainProvider($registry, $this->cache);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->provider, $this->repository, $this->cache);
     }
 
     public function testGetAvailableDomainsWithoutCache()
@@ -74,10 +67,13 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
     {
         $domains = ['domain1' => 'domain1', 'domain2' => 'domain2'];
 
-        $this->repository->expects($this->never())->method($this->anything());
+        $this->repository->expects($this->never())
+            ->method($this->anything());
 
-        $this->cache->expects($this->never())->method('delete');
-        $this->cache->expects($this->never())->method('save');
+        $this->cache->expects($this->never())
+            ->method('delete');
+        $this->cache->expects($this->never())
+            ->method('save');
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE)
@@ -94,7 +90,9 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         $domains = ['domain1' => 'domain1', 'domain2' => 'domain2'];
         $locales = ['locale1', 'locale2'];
 
-        $this->cache->expects($this->once())->method('fetch')->willReturn($domains);
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->willReturn($domains);
 
         $this->assertEquals(
             [

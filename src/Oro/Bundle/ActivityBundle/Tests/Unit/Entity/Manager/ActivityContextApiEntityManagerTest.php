@@ -6,6 +6,7 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -106,7 +107,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetActivityContextWhenNotGranted(): void
     {
-        $target = $this->getTarget(1);
+        $target = new TestTarget(1);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
@@ -137,26 +138,9 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         return $activity;
     }
 
-    private function getTarget(int $id): object
-    {
-        return new class($id) {
-            protected $id;
-
-            public function __construct(int $id)
-            {
-                $this->id = $id;
-            }
-
-            public function getId(): int
-            {
-                return $this->id;
-            }
-        };
-    }
-
     public function testGetActivityContextWhenFeatureNotEnabled(): void
     {
-        $target = $this->getTarget(1);
+        $target = new TestTarget(1);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
@@ -270,7 +254,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'targets' => [$this->getTarget(2), $this->getTarget(1)],
+                'targets' => [new TestTarget(2), new TestTarget(1)],
                 'expectedResult' => [
                     [
                         'title' => 'sample-name-1',

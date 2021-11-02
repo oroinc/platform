@@ -2,52 +2,52 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data\Transformer;
 
+use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
+use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var TransformerFactory
-     */
-    protected $factory;
+    /** @var TransformerFactory */
+    private $factory;
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
+
         $this->factory = new TransformerFactory($this->container);
     }
 
     public function testCreateTransformer()
     {
-        $expected = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface');
+        $expected = $this->createMock(TransformerInterface::class);
 
         $serviceId = 'transformer_service';
         $this->container->expects($this->once())
             ->method('get')
             ->with($serviceId)
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals($expected, $this->factory->createTransformer($serviceId));
     }
 
     public function testCreateTransformerFails()
     {
-        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
             'Service "transformer_service" must be an instance of "%s".',
-            \Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface::class
+            TransformerInterface::class
         ));
 
         $serviceId = 'transformer_service';
         $this->container->expects($this->once())
             ->method('get')
             ->with($serviceId)
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->factory->createTransformer($serviceId);
     }

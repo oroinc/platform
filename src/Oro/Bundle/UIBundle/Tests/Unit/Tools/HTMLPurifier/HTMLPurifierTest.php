@@ -6,36 +6,22 @@ use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Error;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\ErrorCollector;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\HTMLPurifier;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Filesystem\Filesystem;
 
 class HTMLPurifierTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
-
-    /** @var string */
-    private $cachePath;
 
     /** @var HTMLPurifier */
     private $purifier;
 
     protected function setUp(): void
     {
-        $this->cachePath = $this->getTempDir('cache_test_data');
-
-        $html5Config = \HTMLPurifier_HTML5Config::createDefault();
-        $config = \HTMLPurifier_Config::create($html5Config);
-
+        $config = \HTMLPurifier_Config::create(\HTMLPurifier_HTML5Config::createDefault());
         $config->set('Core.CollectErrors', true);
-        $config->set('Cache.SerializerPath', $this->cachePath);
+        $config->set('Cache.SerializerPath', $this->getTempDir('cache_test_data'));
         $config->set('HTML.AllowedElements', ['div']);
 
         $this->purifier = new HTMLPurifier($config);
-    }
-
-    protected function tearDown(): void
-    {
-        $fileSystem = new Filesystem();
-        $fileSystem->remove($this->cachePath);
     }
 
     public function testPurify(): void

@@ -4,37 +4,30 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Datagrid\InlineEditing\InlineEdit
 
 use Oro\Bundle\CurrencyBundle\Converter\CurrencyToString;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser;
+use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 
 class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $currencyHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $currencyHelper;
 
     /** @var MultiCurrencyGuesser */
-    protected $guesser;
+    private $guesser;
 
     /** @var CurrencyToString */
-    protected $currencyToStringConverter;
+    private $currencyToStringConverter;
 
     protected function setUp(): void
     {
-        $this->currencyHelper = $this
-            ->getMockBuilder('Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->currencyHelper = $this->createMock(CurrencyNameHelper::class);
 
         $this->guesser = new MultiCurrencyGuesser($this->currencyHelper, $this->getCurrencyToStringConverter());
     }
 
-    protected function getCurrencyToStringConverter()
+    private function getCurrencyToStringConverter()
     {
         if (null === $this->currencyToStringConverter) {
-            $this->currencyToStringConverter = $this
-                ->getMockBuilder('Oro\Bundle\CurrencyBundle\Converter\CurrencyToString')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $this->currencyToStringConverter = $this->createMock(CurrencyToString::class);
         }
 
         return $this->currencyToStringConverter;

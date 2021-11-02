@@ -217,5 +217,96 @@ define(function(require) {
                 });
             });
         });
+
+        describe('delays component\'s initialization until UI event,', () => {
+            let manager;
+            beforeEach(function(done) {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on" data-page-component-init-on="click">
+                            <div data-page-component-name="component-foo"
+                                data-page-component-module="js/foo-component"></div>
+                        </div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                manager.init().then(done);
+            });
+
+            it('component initially not initialized', () => {
+                expect(manager.get('component-foo')).toBeNull();
+            });
+
+            describe('after click event', () => {
+                beforeEach(function(done) {
+                    $('#init-on').click();
+                    $.when(...Object.values(manager.initPromises).map(({promise}) => promise)).then(done);
+                });
+
+                it('component gets initialized', () => {
+                    expect(manager.get('component-foo')).not.toBeNull();
+                });
+            });
+        });
+
+        describe('`init-on-asap` component within `init-on` element', () => {
+            let manager;
+            beforeEach(function(done) {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on" data-page-component-init-on="click">
+                            <div
+                                data-page-component-init-on="asap"
+                                data-page-component-name="component-bar" 
+                                data-page-component-module="js/bar-component"></div>
+                        </div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                manager.init().then(done);
+            });
+
+            it('initially initialized', () => {
+                expect(manager.get('component-bar')).not.toBeNull();
+            });
+        });
+
+        describe('`init-on` rule applies only on component within same layout,', () => {
+            let managerA;
+            let managerB;
+            beforeEach(function(done) {
+                window.setFixtures(`
+                    <div id="container-a" data-layout="separate">
+                        <div id="init-on" data-page-component-init-on="click">
+                            <div
+                                data-page-component-name="component-bar" 
+                                data-page-component-module="js/bar-component"></div>
+                            <div id="container-b" data-layout="separate">
+                                <div
+                                    data-page-component-name="component-foo" 
+                                    data-page-component-module="js/bar-component"></div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                managerA = new ComponentManager($('#container-a'));
+                managerB = new ComponentManager($('#container-b'));
+                $.when(
+                    managerA.init(),
+                    managerB.init()
+                ).then(done);
+            });
+
+            it('component im outer layout is not initially initialized`', () => {
+                expect(managerA.get('component-bar')).toBeNull();
+            });
+
+            it('component in nested layout is initially initialized', () => {
+                expect(managerB.get('component-foo')).not.toBeNull();
+            });
+        });
     });
 });

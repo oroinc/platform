@@ -83,7 +83,9 @@ define(function(require, exports, module) {
             'keydown input:not(.select2-focusser)': '_onReadCriteriaInputKey',
             'click .filter-update': '_onClickUpdateCriteria',
             'keydown .filter-update': '_onKeydownUpdateCriteria',
-            'keydown .filter-criteria-selector': 'onKeyDownCriteriaSelector',
+            'keydown .filter-criteria-selector': '_triggerEventOnCriteriaToggle',
+            'focusin .filter-criteria-selector': '_triggerEventOnCriteriaToggle',
+            'focusout .filter-criteria-selector': '_triggerEventOnCriteriaToggle',
             'keydown .filter-criteria': 'onKeyDownCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
@@ -451,8 +453,8 @@ define(function(require, exports, module) {
             }
         },
 
-        onKeyDownCriteriaSelector(e) {
-            this.trigger('keydownOnToggle', e, this);
+        _triggerEventOnCriteriaToggle(e) {
+            this.trigger(`${e.type}OnToggle`, e, this);
         },
 
         _focusCriteriaValue() {

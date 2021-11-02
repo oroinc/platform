@@ -19,13 +19,17 @@ use Twig\Loader\LoaderInterface;
 
 class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private Request $request;
+    /** @var Request */
+    private $request;
 
-    private ViewEvent|\PHPUnit\Framework\MockObject\MockObject $event;
+    /** @var ViewEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
-    private TemplateListener $listener;
+    /** @var TemplateListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -61,9 +65,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider controllerDataProvider
-     *
-     * @param TemplateReference|string $inputTemplate
-     * @param TemplateReference $expectedTemplate
      */
     public function testOnKernelControllerPath(
         TemplateReference|string $inputTemplate,
@@ -149,11 +150,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider templateDataProvider
-     * @param bool $containerExists
-     * @param bool $widgetExists
-     * @param TemplateReference|Template|string $inputTemplate
-     * @param TemplateReference|Template $expectedTemplate
-     * @param string $requestAttribute
      */
     public function testOnKernelViewWidgetTemplate(
         bool $containerExists,
@@ -162,7 +158,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         TemplateReference|Template $expectedTemplate,
         string $requestAttribute
     ): void {
-        $this->request->$requestAttribute->set('_widgetContainer', 'container');
+        $this->request->{$requestAttribute}->set('_widgetContainer', 'container');
         $this->request->attributes->set('_template', $inputTemplate);
 
         $loader = $this->createMock(LoaderInterface::class);

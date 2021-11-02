@@ -6,8 +6,8 @@
     display: inline-block;
 
     .dropdown-toggle {
-        display: inline-block;
-        vertical-align: middle;
+        display: inline-flex;
+        align-items: center;
 
         padding: $more-bar-holder-toggle-offset;
         height: $more-bar-holder-toggle-size;

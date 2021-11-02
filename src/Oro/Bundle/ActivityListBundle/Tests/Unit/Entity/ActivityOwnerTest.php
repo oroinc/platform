@@ -11,22 +11,12 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ActivityOwner
-     */
-    protected $entity;
+    /** @var ActivityOwner */
+    private $entity;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->entity = new ActivityOwner();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->entity);
     }
 
     public function testGetId()
@@ -40,20 +30,15 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->entity, $property, $value);
         $this->assertEquals($value, $accessor->getValue($this->entity, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['activity', new ActivityList()],

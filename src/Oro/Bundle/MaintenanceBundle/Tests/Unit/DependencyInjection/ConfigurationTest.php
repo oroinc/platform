@@ -34,7 +34,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'attributes' => [],
                     ],
                     'driver' => [
-                        'ttl' => 600,
                         'options' => [],
                     ],
                     'response' => [
@@ -59,7 +58,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'driver' => [
-                            'ttl' => 10,
                             'options' => [
                                 'file_path' => '%kernel.root_dir%/../var/cache/lock',
                             ],
@@ -84,7 +82,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                     'driver' => [
-                        'ttl' => 10,
                         'options' => [
                             'file_path' => '%kernel.root_dir%/../var/cache/lock',
                         ],

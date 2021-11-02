@@ -16,22 +16,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorRegistry;
+
+    /** @var Executor|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobExecutor;
+
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
+
     /** @var Integration|\PHPUnit\Framework\MockObject\MockObject */
     private $integration;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerStrategy|\PHPUnit\Framework\MockObject\MockObject */
     private $log;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
     protected function setUp(): void
@@ -46,8 +46,8 @@ class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        $connectors    = 'test';
-        $params        = [];
+        $connectors = 'test';
+        $params = [];
         $realConnector = new TestConnector();
 
         $this->registry->expects($this->any())

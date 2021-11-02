@@ -10,13 +10,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
+    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $highPriorityProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
+    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $lowPriorityProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
+    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $unsupportedProvider;
 
     protected function setUp(): void
@@ -57,24 +57,24 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->lowPriorityProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->highPriorityProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->unsupportedProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->lowPriorityProvider->expects($this->once())
             ->method('getWidgets')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($lowPriorityProviderWidgets));
+            ->willReturn($lowPriorityProviderWidgets);
         $this->highPriorityProvider->expects($this->once())
             ->method('getWidgets')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($highPriorityProviderWidgets));
+            ->willReturn($highPriorityProviderWidgets);
         $this->unsupportedProvider->expects($this->never())
             ->method('getWidgets');
 
@@ -128,24 +128,24 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->lowPriorityProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->highPriorityProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->unsupportedProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->lowPriorityProvider->expects($this->once())
             ->method('getWidgets')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($lowPriorityProviderWidgets));
+            ->willReturn($lowPriorityProviderWidgets);
         $this->highPriorityProvider->expects($this->once())
             ->method('getWidgets')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($highPriorityProviderWidgets));
+            ->willReturn($highPriorityProviderWidgets);
         $this->unsupportedProvider->expects($this->never())
             ->method('getWidgets');
 
@@ -175,25 +175,18 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param bool $withGroupNameProvider
-     * @param bool $setEventDispatcher
-     * @return GroupingChainWidgetProvider
-     */
-    private function getChainProvider($withGroupNameProvider = false, $setEventDispatcher = true)
-    {
+    private function getChainProvider(
+        bool $withGroupNameProvider = false,
+        bool $setEventDispatcher = true
+    ): GroupingChainWidgetProvider {
         $groupNameProvider = null;
         if ($withGroupNameProvider) {
             $groupNameProvider = $this->createMock(LabelProviderInterface::class);
             $groupNameProvider->expects($this->any())
                 ->method('getLabel')
-                ->will(
-                    $this->returnCallback(
-                        function ($parameters) {
-                            return $parameters['groupName'] . ' - ' . $parameters['entityClass'];
-                        }
-                    )
-                );
+                ->willReturnCallback(function ($parameters) {
+                    return $parameters['groupName'] . ' - ' . $parameters['entityClass'];
+                });
         }
 
         $pageType = null;

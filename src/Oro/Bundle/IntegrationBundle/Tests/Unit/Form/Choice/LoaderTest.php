@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Choice;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
@@ -11,16 +12,12 @@ class LoaderTest extends OrmTestCase
 {
     /**
      * @dataProvider allowedTypesProvider
-     *
-     * @param array|null $allowedTypes
-     * @param String     $expectedDQL
      */
-    public function testQueryConfiguration($allowedTypes, $expectedDQL)
+    public function testQueryConfiguration(?array $allowedTypes, string $expectedDQL)
     {
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()->getMock();
+        $aclHelper = $this->createMock(AclHelper::class);
 
-        $em     = $this->getTestEntityManager();
+        $em = $this->getTestEntityManager();
         $loader = new Loader($aclHelper, $em, $allowedTypes);
 
         /** @var QueryBuilder $qb */
@@ -28,10 +25,7 @@ class LoaderTest extends OrmTestCase
         $this->assertSame($expectedDQL, $qb->getDQL());
     }
 
-    /**
-     * @return array
-     */
-    public function allowedTypesProvider()
+    public function allowedTypesProvider(): array
     {
         return [
             'types are not restricted' => [

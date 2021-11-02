@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityList;
@@ -24,40 +25,40 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListManager */
-    protected $activityListManager;
+    private $activityListManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $config;
+    private $config;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $activityListIdProvider;
+    private $activityListIdProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commentManager;
+    private $commentManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var WorkflowDataHelper */
-    protected $workflowHelper;
+    private $workflowHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
+    private $htmlTagHelper;
 
     protected function setUp(): void
     {
@@ -74,13 +75,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->htmlTagHelper->expects($this->any())
             ->method('purify')
-            ->will(
-                $this->returnCallback(
-                    function ($value) {
-                        return $value;
-                    }
-                )
-            );
+            ->willReturnArgument(0);
 
         $this->activityListManager = new ActivityListManager(
             $this->authorizationChecker,
@@ -107,8 +102,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNonExistItem()
     {
-        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
+        $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
         $repo->expects($this->once())->method('find')->with(12)->willReturn(null);
         $this->assertNull($this->activityListManager->getItem(12));
@@ -170,8 +164,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
+        $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
         $this->doctrineHelper->expects(self::once())->method('getEntity')->willReturn($testItem);
         $repo->expects($this->once())->method('find')->with(105)->willReturn($testItem);

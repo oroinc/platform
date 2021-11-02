@@ -114,8 +114,15 @@ services:
         arguments:
             - '@oro_security.acl.object_identity_factory'
             - '@oro_security.acl.security_identity_to_string_converter'
+            - '@oro_security.acl.full_access_field_root_acl_builder'
         calls:
             - [setUnderlyingCache, ['@security.acl.underlying.cache']]
+
+    oro_security.acl.full_access_field_root_acl_builder:
+        public: false
+        class: Oro\Bundle\SecurityBundle\Acl\Domain\FullAccessFieldRootAclBuilder
+        arguments:
+            - '@oro_security.acl.extension_selector'
 
     security.acl.underlying.cache:
         public: false
@@ -582,13 +589,6 @@ services:
             - '@doctrine'
         tags:
             - { name: layout.data_provider, alias: acl }
-
-    oro_security.layout.data_provider.current_user:
-        class: Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider
-        arguments:
-            - '@oro_security.token_accessor'
-        tags:
-            - { name: layout.data_provider, alias: current_user }
 
     oro_security.form.field_acl_helper:
         class: Oro\Bundle\SecurityBundle\Form\FieldAclHelper

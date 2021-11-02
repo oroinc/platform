@@ -15,6 +15,7 @@ use Oro\Bundle\IntegrationBundle\Provider\AbstractConnector;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\LoggerAwareIteratorSource;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
 use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\NullLogger;
@@ -53,13 +54,12 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider initializationDataProvider
-     *
-     * @param Transport|\PHPUnit\Framework\MockObject\MockObject $transport
-     * @param null                                               $source
-     * @param bool|string                                        $expectedException
      */
-    public function testInitialization($transport, $source = null, $expectedException = false)
-    {
+    public function testInitialization(
+        TransportInterface|\PHPUnit\Framework\MockObject\MockObject|null $transport,
+        ?object $source,
+        string $expectedException = null
+    ) {
         $logger = new LoggerStrategy(new NullLogger());
         $contextRegistry = new ContextRegistry();
         $contextMediator = $this->createMock(ConnectorContextMediator::class);
@@ -81,7 +81,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs([$contextRegistry, $logger, $contextMediator])
             ->getMockForAbstractClass();
 
-        if (false !== $expectedException) {
+        if ($expectedException) {
             $this->expectException($expectedException);
         } else {
             $transport->expects($this->once())
@@ -95,48 +95,38 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
         $connector->setStepExecution($this->stepExecution);
     }
 
-    public function initializationDataProvider()
+    public function initializationDataProvider(): array
     {
         return [
             'bad transport given, exception expected'       => [
-                false,
                 null,
-                '\LogicException'
+                null,
+                \LogicException::class
             ],
             'with regular iterator, correct initialization' => [
                 $this->createMock(TransportInterface::class),
-                $this->createMock('\Iterator')
+                $this->createMock(\Iterator::class)
             ],
             'logger aware iterator should receive logger'   => [
                 $this->createMock(TransportInterface::class),
-                $this->createMock(\Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\LoggerAwareIteratorSource::class)
+                $this->createMock(LoggerAwareIteratorSource::class)
             ]
         ];
     }
 
-    /**
-     * @param mixed            $transport
-     * @param mixed            $stepExecution
-     * @param null|Integration $channel
-     * @param null             $context
-     *
-     * @return AbstractConnector
-     */
-    private function getConnector($transport, $stepExecution, $channel = null, $context = null)
+    private function getConnector(): AbstractConnector
     {
         $contextRegistry = $this->createMock(ContextRegistry::class);
         $contextMediator = $this->createMock(ConnectorContextMediator::class);
 
         $transportSettings = $this->createMock(Transport::class);
-        $channel = $channel ?: new Integration();
+        $channel = new Integration();
         $channel->setTransport($transportSettings);
 
-        if (null === $context) {
-            $context = new Context([]);
-        }
+        $context = new Context([]);
 
         $executionContext = new ExecutionContext();
-        $stepExecution->expects($this->any())
+        $this->stepExecution->expects($this->any())
             ->method('getExecutionContext')
             ->willReturn($executionContext);
 
@@ -146,7 +136,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
         $contextMediator->expects($this->once())
             ->method('getTransport')
             ->with($this->identicalTo($context))
-            ->willReturn($transport);
+            ->willReturn($this->transport);
         $contextMediator->expects($this->once())
             ->method('getChannel')
             ->with($this->identicalTo($context))
@@ -159,7 +149,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetStatusData()
     {
-        $connector = $this->getConnector($this->transport, $this->stepExecution);
+        $connector = $this->getConnector();
         $connector->setStepExecution($this->stepExecution);
 
         ReflectionUtil::callMethod($connector, 'addStatusData', ['key', 'value']);

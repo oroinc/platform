@@ -11,20 +11,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $jsDumper;
+    private $jsDumper;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
+    private $input;
 
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $output;
+    private $output;
 
     /** @var OroTranslationDumpCommand */
-    protected $command;
+    private $command;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->jsDumper = $this->createMock(JsTranslationDumper::class);
@@ -32,14 +29,6 @@ class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = $this->createMock(OutputInterface::class);
 
         $this->command = new OroTranslationDumpCommand($this->jsDumper);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->jsDumper, $this->input, $this->output, $this->command);
     }
 
     public function testConfigure()
@@ -63,7 +52,10 @@ class OroTranslationDumpCommandTest extends \PHPUnit\Framework\TestCase
             ->method('setLogger')
             ->with(new OutputLogger($this->output));
 
-        $this->jsDumper->expects($this->once())->method('dumpTranslations')->with($locales);
+        $this->jsDumper->expects($this->once())
+            ->method('dumpTranslations')
+            ->with($locales);
+
         $this->command->run($this->input, $this->output);
     }
 }

@@ -1,18 +1,37 @@
 import StringCell from 'oro/datagrid/cell/string-cell';
+import __ from 'orotranslation/js/translator';
 
 const HtmlTemplateCell = StringCell.extend({
     constructor: function HtmlTemplateCell(options) {
         HtmlTemplateCell.__super__.constructor.call(this, options);
     },
 
-    getTemplateData: function() {
+    _attributes() {
         return {
+            'data-blank-content': null
+        };
+    },
+
+    getTemplateData: function() {
+        const data = {
             ...this.model.toJSON(),
             _cid: this.cid,
             _metadata: {
                 ...this.column.get('metadata')
-            }
+            },
+            _attrs: this._collectAttributes()
         };
+        const value = this.model.get(this.column.get('name'));
+
+        if (
+            value === void 0 ||
+            value === null ||
+            (typeof value === 'string' && value.trim().length === 0)
+        ) {
+            data['_blankContent'] = __('oro.datagrid.cell.blank.placeholder');
+        }
+
+        return data;
     },
 
     getTemplateFunction: function(templateKey = 'default') {

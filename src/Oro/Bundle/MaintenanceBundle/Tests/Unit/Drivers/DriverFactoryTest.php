@@ -44,12 +44,11 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            'path and ttl' => [
+            'path and some options' => [
                 [
                     'class' => FileDriver::class,
                     'options'=> [
                         'file_path' => 'file/path',
-                        'ttl' => 10,
                         'unknown_option' => 'value',
                     ],
                 ],

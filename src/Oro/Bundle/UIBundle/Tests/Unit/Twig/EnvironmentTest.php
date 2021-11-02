@@ -44,11 +44,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $filename
-     * @return string
-     */
-    public function escapingStrategyCallback($filename)
+    public function escapingStrategyCallback(string $filename): string
     {
         return $filename;
     }

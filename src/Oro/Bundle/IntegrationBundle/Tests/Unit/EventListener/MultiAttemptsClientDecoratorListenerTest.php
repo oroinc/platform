@@ -12,22 +12,16 @@ use Psr\Log\LoggerInterface;
 
 class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MultiAttemptsClientDecoratorListener
-     */
-    protected $listener;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
-     */
-    protected $logger;
+    /** @var MultiAttemptsClientDecoratorListener */
+    private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->listener = new MultiAttemptsClientDecoratorListener();
         $this->listener->setLogger($this->logger);
     }
@@ -36,10 +30,9 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
     {
         $client = $this->createMock(RestClientInterface::class);
         $transport = $this->createMock(RestTransportSettingsInterface::class);
-        $transport
-            ->expects($this->any())
+        $transport->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $event = new ClientCreatedAfterEvent($client, $transport);
         $this->listener->onClientCreated($event);
@@ -47,7 +40,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
         $this->assertInstanceOf(
             MultiAttemptsClientDecorator::class,
             $event->getClient(),
-            "Decorator must be attached to client !"
+            'decorator must be attached to client'
         );
     }
 
@@ -57,22 +50,13 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
 
         $client = $this->createMock(RestClientInterface::class);
         $transport = $this->createMock(RestTransportSettingsInterface::class);
-        $transport
-            ->expects($this->any())
+        $transport->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
         $event = new ClientCreatedAfterEvent($client, $transport);
         $this->listener->onClientCreated($event);
 
         $this->assertSame($client, $event->getClient());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->logger, $this->listener);
     }
 }

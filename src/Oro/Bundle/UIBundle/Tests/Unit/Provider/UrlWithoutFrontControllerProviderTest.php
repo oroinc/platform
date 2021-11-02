@@ -8,19 +8,16 @@ use Symfony\Component\Routing\RouterInterface;
 
 class UrlWithoutFrontControllerProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface
-     */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /**
-     * @var UrlWithoutFrontControllerProvider
-     */
+    /** @var UrlWithoutFrontControllerProvider */
     private $provider;
 
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
+
         $this->provider = new UrlWithoutFrontControllerProvider($this->router);
     }
 
@@ -34,7 +31,7 @@ class UrlWithoutFrontControllerProviderTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->with($name, $parameters)
             ->willReturn($path);
-        $this->router
+        $this->router->expects($this->any())
             ->method('getContext')
             ->willReturn(new RequestContext('/index.php'));
 

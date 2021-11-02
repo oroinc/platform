@@ -56,7 +56,7 @@
     }
 
     &__oauth {
-        padding: 24px 0 0 93px;
+        padding: 24px 0 0;
     }
 
     &__section {
@@ -207,6 +207,10 @@
 
     &.form-row-layout {
         .oro-remember-me {
+            padding-left: 91px;
+        }
+
+        .form-signin__oauth {
             padding-left: 91px;
         }
 

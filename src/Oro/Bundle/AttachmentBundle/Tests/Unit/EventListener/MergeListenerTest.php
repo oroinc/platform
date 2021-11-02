@@ -103,44 +103,25 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param  array  $targets
-     * @return MergeListener
-     */
-    private function getListener(array $targets = [])
+    private function getListener(array $targets = []): MergeListener
     {
-        $manager = $this->getMockBuilder(AttachmentManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $manager = $this->createMock(AttachmentManager::class);
         $manager->expects($this->any())
             ->method('getAttachmentTargets')
-            ->will($this->returnValue($targets));
+            ->willReturn($targets);
 
-        $listener = new MergeListener($manager);
-
-        return $listener;
+        return new MergeListener($manager);
     }
 
-    /**
-     * @param  string $className
-     * @return EntityMetadataEvent
-     */
-    private function getEvent($className)
+    private function getEvent(string $className): EntityMetadataEvent
     {
         $doctrineMetadata = new DoctrineMetadata(['name' => $className]);
         $entityMetadata = new EntityMetadata([], $doctrineMetadata);
-        $event = new EntityMetadataEvent($entityMetadata);
 
-        return $event;
+        return new EntityMetadataEvent($entityMetadata);
     }
 
-    /**
-     * @param  EntityMetadata $entityMetadata
-     * @param  array          $options
-     * @return FieldMetadata
-     */
-    private function addFieldMetadata(EntityMetadata $entityMetadata, array $options)
+    private function addFieldMetadata(EntityMetadata $entityMetadata, array $options): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata($options);
         $entityMetadata->addFieldMetadata($fieldMetadata);

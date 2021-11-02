@@ -430,11 +430,17 @@ services:
             - 'public_mediacache'
             - '%kernel.project_dir%/public/media/cache'
 
+    oro_attachment.liip_imagine:
+        parent: liip_imagine
+        decorates: liip_imagine
+        calls:
+            - ['setClassFactory', [!service {class: Oro\Bundle\AttachmentBundle\Imagine\Factory\ClassFactory, arguments: ['%knp_gaufrette.stream_wrapper.protocol%']}]]
+
     oro_attachment.liip_imagine.filter.loader.watermark_image:
         class: Liip\ImagineBundle\Imagine\Filter\Loader\WatermarkFilterLoader
         decorates: liip_imagine.filter.loader.watermark_image
         arguments:
-            - '@liip_imagine'
+            - '@oro_attachment.liip_imagine'
             - 'gaufrette:/' # One slash instead of two used intentionally due to specifics of WatermarkFilterLoader
 
     oro_attachment.provider.file_constraints:

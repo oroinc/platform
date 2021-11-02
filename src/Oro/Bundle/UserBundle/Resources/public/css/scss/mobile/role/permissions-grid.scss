@@ -1,0 +1,11 @@
+/* @theme: admin.oro; */
+
+/* stylelint-disable no-descending-specificity */
+
+.inner-permissions-grid {
+    .oro-datagrid {
+        .dropdown-menu {
+            z-index: 1;
+        }
+    }
+}

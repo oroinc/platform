@@ -124,7 +124,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider menuProvider
      */
-    public function testGetTabs($options, $tab, $tabOptions, $acl, $isDisplayed = true)
+    public function testGetTabs(array $options, ?array $tab, array $tabOptions, array $acl, $isDisplayed = true)
     {
         $child = $this->createMenuItem(null, $options);
         $child->expects($this->once())
@@ -155,7 +155,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         } else {
             $this->translator->expects($this->once())
                 ->method('trans')
-                ->will($this->returnArgument(0));
+                ->willReturnArgument(0);
         }
 
         $result = $this->extension->getTabs('menu', $tabOptions);
@@ -254,7 +254,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return MenuItem|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function createMenuItem(MenuItem $child = null, array $options = [])
+    private function createMenuItem(MenuItem $child = null, array $options = []): MenuItem
     {
         $menuItem = $this->createMock(MenuItem::class);
         if ($child) {

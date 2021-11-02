@@ -8,11 +8,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
     /** @var WindowsStateRequestManager */
     private $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
-    private $requestStack;
 
     protected function setUp(): void
     {
@@ -26,7 +26,10 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing $request');
 
-        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn(null);
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn(null);
+
         $this->manager->getData();
     }
 
@@ -36,7 +39,10 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Missing data in $request');
 
         $request = new Request();
-        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
         $this->manager->getData();
     }
 
@@ -46,7 +52,10 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Missing url in $data');
 
         $request = new Request([], ['data' => []]);
-        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
         $this->manager->getData();
     }
 
@@ -56,31 +65,32 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('$cleanUrl is empty');
 
         $request = new Request([], ['data' => ['url' => 'localhost']], [], [], [], ['SCRIPT_NAME' => 'localhost']);
-        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
         $this->manager->getData();
     }
 
     public function testGetData()
     {
         $request = new Request([], ['data' => ['url' => 'localhost/path']], [], [], [], ['SCRIPT_NAME' => 'localhost']);
-        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
         $this->assertEquals(['url' => 'localhost/path', 'cleanUrl' => '/path'], $this->manager->getData());
     }
 
     /**
      * @dataProvider uriDataProvider
-     * @param string $expected
-     * @param array $data
      */
-    public function testGetUri($expected, array $data)
+    public function testGetUri(string $expected, array $data)
     {
         $this->assertStringStartsWith($expected, $this->manager->getUri($data));
     }
 
-    /**
-     * @return array
-     */
-    public function uriDataProvider()
+    public function uriDataProvider(): array
     {
         return [
             'simple path' => ['/path', ['cleanUrl' => '/path']],

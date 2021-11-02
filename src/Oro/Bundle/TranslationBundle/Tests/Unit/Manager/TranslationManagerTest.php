@@ -275,7 +275,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidateCacheDataProvider
      */
-    public function testInvalidateCache($with)
+    public function testInvalidateCache(?string $with)
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')

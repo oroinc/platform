@@ -2,24 +2,22 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Condition;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Model\Condition\HasActiveIntegration;
 
 class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var HasActiveIntegration
-     */
-    protected $condition;
+    /** @var HasActiveIntegration */
+    private $condition;
 
     protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+
         $this->condition = new HasActiveIntegration($this->registry);
     }
 
@@ -32,10 +30,7 @@ class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function failingOptionsDataProvider()
+    public function failingOptionsDataProvider(): array
     {
         return [
             'empty' => [[]],
@@ -57,17 +52,15 @@ class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 
         $this->condition->initialize([$type]);
 
-        $repository = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(ChannelRepository::class);
         $repository->expects($this->once())
             ->method('getConfiguredChannelsForSync')
             ->with($type, true)
-            ->will($this->returnValue([$entity]));
+            ->willReturn([$entity]);
         $this->registry->expects($this->once())
             ->method('getRepository')
             ->with('OroIntegrationBundle:Channel')
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
         $this->assertTrue($this->condition->evaluate($context));
     }

@@ -7,10 +7,9 @@ use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Oro\Bundle\IntegrationBundle\Provider\SOAPTransport;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SoapTransportTest extends TestCase
+class SoapTransportTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SOAPTransport|\PHPUnit\Framework\MockObject\MockObject */
     private $transport;
@@ -81,7 +80,7 @@ class SoapTransportTest extends TestCase
     /**
      * @dataProvider exceptionProvider
      */
-    public function testMultipleAttemptException($header, $attempt, $code)
+    public function testMultipleAttemptException(string $header, int $attempt, int $code)
     {
         $this->expectException(SoapConnectionException::class);
         $this->soapClient->expects($this->any())

@@ -18,8 +18,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
-    private $messages = [
+    private array $messages = [
         'fr' => [
             'jsmessages' => [
                 'foo' => 'foo (FR)',
@@ -304,7 +303,9 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
 
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $translator->setApplicationState($applicationState);
         $translator->setEventDispatcher($this->getEventDispatcher());
@@ -350,7 +351,9 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
         $translator->setEventDispatcher($this->getEventDispatcher());
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $translator->setApplicationState($applicationState);
 
@@ -472,7 +475,9 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $translator->setApplicationState($applicationState);
         $translator->setEventDispatcher($eventDispatcher);

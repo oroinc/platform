@@ -1,9 +1,9 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid'
-], function(_, Backbone, Backgrid) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Backgrid = require('backgrid');
 
     /**
      * Datagrid footer cell
@@ -13,6 +13,10 @@ define([
      * @extends Backbone.View
      */
     const FooterCell = Backbone.View.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         /** @property */
         tagName: 'th',
 
@@ -37,7 +41,6 @@ define([
         initialize: function(options) {
             this.options = options || {};
 
-            this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
@@ -90,7 +93,6 @@ define([
                 this.$el.removeClass('align-left align-center align-right');
                 this.$el.addClass('align-' + this.column.get('align'));
             }
-
             return this;
         }
     });

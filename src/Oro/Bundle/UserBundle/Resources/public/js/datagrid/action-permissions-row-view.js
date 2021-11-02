@@ -14,6 +14,8 @@ define(function(require) {
 
         fieldItemView: FieldView,
 
+        readonlyMode: false,
+
         /**
          * @inheritdoc
          */

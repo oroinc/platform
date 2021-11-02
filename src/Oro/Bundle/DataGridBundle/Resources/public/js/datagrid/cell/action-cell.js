@@ -20,7 +20,6 @@ define(function(require, exports, module) {
      * @extends Backgrid.Cell
      */
     const ActionCell = Backgrid.Cell.extend({
-
         /** @property */
         className: 'action-cell',
 
@@ -58,7 +57,7 @@ define(function(require, exports, module) {
                 '<div class="dropleft">' +
                     '<a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" ' +
                         'aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">' +
-                        '<span class="icon fa-ellipsis-h" aria-hidden="true"></span>' +
+                        '<span class="icon fa-ellipsis-h fa--no-offset" aria-hidden="true"></span>' +
                     '</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
                         'aria-labelledby="<%- togglerId %>"></ul>' +
@@ -266,7 +265,6 @@ define(function(require, exports, module) {
          * Render cell with actions
          */
         render: function() {
-            let isSimplifiedMarkupApplied = false;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.actions)) {
                 this.$el.empty();
@@ -283,7 +281,6 @@ define(function(require, exports, module) {
             }
 
             if (!this.isDropdownActions) {
-                isSimplifiedMarkupApplied = true;
                 this.baseMarkup = this.simpleBaseMarkup;
                 this.launchersListTemplate = this.simpleLaunchersListTemplate;
                 this.launchersContainerSelector = '.more-bar-holder';
@@ -292,9 +289,11 @@ define(function(require, exports, module) {
             this.$el.html(this.baseMarkup(this.getTemplateData()));
             this.isLauncherListFilled = false;
 
-            if (isSimplifiedMarkupApplied) {
+            if (!this.isDropdownActions) {
                 this.fillLauncherList();
             }
+
+            this.$el.toggleClass('dropdown-action-cell', this.isDropdownActions);
 
             return this;
         },
