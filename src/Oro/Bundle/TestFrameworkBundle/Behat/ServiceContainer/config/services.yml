@@ -191,3 +191,7 @@ services:
             - '@fob_symfony.kernel'
         tags:
             - { name: 'context.initializer' }
+
+    Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient:
+        arguments:
+            - !service { class: GuzzleHttp\Client }

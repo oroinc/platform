@@ -91,7 +91,7 @@ class DebugCommand extends AbstractDebugCommand
             ->setDescription('Displays registered API actions and processors.')
             ->setHelp(
                 <<<'HELP'
-The <info>%command.name%</info> command display a list of available API actions.
+The <info>%command.name%</info> command displays a list of available API actions.
 
   <info>php %command.full_name%</info>
 

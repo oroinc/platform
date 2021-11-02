@@ -79,7 +79,7 @@ The <info>%command.name%</info> command move application files from old storages
   In the Manual mode, a user is asked for a path to be migrated, as well as the Gaufrette file system name
   where the data should migrate to. 
 
-  The path that have to be migrated can be set with <info>--migration-path</info> option.
+  The path that has to be migrated can be set with <info>--migration-path</info> option.
 
   The Gaufrette file system name can be set with <info>--gaufrette-filesystem</info> option.
   To get the list of available file systems, run command with <info>--mode=filesystems-list</info> option.
