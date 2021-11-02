@@ -21,7 +21,7 @@ $input-append-add-on-font-size: $base-font-size;
 $input-append-add-on-line-height: 36px;
 
 $controls-fields-row-input-small-gap: 5px !default;
-$controls-fields-row-input-small-width: calc(50% - #{$controls-fields-row-input-small-gap / 2});
+$controls-fields-row-input-small-width: calc(50% - #{$controls-fields-row-input-small-gap * .5});
 
 $form-horizontal-max-width: 100%;
 $form-horizontal-control-group-max-width: none;

@@ -3,14 +3,13 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChartTypeEventListener
-     */
-    protected $listener;
+    /** @var ChartTypeEventListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -28,23 +27,15 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider chartConfigsProvider
      */
-
     public function testPostSubmit(array $data, array $expected)
     {
-        $event = $this
-            ->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects($this->once())
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
-
-        $event
-            ->expects($this->once())
+            ->willReturn($data);
+        $event->expects($this->once())
             ->method('setData')
-            ->with($this->equalTo($expected));
+            ->with($expected);
 
         $this->listener->onSubmit($event);
     }
@@ -52,31 +43,20 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider chartConfigsProvider
      */
-
     public function testPreSetData(array $data, array $expected)
     {
-        $event = $this
-            ->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects($this->once())
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($expected));
-
-        $event
-            ->expects($this->once())
+            ->willReturn($expected);
+        $event->expects($this->once())
             ->method('setData')
-            ->with($this->equalTo($data));
+            ->with($data);
 
         $this->listener->preSetData($event);
     }
 
-    /**
-     * @return array
-     */
-    public function chartConfigsProvider()
+    public function chartConfigsProvider(): array
     {
         return [
             'name' => [
@@ -108,20 +88,13 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyData()
     {
-        $event = $this
-            ->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event
-            ->expects($this->exactly(2))
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->exactly(2))
             ->method('getData')
-            ->will($this->returnValue(['test']));
-
-        $event
-            ->expects($this->atLeastOnce())
+            ->willReturn(['test']);
+        $event->expects($this->atLeastOnce())
             ->method('setData')
-            ->with($this->equalTo([]));
+            ->with([]);
 
         $this->listener->preSetData($event);
         $this->listener->onSubmit($event);

@@ -13,19 +13,25 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    private Form|\PHPUnit\Framework\MockObject\MockObject $form;
+    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    private Request $request;
+    /** @var Request */
+    private $request;
 
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    private StaticSegmentManager|\PHPUnit\Framework\MockObject\MockObject $staticSegmentManager;
+    /** @var StaticSegmentManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $staticSegmentManager;
 
-    private Segment|\PHPUnit\Framework\MockObject\MockObject $entity;
+    /** @var Segment|\PHPUnit\Framework\MockObject\MockObject */
+    private $entity;
 
-    private SegmentHandler $handler;
+    /** @var SegmentHandler */
+    private $handler;
 
     protected function setUp(): void
     {
@@ -42,11 +48,6 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
             $this->managerRegistry,
             $this->staticSegmentManager
         );
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->form, $this->request, $this->manager, $this->handler, $this->entity);
     }
 
     public function testProcessUnsupportedRequest(): void
@@ -104,13 +105,15 @@ class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessSupportedRequest(string $method): void
     {
-        $this->form->expects($this->once())->method('setData')
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
 
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
 
-        $this->form->expects($this->once())->method('submit')
+        $this->form->expects($this->once())
+            ->method('submit')
             ->with(self::FORM_DATA);
 
         self::assertFalse($this->handler->process($this->form, $this->entity));

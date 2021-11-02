@@ -17,7 +17,7 @@
 
         .my-emails {
             width: 50%;
-            padding-right: $content-padding-small / 2;
+            padding-right: $content-padding-small * .5;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
@@ -32,7 +32,7 @@
         line-height: 15px;
         width: 50%;
         display: block;
-        padding: 0 0 0 ($content-padding-small / 2);
+        padding: 0 0 0 ($content-padding-small * .5);
         text-overflow: ellipsis;
         overflow: hidden;
 

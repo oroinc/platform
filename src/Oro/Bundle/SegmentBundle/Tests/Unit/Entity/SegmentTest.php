@@ -14,16 +14,11 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var Segment */
-    protected $entity;
+    private $entity;
 
     protected function setUp(): void
     {
         $this->entity = new Segment();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->entity);
     }
 
     public function testSettersAndGetters()
@@ -54,11 +49,11 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
         $this->entity->setDescription($testData);
         $this->assertEquals($testData, $this->entity->getDescription());
 
-        $testData = $this->createMock('Oro\Bundle\SegmentBundle\Entity\SegmentType', [], ['testTypeName']);
+        $testData = $this->createMock(SegmentType::class, [], ['testTypeName']);
         $this->entity->setType($testData);
         $this->assertSame($testData, $this->entity->getType());
 
-        $testData = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
+        $testData = $this->createMock(BusinessUnit::class);
         $this->entity->setOwner($testData);
         $this->assertSame($testData, $this->entity->getOwner());
 
@@ -78,7 +73,7 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
         $this->entity->setLastRun($testData);
         $this->assertSame($testData, $this->entity->getLastRun());
 
-        $testData = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $testData = $this->createMock(Organization::class);
         $this->entity->setOrganization($testData);
         $this->assertSame($testData, $this->entity->getOrganization());
 
@@ -92,14 +87,14 @@ class SegmentTest extends \PHPUnit\Framework\TestCase
         $segment = new Segment();
 
         $segment->beforeSave();
-        $this->assertInstanceOf('\DateTime', $segment->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $segment->getUpdatedAt());
+        $this->assertInstanceOf(\DateTime::class, $segment->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $segment->getUpdatedAt());
         $this->assertEquals($segment->getCreatedAt(), $segment->getUpdatedAt());
 
         $segment = new Segment();
         $segment->doUpdate();
         $this->assertEmpty($segment->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $segment->getUpdatedAt());
+        $this->assertInstanceOf(\DateTime::class, $segment->getUpdatedAt());
     }
 
     public function testIsDynamicFalse()

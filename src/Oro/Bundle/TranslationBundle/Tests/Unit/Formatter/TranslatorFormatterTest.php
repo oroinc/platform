@@ -7,7 +7,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslatorFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var TranslatorFormatter */
@@ -16,13 +16,13 @@ class TranslatorFormatterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->formatter = new TranslatorFormatter($this->translator);
     }
 
     public function testFormat(): void
     {
-        $this->translator
-            ->expects($this->any())
+        $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -31,8 +31,7 @@ class TranslatorFormatterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDefaultValue(): void
     {
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('N/A')
             ->willReturn('translated_value');

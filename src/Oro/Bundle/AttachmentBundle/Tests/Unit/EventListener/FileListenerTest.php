@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 /**
@@ -16,20 +17,17 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
  */
 class FileListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
+
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
     /** @var FileListener */
-    protected $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var File */
-    protected $attachment;
+    private $listener;
 
     protected function setUp(): void
     {
@@ -45,24 +43,20 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $this->em
-            ->expects($this->once())
+        $this->em->expects($this->once())
             ->method('contains')
             ->with($entity)
             ->willReturn(true);
 
-        $this->em
-            ->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
 
-        $unitOfWork
-            ->expects($this->once())
+        $unitOfWork->expects($this->once())
             ->method('clearEntityChangeSet')
             ->with(spl_object_hash($entity));
 
-        $this->em
-            ->expects($this->once())
+        $this->em->expects($this->once())
             ->method('refresh')
             ->with($entity);
 
@@ -90,9 +84,7 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
-        $loggedUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $loggedUser = $this->createMock(User::class);
 
         $this->fileManager->expects($this->once())
             ->method('preUpload')
@@ -122,9 +114,7 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
-        $loggedUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $loggedUser = $this->createMock(User::class);
 
         $this->fileManager->expects($this->once())
             ->method('preUpload')

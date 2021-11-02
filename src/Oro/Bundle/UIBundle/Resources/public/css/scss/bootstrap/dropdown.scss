@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-@import '~bootstrap/scss/dropdown';
+@import '~@oroinc/bootstrap/scss/dropdown';
 
 .dropdown-menu {
     box-shadow: $dropdown-menu-box-shadow;
@@ -139,7 +139,7 @@
 
 .dropdown-toggle {
     &::after {
-        vertical-align: $caret-width / 2;
+        vertical-align: $caret-width * .5;
 
         margin-left: $content-padding-small;
 

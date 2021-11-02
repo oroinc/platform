@@ -13,7 +13,7 @@
         left: 50%;
         width: $help-carousel-popup-width;
         min-width: 288px;
-        margin: 100px 0 0 (-$help-carousel-popup-width / 2);
+        margin: 100px 0 0 (-$help-carousel-popup-width * .5);
 
         color: $primary-200;
         background-color: $primary-inverse;

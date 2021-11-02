@@ -11,16 +11,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    protected $session;
+    private $session;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
+    private $htmlTagHelper;
 
     /** @var FlashMessageHelper */
-    protected $helper;
+    private $helper;
 
     protected function setUp(): void
     {

@@ -9,8 +9,6 @@ use Monolog\Processor\PsrLogMessageProcessor;
  * Provides the following methods to log a message to the logger and throw an exception:
  *  - **throwErrorException()** logs an error message and throws an exception;
  *  - **throwCriticalException()** logs a critical message and throws an exception.
- *
- * @see \Oro\Component\Log\Test\LogAndThrowExceptionTestTrait simplifies unit testing the classes that use this trait.
  */
 trait LogAndThrowExceptionTrait
 {

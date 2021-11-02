@@ -102,11 +102,8 @@ class EnumFilterTest extends OrmTestCase
 
     /**
      * @dataProvider filterProvider
-     *
-     * @param int    $filterType
-     * @param string $expected
      */
-    public function testBuildComparisonExpr($filterType, $expected)
+    public function testBuildComparisonExpr(int $filterType, string $expected)
     {
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder()
@@ -134,7 +131,7 @@ class EnumFilterTest extends OrmTestCase
         self::assertSame($expected, $result);
     }
 
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             [

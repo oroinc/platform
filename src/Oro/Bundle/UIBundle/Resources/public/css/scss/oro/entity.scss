@@ -22,7 +22,7 @@
     .btn-group.entity-create-dropdown {
         display: inline-block;
         vertical-align: top;
-        margin-left: $content-padding-small / 2;
+        margin-left: $content-padding-small * .5;
         border-radius: 0 4px 4px 0;
 
         > .btn {

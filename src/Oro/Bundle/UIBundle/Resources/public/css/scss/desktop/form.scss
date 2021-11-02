@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 .oro-item-collection {
     &input[type='email'],
     &input[type='text'] {
@@ -77,14 +79,14 @@ input[type='text'].hasDatepicker {
 .clearable-input {
     &__container--clear .clearable-input__placeholder-icon {
         font-size: $icon-font-size;
-        top: ($field-size - $icon-font-size) / -2;
+        top: math.div($field-size - $icon-font-size, -2);
         width: $field-size;
         height: $field-size;
         line-height: $field-size;
     }
 
     &__clear {
-        top: ($field-size - $icon-font-size) / -2;
+        top: math.div($field-size - $icon-font-size, -2);
     }
 
     &__container > input {

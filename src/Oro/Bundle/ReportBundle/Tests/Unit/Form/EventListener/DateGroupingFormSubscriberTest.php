@@ -13,34 +13,24 @@ use Symfony\Component\Form\FormInterface;
 
 class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DateGroupingFormSubscriber
-     */
-    protected $dateGroupingFormSubscriber;
+    /** @var DateGroupingFormSubscriber */
+    private $dateGroupingFormSubscriber;
 
-    /**
-     * @var FormEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dateForm;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateForm;
 
     protected function setUp(): void
     {
         $this->dateGroupingFormSubscriber = new DateGroupingFormSubscriber();
-        $this->event = $this->getMockBuilder(FormEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dateForm = $this->getNewForm();
-        $this->form = $this->getNewForm();
+        $this->event = $this->createMock(FormEvent::class);
+        $this->dateForm = $this->createMock(FormInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
         $this->form->expects($this->any())
             ->method('get')
             ->with(ReportType::DATE_GROUPING_FORM_NAME)
@@ -201,13 +191,5 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             'newValue',
             $newDefinition[DateGroupingType::DATE_GROUPING_NAME][DateGroupingType::FIELD_NAME_ID]
         );
-    }
-
-    /**
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getNewForm()
-    {
-        return $this->getMockBuilder(FormInterface::class)->getMock();
     }
 }

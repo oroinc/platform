@@ -16,7 +16,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
     use TempDirExtension;
 
     /** @var Controller|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationControllerMock;
+    private $translationController;
 
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
@@ -32,13 +32,13 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->translationControllerMock = $this->createMock(Controller::class);
+        $this->translationController = $this->createMock(Controller::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->dumper = new JsTranslationDumper(
-            $this->translationControllerMock,
+            $this->translationController,
             $this->router,
             [],
             '',
@@ -66,7 +66,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects($this->once())
             ->method('info');
 
-        $this->translationControllerMock->expects($this->once())
+        $this->translationController->expects($this->once())
             ->method('renderJsTranslationContent')
             ->with([], 'en')
             ->willReturn('test');
@@ -97,7 +97,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects($this->once())
             ->method('info');
 
-        $this->translationControllerMock->expects($this->once())
+        $this->translationController->expects($this->once())
             ->method('renderJsTranslationContent')
             ->with([], 'en_US')
             ->willReturn('test');

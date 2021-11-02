@@ -23,7 +23,6 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
     private IsLanguageTranslationUpdateAvailableCondition $condition2;
     private IsLanguageTranslationUpdateAvailableCondition $condition3;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $tomorrow = new \DateTime('tomorrow');
@@ -39,23 +38,29 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
         $this->languageWithOldTranslations = (new Language())->setCode($this->codeOld)->setInstalledBuildDate($now);
 
         $languageRepository = $this->createMock(LanguageRepository::class);
-        $languageRepository->method('findOneBy')->willReturnMap([
-            [['code' => $this->codeWithout], null, $this->languageWithoutTranslations],
-            [['code' => $this->codeNew], null, $this->languageWithNewTranslations],
-            [['code' => $this->codeOld], null, $this->languageWithOldTranslations],
-        ]);
+        $languageRepository->expects(self::any())
+            ->method('findOneBy')
+            ->willReturnMap([
+                [['code' => $this->codeWithout], null, $this->languageWithoutTranslations],
+                [['code' => $this->codeNew], null, $this->languageWithNewTranslations],
+                [['code' => $this->codeOld], null, $this->languageWithOldTranslations],
+            ]);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->method('getRepository')->willReturnMap([
-            [Language::class, null, $languageRepository]
-        ]);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->willReturnMap([
+                [Language::class, null, $languageRepository]
+            ]);
 
         $translationMetricsProvider = $this->createMock(TranslationMetricsProviderInterface::class);
-        $translationMetricsProvider->method('getForLanguage')->willReturnMap([
-            [$this->codeWithout, null],
-            [$this->codeNew, ['code' => $this->codeNew, 'lastBuildDate' => $tomorrow, 'translationStatus' => 90]],
-            [$this->codeOld, ['code' => $this->codeOld, 'lastBuildDate' => $yesterday, 'translationStatus' => 90]],
-        ]);
+        $translationMetricsProvider->expects(self::any())
+            ->method('getForLanguage')
+            ->willReturnMap([
+                [$this->codeWithout, null],
+                [$this->codeNew, ['code' => $this->codeNew, 'lastBuildDate' => $tomorrow, 'translationStatus' => 90]],
+                [$this->codeOld, ['code' => $this->codeOld, 'lastBuildDate' => $yesterday, 'translationStatus' => 90]],
+            ]);
 
         $this->condition1 = new IsLanguageTranslationUpdateAvailableCondition($translationMetricsProvider, $doctrine);
         $this->condition2 = new IsLanguageTranslationUpdateAvailableCondition($translationMetricsProvider, $doctrine);
@@ -69,18 +74,18 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
     {
         $context = [];
 
-        static::assertFalse($this->condition1->initialize([$this->codeWithout])->evaluate($context));
-        static::assertTrue($this->condition2->initialize([$this->codeNew])->evaluate($context));
-        static::assertFalse($this->condition3->initialize([$this->codeOld])->evaluate($context));
+        self::assertFalse($this->condition1->initialize([$this->codeWithout])->evaluate($context));
+        self::assertTrue($this->condition2->initialize([$this->codeNew])->evaluate($context));
+        self::assertFalse($this->condition3->initialize([$this->codeOld])->evaluate($context));
     }
 
     public function testWithEntityValue(): void
     {
         $context = [];
 
-        static::assertFalse($this->condition1->initialize([$this->languageWithoutTranslations])->evaluate($context));
-        static::assertTrue($this->condition2->initialize([$this->languageWithNewTranslations])->evaluate($context));
-        static::assertFalse($this->condition3->initialize([$this->languageWithOldTranslations])->evaluate($context));
+        self::assertFalse($this->condition1->initialize([$this->languageWithoutTranslations])->evaluate($context));
+        self::assertTrue($this->condition2->initialize([$this->languageWithNewTranslations])->evaluate($context));
+        self::assertFalse($this->condition3->initialize([$this->languageWithOldTranslations])->evaluate($context));
     }
 
     public function testWithPropertyPathToScalarValue(): void
@@ -95,9 +100,9 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
         $this->condition2->initialize([new PropertyPath('$.language2')]);
         $this->condition3->initialize([new PropertyPath('$.language3')]);
 
-        static::assertFalse($this->condition1->evaluate($context));
-        static::assertTrue($this->condition2->evaluate($context));
-        static::assertFalse($this->condition3->evaluate($context));
+        self::assertFalse($this->condition1->evaluate($context));
+        self::assertTrue($this->condition2->evaluate($context));
+        self::assertFalse($this->condition3->evaluate($context));
     }
 
     public function testWithPropertyPathToEntityValue(): void
@@ -112,8 +117,8 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
         $this->condition2->initialize([new PropertyPath('$.language2')]);
         $this->condition3->initialize([new PropertyPath('$.language3')]);
 
-        static::assertFalse($this->condition1->evaluate($context));
-        static::assertTrue($this->condition2->evaluate($context));
-        static::assertFalse($this->condition3->evaluate($context));
+        self::assertFalse($this->condition1->evaluate($context));
+        self::assertTrue($this->condition2->evaluate($context));
+        self::assertFalse($this->condition3->evaluate($context));
     }
 }

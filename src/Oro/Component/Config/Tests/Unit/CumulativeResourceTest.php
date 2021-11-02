@@ -4,6 +4,7 @@ namespace Oro\Component\Config\Tests\Unit;
 
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\CumulativeResourceLoader;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -23,7 +24,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($resource->isFound('bundle1', 'path'));
     }
 
-    public function testSetialization()
+    public function testSerialization()
     {
         $resource = new CumulativeResource(
             'test',
@@ -52,7 +53,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
     {
         $bundle = new TestBundle1();
 
-        $resourceLoader = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->createMock(CumulativeResourceLoader::class);
 
         $resource = new CumulativeResource(
             'test',
@@ -61,7 +62,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
 
         $resourceLoader->expects($this->once())
             ->method('isResourceFresh')
-            ->will($this->onConsecutiveCalls(true));
+            ->willReturn(true);
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -75,7 +76,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
     {
         $bundle = new TestBundle1();
 
-        $resourceLoader = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->createMock(CumulativeResourceLoader::class);
 
         $resource = new CumulativeResource(
             'test',
@@ -84,7 +85,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
 
         $resourceLoader->expects($this->exactly(2))
             ->method('isResourceFresh')
-            ->will($this->onConsecutiveCalls(true, true));
+            ->willReturn(true);
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -99,8 +100,8 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
 
-        $resourceLoader1 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
-        $resourceLoader2 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader1 = $this->createMock(CumulativeResourceLoader::class);
+        $resourceLoader2 = $this->createMock(CumulativeResourceLoader::class);
 
         $resource1 = new CumulativeResource(
             'test1',
@@ -113,11 +114,11 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
 
         $resourceLoader1->expects($this->exactly(2))
             ->method('isResourceFresh')
-            ->will($this->onConsecutiveCalls(true, true));
+            ->willReturn(true);
 
         $resourceLoader2->expects($this->exactly(2))
             ->method('isResourceFresh')
-            ->will($this->onConsecutiveCalls(true, true));
+            ->willReturn(true);
 
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -132,8 +133,8 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
 
-        $resourceLoader1 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
-        $resourceLoader2 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader1 = $this->createMock(CumulativeResourceLoader::class);
+        $resourceLoader2 = $this->createMock(CumulativeResourceLoader::class);
 
         $resource = new CumulativeResource(
             'test',
@@ -142,11 +143,11 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
 
         $resourceLoader1->expects($this->exactly(2))
             ->method('isResourceFresh')
-            ->will($this->onConsecutiveCalls(true, false));
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $resourceLoader2->expects($this->once())
             ->method('isResourceFresh')
-            ->will($this->onConsecutiveCalls(true));
+            ->willReturn(true);
 
         CumulativeResourceManager::getInstance()
             ->clear()

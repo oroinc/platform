@@ -109,9 +109,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     {
         $schema = new Schema();
 
-        $platform = $this->getMockBuilder(AbstractPlatform::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $platform = $this->createMock(AbstractPlatform::class);
 
         $schemaUpdateQuery = new SqlSchemaUpdateMigrationQuery('ALTER TABLE');
 

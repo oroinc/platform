@@ -8,53 +8,39 @@ use GuzzleHttp\Psr7\Response;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Http\Message\StreamInterface;
 
-class GuzzleRestClientTest extends TestCase
+class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Client|MockObject */
-    protected $sourceClient;
+    private const BASE_URL = 'https://example.com/api/';
+    private const DEFAULT_OPTIONS = ['default' => 'value'];
+
+    /** @var Client|\PHPUnit\Framework\MockObject\MockObject */
+    private $sourceClient;
 
     /** @var GuzzleRestClient */
-    protected $client;
-
-    /** @var string */
-    protected $baseUrl = 'https://example.com/api/';
-
-    /** @var array */
-    protected $defaultOptions = ['default' => 'value'];
+    private $client;
 
     protected function setUp(): void
     {
-        $this->sourceClient = $this->getMockBuilder(Client::class)->disableOriginalConstructor()->getMock();
+        $this->sourceClient = $this->createMock(Client::class);
 
-        $this->client = new class($this->baseUrl, $this->defaultOptions) extends GuzzleRestClient {
-            public function xgetBaseUrl(): string
-            {
-                return $this->baseUrl;
-            }
-
-            public function xgetDefaultOptions(): array
-            {
-                return $this->defaultOptions;
-            }
-        };
+        $this->client = new GuzzleRestClient(self::BASE_URL, self::DEFAULT_OPTIONS);
         $this->client->setGuzzleClient($this->sourceClient);
     }
 
     public function testConstructor()
     {
-        static::assertEquals($this->baseUrl, $this->client->xgetBaseUrl());
-        static::assertEquals($this->defaultOptions, $this->client->xgetDefaultOptions());
+        self::assertEquals(self::BASE_URL, ReflectionUtil::getPropertyValue($this->client, 'baseUrl'));
+        self::assertEquals(self::DEFAULT_OPTIONS, ReflectionUtil::getPropertyValue($this->client, 'defaultOptions'));
     }
 
     public function testGetLastResponseWorks()
     {
         $response = $this->client->get('users');
 
-        static::assertEquals($response, $this->client->getLastResponse());
+        self::assertEquals($response, $this->client->getLastResponse());
     }
 
     /**
@@ -64,7 +50,7 @@ class GuzzleRestClientTest extends TestCase
     {
         $response = $this->createMock(Response::class);
 
-        $this->sourceClient->expects(static::once())
+        $this->sourceClient->expects(self::once())
             ->method('send')
             ->with(
                 $this->callback(
@@ -86,14 +72,14 @@ class GuzzleRestClientTest extends TestCase
 
         $actual = call_user_func_array([$this->client, $method], $args);
 
-        static::assertInstanceOf(GuzzleRestResponse::class, $actual);
-        static::assertEquals($response, $actual->getSourceResponse());
+        self::assertInstanceOf(GuzzleRestResponse::class, $actual);
+        self::assertEquals($response, $actual->getSourceResponse());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function performRequestDataProvider()
+    public function performRequestDataProvider(): array
     {
         $date = new \DateTime('2021-01-10T12:26:04+05:00');
 
@@ -225,9 +211,9 @@ class GuzzleRestClientTest extends TestCase
         $method = 'get';
         $url = 'https://google.com/api/v2';
 
-        $this->sourceClient->expects(static::once())->method('send')->willThrowException(
-            new \Exception('Exception message')
-        );
+        $this->sourceClient->expects(self::once())
+            ->method('send')
+            ->willThrowException(new \Exception('Exception message'));
 
         $this->client->performRequest($method, $url);
     }
@@ -240,14 +226,20 @@ class GuzzleRestClientTest extends TestCase
         $options = ['foo' => 'option'];
         $expectedResult = ['foo' => 'data'];
 
-        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
+        $response = $this->createMock(Response::class);
 
-        $this->sourceClient->expects(static::once())->method('send')->willReturn($response);
+        $this->sourceClient->expects(self::once())
+            ->method('send')
+            ->willReturn($response);
 
-        $response->expects(static::any())->method('getStatusCode')->willReturn(200);
-        $response->expects(static::once())->method('getBody')->willReturn('{"foo":"data"}');
+        $response->expects(self::any())
+            ->method('getStatusCode')
+            ->willReturn(200);
+        $response->expects(self::once())
+            ->method('getBody')
+            ->willReturn('{"foo":"data"}');
 
-        static::assertEquals($expectedResult, $this->client->getJSON($url, $params, $headers, $options));
+        self::assertEquals($expectedResult, $this->client->getJSON($url, $params, $headers, $options));
     }
 
     public function testGetFormattedResultThrowException()
@@ -259,17 +251,25 @@ class GuzzleRestClientTest extends TestCase
         $statusCode = 403;
         $reasonPhrase = 'Forbidden';
 
-        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
+        $response = $this->createMock(Response::class);
 
-        $this->sourceClient->expects(static::once())->method('send')->willReturn($response);
+        $this->sourceClient->expects(self::once())
+            ->method('send')
+            ->willReturn($response);
 
-        $response->expects(static::atLeastOnce())->method('getStatusCode')->willReturn($statusCode);
-        $response->expects(static::atLeastOnce())->method('getReasonPhrase')->willReturn($reasonPhrase);
+        $response->expects(self::atLeastOnce())
+            ->method('getStatusCode')
+            ->willReturn($statusCode);
+        $response->expects(self::atLeastOnce())
+            ->method('getReasonPhrase')
+            ->willReturn($reasonPhrase);
         $body = $this->createMock(StreamInterface::class);
         $body->expects($this->atLeastOnce())
             ->method('isSeekable')
             ->willReturn(false);
-        $response->expects(static::atLeastOnce())->method('getBody')->willReturn($body);
+        $response->expects(self::atLeastOnce())
+            ->method('getBody')
+            ->willReturn($body);
 
         $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage(

@@ -10,21 +10,19 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractRoundingService */
     protected $service;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->service = $this->getRoundingService();
     }
 
-    /** AbstractRoundingService */
+    /**
+     * @return AbstractRoundingService
+     */
     abstract protected function getRoundingService();
 
     /**

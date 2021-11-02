@@ -2,6 +2,8 @@
 
 /* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
 
+@use 'sass:math';
+
 .drag-n-drop-hint {
     display: none;
 
@@ -18,7 +20,7 @@
         left: 50%;
         width: $condition-builder-drag-n-drop-hint-width;
         height: 100%;
-        margin: 0 $condition-builder-drag-n-drop-hint-width / -2;
+        margin: 0 math.div($condition-builder-drag-n-drop-hint-width, -2);
     }
 }
 
@@ -101,7 +103,7 @@
                     position: absolute;
                     top: 50%;
                     left: 50%;
-                    margin: -$condition-builder-condition-item-loader-size / 2;
+                    margin: -$condition-builder-condition-item-loader-size * .5;
 
                     @include loader(
                         $condition-builder-condition-item-loader-size,
@@ -145,8 +147,8 @@
                 float: none;
                 position: absolute;
                 top: 50%;
-                left: ceil($condition-builder-conditions-group-start-border-width / 2);
-                margin: $condition-builder-close-item-size / -2;
+                left: ceil($condition-builder-conditions-group-start-border-width * .5);
+                margin: math.div($condition-builder-close-item-size, -2);
                 width: $condition-builder-close-item-size;
                 height: $condition-builder-close-item-size;
                 line-height: $condition-builder-close-item-size - 1;

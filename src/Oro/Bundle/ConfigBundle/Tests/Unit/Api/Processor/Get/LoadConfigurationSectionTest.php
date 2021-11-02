@@ -6,23 +6,22 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Processor\Get\LoadConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
+use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LoadConfigurationSectionTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configRepository;
+    /** @var ConfigurationRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $configRepository;
 
     /** @var LoadConfigurationSection */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->configRepository = $this
-            ->getMockBuilder('Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configRepository = $this->createMock(ConfigurationRepository::class);
 
         $this->processor = new LoadConfigurationSection($this->configRepository);
     }
@@ -59,7 +58,8 @@ class LoadConfigurationSectionTest extends GetProcessorTestCase
 
     public function testProcessForUnknownSection()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
+
         $scope = 'scope';
         $sectionId = 'unknown';
 

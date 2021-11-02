@@ -4,32 +4,28 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Processor;
 
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\ImportProcessorTest;
 use Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor;
 
 class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
 {
-    protected ContextAwareProcessor $processor;
+    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
+    private $stepExecution;
 
-    private StepExecution|\PHPUnit\Framework\MockObject\MockObject $stepExecution;
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
 
-    private ContextRegistry|\PHPUnit\Framework\MockObject\MockObject $contextRegistry;
+    /** @var StepExecutionAwareImportProcessor */
+    protected $processor;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
-        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
-        $this->processor = new class() extends StepExecutionAwareImportProcessor {
-            public function xgetEntityName(): string
-            {
-                return $this->entityName;
-            }
-        };
-
+        $this->processor = new StepExecutionAwareImportProcessor();
         $this->processor->setSerializer($this->serializer);
         $this->processor->setImportExportContext($this->context);
     }
@@ -46,7 +42,7 @@ class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
     {
         $this->processor->setContextRegistry($this->contextRegistry);
 
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->willReturn($this->context);
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Route;
 
+use Oro\Bundle\CallBundle\Entity\Call;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -281,10 +282,8 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function redirectDataProvider()
+    public function redirectDataProvider(): array
     {
         $expectedId = 42;
         $entity = $this->getEntityStub($expectedId);
@@ -296,7 +295,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => Call::class,
                         'id' => $expectedId,
                         'testQueryParameter' => 'foo'
                     ]
@@ -305,7 +304,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => Call::class,
                             'id' => '$id'
                         ]
                     ],
@@ -319,7 +318,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => Call::class,
                         'id' => $expectedId,
                     ]
                 ],
@@ -327,7 +326,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => Call::class,
                             'id' => '$id'
                         ]
                     ],
@@ -341,7 +340,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => Call::class,
                         'id' => $expectedId
                     ]
                 ],
@@ -349,7 +348,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => Call::class,
                             'id' => '$id'
                         ]
                     ],
@@ -361,7 +360,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => Call::class,
                         'id' => $expectedId,
                         'secondId' => $expectedSecondEntityId
                     ]
@@ -370,7 +369,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => Call::class,
                             'id' => '$firstEntity.id',
                             'secondId' => '$secondEntity.id'
                         ]

@@ -3,39 +3,27 @@
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ReflectionClassHelper;
+use Oro\Component\PhpUtils\Tests\Unit\Stubs\StubInterface;
 
 class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReflectionClassHelper */
-    protected $utils;
+    private $utils;
 
     protected function setUp(): void
     {
-        $this->utils = new ReflectionClassHelper(
-            'Oro\Component\PhpUtils\Tests\Unit\Stubs\StubInterface'
-        );
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->utils);
+        $this->utils = new ReflectionClassHelper(StubInterface::class);
     }
 
     /**
      * @dataProvider hasMethodDataProvider
-     *
-     * @param string $methodName
-     * @param bool   $expectedResult
      */
-    public function testHasMethod($methodName, $expectedResult)
+    public function testHasMethod(string $methodName, bool $expectedResult)
     {
         $this->assertSame($expectedResult, $this->utils->hasMethod($methodName));
     }
 
-    /**
-     * @return array
-     */
-    public function hasMethodDataProvider()
+    public function hasMethodDataProvider(): array
     {
         return [
             'empty method name, should be handled as unknown' => [
@@ -59,23 +47,19 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider argumentsDataProvider
-     *
-     * @param array       $arguments
-     * @param bool        $expectedResult
-     * @param null|string $expectedErrorMessage
-     * @param string      $actionName
      */
-    public function testIsValidArguments(array $arguments, $expectedResult, $expectedErrorMessage, $actionName = 'add')
-    {
+    public function testIsValidArguments(
+        array $arguments,
+        bool $expectedResult,
+        ?string $expectedErrorMessage,
+        string $actionName = 'add'
+    ) {
         $result = $this->utils->isValidArguments($actionName, $arguments);
         $this->assertSame($expectedErrorMessage, $this->utils->getLastError());
         $this->assertSame($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function argumentsDataProvider()
+    public function argumentsDataProvider(): array
     {
         return [
             'not enough arguments'                               => [
@@ -149,10 +133,7 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResults, $arguments);
     }
 
-    /**
-     * @return array
-     */
-    public function completeArgumentsDataProvider()
+    public function completeArgumentsDataProvider(): array
     {
         return [
             'arguments, not assoc list, not required to complete'            => [

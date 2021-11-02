@@ -104,14 +104,14 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             $this->userChecker->expects(self::once())
                 ->method('checkPreAuth')
                 ->with($user)
-                ->will($this->throwException(new DisabledException('User account is disabled.')));
+                ->willThrowException(new DisabledException('User account is disabled.'));
         }
 
         if ($isLockedUserAuthStatus) {
             $this->userChecker->expects(self::once())
                 ->method('checkPreAuth')
                 ->with($user)
-                ->will($this->throwException(new LockedException('User account is locked.')));
+                ->willThrowException(new LockedException('User account is locked.'));
         }
 
         $token = $this->prepareTestInstance($user, $secret);
@@ -234,8 +234,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $noApiKeyUser = new User();
         $noApiKeyUser->setUsername('sample_user_no_api');
 
-        $this->userProvider
-            ->expects(self::once())
+        $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->willReturn($noApiKeyUser);
 
@@ -269,23 +268,14 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 
     private function prepareTestInstance(User $user, string $secret): Token
     {
-        $this->userProvider
-            ->expects(self::any())
+        $this->userProvider->expects(self::any())
             ->method('loadUserByUsername')
             ->willReturn($user);
 
         $nonce = $this->getNonce();
         $time = date('Y-m-d H:i:s');
 
-        $digest = $this->encoder->encodePassword(
-            sprintf(
-                '%s%s%s',
-                base64_decode($nonce),
-                $time,
-                $secret
-            ),
-            ''
-        );
+        $digest = $this->encoder->encodePassword(sprintf('%s%s%s', base64_decode($nonce), $time, $secret), '');
 
         $token = new Token($user, $digest, self::PROVIDER_KEY, $user->getRoles());
         $token->setAttribute('digest', $digest);

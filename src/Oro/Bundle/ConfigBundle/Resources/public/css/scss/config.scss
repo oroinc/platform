@@ -60,7 +60,7 @@
     }
 
     .control-subgroup.parent-scope-checkbox {
-        margin-top: ($content-padding-small / 2);
+        margin-top: ($content-padding-small * .5);
         margin-right: $content-padding-small;
 
         label,

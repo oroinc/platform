@@ -3,7 +3,7 @@
 $accordion-heading-background-color: $primary-900;
 $content-padding: 16px;
 $content-padding-medium: 8px;
-$content-padding-small: $content-padding-medium / 2;
+$content-padding-small: $content-padding-medium * .5;
 $horizontal-padding: $content-padding;
 $vertical-padding: $content-padding;
 $top-padding: $content-padding;

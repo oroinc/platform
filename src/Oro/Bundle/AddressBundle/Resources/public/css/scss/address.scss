@@ -64,8 +64,8 @@
         width: 40%;
         overflow: hidden;
         max-height: inherit;
-        margin-right: $address-box-margin-small/2;
-        padding-right: $address-box-margin-small/2;
+        margin-right: $address-box-margin-small * .5;
+        padding-right: $address-box-margin-small * .5;
 
         &:hover {
             overflow-y: auto;

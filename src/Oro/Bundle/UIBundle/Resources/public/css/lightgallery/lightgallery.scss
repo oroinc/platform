@@ -24,8 +24,8 @@
             top: 50%;
             left: 50%;
 
-            margin-top: -$loader-size / 2;
-            margin-left: -$loader-size / 2;
+            margin-top: -$loader-size * .5;
+            margin-left: -$loader-size * .5;
 
             content: '';
 

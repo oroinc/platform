@@ -10,7 +10,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $htmlTagHelper;
 
     /* @var HtmlTagExtension */
@@ -73,10 +73,8 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider attributeDataProvider
-     * @param string $string
-     * @param string $expected
      */
-    public function testAttributeNamePurify($string, $expected)
+    public function testAttributeNamePurify(string $string, string $expected)
     {
         $this->assertSame(
             $expected,
@@ -84,10 +82,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function attributeDataProvider()
+    public function attributeDataProvider(): array
     {
         return [
             [' onclick=alert(1)', 'onclickalert1'],

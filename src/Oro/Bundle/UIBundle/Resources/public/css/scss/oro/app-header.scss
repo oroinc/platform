@@ -154,11 +154,11 @@
                             }
 
                             li:first-child {
-                                margin-top: $header-search-suggestion-item-v-margin / 2;
+                                margin-top: $header-search-suggestion-item-v-margin * .5;
                             }
 
                             li:last-child {
-                                margin-bottom: $header-search-suggestion-item-v-margin / 2;
+                                margin-bottom: $header-search-suggestion-item-v-margin * .5;
                             }
 
                             li:first-child,
@@ -179,10 +179,10 @@
                             }
 
                             li.selected {
-                                margin-left: $header-search-suggestion-item-h-margin / 2;
-                                margin-right: $header-search-suggestion-item-h-margin / 2;
-                                padding-left: $header-search-suggestion-item-h-margin / 2;
-                                padding-right: $header-search-suggestion-item-h-margin / 2;
+                                margin-left: $header-search-suggestion-item-h-margin * .5;
+                                margin-right: $header-search-suggestion-item-h-margin * .5;
+                                padding-left: $header-search-suggestion-item-h-margin * .5;
+                                padding-right: $header-search-suggestion-item-h-margin * .5;
                                 background-color: $header-search-selected-suggestion-item-bg;
 
                                 .description,

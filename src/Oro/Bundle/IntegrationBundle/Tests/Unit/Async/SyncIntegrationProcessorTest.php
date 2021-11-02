@@ -58,26 +58,24 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithExpectedArguments()
     {
         new SyncIntegrationProcessor(
-            $this->createRegistryStub(),
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub(null),
+            $this->createDoctrine(),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry(null),
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldRejectAndLogMessageBodyMissIntegrationId()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Invalid message: integration_id is empty')
-        ;
+            ->with('Invalid message: integration_id is empty');
         $processor = new SyncIntegrationProcessor(
-            $this->createRegistryStub(),
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub(null),
+            $this->createDoctrine(),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry(null),
             new JobRunner(),
             $logger
         );
@@ -85,7 +83,6 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->setBody('[]');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -98,45 +95,39 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('The malformed json given.');
 
         $processor = new SyncIntegrationProcessor(
-            $this->createRegistryStub(),
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub(null),
+            $this->createDoctrine(),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry(null),
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody('[}');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
     }
 
     public function testShouldRejectMessageIfIntegrationNotExist()
     {
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn(null)
-        ;
-
-        $registryStub = $this->createRegistryStub($entityManagerMock);
+            ->willReturn(null);
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub(null),
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry(null),
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -148,28 +139,23 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(false);
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
-
-        $registryStub = $this->createRegistryStub($entityManagerMock);
+            ->willReturn($integration);
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub(null),
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry(null),
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -181,31 +167,28 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
+            ->willReturn($integration);
 
         $jobRunner = new JobRunner();
 
         $processor = new SyncIntegrationProcessor(
-            $this->createRegistryStub($entityManagerMock),
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock()),
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry($this->createSyncProcessor()),
             $jobRunner,
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('theMessageId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
 
@@ -220,11 +203,10 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
@@ -233,18 +215,17 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $syncProcessor = $this->createMock(SyncProcessorInterface::class);
 
         $processor = new SyncIntegrationProcessor(
-            $this->createRegistryStub($entityManagerMock),
-            $this->createTokenStorageMock(),
-            $this->createSyncProcessorRegistryStub($syncProcessor),
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createSyncProcessorRegistry($syncProcessor),
             $jobRunner,
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('theMessageId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
 
@@ -259,40 +240,33 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
-        ;
 
-        $registryStub = $this->createRegistryStub($entityManagerMock);
-
-        $tokenStorageStub = $this->createTokenStorageMock();
-        $tokenStorageStub
-            ->expects($this->once())
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->once())
             ->method('setToken')
-            ->with($this->isInstanceOf(OrganizationToken::class))
-        ;
+            ->with($this->isInstanceOf(OrganizationToken::class));
 
-        $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($this->createSyncProcessorMock());
+        $syncProcessorRegistry = $this->createSyncProcessorRegistry($this->createSyncProcessor());
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $tokenStorageStub,
-            $syncProcessorRegistryStub,
+            $this->createDoctrine($entityManager),
+            $tokenStorage,
+            $syncProcessorRegistry,
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
     }
@@ -302,40 +276,33 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
+            ->willReturn($integration);
 
-        $registryStub = $this->createRegistryStub($entityManagerMock);
-
-        $syncProcessorMock = $this->createSyncProcessorMock();
-        $syncProcessorMock
-            ->expects($this->once())
+        $syncProcessor = $this->createSyncProcessor();
+        $syncProcessor->expects($this->once())
             ->method('process')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
-        $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($syncProcessorMock);
+        $syncProcessorRegistry = $this->createSyncProcessorRegistry($syncProcessor);
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $this->createTokenStorageMock(),
-            $syncProcessorRegistryStub,
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $syncProcessorRegistry,
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -347,40 +314,33 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
+            ->willReturn($integration);
 
-        $registryStub = $this->createRegistryStub($entityManagerMock);
-
-        $syncProcessorMock = $this->createSyncProcessorMock();
-        $syncProcessorMock
-            ->expects($this->once())
+        $syncProcessor = $this->createSyncProcessor();
+        $syncProcessor->expects($this->once())
             ->method('process')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
-        $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($syncProcessorMock);
+        $syncProcessorRegistry = $this->createSyncProcessorRegistry($syncProcessor);
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $this->createTokenStorageMock(),
-            $syncProcessorRegistryStub,
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $syncProcessorRegistry,
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -392,41 +352,34 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
+            ->willReturn($integration);
 
-        $registryStub = $this->createRegistryStub($entityManagerMock);
-
-        $syncProcessorMock = $this->createSyncProcessorMock();
-        $syncProcessorMock
-            ->expects($this->once())
+        $syncProcessor = $this->createSyncProcessor();
+        $syncProcessor->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($integration), null, [])
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
-        $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($syncProcessorMock);
+        $syncProcessorRegistry = $this->createSyncProcessorRegistry($syncProcessor);
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $this->createTokenStorageMock(),
-            $syncProcessorRegistryStub,
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $syncProcessorRegistry,
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
         $message->setMessageId('someId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -438,21 +391,16 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setOrganization(new Organization());
-        $integration->setTransport($this->createTransportStub());
+        $integration->setTransport($this->createTransport());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
-        ;
 
-        $registryStub = $this->createRegistryStub($entityManagerMock);
-
-        $syncProcessorMock = $this->createSyncProcessorMock();
-        $syncProcessorMock
-            ->expects($this->once())
+        $syncProcessor = $this->createSyncProcessor();
+        $syncProcessor->expects($this->once())
             ->method('process')
             ->with(
                 $this->identicalTo($integration),
@@ -462,17 +410,16 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
                     'force' => true,
                 ]
             )
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
-        $syncProcessorRegistryStub = $this->createSyncProcessorRegistryStub($syncProcessorMock);
+        $syncProcessorRegistry = $this->createSyncProcessorRegistry($syncProcessor);
 
         $processor = new SyncIntegrationProcessor(
-            $registryStub,
-            $this->createTokenStorageMock(),
-            $syncProcessorRegistryStub,
+            $this->createDoctrine($entityManager),
+            $this->createMock(TokenStorageInterface::class),
+            $syncProcessorRegistry,
             new JobRunner(),
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
@@ -486,7 +433,6 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         ]));
         $message->setMessageId('someId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -496,54 +442,47 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
-    private function createEntityManagerStub()
+    private function createEntityManager()
     {
         $configuration = new Configuration();
 
-        $connectionMock = $this->createMock(Connection::class);
-        $connectionMock
-            ->expects($this->any())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->any())
             ->method('getConfiguration')
-            ->willReturn($configuration)
-        ;
+            ->willReturn($configuration);
 
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock
-            ->expects($this->any())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->any())
             ->method('getConnection')
-            ->willReturn($connectionMock)
-        ;
+            ->willReturn($connection);
 
-        return $entityManagerMock;
+        return $entityManager;
     }
 
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
-    private function createRegistryStub($entityManager = null)
+    private function createDoctrine(EntityManagerInterface $entityManager = null)
     {
-        $registryMock = $this->createMock(ManagerRegistry::class);
-        $registryMock
-            ->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManager')
-            ->willReturn($entityManager)
-        ;
+            ->willReturn($entityManager);
 
-        return $registryMock;
+        return $doctrine;
     }
 
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|AbstractSyncProcessor
      */
-    private function createSyncProcessorMock()
+    private function createSyncProcessor()
     {
         $syncProcessor = $this->getMockBuilder(AbstractSyncProcessor::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['process', 'getLoggerStrategy'])
             ->addMethods(['assertValidConnector'])
             ->getMock();
-        $syncProcessor
-            ->expects($this->any())
+        $syncProcessor->expects($this->any())
             ->method('getLoggerStrategy')
             ->willReturn(new LoggerStrategy());
 
@@ -553,46 +492,26 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|SyncProcessorRegistry
      */
-    private function createSyncProcessorRegistryStub($syncProcessor)
+    private function createSyncProcessorRegistry(?SyncProcessorInterface $syncProcessor)
     {
         $syncProcessorRegistry = $this->createMock(SyncProcessorRegistry::class);
-        $syncProcessorRegistry
-            ->expects($this->any())
+        $syncProcessorRegistry->expects($this->any())
             ->method('getProcessorForIntegration')
-            ->willReturn($syncProcessor)
-        ;
+            ->willReturn($syncProcessor);
 
         return $syncProcessorRegistry;
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
-     */
-    private function createTokenStorageMock()
-    {
-        return $this->createMock(TokenStorageInterface::class);
-    }
-
-    /**
      * @return \PHPUnit\Framework\MockObject\MockObject|Transport
      */
-    private function createTransportStub()
+    private function createTransport()
     {
         $transportMock = $this->createMock(Transport::class);
-        $transportMock
-            ->expects($this->any())
+        $transportMock->expects($this->any())
             ->method('getSettingsBag')
-            ->willReturn(new ParameterBag())
-        ;
+            ->willReturn(new ParameterBag());
 
         return $transportMock;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

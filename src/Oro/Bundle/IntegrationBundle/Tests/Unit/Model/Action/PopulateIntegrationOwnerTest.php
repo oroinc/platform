@@ -8,44 +8,28 @@ use Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextAccessor */
-    protected $contextAccessor;
+    private $contextAccessor;
 
-    /** @var DefaultOwnerHelper|MockObject */
-    protected $defaultOwnerHelper;
+    /** @var DefaultOwnerHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $defaultOwnerHelper;
 
     /** @var ActionInterface */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
+        $this->defaultOwnerHelper = $this->createMock(DefaultOwnerHelper::class);
 
-        $this->defaultOwnerHelper = $this->getMockBuilder(DefaultOwnerHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->action = new class($this->contextAccessor, $this->defaultOwnerHelper) extends PopulateIntegrationOwner {
-            public function xgetAttribute()
-            {
-                return $this->attribute;
-            }
-
-            public function xgetIntegration()
-            {
-                return $this->integration;
-            }
-        };
-
-        /** @var EventDispatcher|MockObject $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new PopulateIntegrationOwner($this->contextAccessor, $this->defaultOwnerHelper);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -57,10 +41,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             [[]],
@@ -76,10 +57,10 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $integration = 'b';
 
         $options = ['attribute' => $attribute, 'integration' => $integration];
-        static::assertSame($this->action, $this->action->initialize($options));
+        self::assertSame($this->action, $this->action->initialize($options));
 
-        static::assertEquals($attribute, $this->action->xgetAttribute());
-        static::assertEquals($integration, $this->action->xgetIntegration());
+        self::assertEquals($attribute, ReflectionUtil::getPropertyValue($this->action, 'attribute'));
+        self::assertEquals($integration, ReflectionUtil::getPropertyValue($this->action, 'integration'));
     }
 
     public function testExecuteIncorrectEntity()
@@ -91,9 +72,10 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
 
         $context = new \stdClass();
         $context->attr = 'test';
-        $context->integration = $this->getMockBuilder(Channel::class)->disableOriginalConstructor()->getMock();
+        $context->integration = $this->createMock(Channel::class);
 
-        $this->defaultOwnerHelper->expects(static::never())->method(static::anything());
+        $this->defaultOwnerHelper->expects(self::never())
+            ->method(self::anything());
 
         $options = ['attribute' => new PropertyPath('attr'), 'integration' => new PropertyPath('integration')];
         $this->action->initialize($options);
@@ -112,7 +94,8 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $context->attr = new \stdClass();
         $context->integration = new \stdClass();
 
-        $this->defaultOwnerHelper->expects(static::never())->method(static::anything());
+        $this->defaultOwnerHelper->expects(self::never())
+            ->method(self::anything());
 
         $options = ['attribute' => new PropertyPath('attr'), 'integration' => new PropertyPath('integration')];
         $this->action->initialize($options);
@@ -123,9 +106,9 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
     {
         $context = new \stdClass();
         $context->attr = new \stdClass();
-        $context->integration = $this->getMockBuilder(Channel::class)->disableOriginalConstructor()->getMock();
+        $context->integration = $this->createMock(Channel::class);
 
-        $this->defaultOwnerHelper->expects(static::once())
+        $this->defaultOwnerHelper->expects(self::once())
             ->method('populateChannelOwner')
             ->with($context->attr, $context->integration);
 

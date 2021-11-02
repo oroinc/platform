@@ -37,8 +37,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileMimeTypes(): void
     {
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.upload_file_mime_types', '', false, null)
             ->willReturn('sample/type1,sample/type2');
@@ -48,8 +47,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetImageMimeTypes(): void
     {
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.upload_image_mime_types', '', false, null)
             ->willReturn('sample/type1,sample/type2');
@@ -62,14 +60,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetMimeTypes(?string $fileMimeTypes, ?string $imageMimeTypes, array $expected): void
     {
-        $this->systemConfigManager
+        $this->systemConfigManager->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_attachment.upload_file_mime_types', '', false, null, $fileMimeTypes],
-                    ['oro_attachment.upload_image_mime_types', '', false, null, $imageMimeTypes],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_attachment.upload_file_mime_types', '', false, null, $fileMimeTypes],
+                ['oro_attachment.upload_image_mime_types', '', false, null, $imageMimeTypes],
+            ]);
 
         $this->assertEquals($expected, $this->provider->getMimeTypes());
     }
@@ -106,14 +102,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetMimeTypesAsChoices(?string $fileMimeTypes, ?string $imageMimeTypes, array $expected): void
     {
-        $this->systemConfigManager
+        $this->systemConfigManager->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_attachment.upload_file_mime_types', '', false, null, $fileMimeTypes],
-                    ['oro_attachment.upload_image_mime_types', '', false, null, $imageMimeTypes],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_attachment.upload_file_mime_types', '', false, null, $fileMimeTypes],
+                ['oro_attachment.upload_image_mime_types', '', false, null, $imageMimeTypes],
+            ]);
 
         $this->assertEquals($expected, $this->provider->getMimeTypesAsChoices());
     }
@@ -147,20 +141,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityWhenNoFieldConfig(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
             ->with($entityClass = \stdClass::class)
             ->willReturn(null);
 
-        $this->systemConfigManager
-            ->expects($this->exactly(2))
+        $this->systemConfigManager->expects($this->exactly(2))
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_attachment.upload_file_mime_types', '', false, null, 'sample/type1'],
-                    ['oro_attachment.upload_image_mime_types', '', false, null, 'sample/type2'],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_attachment.upload_file_mime_types', '', false, null, 'sample/type1'],
+                ['oro_attachment.upload_image_mime_types', '', false, null, 'sample/type2'],
+            ]);
 
         $this->assertEquals(
             ['sample/type1', 'sample/type2'],
@@ -170,26 +161,22 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityWhenNoMimeTypes(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
             ->with($entityClass = \stdClass::class)
             ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
 
-        $entityConfig
-            ->expects($this->once())
+        $entityConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('');
 
-        $this->systemConfigManager
-            ->expects($this->exactly(2))
+        $this->systemConfigManager->expects($this->exactly(2))
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_attachment.upload_file_mime_types', '', false, null, 'sample/type1'],
-                    ['oro_attachment.upload_image_mime_types', '', false, null, 'sample/type2'],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_attachment.upload_file_mime_types', '', false, null, 'sample/type1'],
+                ['oro_attachment.upload_image_mime_types', '', false, null, 'sample/type2'],
+            ]);
 
         $this->assertEquals(
             ['sample/type1', 'sample/type2'],
@@ -199,19 +186,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntity(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
             ->with($entityClass = \stdClass::class)
             ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
 
-        $entityConfig
-            ->expects($this->once())
+        $entityConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('sample/type1,sample/type2');
 
-        $this->systemConfigManager
-            ->expects($this->never())
+        $this->systemConfigManager->expects($this->never())
             ->method('get');
 
         $this->assertEquals(
@@ -222,14 +207,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityFieldWhenNoFieldConfig(): void
     {
-        $this->attachmentEntityConfigProvider
-            ->expects($this->once())
+        $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn(null);
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.upload_file_mime_types', '', false, null)
             ->willReturn('sample/type1,sample/type2');
@@ -247,35 +230,30 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         string $inputType,
         array $expectedResult
     ): void {
-        $this->attachmentEntityConfigProvider
-            ->expects($this->once())
+        $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('');
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
 
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn($inputType);
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['oro_attachment.upload_image_mime_types', '', false, null, 'image/type1,image/type2'],
                 ['oro_attachment.upload_file_mime_types', '', false, null, 'file/type1,file/type2'],
-            ]));
+            ]);
 
         $this->assertEquals(
             $expectedResult,
@@ -303,30 +281,25 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityFieldWhenNotImageAndNoMimeTypes(): void
     {
-        $this->attachmentEntityConfigProvider
-            ->expects($this->once())
+        $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('');
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('getId')
             ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
 
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn('another_type');
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.upload_file_mime_types', '', false, null)
             ->willReturn('sample/type1,sample/type2');
@@ -339,20 +312,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityField(): void
     {
-        $this->attachmentEntityConfigProvider
-            ->expects($this->once())
+        $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('sample/type1,sample/type2');
 
-        $entityFieldConfig
-            ->expects($this->never())
+        $entityFieldConfig->expects($this->never())
             ->method('getId');
 
         $this->assertEquals(
@@ -363,8 +333,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSize(): void
     {
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.maxsize', '', false, null)
             ->willReturn(10);
@@ -375,8 +344,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetMaxSizeByConfigPath(): void
     {
         $key = 'oro_attachment.maxsize_key';
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with($key, '', false, null)
             ->willReturn(0.03);
@@ -389,13 +357,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityWhenNoEntityConfig(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
             ->with($entityClass = \stdClass::class)
             ->willReturn(null);
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.maxsize', '', false, null)
             ->willReturn(10);
@@ -408,19 +375,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityWhenNoMaxSize(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
             ->with($entityClass = \stdClass::class)
             ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
 
-        $entityConfig
-            ->expects($this->once())
+        $entityConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
             ->willReturn(null);
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.maxsize', '', false, null)
             ->willReturn(10);
@@ -433,19 +398,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntity(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
             ->with($entityClass = \stdClass::class)
             ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
 
-        $entityConfig
-            ->expects($this->once())
+        $entityConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
             ->willReturn(10);
 
-        $this->systemConfigManager
-            ->expects($this->never())
+        $this->systemConfigManager->expects($this->never())
             ->method('get');
 
         $this->assertEquals(
@@ -456,13 +419,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityFieldWhenNoFieldConfig(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn(null);
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.maxsize', '', false, null)
             ->willReturn(10);
@@ -475,19 +437,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityFieldWhenNoMaxSize(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
             ->willReturn(null);
 
-        $this->systemConfigManager
-            ->expects($this->once())
+        $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->with('oro_attachment.maxsize', '', false, null)
             ->willReturn(10);
@@ -500,19 +460,17 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityField(): void
     {
-        $this->attachmentEntityConfigProvider
+        $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getFieldConfig')
             ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
             ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
             ->willReturn(10);
 
-        $this->systemConfigManager
-            ->expects($this->never())
+        $this->systemConfigManager->expects($this->never())
             ->method('get');
 
         $this->assertEquals(

@@ -13,15 +13,12 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DumpJsTranslationsMessageProcessor */
-    private $processor;
-
     /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
     private $dumper;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var DumpJsTranslationsMessageProcessor */
+    private $processor;
+
     protected function setUp(): void
     {
         $logger = new NullLogger();
@@ -51,7 +48,7 @@ class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessWhithDumperCrash()
+    public function testProcessWithDumperCrash()
     {
         $this->dumper->expects($this->once())
             ->method('dumpTranslations')

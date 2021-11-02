@@ -9,25 +9,20 @@ use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
 
 class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $languageProvider;
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $languageProvider;
 
-    /**
-     * @var DefaultTranslationStrategy
-     */
-    protected $strategy;
+    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
+    private $applicationState;
 
-    private ApplicationState $applicationState;
+    /** @var DefaultTranslationStrategy */
+    private $strategy;
 
     protected function setUp(): void
     {
-        $this->languageProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Provider\LanguageProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->languageProvider = $this->createMock(LanguageProvider::class);
         $this->applicationState = $this->createMock(ApplicationState::class);
+
         $this->strategy = new DefaultTranslationStrategy($this->languageProvider, $this->applicationState);
     }
 
@@ -43,17 +38,19 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLocaleFallbacks(): void
     {
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $this->strategy = new DefaultTranslationStrategy($this->languageProvider, $this->applicationState);
 
         $currentLanguagesCodes = ['fr_FR', 'uk_UA',];
 
-        $this->languageProvider->expects(static::once())
+        $this->languageProvider->expects(self::once())
             ->method('getAvailableLanguageCodes')
             ->willReturn($currentLanguagesCodes);
 
-        static::assertEquals(
+        self::assertEquals(
             [
                 Configuration::DEFAULT_LOCALE => [
                     'fr_FR' => [],
@@ -66,7 +63,9 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLocaleFallbacksNotInstalledApp()
     {
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         $strategy = new DefaultTranslationStrategy($this->languageProvider, $this->applicationState);
 

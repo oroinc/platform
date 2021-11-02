@@ -4,26 +4,23 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Form\Type\UrlInfoType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class UrlInfoTypeTest extends FormIntegrationTestCase
 {
-    /** @var RouterInterface|MockObject */
-    protected $router;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder(RouterInterface::class)->getMock();
+        $this->router = $this->createMock(RouterInterface::class);
         parent::setUp();
     }
 
     /**
-     * @return array|PreloadedExtension[]
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -46,7 +43,7 @@ class UrlInfoTypeTest extends FormIntegrationTestCase
     {
         $expectedRoute = $route ?? UrlInfoType::DEFAULT_DISPLAY_ROUTE;
         $expectedRouteParams = $routeParams ?? UrlInfoType::DEFAULT_DISPLAY_ROUTE_PARAMS;
-        $expectedUrlType = $urlType ?? RouterInterface::ABSOLUTE_URL;
+        $expectedUrlType = $urlType ?? UrlGeneratorInterface::ABSOLUTE_URL;
         $options = [];
         if (null !== $route) {
             $options['route'] = $route;
@@ -69,9 +66,6 @@ class UrlInfoTypeTest extends FormIntegrationTestCase
         self::assertEquals($expected, $view->vars['value']);
     }
 
-    /**
-     * @return array[]
-     */
     public function formData(): array
     {
         return [
@@ -79,13 +73,13 @@ class UrlInfoTypeTest extends FormIntegrationTestCase
                 'https://example.com/route',
                 'route_1',
                 [],
-                RouterInterface::ABSOLUTE_URL
+                UrlGeneratorInterface::ABSOLUTE_URL
             ],
             [
                 '/route/param1/value1',
                 'route_1',
                 ['param1' => 'value1'],
-                RouterInterface::RELATIVE_PATH
+                UrlGeneratorInterface::RELATIVE_PATH
             ],
             [
                 'https://example.com/route',

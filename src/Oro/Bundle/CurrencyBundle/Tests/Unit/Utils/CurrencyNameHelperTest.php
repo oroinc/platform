@@ -112,24 +112,20 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
 
     private function getLocaleSettings(string $localeCode): LocaleSettings
     {
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('get')
             ->with('oro_locale.default_localization')
             ->willReturn(42);
 
-        /** @var CalendarFactory $calendarFactory */
         $calendarFactory = $this->createMock(CalendarFactory::class);
 
-        /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject $localizationManager */
         $localizationManager = $this->createMock(LocalizationManager::class);
         $localizationManager->expects($this->any())
             ->method('getLocalizationData')
             ->with(42)
             ->willReturn(['id' => 42, 'formattingCode' => $localeCode]);
 
-        /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject $localeConfigProvider */
         $localeConfigProvider = $this->createMock(LocaleConfigurationProvider::class);
 
         $themeRegistry = $this->createMock(ThemeRegistry::class);
@@ -167,7 +163,7 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
                 $options['symbols'],
                 $options['locale']
             )
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals($expected, $currencyNameHelper->formatPrice($price, $options));
     }

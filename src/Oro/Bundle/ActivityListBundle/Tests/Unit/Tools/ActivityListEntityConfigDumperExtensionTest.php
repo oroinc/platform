@@ -2,33 +2,36 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListEntityConfigDumperExtension */
-    protected $extension;
+    private $extension;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $listProvider;
+    private $listProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $associationBuilder;
+    private $associationBuilder;
 
     protected function setUp(): void
     {
-        $this->listProvider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()->getMock();
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->associationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
-            ->disableOriginalConstructor()->getMock();
+        $this->listProvider = $this->createMock(ActivityListChainProvider::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->associationBuilder = $this->createMock(AssociationBuilder::class);
+
         $this->extension = new ActivityListEntityConfigDumperExtension(
             $this->listProvider,
             $this->configManager,
@@ -43,8 +46,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
 
     public function testEmptyTargetsSupports()
     {
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
+        $provider = $this->createMock(ConfigProvider::class);
         $provider
             ->expects($this->once())
             ->method('getConfigs')
@@ -64,8 +66,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
         $config   = new Config($configId);
         $config->set('upgradeable', true);
 
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
+        $provider = $this->createMock(ConfigProvider::class);
         $provider
             ->expects($this->once())
             ->method('getConfigs')
@@ -95,8 +96,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
         $config   = new Config($configId);
         $config->set('upgradeable', true);
 
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
+        $provider = $this->createMock(ConfigProvider::class);
         $provider
             ->expects($this->once())
             ->method('getConfigs')
@@ -116,7 +116,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
             ->expects($this->once())
             ->method('createManyToManyAssociation')
             ->with(
-                'Oro\Bundle\ActivityListBundle\Entity\ActivityList',
+                ActivityList::class,
                 'Acme\TestBundle\Entity\TestEntity',
                 'activityList'
             );

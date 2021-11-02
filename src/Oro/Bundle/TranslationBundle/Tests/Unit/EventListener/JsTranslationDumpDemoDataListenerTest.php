@@ -16,21 +16,27 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $languageProvider;
 
+    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
+    private $applicationState;
+
     /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject */
     private $event;
 
-    private ApplicationState $applicationState;
+    /** @var JsTranslationDumpDemoDataListener */
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->jsTranslationDumper = $this->createMock(JsTranslationDumper::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
         $this->applicationState = $this->createMock(ApplicationState::class);
-
         $this->event = $this->createMock(MigrationDataFixturesEvent::class);
+
+        $this->listener = new JsTranslationDumpDemoDataListener(
+            $this->jsTranslationDumper,
+            $this->languageProvider,
+            $this->applicationState
+        );
     }
 
     public function testOnPostLoad(): void
@@ -58,14 +64,11 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
             ->method('dumpTranslations')
             ->with(['fr_FR']);
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
-        $listener = new JsTranslationDumpDemoDataListener(
-            $this->jsTranslationDumper,
-            $this->languageProvider,
-            $this->applicationState
-        );
-        $listener->onPostLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 
     public function testOnPostLoadWithoutRebuildTranslations(): void
@@ -88,14 +91,11 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->jsTranslationDumper->expects($this->never())
             ->method('dumpTranslations');
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
-        $listener = new JsTranslationDumpDemoDataListener(
-            $this->jsTranslationDumper,
-            $this->languageProvider,
-            $this->applicationState
-        );
-        $listener->onPostLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 
     public function testOnPostLoadWithNotInstalled(): void
@@ -109,14 +109,11 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->jsTranslationDumper->expects($this->never())
             ->method($this->anything());
 
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
-        $listener = new JsTranslationDumpDemoDataListener(
-            $this->jsTranslationDumper,
-            $this->languageProvider,
-            $this->applicationState
-        );
-        $listener->onPostLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 
     public function testOnPostLoadWithNoDemoFixtures(): void
@@ -131,13 +128,10 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->jsTranslationDumper->expects($this->never())
             ->method($this->anything());
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects($this->once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
-        $listener = new JsTranslationDumpDemoDataListener(
-            $this->jsTranslationDumper,
-            $this->languageProvider,
-            $this->applicationState
-        );
-        $listener->onPostLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 }

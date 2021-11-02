@@ -4,12 +4,12 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestNonActiveTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestNonManagedTarget;
-use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;

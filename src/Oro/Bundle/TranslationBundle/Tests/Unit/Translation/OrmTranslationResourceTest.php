@@ -2,27 +2,23 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
 
 class OrmTranslationResourceTest extends \PHPUnit\Framework\TestCase
 {
+    private string $locale;
+
+    /** @var DynamicTranslationMetadataCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $metaCache;
+
     /** @var OrmTranslationResource */
-    protected $trResource;
-
-    /** @var string */
-    protected $locale;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metaCache;
+    private $trResource;
 
     protected function setUp(): void
     {
-        $this->locale    = 'uk';
-        $this->metaCache = $this->getMockBuilder(
-            'Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->locale = 'uk';
+        $this->metaCache = $this->createMock(DynamicTranslationMetadataCache::class);
 
         $this->trResource = new OrmTranslationResource($this->locale, $this->metaCache);
     }
@@ -32,7 +28,7 @@ class OrmTranslationResourceTest extends \PHPUnit\Framework\TestCase
         $this->metaCache->expects($this->once())
             ->method('getTimestamp')
             ->with($this->locale)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $result = $this->trResource->isFresh(time());
         $this->assertTrue($result);

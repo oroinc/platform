@@ -14,18 +14,26 @@ use Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageTranslationCompl
 
 class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private TranslationMetricsProviderInterface $translationMetricsProvider;
-    private TranslationKeyRepository $translationKeyRepository;
-    private LanguageTranslationCompletenessAndAvailabilityListener $listener;
+    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationMetricsProvider;
+
+    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationKeyRepository;
+
+    /** @var LanguageTranslationCompletenessAndAvailabilityListener */
+    private $listener;
 
     protected function setUp(): void
     {
         $this->translationMetricsProvider = $this->createMock(TranslationMetricsProviderInterface::class);
-        $doctrine = $this->createMock(ManagerRegistry::class);
         $this->translationKeyRepository = $this->createMock(TranslationKeyRepository::class);
-        $doctrine->method('getRepository')->willReturnMap([
-            [TranslationKey::class, null, $this->translationKeyRepository]
-        ]);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->with(TranslationKey::class)
+            ->willReturn($this->translationKeyRepository);
+
         $this->listener = new LanguageTranslationCompletenessAndAvailabilityListener(
             $this->translationMetricsProvider,
             $doctrine
@@ -34,12 +42,11 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
 
     public function testSetsTranslationCompletenessAndAvailability(): void
     {
-        $this->translationKeyRepository->method('getCount')->willReturn(100);
+        $this->translationKeyRepository->expects(self::any())
+            ->method('getCount')
+            ->willReturn(100);
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         $today = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        /** @noinspection PhpUnhandledExceptionInspection */
         $yesterday = new \DateTime('yesterday', new \DateTimeZone('UTC'));
 
         $originalRecords = [];
@@ -110,19 +117,25 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationStatus' => 'not_available',
         ]);
 
-        $this->translationMetricsProvider->method('getForLanguage')->willReturnMap($languageMetrics);
+        $this->translationMetricsProvider->expects(self::any())
+            ->method('getForLanguage')
+            ->willReturnMap($languageMetrics);
         $event = new OrmResultAfter($this->createMock(DatagridInterface::class), $originalRecords);
 
         ($this->listener)($event);
 
-        static::assertEquals($expectedRecords, $event->getRecords());
+        self::assertEquals($expectedRecords, $event->getRecords());
     }
 
     public function testSetTranslationCompletenessNullIfZeroTranslationKeyCount(): void
     {
-        $this->translationKeyRepository->method('getCount')->willReturn(null);
+        $this->translationKeyRepository->expects(self::any())
+            ->method('getCount')
+            ->willReturn(null);
 
-        $this->translationMetricsProvider->method('getForLanguage')->willReturn(null);
+        $this->translationMetricsProvider->expects(self::any())
+            ->method('getForLanguage')
+            ->willReturn(null);
         $event = new OrmResultAfter(
             $this->createMock(DatagridInterface::class),
             [new ResultRecord(['code' => 'uk_UA', 'translationCount' => 99])]
@@ -130,6 +143,6 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
 
         ($this->listener)($event);
 
-        static::assertNull($event->getRecords()[0]->getValue('translationCompleteness'));
+        self::assertNull($event->getRecords()[0]->getValue('translationCompleteness'));
     }
 }

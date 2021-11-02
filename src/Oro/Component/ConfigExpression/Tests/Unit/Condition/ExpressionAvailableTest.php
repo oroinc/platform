@@ -4,36 +4,25 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\ExpressionAvailable;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
 class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
 {
-    const NAME = 'test_condition_name';
-    const TEST_TYPE = 'test_type';
-
-    /** @var FactoryWithTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
+    private const NAME = 'test_condition_name';
+    private const TEST_TYPE = 'test_type';
 
     /** @var ExpressionAvailable */
-    protected $condition;
+    private $condition;
 
     protected function setUp(): void
     {
-        $this->factory = $this->createMock(FactoryWithTypesInterface::class);
-        $this->factory->expects($this->any())
+        $factory = $this->createMock(FactoryWithTypesInterface::class);
+        $factory->expects($this->any())
             ->method('isTypeExists')
-            ->willReturnCallback(
-                function ($type) {
-                    return $type === self::TEST_TYPE;
-                }
-            );
+            ->willReturnCallback(fn ($type) => self::TEST_TYPE === $type);
 
-        $this->condition = new ExpressionAvailable($this->factory, self::NAME);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->condition, $this->factory);
+        $this->condition = new ExpressionAvailable($factory, self::NAME);
     }
 
     public function testGetName()
@@ -44,16 +33,13 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $expectedResult)
+    public function testEvaluate(array $options, bool $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate([]));
+        $this->assertSame($expectedResult, $this->condition->evaluate([]));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             [
@@ -83,7 +69,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
 
         $this->condition->initialize([]);
@@ -91,11 +77,8 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider toArrayDataProvider
-     *
-     * @param string $message
-     * @param array $expected
      */
-    public function testToArray($message, array $expected)
+    public function testToArray(?string $message, array $expected)
     {
         $this->condition->initialize([self::TEST_TYPE]);
         $this->condition->setMessage($message);
@@ -103,10 +86,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->condition->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -126,11 +106,8 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider compileDataProvider
-     *
-     * @param string $message
-     * @param string $expected
      */
-    public function testCompile($message, $expected)
+    public function testCompile(?string $message, string $expected)
     {
         $this->condition->initialize([self::TEST_TYPE]);
         $this->condition->setMessage($message);
@@ -138,10 +115,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->condition->compile('$factory'));
     }
 
-    /**
-     * @return array
-     */
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

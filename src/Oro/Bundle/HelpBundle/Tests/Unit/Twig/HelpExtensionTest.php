@@ -18,9 +18,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->linkProvider = $this->getMockBuilder(HelpLinkProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->linkProvider = $this->createMock(HelpLinkProvider::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_help.help_link_provider', $this->linkProvider)
@@ -36,7 +34,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
         $this->linkProvider
             ->expects($this->once())
             ->method('getHelpLinkUrl')
-            ->will($this->returnValue($expects));
+            ->willReturn($expects);
 
         $this->assertEquals(
             $expects,
