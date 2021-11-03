@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Stub;
+namespace Oro\Component\Config\Tests\Unit\Fixtures;
 
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 

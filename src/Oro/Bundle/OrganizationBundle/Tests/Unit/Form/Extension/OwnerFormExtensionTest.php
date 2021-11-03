@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
@@ -89,7 +89,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->createMock(\Oro\Bundle\EntityBundle\ORM\DoctrineHelper::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->doctrineHelper->expects($this->any())
             ->method('isManageableEntityClass')
             ->willReturn(true);

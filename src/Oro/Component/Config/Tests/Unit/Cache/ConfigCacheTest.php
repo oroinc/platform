@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Config\Tests\Unit\Cache;
 
-use Oro\Bundle\ApiBundle\Tests\Unit\Stub\ResourceStub;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 use Oro\Component\Config\Tests\Unit\Fixtures\ConfigCacheStub;
 use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
+use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
 use Oro\Component\Testing\TempDirExtension;
 
 /**
