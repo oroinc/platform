@@ -5,8 +5,8 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Collection\Join;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubEntity;
@@ -83,8 +83,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWhere()
     {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
-        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $scopeClassMetadata = new ClassMetadata(Scope::class);
         $scopeClassMetadata->associationMappings = [
             'nullField' => ['type' => ClassMetadata::MANY_TO_ONE],
@@ -129,8 +128,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWhereWithPriority()
     {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
-        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $this->classMetadataFactory->expects($this->once())
             ->method('getMetadataFor')
@@ -293,8 +291,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
      */
     private function getBaseQbMock()
     {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
-        $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->method('expr')->willReturn(new Expr());
 
         $qb->expects($this->once())
@@ -326,6 +323,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                     ],
                 ]
             );
+
         return $qb;
     }
 }

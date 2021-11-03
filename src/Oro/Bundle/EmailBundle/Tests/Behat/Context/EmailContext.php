@@ -3,11 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
-use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
+use Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -16,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTra
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Feature context to work with emails
+ * Assets email messages received from Oro application over SMTP
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -24,9 +23,11 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 {
     use AssertTrait, MessageQueueProcessorAwareTrait;
 
-    private ?DirectMailer $mailer = null;
-
     private string $downloadedFile = '';
+
+    public function __construct(private EmailClient $emailClient)
+    {
+    }
 
     /**
      * @BeforeScenario
@@ -34,10 +35,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
      */
     public function clear()
     {
-        $mailer = $this->getMailer();
-        if ($mailer instanceof DirectMailerDecorator) {
-            $mailer->clear();
-        }
+        $this->emailClient->purge();
     }
 
     /**
@@ -51,28 +49,21 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
     {
         self::assertNotEmpty($text, 'Assertion text can\'t be empty.');
 
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $pattern = $this->getPattern($text);
         $found = false;
 
-        $messages = $this->getSentMessages($mailer);
+        $messages = $this->getSentMessages();
 
-        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($messages as $message) {
             $data = array_map(
                 function ($field) use ($message) {
                     return $this->getMessageData($message, $field);
                 },
-                ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body']
+                ['From', 'To', 'Subject', 'Body']
             );
-
             $data = preg_replace('/\s+/u', ' ', implode(' ', $data));
 
-            $found = (bool) preg_match($pattern, $data);
+            $found = (bool)preg_match($pattern, $data);
             if ($found !== false) {
                 break;
             }
@@ -81,7 +72,8 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         self::assertNotFalse(
             $found,
             sprintf(
-                'Sent emails bodies don\'t contain expected text. The following messages has been sent: %s',
+                'Sent emails bodies don\'t contain "%s" text. The following messages have been sent: %s',
+                $text,
                 print_r($this->getSentMessagesData($messages), true)
             )
         );
@@ -103,26 +95,20 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
     {
         self::assertNotEmpty($table, 'Assertions list must contain at least one row.');
 
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $expectedRows = [];
         foreach ($table->getRows() as [$field, $text]) {
             //Keys makes possible to use multiple Body field in expected table
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
 
-        $sentMessages = $this->getSentMessages($mailer);
+        $sentMessages = $this->getSentMessages();
 
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
         $found = false;
-        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($sentMessages as $message) {
             foreach ($expectedRows as $expectedContent) {
-                $found = (bool) preg_match(
+                $found = (bool)preg_match(
                     $expectedContent['pattern'],
                     $this->getMessageData($message, $expectedContent['field'])
                 );
@@ -139,7 +125,9 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         self::assertNotFalse(
             $found,
             sprintf(
-                'Sent emails bodies don\'t contain expected data. The following messages has been sent: %s',
+                'Sent emails bodies don\'t contain "%s" in "%s". The following messages have been sent: %s',
+                $expectedContent['pattern'],
+                $expectedContent['field'],
                 print_r($this->getSentMessagesData($sentMessages), true)
             )
         );
@@ -150,7 +138,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         $messagesData = [];
         foreach ($messages as $message) {
             $item = [];
-            foreach (['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'] as $field) {
+            foreach (['From', 'To', 'Subject', 'Body'] as $field) {
                 $item[$field] = $this->getMessageData($message, $field);
             }
             $messagesData[] = $item;
@@ -175,26 +163,20 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
     {
         self::assertNotEmpty($table, 'Assertions list must contain at least one row.');
 
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $expectedRows = [];
         foreach ($table->getRows() as [$field, $text]) {
             //Keys makes possible to use multiple Body field in expected table
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
 
-        $sentMessages = $this->getSentMessages($mailer);
+        $sentMessages = $this->getSentMessages();
 
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
         $found = false;
-        /** @var \Swift_Mime_SimpleMessage $message */
         foreach ($sentMessages as $message) {
             foreach ($expectedRows as $expectedContent) {
-                $found = (bool) preg_match(
+                $found = (bool)preg_match(
                     $expectedContent['pattern'],
                     $this->getMessageData($message, $expectedContent['field'])
                 );
@@ -211,7 +193,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         self::assertFalse(
             $found,
             sprintf(
-                'Sent emails contains extra data. The following messages has been sent: %s',
+                'Sent emails contains extra data. The following messages have been sent: %s',
                 print_r($this->getSentMessagesData($sentMessages), true)
             )
         );
@@ -222,19 +204,11 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
      */
     public function downloadFileFromEmail()
     {
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $pattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/mi';
         $found = null;
 
-        /** @var \Swift_Mime_Message $message */
-        foreach ($this->getSentMessages($mailer) as $message) {
-            $body = $message->getBody();
-
-            if (!preg_match($pattern, $body, $matches)) {
+        foreach ($this->getSentMessages() as $message) {
+            if (!preg_match($pattern, $message['body'], $matches)) {
                 continue;
             }
 
@@ -243,7 +217,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         }
 
         if ($found) {
-            $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'email';
+            $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'email';
             if (!is_dir($path)) {
                 mkdir($path);
             }
@@ -318,11 +292,6 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
         self::assertEmailFieldValid($searchField);
 
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $expectedContent = [];
         foreach ($table->getRows() as [$field, $text]) {
             $expectedContent[$field] = $this->getPattern($text);
@@ -330,21 +299,29 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
         $found = false;
 
-        /** @var \Swift_Mime_SimpleMessage $message */
-        foreach ($this->getSentMessages($mailer) as $message) {
+        $messages = $this->getSentMessages();
+        foreach ($messages as $message) {
             if ($searchText !== $this->getMessageData($message, $searchField)) {
                 continue;
             }
 
             foreach ($expectedContent as $field => $pattern) {
-                $found = (bool) preg_match($pattern, $this->getMessageData($message, $field));
+                $found = (bool)preg_match($pattern, $this->getMessageData($message, $field));
                 if ($found === false) {
                     break 2;
                 }
             }
         }
 
-        self::assertNotFalse($found, 'Sent emails don\'t contain expected data.');
+        self::assertNotFalse(
+            $found,
+            sprintf(
+                'Sent emails "%s" don\'t contain "%s".The following messages have been sent: %s',
+                $searchField,
+                $searchText,
+                print_r($this->getSentMessagesData($messages), true)
+            )
+        );
     }
 
     /**
@@ -356,13 +333,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
     {
         self::assertEmailFieldValid($searchField);
 
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
-        /** @var \Swift_Mime_SimpleMessage $message */
-        foreach ($this->getSentMessages($mailer) as $message) {
+        foreach ($this->getSentMessages() as $message) {
             if ($searchText === $this->getMessageData($message, $searchField)) {
                 self::fail(sprintf('Email with %s \"%s\" was not expected to be sent', $searchField, $searchText));
             }
@@ -376,17 +347,11 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
      */
     public function assertDateInEmail(string $condition, string $expectedDate)
     {
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $found = null;
-        /** @var \Swift_Mime_Message $message */
-        foreach ($this->getSentMessages($mailer) as $message) {
-            $found = (bool) preg_match(
+        foreach ($this->getSentMessages() as $message) {
+            $found = (bool)preg_match(
                 '/\D{2,3}\s\d{1,2},\s\d{4} at \d{1,2}:\d{2}\s(AM|PM)/',
-                $message->getBody(),
+                $message['body'],
                 $matches
             );
             if ($found) {
@@ -418,57 +383,25 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         return sprintf('/%s/ui', preg_replace('/\s+/', '[[:space:][:cntrl:]]+', preg_quote($text, '/')));
     }
 
-    /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param string $field
-     * @return string
-     */
-    private function getMessageData(\Swift_Mime_SimpleMessage $message, $field)
+    private function getMessageData(array $message, string $fieldName): string
     {
-        switch (strtolower(trim($field))) {
-            case 'from':
-                $data = array_keys($message->getFrom());
-                break;
-            case 'to':
-                $data = array_keys($message->getTo());
-                break;
-            case 'cc':
-                $data = is_array($message->getCc()) ? array_keys($message->getCc()) : $message->getCc();
-                break;
-            case 'bcc':
-                $data = is_array($message->getBcc()) ? array_keys($message->getBcc()) : $message->getBcc();
-                break;
-            case 'subject':
-                $data = $message->getSubject();
-                break;
-            case 'body':
-                $data = strip_tags($message->getBody());
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported email field "%s".', $field));
-                break;
+        $fieldName = strtolower(trim($fieldName));
+        if (array_key_exists($fieldName, $message)) {
+            if ($fieldName === 'body') {
+                return html_entity_decode(strip_tags($message[$fieldName]), ENT_QUOTES);
+            }
+
+            return $message[$fieldName];
         }
 
-        $messageData = implode(' ', (array) $data);
-
-        return trim(html_entity_decode(strip_tags($messageData), ENT_QUOTES));
-    }
-
-    /**
-     * @return DirectMailer
-     */
-    private function getMailer()
-    {
-        if (!$this->mailer) {
-            $this->mailer = $this->getAppContainer()->get('oro_email.direct_mailer');
-        }
-
-        return $this->mailer;
+        throw new \LogicException(
+            sprintf('Email field %s not found. Available fields are ', $fieldName, implode(', ', array_keys($message)))
+        );
     }
 
     private static function assertEmailFieldValid(string $fieldName): void
     {
-        $allowedFields = ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'];
+        $allowedFields = ['From', 'To', 'Subject', 'Body'];
         self::assertContains(
             $fieldName,
             $allowedFields,
@@ -484,11 +417,6 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
      */
     public function followLinkFromEmail(string $linkCaption = '[^\<]+')
     {
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return;
-        }
-
         $url = $this->getLinkUrlFromEmail($linkCaption);
 
         self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
@@ -498,17 +426,11 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
     public function getLinkUrlFromEmail(string $linkCaption): ?string
     {
-        $mailer = $this->getMailer();
-        if (!$mailer instanceof DirectMailerDecorator) {
-            return null;
-        }
-
         $pattern = sprintf('/<a.*href\s*=\s*"(?P<url>[^"]+)".*>\s*%s\s*<\/a>/s', $linkCaption);
-        $url = $this->spin(function () use ($mailer, $pattern) {
+        $url = $this->spin(function () use ($pattern) {
             $matches = [];
-            /** @var \Swift_Mime_SimpleMessage $message */
-            foreach ($this->getSentMessages($mailer) as $message) {
-                $text = utf8_decode(html_entity_decode($message->getBody()));
+            foreach ($this->getSentMessages() as $message) {
+                $text = utf8_decode(html_entity_decode($message['body']));
                 // replace non-breaking spaces with plain spaces to be able to search
                 $text = str_replace(chr(160), chr(32), $text);
 
@@ -589,12 +511,13 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         return $data;
     }
 
-    private function getSentMessages(DirectMailerDecorator $mailer): array
+    private function getSentMessages(): array
     {
         $this->messageQueueProcessor->waitWhileProcessingMessages();
+        $emailClient = $this->emailClient;
 
-        return $this->spin(static function () use ($mailer) {
-            return $mailer->getSentMessages() ?: null;
+        return $this->spin(static function () use ($emailClient) {
+            return $emailClient->getMessages();
         }) ?? [];
     }
 }

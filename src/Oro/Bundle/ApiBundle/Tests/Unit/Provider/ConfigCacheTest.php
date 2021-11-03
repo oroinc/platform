@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFile;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
-use Oro\Bundle\ApiBundle\Tests\Unit\Stub\ResourceStub;
+use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
 use Oro\Component\Testing\TempDirExtension;
 
 /**
