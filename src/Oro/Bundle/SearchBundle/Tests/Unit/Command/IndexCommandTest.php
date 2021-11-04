@@ -57,7 +57,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with('class-name')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $this->indexer->expects($this->never())
             ->method('save');
 
@@ -72,12 +72,11 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getReference')
             ->with('class-name', 'id')
-            ->will($this->returnValue($entity));
+            ->willReturn($entity);
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -94,6 +93,6 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
             'identifiers' => ['id'],
         ]);
 
-        static::assertStringContainsString('Started index update for entities.', $tester->getDisplay());
+        self::assertStringContainsString('Started index update for entities.', $tester->getDisplay());
     }
 }

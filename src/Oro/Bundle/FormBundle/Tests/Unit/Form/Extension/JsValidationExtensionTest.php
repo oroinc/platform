@@ -6,23 +6,21 @@ use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterfa
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
 
 class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $constraintsProvider;
+    /** @var ConstraintsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintsProvider;
 
-    /**
-     * @var JsValidationExtension
-     */
-    protected $extension;
+    /** @var JsValidationExtension */
+    private $extension;
 
     protected function setUp(): void
     {
         $this->constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);
+
         $this->extension = new JsValidationExtension($this->constraintsProvider);
     }
 
@@ -37,14 +35,14 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->extension->finishView($view, $form, $options);
 
         $this->assertEquals($expectedAttributes, $view->vars['attr']);
     }
 
-    public function finishViewAddOptionalGroupAttributeDataProvider()
+    public function finishViewAddOptionalGroupAttributeDataProvider(): array
     {
         return [
             'not_optional_group_without_children' => [
@@ -146,7 +144,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
-            ->will($this->returnValue($expectedConstraints));
+            ->willReturn($expectedConstraints);
 
         $this->extension->finishView($view, $form, []);
 
@@ -155,10 +153,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD)
-     *
-     * @return array
      */
-    public function finishViewAddDataValidationAttributeDataProvider()
+    public function finishViewAddDataValidationAttributeDataProvider(): array
     {
         $constraintWithNestedData = new Constraints\NotNull();
         $constraintWithNestedData->message = [
@@ -170,7 +166,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
             'integer' => 1,
         ];
 
-        $constraintWithCustomName = $this->createMock('Symfony\Component\Validator\Constraint');
+        $constraintWithCustomName = $this->createMock(Constraint::class);
         $constraintWithCustomName->foo = 1;
 
         return [
@@ -211,13 +207,13 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => [
                     new Constraints\Regex([
-                        'pattern' => "/^[a-z]+[a-z]*$/i",
-                        'message' => "Value should start with a symbol and contain only alphabetic symbols"
+                        'pattern' => '/^[a-z]+[a-z]*$/i',
+                        'message' => 'Value should start with a symbol and contain only alphabetic symbols'
                     ]),
                     new Constraints\Regex([
-                        'pattern' => "/^id$/i",
+                        'pattern' => '/^id$/i',
                         'match' => false,
-                        'message' => "Value cannot be used as a field name."
+                        'message' => 'Value cannot be used as a field name.'
                     ]),
                 ],
                 'expectedAttributes' => [
@@ -295,26 +291,18 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $vars
-     * @param array $children
-     * @param FormView $parent
-     * @return FormView
-     */
-    protected function createView(array $vars = [], array $children = [], FormView $parent = null)
+    private function createView(array $vars = [], array $children = [], FormView $parent = null): FormView
     {
         $result = new FormView();
         $result->vars = array_merge_recursive($result->vars, $vars);
         $result->children = $children;
         $result->parent = $parent;
+
         return $result;
     }
 
-    /**
-     * @return FormInterface
-     */
-    protected function createForm()
+    private function createForm(): FormInterface
     {
-        return $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        return $this->createMock(FormInterface::class);
     }
 }

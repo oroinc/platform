@@ -3,13 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\LinkType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LinkTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LinkType
-     */
-    protected $type;
+    /** @var LinkType */
+    private $type;
 
     protected function setUp(): void
     {
@@ -23,30 +24,22 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
-
-        $resolver
-            ->expects($this->once())
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
             ->method('setRequired')
             ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
+            ->willReturnSelf();
+        $resolver->expects($this->once())
             ->method('setDefined')
             ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
+            ->willReturnSelf();
+        $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->exactly(3))
+            ->willReturnSelf();
+        $resolver->expects($this->exactly(3))
             ->method('setAllowedTypes')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->type->configureOptions($resolver);
     }
@@ -56,19 +49,14 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testFinishView(array $options, array $expected)
     {
-        $formView = $this->createMock('Symfony\Component\Form\FormView');
-        $form     = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
+        $form = $this->createMock(Form::class);
 
         $this->type->finishView($formView, $form, $options);
         $this->assertEquals($expected, $formView->vars);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsProvider()
+    public function optionsProvider(): array
     {
         return [
             [

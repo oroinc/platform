@@ -20,11 +20,8 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var array */
-    private $productStubs;
-
-    /** @var array */
-    private $categoryStubs;
+    private array $productStubs;
+    private array $categoryStubs;
 
     private function prepareEntityManager()
     {

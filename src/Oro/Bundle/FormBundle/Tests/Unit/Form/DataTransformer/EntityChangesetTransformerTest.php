@@ -8,28 +8,17 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntityChangesetTransformer;
 
 class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var string
-     */
-    protected $class;
-
-    /**
-     * @var EntityChangesetTransformer
-     */
-    protected $transformer;
+    /** @var EntityChangesetTransformer */
+    private $transformer;
 
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->class = '\stdClass';
-        $this->transformer = new EntityChangesetTransformer($this->doctrineHelper, $this->class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
+        $this->transformer = new EntityChangesetTransformer($this->doctrineHelper, \stdClass::class);
     }
 
     public function testTransform()
@@ -40,11 +29,8 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param mixed $expected
-     * @param mixed $value
      */
-    public function testReverseTransform($expected, $value)
+    public function testReverseTransform(mixed $expected, mixed $value)
     {
         if (!$expected) {
             $expected = new ArrayCollection();
@@ -52,21 +38,14 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($expected->isEmpty() ? $this->never() : $this->exactly($expected->count()))
             ->method('getEntityReference')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        return $this->createDataObject(func_get_arg(1));
-                    }
-                )
-            );
+            ->willReturnCallback(function () {
+                return $this->createDataObject(func_get_arg(1));
+            });
 
         $this->assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             [null,[]],
@@ -92,11 +71,7 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->reverseTransform('test');
     }
 
-    /**
-     * @param int $id
-     * @return \stdClass
-     */
-    public function createDataObject($id)
+    private function createDataObject(int $id): \stdClass
     {
         $obj = new \stdClass();
         $obj->id = $id;

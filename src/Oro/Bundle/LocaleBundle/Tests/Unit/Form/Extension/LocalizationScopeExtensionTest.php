@@ -15,14 +15,16 @@ use Symfony\Component\Validator\Validation;
 
 class LocalizationScopeExtensionTest extends FormIntegrationTestCase
 {
-    /** @var LocalizationScopeExtension */
-    protected $localizationScopeExtension;
-
     /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $scopeManager;
+    private $scopeManager;
+
+    /** @var LocalizationScopeExtension */
+    private $localizationScopeExtension;
 
     protected function setUp(): void
     {
+        $this->scopeManager = $this->createMock(ScopeManager::class);
+
         $this->localizationScopeExtension = new LocalizationScopeExtension();
 
         parent::setUp();
@@ -54,10 +56,6 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         return [
             new PreloadedExtension(
                 [

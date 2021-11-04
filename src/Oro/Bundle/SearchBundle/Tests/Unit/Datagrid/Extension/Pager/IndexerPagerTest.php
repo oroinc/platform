@@ -6,26 +6,19 @@ use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class IndexerPagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IndexerPager */
-    protected $pager;
+    private $pager;
 
     protected function setUp(): void
     {
         $this->pager = new IndexerPager();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->pager);
-    }
-
     public function testSetQueryIsUsedLater()
     {
-        /** @var SearchQueryInterface|MockObject $indexerQuery */
         $indexerQuery = $this->getMockBuilder(SearchQueryInterface::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getTotalCount'])
@@ -33,7 +26,8 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
 
         $this->pager->setQuery($indexerQuery);
 
-        $indexerQuery->expects(static::once())->method('getTotalCount');
+        $indexerQuery->expects(self::once())
+            ->method('getTotalCount');
         $this->pager->getNbResults();
     }
 
@@ -52,18 +46,13 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $indexerQuery = $this->createMock(IndexerQuery::class);
         $indexerQuery->expects($this->once())
             ->method('getTotalCount')
-            ->will($this->returnValue($totalCount));
+            ->willReturn($totalCount);
 
         $this->pager->setQuery($indexerQuery);
         $this->assertEquals($totalCount, $this->pager->getNbResults());
     }
 
-    /**
-     * Data provider for testSetMaxPerPage
-     *
-     * @return array
-     */
-    public function maxPerPageDataProvider()
+    public function maxPerPageDataProvider(): array
     {
         return [
             'fixed'    => [
@@ -80,13 +69,9 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $maxPerPage
-     * @param int $maxResults
-     * @param int $firstResult
-     *
      * @dataProvider maxPerPageDataProvider
      */
-    public function testSetGetMaxPerPage($maxPerPage, $maxResults, $firstResult)
+    public function testSetGetMaxPerPage(int $maxPerPage, int $maxResults, int $firstResult)
     {
         $indexerQuery = $this->createMock(IndexerQuery::class);
         $indexerQuery->expects($this->once())
@@ -104,7 +89,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetGetPage()
     {
-        $page        = 2;
+        $page = 2;
         $firstResult = 10;
 
         $indexerQuery = $this->createMock(IndexerQuery::class);
@@ -120,18 +105,18 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFirstPreviousNextLastPage()
     {
-        $page         = 2;
-        $maxPerPage   = 20;
-        $totalCount   = 123;
-        $firstPage    = 1;
-        $lastPage     = 7;
+        $page = 2;
+        $maxPerPage = 20;
+        $totalCount = 123;
+        $firstPage = 1;
+        $lastPage = 7;
         $previousPage = 1;
-        $nextPage     = 3;
+        $nextPage = 3;
 
         $indexerQuery = $this->createMock(IndexerQuery::class);
         $indexerQuery->expects($this->any())
             ->method('getTotalCount')
-            ->will($this->returnValue($totalCount));
+            ->willReturn($totalCount);
 
         $this->pager->setQuery($indexerQuery);
         $this->pager->setPage($page);
@@ -143,12 +128,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($nextPage, $this->pager->getNextPage());
     }
 
-    /**
-     * Data provider for testHaveToPaginate
-     *
-     * @return array
-     */
-    public function haveToPaginateDataProvider()
+    public function haveToPaginateDataProvider(): array
     {
         return [
             'no_data'      => [
@@ -173,19 +153,14 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param boolean $expected
-     * @param int     $page
-     * @param int     $maxPerPage
-     * @param int     $totalCount
-     *
      * @dataProvider haveToPaginateDataProvider
      */
-    public function testHaveToPaginate($expected, $page, $maxPerPage, $totalCount)
+    public function testHaveToPaginate(bool $expected, int $page, int $maxPerPage, int $totalCount)
     {
         $indexerQuery = $this->createMock(IndexerQuery::class);
         $indexerQuery->expects($this->any())
             ->method('getTotalCount')
-            ->will($this->returnValue($totalCount));
+            ->willReturn($totalCount);
 
         $this->pager->setQuery($indexerQuery);
         $this->pager->setPage($page);

@@ -24,47 +24,30 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datasource;
+    private $datasource;
 
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queryBuilder;
+    private $queryBuilder;
 
     /** @var LocalizedValueExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
+        $this->datasource = $this->createMock(OrmDatasource::class);
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
 
         $this->extension = new LocalizedValueExtension(
             $this->doctrineHelper,
@@ -113,7 +96,9 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $config = DatagridConfiguration::create([]);
         $clonedConfig = clone $config;
 
-        $this->localizationHelper->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
 
         $this->extension->processConfigs($clonedConfig);
 
@@ -159,7 +144,8 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentLocalization')
             ->willReturn(new Localization());
 
-        $this->datasource->expects($this->never())->method($this->anything());
+        $this->datasource->expects($this->never())
+            ->method($this->anything());
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -168,9 +154,12 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create([]);
 
-        $this->localizationHelper->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
 
-        $this->datasource->expects($this->never())->method($this->anything());
+        $this->datasource->expects($this->never())
+            ->method($this->anything());
 
         $this->extension->visitDatasource($config, $this->datasource);
     }
@@ -298,7 +287,9 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create([]);
 
-        $this->localizationHelper->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
 
         $result = ResultsObject::create([]);
 

@@ -29,7 +29,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(string $property, $value, $expectedValue)
+    public function testTransform(string $property, ?object $value, ?int $expectedValue)
     {
         $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', $property, null);
         $this->assertEquals($expectedValue, $transformer->transform($value));

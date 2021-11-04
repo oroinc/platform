@@ -11,14 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $crypter;
 
-    /**
-     * @var OroEncodedPlaceholderPasswordType
-     */
+    /** @var OroEncodedPlaceholderPasswordType */
     private $formType;
 
     protected function setUp(): void
@@ -49,7 +45,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         $pass = 'test';
         $passEncrypted = base64_encode($pass);
 
-        $this->crypter->expects(static::once())
+        $this->crypter->expects(self::once())
             ->method('encryptData')
             ->willReturn($passEncrypted);
 
@@ -73,7 +69,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
     {
         $pass = 'test';
         $passEncrypted = base64_encode($pass);
-        $this->crypter->expects(static::once())
+        $this->crypter->expects(self::once())
             ->method('decryptData')
             ->willReturn($pass);
 
@@ -81,7 +77,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
         $view = $form->createView();
 
-        static::assertSame('****', $view->vars['value']);
+        self::assertSame('****', $view->vars['value']);
     }
 
     public function testBuildViewWithAutocompleteAttribute()
@@ -109,22 +105,22 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['browser_autocomplete' => false])
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $resolver->expects($this->once())
             ->method('setAllowedTypes')
             ->with('browser_autocomplete', 'bool')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->formType->configureOptions($resolver);
     }
 
     public function testGetParent()
     {
-        static::assertSame(PasswordType::class, $this->formType->getParent());
+        self::assertSame(PasswordType::class, $this->formType->getParent());
     }
 
     public function testGetBlockPrefix()
     {
-        static::assertSame('oro_encoded_placeholder_password', $this->formType->getBlockPrefix());
+        self::assertSame('oro_encoded_placeholder_password', $this->formType->getBlockPrefix());
     }
 }

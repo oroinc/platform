@@ -7,17 +7,16 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CurrencyFormatter */
-    protected $formatter;
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
+    private $numberFormatter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $numberFormatter;
+    /** @var CurrencyFormatter */
+    private $formatter;
 
     protected function setUp(): void
     {
-        $this->numberFormatter = $this->getMockBuilder(NumberFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->numberFormatter = $this->createMock(NumberFormatter::class);
+
         $this->formatter = new CurrencyFormatter($this->numberFormatter);
     }
 

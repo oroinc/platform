@@ -3,15 +3,16 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const ID = 'test_id';
-    /**
-     * @var AdditionalAttrExtension
-     */
-    protected $extension;
+    private const ID = 'test_id';
+
+    /** @var AdditionalAttrExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -20,8 +21,9 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
-        $resolver->expects($this->once())->method('setDefaults')
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
+            ->method('setDefaults')
             ->with(['random_id' => true]);
 
         $this->extension->configureOptions($resolver);
@@ -30,11 +32,9 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider finishViewData
      */
-    public function testFinishView(FormView $view, array $options, array  $expectedVars)
+    public function testFinishView(FormView $view, array $options, array $expectedVars)
     {
-        $formMock = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formMock = $this->createMock(Form::class);
 
         $this->extension->finishView($view, $formMock, $options);
 
@@ -49,10 +49,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function finishViewData()
+    public function finishViewData(): array
     {
         return [
             'add random hash' => [
@@ -102,12 +99,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $vars
-     * @param bool $hasParent
-     * @return FormView
-     */
-    protected function createView(array $vars, $hasParent = false)
+    private function createView(array $vars, bool $hasParent = false): FormView
     {
         $result = new FormView();
         $result->vars = $vars;

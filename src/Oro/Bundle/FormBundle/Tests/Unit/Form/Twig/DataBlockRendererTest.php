@@ -19,30 +19,19 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var Environment
-     */
+    /** @var Environment */
     private $environment;
 
-    /**
-     * @var FormFactory
-     */
+    /** @var FormFactory */
     private $factory;
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
-    /**
-     * @var DataBlockRenderer
-     */
+    /** @var DataBlockRenderer */
     private $renderer;
 
-    /**
-     * @var array
-     */
-    private $testFormConfig = [
+    private array $testFormConfig = [
         0 => [
             'title'       => 'Second',
             'class'       => null,
@@ -119,9 +108,6 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
             ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
 
-        $this->twig = $this->getMockBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->container = $this->createMock(ContainerInterface::class);
 
         $this->environment = new Environment(new ArrayLoader());

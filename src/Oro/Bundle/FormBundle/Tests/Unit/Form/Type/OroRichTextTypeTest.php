@@ -14,23 +14,23 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroRichTextTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroRichTextType */
-    protected $formType;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Packages */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
+    private $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
-    protected $htmlTagProvider;
+    private $htmlTagProvider;
 
     /** @var HtmlTagHelper */
     private $htmlTagHelper;
+
+    /** @var OroRichTextType */
+    private $formType;
 
     protected function setUp(): void
     {
@@ -48,12 +48,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         );
         $this->formType->setAssetHelper($this->assetsHelper);
         parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        unset($this->formType, $this->configManager);
     }
 
     /**
@@ -83,27 +77,21 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param bool $globalEnable
-     * @param array $viewData
-     * @param array $elements
-     * @param bool $expectedEnable
-     * @param string $subfolder
      */
     public function testBuildForm(
         array $options,
-        $globalEnable,
+        bool $globalEnable,
         array $viewData,
         array $elements,
-        $expectedEnable = true,
-        $subfolder = ''
+        bool $expectedEnable = true,
+        string $subfolder = ''
     ) {
         $data = 'test';
 
         $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_form.wysiwyg_enabled')
-            ->will($this->returnValue($globalEnable));
+            ->willReturn($globalEnable);
 
         $this->context->expects($this->any())
             ->method('getBasePath')
@@ -111,13 +99,9 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
 
         $this->assetsHelper->expects($this->any())
             ->method('getUrl')
-            ->will(
-                $this->returnCallback(
-                    function ($data) {
-                        return '/prefix/' . $data;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($data) {
+                return '/prefix/' . $data;
+            });
 
         $this->htmlTagProvider->expects($this->once())
             ->method('getAllowedElements')
@@ -151,9 +135,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         $toolbar = [
             'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist ' .
