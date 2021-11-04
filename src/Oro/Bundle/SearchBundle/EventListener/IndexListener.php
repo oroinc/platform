@@ -15,11 +15,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Oro\Bundle\SearchBundle\Event\BeforeEntityAddToIndexEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Doctrine event listener which collects changes and updates search index
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class IndexListener implements OptionalListenerInterface
 {
@@ -39,6 +42,11 @@ class IndexListener implements OptionalListenerInterface
      * @var SearchMappingProvider
      */
     protected $mappingProvider;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * @var array
@@ -73,37 +81,41 @@ class IndexListener implements OptionalListenerInterface
         $this->mappingProvider = $mappingProvider;
     }
 
-    public function onFlush(OnFlushEventArgs $args)
+    /**
+     * @param OnFlushEventArgs $args
+     */
+    public function onFlush(OnFlushEventArgs $args): void
     {
         if (!$this->enabled) {
             return;
         }
 
         $entityManager = $args->getEntityManager();
-        $unitOfWork = $entityManager->getUnitOfWork();
+        $this->scheduleSavedEntities($entityManager);
+        $this->scheduleDeletedEntities($entityManager);
+    }
 
-        // schedule saved entities
-        // inserted and updated entities should be processed as is
-        $inserts = $unitOfWork->getScheduledEntityInsertions();
-        $updates = $unitOfWork->getScheduledEntityUpdates();
-        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
+    private function scheduleSavedEntities(EntityManager $entityManager): void
+    {
+        $uow = $entityManager->getUnitOfWork();
         $this->savedEntities = array_merge(
             $this->savedEntities,
-            $this->getEntitiesWithUpdatedIndexedFields($unitOfWork),
-            $this->getAssociatedEntitiesToReindex($entityManager, $inserts),
-            $this->getAssociatedEntitiesToReindex($entityManager, $updates),
-            $this->getAssociatedEntitiesToReindex($entityManager, $deletedEntities),
-            $this->getEntitiesFromUpdatedCollections($unitOfWork)
+            $this->getEntitiesToReindex($uow),
+            $this->getEntitiesWithUpdatedIndexedFields($uow),
+            $this->getAssociatedEntitiesToReindex($entityManager, $uow->getScheduledEntityInsertions()),
+            $this->getAssociatedEntitiesToReindex($entityManager, $uow->getScheduledEntityUpdates()),
+            $this->getAssociatedEntitiesToReindex($entityManager, $uow->getScheduledEntityDeletions()),
+            $this->getEntitiesFromUpdatedCollections($uow)
         );
+    }
 
-        foreach ($inserts as $object) {
-            if ($this->isSupported($object)) {
-                $this->savedEntities[spl_object_hash($object)] = $object;
-            }
-        }
-        // schedule deleted entities
-        // deleted entities should be processed as references because on postFlush they are already deleted
-        foreach ($deletedEntities as $hash => $entity) {
+    /**
+     * Deleted entities should be processed as references because on postFlush they are already deleted.
+     */
+    private function scheduleDeletedEntities(EntityManager $entityManager): void
+    {
+        $uow = $entityManager->getUnitOfWork();
+        foreach ($uow->getScheduledEntityDeletions() as $hash => $entity) {
             if (empty($this->deletedEntities[$hash]) && $this->isSupported($entity)) {
                 $this->deletedEntities[$hash] = $entityManager->getReference(
                     $this->doctrineHelper->getEntityClass($entity),
@@ -157,6 +169,19 @@ class IndexListener implements OptionalListenerInterface
             );
             if ($changedIndexedFields) {
                 $entitiesToReindex[$hash] = $entity;
+            }
+        }
+
+        return $entitiesToReindex;
+    }
+
+    protected function getEntitiesToReindex(UnitOfWork $uow): array
+    {
+        $entitiesToReindex = [];
+
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            if ($this->isInsertSupported($entity)) {
+                $entitiesToReindex[spl_object_hash($entity)] = $entity;
             }
         }
 
@@ -267,11 +292,26 @@ class IndexListener implements OptionalListenerInterface
      * @param object $entity
      * @return bool
      */
+    private function isInsertSupported($entity): bool
+    {
+        if (!$this->isSupported($entity)) {
+            return false;
+        }
+
+        $event = new BeforeEntityAddToIndexEvent($entity);
+        $this->dispatcher->dispatch($event, BeforeEntityAddToIndexEvent::EVENT_NAME);
+
+        return null !== $event->getEntity();
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
     protected function isSupported($entity)
     {
         return !empty($this->getEntityIndexedFields(ClassUtils::getClass($entity)));
     }
-
     /**
      * @return bool
      */
@@ -342,5 +382,13 @@ class IndexListener implements OptionalListenerInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
+    {
+        $this->dispatcher = $dispatcher;
     }
 }
