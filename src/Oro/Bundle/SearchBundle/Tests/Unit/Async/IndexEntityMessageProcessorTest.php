@@ -11,6 +11,7 @@ use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -18,9 +19,9 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithRequiredAttributes()
     {
         new IndexEntityMessageProcessor(
-            $this->createIndexerMock(),
-            $this->createDoctrineMock(),
-            $this->createLoggerMock()
+            $this->createMock(IndexerInterface::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
@@ -35,87 +36,69 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectMessageIfMessageHasNoClass()
     {
-        $indexer = $this->createIndexerMock();
+        $indexer = $this->createMock(IndexerInterface::class);
 
-        $doctrine = $this->createDoctrineMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
-        $message->setBody(json_encode(
-            [
-                'key' => 'value',
-            ]
-        ));
+        $message->setBody(JSON::encode([
+            'key' => 'value',
+        ]));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with(
-                'Message is invalid. Class was not found.'
-            )
-        ;
+            ->with('Message is invalid. Class was not found.');
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfMessageHasNoId()
     {
-        $indexer = $this->createIndexerMock();
+        $indexer = $this->createMock(IndexerInterface::class);
 
-        $doctrine = $this->createDoctrineMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
-        $message->setBody(json_encode(
-            [
-                'class' => 'class-name',
-            ]
-        ));
+        $message->setBody(JSON::encode([
+            'class' => 'class-name',
+        ]));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with(
-                'Message is invalid. Id was not found.'
-            )
-        ;
+            ->with('Message is invalid. Id was not found.');
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfEntityMangerWasNotFoundForClass()
     {
-        $indexer = $this->createIndexerMock();
+        $indexer = $this->createMock(IndexerInterface::class);
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getManagerForClass')
-        ;
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass');
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with('Entity manager is not defined for class: "class-name"')
-        ;
+            ->with('Entity manager is not defined for class: "class-name"');
 
         $message = new Message();
-        $message->setBody(json_encode(
-            [
-                'class' => 'class-name',
-                'id' => 'id',
-            ]
-        ));
+        $message->setBody(JSON::encode([
+            'class' => 'class-name',
+            'id' => 'id',
+        ]));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -124,52 +107,40 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $indexer = $this->createIndexerMock();
-        $indexer
-            ->expects($this->once())
+        $indexer = $this->createMock(IndexerInterface::class);
+        $indexer->expects($this->once())
             ->method('save')
-            ->with($this->identicalTo($entity))
-        ;
+            ->with($this->identicalTo($entity));
 
-        $repository = $this->createEntityRepositoryMock();
-        $repository
-            ->expects($this->once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
             ->method('find')
             ->with('id')
-            ->will($this->returnValue($entity))
-        ;
+            ->willReturn($entity);
 
-        $entityManager = $this->createEntityManagerMock();
-        $entityManager
-            ->expects($this->once())
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($repository))
-        ;
+            ->willReturn($repository);
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with('class-name')
-            ->will($this->returnValue($entityManager))
-        ;
+            ->willReturn($entityManager);
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
-            ->method('error')
-        ;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('error');
 
         $message = new Message();
-        $message->setBody(json_encode(
-            [
-                'class' => 'class-name',
-                'id' => 'id',
-            ]
-        ));
+        $message->setBody(JSON::encode([
+            'class' => 'class-name',
+            'id' => 'id',
+        ]));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -178,107 +149,45 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $indexer = $this->createIndexerMock();
-        $indexer
-            ->expects($this->once())
+        $indexer = $this->createMock(IndexerInterface::class);
+        $indexer->expects($this->once())
             ->method('delete')
-            ->with($this->identicalTo($entity))
-        ;
+            ->with($this->identicalTo($entity));
 
-        $repository = $this->createEntityRepositoryMock();
-        $repository
-            ->expects($this->once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
             ->method('find')
             ->with('id')
-            ->will($this->returnValue(null))
-        ;
+            ->willReturn(null);
 
-        $entityManager = $this->createEntityManagerMock();
-        $entityManager
-            ->expects($this->once())
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($repository))
-        ;
-        $entityManager
-            ->expects($this->once())
+            ->willReturn($repository);
+        $entityManager->expects($this->once())
             ->method('getReference')
             ->with('class-name', 'id')
-            ->will($this->returnValue($entity))
-        ;
+            ->willReturn($entity);
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with('class-name')
-            ->will($this->returnValue($entityManager))
-        ;
+            ->willReturn($entityManager);
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
-            ->method('error')
-        ;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('error');
 
         $message = new Message();
-        $message->setBody(json_encode(
-            [
-                'class' => 'class-name',
-                'id' => 'id',
-            ]
-        ));
+        $message->setBody(JSON::encode([
+            'class' => 'class-name',
+            'id' => 'id',
+        ]));
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
-     */
-    protected function createEntityRepositoryMock()
-    {
-        return $this->createMock(EntityRepository::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
-     */
-    protected function createEntityManagerMock()
-    {
-        return $this->createMock(EntityManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    protected function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|IndexerInterface
-     */
-    protected function createIndexerMock()
-    {
-        return $this->createMock(IndexerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    protected function createDoctrineMock()
-    {
-        return $this->createMock(ManagerRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    protected function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

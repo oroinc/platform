@@ -2,29 +2,27 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 {
     /** @var OroSimpleColorChoiceType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configManager
-            ->expects($this->any())
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(['#FFFFFF', '#000000']));
+            ->willReturn(['#FFFFFF', '#000000']);
 
         $this->formType = new OroSimpleColorChoiceType($configManager);
     }
@@ -96,7 +94,7 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
      */
     public function testBuildView(array $options, array $expectedVars)
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $view = new FormView();
 
         $this->formType->buildView($view, $form, $options);
@@ -121,10 +119,7 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
         $this->assertEquals('oro_simple_color_choice', $this->formType->getName());
     }
 
-    /**
-     * @return array
-     */
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         return [
             [
@@ -156,10 +151,7 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([]);

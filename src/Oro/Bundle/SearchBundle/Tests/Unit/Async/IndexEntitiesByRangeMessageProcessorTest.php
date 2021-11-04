@@ -18,25 +18,26 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
     public function testCouldBeConstructedWithRequiredAttributes()
     {
         new IndexEntitiesByRangeMessageProcessor(
-            $this->createDoctrineMock(),
-            $this->createSearchIndexerMock(),
-            $this->createJobRunnerMock(),
-            $this->createLoggerMock()
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(IndexerInterface::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldBeSubscribedForTopics()
     {
-        $expectedSubscribedTopics = [
-            Topics::INDEX_ENTITY_BY_RANGE,
-        ];
-
-        $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByRangeMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(
+            [
+                Topics::INDEX_ENTITY_BY_RANGE
+            ],
+            IndexEntitiesByRangeMessageProcessor::getSubscribedTopics()
+        );
     }
 
     public function testShouldRejectMessageIfClassIsNotSetInMessage()
     {
-        $doctrine = $this->createDoctrineMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
         $message->setBody(JSON::encode([
@@ -45,23 +46,20 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
             'jobId' => 12345,
         ]));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
             ->with('Message is not valid.');
 
-        $producer = $this->createSearchIndexerMock();
+        $producer = $this->createMock(IndexerInterface::class);
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(12345)
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
-            }))
-        ;
+            });
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -70,7 +68,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
 
     public function testShouldRejectMessageIfOffsetIsNotSetInMessage()
     {
-        $doctrine = $this->createDoctrineMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
         $message->setBody(JSON::encode([
@@ -79,26 +77,20 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
             'jobId' => 12345,
         ]));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with(
-                'Message is not valid.'
-            )
-        ;
+            ->with('Message is not valid.');
 
-        $producer = $this->createSearchIndexerMock();
+        $producer = $this->createMock(IndexerInterface::class);
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(12345)
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
-            }))
-        ;
+            });
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -108,7 +100,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
 
     public function testShouldRejectMessageIfLimitIsNotSetInMessage()
     {
-        $doctrine = $this->createDoctrineMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
         $message->setBody(JSON::encode([
@@ -117,26 +109,20 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
             'jobId' => 12345,
         ]));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with(
-                'Message is not valid.'
-            )
-        ;
+            ->with('Message is not valid.');
 
-        $producer = $this->createSearchIndexerMock();
+        $producer = $this->createMock(IndexerInterface::class);
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(12345)
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
-            }))
-        ;
+            });
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -146,76 +132,36 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
 
     public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass()
     {
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getManagerForClass')
-        ;
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass');
 
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'entityClass' => 'entity-name',
             'offset' => 1235,
             'limit' => 6789,
             'jobId' => 12345,
         ]));
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
-            ->with(
-                'Entity manager is not defined for class: "entity-name"'
-            )
-        ;
+            ->with('Entity manager is not defined for class: "entity-name"');
 
-        $producer = $this->createSearchIndexerMock();
+        $producer = $this->createMock(IndexerInterface::class);
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(12345)
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
-            }))
-        ;
+            });
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|IndexerInterface
-     */
-    protected function createSearchIndexerMock()
-    {
-        return $this->createMock(IndexerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    protected function createDoctrineMock()
-    {
-        return $this->createMock(ManagerRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    protected function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

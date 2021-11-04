@@ -2,28 +2,26 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
 {
     /** @var OroSimpleColorPickerType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translatorInterface = $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
+        $translatorInterface = $this->createMock(TranslatorInterface::class);
 
         $this->formType = new OroSimpleColorPickerType($configManager, $translatorInterface);
     }
@@ -136,9 +134,9 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider buildViewDataProvider
      */
-    public function testBuildView($options, $expectedVars)
+    public function testBuildView(array $options, array $expectedVars)
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $view = new FormView();
 
         $this->formType->buildView($view, $form, $options);
@@ -155,7 +153,7 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         $this->assertEquals('oro_simple_color_picker', $this->formType->getName());
     }
 
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         return [
             [
@@ -205,10 +203,7 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([]);

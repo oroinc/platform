@@ -17,9 +17,6 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     private const TEST_VALUE = 'test_value';
     private const TEST_COUNT = 42;
 
-    /** @var IndexerQuery */
-    private $query;
-
     /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
     private $searchIndexer;
 
@@ -31,6 +28,9 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
 
     /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject */
     private $criteria;
+
+    /** @var IndexerQuery */
+    private $query;
 
     protected function setUp(): void
     {
@@ -52,7 +52,8 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->criteria = $this->createMock(Criteria::class);
 
-        $this->innerQuery->method('getCriteria')
+        $this->innerQuery->expects($this->any())
+            ->method('getCriteria')
             ->willReturn($this->criteria);
 
         $this->query = new IndexerQuery($this->searchIndexer, $this->innerQuery);
@@ -190,10 +191,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, call_user_func_array([$this->query, 'setOrderBy'], $arguments));
     }
 
-    /**
-     * @return array
-     */
-    public function orderByDataProvider()
+    public function orderByDataProvider(): array
     {
         return [
             'only field name' => [

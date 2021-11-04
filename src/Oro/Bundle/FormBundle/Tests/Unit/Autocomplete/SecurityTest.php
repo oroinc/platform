@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SecurityTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
     /** @var Security */
@@ -34,7 +34,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('test_acl_resource')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue($this->security->isAutocompleteGranted('test_acl_resource'));
         $this->assertTrue($this->security->isAutocompleteGranted('test_search'));

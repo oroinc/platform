@@ -81,9 +81,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('isValid')
             ->willReturn(true);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('beginTransaction');
         $em->expects($this->once())
@@ -128,9 +126,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('isValid')
             ->willReturn(true);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('beginTransaction');
         $em->expects($this->once())
@@ -159,13 +155,11 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($this->anything(), Events::BEFORE_FORM_DATA_SET)
-            ->willReturnCallback(
-                function (FormProcessEvent $event, $name) {
-                    $event->interruptFormProcess();
+            ->willReturnCallback(function (FormProcessEvent $event) {
+                $event->interruptFormProcess();
 
-                    return $event;
-                }
-            );
+                return $event;
+            });
 
         $this->assertFalse($this->handler->process($entity, $this->form, $this->request));
     }

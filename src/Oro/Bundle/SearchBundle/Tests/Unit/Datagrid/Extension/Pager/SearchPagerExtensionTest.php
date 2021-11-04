@@ -12,20 +12,14 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var  \PHPUnit\Framework\MockObject\MockObject | DatagridConfiguration
-     */
-    protected $datagridConfig;
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagridConfig;
 
-    /**
-     * @var  \PHPUnit\Framework\MockObject\MockObject | IndexerPager
-     */
-    protected $pager;
+    /** @var IndexerPager|\PHPUnit\Framework\MockObject\MockObject */
+    private $pager;
 
-    /**
-     * @var SearchPagerExtension
-     */
-    protected $pagerExtension;
+    /** @var SearchPagerExtension */
+    private $pagerExtension;
 
     protected function setUp(): void
     {
@@ -38,27 +32,18 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->pagerExtension->setParameters($parameterBag);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->pagerExtension);
-    }
-
     /**
      * @dataProvider providerTestIsApplicable
-     *
-     * @param string $dataSourceType
-     * @param bool $expectedResult
      */
-    public function testIsApplicable($dataSourceType, $expectedResult)
+    public function testIsApplicable(string $dataSourceType, bool $expectedResult)
     {
-        $this->datagridConfig->expects($this->once())->method('getDatasourceType')->willReturn($dataSourceType);
+        $this->datagridConfig->expects($this->once())
+            ->method('getDatasourceType')
+            ->willReturn($dataSourceType);
         $this->assertEquals($expectedResult, $this->pagerExtension->isApplicable($this->datagridConfig));
     }
 
-    /**
-     * @return array
-     */
-    public function providerTestIsApplicable()
+    public function providerTestIsApplicable(): array
     {
         return [
             'Check applicable data source type' => [
@@ -74,11 +59,8 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider providerTestVisitDataSource
-     *
-     * @param int $perPage
-     * @param bool $onePageEnable
      */
-    public function testVisitDataSource($perPage, $onePageEnable)
+    public function testVisitDataSource(int $perPage, bool $onePageEnable)
     {
         $dataSource = $this->createMock(SearchDatasource::class);
         $searchQuery = $this->createMock(SearchQueryInterface::class);
@@ -89,7 +71,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
                 $this->equalTo(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH),
                 $this->equalTo(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH)
             ))
-            ->will($this->returnCallback(function ($key) use ($perPage, $onePageEnable) {
+            ->willReturnCallback(function ($key) use ($perPage, $onePageEnable) {
                 if ($key === ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH) {
                     return $perPage;
                 }
@@ -97,26 +79,34 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
                 if ($key === ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH) {
                     return $onePageEnable;
                 }
-            }));
 
-        $dataSource->expects($this->once())->method('getSearchQuery')->willReturn($searchQuery);
-        $this->pager->expects($this->once())->method('setQuery')->with($searchQuery);
+                return null;
+            });
+
+        $dataSource->expects($this->once())
+            ->method('getSearchQuery')
+            ->willReturn($searchQuery);
+        $this->pager->expects($this->once())
+            ->method('setQuery')
+            ->with($searchQuery);
 
         if ($onePageEnable) {
-            $this->pager->expects($this->once())->method('setMaxPerPage')->with(1000);
+            $this->pager->expects($this->once())
+                ->method('setMaxPerPage')
+                ->with(1000);
         } else {
-            $this->pager->expects($this->once())->method('setMaxPerPage')->with(20);
+            $this->pager->expects($this->once())
+                ->method('setMaxPerPage')
+                ->with(20);
         }
 
-        $this->pager->expects($this->once())->method('init');
+        $this->pager->expects($this->once())
+            ->method('init');
 
         $this->pagerExtension->visitDatasource($this->datagridConfig, $dataSource);
     }
 
-    /**
-     * @return array
-     */
-    public function providerTestVisitDataSource()
+    public function providerTestVisitDataSource(): array
     {
         return [
             'Enabled One page option for DataGrid' => [
@@ -132,12 +122,8 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider datagridPagerParamsDataProvider
-     *
-     * @param array $parameters
-     * @param integer|null $expectedPageSize
-     * @param integer|null $expectPage
      */
-    public function testProcessConfigs(array $parameters, $expectedPageSize, $expectPage)
+    public function testProcessConfigs(array $parameters, ?int $expectedPageSize, ?int $expectPage)
     {
         $config = [
             'options' => [

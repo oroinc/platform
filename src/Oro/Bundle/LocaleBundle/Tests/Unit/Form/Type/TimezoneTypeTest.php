@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\LocaleBundle\Form\Type\TimezoneType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormTypeWithoutCache()
     {
         $type = new TimezoneType();
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
@@ -40,16 +40,14 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     {
         $timezones = ['Test' => '(UTC +0) Test'];
 
-        $cache = $this->createMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->createMock(Cache::class);
         $cache->expects($this->once())
             ->method('fetch')
             ->with('timezones')
-            ->will($this->returnValue($timezones));
+            ->willReturn($timezones);
 
         $type = new TimezoneType($cache);
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
@@ -63,19 +61,17 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormTypeWithEmptyCache()
     {
-        $cache = $this->createMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->createMock(Cache::class);
         $cache->expects($this->once())
             ->method('fetch')
             ->with('timezones')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $cache->expects($this->once())
             ->method('save')
             ->with('timezones', $this->isType('array'));
 
         $type = new TimezoneType($cache);
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));

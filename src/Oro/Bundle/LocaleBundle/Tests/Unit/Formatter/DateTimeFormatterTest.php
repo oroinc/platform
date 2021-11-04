@@ -3,33 +3,27 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $localeSettings;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-    /**
-     * @var DateTimeFormatter
-     */
-    protected $formatter;
+    /** @var DateTimeFormatter */
+    private $formatter;
 
     protected function setUp(): void
     {
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
 
-        $translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator->method('trans')
+        $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
+            ->method('trans')
             ->willReturn('MMM d');
 
         $this->formatter = new DateTimeFormatter($this->localeSettings, $translator);
@@ -59,19 +53,24 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
-        $this->localeSettings->expects($this->once())->method('getLanguage')->will($this->returnValue($language));
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->willReturn($language);
         $methodCalls = 1;
         if ($defaultLocale) {
             $methodCalls++;
-            $this->localeSettings->expects($this->once())->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
+            $this->localeSettings->expects($this->once())
+                ->method('getLocale')
+                ->willReturn($defaultLocale);
         }
         if ($defaultTimeZone) {
             $methodCalls++;
-            $this->localeSettings->expects($this->once())->method('getTimeZone')
-                ->will($this->returnValue($defaultTimeZone));
+            $this->localeSettings->expects($this->once())
+                ->method('getTimeZone')
+                ->willReturn($defaultTimeZone);
         }
-        $this->localeSettings->expects($this->exactly($methodCalls))->method($this->anything());
+        $this->localeSettings->expects($this->exactly($methodCalls))
+            ->method($this->anything());
 
         $pattern = $this->getPattern($locale ? : $defaultLocale, $expectedDateType, $expectedTimeType);
         $formatter = $this->getFormatter($language, $timeZone ? : $defaultTimeZone, $pattern);
@@ -85,12 +84,11 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function formatDataProvider()
+    public function formatDataProvider(): array
     {
-        return array(
-            'full_format' => array(
+        return [
+            'full_format' => [
                 'expectedDateType' => \IntlDateFormatter::FULL,
                 'expectedTimeType' => \IntlDateFormatter::FULL,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
@@ -100,8 +98,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'full_format_default_locale_and_timezone' => array(
+            ],
+            'full_format_default_locale_and_timezone' => [
                 'expectedDateType' => \IntlDateFormatter::FULL,
                 'expectedTimeType' => \IntlDateFormatter::FULL,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
@@ -113,8 +111,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'language' => 'en_US',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
-            ),
-            'full_format_english_locale_french_language' => array(
+            ],
+            'full_format_english_locale_french_language' => [
                 'expectedDateType' => \IntlDateFormatter::FULL,
                 'expectedTimeType' => \IntlDateFormatter::FULL,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
@@ -124,8 +122,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'fr_FR',
-            ),
-            'string_date' => array(
+            ],
+            'string_date' => [
                 'expectedDateType' => \IntlDateFormatter::SHORT,
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'UTC'),
@@ -135,8 +133,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_CA',
                 'timeZone' => 'Europe/Athens',
                 'language' => 'en_CA',
-            ),
-            'string_date_with_timezone' => array(
+            ],
+            'string_date_with_timezone' => [
                 'expectedDateType' => \IntlDateFormatter::SHORT,
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'expectedDate' => $this->createDateTime('2013-12-31 22:00:00', 'UTC'),
@@ -146,8 +144,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_CA',
                 'timeZone' => 'Europe/Athens',
                 'language' => 'en_CA',
-            ),
-            'integer_date' => array(
+            ],
+            'integer_date' => [
                 'expectedDateType' => \IntlDateFormatter::SHORT,
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'expectedDate' => $this->createDateTime('2014-01-01 08:00:00', 'UTC'),
@@ -157,8 +155,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_CA',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_CA',
-            ),
-            'short_format_and_text_date_types' => array(
+            ],
+            'short_format_and_text_date_types' => [
                 'expectedDateType' => \IntlDateFormatter::SHORT,
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
@@ -168,8 +166,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'long_date_without_time' => array(
+            ],
+            'long_date_without_time' => [
                 'expectedDateType' => \IntlDateFormatter::LONG,
                 'expectedTimeType' => \IntlDateFormatter::NONE,
                 'expectedDate' => $this->createDateTime('2014-01-01 02:00:00', 'Europe/London'),
@@ -179,8 +177,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'fr_FR',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'fr_FR',
-            ),
-            'long_date_without_time_french_locale_russian_language' => array(
+            ],
+            'long_date_without_time_french_locale_russian_language' => [
                 'expectedDateType' => \IntlDateFormatter::LONG,
                 'expectedTimeType' => \IntlDateFormatter::NONE,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
@@ -190,8 +188,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'fr_FR',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'ru_RU',
-            ),
-            'default_date_and_time_type' => array(
+            ],
+            'default_date_and_time_type' => [
                 'expectedDateType' => \IntlDateFormatter::MEDIUM,
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'expectedDate' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
@@ -201,8 +199,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'locale' => 'en_CA',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_CA',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -218,19 +216,24 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
-        $this->localeSettings->expects($this->once())->method('getLanguage')->will($this->returnValue($language));
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->willReturn($language);
         $methodCalls = 1;
         if ($defaultLocale) {
-            $this->localeSettings->expects($this->once())->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
+            $this->localeSettings->expects($this->once())
+                ->method('getLocale')
+                ->willReturn($defaultLocale);
             $methodCalls++;
         }
         if ($defaultTimeZone) {
-            $this->localeSettings->expects($this->once())->method('getTimeZone')
-                ->will($this->returnValue($defaultTimeZone));
+            $this->localeSettings->expects($this->once())
+                ->method('getTimeZone')
+                ->willReturn($defaultTimeZone);
             $methodCalls++;
         }
-        $this->localeSettings->expects($this->exactly($methodCalls))->method($this->anything());
+        $this->localeSettings->expects($this->exactly($methodCalls))
+            ->method($this->anything());
 
         $pattern = $this->getPattern($locale ? : $defaultLocale, $expectedDateType, \IntlDateFormatter::NONE);
         $formatter = $this->getFormatter($language, $timeZone ? : $defaultTimeZone, $pattern);
@@ -242,18 +245,18 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function formatDateDataProvider()
+    public function formatDateDataProvider(): array
     {
-        return array(
-            'full_date' => array(
+        return [
+            'full_date' => [
                 'expectedDateType' => \IntlDateFormatter::FULL,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::FULL,
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'full_date_default_locale_and_timezone' => array(
+            ],
+            'full_date_default_locale_and_timezone' => [
                 'expectedDateType' => \IntlDateFormatter::FULL,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::FULL,
@@ -262,48 +265,48 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'language' => 'en_US',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
-            ),
-            'full_date_object' => array(
+            ],
+            'full_date_object' => [
                 'expectedDateType' => \IntlDateFormatter::FULL,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::FULL,
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'short_date_and_text_date_type' => array(
+            ],
+            'short_date_and_text_date_type' => [
                 'expectedDateType' => \IntlDateFormatter::SHORT,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => 'short',
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'long_date' => array(
+            ],
+            'long_date' => [
                 'expectedDateType' => \IntlDateFormatter::LONG,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::LONG,
                 'locale' => 'fr_FR',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'fr_FR',
-            ),
-            'long_date_french_locale_english_language' => array(
+            ],
+            'long_date_french_locale_english_language' => [
                 'expectedDateType' => \IntlDateFormatter::LONG,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::LONG,
                 'locale' => 'fr_FR',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en',
-            ),
-            'default_date_type' => array(
+            ],
+            'default_date_type' => [
                 'expectedDateType' => \IntlDateFormatter::MEDIUM,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'dateType' => null,
                 'locale' => 'en_CA',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_CA',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -319,19 +322,24 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
-        $this->localeSettings->expects($this->once())->method('getLanguage')->will($this->returnValue($language));
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->willReturn($language);
         $methodCalls = 1;
         if ($defaultLocale) {
-            $this->localeSettings->expects($this->once())->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
+            $this->localeSettings->expects($this->once())
+                ->method('getLocale')
+                ->willReturn($defaultLocale);
             $methodCalls++;
         }
         if ($defaultTimeZone) {
-            $this->localeSettings->expects($this->once())->method('getTimeZone')
-                ->will($this->returnValue($defaultTimeZone));
+            $this->localeSettings->expects($this->once())
+                ->method('getTimeZone')
+                ->willReturn($defaultTimeZone);
             $methodCalls++;
         }
-        $this->localeSettings->expects($this->exactly($methodCalls))->method($this->anything());
+        $this->localeSettings->expects($this->exactly($methodCalls))
+            ->method($this->anything());
 
         $pattern = $this->getPattern($locale ? : $defaultLocale, \IntlDateFormatter::NONE, $expectedTimeType);
         $formatter = $this->getFormatter($language, $timeZone ? : $defaultTimeZone, $pattern);
@@ -343,18 +351,18 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function formatTimeDataProvider()
+    public function formatTimeDataProvider(): array
     {
-        return array(
-            'full_date' => array(
+        return [
+            'full_date' => [
                 'expectedTimeType' => \IntlDateFormatter::FULL,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'timeType' => \IntlDateFormatter::FULL,
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'full_date_default_locale_and_timezone' => array(
+            ],
+            'full_date_default_locale_and_timezone' => [
                 'expectedTimeType' => \IntlDateFormatter::FULL,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'timeType' => \IntlDateFormatter::FULL,
@@ -363,72 +371,67 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
                 'language' => 'en_US',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
-            ),
-            'full_date_english_locale_french_language' => array(
+            ],
+            'full_date_english_locale_french_language' => [
                 'expectedTimeType' => \IntlDateFormatter::FULL,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'timeType' => \IntlDateFormatter::FULL,
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'fr',
-            ),
-            'short_date_and_text_date_type' => array(
+            ],
+            'short_date_and_text_date_type' => [
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'timeType' => 'short',
                 'locale' => 'en_US',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
-            ),
-            'long_time' => array(
+            ],
+            'long_time' => [
                 'expectedTimeType' => \IntlDateFormatter::LONG,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'timeType' => \IntlDateFormatter::LONG,
                 'locale' => 'fr_FR',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'fr_FR',
-            ),
-            'default_date_type' => array(
+            ],
+            'default_date_type' => [
                 'expectedTimeType' => \IntlDateFormatter::SHORT,
                 'date' => $this->createDateTime('2014-01-01 00:00:00', 'Europe/London'),
                 'timeType' => null,
                 'locale' => 'en_CA',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_CA',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @param \DateTime $date
-     * @param int       $dateType
-     * @param string    $locale
-     * @param string    $timeZone
-     * @param string    $language
-     * @param string    $year
-     * @param string    $defaultLocale
-     * @param string    $defaultTimeZone
-     *
      * @dataProvider formatDayDataProvider
      */
     public function testFormatDay(
         \DateTime $date,
-        $dateType,
-        $locale,
-        $timeZone,
-        $language,
-        $year,
-        $defaultLocale = null,
-        $defaultTimeZone = null
+        int $dateType,
+        ?string $locale,
+        ?string $timeZone,
+        string $language,
+        string $year,
+        ?string $defaultLocale = null,
+        ?string $defaultTimeZone = null
     ) {
-        $this->localeSettings->expects($this->any())->method('getLanguage')->will($this->returnValue($language));
+        $this->localeSettings->expects($this->any())
+            ->method('getLanguage')
+            ->willReturn($language);
         if ($defaultLocale) {
-            $this->localeSettings->expects($this->any())->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
+            $this->localeSettings->expects($this->any())
+                ->method('getLocale')
+                ->willReturn($defaultLocale);
         }
         if ($defaultTimeZone) {
-            $this->localeSettings->expects($this->any())->method('getTimeZone')
-                ->will($this->returnValue($defaultTimeZone));
+            $this->localeSettings->expects($this->any())
+                ->method('getTimeZone')
+                ->willReturn($defaultTimeZone);
         }
 
         $actual = $this->formatter->formatDay($date, $dateType, $locale, $timeZone);
@@ -437,7 +440,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertStringNotContainsString($year, $actual);
     }
 
-    public function formatDayDataProvider()
+    public function formatDayDataProvider(): array
     {
         return [
             [
@@ -461,12 +464,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $date
-     * @param string $timeZone
-     * @return \DateTime
-     */
-    protected function createDateTime($date, $timeZone)
+    private function createDateTime(string $date, string $timeZone): \DateTime
     {
         return new \DateTime($date, new \DateTimeZone($timeZone));
     }
@@ -485,31 +483,31 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->formatter->getPattern($dateType, $timeType, $locale));
     }
 
-    public function getDatePatternDataProvider()
+    public function getDatePatternDataProvider(): array
     {
-        return array(
-            array(
+        return [
+            [
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 'en_US'
-            ),
-            array(
+            ],
+            [
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 'fr_FR'
-            ),
-            array(
+            ],
+            [
                 \IntlDateFormatter::FULL,
                 \IntlDateFormatter::FULL,
                 'full',
                 'full',
                 'fr_FR'
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -520,10 +518,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date, $this->formatter->getDateTime($date));
     }
 
-    /**
-     * @return array
-     */
-    public function getDateTimeNotModifiedDataProvider()
+    public function getDateTimeNotModifiedDataProvider(): array
     {
         return [
             'DateTime' => [
@@ -549,14 +544,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('UTC', $actual->getTimezone()->getName());
     }
 
-    /**
-     * @param string $lang
-     * @param string $timeZone
-     * @param string $pattern
-     *
-     * @return \IntlDateFormatter
-     */
-    protected function getFormatter($lang, $timeZone, $pattern)
+    private function getFormatter(string $lang, string $timeZone, string $pattern): \IntlDateFormatter
     {
         return new \IntlDateFormatter(
             $lang,
@@ -568,16 +556,10 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $locale
-     * @param int $dateType
-     * @param int $timeType
-     *
-     * @return string
-     */
-    protected function getPattern($locale, $dateType, $timeType)
+    private function getPattern(string $locale, int $dateType, int $timeType): string
     {
         $localeFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
+
         return $localeFormatter->getPattern();
     }
 }

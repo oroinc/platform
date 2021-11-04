@@ -11,13 +11,12 @@ class SearchAllTextTest extends \PHPUnit\Framework\TestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
 
-        $translationMap = [
-            ['oro.filter.form.label_type_contains', [], null, null, 'contains'],
-            ['oro.filter.form.label_type_not_contains', [], null, null, 'does not contain']
-        ];
-
-        $translator->method('trans')
-            ->will($this->returnValueMap($translationMap));
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnMap([
+                ['oro.filter.form.label_type_contains', [], null, null, 'contains'],
+                ['oro.filter.form.label_type_not_contains', [], null, null, 'does not contain']
+            ]);
 
         $searchAllTextUtil = new SearchAllText($translator);
 

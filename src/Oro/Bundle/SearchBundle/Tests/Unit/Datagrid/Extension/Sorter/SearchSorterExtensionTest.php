@@ -8,13 +8,12 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter\AbstractSorterExtensionTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension;
+use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 {
-    /**
-     * @var SearchSorterExtension
-     */
+    /** @var SearchSorterExtension */
     protected $extension;
 
     protected function setUp(): void
@@ -25,11 +24,9 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
     }
 
     /**
-     * @param string $configDataType A valid configuration datatype (eg. string or integer)
-     *
      * @dataProvider visitDatasourceWithValidTypeProvider
      */
-    public function testVisitDatasourceWithValidType($configDataType)
+    public function testVisitDatasourceWithValidType(string $configDataType)
     {
         $this->configureResolver();
         $config = DatagridConfiguration::create([
@@ -37,7 +34,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
                 Configuration::DEFAULT_SORTERS_KEY => [
                     'testColumn' => 'ASC'
                 ],
-                Configuration::COLUMNS_KEY => [
+                Configuration::COLUMNS_KEY         => [
                     'testColumn' => [
                         'data_name' => 'testColumn',
                         'type'      => $configDataType,
@@ -46,8 +43,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ]
         ]);
 
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
@@ -55,8 +51,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $mockDatasource = $this->createMock(SearchDatasource::class);
 
-        $mockDatasource
-            ->expects($this->once())
+        $mockDatasource->expects($this->once())
             ->method('getSearchQuery')
             ->willReturn($mockQuery);
 
@@ -66,10 +61,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->extension->visitDatasource($config, $mockDatasource);
     }
 
-    /**
-     * @return array
-     */
-    public function visitDatasourceWithValidTypeProvider()
+    public function visitDatasourceWithValidTypeProvider(): array
     {
         return [
             'string'  => [
@@ -83,14 +75,14 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithInvalidType()
     {
-        $this->expectException(\Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
                 Configuration::DEFAULT_SORTERS_KEY => [
                     'testColumn' => 'ASC'
                 ],
-                Configuration::COLUMNS_KEY => [
+                Configuration::COLUMNS_KEY         => [
                     'testColumn' => [
                         'data_name' => 'testColumn',
                         'type'      => 'this_will_not_be_a_valid_type',
@@ -99,18 +91,12 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ]
         ]);
 
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
-        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockDatasource = $this->createMock(SearchDatasource::class);
+        $mockParameterBag = $this->createMock(ParameterBag::class);
 
         $this->extension->setParameters($mockParameterBag);
         $this->extension->visitDatasource($config, $mockDatasource);
@@ -121,38 +107,30 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
-                Configuration::COLUMNS_KEY                 => [
+                Configuration::COLUMNS_KEY         => [
                     'testColumn' => [
                         'data_name' => 'testColumn',
                         'type'      => 'string',
                     ]
                 ],
-                Configuration::DEFAULT_SORTERS_KEY         => [
+                Configuration::DEFAULT_SORTERS_KEY => [
                     'testColumn' => 'ASC',
                 ]
             ],
         ]);
 
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
-        $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
-            ->getMock();
+        $mockQuery = $this->createMock(SearchQueryInterface::class);
 
-        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockDatasource
-            ->expects($this->once())
+        $mockDatasource = $this->createMock(SearchDatasource::class);
+        $mockDatasource->expects($this->once())
             ->method('getSearchQuery')
             ->willReturn($mockQuery);
 
-        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockParameterBag = $this->createMock(ParameterBag::class);
         $this->extension->setParameters($mockParameterBag);
 
         $this->extension->visitDatasource($config, $mockDatasource);
@@ -161,8 +139,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
     public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
     {
         $this->configureResolver();
-        $this->sortersStateProvider
-            ->expects($this->any())
+        $this->sortersStateProvider->expects($this->any())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
@@ -178,7 +155,12 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ],
         ]);
 
-        list($mockDatasource, $mockParameterBag) = $this->getDependenciesMocks();
+        $mockDatasource = $this->createMock(SearchDatasource::class);
+        $mockDatasource->expects($this->never())
+            ->method('getSearchQuery')
+            ->willReturn($this->createMock(SearchQueryInterface::class));
+
+        $mockParameterBag = $this->createMock(ParameterBag::class);
 
         $this->extension->setParameters($mockParameterBag);
         $this->extension->visitDatasource($config, $mockDatasource);
@@ -187,8 +169,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
     public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting()
     {
         $this->configureResolver();
-        $this->sortersStateProvider
-            ->expects($this->any())
+        $this->sortersStateProvider->expects($this->any())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
@@ -207,33 +188,14 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ],
         ]);
 
-        list($mockDatasource, $mockParameterBag) = $this->getDependenciesMocks();
+        $mockDatasource = $this->createMock(SearchDatasource::class);
+        $mockDatasource->expects($this->never())
+            ->method('getSearchQuery')
+            ->willReturn($this->createMock(SearchQueryInterface::class));
+
+        $mockParameterBag = $this->createMock(ParameterBag::class);
 
         $this->extension->setParameters($mockParameterBag);
         $this->extension->visitDatasource($config, $mockDatasource);
-    }
-
-    /**
-     * @return array
-     */
-    private function getDependenciesMocks()
-    {
-        $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
-            ->getMock();
-
-        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockDatasource
-            ->expects($this->never())
-            ->method('getSearchQuery')
-            ->willReturn($mockQuery);
-
-        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return [$mockDatasource, $mockParameterBag];
     }
 }

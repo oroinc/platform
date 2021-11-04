@@ -31,6 +31,7 @@ services:
             - '@property_accessor'
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
+            - [setDispatcher, ['@event_dispatcher']]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }

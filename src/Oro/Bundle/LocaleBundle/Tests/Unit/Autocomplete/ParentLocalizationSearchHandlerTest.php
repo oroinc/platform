@@ -3,8 +3,10 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Autocomplete;
 
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,32 +15,26 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
-    const TEST_ENTITY_CLASS = 'stdClass';
+    private const TEST_ENTITY_CLASS = 'stdClass';
 
     /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $indexer;
+    private $indexer;
 
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityRepository;
+    private $entityRepository;
 
     /** @var ParentLocalizationSearchHandler */
-    protected $searchHandler;
+    private $searchHandler;
 
     protected function setUp(): void
     {
-        $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->indexer = $this->createMock(Indexer::class);
+        $this->entityRepository = $this->createMock(EntityRepository::class);
 
         $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
         $searchMappingProvider->expects($this->once())
@@ -48,12 +44,13 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->searchHandler = new ParentLocalizationSearchHandler(self::TEST_ENTITY_CLASS, ['name']);
         $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
-        $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistryMock());
+        $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistry());
     }
 
     public function testSearchNoDelimiter()
     {
-        $this->indexer->expects($this->never())->method($this->anything());
+        $this->indexer->expects($this->never())
+            ->method($this->anything());
 
         $result = $this->searchHandler->search('test', 1, 10);
 
@@ -66,33 +63,25 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider searchDataProvider
-     *
-     * @param string $search
-     * @param int|null $entityId
-     * @param object|null $entity
-     * @param array $foundElements
-     * @param array $resultData
-     * @param array $expectedIds
-     * @param bool $byId
      */
     public function testSearch(
-        $search,
-        $entityId,
-        $entity,
+        string $search,
+        ?int $entityId,
+        ?object $entity,
         array $foundElements,
         array $resultData,
         array $expectedIds,
-        $byId = false
+        bool $byId = false
     ) {
         $page = 1;
         $perPage = 15;
 
         $foundElements = array_map(
             function ($id) {
-                $element = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-                $element->expects($this->any())->method('getRecordId')->willReturn($id);
+                $element = $this->createMock(Item::class);
+                $element->expects($this->any())
+                    ->method('getRecordId')
+                    ->willReturn($id);
 
                 return $element;
             },
@@ -101,7 +90,10 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSearchCall($search, $page, $perPage, $foundElements, $resultData, $expectedIds, $byId);
 
-        $this->entityRepository->expects($this->any())->method('find')->with($entityId)->willReturn($entity);
+        $this->entityRepository->expects($this->any())
+            ->method('find')
+            ->with($entityId)
+            ->willReturn($entity);
 
         $searchResult = $this->searchHandler->search(
             sprintf('%s%s%s', $search, ParentLocalizationSearchHandler::DELIMITER, $entityId),
@@ -124,10 +116,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResultData, $searchResult['results']);
     }
 
-    /**
-     * @return array
-     */
-    public function searchDataProvider()
+    public function searchDataProvider(): array
     {
         $local6 = $this->getLocalization(6, 'test6');
         $local5 = $this->getLocalization(5, 'test5');
@@ -181,84 +170,83 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int $id
-     * @param string $name
-     * @return Localization
-     */
-    protected function getLocalization($id, $name)
+    private function getLocalization(int $id, string $name): Localization
     {
-        return $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => $id, 'name' => $name]);
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+        $localization->setName($name);
+
+        return $localization;
     }
 
-    /**
-     * @param string $search
-     * @param int $page
-     * @param int $perPage
-     * @param array $foundElements
-     * @param array $resultData
-     * @param array $expectedIds
-     * @param bool $byId
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function assertSearchCall(
-        $search,
-        $page,
-        $perPage,
+    private function assertSearchCall(
+        string $search,
+        int $page,
+        int $perPage,
         array $foundElements,
         array $resultData,
         array $expectedIds,
-        $byId = false
-    ) {
+        bool $byId = false
+    ): void {
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())->method('getResult')->will($this->returnValue($resultData));
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn($resultData);
 
         $expr = $this->createMock(Expr::class);
-        $expr->expects($this->once())->method('in')->with('e.id', ':entityIds')->willReturnSelf();
+        $expr->expects($this->once())
+            ->method('in')
+            ->with('e.id', ':entityIds')
+            ->willReturnSelf();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects($this->once())->method('expr')->willReturn($expr);
-        $queryBuilder->expects($this->once())->method('where')->with($expr)->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expr);
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with($expr)
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('setParameter')
             ->with('entityIds', $expectedIds)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $this->entityRepository->expects($this->any())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $this->entityRepository->expects($this->any())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $searchResult = $this->createMock(Result::class);
-        $searchResult->expects($this->any())->method('getElements')->willReturn($foundElements);
+        $searchResult->expects($this->any())
+            ->method('getElements')
+            ->willReturn($foundElements);
 
         if ($byId) {
-            $this->indexer->expects($this->never())->method($this->anything());
+            $this->indexer->expects($this->never())
+                ->method($this->anything());
         } else {
             $this->indexer->expects($this->once())
                 ->method('simpleSearch')
                 ->with($search, $page - 1, $perPage + 1, 'alias')
                 ->willReturn($searchResult);
         }
-
-        return $searchResult;
     }
 
-    /**
-     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getManagerRegistryMock()
+    private function getManagerRegistry(): ManagerRegistry
     {
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->once())
             ->method('getMetadataFactory')
-            ->willReturn($this->getMetadataFactoryMock());
+            ->willReturn($this->getMetadataFactory());
         $entityManager->expects($this->once())
             ->method('getRepository')
             ->with(self::TEST_ENTITY_CLASS)
             ->willReturn($this->entityRepository);
 
-        $managerRegistry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::TEST_ENTITY_CLASS)
@@ -267,19 +255,14 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         return $managerRegistry;
     }
 
-    /**
-     * @return ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMetadataFactoryMock()
+    private function getMetadataFactory(): ClassMetadataFactory
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->once())->method('getSingleIdentifierFieldName')->willReturn('id');
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
 
-        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->once())
             ->method('getMetadataFor')
             ->with(self::TEST_ENTITY_CLASS)

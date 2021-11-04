@@ -18,7 +18,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         new Indexer(
             $this->createMock(MessageProducerInterface::class),
             $doctrineHelper,
@@ -31,7 +31,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Method is not implemented');
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -46,7 +46,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Method is not implemented');
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -58,11 +58,9 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveShouldReturnFalseIfEntityIsNull()
     {
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->never())
-            ->method('getEntityIdentifier')
-        ;
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->never())
+            ->method('getEntityIdentifier');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -77,11 +75,9 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteShouldReturnFalseIfEntityIsNull()
     {
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->never())
-            ->method('getEntityIdentifier')
-        ;
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->never())
+            ->method('getEntityIdentifier');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -98,19 +94,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -130,19 +122,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entities = [new \stdClass()];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -162,19 +150,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -194,19 +178,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entities = [new \stdClass()];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -226,7 +206,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $class = 'class-name';
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -241,7 +221,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $classes = ['class-name'];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -256,7 +236,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $classes = null;
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -272,13 +252,11 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\ReflectionException::class);
         $entities = [new \stdClass()];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityManagerForClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->throwException(new \ReflectionException()))
-        ;
+            ->willThrowException(new \ReflectionException());
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -286,13 +264,5 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             new MessageTransformer($doctrineHelper)
         );
         $indexer->reindex($entities);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    protected function createDoctrineHelperMock()
-    {
-        return $this->createMock(DoctrineHelper::class);
     }
 }
