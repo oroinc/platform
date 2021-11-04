@@ -34,6 +34,12 @@ class AddIncludeFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $config = $context->getConfig();
+        if (null === $config || !$config->isInclusionEnabled()) {
+            // the "include" filter is disabled
+            return;
+        }
+
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getIncludeFilterName();
@@ -45,12 +51,6 @@ class AddIncludeFilter implements ProcessorInterface
         $filters = $context->getFilters();
         if ($filters->has($filterName)) {
             // the "include" filter is already added
-            return;
-        }
-
-        $config = $context->getConfig();
-        if (null === $config || !$config->isInclusionEnabled()) {
-            // the "include" filter is disabled
             return;
         }
 

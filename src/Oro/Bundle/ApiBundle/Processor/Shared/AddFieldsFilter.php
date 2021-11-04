@@ -44,6 +44,12 @@ class AddFieldsFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $config = $context->getConfig();
+        if (null === $config || !$config->isFieldsetEnabled()) {
+            // the "fields" filter is disabled
+            return;
+        }
+
         $filterNames = $this->filterNamesRegistry->getFilterNames($context->getRequestType());
         $filterGroupName = $filterNames->getFieldsFilterGroupName();
         if (!$filterGroupName) {
@@ -54,12 +60,6 @@ class AddFieldsFilter implements ProcessorInterface
         $filters = $context->getFilters();
         if ($filters->has($filterGroupName)) {
             // filters have been already set
-            return;
-        }
-
-        $config = $context->getConfig();
-        if (null === $config || !$config->isFieldsetEnabled()) {
-            // the "fields" filter is disabled
             return;
         }
 
