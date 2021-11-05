@@ -153,7 +153,7 @@ define(function(require) {
 
         const getFractionDigits = function(value, defaultFractionDigits) {
             const numberValue = Number(value);
-            const digits = !Number.isNaN(numberValue) && numberValue % 1 !== 0
+            const digits = !Number.isNaN(numberValue) && Number.isFinite(numberValue) && numberValue % 1 !== 0
                 ? value.toString().split('.')[1].length || 0
                 : 0;
 
