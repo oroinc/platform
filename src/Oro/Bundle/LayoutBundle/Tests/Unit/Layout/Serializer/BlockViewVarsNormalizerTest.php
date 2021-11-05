@@ -35,11 +35,12 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
     public function normalizeDataProvider(): array
     {
         return [
-            'required vars only' => [
+            'required vars only(null cache)' => [
                 'vars'           => [
                     'option1'    => 'value1',
                     'id'         => 'test_id',
-                    'block_type' => 'test_type'
+                    'block_type' => 'test_type',
+                    'cache'      => null
                 ],
                 'normalizedVars' => [
                     'option1'    => 'value1',
@@ -47,7 +48,7 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'block_type' => 'test_type'
                 ]
             ],
-            'default values'     => [
+            'default values(empty cache)'    => [
                 'vars'           => [
                     'option1'              => 'value1',
                     'id'                   => 'test_id',
@@ -59,15 +60,17 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'class_prefix'         => null,
                     'block_type_widget_id' => 'test_type_widget',
                     'unique_block_prefix'  => '_test_id',
-                    'cache_key'            => '_test_id_test_type_test_context_hash'
+                    'cache_key'            => '_test_id_test_type_test_context_hash',
+                    'cache'                => ''
                 ],
                 'normalizedVars' => [
                     'option1'    => 'value1',
                     'id'         => 'test_id',
-                    'block_type' => 'test_type'
+                    'block_type' => 'test_type',
+                    'cache'      => ''
                 ]
             ],
-            'all vars'           => [
+            'all vars(not empty cache)'      => [
                 'vars'           => [
                     'option1'              => 'value1',
                     'id'                   => 'test_id',
@@ -79,7 +82,8 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'class_prefix'         => 'test_prefix',
                     'block_type_widget_id' => 'test_type_widget',
                     'unique_block_prefix'  => '_test_id',
-                    'cache_key'            => '_test_id_test_type_test_context_hash'
+                    'cache_key'            => '_test_id_test_type_test_context_hash',
+                    'cache'                => 'test'
                 ],
                 'normalizedVars' => [
                     'option1'            => 'value1',
@@ -90,15 +94,16 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'attr'               => ['attr1' => 'val1'],
                     'translation_domain' => 'test_domain',
                     'class_prefix'       => 'test_prefix',
+                    'cache'              => 'test'
                 ]
-            ],
+            ]
         ];
     }
 
     public function denormalizeDataProvider(): array
     {
         return [
-            'required vars only' => [
+            'required vars only(null cache)' => [
                 'vars'             => [
                     'option1'    => 'value1',
                     'id'         => 'test_id',
@@ -115,10 +120,33 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'class_prefix'         => null,
                     'block_type_widget_id' => 'test_type_widget',
                     'unique_block_prefix'  => '_test_id',
-                    'cache_key'            => '_test_id_test_type_test_context_hash'
+                    'cache_key'            => '_test_id_test_type_test_context_hash',
+                    'cache'                => null
                 ]
             ],
-            'all vars'           => [
+            'required vars only(empty cache)' => [
+                'vars'             => [
+                    'option1'    => 'value1',
+                    'id'         => 'test_id',
+                    'block_type' => 'test_type',
+                    'cache'      => ''
+                ],
+                'denormalizedVars' => [
+                    'option1'              => 'value1',
+                    'id'                   => 'test_id',
+                    'block_type'           => 'test_type',
+                    'visible'              => true,
+                    'hidden'               => false,
+                    'attr'                 => [],
+                    'translation_domain'   => 'messages',
+                    'class_prefix'         => null,
+                    'block_type_widget_id' => 'test_type_widget',
+                    'unique_block_prefix'  => '_test_id',
+                    'cache_key'            => '_test_id_test_type_test_context_hash',
+                    'cache'                => ''
+                ]
+            ],
+            'all vars(not empty cache)'           => [
                 'vars'             => [
                     'option1'            => 'value1',
                     'id'                 => 'test_id',
@@ -127,7 +155,8 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'hidden'             => true,
                     'attr'               => ['attr1' => 'val1'],
                     'translation_domain' => 'test_domain',
-                    'class_prefix'       => 'test_prefix'
+                    'class_prefix'       => 'test_prefix',
+                    'cache'              => 'test'
                 ],
                 'denormalizedVars' => [
                     'option1'              => 'value1',
@@ -140,7 +169,8 @@ class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
                     'class_prefix'         => 'test_prefix',
                     'block_type_widget_id' => 'test_type_widget',
                     'unique_block_prefix'  => '_test_id',
-                    'cache_key'            => '_test_id_test_type_test_context_hash'
+                    'cache_key'            => '_test_id_test_type_test_context_hash',
+                    'cache'                => 'test'
                 ]
             ],
         ];

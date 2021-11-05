@@ -6,6 +6,9 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
+/**
+ * Layout factory builder.
+ */
 class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
 {
     /**
@@ -194,7 +197,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
     /**
      * @return BlockViewCache|null
      */
-    private function getBlockViewCache()
+    protected function getBlockViewCache()
     {
         return $this->debug === false ? $this->blockViewCache : null;
     }

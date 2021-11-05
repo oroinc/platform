@@ -12,6 +12,9 @@ services:
         class: Oro\Bundle\LayoutBundle\Twig\TwigRenderer
         arguments:
             - '@oro_layout.twig.renderer.engine'
+            - '@oro_layout.cache.render_cache'
+            - '@oro_layout.cache.placeholder_renderer'
+            - '@logger'
 
     oro_layout.twig.renderer.engine:
         public: false
@@ -29,6 +32,7 @@ services:
             - '@oro_layout.twig.renderer'
             - '@twig.form.engine'
             - '@twig'
+            - '@oro_layout.cache.placeholder_renderer'
 
     oro_layout.twig.form.engine:
         class: Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine
