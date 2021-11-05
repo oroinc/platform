@@ -104,6 +104,34 @@ class HateoasTest extends RestJsonApiTestCase
         );
     }
 
+    public function testGetListWhenGetActionExcluded()
+    {
+        $this->appendEntityConfig(
+            TestEntity1::class,
+            [
+                'actions' => [
+                    'get' => false
+                ]
+            ],
+            true
+        );
+
+        $this->loadCustomEntities();
+
+        $entityId = $this->getReference('entity1_1')->getId();
+        $response = $this->cget(
+            ['entity' => 'testapientity1'],
+            [],
+            ['HTTP_HATEOAS' => true]
+        );
+
+        $expectedContent = $this->getExpectedContent('hateoas_cget.yml', (string)$entityId);
+        unset($expectedContent['data'][0]['links']);
+        $this->assertResponseContains($expectedContent, $response);
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('links', $content['data'][0]);
+    }
+
     public function testGet()
     {
         $this->loadCustomEntities();
