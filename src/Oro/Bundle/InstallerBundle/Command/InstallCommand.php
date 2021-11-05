@@ -211,7 +211,9 @@ HELP
         if ($this->isInstalled()) {
             $this->alreadyInstalledMessageShow($input, $output);
 
-            return 1;
+            // Using non-reserved exit code for already installed case.
+            // See https://tldp.org/LDP/abs/html/exitcodes.html
+            return 3;
         }
 
         $skipAssets = $input->getOption('skip-assets');
