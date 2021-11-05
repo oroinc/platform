@@ -371,7 +371,8 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
             'class_prefix' => null,
             'block_type_widget_id' => 'container_widget',
             'unique_block_prefix' => '_root',
-            'cache_key' => '_root_container_' . self::CONTEXT_HASH_VALUE
+            'cache_key' => '_root_container_' . self::CONTEXT_HASH_VALUE,
+            'cache' => null
         ];
 
         $expectedView->blocks = new BlockViewCollection(['root' => $expectedView]);
@@ -426,7 +427,8 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
             'class_prefix' => null,
             'block_type_widget_id' => 'container_widget',
             'unique_block_prefix' => '_root',
-            'cache_key' => '_root_container_' . self::CONTEXT_HASH_VALUE
+            'cache_key' => '_root_container_' . self::CONTEXT_HASH_VALUE,
+            'cache' => null
         ];
 
         $expectedView->blocks = new BlockViewCollection(['root' => $expectedView]);
@@ -462,7 +464,8 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
                 'class_prefix' => null,
                 'block_type_widget_id' => $blockType . '_widget',
                 'unique_block_prefix' => '_' . $id,
-                'cache_key' => '_' . $id . '_' . $blockType . '_' . self::CONTEXT_HASH_VALUE
+                'cache_key' => '_' . $id . '_' . $blockType . '_' . self::CONTEXT_HASH_VALUE,
+                'cache' => null
             ],
             $vars
         );

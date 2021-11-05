@@ -20,6 +20,7 @@ class BlockViewVarsNormalizer implements BlockViewVarsNormalizerInterface
     private const BLOCK_TYPE_WIDGET_ID = 'block_type_widget_id';
     private const UNIQUE_BLOCK_PREFIX = 'unique_block_prefix';
     private const CACHE_KEY = 'cache_key';
+    private const CACHE = 'cache';
 
     /**
      * {@inheritDoc}
@@ -28,6 +29,10 @@ class BlockViewVarsNormalizer implements BlockViewVarsNormalizerInterface
     {
         $this->unsetDefaults($vars);
         $this->unsetComputed($vars);
+
+        if (\array_key_exists(self::CACHE, $vars) && null === $vars[self::CACHE]) {
+            unset($vars[self::CACHE]);
+        }
     }
 
     /**
@@ -37,6 +42,10 @@ class BlockViewVarsNormalizer implements BlockViewVarsNormalizerInterface
     {
         $this->populateDefaults($vars);
         $this->populateComputed($vars, $context[self::CONTEXT_HASH]);
+
+        if (!\array_key_exists(self::CACHE, $vars)) {
+            $vars[self::CACHE] = null;
+        }
     }
 
     protected function unsetDefaults(array &$vars): void

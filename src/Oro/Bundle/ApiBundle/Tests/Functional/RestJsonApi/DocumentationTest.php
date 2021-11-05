@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DocumentationTest extends RestJsonApiTestCase
 {
     use DocumentationTestTrait;
@@ -178,5 +181,40 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testOptionsDocumentation()
     {
         $this->checkOptionsDocumentationForEntity($this->getEntityType(User::class));
+    }
+
+    /**
+     * @depends testWarmUpCache
+     * This test should be at the end to avoid unnecessary warming up documentation cache in previous tests.
+     */
+    public function testFiltersWhenMetaAndIncludeAndFieldsFiltersAreDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'disable_meta_properties' => true,
+                'disable_inclusion'       => true,
+                'disable_fieldset'        => true
+            ],
+            true
+        );
+        $this->warmUpDocumentationCache();
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
+
+        $data = $this->getSimpleFormatter()->format($docs);
+        $resourceData = reset($data);
+        $resourceData = reset($resourceData);
+        $expectedData = $this->loadYamlData('filters.yml', 'documentation');
+        unset(
+            $expectedData['filters']['meta'],
+            $expectedData['filters']['include'],
+            $expectedData['filters']['fields[businessunits]']
+        );
+        self::assertArrayContains($expectedData, $resourceData);
+        self::assertArrayNotHasKey('meta', $resourceData['filters']);
+        self::assertArrayNotHasKey('include', $resourceData['filters']);
+        self::assertArrayNotHasKey('fields[businessunits]', $resourceData['filters']);
     }
 }

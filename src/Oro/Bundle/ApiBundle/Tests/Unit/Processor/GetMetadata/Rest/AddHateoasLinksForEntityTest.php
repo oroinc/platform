@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Rest\AddHateoasLinksForEntity;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\MetadataProcessorTestCase;
@@ -15,12 +17,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
 {
+    /** @var ResourcesProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $resourcesProvider;
+
     /** @var AddHateoasLinksForEntity */
     private $processor;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
         $routes = new RestRoutes('item', 'list', 'subresource', 'relationship');
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->processor = new AddHateoasLinksForEntity(
@@ -29,7 +35,8 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
                 TestContainerBuilder::create()->add('routes', $routes)->getContainer($this),
                 new RequestExpressionMatcher()
             ),
-            $urlGenerator
+            $urlGenerator,
+            $this->resourcesProvider
         );
     }
 
@@ -45,6 +52,9 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
         $entityMetadata = new EntityMetadata();
         $entityMetadata->addLink('self', $existingSelfLinkMetadata);
 
+        $this->resourcesProvider->expects(self::never())
+            ->method('getResourceExcludeActions');
+
         $this->context->setResult($entityMetadata);
         $this->processor->process($this->context);
 
@@ -55,6 +65,12 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
     public function testProcessWhenSelfLinkDoesNotExistInEntityMetadata()
     {
         $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName('Test\Entity');
+
+        $this->resourcesProvider->expects(self::once())
+            ->method('getResourceExcludeActions')
+            ->with('Test\Entity', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn([ApiAction::UPDATE_LIST]);
 
         $this->context->setResult($entityMetadata);
         $this->processor->process($this->context);
@@ -70,5 +86,21 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
             ],
             $selfLinkMetadata->toArray()
         );
+    }
+
+    public function testProcessWhenSelfLinkDoesNotExistInEntityMetadataAndGetActionExcluded()
+    {
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName('Test\Entity');
+
+        $this->resourcesProvider->expects(self::once())
+            ->method('getResourceExcludeActions')
+            ->with('Test\Entity', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn([ApiAction::UPDATE_LIST, ApiAction::GET]);
+
+        $this->context->setResult($entityMetadata);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $entityMetadata->getLinks());
     }
 }

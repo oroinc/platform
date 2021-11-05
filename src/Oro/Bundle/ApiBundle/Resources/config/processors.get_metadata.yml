@@ -116,6 +116,7 @@ services:
         arguments:
             - '@oro_api.rest.routes_registry'
             - '@router'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, priority: -200 }
 
