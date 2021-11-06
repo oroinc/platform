@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Manager;
 
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\ClearableCache;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 
 class OroDataCacheManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSync()
     {
-        $syncProvider    = $this->createMock('Oro\Bundle\CacheBundle\Provider\SyncCacheInterface');
-        $notSyncProvider = $this->createMock('Oro\Bundle\CacheBundle\Provider\SyncCacheInterface');
+        $syncProvider = $this->createMock(SyncCacheInterface::class);
+        $notSyncProvider = $this->createMock(SyncCacheInterface::class);
 
         $syncProvider->expects($this->once())
             ->method('sync');
@@ -23,11 +26,11 @@ class OroDataCacheManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testClear()
     {
-        $clearableProvider = $this->createMock('Doctrine\Common\Cache\ClearableCache');
+        $clearableProvider = $this->createMock(ClearableCache::class);
         $clearableProvider->expects($this->once())
             ->method('deleteAll');
 
-        $notClearableProvider = $this->createMock('Doctrine\Common\Cache\Cache');
+        $notClearableProvider = $this->createMock(Cache::class);
         $notClearableProvider->expects($this->never())
             ->method($this->anything());
 

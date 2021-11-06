@@ -12,24 +12,16 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $scheduleArgsBuilder;
 
-    /**
-     * @var ScheduleManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ScheduleManager|\PHPUnit\Framework\MockObject\MockObject */
     private $scheduleManager;
 
-    /**
-     * @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cronFormatTransformer;
 
-    /**
-     * @var InvalidateCacheTimeProvider
-     */
+    /** @var InvalidateCacheTimeProvider */
     private $provider;
 
     protected function setUp(): void
@@ -51,20 +43,20 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
         $schedule = new Schedule();
         $dateTime = new \DateTime();
 
-        $this->scheduleArgsBuilder->expects(static::once())
+        $this->scheduleArgsBuilder->expects(self::once())
             ->method('build')
             ->willReturn($args);
 
-        $this->scheduleManager->expects(static::once())
+        $this->scheduleManager->expects(self::once())
             ->method('getSchedulesByCommandAndArguments')
             ->with(InvalidateCacheScheduleCommand::getDefaultName(), $args)
             ->willReturn([$schedule]);
 
-        $this->cronFormatTransformer->expects(static::once())
+        $this->cronFormatTransformer->expects(self::once())
             ->method('reverseTransform')
             ->willReturn($dateTime);
 
-        static::assertSame(
+        self::assertSame(
             $dateTime,
             $this->provider->getByDataStorage(new InvalidateCacheDataStorage())
         );
@@ -74,19 +66,19 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
     {
         $args = ['1', '2'];
 
-        $this->scheduleArgsBuilder->expects(static::once())
+        $this->scheduleArgsBuilder->expects(self::once())
             ->method('build')
             ->willReturn($args);
 
-        $this->scheduleManager->expects(static::once())
+        $this->scheduleManager->expects(self::once())
             ->method('getSchedulesByCommandAndArguments')
             ->with(InvalidateCacheScheduleCommand::getDefaultName(), $args)
             ->willReturn([]);
 
-        $this->cronFormatTransformer->expects(static::never())
+        $this->cronFormatTransformer->expects(self::never())
             ->method('reverseTransform');
 
-        static::assertNull(
+        self::assertNull(
             $this->provider->getByDataStorage(new InvalidateCacheDataStorage())
         );
     }

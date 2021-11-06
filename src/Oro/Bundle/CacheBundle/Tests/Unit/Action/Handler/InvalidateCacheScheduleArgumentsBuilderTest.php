@@ -23,6 +23,6 @@ class InvalidateCacheScheduleArgumentsBuilderTest extends \PHPUnit\Framework\Tes
 
         $builder = new InvalidateCacheScheduleArgumentsBuilder();
 
-        static::assertSame($expectedArgs, $builder->build($dataStorage));
+        self::assertSame($expectedArgs, $builder->build($dataStorage));
     }
 }

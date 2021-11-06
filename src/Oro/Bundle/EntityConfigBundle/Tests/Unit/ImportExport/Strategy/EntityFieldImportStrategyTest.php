@@ -21,9 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseHelper */
     private $databaseHelper;
 
@@ -51,7 +48,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->fieldHelper = $this->createMock(FieldHelper::class);
         $this->strategyHelper = $this->createMock(ImportStrategyHelper::class);
         $this->databaseHelper = $this->createMock(DatabaseHelper::class);
@@ -60,17 +56,21 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->constraintFactory = $this->createMock(ConstraintFactory::class);
         $this->context = $this->createMock(ContextInterface::class);
 
-        $this->translator->expects(self::any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(function ($value) {
-                return $value;
-            });
+            ->willReturnArgument(0);
 
-        $this->strategy = $this->createStrategy();
+        $this->strategy = new EntityFieldImportStrategy(
+            new EventDispatcher(),
+            $this->strategyHelper,
+            $this->fieldHelper,
+            $this->databaseHelper
+        );
         $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName(FieldConfigModel::class);
         $this->strategy->setFieldTypeProvider($this->fieldTypeProvider);
-        $this->strategy->setTranslator($this->translator);
+        $this->strategy->setTranslator($translator);
         $this->strategy->setFieldValidationHelper($this->validationHelper);
         $this->strategy->setConstraintFactory($this->constraintFactory);
     }
@@ -90,7 +90,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
             ->willReturn(['string', 'integer', 'date']);
-        $this->fieldTypeProvider->expects(static::any())
+        $this->fieldTypeProvider->expects(self::any())
             ->method('getFieldProperties')
             ->willReturn([]);
 
@@ -148,7 +148,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
             ->willReturn(['string', 'integer', 'date']);
-        $this->fieldTypeProvider->expects(static::any())
+        $this->fieldTypeProvider->expects(self::any())
             ->method('getFieldProperties')
             ->willReturn([]);
 
@@ -238,18 +238,5 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         self::assertNull($this->strategy->process($entity));
-    }
-
-    /**
-     * @return EntityFieldImportStrategy
-     */
-    private function createStrategy()
-    {
-        return new EntityFieldImportStrategy(
-            new EventDispatcher(),
-            $this->strategyHelper,
-            $this->fieldHelper,
-            $this->databaseHelper
-        );
     }
 }

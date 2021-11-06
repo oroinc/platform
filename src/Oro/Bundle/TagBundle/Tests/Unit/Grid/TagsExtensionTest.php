@@ -11,20 +11,32 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Grid\TagsExtension;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TagsExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    private TagManager|MockObject $tagManager;
-    private EntityClassResolver|MockObject $entityClassResolver;
-    private TaggableHelper|MockObject $taggableHelper;
-    private AuthorizationCheckerInterface|MockObject $authorizationChecker;
-    private TokenStorageInterface|MockObject $tokenStorage;
-    private InlineEditingConfigurator $inlineEditingConfigurator;
-    private TagsExtension $extension;
+    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $tagManager;
+
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassResolver;
+
+    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $taggableHelper;
+
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
+
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
+
+    /** @var InlineEditingConfigurator|\PHPUnit\Framework\MockObject\MockObject */
+    private $inlineEditingConfigurator;
+
+    /** @var TagsExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -100,90 +112,86 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->extension->isApplicable($config));
     }
 
-    public function parametersDataProvider()
+    public function parametersDataProvider(): array
     {
-        yield [
+        return [
             [
-                'extended_entity_name' => 'Test',
-                'source' => ['type' => 'orm'],
-                'properties' => ['id' => 'id']
+                [
+                    'extended_entity_name' => 'Test',
+                    'source' => ['type' => 'orm'],
+                    'properties' => ['id' => 'id']
+                ],
+                true,
+                true,
+                $this->createMock(TokenInterface::class),
+                true
             ],
-            true,
-            true,
-            $this->createMock(TokenInterface::class),
-            true
-        ];
-
-        yield [
             [
-                'extended_entity_name' => 'Test',
-                'source' => ['type' => 'orm'],
-                'properties' => ['id' => 'id']
+                [
+                    'extended_entity_name' => 'Test',
+                    'source' => ['type' => 'orm'],
+                    'properties' => ['id' => 'id']
+                ],
+                false,
+                true,
+                $this->createMock(TokenInterface::class),
+                false
             ],
-            false,
-            true,
-            $this->createMock(TokenInterface::class),
-            false
-        ];
-
-        yield [
             [
-                'extended_entity_name' => 'Test',
-                'source' => ['type' => 'orm'],
-                'properties' => ['id' => 'id']
+                [
+                    'extended_entity_name' => 'Test',
+                    'source' => ['type' => 'orm'],
+                    'properties' => ['id' => 'id']
+                ],
+                true,
+                false,
+                $this->createMock(TokenInterface::class),
+                false
             ],
-            true,
-            false,
-            $this->createMock(TokenInterface::class),
-            false
-        ];
-
-        yield [
             [
-                'extended_entity_name' => 'Test',
-                'source' => ['type' => 'orm'],
-                'properties' => ['id' => 'id']
+                [
+                    'extended_entity_name' => 'Test',
+                    'source' => ['type' => 'orm'],
+                    'properties' => ['id' => 'id']
+                ],
+                true,
+                true,
+                null,
+                false
             ],
-            true,
-            true,
-            null,
-            false
-        ];
-
-        yield [
             [
-                'extended_entity_name' => null,
-                'source' => ['type' => 'orm'],
-                'properties' => ['id' => 'id']
+                [
+                    'extended_entity_name' => null,
+                    'source' => ['type' => 'orm'],
+                    'properties' => ['id' => 'id']
+                ],
+                true,
+                true,
+                $this->createMock(TokenInterface::class),
+                false
             ],
-            true,
-            true,
-            $this->createMock(TokenInterface::class),
-            false
-        ];
-
-        yield [
             [
-                'extended_entity_name' => 'Test',
-                'source' => ['type' => 'array'],
-                'properties' => ['id' => 'id']
+                [
+                    'extended_entity_name' => 'Test',
+                    'source' => ['type' => 'array'],
+                    'properties' => ['id' => 'id']
+                ],
+                true,
+                true,
+                $this->createMock(TokenInterface::class),
+                false
             ],
-            true,
-            true,
-            $this->createMock(TokenInterface::class),
-            false
-        ];
-
-        yield [
             [
-                'extended_entity_name' => 'Test',
-                'source' => ['type' => 'orm'],
-                'properties' => []
-            ],
-            true,
-            true,
-            $this->createMock(TokenInterface::class),
-            false
+                [
+                    'extended_entity_name' => 'Test',
+                    'source' => ['type' => 'orm'],
+                    'properties' => []
+                ],
+                true,
+                true,
+                $this->createMock(TokenInterface::class),
+                false
+            ]
         ];
     }
 

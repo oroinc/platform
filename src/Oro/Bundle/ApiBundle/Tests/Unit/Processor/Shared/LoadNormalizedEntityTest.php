@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ParameterBag;
 
 class LoadNormalizedEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorBag;
 
     /** @var ParameterBag */
@@ -89,7 +89,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessWhenNormalizedEntityAlreadyLoaded()
     {
-        $this->processorBag->expects(static::never())
+        $this->processorBag->expects(self::never())
             ->method('getProcessor')
             ->with('get');
 

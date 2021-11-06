@@ -37,7 +37,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'templating' => '@OroTranslation/default.html.twig'
         ];
 
-        static::assertEquals(
+        self::assertEquals(
             $expected,
             $processor->processConfiguration(
                 new Configuration(),

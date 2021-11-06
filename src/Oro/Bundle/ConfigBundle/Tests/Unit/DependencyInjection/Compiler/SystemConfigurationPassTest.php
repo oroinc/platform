@@ -138,11 +138,11 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
-        $this->container->expects(static::once())
+        $this->container->expects(self::once())
             ->method('getExtensions')
             ->willReturn(['test_bundle' => null]);
 
-        $this->container->expects(static::once())
+        $this->container->expects(self::once())
             ->method('getExtensionConfig')
             ->with('test_bundle')
             ->willReturn([
@@ -172,7 +172,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
         $bagServiceDef = $this->createMock(Definition::class);
         $configBagServiceDef = $this->createMock(Definition::class);
-        $this->container->expects(static::once())
+        $this->container->expects(self::once())
             ->method('findTaggedServiceIds')
             ->willReturn([
                 'first_scope_service'  => [
@@ -185,7 +185,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
         $apiManagerServiceDef = $this->createMock(Definition::class);
         $configManagerServiceDef = $this->createMock(Definition::class);
-        $this->container->expects(static::exactly(5))
+        $this->container->expects(self::exactly(5))
             ->method('getDefinition')
             ->willReturnMap([
                 ['oro_config.config_definition_bag', $bagServiceDef],

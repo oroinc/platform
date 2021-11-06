@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class WidgetItemsChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetItemsChoiceType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {

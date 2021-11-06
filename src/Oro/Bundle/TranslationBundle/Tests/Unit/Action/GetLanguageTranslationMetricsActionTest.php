@@ -20,7 +20,6 @@ class GetLanguageTranslationMetricsActionTest extends \PHPUnit\Framework\TestCas
     private GetLanguageTranslationMetricsAction $action2;
     private array $metrics;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $this->codeWithoutTranslations = 'fr_FR';
@@ -33,10 +32,12 @@ class GetLanguageTranslationMetricsActionTest extends \PHPUnit\Framework\TestCas
         ];
 
         $translationMetricsProvider = $this->createMock(TranslationMetricsProviderInterface::class);
-        $translationMetricsProvider->method('getForLanguage')->willReturnMap([
-            [$this->codeWithoutTranslations, null],
-            [$this->codeWithTranslations, $this->metrics],
-        ]);
+        $translationMetricsProvider->expects(self::any())
+            ->method('getForLanguage')
+            ->willReturnMap([
+                [$this->codeWithoutTranslations, null],
+                [$this->codeWithTranslations, $this->metrics],
+            ]);
 
         $this->action1 = new GetLanguageTranslationMetricsAction(new ContextAccessor(), $translationMetricsProvider);
         $this->action2 = new GetLanguageTranslationMetricsAction(new ContextAccessor(), $translationMetricsProvider);
@@ -58,14 +59,14 @@ class GetLanguageTranslationMetricsActionTest extends \PHPUnit\Framework\TestCas
             'result' => new PropertyPath('$.result1')
         ]);
         $this->action1->execute($context);
-        static::assertNull($context['$']['result1']);
+        self::assertNull($context['$']['result1']);
 
         $this->action2->initialize([
             'language' => $this->codeWithTranslations,
             'result' => new PropertyPath('$.result2')
         ]);
         $this->action2->execute($context);
-        static::assertSame($this->metrics, $context['$']['result2']);
+        self::assertSame($this->metrics, $context['$']['result2']);
     }
 
     public function testWithLanguageEntity(): void
@@ -77,13 +78,13 @@ class GetLanguageTranslationMetricsActionTest extends \PHPUnit\Framework\TestCas
             'result' => new PropertyPath('$.result1')
         ]);
         $this->action1->execute($context);
-        static::assertNull($context['$']['result1']);
+        self::assertNull($context['$']['result1']);
 
         $this->action2->initialize([
             'language' => $this->languageWithTranslations,
             'result' => new PropertyPath('$.result2')
         ]);
         $this->action2->execute($context);
-        static::assertSame($this->metrics, $context['$']['result2']);
+        self::assertSame($this->metrics, $context['$']['result2']);
     }
 }

@@ -8,21 +8,22 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\DashboardBundle\EventListener\WidgetSortByListener;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class WidgetSortByListenerTest extends OrmTestCase
 {
     /**
      * @dataProvider onResultBeforeQueryShouldNotUpdateQueryProvider
      */
-    public function testOnResultBeforeQueryShouldNotUpdateQuery(WidgetOptionBag $widgetOptionBag = null)
+    public function testOnResultBeforeQueryShouldNotUpdateQuery(WidgetOptionBag $widgetOptionBag)
     {
-        /** @var MockObject|WidgetConfigs $widgetConfigs */
-        $widgetConfigs = $this->getMockBuilder(WidgetConfigs::class)->disableOriginalConstructor()->getMock();
-        $widgetConfigs->method('getWidgetOptions')->willReturn($widgetOptionBag);
+        $widgetConfigs = $this->createMock(WidgetConfigs::class);
+        $widgetConfigs->expects(self::any())
+            ->method('getWidgetOptions')
+            ->willReturn($widgetOptionBag);
 
         $em = $this->getTestEntityManager();
         $em->getConfiguration()->setMetadataDriverImpl(
@@ -40,10 +41,10 @@ class WidgetSortByListenerTest extends OrmTestCase
         $widgetSortByListener = new WidgetSortByListener($widgetConfigs);
         $widgetSortByListener->onResultBeforeQuery(new OrmResultBeforeQuery($datagrid, $qb));
 
-        static::assertEquals($originalDQL, $qb->getQuery()->getDQL());
+        self::assertEquals($originalDQL, $qb->getQuery()->getDQL());
     }
 
-    public function onResultBeforeQueryShouldNotUpdateQueryProvider()
+    public function onResultBeforeQueryShouldNotUpdateQueryProvider(): array
     {
         return [
             [new WidgetOptionBag()],
@@ -51,14 +52,14 @@ class WidgetSortByListenerTest extends OrmTestCase
                 'sortBy' => [
                     'property' => '',
                     'order' => 'ASC',
-                    'className' => 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass',
+                    'className' => TestClass::class,
                 ],
             ])],
             [new WidgetOptionBag([
                 'sortBy' => [
                     'property' => 'nonExisting',
                     'order' => 'ASC',
-                    'className' => 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass',
+                    'className' => TestClass::class,
                 ]
             ])],
         ];
@@ -67,11 +68,12 @@ class WidgetSortByListenerTest extends OrmTestCase
     /**
      * @dataProvider onResultBeforeQueryShouldUpdateQueryProvider
      */
-    public function testOnResultBeforeQueryShouldUpdateQuery(WidgetOptionBag $widgetOptionBag, $expectedDQL)
+    public function testOnResultBeforeQueryShouldUpdateQuery(WidgetOptionBag $widgetOptionBag, string $expectedDQL)
     {
-        /** @var MockObject|WidgetConfigs $widgetConfigs */
-        $widgetConfigs = $this->getMockBuilder(WidgetConfigs::class)->disableOriginalConstructor()->getMock();
-        $widgetConfigs->method('getWidgetOptions')->willReturn($widgetOptionBag);
+        $widgetConfigs = $this->createMock(WidgetConfigs::class);
+        $widgetConfigs->expects(self::any())
+            ->method('getWidgetOptions')
+            ->willReturn($widgetOptionBag);
 
         $em = $this->getTestEntityManager();
         $em->getConfiguration()->setMetadataDriverImpl(
@@ -82,7 +84,7 @@ class WidgetSortByListenerTest extends OrmTestCase
         );
         $qb = $em->createQueryBuilder()
             ->select('tc')
-            ->from('Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass', 'tc')
+            ->from(TestClass::class, 'tc')
             ->orderBy('tc.id', 'DESC');
 
         $datagrid = $this->createMock(DatagridInterface::class);
@@ -90,10 +92,10 @@ class WidgetSortByListenerTest extends OrmTestCase
         $widgetSortByListener = new WidgetSortByListener($widgetConfigs);
         $widgetSortByListener->onResultBeforeQuery(new OrmResultBeforeQuery($datagrid, $qb));
 
-        static::assertEquals($expectedDQL, $qb->getQuery()->getDQL());
+        self::assertEquals($expectedDQL, $qb->getQuery()->getDQL());
     }
 
-    public function onResultBeforeQueryShouldUpdateQueryProvider()
+    public function onResultBeforeQueryShouldUpdateQueryProvider(): array
     {
         return [
             [
@@ -101,7 +103,7 @@ class WidgetSortByListenerTest extends OrmTestCase
                     'sortBy' => [
                         'property' => 'existing',
                         'order' => 'ASC',
-                        'className' => 'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestClass',
+                        'className' => TestClass::class,
                     ]
                 ]),
                 <<<'DQL'

@@ -11,14 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\PhpUtils\ClassGenerator;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|ConfigProvider */
-    protected ConfigProvider $groupingConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $groupingConfigProvider;
 
-    protected ActivityEntityGeneratorExtension $extension;
+    /** @var ActivityEntityGeneratorExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -36,44 +36,44 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
         $config->set('groups', [ActivityScope::GROUP_ACTIVITY]);
 
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(true);
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
             ->willReturn($config);
 
-        static::assertTrue($this->extension->supports($schema));
+        self::assertTrue($this->extension->supports($schema));
     }
 
     public function testSupportsForNotConfigurableEntity()
     {
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(false);
-        $this->groupingConfigProvider->expects(static::never())
+        $this->groupingConfigProvider->expects(self::never())
             ->method('getConfig');
 
-        static::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
+        self::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
     }
 
     public function testSupportsForEntityNotIncludedInAnyGroup()
     {
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
 
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(true);
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
             ->willReturn($config);
 
-        static::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
+        self::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
     }
 
     public function testSupportsForNotActivityEntity()
@@ -81,16 +81,16 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
         $config->set('groups', ['another_group']);
 
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(true);
-        $this->groupingConfigProvider->expects(static::once())
+        $this->groupingConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
             ->willReturn($config);
 
-        static::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
+        self::assertFalse($this->extension->supports(['class' => 'Test\Entity']));
     }
 
     public function testGenerate()
@@ -150,6 +150,6 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->generate($schema, $class);
         $expectedBody = \file_get_contents(__DIR__ . '/Fixtures/generationResult.txt');
 
-        static::assertEquals($expectedBody, $class->print());
+        self::assertEquals($expectedBody, $class->print());
     }
 }

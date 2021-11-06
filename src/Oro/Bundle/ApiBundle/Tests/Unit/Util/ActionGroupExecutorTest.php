@@ -24,7 +24,7 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
     {
         $this->actionGroupRegistry = $this->createMock(ActionGroupRegistry::class);
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects(static::any())
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($message) {
                 return 'Translated: ' . $message;

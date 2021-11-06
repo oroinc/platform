@@ -8,14 +8,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CurrencyType
-     */
+    /** @var CurrencyType */
     protected $formType;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->formType = new CurrencyType();
@@ -23,8 +18,7 @@ class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([

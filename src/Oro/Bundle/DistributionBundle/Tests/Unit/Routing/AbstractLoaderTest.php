@@ -4,41 +4,35 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
 
 use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 use Oro\Bundle\DistributionBundle\Routing\AbstractLoader;
+use Oro\Bundle\DistributionBundle\Routing\SharedData;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
 abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|KernelInterface
-     */
+    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $kernel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RouteOptionsResolverInterface
-     */
+    /** @var RouteOptionsResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $routeOptionsResolver;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /**
-     * @var LoaderResolver
-     */
+    /** @var LoaderResolver */
     protected $loaderResolver;
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-        $this->routeOptionsResolver = $this->createMock('Oro\Component\Routing\Resolver\RouteOptionsResolverInterface');
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->routeOptionsResolver = $this->createMock(RouteOptionsResolverInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->loaderResolver = new LoaderResolver([new YamlFileLoader(new FileLocator())]);
     }
@@ -59,7 +53,7 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     public function testLoad(array $expected)
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
-        $bundle = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->createMock(BundleInterface::class);
         $bundle->expects($this->any())->method('getPath')->willReturn($dir);
 
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle, $bundle]);
@@ -91,11 +85,11 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithEmptyCache()
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
-        $bundle = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->createMock(BundleInterface::class);
         $bundle->expects($this->any())->method('getPath')->willReturn($dir);
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
 
-        $cache = $this->getMockBuilder('Oro\Bundle\DistributionBundle\Routing\SharedData')
+        $cache = $this->getMockBuilder(SharedData::class)
             ->disableOriginalConstructor()
             ->getMock();
         $cache->expects($this->once())
@@ -104,7 +98,7 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
         $cache->expects($this->once())
             ->method('setRoutes')
-            ->with($this->isType('string'), $this->isInstanceOf('Symfony\Component\Routing\RouteCollection'));
+            ->with($this->isType('string'), $this->isInstanceOf(RouteCollection::class));
 
         $loader = $this->getLoader();
         $loader->setCache($cache);
@@ -114,11 +108,11 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithCachedData()
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
-        $bundle = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->createMock(BundleInterface::class);
         $bundle->expects($this->any())->method('getPath')->willReturn($dir);
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
 
-        $cache = $this->getMockBuilder('Oro\Bundle\DistributionBundle\Routing\SharedData')
+        $cache = $this->getMockBuilder(SharedData::class)
             ->disableOriginalConstructor()
             ->getMock();
         $cache->expects($this->once())

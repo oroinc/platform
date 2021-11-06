@@ -8,46 +8,33 @@ use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\UnsupportedBinaries;
 
 class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedFilter;
 
-    /**
-     * @var array
-     */
-    private $unsupportedMimeTypes;
-
-    /**
-     * @var UnsupportedBinaries\SkipUnsupportedBinariesByMimeTypeFilterDecorator
-     */
+    /** @var UnsupportedBinaries\SkipUnsupportedBinariesByMimeTypeFilterDecorator */
     private $filterDecorator;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->decoratedFilter = $this->createMock(ImagineBinaryFilterInterface::class);
-        $this->unsupportedMimeTypes = [
-            'image/png'
-        ];
 
         $this->filterDecorator = new UnsupportedBinaries\SkipUnsupportedBinariesByMimeTypeFilterDecorator(
             $this->decoratedFilter,
-            $this->unsupportedMimeTypes
+            ['image/png']
         );
     }
 
     public function testApplyFilterSupported()
     {
-        $binary = $this->createBinaryMock();
+        $binary = $this->createMock(BinaryInterface::class);
         $filter = 'product_medium';
 
-        $binary->method('getMimeType')
+        $binary->expects(self::any())
+            ->method('getMimeType')
             ->willReturn('image/jpg');
 
-        $this->decoratedFilter->method('applyFilter')
+        $this->decoratedFilter->expects(self::any())
+            ->method('applyFilter')
             ->with($binary, $filter);
 
         $this->filterDecorator->applyFilter($binary, $filter);
@@ -55,23 +42,16 @@ class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit\Fram
 
     public function testApplyFilterNotSupported()
     {
-        $binary = $this->createBinaryMock();
+        $binary = $this->createMock(BinaryInterface::class);
         $filter = 'product_medium';
 
-        $binary->method('getMimeType')
+        $binary->expects(self::any())
+            ->method('getMimeType')
             ->willReturn('image/png');
 
-        $this->decoratedFilter->expects(static::never())
+        $this->decoratedFilter->expects(self::never())
             ->method('applyFilter');
 
         $this->filterDecorator->applyFilter($binary, $filter);
-    }
-
-    /**
-     * @return BinaryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createBinaryMock()
-    {
-        return $this->createMock(BinaryInterface::class);
     }
 }

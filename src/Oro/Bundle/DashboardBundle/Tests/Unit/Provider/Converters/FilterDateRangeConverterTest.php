@@ -2,60 +2,36 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
-use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
+use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formatter;
+
+    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateCompiler;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
     /** @var FilterDateRangeConverter */
-    protected $converter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dateCompiler;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dateHelper;
+    private $converter;
 
     protected function setUp(): void
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dateCompiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $settings->expects($this->any())
-            ->method('getTimeZone')
-            ->willReturn('UTC');
-        $doctrine         = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $aclHelper        = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dateHelper = new DateHelper($settings, $doctrine, $aclHelper);
+        $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
+        $this->dateCompiler = $this->createMock(Compiler::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->converter = new FilterDateRangeConverter(
             $this->formatter,
             $this->dateCompiler,
-            $this->translator,
-            $this->dateHelper
+            $this->translator
         );
     }
 
@@ -72,7 +48,7 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         $this->dateCompiler->expects($this->once())
             ->method('compile')
             ->with('{{4}}')
-            ->will($this->returnValue(new \DateTime('01-01-2016 00:00:00')));
+            ->willReturn(new \DateTime('01-01-2016 00:00:00'));
         $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
 
         $this->assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
@@ -145,13 +121,11 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
     {
         $this->formatter->expects($this->exactly(2))
             ->method('formatDate')
-            ->willReturnCallback(
-                function ($input) {
-                    return $input->format('Y-m-d');
-                }
-            );
+            ->willReturnCallback(function ($input) {
+                return $input->format('Y-m-d');
+            });
         $start = new \DateTime('2014-01-01', new \DateTimeZone('UTC'));
-        $end   = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
+        $end = new \DateTime('2015-01-01', new \DateTimeZone('UTC'));
 
         $this->assertEquals(
             '2014-01-01 - 2015-01-01',

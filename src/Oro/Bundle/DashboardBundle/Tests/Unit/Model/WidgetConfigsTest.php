@@ -13,7 +13,6 @@ use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
 use Oro\Component\Config\Resolver\ResolverInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,28 +20,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WidgetRepository|MockObject */
+    /** @var WidgetRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $widgetRepository;
 
-    /** @var EntityManagerInterface|MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var ConfigValueProvider|MockObject */
+    /** @var ConfigValueProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $valueProvider;
 
-    /** @var ConfigProvider|MockObject */
-    protected $configProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    private WidgetConfigs $widgetConfigs;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var TranslatorInterface|MockObject */
-    protected $translator;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /** @var EventDispatcherInterface|MockObject */
-    protected $eventDispatcher;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    /** @var RequestStack|MockObject */
-    protected $requestStack;
+    /** @var WidgetConfigs */
+    private $widgetConfigs;
 
     protected function setUp(): void
     {
@@ -54,10 +54,13 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $widgetConfigVisibilityFilter = $this->createMock(WidgetConfigVisibilityFilter::class);
 
-        $this->valueProvider->method('getConvertedValue')
+        $this->valueProvider->expects(self::any())
+            ->method('getConvertedValue')
             ->willReturnCallback(fn ($widgetConfig, $type, $value) => $value);
 
-        $widgetConfigVisibilityFilter->method('filterConfigs')->willReturnArgument(0);
+        $widgetConfigVisibilityFilter->expects(self::any())
+            ->method('filterConfigs')
+            ->willReturnArgument(0);
 
         $this->requestStack = new RequestStack();
         $this->widgetConfigs = new WidgetConfigs(
@@ -72,26 +75,29 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->widgetRepository = $this->createMock(EntityRepository::class);
-        $this->em->method('getRepository')->with('OroDashboardBundle:Widget')->willReturn($this->widgetRepository);
+        $this->em->expects(self::any())
+            ->method('getRepository')
+            ->with('OroDashboardBundle:Widget')
+            ->willReturn($this->widgetRepository);
     }
 
     public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfRequestIsNull()
     {
-        static::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
+        self::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
     public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfThereIsNoWidgetIdInRequestQuery()
     {
         $this->requestStack->push(new Request());
 
-        static::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
+        self::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
     public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfWidgetDoesNotExist()
     {
         $this->requestStack->push(new Request(['_widgetId' => 1]));
 
-        static::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
+        self::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
     }
 
     public function testGetWidgetOptionsShouldReturnOptionsOfWidget()
@@ -101,7 +107,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
 
         $widget = new Widget();
         $widget->setName('test');
-        $this->widgetRepository->expects(static::once())
+        $this->widgetRepository->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($widget);
@@ -118,7 +124,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
     }
 
     public function testGetWidgetsShouldReturnOptionsFromLocalCacheOnSubsequentCalls()
@@ -129,12 +135,12 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $widget = (new Widget())->setName('test');
         $options = ['k' => 'v', 'k2' => 'v2'];
         $widget->setOptions($options);
-        $this->widgetRepository->expects(static::once())
+        $this->widgetRepository->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($widget);
 
-        $this->configProvider->expects(static::once())
+        $this->configProvider->expects(self::once())
             ->method('getWidgetConfig')
             ->willReturn([
                 'configuration' => [
@@ -143,8 +149,8 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
-        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
     }
 
     public function testGetWidgetOptionsShouldReturnOptionsOfWidgetSpecifiedAsArgument()
@@ -153,7 +159,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
 
         $widget = new Widget();
         $widget->setName('test');
-        $this->widgetRepository->expects(static::once())
+        $this->widgetRepository->expects(self::once())
             ->method('find')
             ->with(2)
             ->willReturn($widget);
@@ -161,7 +167,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $options = ['k' => 'v', 'k2' => 'v2'];
         $widget->setOptions($options);
 
-        $this->configProvider->expects(static::once())
+        $this->configProvider->expects(self::once())
             ->method('getWidgetConfig')
             ->willReturn([
                 'configuration' => [
@@ -170,18 +176,21 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-        static::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
+        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
     }
 
     public function testGetWidgetConfigShouldReturnNullIfConfigProviderReturnsNull()
     {
-        $this->configProvider->method('getWidgetConfig')->willReturn(null);
-        static::assertNull($this->widgetConfigs->getWidgetConfig('non-existent-widget'));
+        $this->configProvider->expects(self::any())
+            ->method('getWidgetConfig')
+            ->willReturn(null);
+        self::assertNull($this->widgetConfigs->getWidgetConfig('non-existent-widget'));
     }
 
     public function testGetWidgetConfigShouldPassThroughConfigProviderException()
     {
-        $this->configProvider->method('getWidgetConfig')
+        $this->configProvider->expects(self::any())
+            ->method('getWidgetConfig')
             ->willThrowException(new InvalidConfigurationException('non-existent-widget'));
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for: non-existent-widget");

@@ -13,34 +13,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var FallbackPropertyType
-     */
-    protected $formType;
+    /** @var FallbackPropertyType */
+    private $formType;
 
     protected function setUp(): void
     {
-        /** @var TranslatorInterface $translator */
-        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
             ->willReturnMap([
                 ['oro.locale.fallback.type.parent_localization', [], null, null, 'Parent Localization'],
                 ['oro.locale.fallback.type.custom', [], null, null, 'Custom']
             ]);
 
-        $this->formType = new FallbackPropertyType($this->translator);
+        $this->formType = new FallbackPropertyType($translator);
         parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->translator, $this->formType);
     }
 
     /**
@@ -59,12 +46,9 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $inputOptions
-     * @param array $expectedOptions
-     * @param mixed $submittedData
      * @dataProvider submitDataProvider
      */
-    public function testSubmit(array $inputOptions, array $expectedOptions, $submittedData)
+    public function testSubmit(array $inputOptions, array $expectedOptions, ?string $submittedData)
     {
         $form = $this->factory->create(FallbackPropertyType::class, null, $inputOptions);
 
@@ -81,10 +65,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $this->assertEquals($submittedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'default options' => [
@@ -158,8 +139,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $localizationCode = 'en_US';
         $parentCode = 'en';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form */
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $formView = new FormView();
         $this->formType->finishView($formView, $form, [

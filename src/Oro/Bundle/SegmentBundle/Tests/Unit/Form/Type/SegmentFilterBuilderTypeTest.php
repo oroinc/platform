@@ -31,19 +31,13 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /**
-     * @var SegmentFilterBuilderType
-     */
+    /** @var SegmentFilterBuilderType */
     private $formType;
 
     protected function setUp(): void
@@ -59,7 +53,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -76,14 +70,15 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptionsNonManageableEntityClass()
     {
-        $entityClass = '\stdClass';
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('Option segment_entity must be a valid entity class, "stdClass" given');
+
+        $entityClass = \stdClass::class;
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManagerForClass')
             ->with($entityClass, false)
             ->willReturn(null);
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('Option segment_entity must be a valid entity class, "\stdClass" given');
 
         $options = [
             'segment_entity' => $entityClass
@@ -97,43 +92,41 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
      */
     public function testConfigureOptionsUnsupportedOptions(array $options)
     {
-        $entityClass = '\stdClass';
+        $this->expectException(InvalidOptionsException::class);
+
+        $entityClass = \stdClass::class;
 
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManagerForClass')
             ->with($entityClass, false)
             ->willReturn($em);
-        $this->expectException(InvalidOptionsException::class);
 
         $this->factory->create(SegmentFilterBuilderType::class, null, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             'segment_entity unsupported type' => [['segment_entity' => []]],
-            'segment_columns unsupported type' => [['segment_entity' => '\stdClass', 'segment_columns' => 'id']],
-            'segment_type unsupported type' => [['segment_entity' => '\stdClass', 'segment_type' => []]],
+            'segment_columns unsupported type' => [['segment_entity' => \stdClass::class, 'segment_columns' => 'id']],
+            'segment_type unsupported type' => [['segment_entity' => \stdClass::class, 'segment_type' => []]],
             'segment_name_template unsupported type' => [
                 [
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'segment_name_template' => []
                 ]
             ],
-            'segment_type unknown value' => [['segment_entity' => '\stdClass', 'segment_type' => 'some_type']],
+            'segment_type unknown value' => [['segment_entity' => \stdClass::class, 'segment_type' => 'some_type']],
             'add_name_field unsupported type' => [
                 [
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'add_name_field' => 123
                 ]
             ],
             'name_field_required unsupported type' => [
                 [
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'name_field_required' => 123
                 ]
             ],
@@ -145,7 +138,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
      */
     public function testConfigureOptionsDefaultsAndAutoFill(array $options, array $expected)
     {
-        $this->assertNormalizersCalls('\stdClass');
+        $this->assertNormalizersCalls(\stdClass::class);
 
         $form = $this->factory->create(SegmentFilterBuilderType::class, null, $options);
 
@@ -159,24 +152,21 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertNotEmpty($actualOptions['constraints']);
         $this->assertGreaterThan(
             0,
-            \array_reduce($actualOptions['constraints'], function ($carry, $item) {
-                return \is_a($item, NotEmptyFilters::class) ? $carry + 1 : 0;
+            array_reduce($actualOptions['constraints'], function ($carry, $item) {
+                return is_a($item, NotEmptyFilters::class) ? $carry + 1 : 0;
             })
         );
     }
 
-    /**
-     * @return array
-     */
-    public function defaultsAndAutoFillOptionsDataProvider()
+    public function defaultsAndAutoFillOptionsDataProvider(): array
     {
         return [
             'defaults' => [
                 'options' => [
-                    'segment_entity' => '\stdClass'
+                    'segment_entity' => \stdClass::class
                 ],
                 'expected' => [
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'data_class' => Segment::class,
                     'segment_type' => SegmentType::TYPE_DYNAMIC,
                     'segment_columns' => ['id'],
@@ -188,12 +178,12 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ],
             'name_field_required' => [
                 'options' => [
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'add_name_field' => true,
                     'name_field_required' => true,
                 ],
                 'expected' => [
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'data_class' => Segment::class,
                     'segment_type' => SegmentType::TYPE_DYNAMIC,
                     'segment_columns' => ['id'],
@@ -206,12 +196,12 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'add NotEmptyFilters constraint if required option is true' => [
                 'options' => [
                     'required' => true,
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'constraints' => new Valid()
                 ],
                 'expected' => [
                     'required' => true,
-                    'segment_entity' => '\stdClass',
+                    'segment_entity' => \stdClass::class,
                     'constraints' => [new Valid(), new NotEmptyFilters()]
                 ]
             ]
@@ -221,9 +211,9 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider formDataProvider
      */
-    public function testSubmitNew(array $data, array $expectedDefinition, $segmentName)
+    public function testSubmitNew(array $data, array $expectedDefinition, string $segmentName)
     {
-        $entityClass = '\stdClass';
+        $entityClass = \stdClass::class;
         $options = [
             'segment_entity' => $entityClass,
             'add_name_field' => true
@@ -261,7 +251,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($segmentType, $submittedData->getType());
         $this->assertEquals($owner, $submittedData->getOwner());
         $this->assertEquals($organization, $submittedData->getOrganization());
-        static::assertStringContainsString($segmentName, $submittedData->getName());
+        self::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertJsonStringEqualsJsonString(
             QueryDefinitionUtil::encodeDefinition($expectedDefinition),
             $submittedData->getDefinition()
@@ -271,7 +261,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider formDataProvider
      */
-    public function testSubmitNewWhenNoUserInStorage(array $data, array $expectedDefinition, $segmentName)
+    public function testSubmitNewWhenNoUserInStorage(array $data, array $expectedDefinition, string $segmentName)
     {
         $entityClass = \stdClass::class;
         $options = [
@@ -303,7 +293,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($segmentType, $submittedData->getType());
         $this->assertNull($submittedData->getOwner());
         $this->assertNull($submittedData->getOrganization());
-        static::assertStringContainsString($segmentName, $submittedData->getName());
+        self::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertJsonStringEqualsJsonString(
             QueryDefinitionUtil::encodeDefinition($expectedDefinition),
             $submittedData->getDefinition()
@@ -313,9 +303,9 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider formDataProvider
      */
-    public function testSubmitExisting(array $data, array $expectedDefinition, $segmentName)
+    public function testSubmitExisting(array $data, array $expectedDefinition, string $segmentName)
     {
-        $entityClass = '\stdClass';
+        $entityClass = \stdClass::class;
         $options = [
             'segment_entity' => $entityClass,
             'segment_columns' => ['id'],
@@ -339,7 +329,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $form->submit($data);
         /** @var Segment $submittedData */
         $submittedData = $form->getData();
-        static::assertStringContainsString($segmentName, $submittedData->getName());
+        self::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertInstanceOf(Segment::class, $submittedData);
         $this->assertJsonStringEqualsJsonString(
             QueryDefinitionUtil::encodeDefinition($expectedDefinition),
@@ -348,15 +338,14 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function formDataProvider()
+    public function formDataProvider(): array
     {
         return [
             'without columns' => [
                 'data' => [
-                    'entity' => '\stdClass',
+                    'entity' => \stdClass::class,
                     'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
@@ -392,7 +381,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ],
             'with columns' => [
                 'data' => [
-                    'entity' => '\stdClass',
+                    'entity' => \stdClass::class,
                     'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
@@ -436,7 +425,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ],
             'with custom name' => [
                 'data' => [
-                    'entity' => '\stdClass',
+                    'entity' => \stdClass::class,
                     'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
@@ -476,7 +465,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     public function testSubmitExistingWhenNoNameField()
     {
-        $entityClass = '\stdClass';
+        $entityClass = \stdClass::class;
         $options = [
             'segment_entity' => $entityClass,
             'segment_columns' => ['id'],
@@ -502,7 +491,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     public function testEventListenersOptions()
     {
         $isCalled = false;
-        $entityClass = '\stdClass';
+        $entityClass = \stdClass::class;
         $options = [
             'segment_entity' => $entityClass,
             'segment_columns' => ['id'],
@@ -538,7 +527,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     {
         $formView = new FormView();
 
-        /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
 
         $conditionBuilderValidation = [
@@ -573,7 +561,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($fieldConditionOptions, $formView->vars['field_condition_options']);
     }
 
-    protected function assertNormalizersCalls($entityClass)
+    private function assertNormalizersCalls(string $entityClass): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects($this->once())

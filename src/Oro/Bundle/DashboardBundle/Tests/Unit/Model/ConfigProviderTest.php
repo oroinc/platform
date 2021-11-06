@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle;
@@ -141,12 +142,12 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testHasWidgetConfigForUnknownWidget()
     {
-        static::assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
+        self::assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
     }
 
     public function testGetWidgetConfigForUnknownWidget()
     {
-        $this->expectException(\Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for: unknown");
 
         $this->configurationProvider->getWidgetConfig('unknown');
@@ -154,17 +155,17 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWidgetConfigForUnknownWidgetIfExceptioNotAllowed()
     {
-        static::assertNull($this->configurationProvider->getWidgetConfig('unknown', false));
+        self::assertNull($this->configurationProvider->getWidgetConfig('unknown', false));
     }
 
     public function testHasDashboardConfigForUnknownDashboard()
     {
-        static::assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
+        self::assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
     }
 
     public function testGetDashboardConfigForUnknownDashboard()
     {
-        $this->expectException(\Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for: unknown");
 
         $this->configurationProvider->getDashboardConfig('unknown');

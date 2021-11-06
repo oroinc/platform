@@ -16,9 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberRangeFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var NumberRangeFilterType
-     */
+    /** @var NumberRangeFilterType */
     protected $type;
 
     /**
@@ -57,7 +55,7 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
      */
     protected function createMockOptionsResolver()
     {
-        return $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        return $this->createMock(OptionsResolver::class);
     }
 
     /**
@@ -189,8 +187,7 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     private function createMockLocaleSettings()
     {
         $localeSettings = $this->createMock(LocaleSettings::class);
-        $localeSettings
-            ->expects(self::any())
+        $localeSettings->expects(self::any())
             ->method('getLocale')
             ->willReturn('en');
 

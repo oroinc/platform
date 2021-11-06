@@ -8,9 +8,8 @@ use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
-use PHPUnit\Framework\TestCase;
 
-class BigNumberDateHelperTest extends TestCase
+class BigNumberDateHelperTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -52,7 +51,7 @@ class BigNumberDateHelperTest extends TestCase
         $this->assertEquals($expectedWeekStart, $period['start']->format('l'));
     }
 
-    public function localeDataProvider()
+    public function localeDataProvider(): array
     {
         return [
             'US locale with start week day is Sunday' => [

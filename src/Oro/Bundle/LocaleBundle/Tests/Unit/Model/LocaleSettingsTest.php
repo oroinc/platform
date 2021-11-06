@@ -7,6 +7,7 @@ use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfi
 use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ThemeBundle\Model\Theme;
@@ -199,14 +200,13 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getLocaleByCountryDataProvider
-     *
-     * @param array $localeData
-     * @param string $countryCode
-     * @param string $expectedLocale
-     * @param string|null $defaultLocale
      */
-    public function testGetLocaleByCountry(array $localeData, $countryCode, $expectedLocale, $defaultLocale = null)
-    {
+    public function testGetLocaleByCountry(
+        array $localeData,
+        string $countryCode,
+        string $expectedLocale,
+        ?string $defaultLocale = null
+    ) {
         $this->localeSettings->addLocaleData($localeData);
 
         if (null !== $defaultLocale) {
@@ -226,10 +226,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedLocale, $this->localeSettings->getLocaleByCountry($countryCode));
     }
 
-    /**
-     * @return array
-     */
-    public function getLocaleByCountryDataProvider()
+    public function getLocaleByCountryDataProvider(): array
     {
         return [
             [
@@ -247,11 +244,9 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $expectedValue
-     * @param string $configurationValue
      * @dataProvider getLocaleDataProvider
      */
-    public function testGetLocale($expectedValue, $configurationValue)
+    public function testGetLocale(string $expectedValue, ?string $configurationValue)
     {
         $this->configManager->expects($this->once())
             ->method('get')
@@ -267,10 +262,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $this->localeSettings->getLocale());
     }
 
-    /**
-     * @return array
-     */
-    public function getLocaleDataProvider()
+    public function getLocaleDataProvider(): array
     {
         return [
             'configuration value' => [
@@ -322,7 +314,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTimeZoneDataProvider
      */
-    public function testGetTimeZone($expectedValue, $configurationValue)
+    public function testGetTimeZone(string $expectedValue, ?string $configurationValue)
     {
         $this->configManager->expects($this->once())
             ->method('get')
@@ -333,10 +325,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $this->localeSettings->getTimeZone());
     }
 
-    /**
-     * @return array
-     */
-    public function getTimeZoneDataProvider()
+    public function getTimeZoneDataProvider(): array
     {
         return [
             'configuration value' => [
@@ -391,7 +380,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
             ->with(42)
             ->willReturn(['id' => 42, 'formattingCode' => $expectedLocale, 'languageCode' => $expectedLanguage]);
 
-        $calendar = $this->createMock('Oro\Bundle\LocaleBundle\Model\Calendar');
+        $calendar = $this->createMock(Calendar::class);
 
         $this->calendarFactory->expects($this->once())->method('getCalendar')
             ->with($expectedLocale, $expectedLanguage)
@@ -407,7 +396,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->never())->method($this->anything());
 
-        $calendar = $this->createMock('Oro\Bundle\LocaleBundle\Model\Calendar');
+        $calendar = $this->createMock(Calendar::class);
 
         $this->calendarFactory->expects($this->once())->method('getCalendar')
             ->with($locale, $language)
@@ -431,11 +420,9 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $expectedValue
-     * @param string $configurationValue
      * @dataProvider getLanguageDataProvider
      */
-    public function testGetLanguage($expectedValue, $configurationValue)
+    public function testGetLanguage(string $expectedValue, ?string $configurationValue)
     {
         $this->configManager->expects($this->once())
             ->method('get')
@@ -453,10 +440,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
     }
 
-    /**
-     * @return array
-     */
-    public function getLanguageDataProvider()
+    public function getLanguageDataProvider(): array
     {
         return [
             'configuration value' => [
@@ -632,11 +616,8 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider localeProvider
-     *
-     * @param string $locale
-     * @param string $expectedCurrency
      */
-    public function testGetCountryByLocal($locale, $expectedCurrency)
+    public function testGetCountryByLocal(string $locale, string $expectedCurrency)
     {
         $currency = LocaleSettings::getCurrencyByLocale($locale);
 
@@ -645,10 +626,8 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * The USD is default currency
-     *
-     * @return array
      */
-    public function localeProvider()
+    public function localeProvider(): array
     {
         return [
             [
@@ -678,11 +657,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $locale
-     * @return bool|string
-     */
-    protected function getCurrencyBuLocale($locale)
+    private function getCurrencyBuLocale(string $locale): string
     {
         $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
 

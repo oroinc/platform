@@ -47,11 +47,16 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->repo = $this->createMock(ConfigRepository::class);
 
         $this->em = $this->createMock(EntityManager::class);
-        $this->em->expects($this->any())->method('getRepository')->with(Config::class)->willReturn($this->repo);
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with(Config::class)
+            ->willReturn($this->repo);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine */
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())->method('getManagerForClass')->with(Config::class)->willReturn($this->em);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(Config::class)
+            ->willReturn($this->em);
 
         $this->cache = new ArrayCache();
 
@@ -276,8 +281,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             'oro_user.boolean' => ['value' => '1', 'use_parent_scope_value' => false],
         ];
 
-        $this->configBag
-            ->expects($this->once())
+        $this->configBag->expects($this->once())
             ->method('getConfig')
             ->willReturn([
                 'fields' => [
@@ -340,8 +344,11 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->with($this->getScopedEntityName(), $scopeId)
             ->willReturn($config);
 
-        $this->em->expects($this->once())->method('remove')->with($this->identicalTo($config));
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())
+            ->method('remove')
+            ->with($this->identicalTo($config));
+        $this->em->expects($this->once())
+            ->method('flush');
 
         $this->configBag->expects($this->any())
             ->method('getConfig')
@@ -376,7 +383,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $newScopeId = $entityId ?: $this->manager->getScopeId();
         $this->dispatcher->expects($this->exactly($newScopeId ? 1 : 0))
             ->method('dispatch')
-            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(self::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeIdFromEntity($entity);
         $this->assertEquals($newScopeId, $this->manager->getScopeId());
@@ -388,7 +395,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $oldScopeId = $this->manager->getScopeId();
         $this->dispatcher->expects($this->exactly(0))
             ->method('dispatch')
-            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(self::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $entity = new \stdClass();
         $this->manager->setScopeIdFromEntity($entity);
@@ -416,8 +423,11 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->with($this->getScopedEntityName(), $scopeId)
             ->willReturn($config);
 
-        $this->em->expects($this->once())->method('persist')->with($this->identicalTo($config));
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($config));
+        $this->em->expects($this->once())
+            ->method('flush');
     }
 
     /**

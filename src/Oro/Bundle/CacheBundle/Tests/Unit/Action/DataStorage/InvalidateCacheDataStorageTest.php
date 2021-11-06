@@ -12,6 +12,6 @@ class InvalidateCacheDataStorageTest extends \PHPUnit\Framework\TestCase
 
         $storage->set('test', 145);
 
-        static::assertSame(145, $storage->get('test'));
+        self::assertSame(145, $storage->get('test'));
     }
 }

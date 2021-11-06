@@ -18,13 +18,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TagManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_TAG_NAME     = 'testName';
+    private const TEST_TAG_NAME = 'testName';
     private const TEST_NEW_TAG_NAME = 'testAnotherName';
-    private const TEST_TAG_ID       = 3333;
-    private const TEST_ENTITY_NAME  = 'test name';
-    private const TEST_RECORD_ID    = 1;
-    private const TEST_CREATED_ID   = 22;
-    private const TEST_USER_ID      = 'someID';
+    private const TEST_TAG_ID = 3333;
+    private const TEST_ENTITY_NAME = 'test name';
+    private const TEST_RECORD_ID = 1;
+    private const TEST_CREATED_ID = 22;
+    private const TEST_USER_ID = 'someID';
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
@@ -308,10 +308,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->manager->getTagsByEntityIds($entityClass, $ids));
     }
 
-    /**
-     * @return ArrayCollection|Tag[]
-     */
-    private function tagForPreparing()
+    private function tagForPreparing(): ArrayCollection
     {
         $tag1 = $this->createMock(Tag::class);
         $tag2 = $this->createMock(Tag::class);

@@ -5,14 +5,18 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Grid\InlineEditing\InlineEditColumnOpt
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Grid\InlineEditing\InlineEditColumnOptions\TagsGuesser;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class TagsGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityRoutingHelper|MockObject $entityRoutingHelper;
-    private AuthorizationCheckerInterface|MockObject $authorizationChecker;
-    private TagsGuesser $guesser;
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRoutingHelper;
+
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
+
+    /** @var TagsGuesser */
+    private $guesser;
 
     protected function setUp(): void
     {

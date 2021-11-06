@@ -8,14 +8,10 @@ use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 
 class ChannelDeleteActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DeleteManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DeleteManager|\PHPUnit\Framework\MockObject\MockObject */
     private $deleteManager;
 
-    /**
-     * @var ChannelDeleteActionHandler
-     */
+    /** @var ChannelDeleteActionHandler */
     private $handler;
 
     protected function setUp(): void
@@ -27,10 +23,10 @@ class ChannelDeleteActionHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleAction()
     {
-        $this->deleteManager->expects(static::once())
+        $this->deleteManager->expects(self::once())
             ->method('delete')
             ->willReturn(false);
 
-        static::assertFalse($this->handler->handleAction(new Channel()));
+        self::assertFalse($this->handler->handleAction(new Channel()));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
@@ -18,15 +19,13 @@ class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
-            ->addTypeExtension(
-                new DataBlockExtension()
-            )
+            ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
     }
 
     public function testGetFormShouldReturnExceptionIfNoFormIsDefinedForWidget()
     {
-        $this->expectException(\Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
         $this->assertFalse($provider->hasForm('quick_launchpad_without_form'));
 
@@ -45,24 +44,12 @@ class WidgetConfigurationFormProviderTest extends FormIntegrationTestCase
         $this->assertCount(2, $form);
     }
 
-    /**
-     * Parse config fixture and validate through processorDecorator
-     *
-     * @param string $path
-     *
-     * @return array
-     */
-    private function getConfig($path)
+    private function getConfig(string $path): array
     {
         return Yaml::parse(file_get_contents($path));
     }
 
-    /**
-     * @param string $configPath
-     *
-     * @return WidgetConfigurationFormProvider
-     */
-    private function getProviderWithConfigLoaded($configPath)
+    private function getProviderWithConfigLoaded(string $configPath): WidgetConfigurationFormProvider
     {
         $config = $this->getConfig($configPath);
         $configProvider = $this->createMock(ConfigProvider::class);

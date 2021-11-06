@@ -10,7 +10,7 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AbstractComposite */
-    protected $condition;
+    private $condition;
 
     protected function setUp(): void
     {
@@ -34,8 +34,8 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     {
         $operands = [$this->createMock(ExpressionInterface::class)];
 
-        static::assertSame($this->condition, $this->condition->initialize($operands));
-        static::assertEquals($operands, $this->condition->xgetOperands());
+        self::assertSame($this->condition, $this->condition->initialize($operands));
+        self::assertEquals($operands, $this->condition->xgetOperands());
     }
 
     public function testInitializeFailsWithEmptyElements()
@@ -49,7 +49,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     public function testInitializeFailsWithScalarElement()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Invalid type of option "0". Expected "%s", "string" given.',
             ExpressionInterface::class
         ));
@@ -60,7 +60,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     public function testInitializeFailsWithWrongInstanceElement()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Invalid type of option "0". Expected "%s", "stdClass" given.',
             ExpressionInterface::class
         ));

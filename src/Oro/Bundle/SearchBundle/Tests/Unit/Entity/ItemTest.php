@@ -14,10 +14,7 @@ use Oro\Bundle\SearchBundle\Entity\Item;
  */
 class ItemTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Oro\Bundle\SearchBundle\Entity\Item
-     */
-    private $item;
+    private Item $item;
 
     protected function setUp(): void
     {
@@ -170,21 +167,21 @@ class ItemTest extends \PHPUnit\Framework\TestCase
     public function testSaveItemData()
     {
         $this->item->saveItemData(
-            array(
-                'text' => array(
+            [
+                'text' => [
                     'test_field' => 'test text'
-                ),
-                'integer' => array(
+                ],
+                'integer' => [
                     'test_integer' => 10,
                     'test_integer_array' => [2, 3]
-                ),
-                'datetime' => array(
+                ],
+                'datetime' => [
                     'test_datetime' => new \DateTime('2013-01-01')
-                ),
-                'decimal' => array(
+                ],
+                'decimal' => [
                     'test_decimal' => 10.26
-                )
-            )
+                ]
+            ]
         );
 
         $textFields = $this->item->getTextFields();
@@ -200,12 +197,12 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(10.26, $decimalFields->get(0)->getValue());
 
         $this->item->saveItemData(
-            array(
-                'integer' => array(
+            [
+                'integer' => [
                     'test_integer' => 10,
                     'test_integer_array' => [5]
-                ),
-            )
+                ],
+            ]
         );
 
         $integerFields = $this->item->getIntegerFields();
@@ -215,11 +212,11 @@ class ItemTest extends \PHPUnit\Framework\TestCase
 
     public function testSetGetWeight()
     {
-        static::assertEquals(1.0, $this->item->getWeight());
+        self::assertEquals(1.0, $this->item->getWeight());
 
         $weight = 4.2;
         $this->item->setWeight($weight);
 
-        static::assertEquals($weight, $this->item->getWeight());
+        self::assertEquals($weight, $this->item->getWeight());
     }
 }

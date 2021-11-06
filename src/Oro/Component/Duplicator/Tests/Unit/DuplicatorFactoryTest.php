@@ -15,12 +15,13 @@ class DuplicatorFactoryTest extends \PHPUnit\Framework\TestCase
         $factory = new DuplicatorFactory();
         $filter = new SetNullFilter();
         $matcher = new PropertyNameMatcher('firstField');
-        /** @var FilterFactory|\PHPUnit\Framework\MockObject\MockObject $filterFactory */
-        $filterFactory = $this->createMock('Oro\Component\Duplicator\Filter\FilterFactory');
-        $filterFactory->expects($this->once())->method('create')->with('setNull', [])->willReturn($filter);
+        $filterFactory = $this->createMock(FilterFactory::class);
+        $filterFactory->expects($this->once())
+            ->method('create')
+            ->with('setNull', [])
+            ->willReturn($filter);
 
-        /** @var MatcherFactory|\PHPUnit\Framework\MockObject\MockObject $matcherFactory */
-        $matcherFactory = $this->createMock('Oro\Component\Duplicator\Matcher\MatcherFactory');
+        $matcherFactory = $this->createMock(MatcherFactory::class);
         $matcherFactory->expects($this->once())
             ->method('create')
             ->with('propertyName', ['firstField'])

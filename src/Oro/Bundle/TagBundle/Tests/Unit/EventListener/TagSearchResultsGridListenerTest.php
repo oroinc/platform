@@ -87,7 +87,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
             ['tag', $tagId]
         ];
 
-        if (strlen($alias) > 0) {
+        if ($alias) {
             $earMockBuilder = $this->entityAliasResolver->expects($this->once())
                 ->method('getClassByAlias')
                 ->with($alias);
@@ -115,7 +115,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBuildAfter($this->event);
     }
 
-    public function onBuildAfterDataProvider()
+    public function onBuildAfterDataProvider(): array
     {
         return [
             'empty parameter' => [''],

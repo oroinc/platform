@@ -10,7 +10,7 @@ class RemoveActivityAssociationQueryTest extends \PHPUnit\Framework\TestCase
     public function testInitialized()
     {
         $query = new RemoveActivityAssociationQuery('Some\Activity', 'Some\Entity', true);
-        static::assertEquals(
+        self::assertEquals(
             'Remove association relation from Some\Activity entity to Some\Entity '
             . '(association kind: activity, relation type: manyToMany, drop relation column/table: yes, '
             . 'source table: n/a, target table: n/a).',

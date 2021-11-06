@@ -30,6 +30,6 @@ class OroCurrencyExtensionTest extends ExtensionTestCase
 
     public function testGetAlias(): void
     {
-        static::assertEquals('oro_currency', (new OroCurrencyExtension())->getAlias());
+        self::assertEquals('oro_currency', (new OroCurrencyExtension())->getAlias());
     }
 }

@@ -24,7 +24,6 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
-
         $entityNameResolver->expects($this->any())
             ->method('getName')
             ->willReturnCallback(function (User $object) {
@@ -32,38 +31,33 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
             });
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-
-        $entityManager = $this->createMock(EntityManager::class);
-
         $this->query = $this->createMock(AbstractQuery::class);
 
         $aclHelper = $this->createMock(AclHelper::class);
-
         $aclHelper->expects($this->any())
             ->method('apply')
             ->willReturn($this->query);
-
-        $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $expr = $this->createMock(Expr::class);
         $expr->expects($this->any())
             ->method('in')
             ->willReturnSelf();
 
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->any())
             ->method('expr')
             ->willReturn($expr);
 
         $repository = $this->createMock(EntityRepository::class);
-
-        $entityManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repository);
-
         $repository->expects($this->any())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
 
         $this->converter = new WidgetEntitySelectConverter(
             $aclHelper,

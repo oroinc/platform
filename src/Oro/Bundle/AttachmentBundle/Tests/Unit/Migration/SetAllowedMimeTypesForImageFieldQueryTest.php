@@ -10,17 +10,9 @@ use Psr\Log\LoggerInterface;
 
 class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var string */
-    private $className = 'Oro\Bundle\CatalogBundle\Tests\Unit\Stub\TestEntity1';
-
-    /** @var string */
-    private $fieldName = 'testField';
-
-    /** @var array */
-    private $mimeTypes = [
-        'testType1',
-        'testType2'
-    ];
+    private const CLASS_NAME = 'Oro\Bundle\CatalogBundle\Tests\Unit\Stub\TestEntity1';
+    private const FIELD_NAME = 'testField';
+    private const MIME_TYPES = ['testType1', 'testType2'];
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
@@ -35,37 +27,38 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
     {
         $this->connection = $this->createMock(Connection::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->updateAttachmentOptionQuery = new SetAllowedMimeTypesForImageFieldQuery(
-            $this->className,
-            $this->fieldName,
-            $this->mimeTypes
+            self::CLASS_NAME,
+            self::FIELD_NAME,
+            self::MIME_TYPES
         );
     }
 
-    public function testExexuteWithoutRowResult()
+    public function testExecuteWithoutRowResult()
     {
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('fetchAssoc')
-            ->with($this->getSelectFromConfigField(), [$this->className, $this->fieldName])
+            ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn(null);
-        $this->connection->expects(static::never())
+        $this->connection->expects(self::never())
             ->method('convertToPHPValue');
-        $this->connection->expects(static::never())
+        $this->connection->expects(self::never())
             ->method('prepare');
         $this->updateAttachmentOptionQuery->setConnection($this->connection);
         $this->updateAttachmentOptionQuery->execute($this->logger);
     }
 
-    public function testExexuteWithMimeTypes()
+    public function testExecuteWithMimeTypes()
     {
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('fetchAssoc')
-            ->with($this->getSelectFromConfigField(), [$this->className, $this->fieldName])
+            ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
                 'data' =>'data persisted serialized',
                 'id' => 56
             ]);
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('convertToPHPValue')
             ->with('data persisted serialized', Types::ARRAY)
             ->willReturn([
@@ -76,9 +69,9 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
                 ]
             ]);
 
-        $this->connection->expects(static::never())
+        $this->connection->expects(self::never())
             ->method('convertToDatabaseValue');
-        $this->connection->expects(static::never())
+        $this->connection->expects(self::never())
             ->method('prepare');
         $this->updateAttachmentOptionQuery->setConnection($this->connection);
         $this->updateAttachmentOptionQuery->getDescription();
@@ -86,17 +79,17 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
 
     public function testGetDescription()
     {
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('fetchAssoc')
-            ->with($this->getSelectFromConfigField(), [$this->className, $this->fieldName])
+            ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
                 'data' => 'data persisted serialized',
                 'id' => 16
             ]);
-        $this->connection->expects(static::never())
+        $this->connection->expects(self::never())
             ->method('prepare');
 
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('convertToPHPValue')
             ->with('data persisted serialized', Types::ARRAY)
             ->willReturn([
@@ -105,7 +98,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
                 ]
             ]);
 
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('convertToDatabaseValue')
             ->with([
                 'attachment' => [
@@ -130,14 +123,14 @@ testType2'
 
     public function testExecute()
     {
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('fetchAssoc')
-            ->with($this->getSelectFromConfigField(), [$this->className, $this->fieldName])
+            ->with($this->getSelectFromConfigField(), [self::CLASS_NAME, self::FIELD_NAME])
             ->willReturn([
                 'data' =>'data persisted serialized',
                 'id' => 16
             ]);
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('convertToPHPValue')
             ->with('data persisted serialized', Types::ARRAY)
             ->willReturn([
@@ -146,7 +139,7 @@ testType2'
                 ]
             ]);
 
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('convertToDatabaseValue')
             ->with([
                 'attachment' => [
@@ -157,21 +150,18 @@ testType2'
             ], Types::ARRAY)
             ->willReturn('data serialized to persist');
         $statement = $this->createMock(Statement::class);
-        $this->connection->expects(static::once())
+        $this->connection->expects(self::once())
             ->method('prepare')
             ->with($this->getUpdateFromConfigField())
             ->willReturn($statement);
-        $statement->expects(static::once())
+        $statement->expects(self::once())
             ->method('execute')
             ->with(['data serialized to persist', 16]);
         $this->updateAttachmentOptionQuery->setConnection($this->connection);
         $this->updateAttachmentOptionQuery->execute($this->logger);
     }
 
-    /**
-     * @return string
-     */
-    private function getSelectFromConfigField()
+    private function getSelectFromConfigField(): string
     {
         return 'SELECT f.id, f.data
             FROM oro_entity_config_field as f
@@ -180,10 +170,7 @@ testType2'
             AND field_name = ?';
     }
 
-    /**
-     * @return string
-     */
-    private function getUpdateFromConfigField()
+    private function getUpdateFromConfigField(): string
     {
         return 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
     }

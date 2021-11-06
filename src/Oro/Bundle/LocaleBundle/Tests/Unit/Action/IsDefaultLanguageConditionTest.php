@@ -21,30 +21,33 @@ class IsDefaultLanguageConditionTest extends \PHPUnit\Framework\TestCase
     private IsDefaultLanguageCondition $condition1;
     private IsDefaultLanguageCondition $condition2;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $configManager = $this->createMock(ConfigManager::class);
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $languageRepository = $this->createMock(LanguageRepository::class);
-        $doctrine->method('getRepository')->willReturnMap([
-            [Language::class, null, $languageRepository]
-        ]);
-
         $this->otherCode = 'fr_FR';
         $this->defaultCode = 'de_DE';
 
-        $configManager->method('get')->willReturnMap([
-            [Configuration::getConfigKeyByName(Configuration::LANGUAGE), false, false, null, $this->defaultCode]
-        ]);
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects(self::any())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::LANGUAGE))
+            ->willReturn($this->defaultCode);
 
         $this->otherLanguage = (new Language())->setCode($this->otherCode);
         $this->defaultLanguage = (new Language())->setCode($this->defaultCode);
 
-        $languageRepository->method('findOneBy')->willReturnMap([
-            [['code' => $this->otherCode], null, $this->otherLanguage],
-            [['code' => $this->defaultCode], null, $this->defaultLanguage],
-        ]);
+        $languageRepository = $this->createMock(LanguageRepository::class);
+        $languageRepository->expects(self::any())
+            ->method('findOneBy')
+            ->willReturnMap([
+                [['code' => $this->otherCode], null, $this->otherLanguage],
+                [['code' => $this->defaultCode], null, $this->defaultLanguage],
+            ]);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($languageRepository);
 
         $this->condition1 = new IsDefaultLanguageCondition($configManager, $doctrine);
         $this->condition2 = new IsDefaultLanguageCondition($configManager, $doctrine);
@@ -57,16 +60,16 @@ class IsDefaultLanguageConditionTest extends \PHPUnit\Framework\TestCase
     {
         $context = [];
 
-        static::assertFalse($this->condition1->initialize([$this->otherCode])->evaluate($context));
-        static::assertTrue($this->condition2->initialize([$this->defaultCode])->evaluate($context));
+        self::assertFalse($this->condition1->initialize([$this->otherCode])->evaluate($context));
+        self::assertTrue($this->condition2->initialize([$this->defaultCode])->evaluate($context));
     }
 
     public function testWithEntityValue(): void
     {
         $context = [];
 
-        static::assertFalse($this->condition1->initialize([$this->otherLanguage])->evaluate($context));
-        static::assertTrue($this->condition2->initialize([$this->defaultLanguage])->evaluate($context));
+        self::assertFalse($this->condition1->initialize([$this->otherLanguage])->evaluate($context));
+        self::assertTrue($this->condition2->initialize([$this->defaultLanguage])->evaluate($context));
     }
 
     public function testWithPropertyPathToScalarValue(): void
@@ -79,8 +82,8 @@ class IsDefaultLanguageConditionTest extends \PHPUnit\Framework\TestCase
         $this->condition1->initialize([new PropertyPath('$.language1')]);
         $this->condition2->initialize([new PropertyPath('$.language2')]);
 
-        static::assertFalse($this->condition1->evaluate($context));
-        static::assertTrue($this->condition2->evaluate($context));
+        self::assertFalse($this->condition1->evaluate($context));
+        self::assertTrue($this->condition2->evaluate($context));
     }
 
     public function testWithPropertyPathToEntityValue(): void
@@ -93,7 +96,7 @@ class IsDefaultLanguageConditionTest extends \PHPUnit\Framework\TestCase
         $this->condition1->initialize([new PropertyPath('$.language1')]);
         $this->condition2->initialize([new PropertyPath('$.language2')]);
 
-        static::assertFalse($this->condition1->evaluate($context));
-        static::assertTrue($this->condition2->evaluate($context));
+        self::assertFalse($this->condition1->evaluate($context));
+        self::assertTrue($this->condition2->evaluate($context));
     }
 }

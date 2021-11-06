@@ -33,7 +33,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($query);
         $searchQb->expects($this->any())
             ->method($this->anything())
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
@@ -52,17 +52,17 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
                 $qb->expects($this->once())
                     ->method('andWhere')
                     ->with($tableAlias . '.entityName IN(:allowedEntities)')
-                    ->will($this->returnSelf());
+                    ->willReturnSelf();
                 $qb->expects($this->once())
                     ->method('setParameter')
                     ->with('allowedEntities', $expectedAllowedEntities)
-                    ->will($this->returnSelf());
+                    ->willReturnSelf();
             }
         } else {
             $qb->expects($this->once())
                 ->method('andWhere')
                 ->with('1 = 0')
-                ->will($this->returnSelf());
+                ->willReturnSelf();
         }
 
         $searchSecurityProvider = $this->createMock(SearchSecurityProvider::class);

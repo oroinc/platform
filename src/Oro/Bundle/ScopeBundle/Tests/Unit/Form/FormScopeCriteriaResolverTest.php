@@ -12,21 +12,16 @@ use Symfony\Component\Form\FormInterface;
 
 class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $manager;
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /**
-     * @var FormScopeCriteriaResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormScopeCriteriaResolver */
     private $resolver;
 
     protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder(ScopeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(ScopeManager::class);
+
         $this->resolver = new FormScopeCriteriaResolver($this->manager);
     }
 

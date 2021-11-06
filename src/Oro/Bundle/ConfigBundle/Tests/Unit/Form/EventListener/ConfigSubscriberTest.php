@@ -6,7 +6,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -15,14 +14,14 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
+    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
     /** @var ConfigSubscriber */
-    protected $subscriber;
-
-    /** @var FormEvent|MockObject */
-    protected $event;
+    private $subscriber;
 
     protected function setUp(): void
     {
@@ -37,10 +36,17 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $data = ['oro_user___level' => ['use_parent_scope_value' => true]];
 
         $form = $this->prepareForm(new IntegerType());
-        $this->event->method('getForm')->willReturn($form);
-        $this->event->method('getData')->willReturn($data);
-        $this->configManager->expects(static::once())->method('get')->with('oro_user.level', true)->willReturn(20);
-        $this->event->expects(static::once())
+        $this->event->expects(self::any())
+            ->method('getForm')
+            ->willReturn($form);
+        $this->event->expects(self::any())
+            ->method('getData')
+            ->willReturn($data);
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('oro_user.level', true)
+            ->willReturn(20);
+        $this->event->expects(self::once())
             ->method('setData')
             ->with(\array_merge_recursive($data, [
                 'oro_user___level' => ['value' => 20]
@@ -55,9 +61,13 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $transformer = $this->createMock(ConfigFileDataTransformer::class);
         $form = $this->prepareForm(new ConfigFileType($transformer));
-        $this->event->method('getForm')->willReturn($form);
-        $this->event->method('getData')->willReturn($data);
-        $this->event->expects(static::once())
+        $this->event->expects(self::any())
+            ->method('getForm')
+            ->willReturn($form);
+        $this->event->expects(self::any())
+            ->method('getData')
+            ->willReturn($data);
+        $this->event->expects(self::once())
             ->method('setData')
             ->with(\array_merge_recursive($data, [
                 'oro_user___level' => ['value' => [
@@ -72,19 +82,30 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     private function prepareForm($innerType)
     {
         $resolvedType = $this->createMock(ResolvedFormTypeInterface::class);
-        $resolvedType->method('getInnerType')->willReturn($innerType);
+        $resolvedType->expects(self::any())
+            ->method('getInnerType')
+            ->willReturn($innerType);
 
         $config = $this->createMock(FormConfigInterface::class);
-        $config->method('getType')->willReturn($resolvedType);
+        $config->expects(self::any())
+            ->method('getType')
+            ->willReturn($resolvedType);
 
         $valueForm = $this->createMock(FormInterface::class);
-        $valueForm->method('getConfig')->willReturn($config);
+        $valueForm->expects(self::any())
+            ->method('getConfig')
+            ->willReturn($config);
 
         $childForm = $this->createMock(FormInterface::class);
-        $childForm->method('get')->with('value')->willReturn($valueForm);
+        $childForm->expects(self::any())
+            ->method('get')
+            ->with('value')
+            ->willReturn($valueForm);
 
         $form = $this->createMock(FormInterface::class);
-        $form->method('get')->willReturn($childForm);
+        $form->expects(self::any())
+            ->method('get')
+            ->willReturn($childForm);
 
         return $form;
     }

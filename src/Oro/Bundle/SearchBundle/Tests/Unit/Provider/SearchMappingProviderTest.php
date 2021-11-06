@@ -6,7 +6,6 @@ use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -14,8 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
-    protected $testMapping = [
+    private array $testMapping = [
         'Oro\TestBundle\Entity\TestEntity' => [
             'alias'  => 'test_entity',
             'fields' => [
@@ -33,14 +31,14 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var Cache|MockObject */
-    protected $cache;
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /** @var EventDispatcherInterface|MockObject */
-    protected $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /** @var MappingConfigurationProvider|MockObject */
-    protected $configProvider;
+    /** @var MappingConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
     protected function setUp(): void
     {
@@ -266,37 +264,46 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testClearCache(): void
     {
-        $this->cache->expects(static::once())
+        $this->cache->expects(self::once())
             ->method('delete')
             ->with('oro_search.mapping_config');
 
-        $this->cache->method('fetch')->willReturn(false);
-        $this->eventDispatcher->expects(static::once())
+        $this->cache->expects($this->any())
+            ->method('fetch')
+            ->willReturn(false);
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->willReturnCallback(function (SearchMappingCollectEvent $event) {
                 $event->setMappingConfig($this->testMapping);
 
                 return $event;
             });
-        $this->configProvider->expects(static::never())->method('clearCache');
-        $this->configProvider->expects(static::never())->method('warmUpCache');
+        $this->configProvider->expects(self::never())
+            ->method('clearCache');
+        $this->configProvider->expects(self::never())
+            ->method('warmUpCache');
 
         $provider = $this->getProvider(false);
         $provider->clearCache();
-        static::assertEquals($this->testMapping, $provider->getMappingConfig());
+        self::assertEquals($this->testMapping, $provider->getMappingConfig());
     }
 
     public function testWarmUpCache(): void
     {
-        $this->cache->expects(static::once())->method('delete')->with('oro_search.mapping_config');
-        $this->cache->expects(static::once())->method('fetch')->with('oro_search.mapping_config')->willReturn(false);
-        $this->eventDispatcher->expects(static::once())
+        $this->cache->expects(self::once())
+            ->method('delete')
+            ->with('oro_search.mapping_config');
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->with('oro_search.mapping_config')
+            ->willReturn(false);
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                static::logicalAnd(
-                    static::isInstanceOf(SearchMappingCollectEvent::class),
-                    static::callback(function (SearchMappingCollectEvent $event) {
-                        return static::equalTo($this->testMapping)->evaluate($event->getMappingConfig());
+                self::logicalAnd(
+                    self::isInstanceOf(SearchMappingCollectEvent::class),
+                    self::callback(function (SearchMappingCollectEvent $event) {
+                        return self::equalTo($this->testMapping)->evaluate($event->getMappingConfig());
                     })
                 ),
                 'oro_search.search_mapping_collect'
@@ -310,10 +317,10 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $provider = $this->getProvider(false);
         $provider->warmUpCache();
 
-        static::assertEquals($this->testMapping, $provider->getMappingConfig());
+        self::assertEquals($this->testMapping, $provider->getMappingConfig());
     }
 
-    protected function getProvider(bool $mockFetch = true): SearchMappingProvider
+    private function getProvider(bool $mockFetch = true): SearchMappingProvider
     {
         $provider = new SearchMappingProvider(
             $this->eventDispatcher,

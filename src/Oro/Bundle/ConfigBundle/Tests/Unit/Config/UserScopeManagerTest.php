@@ -21,7 +21,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     protected $manager;
 
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $securityContext;
+    private $securityContext;
 
     protected function setUp(): void
     {
@@ -35,9 +35,13 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     public function testInitializeScopeId()
     {
         $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())->method('getUser')->willReturn($this->getScopedEntity());
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($this->getScopedEntity());
 
-        $this->securityContext->expects($this->once())->method('getToken')->willReturn($token);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->assertEquals(123, $this->manager->getScopeId());
     }
@@ -45,9 +49,13 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     public function testInitializeScopeIdForNewUser()
     {
         $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())->method('getUser')->willReturn(new User());
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn(new User());
 
-        $this->securityContext->expects($this->once())->method('getToken')->willReturn($token);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->assertEquals(0, $this->manager->getScopeId());
     }
@@ -55,27 +63,34 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     public function testInitializeScopeIdForUnsupportedUserObject()
     {
         $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())->method('getUser')->willReturn('test user');
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn('test user');
 
-        $this->securityContext->expects($this->once())->method('getToken')->willReturn($token);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->assertEquals(0, $this->manager->getScopeId());
     }
 
     public function testInitializeScopeIdNoToken()
     {
-        $this->securityContext->expects($this->once())->method('getToken')->willReturn(null);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn(null);
 
         $this->assertEquals(0, $this->manager->getScopeId());
     }
 
     public function testSetScopeId()
     {
-        $this->securityContext->expects($this->never())->method('getToken');
+        $this->securityContext->expects($this->never())
+            ->method('getToken');
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(self::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeId(456);
 

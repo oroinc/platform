@@ -4,7 +4,9 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\CurrencyBundle\EventListener\AclLoadFieldMetadataListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 
@@ -21,8 +23,7 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit\Framework\TestCase
         ];
         $event = new LoadFieldsMetadata($className, $fields);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject $multicurrencyProvider */
-        $multicurrencyProvider = $this->createMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
+        $multicurrencyProvider = $this->createMock(ConfigProvider::class);
         $multicurrencyProvider->expects($this->once())
             ->method('filter')
             ->willReturn([
@@ -47,8 +48,7 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit\Framework\TestCase
                 )
             ]);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject $entityProvider */
-        $entityProvider = $this->createMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
+        $entityProvider = $this->createMock(ConfigProvider::class);
         $entityProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, 'field2')
@@ -61,8 +61,7 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject $configManager */
-        $configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->withConsecutive(['multicurrency'], ['entity'])

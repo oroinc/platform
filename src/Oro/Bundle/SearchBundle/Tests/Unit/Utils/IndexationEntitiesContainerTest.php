@@ -55,7 +55,7 @@ class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
 
         $this->container->addEntity($obj);
 
-        static::assertEquals([\stdClass::class => [spl_object_hash($obj) => $obj]], $this->container->getEntities());
+        self::assertEquals([\stdClass::class => [spl_object_hash($obj) => $obj]], $this->container->getEntities());
     }
 
     public function testRemoveEntities()

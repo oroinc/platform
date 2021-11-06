@@ -6,9 +6,7 @@ use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
 
 class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NonPrintableCharsStringSanitizer
-     */
+    /** @var NonPrintableCharsStringSanitizer */
     private $sanitizer;
 
     protected function setUp(): void
@@ -18,21 +16,15 @@ class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider removeNonPrintableCharactersDataProvider
-     *
-     * @param string $string
-     * @param string $expectedString
      */
-    public function testRemoveNonPrintableCharacters($string, $expectedString)
+    public function testRemoveNonPrintableCharacters(string $string, string $expectedString)
     {
         $actualString = $this->sanitizer->removeNonPrintableCharacters($string);
 
-        static::assertEquals($expectedString, $actualString);
+        self::assertEquals($expectedString, $actualString);
     }
 
-    /**
-     * @return array
-     */
-    public function removeNonPrintableCharactersDataProvider()
+    public function removeNonPrintableCharactersDataProvider(): array
     {
         $lineFeedCode = 10;
         $simpleSpaceCode = 32;

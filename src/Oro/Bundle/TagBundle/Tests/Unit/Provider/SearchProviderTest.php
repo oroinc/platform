@@ -18,17 +18,17 @@ class SearchProviderTest extends \PHPUnit\Framework\TestCase
     private const TEST_ID = 1;
     private const TEST_ENTITY_NAME = 'name';
 
-    /** @var SearchProvider */
-    private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $mapper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
+    private $mapper;
+
+    /** @var SecurityProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $securityProvider;
+
+    /** @var SearchProvider */
+    private $provider;
 
     protected function setUp(): void
     {
