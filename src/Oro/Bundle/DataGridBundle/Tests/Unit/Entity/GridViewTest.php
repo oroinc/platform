@@ -12,15 +12,15 @@ class GridViewTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provider
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $gridView = new GridView();
 
-        call_user_func_array(array($gridView, 'set' . ucfirst($property)), array($value));
-        static::assertEquals($value, call_user_func_array(array($gridView, 'get' . ucfirst($property)), array()));
+        call_user_func([$gridView, 'set' . ucfirst($property)], $value);
+        self::assertEquals($value, call_user_func_array([$gridView, 'get' . ucfirst($property)], []));
     }
 
-    public function provider()
+    public function provider(): array
     {
         $user = new User();
         $user->setUsername('username');
@@ -61,6 +61,6 @@ class GridViewTest extends \PHPUnit\Framework\TestCase
         );
         $expectedView->setLabel('name');
         $expectedView->setAppearanceData(['a' => 'av']);
-        static::assertEquals($expectedView, $gridView->createView());
+        self::assertEquals($expectedView, $gridView->createView());
     }
 }

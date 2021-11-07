@@ -104,7 +104,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
         $repository = $this->createMock(ReminderRepository::class);
         $repository->expects($this->once())
             ->method('findRequestedReminders')
-            ->with($this->equalTo($user))
+            ->with($user)
             ->willReturn($reminders);
         $this->entityManager->expects($this->once())
             ->method('getRepository')

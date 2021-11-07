@@ -172,7 +172,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function valueProvider()
+    public function valueProvider(): array
     {
         $sampleQuery = $this->createSearchQuery();
         $sampleQuery->value('product');
@@ -186,7 +186,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function itemProvider()
+    public function itemProvider(): array
     {
         $sampleQuery = $this->createSearchQuery();
         $sampleQuery->value('product');

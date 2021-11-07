@@ -118,10 +118,7 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
         }
     }
 
-    /**
-     * @return array
-     */
-    public function validationDataProvider()
+    public function validationDataProvider(): array
     {
         return [
             ['category', null, true, []],

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -144,7 +145,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyRemindersProvider
      */
-    public function testSaveRemindersEmpty($reminders)
+    public function testSaveRemindersEmpty(Collection|array $reminders)
     {
         $entityId = 101;
         $entity = $this->createMock(RemindableInterface::class);
@@ -166,7 +167,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->saveReminders($entity);
     }
 
-    public function emptyRemindersProvider()
+    public function emptyRemindersProvider(): array
     {
         $remindersPersistentCollection = $this->createMock(RemindersPersistentCollection::class);
         $remindersPersistentCollection->expects(self::any())

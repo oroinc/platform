@@ -50,7 +50,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     public function testBuildForm(
         $data,
         array $viewData,
-        array $options = array()
+        array $options = []
     ) {
         $form = $this->factory->create(OroPercentType::class, $data, $options);
         $view = $form->createView();
@@ -61,28 +61,25 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 'data'     => 0.1123,
-                'viewData' => array(
+                'viewData' => [
                     'value' => '11.23'
-                ),
-            ),
-            'custom precision' => array(
+                ],
+            ],
+            'custom precision' => [
                 'data'     => 0.1122,
-                'viewData' => array(
+                'viewData' => [
                     'value' => '11'
-                ),
-                'options' => array(
+                ],
+                'options' => [
                     'scale' => 0
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -94,7 +91,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     public function testSubmitForm(
         $data,
         $expectedData,
-        array $options = array()
+        array $options = []
     ) {
         $form = $this->factory->create(OroPercentType::class, null, $options);
         $form->submit($data);
@@ -102,10 +99,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         self::assertSame($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitFormDataProvider()
+    public function submitFormDataProvider(): array
     {
         return [
             'unspecified precision, with numbers after decimal point'                                       => [

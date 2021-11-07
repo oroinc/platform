@@ -25,11 +25,8 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider renameTableProvider
-     *
-     * @param AbstractPlatform $platform
-     * @param string $expectedSql
      */
-    public function testRenameTable(AbstractPlatform $platform, $expectedSql)
+    public function testRenameTable(AbstractPlatform $platform, string|array $expectedSql)
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -74,7 +71,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider renameColumnProvider
      */
-    public function testRenameColumn($platform, $expectedSql)
+    public function testRenameColumn(AbstractPlatform $platform, string $expectedSql)
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -106,7 +103,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addIndexProvider
      */
-    public function testAddIndex($platform, $expectedSql)
+    public function testAddIndex(AbstractPlatform $platform, string $expectedSql)
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -125,7 +122,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addUniqueIndexProvider
      */
-    public function testUniqueAddIndex($platform, $expectedSql)
+    public function testUniqueAddIndex(AbstractPlatform $platform, string $expectedSql)
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -144,7 +141,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addForeignKeyConstraintProvider
      */
-    public function testAddForeignKeyConstraint($platform, $expectedSql)
+    public function testAddForeignKeyConstraint(AbstractPlatform $platform, string $expectedSql)
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -169,7 +166,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedSql, $query->getDescription());
     }
 
-    public function renameTableProvider()
+    public function renameTableProvider(): array
     {
         return [
             'mysql' => [new MySqlPlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
@@ -180,15 +177,15 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
                     "DECLARE @sql NVARCHAR(MAX) = N''; "
                     . "SELECT @sql += N'EXEC sp_rename N''' + dc.name + ''', N'''"
                     . " + REPLACE(dc.name, '50BD45A0', 'EBFCC9B') + ''', ''OBJECT'';' "
-                    . "FROM sys.default_constraints dc JOIN sys.tables tbl ON dc.parent_object_id = tbl.object_id "
+                    . 'FROM sys.default_constraints dc JOIN sys.tables tbl ON dc.parent_object_id = tbl.object_id '
                     . "WHERE tbl.name = 'new_table';"
-                    . "EXEC sp_executesql @sql"
+                    . 'EXEC sp_executesql @sql'
                 ]
             ],
         ];
     }
 
-    public function renameTableWithSequencesProvider()
+    public function renameTableWithSequencesProvider(): array
     {
         return [
             'postgre' => [
@@ -207,7 +204,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function renameColumnProvider()
+    public function renameColumnProvider(): array
     {
         return [
             [new MySqlPlatform(), 'ALTER TABLE test_table CHANGE old_column new_column VARCHAR(100) NOT NULL'],
@@ -217,7 +214,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function addIndexProvider()
+    public function addIndexProvider(): array
     {
         return [
             [new MySqlPlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
@@ -227,7 +224,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function addUniqueIndexProvider()
+    public function addUniqueIndexProvider(): array
     {
         return [
             [new MySqlPlatform(), 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column)'],
@@ -240,7 +237,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function addForeignKeyConstraintProvider()
+    public function addForeignKeyConstraintProvider(): array
     {
         return [
             [

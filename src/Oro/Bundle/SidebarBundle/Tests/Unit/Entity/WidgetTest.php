@@ -5,15 +5,14 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SidebarBundle\Entity\Widget;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class WidgetTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new Widget();
 
@@ -22,17 +21,16 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        $user = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
-        return array(
-            array('user', $user),
-            array('widgetName', 'test'),
-            array('placement', 'left'),
-            array('position', 1),
-            array('state', 'WIDGET_MAXIMIZED_HOVER'),
-            array('settings', array('a' => 'b')),
-            array('organization', new Organization())
-        );
+        return [
+            ['user', $this->createMock(UserInterface::class)],
+            ['widgetName', 'test'],
+            ['placement', 'left'],
+            ['position', 1],
+            ['state', 'WIDGET_MAXIMIZED_HOVER'],
+            ['settings', ['a' => 'b']],
+            ['organization', new Organization()]
+        ];
     }
 }

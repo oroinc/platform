@@ -12,9 +12,11 @@ use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -27,10 +29,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function invalidMessageProvider()
+    public function invalidMessageProvider(): array
     {
         return [
             [
@@ -50,98 +49,89 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidMessageProvider
-     *
-     * @param string $loggerMessage
-     * @param array $messageBody
      */
-    public function testShouldRejectMessageAndLogCriticalIfInvalidMessage($loggerMessage, $messageBody)
+    public function testShouldRejectMessageAndLogCriticalIfInvalidMessage(string $loggerMessage, array $messageBody)
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo($loggerMessage));
+            ->with($loggerMessage);
 
         $processor = new ExportMessageProcessor(
-            $this->createJobRunnerMock(),
+            $this->createMock(JobRunner::class),
             $this->createMock(FileManager::class),
             $logger
         );
 
         $message = new Message();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody(JSON::encode($messageBody));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageAndLogCriticalIfInvalidWriter()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo('Invalid format: "invalid_format"'));
+            ->with('Invalid format: "invalid_format"');
 
-        $writerChain = $this->createWriterChainMock();
-        $writerChain
-            ->expects($this->once())
+        $writerChain = $this->createMock(WriterChain::class);
+        $writerChain->expects($this->once())
             ->method('getWriter')
-            ->with($this->equalTo('invalid_format'))
+            ->with('invalid_format')
             ->willReturn(null);
 
         $processor = new ExportMessageProcessor(
-            $this->createJobRunnerMock(),
+            $this->createMock(JobRunner::class),
             $this->createMock(FileManager::class),
             $logger
         );
         $processor->setWriterChain($writerChain);
 
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'jobId' => 1,
             'parameters' => ['gridName' => 'grid_name'],
             'format' => 'invalid_format',
         ]));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldProcessExportAndReturnACK()
     {
         $exportResult = ['success' => true, 'readsCount' => 10, 'errorsCount' => 0];
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'));
+            ->with('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0');
 
         $job = new Job();
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
-            ->with($this->equalTo(1))
-            ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
+            ->with(1)
+            ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
                 return $callback($jobRunner, $job);
-            }));
+            });
 
-        $fileStreamWriter = $this->createFileStreamWriterMock();
+        $fileStreamWriter = $this->createMock(FileStreamWriter::class);
 
-        $writerChain = $this->createWriterChainMock();
-        $writerChain
-            ->expects($this->once())
+        $writerChain = $this->createMock(WriterChain::class);
+        $writerChain->expects($this->once())
             ->method('getWriter')
-            ->with($this->equalTo('csv'))
+            ->with('csv')
             ->willReturn($fileStreamWriter);
 
-        $connector = $this->createExportConnectorMock();
-        $exportProcessor = $this->createExportProcessorMock();
+        $connector = $this->createMock(DatagridExportConnector::class);
+        $exportProcessor = $this->createMock(ExportProcessor::class);
 
         $processor = new ExportMessageProcessor(
             $jobRunner,
@@ -152,9 +142,8 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setExportProcessor($exportProcessor);
         $processor->setExportConnector($connector);
 
-        $exportHandler = $this->createExportHandlerMock();
-        $exportHandler
-            ->expects($this->once())
+        $exportHandler = $this->createMock(ExportHandler::class);
+        $exportHandler->expects($this->once())
             ->method('handle')
             ->with(
                 $connector,
@@ -175,79 +164,15 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setExportHandler($exportHandler);
 
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'jobId' => 1,
             'parameters' => ['gridName' => 'grid_name'],
             'format' => 'csv',
             'batchSize' => 5000
         ]));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessor::ACK, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|WriterChain
-     */
-    private function createWriterChainMock()
-    {
-        return $this->createMock(WriterChain::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|FileStreamWriter
-     */
-    private function createFileStreamWriterMock()
-    {
-        return $this->createMock(FileStreamWriter::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
-     */
-    private function createExportHandlerMock()
-    {
-        return $this->createMock(ExportHandler::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExportProcessor
-     */
-    private function createExportProcessorMock()
-    {
-        return $this->createMock(ExportProcessor::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DatagridExportConnector
-     */
-    private function createExportConnectorMock()
-    {
-        return $this->createMock(DatagridExportConnector::class);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 }

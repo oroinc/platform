@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,7 +21,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    private const REPORT_CONNECTION_NAME        = 'report_connection';
+    private const REPORT_CONNECTION_NAME = 'report_connection';
     private const CUSTOM_REPORT_DATAGRID_PREFIX = 'acme_report_';
 
     /** @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -46,10 +46,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         $config = new Configuration();
         $config->setMetadataDriverImpl(new AnnotationDriver(
@@ -67,12 +64,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         return EntityManagerMock::create($connection, $config, $eventManager);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getDatagrid($name)
+    private function getDatagrid(string $name): DatagridInterface
     {
         $datagrid = $this->createMock(DatagridInterface::class);
         $datagrid->expects(self::any())
@@ -124,7 +116,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reportGridNameDataProvider
      */
-    public function testExecuteForReportDatagrid($gridName)
+    public function testExecuteForReportDatagrid(string $gridName)
     {
         $em = $this->getEntityManager();
         $datagrid = $this->getDatagrid($gridName);
@@ -154,7 +146,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($connection, $em->getConnection());
     }
 
-    public function reportGridNameDataProvider()
+    public function reportGridNameDataProvider(): array
     {
         return [
             [Report::GRID_PREFIX . 'test'],

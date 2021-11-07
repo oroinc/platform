@@ -29,34 +29,22 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     private const USERNAME = 'sampleUsername';
     private const CLIENT_STORAGE_TTL = 100;
 
-    /**
-     * @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedClientManipulator;
 
-    /**
-     * @var ClientStorage
-     */
+    /** @var ClientStorage */
     private $clientStorage;
 
-    /**
-     * @var UserProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var UserProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $userProvider;
 
-    /**
-     * @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ticketProvider;
 
-    /**
-     * @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $websocketAuthenticationProvider;
 
-    /**
-     * @var ClientManipulator
-     */
+    /** @var ClientManipulator */
     private $clientManipulator;
 
     protected function setUp(): void
@@ -82,14 +70,12 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     {
         $connection = $this->createConnection();
 
-        $this->clientStorage
-            ->expects(self::any())
+        $this->clientStorage->expects(self::any())
             ->method('getStorageId')
             ->with($connection)
             ->willReturn(self::CONNECTION_RESOURCE_ID);
 
-        $this->clientStorage
-            ->expects(self::once())
+        $this->clientStorage->expects(self::once())
             ->method('getClient')
             ->with(self::CONNECTION_RESOURCE_ID)
             ->willThrowException(new StorageException());
@@ -105,13 +91,11 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     {
         $connection = $this->createConnection();
 
-        $this->clientStorage
-            ->expects(self::any())
+        $this->clientStorage->expects(self::any())
             ->method('getStorageId')
             ->with($connection)
             ->willReturn(self::CONNECTION_RESOURCE_ID);
-        $this->clientStorage
-            ->expects(self::once())
+        $this->clientStorage->expects(self::once())
             ->method('getClient')
             ->with(self::CONNECTION_RESOURCE_ID)
             ->willThrowException(new ClientNotFoundException());
@@ -134,15 +118,13 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
             AuthenticationProviderInterface::USERNAME_NONE_PROVIDED
         );
 
-        $this->clientStorage
-            ->expects(self::any())
+        $this->clientStorage->expects(self::any())
             ->method('getStorageId')
             ->with($connection)
             ->willReturn(self::CONNECTION_RESOURCE_ID);
 
         $call = 0;
-        $this->clientStorage
-            ->expects(self::exactly(2))
+        $this->clientStorage->expects(self::exactly(2))
             ->method('getClient')
             ->with(self::CONNECTION_RESOURCE_ID)
             ->willReturnCallback(static function () use (&$call, $token) {
@@ -185,15 +167,13 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(UserInterface::class);
         $token = new TicketToken($user, 'credentials', 'providerKey');
 
-        $this->clientStorage
-            ->expects(self::any())
+        $this->clientStorage->expects(self::any())
             ->method('getStorageId')
             ->with($connection)
             ->willReturn(self::CONNECTION_RESOURCE_ID);
 
         $call = 0;
-        $this->clientStorage
-            ->expects(self::exactly(2))
+        $this->clientStorage->expects(self::exactly(2))
             ->method('getClient')
             ->with(self::CONNECTION_RESOURCE_ID)
             ->willReturnCallback(static function () use (&$call, $token) {
@@ -231,12 +211,10 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testGetAll()
     {
         $anonymous = false;
-        /** @var Topic $topic */
         $topic = $this->createMock(Topic::class);
 
         $expectedResult = [new \stdClass(), new \stdClass()];
-        $this->decoratedClientManipulator
-            ->expects(self::once())
+        $this->decoratedClientManipulator->expects(self::once())
             ->method('getAll')
             ->with($topic, $anonymous)
             ->willReturn($expectedResult);
@@ -247,12 +225,10 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testFindByRoles()
     {
         $roles = ['sampleRole'];
-        /** @var Topic $topic */
         $topic = $this->createMock(Topic::class);
 
         $expectedResult = [new \stdClass(), new \stdClass()];
-        $this->decoratedClientManipulator
-            ->expects(self::once())
+        $this->decoratedClientManipulator->expects(self::once())
             ->method('findByRoles')
             ->with($topic, $roles)
             ->willReturn($expectedResult);
@@ -260,9 +236,6 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $this->clientManipulator->findByRoles($topic, $roles));
     }
 
-    /**
-     * @return ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function createConnection(): ConnectionInterface
     {
         $connection = $this->createMock(ConnectionInterface::class);

@@ -8,9 +8,6 @@ class ExecutionContextTest extends \PHPUnit\Framework\TestCase
 {
     private ExecutionContext $executionContext;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->executionContext = new ExecutionContext();

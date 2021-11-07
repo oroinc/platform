@@ -29,24 +29,17 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
     }
 
     /**
-     * @param array|ScheduleIntervalInterface[] $collection
+     * @param ScheduleIntervalInterface[] $collection
      *
      * @return ScheduleIntervalInterface[]
      */
     private function normalizeCollection(array $collection): array
     {
-        $collection = array_map(function ($dates) {
+        return array_map(function ($dates) {
             return $this->normalizeSingleDateData($dates);
         }, $collection);
-
-        return $collection;
     }
 
-    /**
-     * @param array $dates
-     *
-     * @return ScheduleIntervalInterface
-     */
     private function normalizeSingleDateData(array $dates): ScheduleIntervalInterface
     {
         $start = (null === $dates[0]) ? null : new \DateTime($dates[0]);

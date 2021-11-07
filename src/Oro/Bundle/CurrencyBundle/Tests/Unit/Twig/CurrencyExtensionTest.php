@@ -60,10 +60,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function formatCurrencyDataProvider()
+    public function formatCurrencyDataProvider(): array
     {
         return [
             '$1,234.5' => [

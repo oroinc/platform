@@ -4,6 +4,7 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\TestListener;
+use Symfony\Component\DependencyInjection\Container;
 
 class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,9 +30,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
             'test.listener2',
             'test.listener3',
         ];
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->container = $this->createMock(Container::class);
 
         $this->manager = new OptionalListenerManager($this->testListeners, $this->container);
     }
@@ -49,7 +48,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with($listenerId)
-            ->will($this->returnValue($testListener));
+            ->willReturn($testListener);
         $this->manager->disableListener($listenerId);
         $this->assertFalse($testListener->getEnabled());
     }
@@ -70,7 +69,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with($listenerId)
-            ->will($this->returnValue($testListener));
+            ->willReturn($testListener);
         $this->manager->disableListeners([$listenerId]);
         $this->assertFalse($testListener->getEnabled());
     }

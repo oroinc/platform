@@ -79,10 +79,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->dataConverter->convertToImportFormat($input));
     }
 
-    /**
-     * @return array
-     */
-    public function importDataDataProvider()
+    public function importDataDataProvider(): array
     {
         return [
             [
@@ -176,10 +173,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->dataConverter->convertToExportFormat($input));
     }
 
-    /**
-     * @return array
-     */
-    public function exportDataDataProvider()
+    public function exportDataDataProvider(): array
     {
         return [
             [

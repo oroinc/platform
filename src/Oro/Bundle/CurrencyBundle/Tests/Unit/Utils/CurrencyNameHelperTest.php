@@ -168,10 +168,7 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
         $this->assertEquals($expected, $currencyNameHelper->formatPrice($price, $options));
     }
 
-    /**
-     * @return array
-     */
-    public function formatCurrencyDataProvider()
+    public function formatCurrencyDataProvider(): array
     {
         return [
             '$1,234.5' => [

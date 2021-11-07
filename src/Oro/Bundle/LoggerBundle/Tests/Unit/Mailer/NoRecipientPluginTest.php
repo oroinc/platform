@@ -10,7 +10,7 @@ class NoRecipientPluginTest extends \PHPUnit\Framework\TestCase
     {
         $message = new \Swift_Message();
 
-        $event = $this->getMockBuilder(\Swift_Events_SendEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(\Swift_Events_SendEvent::class);
         $event->expects($this->once())
             ->method('getMessage')
             ->willReturn($message);
@@ -27,7 +27,7 @@ class NoRecipientPluginTest extends \PHPUnit\Framework\TestCase
         $message = new \Swift_Message();
         $message->setTo('recipient@example.com');
 
-        $event = $this->getMockBuilder(\Swift_Events_SendEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(\Swift_Events_SendEvent::class);
         $event->expects($this->once())
             ->method('getMessage')
             ->willReturn($message);

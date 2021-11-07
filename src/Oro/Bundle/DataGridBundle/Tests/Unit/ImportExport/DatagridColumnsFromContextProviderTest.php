@@ -20,31 +20,29 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
     /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $columnsStateProvider;
 
-    /** @var DatagridColumnsFromContextProvider */
-    private $datagridColumnsFromContextProvider;
-
     /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
+
+    /** @var DatagridColumnsFromContextProvider */
+    private $datagridColumnsFromContextProvider;
 
     protected function setUp(): void
     {
         $this->datagridManager = $this->createMock(Manager::class);
         $this->columnsStateProvider = $this->createMock(DatagridStateProviderInterface::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
         $this->datagridColumnsFromContextProvider = new DatagridColumnsFromContextProvider(
             $this->datagridManager,
             $this->columnsStateProvider
         );
-
-        $this->context = $this->createMock(ContextInterface::class);
     }
 
     public function testGetColumnsFromContextWhenColumnsWhenNoGridName(): void
     {
         $this->mockColumnsInContext($expectedColumns = ['sampleColumn1' => ['label' => 'Sample column']]);
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('hasOption')
             ->with('gridName')
             ->willReturn(false);
@@ -56,8 +54,7 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
 
     private function mockColumnsInContext(array $expectedColumns): void
     {
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('getValue')
             ->with('columns')
             ->willReturn($expectedColumns);
@@ -67,8 +64,7 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockColumnsInContext([]);
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('hasOption')
             ->with('gridName')
             ->willReturn(false);
@@ -87,14 +83,12 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->mockGridName($gridName = 'sampleGridName');
 
-        $this->datagridManager
-            ->expects(self::once())
+        $this->datagridManager->expects(self::once())
             ->method('getConfigurationForGrid')
             ->with($gridName)
             ->willReturn($datagridConfig = $this->createMock(DatagridConfiguration::class));
 
-        $datagridConfig
-            ->expects(self::once())
+        $datagridConfig->expects(self::once())
             ->method('offsetGet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn([]);
@@ -109,14 +103,11 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
 
     private function mockGridName(string $gridName): void
     {
-        $this->context
-            ->expects(self::any())
+        $this->context->expects(self::any())
             ->method('hasOption')
             ->with('gridName')
             ->willReturn(true);
-
-        $this->context
-            ->expects(self::any())
+        $this->context->expects(self::any())
             ->method('getOption')
             ->with('gridName')
             ->willReturn($gridName);
@@ -126,30 +117,26 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockColumnsInContext([]);
 
-        $this->context
-            ->expects(self::any())
+        $this->context->expects(self::any())
             ->method('hasOption')
             ->willReturnMap([
                 ['gridName', true],
                 ['gridParameters', false],
             ]);
 
-        $this->context
-            ->expects(self::any())
+        $this->context->expects(self::any())
             ->method('getOption')
             ->with('gridName')
             ->willReturn($gridName = 'sampleGridName');
 
-        $this->datagridManager
-            ->expects(self::once())
+        $this->datagridManager->expects(self::once())
             ->method('getConfigurationForGrid')
             ->with($gridName)
             ->willReturn($datagridConfig = $this->createMock(DatagridConfiguration::class));
 
         $expectedColumns = ['sampleColumn1' => ['label' => 'Sample column']];
 
-        $datagridConfig
-            ->expects(self::once())
+        $datagridConfig->expects(self::once())
             ->method('offsetGet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn($expectedColumns);
@@ -169,8 +156,7 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
     ): void {
         $this->mockColumnsInContext($gridColumns);
 
-        $this->context
-            ->expects(self::any())
+        $this->context->expects(self::any())
             ->method('hasOption')
             ->willReturnMap([
                 ['gridName', true],
@@ -179,28 +165,24 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
 
         $gridName = 'sampleGridName';
         $gridParameters = $this->createMock(ParameterBag::class);
-        $this->context
-            ->expects(self::any())
+        $this->context->expects(self::any())
             ->method('getOption')
             ->willReturnMap([
                 ['gridName', null, $gridName],
                 ['gridParameters', null, $gridParameters],
             ]);
 
-        $this->datagridManager
-            ->expects(self::once())
+        $this->datagridManager->expects(self::once())
             ->method('getConfigurationForGrid')
             ->with($gridName)
             ->willReturn($datagridConfig = $this->createMock(DatagridConfiguration::class));
 
-        $datagridConfig
-            ->expects(self::once())
+        $datagridConfig->expects(self::once())
             ->method('offsetSet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn($gridColumns);
 
-        $this->columnsStateProvider
-            ->expects(self::once())
+        $this->columnsStateProvider->expects(self::once())
             ->method('getState')
             ->with($datagridConfig, $gridParameters)
             ->willReturn($columnsState);

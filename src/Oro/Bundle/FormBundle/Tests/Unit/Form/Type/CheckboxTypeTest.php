@@ -60,10 +60,7 @@ class CheckboxTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $event->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormProvider()
+    public function buildFormProvider(): array
     {
         return [
             ['any value', 'any value'],

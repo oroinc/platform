@@ -25,7 +25,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     private $em;
 
     /** @var RelationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $relationHelper;
+    private $relationHelper;
 
     protected function setUp(): void
     {
@@ -58,12 +58,8 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
 
     /**
      * @dataProvider getCountQueryBuilderDataProvider
-     *
-     * @param callback    $queryBuilder
-     * @param string      $expectedDql
-     * @param string|null $platformClass
      */
-    public function testGetCountQueryBuilder($queryBuilder, $expectedDql, $platformClass = null)
+    public function testGetCountQueryBuilder(callable $queryBuilder, string $expectedDql, string $platformClass = null)
     {
         if (null !== $platformClass) {
             $this->em->getConnection()->setDatabasePlatform(new $platformClass());
@@ -71,9 +67,9 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
 
         $optimizer = new CountQueryBuilderOptimizer();
         $optimizer->setRelationHelper($this->relationHelper);
-        $countQb   = $optimizer->getCountQueryBuilder(call_user_func($queryBuilder, $this->em));
+        $countQb = $optimizer->getCountQueryBuilder($queryBuilder($this->em));
 
-        $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
+        $this->assertInstanceOf(QueryBuilder::class, $countQb);
         // Check for expected DQL
         $this->assertEquals($expectedDql, $countQb->getQuery()->getDQL());
         // Check that Optimized DQL can be converted to SQL
@@ -82,14 +78,13 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function getCountQueryBuilderDataProvider()
+    public function getCountQueryBuilderDataProvider(): array
     {
         return [
             'simple' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username']);
                 },
@@ -97,7 +92,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'simple with distinct id' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['DISTINCT u.id', 'u.username']);
                 },
@@ -105,7 +100,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'simple with distinct non id' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'DISTINCT u.username']);
                 },
@@ -113,7 +108,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'group_test' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as uName'])
                         ->groupBy('uName');
@@ -122,7 +117,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'function_having_test' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'SUBSTRING(u.username, 1, 3) as uName'])
                         ->groupBy('u.id')
@@ -135,7 +130,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'function_group_test' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'SUBSTRING(u.username, 1, 3) as uName'])
                         ->groupBy('uName');
@@ -146,7 +141,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'complex_group_by' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'SUBSTRING(u.username, 1, 3) as uName'])
                         ->groupBy('u.id, uName');
@@ -157,7 +152,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'one_table' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username'])
                         ->where('u.id=10')
@@ -172,7 +167,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'unused_left_join' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('Test:UserApi', 'api')
                         ->select(['u.id', 'u.username', 'api.apiKey']);
@@ -181,7 +176,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'unused_left_join_without_conditions' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.owner', 'o')
                         ->select('u.id, o.name');
@@ -190,7 +185,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'unused_left_join_with_condition' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.owner', 'o', Join::WITH, 'o.id = 123')
                         ->select('u.id, o.name');
@@ -199,7 +194,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'unused_left_join_with_condition_in_several_joins' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
                         ->leftJoin('bu.users', 'o', Join::WITH, 'o.id = 123')
@@ -211,7 +206,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'used_left_join' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('Test:UserApi', 'api')
                         ->select(['u.id', 'u.username', 'api.apiKey as aKey'])
@@ -224,7 +219,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'with_inner_join' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('u.businessUnits', 'bu')
                         ->leftJoin('bu.organization', 'o')
@@ -235,7 +230,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'with_inner_join_with_condition' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('Test:BusinessUnit', 'bu', Join::WITH, 'u.owner = bu.id')
                         ->leftJoin('Test:UserApi', 'api')
@@ -246,7 +241,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'with_inner_join_depends_on_left_join' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('Test:BusinessUnit', 'bu', Join::WITH, 'owner.id = bu.id')
                         ->leftJoin('u.owner', 'owner')
@@ -258,7 +253,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'with_mediate_inner_join' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:Group', 'g')
                         ->leftJoin('g.owner', 'bu')
                         ->innerJoin('bu.organization', 'o')
@@ -272,7 +267,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'inner_with_2_left_group' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('u.owner', 'bu')
                         ->leftJoin('u.groups', 'g')
@@ -289,7 +284,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'inner_with_2_left_group_and_having' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('u.owner', 'bu')
                         ->leftJoin('u.groups', 'g')
@@ -308,7 +303,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'inner_with_3_left_having' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('u.owner', 'bu')
                         ->leftJoin('u.groups', 'g')
@@ -327,7 +322,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'third_join_in_on' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->innerJoin('u.owner', 'bu')
                         ->leftJoin('u.groups', 'g')
@@ -347,7 +342,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_equal' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as login', 'api.apiKey as aKey'])
                         ->groupBy('u.id')
@@ -359,7 +354,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_in' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as login', 'api.apiKey as aKey'])
                         ->groupBy('u.id')
@@ -371,7 +366,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_like' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as login', 'api.apiKey as aKey'])
                         ->groupBy('u.id')
@@ -383,7 +378,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_is_null' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as login', 'api.apiKey as aKey'])
                         ->groupBy('u.id')
@@ -395,7 +390,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_is_not_null' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as login', 'api.apiKey as aKey'])
                         ->groupBy('u.id')
@@ -407,7 +402,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_instead_where' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'u.username as login', 'api.apiKey as aKey'])
                         ->having('login LIKE :test');
@@ -416,7 +411,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_by_expr_with_function_mysql' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['DATE(u.createdAt) as createdDate', 'COUNT(u.id) as count'])
                         ->groupBy('createdDate')
@@ -430,7 +425,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_by_expr_with_function_postgresql' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['DATE(u.createdAt) as createdDate', 'COUNT(u.id) as count'])
                         ->groupBy('createdDate')
@@ -444,7 +439,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_by_expr_with_nested_functions_mysql' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select([
                             'DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) as createdDate',
@@ -461,7 +456,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'having_by_expr_with_nested_functions_postgresql' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select([
                             'DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) as createdDate',
@@ -478,7 +473,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_on_table_that_has_with_join_condition' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('Test:UserEmail', 'e', Join::WITH, 'e.user = u')
@@ -493,7 +488,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_on_table_that_has_with_join_and_join_on_alias_condition' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('Test:UserEmail', 'e', Join::WITH, 'e.user = u')
@@ -508,7 +503,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_on_table_that_has_with_join_and_join_on_alias_condition_and_group_by' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('Test:UserEmail', 'e', Join::WITH, 'e.user = u')
@@ -526,7 +521,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_one_to_many_table_and_many_to_one_table' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('Test:Email', 'e', Join::WITH, 'u MEMBER OF e.users')
@@ -542,7 +537,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_one_to_many_table' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('Test:Email', 'e', Join::WITH, 'u MEMBER OF e.users');
@@ -552,7 +547,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'unidirectional_join_one_to_many_table' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('Test:EmailOrigin', 'eo', Join::WITH, 'eo MEMBER OF u.emailOrigins');
@@ -562,7 +557,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_many_to_many_table' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->select(['u.id'])
                         ->leftJoin('u.businessUnits', 'b');
@@ -572,7 +567,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'join_many_to_many_depends_on_one_to_one' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->select(['e.id'])
                         ->from('Test:EmailNotification', 'e')
                         ->leftJoin('e.recipientList', 'recipientList')
@@ -584,7 +579,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'several_from' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:Group', 'g')
                         ->from('Test:BusinessUnit', 'bu')
                         ->leftJoin('bu.organization', 'o')
@@ -594,7 +589,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'several_from_with_unused_crossed_dependency' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:Group', 'g')
                         ->from('Test:BusinessUnit', 'bu')
                         ->leftJoin('bu.organization', 'o')
@@ -605,7 +600,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'several_from_with_used_crossed_dependency' => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:Group', 'g')
                         ->from('Test:BusinessUnit', 'bu')
                         ->leftJoin('bu.organization', 'o')
@@ -620,58 +615,42 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     }
 
     /**
-     * @param EntityManager $entityManager
-     *
-     * @return QueryBuilder
-     */
-    public static function createQueryBuilder(EntityManager $entityManager)
-    {
-        return new QueryBuilder($entityManager);
-    }
-
-    /**
      * @dataProvider getCountQueryBuilderDataProviderWithEventDispatcher
-     *
-     * @param callback $queryBuilder
-     * @param array    $joinsToDelete
-     * @param string   $expectedDql
      */
-    public function testGetCountQueryBuilderWithEventDispatcher($queryBuilder, array $joinsToDelete, $expectedDql)
-    {
+    public function testGetCountQueryBuilderWithEventDispatcher(
+        callable $queryBuilder,
+        array $joinsToDelete,
+        string $expectedDql
+    ) {
         $optimizer = new CountQueryBuilderOptimizer();
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(
-                function (CountQueryOptimizationEvent $event, $eventName) use ($joinsToDelete) {
-                    if (count($joinsToDelete)) {
-                        foreach ($joinsToDelete as $deletedJoin) {
-                            $event->removeJoinFromOptimizedQuery($deletedJoin);
-                        }
+            ->willReturnCallback(function (CountQueryOptimizationEvent $event) use ($joinsToDelete) {
+                if (count($joinsToDelete)) {
+                    foreach ($joinsToDelete as $deletedJoin) {
+                        $event->removeJoinFromOptimizedQuery($deletedJoin);
                     }
-                    
-                    return $event;
                 }
-            );
-        $optimizer->setEventDispatcher($eventDispatcher);
-        $countQb = $optimizer->getCountQueryBuilder(call_user_func($queryBuilder, $this->em));
 
-        $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
+                return $event;
+            });
+        $optimizer->setEventDispatcher($eventDispatcher);
+        $countQb = $optimizer->getCountQueryBuilder($queryBuilder($this->em));
+
+        $this->assertInstanceOf(QueryBuilder::class, $countQb);
         // Check for expected DQL
         $this->assertEquals($expectedDql, $countQb->getQuery()->getDQL());
         // Check that Optimized DQL can be converted to SQL
         $this->assertNotEmpty($countQb->getQuery()->getSQL());
     }
 
-    /**
-     * @return array
-     */
-    public function getCountQueryBuilderDataProviderWithEventDispatcher()
+    public function getCountQueryBuilderDataProviderWithEventDispatcher(): array
     {
         return [
             'delete_one_join_table'                                     => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
                         ->leftJoin('bu.users', 'o', Join::WITH, 'o.id = 123')
@@ -683,7 +662,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_3th_join_table_without_deleting'              => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
                         ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
@@ -696,7 +675,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_3th_join_table_delete_main_join_table'        => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
                         ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
@@ -709,7 +688,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_3th_join_table_delete_3th_join_table'         => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:User', 'u')
                         ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
                         ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')
@@ -746,7 +725,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             ],
             'request_with_3_joins_2_manyToOne_through_oneToMany'        => [
                 'queryBuilder' => function ($em) {
-                    return self::createQueryBuilder($em)
+                    return (new QueryBuilder($em))
                         ->from('Test:EmailOrigin', 'eo')
                         ->leftJoin('eo.owner', 'u')
                         ->leftJoin('u.emails', 'primaryEmail', Join::WITH, 'primaryEmail.primary = true')
@@ -762,14 +741,9 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         ];
     }
 
-    /**
-     * @param EntityManager $entityManager
-     *
-     * @return QueryBuilder
-     */
-    private function getQueryBuilderWith3thJoinTables($entityManager)
+    private function getQueryBuilderWith3thJoinTables(EntityManager $em): QueryBuilder
     {
-        return self::createQueryBuilder($entityManager)
+        return (new QueryBuilder($em))
             ->from('Test:User', 'u')
             ->leftJoin('u.organization', 'o', Join::WITH, 'o.id = 456')
             ->leftJoin('o.businessUnits', 'businessUnits', Join::WITH, 'businessUnits.id = 123')

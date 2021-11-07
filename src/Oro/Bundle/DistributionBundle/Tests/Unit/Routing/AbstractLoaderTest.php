@@ -137,8 +137,5 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
      */
     abstract public function getLoaderWithoutEventDispatcher();
 
-    /**
-     * @return array
-     */
-    abstract public function loadDataProvider();
+    abstract public function loadDataProvider(): array;
 }

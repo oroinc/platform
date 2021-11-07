@@ -59,10 +59,7 @@ class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->handler->handle($this->configManager, $this->changeSet, $this->form));
     }
 
-    /**
-     * @return array
-     */
-    public function getHandleWithMailboxDataProvider()
+    public function getHandleWithMailboxDataProvider(): array
     {
         return [
             'empty data' => [

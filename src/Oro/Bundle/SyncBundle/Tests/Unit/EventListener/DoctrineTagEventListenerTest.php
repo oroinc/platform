@@ -14,20 +14,19 @@ use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;
 use Oro\Bundle\TestFrameworkBundle\Entity;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TagGeneratorInterface|MockObject */
+    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tagGenerator;
 
-    /** @var EntityManager|MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var UnitOfWork|MockObject */
+    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
     private $uow;
 
-    /** @var DataUpdateTopicSender|MockObject */
+    /** @var DataUpdateTopicSender|\PHPUnit\Framework\MockObject\MockObject */
     private $dataUpdateTopicSender;
 
     /** @var DoctrineTagEventListener */
@@ -40,7 +39,9 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->uow = $this->createMock(UnitOfWork::class);
         $applicationState = $this->createMock(ApplicationState::class);
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $this->em->expects(self::any())
             ->method('getUnitOfWork')

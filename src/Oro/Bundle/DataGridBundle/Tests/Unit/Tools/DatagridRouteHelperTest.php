@@ -8,27 +8,16 @@ use Symfony\Component\Routing\RouterInterface;
 class DatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
     /** @var DatagridRouteHelper */
-    protected $routeHelper;
+    private $routeHelper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
 
         $this->routeHelper = new DatagridRouteHelper($this->router);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->router, $this->routeHelper);
     }
 
     public function testGenerate()

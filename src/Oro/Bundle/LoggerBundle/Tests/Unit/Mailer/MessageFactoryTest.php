@@ -13,12 +13,12 @@ class MessageFactoryTest extends \PHPUnit\Framework\TestCase
         $messageFactory = new MessageFactory();
         $message = new \Swift_Message();
 
-        $mailer = $this->getMockBuilder(\Swift_Mailer::class)->disableOriginalConstructor()->getMock();
+        $mailer = $this->createMock(\Swift_Mailer::class);
         $mailer->expects($this->once())
             ->method('createMessage')
             ->willReturn($message);
 
-        $config = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
+        $config = $this->createMock(ConfigManager::class);
         $config->expects($this->exactly(3))
             ->method('get')
             ->willReturnMap(
@@ -62,7 +62,7 @@ class MessageFactoryTest extends \PHPUnit\Framework\TestCase
         $messageFactory = new MessageFactory();
         $message = new \Swift_Message();
 
-        $mailer = $this->getMockBuilder(\Swift_Mailer::class)->disableOriginalConstructor()->getMock();
+        $mailer = $this->createMock(\Swift_Mailer::class);
         $mailer->expects($this->once())
             ->method('createMessage')
             ->willReturn($message);

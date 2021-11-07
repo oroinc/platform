@@ -33,7 +33,9 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->repository = $this->createMock(AuditFieldRepository::class);
         $this->fieldsTransformer = new FieldsTransformer();
-        $this->doctrineHelper->expects($this->any())->method('getEntityRepository')->willReturn($this->repository);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->willReturn($this->repository);
 
         $this->listener = new AuditGridDataListener($this->doctrineHelper, $this->fieldsTransformer);
 
@@ -50,7 +52,9 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
     {
         $record = new ResultRecord(['id' => 1]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
-        $this->repository->expects($this->once())->method('getVisibleFieldsByAuditIds')->willReturn([]);
+        $this->repository->expects($this->once())
+            ->method('getVisibleFieldsByAuditIds')
+            ->willReturn([]);
         $this->listener->addDataSupport($event);
         $this->assertNull($record->getValue('data'));
     }
@@ -59,7 +63,9 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
     {
         $record = new ResultRecord([]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
-        $this->repository->expects($this->once())->method('getVisibleFieldsByAuditIds')->willReturn([]);
+        $this->repository->expects($this->once())
+            ->method('getVisibleFieldsByAuditIds')
+            ->willReturn([]);
         $this->listener->addDataSupport($event);
         $this->assertNull($record->getValue('data'));
     }
@@ -79,21 +85,23 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
         $auditFieldWithTranslationDomain = new AuditField('field5', 'string', 'new_translatable', 'old_translatable');
         $auditFieldWithTranslationDomain->setTranslationDomain('message');
 
-        $this->repository->expects($this->once())->method('getVisibleFieldsByAuditIds')->willReturn(
-            [
-                23 => [
-                    new AuditField('field', 'integer', 1, 0),
-                    new AuditField('field2', 'string', 'new_', '_old'),
-                ],
-                24 => [
-                    new AuditField('field3', 'date', $newDate, $oldDate),
-                    new AuditField('field4', 'datetime', $newDate, $oldDate),
-                ],
-                25 => [
-                    $auditFieldWithTranslationDomain,
-                ],
-            ]
-        );
+        $this->repository->expects($this->once())
+            ->method('getVisibleFieldsByAuditIds')
+            ->willReturn(
+                [
+                    23 => [
+                        new AuditField('field', 'integer', 1, 0),
+                        new AuditField('field2', 'string', 'new_', '_old'),
+                    ],
+                    24 => [
+                        new AuditField('field3', 'date', $newDate, $oldDate),
+                        new AuditField('field4', 'datetime', $newDate, $oldDate),
+                    ],
+                    25 => [
+                        $auditFieldWithTranslationDomain,
+                    ],
+                ]
+            );
         $this->listener->addDataSupport($event);
         $this->assertSame(
             [

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ReminderBundle\Exception\MethodNotSupportedException;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
@@ -13,7 +14,7 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     private const BAR_METHOD = 'bar';
     private const BAR_LABEL  = 'bar_label';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var SendProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $processors;
 
     /** @var SendProcessorRegistry */
@@ -36,6 +37,16 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    private function getMockProcessor(string $label): SendProcessorInterface
+    {
+        $result = $this->createMock(SendProcessorInterface::class);
+        $result->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($label);
+
+        return $result;
+    }
+
     public function testGetProcessors()
     {
         $this->assertEquals(
@@ -55,19 +66,9 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProcessorFails()
     {
-        $this->expectException(\Oro\Bundle\ReminderBundle\Exception\MethodNotSupportedException::class);
+        $this->expectException(MethodNotSupportedException::class);
         $this->expectExceptionMessage('Reminder method "not_exist" is not supported.');
 
         $this->registry->getProcessor('not_exist');
-    }
-
-    private function getMockProcessor($label)
-    {
-        $result = $this->createMock(SendProcessorInterface::class);
-        $result->expects($this->any())
-            ->method('getLabel')
-            ->will($this->returnValue($label));
-
-        return $result;
     }
 }

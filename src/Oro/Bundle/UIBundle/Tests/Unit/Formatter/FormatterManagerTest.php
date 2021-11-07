@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Formatter;
 
+use Oro\Bundle\UIBundle\Exception\InvalidFormatterException;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestDefaultFormatter;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestFormatter;
@@ -43,7 +44,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testFormatByNotExistingFormatter()
     {
-        $this->expectException(\Oro\Bundle\UIBundle\Exception\InvalidFormatterException::class);
+        $this->expectException(InvalidFormatterException::class);
         $this->expectExceptionMessage('The formatter "not_existing_formatter" does not exist.');
 
         $this->manager->format('test_value', 'not_existing_formatter');
@@ -52,7 +53,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider guessFormatterDataProvider
      */
-    public function testGuessFormatter($type, $expected)
+    public function testGuessFormatter(string $type, ?string $expected)
     {
         self::assertSame(
             $expected,
@@ -60,7 +61,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function guessFormatterDataProvider()
+    public static function guessFormatterDataProvider(): array
     {
         return [
             ['string', 'test_default_format_name'],

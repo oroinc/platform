@@ -118,7 +118,7 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetTargetJoinAlias($className, $fieldName, $expected)
     {
         if (is_array($expected)) {
-            list($exception, $message) = $expected;
+            [$exception, $message] = $expected;
             $this->expectException($exception);
             $this->expectExceptionMessage($message);
         }
@@ -129,10 +129,7 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function targetJoinAliasProvider()
+    public function targetJoinAliasProvider(): array
     {
         return [
             'not existing' => [

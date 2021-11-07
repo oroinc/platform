@@ -51,7 +51,9 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
         $this->dateGroupingBuilder = $this->createMock(DatagridDateGroupingBuilder::class);
 
-        $entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->virtualFieldProvider->expects($this->any())
+            ->method('isVirtualField')
+            ->willReturn(false);
 
         $this->builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
@@ -59,15 +61,10 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             $this->virtualRelationProvider,
             new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
-            $entityNameResolver
+            $this->createMock(EntityNameResolver::class)
         );
-
         $this->builder->setDateGroupingBuilder($this->dateGroupingBuilder);
         $this->builder->setConfigManager($this->configManager);
-
-        $this->virtualFieldProvider->expects($this->any())
-            ->method('isVirtualField')
-            ->willReturn(false);
     }
 
     public function testGetConfigurationWhenNoGridName(): void
@@ -174,7 +171,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    private function mockEntityMetadata(string $viewRoute)
+    private function mockEntityMetadata(string $viewRoute): void
     {
         $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = $viewRoute;
@@ -183,8 +180,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityMetadata')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
-
-        return $entityMetadata;
     }
 
     /**
@@ -316,51 +311,42 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $config['options']['export']);
     }
 
-    public function groupByDataProvider()
+    public function groupByDataProvider(): array
     {
-        yield [
-            [['name' => 'sampleColumn']],
-            ClassMetadata::MANY_TO_MANY,
-            true
-        ];
-
-        yield [
-            [['name' => 'sampleColumn']],
-            ClassMetadata::ONE_TO_ONE,
-            true
-        ];
-
-        yield [
-            [['name' => 'sampleColumn']],
-            ClassMetadata::ONE_TO_MANY,
-            true
-        ];
-
-        yield [
-            [['name' => 'sampleColumn']],
-            ClassMetadata::MANY_TO_ONE,
-            false
-        ];
-
-        yield [
-            [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
-            ClassMetadata::MANY_TO_ONE,
-            true
-        ];
-
-        yield [
-            [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
-            ClassMetadata::ONE_TO_MANY,
-            true
+        return [
+            [
+                [['name' => 'sampleColumn']],
+                ClassMetadata::MANY_TO_MANY,
+                true
+            ],
+            [
+                [['name' => 'sampleColumn']],
+                ClassMetadata::ONE_TO_ONE,
+                true
+            ],
+            [
+                [['name' => 'sampleColumn']],
+                ClassMetadata::ONE_TO_MANY,
+                true
+            ],
+            [
+                [['name' => 'sampleColumn']],
+                ClassMetadata::MANY_TO_ONE,
+                false
+            ],
+            [
+                [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
+                ClassMetadata::MANY_TO_ONE,
+                true
+            ],
+            [
+                [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
+                ClassMetadata::ONE_TO_MANY,
+                true
+            ]
         ];
     }
 
-    /**
-     * @param string $entityClass
-     * @param array $definition
-     *
-     * @return Report|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getReportEntity(string $entityClass, array $definition): Report
     {
         $report = $this->createMock(Report::class);

@@ -164,7 +164,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValue, $fromCache['oro_user']['level']['value']);
     }
 
-    public function getInfoLoadedWithNormalizationProvider()
+    public function getInfoLoadedWithNormalizationProvider(): array
     {
         return [
             'integer' => [

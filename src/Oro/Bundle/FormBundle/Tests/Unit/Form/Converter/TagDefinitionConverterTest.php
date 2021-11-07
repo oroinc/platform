@@ -30,10 +30,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function elementsDataProvider()
+    public function elementsDataProvider(): array
     {
         return [
             [null, []],
@@ -66,10 +63,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function attributesDataProvider()
+    public function attributesDataProvider(): array
     {
         return [
             [null, []],

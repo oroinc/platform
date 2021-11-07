@@ -68,10 +68,7 @@ class SettingsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getFormSettingsDataProvider()
+    public function getFormSettingsDataProvider(): array
     {
         return [
             'should return all fields'                            => [

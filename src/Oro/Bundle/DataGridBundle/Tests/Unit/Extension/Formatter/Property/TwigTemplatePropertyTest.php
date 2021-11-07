@@ -41,20 +41,14 @@ class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
 
         $template = $this->createMock(Template::class);
 
-        $this->twig
-            ->expects($this->once())
+        $this->twig->expects($this->once())
             ->method('loadTemplate')
             ->with(self::TEMPLATE)
             ->willReturn($template);
 
-        $template
-            ->expects($this->exactly(2))
+        $template->expects($this->exactly(2))
             ->method('render')
-            ->with(
-                [
-                    'record' => $record,
-                ] + $expected
-            );
+            ->with(['record' => $record] + $expected);
 
         $this->property->getRawValue($record);
 

@@ -71,7 +71,7 @@ class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
             ->willReturn([$propertyName => $returnValue]);
     }
 
-    public function changedFieldValueDataProvider()
+    public function changedFieldValueDataProvider(): array
     {
         return [
             'changed value'         => [
@@ -114,7 +114,7 @@ class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function notChangedFieldValueDataProvider()
+    public function notChangedFieldValueDataProvider(): array
     {
         return [
             'not changed value'         => [

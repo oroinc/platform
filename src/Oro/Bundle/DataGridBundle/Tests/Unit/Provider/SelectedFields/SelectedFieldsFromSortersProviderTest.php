@@ -19,8 +19,7 @@ class SelectedFieldsFromSortersProviderTest extends AbstractSelectedFieldsProvid
      */
     protected function mockGetConfiguration(array $configuration): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('offsetGetByPath')
             ->with(SorterConfiguration::COLUMNS_PATH)
             ->willReturn($configuration);

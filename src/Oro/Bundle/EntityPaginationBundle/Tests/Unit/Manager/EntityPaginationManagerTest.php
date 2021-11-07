@@ -2,55 +2,46 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
 class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const WRONG_SCOPE = 'wrong_scope';
+    private const WRONG_SCOPE = 'wrong_scope';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var EntityPaginationManager */
-    protected $entityPaginationManager;
-
-    /** @var \stdClass */
-    protected $entity;
+    private $entityPaginationManager;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->entityPaginationManager = new EntityPaginationManager($this->configManager);
-        $this->entity = new \stdClass();
     }
 
     /**
-     * @param mixed $source
-     * @param bool $expected
      * @dataProvider isEnabledDataProvider
      */
-    public function testIsEnabled($source, $expected)
+    public function testIsEnabled(string|bool|null $source, bool $expected)
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->once())
             ->method('get')
             ->with('oro_entity_pagination.enabled')
-            ->will($this->returnValue($source));
+            ->willReturn($source);
 
         $storage = new EntityPaginationManager($configManager);
         $this->assertSame($expected, $storage->isEnabled());
     }
 
-    /**
-     * @return array
-     */
-    public function isEnabledDataProvider()
+    public function isEnabledDataProvider(): array
     {
         return [
             'string true' => [
@@ -83,7 +74,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_entity_pagination.limit')
-            ->will($this->returnValue($limit));
+            ->willReturn($limit);
 
         $this->assertEquals($limit, $this->entityPaginationManager->getLimit());
     }
@@ -91,16 +82,13 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPermissionProvider
      */
-    public function testGetPermission($scope, $expected)
+    public function testGetPermission(string $scope, string $expected)
     {
         $result = EntityPaginationManager::getPermission($scope);
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getPermissionProvider()
+    public function getPermissionProvider(): array
     {
         return [
             'view scope' => [
@@ -123,39 +111,31 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param bool $isOrmDatasource
-     * @param bool|null $entityPagination
      * @dataProvider isDatagridApplicableDataProvider
      */
-    public function testIsDatagridApplicable($expected, $isOrmDatasource, $entityPagination)
+    public function testIsDatagridApplicable(bool $expected, bool $isOrmDatasource, ?bool $entityPagination)
     {
         if ($isOrmDatasource) {
-            $dataSource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $dataSource = $this->createMock(OrmDatasource::class);
         } else {
-            $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+            $dataSource = $this->createMock(DatasourceInterface::class);
         }
 
         $config = ['options' => ['entity_pagination' => $entityPagination]];
         $configObject = DatagridConfiguration::create($config);
 
-        $dataGrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $dataGrid = $this->createMock(DatagridInterface::class);
         $dataGrid->expects($this->any())
             ->method('getDatasource')
-            ->will($this->returnValue($dataSource));
+            ->willReturn($dataSource);
         $dataGrid->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($configObject));
+            ->willReturn($configObject);
 
         $this->assertSame($expected, $this->entityPaginationManager->isDatagridApplicable($dataGrid));
     }
 
-    /**
-     * @return array
-     */
-    public function isDatagridApplicableDataProvider()
+    public function isDatagridApplicableDataProvider(): array
     {
         return [
             'not orm datasource' => [

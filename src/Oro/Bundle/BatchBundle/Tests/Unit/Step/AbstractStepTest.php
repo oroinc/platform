@@ -14,20 +14,18 @@ class AbstractStepTest extends \PHPUnit\Framework\TestCase
 {
     private const STEP_NAME = 'test_step_name';
 
-    private JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject $jobRepository;
+    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRepository;
 
-    private AbstractStep|\PHPUnit\Framework\MockObject\MockObject $step;
+    /** @var AbstractStep|\PHPUnit\Framework\MockObject\MockObject */
+    private $step;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
 
         $this->step = $this->getMockForAbstractClass(AbstractStep::class, [self::STEP_NAME]);
-
         $this->step->setEventDispatcher($eventDispatcher);
         $this->step->setJobRepository($this->jobRepository);
     }

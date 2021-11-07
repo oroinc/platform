@@ -14,7 +14,6 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        /** @var QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject $queryHintResolver */
         $queryHintResolver = $this->createMock(QueryHintResolver::class);
         $queryHintResolver->expects(self::any())
             ->method('resolveHintName')

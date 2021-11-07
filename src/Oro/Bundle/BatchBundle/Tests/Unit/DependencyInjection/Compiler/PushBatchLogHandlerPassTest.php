@@ -46,10 +46,7 @@ class PushBatchLogHandlerPassTest extends \PHPUnit\Framework\TestCase
     private function getContainerBuilderMock(
         Definition $logger = null
     ): ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject {
-        $container = $this
-            ->getMockBuilder(ContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = $this->createMock(ContainerBuilder::class);
 
         $container->expects(self::any())
             ->method('has')

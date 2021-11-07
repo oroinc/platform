@@ -44,10 +44,8 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function buildBeforeEventDataProvider()
+    public function buildBeforeEventDataProvider(): array
     {
         return [
             'Not applicable column type' => [

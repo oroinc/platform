@@ -5,8 +5,10 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Appearance;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,20 +24,18 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $manager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $manager->expects($this->any())->method('getAppearanceTypes')->will($this->returnValue(
-            [
-                'grid' => [
+        $manager = $this->createMock(AppearanceTypeManager::class);
+        $manager->expects($this->any())
+            ->method('getAppearanceTypes')
+            ->willReturn([
+                'grid'  => [
                     'label' => 'grid',
                     'icon'  => 'icon'
                 ],
                 'board' => []
-            ]
-        ));
+            ]);
         $configuration = new Configuration($manager);
-        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->extension = new AppearanceExtension(
             $configuration,
@@ -91,8 +91,10 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
                 'board' => [],
             ]
         ]);
-        $this->translator->expects($this->once())->method('trans')->with('grid label')
-            ->will($this->returnValue('translated grid label'));
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('grid label')
+            ->willReturn('translated grid label');
         $this->extension->processConfigs($config);
         $expected = [
             'grid' => [

@@ -31,10 +31,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
         $this->factory->create(ReportChartSchemaType::class, null, ['data_schema' => $dataSchema]);
     }
 
-    /**
-     * @return array
-     */
-    public function dataSchemaProvider()
+    public function dataSchemaProvider(): array
     {
         return [
             'full' => [
@@ -51,7 +48,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {

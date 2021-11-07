@@ -12,9 +12,10 @@ use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProvider;
 class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private FilterFactory $filterFactory;
+    private $filterFactory;
 
-    private DatagridFiltersProvider $provider;
+    /** @var DatagridFiltersProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -27,8 +28,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetDatagridFiltersWhenNoFilters(array $gridConfigParams): void
     {
-        $this->filterFactory
-            ->expects($this->never())
+        $this->filterFactory->expects($this->never())
             ->method($this->anything());
 
         $gridConfig = $this->getGridConfig(OrmDatasource::TYPE, $gridConfigParams);
@@ -57,8 +57,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
         $gridConfig = $this->getGridConfig(OrmDatasource::TYPE, ['filters' => ['columns' => [$filter1Name => []]]]);
         $filter1 = $this->createMock(FilterInterface::class);
 
-        $this->filterFactory
-            ->expects($this->once())
+        $this->filterFactory->expects($this->once())
             ->method('createFilter')
             ->with($filter1Name, ['label' => null])
             ->willReturn($filter1);
@@ -82,8 +81,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
         );
         $filter1 = $this->createMock(FilterInterface::class);
 
-        $this->filterFactory
-            ->expects($this->once())
+        $this->filterFactory->expects($this->once())
             ->method('createFilter')
             ->with($filter1Name, ['label' => $filter1Name, 'name' => $filter1Name])
             ->willReturn($filter1);
@@ -104,8 +102,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->filterFactory
-            ->expects($this->never())
+        $this->filterFactory->expects($this->never())
             ->method('createFilter');
 
         $this->assertEquals([], $this->provider->getDatagridFilters($gridConfig));

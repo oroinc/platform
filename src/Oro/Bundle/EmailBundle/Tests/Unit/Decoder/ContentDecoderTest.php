@@ -22,7 +22,7 @@ class ContentDecoderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $str);
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             'default' => [

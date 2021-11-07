@@ -34,14 +34,12 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     public function testGet(array $actual, array $expected): void
     {
-        $this->filterConfiguration
-            ->expects($this->once())
+        $this->filterConfiguration->expects($this->once())
             ->method('get')
             ->with(self::FILTER_NAME)
             ->willReturn($actual);
 
-        $this->attachmentPostProcessorsProvider
-            ->expects($this->any())
+        $this->attachmentPostProcessorsProvider->expects($this->any())
             ->method('getFilterConfig')
             ->willReturn($expected['post_processors']);
 
@@ -57,8 +55,7 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
                 'processor2' => ['processor_option2' => 'option2']
             ]
         ];
-        $this->filterConfiguration
-            ->expects($this->once())
+        $this->filterConfiguration->expects($this->once())
             ->method('set')
             ->with(self::FILTER_NAME, $filter);
 
@@ -70,13 +67,11 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     public function testAll(array $actual, array $expected): void
     {
-        $this->filterConfiguration
-            ->expects($this->once())
+        $this->filterConfiguration->expects($this->once())
             ->method('all')
             ->willReturn([$actual]);
 
-        $this->attachmentPostProcessorsProvider
-            ->expects($this->any())
+        $this->attachmentPostProcessorsProvider->expects($this->any())
             ->method('getFilterConfig')
             ->willReturn($expected['post_processors']);
 

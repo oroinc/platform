@@ -7,7 +7,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
     /** @var DateHelper */

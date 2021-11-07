@@ -32,8 +32,7 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostProcessingEnabled(bool $postProcessingEnabled): void
     {
-        $this->featureChecker
-            ->expects($this->once())
+        $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
             ->with(PostProcessingVoter::ATTACHMENT_POST_PROCESSING)
             ->willReturn($postProcessingEnabled);
@@ -60,8 +59,7 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostProcessorAllowed(bool $postProcessorEnabled): void
     {
-        $this->featureChecker
-            ->expects($this->once())
+        $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
             ->with('attachment_post_processors_allowed')
             ->willReturn($postProcessorEnabled);
@@ -85,14 +83,12 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilterConfig(): void
     {
-        $this->featureChecker
-            ->expects($this->once())
+        $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
             ->with('attachment_post_processors_allowed')
             ->willReturn(true);
 
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 ['oro_attachment.png_quality'],
@@ -113,8 +109,7 @@ class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilterConfigWithoutLibraries(): void
     {
-        $this->featureChecker
-            ->expects($this->once())
+        $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
             ->with('attachment_post_processors_allowed')
             ->willReturn(false);

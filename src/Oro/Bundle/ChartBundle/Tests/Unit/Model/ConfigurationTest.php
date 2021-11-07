@@ -19,202 +19,201 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
-        return array(
-            'empty' => array(
-                'configs'  => array(
-                    array(
-                        'foo_chart' => array(
+        return [
+            'empty' => [
+                'configs'  => [
+                    [
+                        'foo_chart' => [
                             'label' => 'Foo',
-                            'data_schema' => array(
-                                array(
+                            'data_schema' => [
+                                [
                                     'name' => 'label',
                                     'label' => 'Category (X axis)',
                                     'required' => true,
                                     'default_type' => 'decimal'
-                                ),
-                                array(
+                                ],
+                                [
                                     'name' => 'value',
                                     'label' => 'Value (Y axis)',
                                     'required' => true,
                                     'default_type' => 'string'
-                                ),
-                            ),
-                            'settings_schema' => array(
-                                array(
+                                ],
+                            ],
+                            'settings_schema' => [
+                                [
                                     'name' => 'connect_dots_with_line',
                                     'label' => 'Connect line with dots',
                                     'type' => 'boolean'
-                                ),
-                                array(
+                                ],
+                                [
                                     'name' => 'advanced_option',
                                     'label' => 'Advanced option',
                                     'type' => 'string',
-                                    'options' => array(
+                                    'options' => [
                                         'foo' => 'bar'
-                                    )
-                                ),
-                            ),
+                                    ]
+                                ],
+                            ],
                             'data_transformer' => 'foo_data_transformer_service',
                             'template' => 'FooTemplate.html.twig'
-                        )
-                    ),
-                    array(
-                        'bar_chart' => array(
+                        ]
+                    ],
+                    [
+                        'bar_chart' => [
                             'label' => 'Bar',
                             'template' => 'BarTemplate.html.twig'
-                        )
-                    ),
-                ),
-                'expected' => array(
-                    'foo_chart' => array(
+                        ]
+                    ],
+                ],
+                'expected' => [
+                    'foo_chart' => [
                         'label' => 'Foo',
-                        'data_schema' => array(
-                            array(
+                        'data_schema' => [
+                            [
                                 'label' => 'Category (X axis)',
                                 'name' => 'label',
                                 'required' => true,
                                 'type_filter' => [],
                                 'default_type' => 'decimal'
-                            ),
-                            array(
+                            ],
+                            [
                                 'label' => 'Value (Y axis)',
                                 'name' => 'value',
                                 'required' => true,
                                 'type_filter' => [],
                                 'default_type' => 'string'
-                            ),
-                        ),
-                        'settings_schema' => array(
-                            array(
+                            ],
+                        ],
+                        'settings_schema' => [
+                            [
                                 'name' => 'connect_dots_with_line',
                                 'label' => 'Connect line with dots',
                                 'type' => 'boolean',
-                                'options' => array(),
-                            ),
-                            array(
+                                'options' => [],
+                            ],
+                            [
                                 'name' => 'advanced_option',
                                 'label' => 'Advanced option',
                                 'type' => 'string',
-                                'options' => array(
+                                'options' => [
                                     'foo' => 'bar'
-                                ),
-                            ),
-                        ),
+                                ],
+                            ],
+                        ],
                         'data_transformer' => 'foo_data_transformer_service',
                         'template' => 'FooTemplate.html.twig',
-                        'default_settings' => array(),
-                        'xaxis' => array(
+                        'default_settings' => [],
+                        'xaxis' => [
                             'mode' => 'normal',
                             'noTicks' => 5
-                        )
-                    ),
-                    'bar_chart' => array(
+                        ]
+                    ],
+                    'bar_chart' => [
                         'label' => 'Bar',
-                        'data_schema' => array(),
-                        'settings_schema' => array(),
-                        'default_settings' => array(),
+                        'data_schema' => [],
+                        'settings_schema' => [],
+                        'default_settings' => [],
                         'template' => 'BarTemplate.html.twig',
-                        'xaxis' => array(
+                        'xaxis' => [
                             'mode' => 'normal',
                             'noTicks' => 5
-                        )
+                        ]
 
-                    ),
-                )
-            ),
-            'with type' => array(
-                'configs'  => array(
-                    array(
-                        'type_chart' => array(
+                    ],
+                ]
+            ],
+            'with type' => [
+                'configs'  => [
+                    [
+                        'type_chart' => [
                             'label' => 'Type',
-                            'data_schema' => array(
-                                array(
+                            'data_schema' => [
+                                [
                                     'name' => 'label',
                                     'label' => 'Category (X axis)',
                                     'required' => true,
                                     'default_type' => 'decimal',
                                     'type' => 'month'
-                                ),
-                                array(
+                                ],
+                                [
                                     'name' => 'value',
                                     'label' => 'Value (Y axis)',
                                     'required' => true,
                                     'default_type' => 'string',
                                     'type' => 'currency'
-                                ),
-                            ),
-                            'settings_schema' => array(
-                                array(
+                                ],
+                            ],
+                            'settings_schema' => [
+                                [
                                     'name' => 'connect_dots_with_line',
                                     'label' => 'Connect line with dots',
                                     'type' => 'boolean'
-                                ),
-                                array(
+                                ],
+                                [
                                     'name' => 'advanced_option',
                                     'label' => 'Advanced option',
                                     'type' => 'string',
-                                    'options' => array(
+                                    'options' => [
                                         'foo' => 'bar'
-                                    )
-                                ),
-                            ),
+                                    ]
+                                ],
+                            ],
                             'data_transformer' => 'foo_data_transformer_service',
                             'template' => 'FooTemplate.html.twig'
-                        )
-                    )
-                ),
-                'expected' => array(
-                    'type_chart' => array(
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'type_chart' => [
                         'label' => 'Type',
-                        'data_schema' => array(
-                            array(
+                        'data_schema' => [
+                            [
                                 'label' => 'Category (X axis)',
                                 'name' => 'label',
                                 'required' => true,
                                 'type_filter' => [],
                                 'default_type' => 'decimal',
                                 'type' => 'month'
-                            ),
-                            array(
+                            ],
+                            [
                                 'label' => 'Value (Y axis)',
                                 'name' => 'value',
                                 'required' => true,
                                 'type_filter' => [],
                                 'default_type' => 'string',
                                 'type' => 'currency'
-                            ),
-                        ),
-                        'settings_schema' => array(
-                            array(
+                            ],
+                        ],
+                        'settings_schema' => [
+                            [
                                 'name' => 'connect_dots_with_line',
                                 'label' => 'Connect line with dots',
                                 'type' => 'boolean',
-                                'options' => array(),
-                            ),
-                            array(
+                                'options' => [],
+                            ],
+                            [
                                 'name' => 'advanced_option',
                                 'label' => 'Advanced option',
                                 'type' => 'string',
-                                'options' => array(
+                                'options' => [
                                     'foo' => 'bar'
-                                ),
-                            ),
-                        ),
+                                ],
+                            ],
+                        ],
                         'data_transformer' => 'foo_data_transformer_service',
                         'template' => 'FooTemplate.html.twig',
-                        'default_settings' => array(),
-                        'xaxis' => array(
+                        'default_settings' => [],
+                        'xaxis' => [
                             'mode' => 'normal',
                             'noTicks' => 5
-                        )
+                        ]
 
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
     }
 }

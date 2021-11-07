@@ -22,11 +22,9 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                static function (string $key) {
-                    return sprintf('[trans]%s[/trans]', $key);
-                }
-            );
+            ->willReturnCallback(function (string $key) {
+                return sprintf('[trans]%s[/trans]', $key);
+            });
 
         $this->searchHandler = new ImpersonationSearchHandler($this->doctrineHelper, $translator);
     }
@@ -78,7 +76,9 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         );
 
         $impresonation = $this->createMock(Impersonation::class);
-        $impresonation->expects($this->once())->method('getToken')->willReturn('hash');
+        $impresonation->expects($this->once())
+            ->method('getToken')
+            ->willReturn('hash');
 
         $this->searchHandler->convertItem($impresonation);
     }
@@ -86,8 +86,12 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
     public function testConvertItem()
     {
         $impresonation = $this->createMock(Impersonation::class);
-        $impresonation->expects($this->once())->method('getToken')->willReturn('hash');
-        $impresonation->expects($this->once())->method('getIpAddress')->willReturn('255.255.255.255');
+        $impresonation->expects($this->once())
+            ->method('getToken')
+            ->willReturn('hash');
+        $impresonation->expects($this->once())
+            ->method('getIpAddress')
+            ->willReturn('255.255.255.255');
 
         $this->assertSame(
             [

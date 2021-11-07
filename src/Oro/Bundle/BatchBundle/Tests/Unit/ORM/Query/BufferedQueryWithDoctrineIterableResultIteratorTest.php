@@ -16,9 +16,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
  */
 class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 {
-    /**
-     * @var EntityManagerMock
-     */
+    /** @var EntityManagerMock */
     private $em;
 
     protected function setUp(): void
@@ -44,13 +42,11 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $this->getDriverConnectionMock($this->em)
             ->expects($this->any())
             ->method('query')
-            ->willReturnCallback(
-                function ($sql) use (&$records, &$actualSql) {
-                    $actualSql = $sql;
+            ->willReturnCallback(function ($sql) use (&$records, &$actualSql) {
+                $actualSql = $sql;
 
-                    return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
-                }
-            );
+                return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
+            });
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
@@ -76,13 +72,11 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $this->getDriverConnectionMock($this->em)
             ->expects($this->any())
             ->method('query')
-            ->willReturnCallback(
-                function ($sql) use (&$records, &$actualSql) {
-                    $actualSql = $sql;
+            ->willReturnCallback(function ($sql) use (&$records, &$actualSql) {
+                $actualSql = $sql;
 
-                    return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
-                }
-            );
+                return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
+            });
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
@@ -106,13 +100,11 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $this->getDriverConnectionMock($this->em)
             ->expects($this->any())
             ->method('query')
-            ->willReturnCallback(
-                function ($sql) use (&$maxResults, &$actualSql) {
-                    $actualSql = $sql;
+            ->willReturnCallback(function ($sql) use (&$maxResults, &$actualSql) {
+                $actualSql = $sql;
 
-                    return $this->createCountStatementMock($maxResults);
-                }
-            );
+                return $this->createCountStatementMock($maxResults);
+            });
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
@@ -137,13 +129,11 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 
         $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
-            ->willReturnCallback(
-                function ($sql) use (&$maxResults, &$actualSql) {
-                    $actualSql = $sql;
+            ->willReturnCallback(function ($sql) use (&$maxResults, &$actualSql) {
+                $actualSql = $sql;
 
-                    return $this->createCountStatementMock($maxResults);
-                }
-            );
+                return $this->createCountStatementMock($maxResults);
+            });
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
@@ -209,15 +199,13 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $this->getDriverConnectionMock($this->em)
             ->expects($this->any())
             ->method('query')
-            ->willReturnCallback(
-                static function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
-                    $actualSqls[$statementCounter] = $sql;
-                    $statement = $statements[$statementCounter];
-                    $statementCounter++;
+            ->willReturnCallback(function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
+                $actualSqls[$statementCounter] = $sql;
+                $statement = $statements[$statementCounter];
+                $statementCounter++;
 
-                    return $statement;
-                }
-            );
+                return $statement;
+            });
     }
 
     public function testIteratorWithMaxResultsSource(): void
@@ -542,44 +530,44 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 
         return [
             [
-                $statements = [$this->createFetchStatementMock([['sclr_0' => 0]])],
-                $bufferSize = 1,
-                $pages = 0,
+                'statements' => [$this->createFetchStatementMock([['sclr_0' => 0]])],
+                'bufferSize' => 1,
+                'pages' => 0,
             ],
             [
-                $statements = [
+                'statements' => [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
                     $this->createFetchStatementMock([$records[0]]),
                     $this->createFetchStatementMock([$records[1]]),
                     $this->createFetchStatementMock([$records[2]]),
                 ],
-                $bufferSize = 1,
-                $pages = 3,
+                'bufferSize' => 1,
+                'pages' => 3,
             ],
             [
-                $statements = [
+                'statements' => [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
                     $this->createFetchStatementMock([$records[0], $records[1]]),
                     $this->createFetchStatementMock([$records[2]]),
                 ],
-                $bufferSize = 2,
-                $pages = 2,
+                'bufferSize' => 2,
+                'pages' => 2,
             ],
             [
-                $statements = [
+                'statements' => [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
                     $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
                 ],
-                $bufferSize = 3,
-                $pages = 1,
+                'bufferSize' => 3,
+                'pages' => 1,
             ],
             [
-                $statements = [
+                'statements' => [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
                     $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
                 ],
-                $bufferSize = 5,
-                $pages = 1,
+                'bufferSize' => 5,
+                'pages' => 1,
             ],
         ];
     }
@@ -613,13 +601,13 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 
         return [
             [
-                $statements = [
+                'statements' => [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
                     $this->createFetchStatementMock([$records[0]]),
                     $this->createFetchStatementMock([$records[1]]),
                     $this->createFetchStatementMock([$records[2]]),
                 ],
-                $expectedResult = [
+                'expectedResult' => [
                     new Entity(1),
                     new Entity(2),
                     new Entity(3),
@@ -629,13 +617,13 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
                 },
             ],
             [
-                $statements = [
+                'statements' => [
                     $this->createFetchStatementMock([['sclr_0' => count($records)]]),
                     $this->createFetchStatementMock([$records[0]]),
                     $this->createFetchStatementMock([$records[1]]),
                     $this->createFetchStatementMock([$records[2]]),
                 ],
-                $expectedResult = [
+                'expectedResult' => [
                     ['entity' => new Entity(1), '_id' => 1],
                     ['entity' => new Entity(2), '_id' => 2],
                     ['entity' => new Entity(3), '_id' => 3],

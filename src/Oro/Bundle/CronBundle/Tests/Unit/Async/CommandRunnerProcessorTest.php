@@ -47,7 +47,6 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message: empty command');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
@@ -68,7 +67,6 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message: "arguments" must be of type array', ['message' => $message]);
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
@@ -106,7 +104,6 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects($this->never())
             ->method('runDelayed');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals($expectedResult, $result);
@@ -145,16 +142,12 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($jobResult);
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $result = $this->commandRunnerProcessor->process($message, $session);
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function argumentsDataProvider()
+    public function argumentsDataProvider(): array
     {
         return [
             'bool' => [true],
@@ -164,10 +157,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function jobDataProvider()
+    public function jobDataProvider(): array
     {
         return [
             'ACK' => [

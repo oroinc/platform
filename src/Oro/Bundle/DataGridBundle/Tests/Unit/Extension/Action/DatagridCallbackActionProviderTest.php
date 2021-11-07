@@ -29,7 +29,10 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyActionsNothingToDo()
     {
-        $this->config->expects($this->once())->method('offsetGetOr')->with('action_configuration')->willReturn(null);
+        $this->config->expects($this->once())
+            ->method('offsetGetOr')
+            ->with('action_configuration')
+            ->willReturn(null);
 
         $this->provider->applyActions($this->config);
     }
@@ -77,17 +80,20 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
             'frontend_type' => 'row_array'
         ];
 
-        $this->config->expects($this->once())->method('offsetAddToArrayByPath')->with(
-            '[properties][action_configuration]',
-            $this->callback(function ($argument) use ($propertyConfigExpected, $resultRecord) {
-                $this->assertSame('callback', $argument['type']);
-                $this->assertSame('row_array', $argument['frontend_type']);
-                $this->assertArrayHasKey('callable', $argument);
-                $this->assertEquals(['an array'], $argument['callable']($resultRecord));
-                $this->assertEquals([], $argument['callable']($resultRecord));
-                return true;
-            })
-        );
+        $this->config->expects($this->once())
+            ->method('offsetAddToArrayByPath')
+            ->with(
+                '[properties][action_configuration]',
+                $this->callback(function ($argument) use ($resultRecord) {
+                    $this->assertSame('callback', $argument['type']);
+                    $this->assertSame('row_array', $argument['frontend_type']);
+                    $this->assertArrayHasKey('callable', $argument);
+                    $this->assertEquals(['an array'], $argument['callable']($resultRecord));
+                    $this->assertEquals([], $argument['callable']($resultRecord));
+
+                    return true;
+                })
+            );
 
         $this->provider->applyActions($this->config);
     }

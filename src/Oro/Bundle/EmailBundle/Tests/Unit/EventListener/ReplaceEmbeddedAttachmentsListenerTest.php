@@ -63,10 +63,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function replaceDataProvider()
+    public function replaceDataProvider(): array
     {
         return [
             'one embedded attachment'                 => [

@@ -25,8 +25,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockParameterExists($parameterName = 'sampleParameterName', false);
 
-        $this->datagridParameters
-            ->expects(self::never())
+        $this->datagridParameters->expects(self::never())
             ->method('get');
 
         self::assertNull($this->datagridParametersHelper->getFromParameters($this->datagridParameters, $parameterName));
@@ -34,8 +33,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
 
     private function mockParameterExists(string $parameterName, bool $exists): void
     {
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('has')
             ->with($parameterName)
             ->willReturn($exists);
@@ -45,8 +43,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockParameterExists($parameterName = 'sampleParameterName', true);
 
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('get')
             ->with($parameterName)
             ->willReturn($parameterValue = 'parameterValue');
@@ -61,8 +58,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockParameterExists($parameterName = ParameterBag::MINIFIED_PARAMETERS, false);
 
-        $this->datagridParameters
-            ->expects(self::never())
+        $this->datagridParameters->expects(self::never())
             ->method('get');
 
         self::assertNull($this->datagridParametersHelper->getFromParameters($this->datagridParameters, $parameterName));
@@ -78,8 +74,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
     ): void {
         $this->mockParameterExists(ParameterBag::MINIFIED_PARAMETERS, true);
 
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('get')
             ->with(ParameterBag::MINIFIED_PARAMETERS)
             ->willReturn($minifiedParameters);

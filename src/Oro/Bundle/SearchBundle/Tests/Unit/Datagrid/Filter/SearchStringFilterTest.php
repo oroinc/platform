@@ -72,7 +72,8 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'field';
 
         $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
-        $ds->expects($this->never())->method('addRestriction');
+        $ds->expects($this->never())
+            ->method('addRestriction');
 
         $this->filter->init('test', array_merge([
             FilterUtility::FORCE_LIKE_KEY => false,
@@ -83,7 +84,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($ds, ['type' => $filterType, 'value' => $fieldValue]);
     }
 
-    public function applyDataProvider()
+    public function applyDataProvider(): array
     {
         return [
             'contains' => [
@@ -137,7 +138,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function applyWithMinAndMaxLengthViolatedDataProvider()
+    public function applyWithMinAndMaxLengthViolatedDataProvider(): array
     {
         return [
             ['abc', [FilterUtility::MIN_LENGTH_KEY => 4]],

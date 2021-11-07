@@ -49,8 +49,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $exceptionMsg = 'Failure exception';
         $exception = new \Exception($exceptionMsg);
-        $reader
-            ->expects(self::once())
+        $reader->expects(self::once())
             ->method('read')
             ->willThrowException($exception);
 

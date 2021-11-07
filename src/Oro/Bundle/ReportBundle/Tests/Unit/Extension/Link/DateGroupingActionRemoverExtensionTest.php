@@ -85,10 +85,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->visitResult($this->config, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function visitResultProvider()
+    public function visitResultProvider(): array
     {
         return [
             [

@@ -10,9 +10,10 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 class FilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private FilterBagInterface $filterBag;
+    private $filterBag;
 
-    private FilterFactory $factory;
+    /** @var FilterFactory */
+    private $factory;
 
     protected function setUp(): void
     {
@@ -49,14 +50,12 @@ class FilterFactoryTest extends \PHPUnit\Framework\TestCase
         $filterConfig = [FilterUtility::TYPE_KEY => $filterType];
 
         $filter = $this->createMock(FilterInterface::class);
-        $this->filterBag
-            ->expects($this->once())
+        $this->filterBag->expects($this->once())
             ->method('getFilter')
             ->with($filterType)
             ->willReturn($filter);
 
-        $filter
-            ->expects($this->once())
+        $filter->expects($this->once())
             ->method('init')
             ->with($filterName, $filterConfig);
 

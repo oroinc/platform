@@ -26,10 +26,7 @@ class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             'empty'      => [

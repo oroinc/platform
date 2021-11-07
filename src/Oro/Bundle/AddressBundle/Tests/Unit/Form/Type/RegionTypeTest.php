@@ -46,7 +46,7 @@ class RegionTypeTest extends \PHPUnit\Framework\TestCase
 
         $builder->expects($this->once())
             ->method('setAttribute')
-            ->with($this->equalTo(RegionType::COUNTRY_OPTION_KEY), $this->equalTo('test'));
+            ->with(RegionType::COUNTRY_OPTION_KEY, 'test');
 
         $this->type->buildForm($builder, $options);
     }
@@ -58,7 +58,7 @@ class RegionTypeTest extends \PHPUnit\Framework\TestCase
         $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getAttribute')
-            ->with($this->equalTo(RegionType::COUNTRY_OPTION_KEY))
+            ->with(RegionType::COUNTRY_OPTION_KEY)
             ->willReturn($optionKey);
 
         $form = $this->createMock(Form::class);

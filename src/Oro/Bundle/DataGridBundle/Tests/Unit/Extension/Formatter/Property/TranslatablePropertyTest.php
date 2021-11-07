@@ -17,28 +17,24 @@ class TranslatablePropertyTest extends \PHPUnit\Framework\TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                static function (?string $key, array $params = []) {
-                    ksort($params);
+            ->willReturnCallback(function (?string $key, array $params = []) {
+                ksort($params);
 
-                    return trim(
-                        sprintf(
-                            'translated %s %s',
-                            $key,
-                            implode(
-                                ', ',
-                                array_map(
-                                    static function (?string $value, ?string $key) {
-                                        return sprintf('%s=%s', $key, $value);
-                                    },
-                                    $params,
-                                    array_keys($params)
-                                )
+                return trim(
+                    sprintf(
+                        'translated %s %s',
+                        $key,
+                        implode(
+                            ', ',
+                            array_map(
+                                fn (?string $value, ?string $key) => sprintf('%s=%s', $key, $value),
+                                $params,
+                                array_keys($params)
                             )
                         )
-                    );
-                }
-            );
+                    )
+                );
+            });
 
         $this->property = new TranslatableProperty($translator);
     }

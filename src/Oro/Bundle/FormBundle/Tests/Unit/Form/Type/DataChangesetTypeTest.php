@@ -41,10 +41,7 @@ class DataChangesetTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expected, $data);
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             [

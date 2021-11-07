@@ -78,10 +78,7 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function phoneSourceProvider()
+    public function phoneSourceProvider(): array
     {
         return [
             'no object' => [null],

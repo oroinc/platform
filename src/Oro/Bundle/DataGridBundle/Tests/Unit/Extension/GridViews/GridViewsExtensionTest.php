@@ -29,13 +29,13 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
     private $eventDispatcher;
 
     /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
-    protected $serviceLink;
+    private $serviceLink;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var GridViewsExtension */
     private $gridViewsExtension;
@@ -43,22 +43,20 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $translator = $this->createMock(TranslatorInterface::class);
-
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn(true);
-
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $aclHelper = $this->createMock(AclHelper::class);
+        $this->serviceLink = $this->createMock(ServiceLink::class);
 
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->createMock(EntityRepository::class));
 
-        $aclHelper = $this->createMock(AclHelper::class);
-
-        $this->serviceLink = $this->createMock(ServiceLink::class);
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
 
         $this->gridViewsExtension = new GridViewsExtension(
             $this->eventDispatcher,
@@ -73,21 +71,20 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testVisitMetadataShouldAddGridViewsFromEvent()
     {
-        $data   = MetadataObject::create([]);
+        $data = MetadataObject::create([]);
         $config = DatagridConfiguration::create(
             [
                 DatagridConfiguration::NAME_KEY => 'grid',
             ]
         );
 
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(GridViewsLoadEvent::EVENT_NAME)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $views          = [(new View('name', ['k' => 'v'], ['k2' => 'v2']))->getMetadata()];
-        $expectedViews  = [
+        $views = [(new View('name', ['k' => 'v'], ['k2' => 'v2']))->getMetadata()];
+        $expectedViews = [
             'views' => $views,
             'permissions' => [
                 'CREATE' => true,
@@ -99,21 +96,18 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
             'gridName' => 'grid',
         ];
 
-        $this->serviceLink->expects($this->any())->method('getService')->willReturn(new GridViewManagerStub());
+        $this->serviceLink->expects($this->any())
+            ->method('getService')
+            ->willReturn(new GridViewManagerStub());
 
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), GridViewsLoadEvent::EVENT_NAME)
-            ->will(
-                $this->returnCallback(
-                    function (GridViewsLoadEvent $event, $eventName) use ($views) {
-                        $event->setGridViews($views);
+            ->with(self::anything(), GridViewsLoadEvent::EVENT_NAME)
+            ->willReturnCallback(function (GridViewsLoadEvent $event) use ($views) {
+                $event->setGridViews($views);
 
-                        return $event;
-                    }
-                )
-            );
+                return $event;
+            });
 
         $this->assertFalse($data->offsetExists('gridViews'));
         $this->gridViewsExtension->setParameters(new ParameterBag());
@@ -130,20 +124,21 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $view1 = $this->getEntity(GridView::class, ['id' => 'view1']);
         $view2 = $this->getEntity(GridView::class, ['id' => 'view2']);
 
-        $this->tokenAccessor->expects($this->any())->method('getUser')->willReturn($user);
+        $this->tokenAccessor->expects($this->any())
+            ->method('getUser')
+            ->willReturn($user);
 
-        /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject $gridViewManager */
         $gridViewManager = $this->createMock(GridViewManager::class);
         $gridViewManager->expects($this->any())
             ->method('getDefaultView')
-            ->willReturnMap(
-                [
-                    [$user, $grid1, $view1],
-                    [$user, $grid2, $view2]
-                ]
-            );
+            ->willReturnMap([
+                [$user, $grid1, $view1],
+                [$user, $grid2, $view2]
+            ]);
 
-        $this->serviceLink->expects($this->any())->method('getService')->willReturn($gridViewManager);
+        $this->serviceLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($gridViewManager);
 
         $this->assertGridStateView($grid1, 'view1');
 
@@ -151,11 +146,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertGridStateView($grid2, 'view2');
     }
 
-    /**
-     * @param string $grid
-     * @param string $expectedGridView
-     */
-    protected function assertGridStateView($grid, $expectedGridView = null)
+    private function assertGridStateView(string $grid, string $expectedGridView = null): void
     {
         $data = MetadataObject::create([]);
         $config = DatagridConfiguration::create([DatagridConfiguration::NAME_KEY => $grid]);
@@ -168,12 +159,9 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param bool  $expected
-     *
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable($input, $expected)
+    public function testIsApplicable(array $input, bool $expected)
     {
         $this->gridViewsExtension->setParameters(new ParameterBag($input));
         $config = DatagridConfiguration::create(
@@ -184,10 +172,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->gridViewsExtension->isApplicable($config));
     }
 
-    /**
-     * @return array
-     */
-    public function isApplicableDataProvider()
+    public function isApplicableDataProvider(): array
     {
         return [
             'Default'            => [
@@ -222,43 +207,40 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->gridViewsExtension->getParameters()->all());
     }
 
-    /**
-     * @return array
-     */
-    public function setParametersDataProvider()
+    public function setParametersDataProvider(): array
     {
-        return array(
-            'empty' => array(
-                'input' => array(),
-                'expected' => array(),
-            ),
-            'regular' => array(
-                'input' => array(
-                    ParameterBag::ADDITIONAL_PARAMETERS => array(
+        return [
+            'empty' => [
+                'input' => [],
+                'expected' => [],
+            ],
+            'regular' => [
+                'input' => [
+                    ParameterBag::ADDITIONAL_PARAMETERS => [
                         GridViewsExtension::VIEWS_PARAM_KEY => 'view'
-                    )
-                ),
-                'expected' => array(
-                    ParameterBag::ADDITIONAL_PARAMETERS => array(
+                    ]
+                ],
+                'expected' => [
+                    ParameterBag::ADDITIONAL_PARAMETERS => [
                         GridViewsExtension::VIEWS_PARAM_KEY => 'view'
-                    )
-                )
-            ),
-            'minified' => array(
-                'input' => array(
-                    ParameterBag::MINIFIED_PARAMETERS => array(
+                    ]
+                ]
+            ],
+            'minified' => [
+                'input' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
                         GridViewsExtension::MINIFIED_VIEWS_PARAM_KEY => 'view'
-                    )
-                ),
-                'expected' => array(
-                    ParameterBag::MINIFIED_PARAMETERS => array(
+                    ]
+                ],
+                'expected' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
                         GridViewsExtension::MINIFIED_VIEWS_PARAM_KEY => 'view'
-                    ),
-                    ParameterBag::ADDITIONAL_PARAMETERS => array(
+                    ],
+                    ParameterBag::ADDITIONAL_PARAMETERS => [
                         GridViewsExtension::VIEWS_PARAM_KEY => 'view'
-                    )
-                )
-            ),
-        );
+                    ]
+                ]
+            ],
+        ];
     }
 }

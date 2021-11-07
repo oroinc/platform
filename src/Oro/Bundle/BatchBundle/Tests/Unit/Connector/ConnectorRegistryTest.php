@@ -14,20 +14,24 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Item\ItemWriterTestHelper;
 
 class ConnectorRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    private JobFactory|\PHPUnit\Framework\MockObject\MockObject $jobFactory;
+    /** @var JobFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobFactory;
 
-    private StepFactory|\PHPUnit\Framework\MockObject\MockObject $stepFactory;
+    /** @var StepFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $stepFactory;
 
+    /** @var ConnectorRegistry */
     private ConnectorRegistry $registry;
 
     protected function setUp(): void
     {
         $this->jobFactory = $this->createMock(JobFactory::class);
         $this->stepFactory = $this->createMock(StepFactory::class);
+
         $this->registry = new ConnectorRegistry($this->jobFactory, $this->stepFactory);
     }
 
-    public function testAddStepToInexistentJob(): void
+    public function testAddStepToNotExistentJob(): void
     {
         $job = $this->createMock(Job::class);
         $step = $this->createMock(ItemStep::class);

@@ -17,9 +17,6 @@ class JobExecutionTest extends \PHPUnit\Framework\TestCase
 {
     private JobExecution $jobExecution;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->jobExecution = new JobExecution();
@@ -229,9 +226,7 @@ class JobExecutionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabel(): void
     {
-        $jobInstance = $this->getMockBuilder(JobInstance::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $jobInstance = $this->createMock(JobInstance::class);
         $this->jobExecution->setJobInstance($jobInstance);
 
         $jobInstance->expects(self::any())->method('getLabel')->willReturn('foo');

@@ -3,46 +3,34 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
 class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Oro\Bundle\DataGridBundle\Event\BuildAfter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datagrid;
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagrid;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datasource;
+    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
+    private $datasource;
 
-    /**
-     * @var CellSelectionListener
-     */
-    protected $listener;
+    /** @var CellSelectionListener */
+    private $listener;
 
     protected function setUp(): void
     {
-        $this->event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildAfter')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $this->datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(BuildAfter::class);
+        $this->datagrid = $this->createMock(DatagridInterface::class);
+        $this->datasource = $this->createMock(OrmDatasource::class);
 
         $this->listener = new CellSelectionListener();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->event, $this->datagrid, $this->datasource, $this->listener);
     }
 
     /**
@@ -54,25 +42,22 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->event->expects($this->once())
             ->method('getDatagrid')
-            ->will($this->returnValue($this->datagrid));
+            ->willReturn($this->datagrid);
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($this->datasource));
+            ->willReturn($this->datasource);
 
         $this->datagrid->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->listener->onBuildAfter($this->event);
 
         $this->assertEquals($expectedConfig, $config->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function onBuildAfterDataProvider()
+    public function onBuildAfterDataProvider(): array
     {
         return [
             'applicable config' => [
@@ -166,26 +151,27 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->event->expects($this->once())
             ->method('getDatagrid')
-            ->will($this->returnValue($this->datagrid));
+            ->willReturn($this->datagrid);
 
-        $datasource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $datasource = $this->createMock(DatasourceInterface::class);
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($datasource));
+            ->willReturn($datasource);
 
         $this->datagrid->expects($this->never())
             ->method('getConfig')
-            ->will($this->returnValue($datasource));
+            ->willReturn($datasource);
 
-        $this->datasource->expects($this->never())->method($this->anything());
+        $this->datasource->expects($this->never())
+            ->method($this->anything());
 
         $this->listener->onBuildAfter($this->event);
     }
 
     public function testOnBuildAfterException()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('cellSelection options `columnName`, `selector` are required');
 
         $config = DatagridConfiguration::create([
@@ -198,15 +184,15 @@ class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($this->datasource));
+            ->willReturn($this->datasource);
 
         $this->datagrid->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->event->expects($this->once())
             ->method('getDatagrid')
-            ->will($this->returnValue($this->datagrid));
+            ->willReturn($this->datagrid);
 
         $this->listener->onBuildAfter($this->event);
     }

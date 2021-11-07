@@ -53,10 +53,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function formatDateDataProvider()
+    public function formatDateDataProvider(): array
     {
         return [
             'default options' => [

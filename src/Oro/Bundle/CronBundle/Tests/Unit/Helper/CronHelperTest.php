@@ -8,11 +8,8 @@ use Oro\Bundle\CronBundle\Helper\CronHelper;
 class CronHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CronHelper */
-    protected $cronHelper;
+    private $cronHelper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->cronHelper = new CronHelper();

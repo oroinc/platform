@@ -43,10 +43,7 @@ class ActivityListTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
         return [
             ['verb', 'testVerb'],

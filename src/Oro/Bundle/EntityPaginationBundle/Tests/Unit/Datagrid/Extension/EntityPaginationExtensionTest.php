@@ -8,10 +8,8 @@ use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
 class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityPaginationExtension
-     */
-    protected $extension;
+    /** @var EntityPaginationExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -22,12 +20,10 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicableProvider
      */
-    public function testIsApplicable($input, $result)
+    public function testIsApplicable(array $input, bool $result)
     {
         $this->assertEquals(
-            $this->extension->isApplicable(
-                DatagridConfiguration::create($input)
-            ),
+            $this->extension->isApplicable(DatagridConfiguration::create($input)),
             $result
         );
     }
@@ -35,14 +31,13 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigsProvider
      */
-    public function testProcessConfigs($input, $result)
+    public function testProcessConfigs(array $input, bool $result)
     {
         $config = DatagridConfiguration::create($input);
         $this->extension->processConfigs($config);
-        $resultConfig = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH);
         $this->assertEquals(
-            $resultConfig,
-            $result
+            $result,
+            $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH)
         );
     }
 
@@ -61,7 +56,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->processConfigs($config);
     }
 
-    public function isApplicableProvider()
+    public function isApplicableProvider(): array
     {
         return [
             [
@@ -105,7 +100,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function processConfigsProvider()
+    public function processConfigsProvider(): array
     {
         return [
             [

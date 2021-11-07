@@ -21,8 +21,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
     /** @var ArrayDatasource */
     private $arrayDatasource;
 
-    /** @var array */
-    private $arraySource = [
+    private array $arraySource = [
         [
             'priceListId'   => 256,
             'priceListName' => 'A',

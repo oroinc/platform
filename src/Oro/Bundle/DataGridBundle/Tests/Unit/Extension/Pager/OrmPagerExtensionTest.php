@@ -14,7 +14,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Pager */
+    /** @var Pager|\PHPUnit\Framework\MockObject\MockObject */
     private $pager;
 
     /** @var OrmPagerExtension */
@@ -36,10 +36,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->extension->getParameters()->all());
     }
 
-    /**
-     * @return array
-     */
-    public function setParametersDataProvider()
+    public function setParametersDataProvider(): array
     {
         return [
             'empty' => [
@@ -81,7 +78,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function visitDatasourceNoRestrictionsDataProvider()
+    public function visitDatasourceNoRestrictionsDataProvider(): array
     {
         return [
             'regular grid' => [
@@ -115,12 +112,9 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $config
-     * @param int $page
-     * @param int $maxPerPage
      * @dataProvider visitDatasourceNoRestrictionsDataProvider
      */
-    public function testVisitDatasourceNoPagerRestrictions(array $config, $page, $maxPerPage)
+    public function testVisitDatasourceNoPagerRestrictions(array $config, int $page, int $maxPerPage)
     {
         $configObject = DatagridConfiguration::create($config);
         $dataSource = $this->createMock(OrmDatasource::class);
@@ -152,12 +146,9 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param null $count
-     * @param bool $adjustTotalCount
-     *
      * @dataProvider adjustedCountDataProvider
      */
-    public function testVisitDatasourceWithAdjustedCount($count, $adjustTotalCount = false)
+    public function testVisitDatasourceWithAdjustedCount(mixed $count, bool $adjustTotalCount = false)
     {
         $configObject = DatagridConfiguration::create([]);
         $dataSource = $this->createMock(OrmDatasource::class);
@@ -225,7 +216,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($configObject, $dataSource);
     }
 
-    public function adjustedCountDataProvider()
+    public function adjustedCountDataProvider(): array
     {
         return [
             'valid value' => [150, true],

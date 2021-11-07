@@ -14,40 +14,29 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DatagridExportIdFetcherTest extends OrmTestCase
 {
-    /**
-     * @var \Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock
-     */
+    /** @var \Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock */
     private $em;
 
-    /**
-     * @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
     private $gridManagerLink;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     private $eventDispatcher;
 
-    /**
-     * @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    /**
-     * @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $queryExecutor;
 
-    /**
-     * @var DatagridExportIdFetcher
-     */
+    /** @var DatagridExportIdFetcher */
     private $fetcher;
 
     protected function setUp(): void
@@ -75,7 +64,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
 
     public function testThrowInvalidConfigurationExceptionIfSettingContextWithoutGridName()
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of datagrid export reader must contain "gridName".');
 
         $this->context->expects($this->once())
@@ -135,9 +124,6 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $this->assertEquals([1, 2], $this->fetcher->getGridDataIds());
     }
 
-    /**
-     * @return array[]
-     */
     public function getGridDataIdsDataProvider(): array
     {
         return [
@@ -185,11 +171,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         ];
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @return DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function assertGridCall(QueryBuilder $qb)
+    private function assertGridCall(QueryBuilder $qb): DatagridInterface
     {
         $gridConfig = $this->createMock(DatagridConfiguration::class);
         $gridConfig->expects($this->any())

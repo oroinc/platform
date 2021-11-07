@@ -13,13 +13,9 @@ use Oro\Bundle\BatchBundle\Job\ExitStatus;
  */
 class StepExecutionTest extends \PHPUnit\Framework\TestCase
 {
+    private JobExecution $jobExecution;
     private StepExecution $stepExecution;
 
-    private JobExecution $jobExecution;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->jobExecution = new JobExecution();
@@ -155,7 +151,7 @@ class StepExecutionTest extends \PHPUnit\Framework\TestCase
 
     public function testToString(): void
     {
-        $expectedString = "id=0, name=[my_step_execution], status=[2], exitCode=[EXECUTING], exitDescription=[]";
+        $expectedString = 'id=0, name=[my_step_execution], status=[2], exitCode=[EXECUTING], exitDescription=[]';
         self::assertEquals($expectedString, (string)$this->stepExecution);
     }
 
@@ -247,17 +243,17 @@ class StepExecutionTest extends \PHPUnit\Framework\TestCase
     {
         $this->stepExecution->incrementSummaryInfo('create');
         $this->stepExecution->incrementSummaryInfo('create');
-        self::assertEquals($this->stepExecution->getSummaryInfo('create'), 2);
+        self::assertEquals(2, $this->stepExecution->getSummaryInfo('create'));
         $this->stepExecution->incrementSummaryInfo('create');
-        self::assertEquals($this->stepExecution->getSummaryInfo('create'), 3);
+        self::assertEquals(3, $this->stepExecution->getSummaryInfo('create'));
     }
 
     public function testIncrementSummaryInfoByBulk(): void
     {
         $this->stepExecution->incrementSummaryInfo('create');
         $this->stepExecution->incrementSummaryInfo('create');
-        self::assertEquals($this->stepExecution->getSummaryInfo('create'), 2);
+        self::assertEquals(2, $this->stepExecution->getSummaryInfo('create'));
         $this->stepExecution->incrementSummaryInfo('create', 5);
-        self::assertEquals($this->stepExecution->getSummaryInfo('create'), 7);
+        self::assertEquals(7, $this->stepExecution->getSummaryInfo('create'));
     }
 }

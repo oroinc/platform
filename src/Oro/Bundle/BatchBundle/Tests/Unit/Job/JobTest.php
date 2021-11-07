@@ -24,15 +24,15 @@ class JobTest extends \PHPUnit\Framework\TestCase
 {
     private const JOB_TEST_NAME = 'job_test';
 
+    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRepository;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    /** @var Job */
     private Job $job;
 
-    private JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject $jobRepository;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
@@ -61,7 +61,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         $jobExecution = new JobExecution();
 
         self::assertNull($jobExecution->getStartTime());
-        self::assertNull($jobExecution->getEndTIme());
+        self::assertNull($jobExecution->getEndTime());
         self::assertEquals(BatchStatus::STARTING, $jobExecution->getStatus()->getValue());
 
         $this->job->setJobRepository($this->jobRepository);

@@ -25,7 +25,6 @@ class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
 
         $this->websocketPing = new WebsocketPingTopic('oro_sync.ping', self::TIMEOUT);
         $this->websocketPing->setPeriodicTimer($this->periodicTimer);
-
         $this->setUpLoggerMock($this->websocketPing);
     }
 

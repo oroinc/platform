@@ -11,8 +11,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BroadcastTopic */
-    private $broadcast;
+    private BroadcastTopic $broadcast;
 
     protected function setUp(): void
     {
@@ -26,20 +25,17 @@ class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPublish(): void
     {
-        /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection */
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects(self::never())
             ->method(self::anything());
 
         $event = new \stdClass();
 
-        /** @var Topic|\PHPUnit\Framework\MockObject\MockObject $topic */
         $topic = $this->createMock(Topic::class);
         $topic->expects(self::once())
             ->method('broadcast')
             ->with($event, ['data1'], ['data2']);
 
-        /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject $wampRequest */
         $wampRequest = new WampRequest(
             'route',
             $this->createMock(Route::class),

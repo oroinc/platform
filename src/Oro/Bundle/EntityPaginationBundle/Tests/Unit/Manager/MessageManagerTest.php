@@ -4,61 +4,40 @@ namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Translation\Translator;
 
 class MessageManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    /** @var Session */
+    private $session;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
+    private $navigation;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $navigation;
+    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
+    private $storage;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $storage;
-
-    /**
-     * @var MessageManager
-     */
-    protected $manager;
+    /** @var MessageManager */
+    private $manager;
 
     protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
+        $this->navigation = $this->createMock(EntityPaginationNavigation::class);
+        $this->storage = $this->createMock(EntityPaginationStorage::class);
 
-        $this->translator = $this->createMock('Symfony\Component\Translation\Translator');
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id, array $parameters = []) {
-                        return str_replace(array_keys($parameters), array_values($parameters), $id . '.trans');
-                    }
-                )
-            );
+            ->willReturnCallback(function ($id, array $parameters = []) {
+                return str_replace(array_keys($parameters), array_values($parameters), $id . '.trans');
+            });
 
-        $this->navigation =
-            $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->manager = new MessageManager($this->session, $this->translator, $this->navigation, $this->storage);
+        $this->manager = new MessageManager($this->session, $translator, $this->navigation, $this->storage);
     }
 
     public function testAddFlashMessage()
@@ -72,27 +51,21 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $expected
-     * @param string $scope
-     * @param int|null $count
      * @dataProvider getNotAvailableMessageDataProvider
      */
-    public function testGetNotAvailableMessage($expected, $scope, $count = null)
+    public function testGetNotAvailableMessage(string $expected, string $scope, int $count = null)
     {
         $entity = new \stdClass();
 
         $this->navigation->expects($this->once())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue($count));
+            ->willReturn($count);
 
         $this->assertEquals($expected, $this->manager->getNotAvailableMessage($entity, $scope));
     }
 
-    /**
-     * @return array
-     */
-    public function getNotAvailableMessageDataProvider()
+    public function getNotAvailableMessageDataProvider(): array
     {
         return [
             'no count' => [
@@ -127,33 +100,27 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         $this->navigation->expects($this->once())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $this->manager->getNotAvailableMessage($entity, $scope);
     }
 
     /**
-     * @param string $expected
-     * @param string $scope
-     * @param int|null $count
      * @dataProvider getNotAccessibleMessageDataProvider
      */
-    public function testGetNotAccessibleMessage($expected, $scope, $count = null)
+    public function testGetNotAccessibleMessage(string $expected, string $scope, int $count = null)
     {
         $entity = new \stdClass();
 
         $this->navigation->expects($this->once())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue($count));
+            ->willReturn($count);
 
         $this->assertEquals($expected, $this->manager->getNotAccessibleMessage($entity, $scope));
     }
 
-    /**
-     * @return array
-     */
-    public function getNotAccessibleMessageDataProvider()
+    public function getNotAccessibleMessageDataProvider(): array
     {
         return [
             'no count' => [
@@ -178,34 +145,30 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|null $expected
-     * @param string $scope
-     * @param bool $shown
-     * @param int|null $viewCount
-     * @param int|null $editCount
      * @dataProvider getInfoMessageDataProvider
      */
-    public function testGetInfoMessage($expected, $scope, $shown, $viewCount = null, $editCount = null)
-    {
+    public function testGetInfoMessage(
+        ?string $expected,
+        string $scope,
+        bool $shown,
+        int $viewCount = null,
+        int $editCount = null
+    ) {
         $entity = new \stdClass();
         $entityName = get_class($entity);
 
         $this->storage->expects($this->once())
             ->method('isInfoMessageShown')
             ->with($entityName, $scope)
-            ->will($this->returnValue($shown));
+            ->willReturn($shown);
 
         $this->navigation->expects($this->any())
             ->method('getTotalCount')
             ->with($entity, $this->isType('string'))
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$entity, EntityPaginationManager::VIEW_SCOPE, $viewCount],
-                        [$entity, EntityPaginationManager::EDIT_SCOPE, $editCount],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$entity, EntityPaginationManager::VIEW_SCOPE, $viewCount],
+                [$entity, EntityPaginationManager::EDIT_SCOPE, $editCount],
+            ]);
 
         if ($expected) {
             $this->storage->expects($this->once())
@@ -219,10 +182,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->manager->getInfoMessage($entity, $scope));
     }
 
-    /**
-     * @return array
-     */
-    public function getInfoMessageDataProvider()
+    public function getInfoMessageDataProvider(): array
     {
         return [
             'message already shown' => [

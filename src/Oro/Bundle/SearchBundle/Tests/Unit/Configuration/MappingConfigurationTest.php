@@ -23,10 +23,7 @@ class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): iterable
     {
         return $this->getTestCaseData(__DIR__ . DIRECTORY_SEPARATOR . 'mapping_configuration');
     }

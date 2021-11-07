@@ -52,13 +52,17 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTranslationKeyProvider
      */
-    public function testGetTranslationKey($expected, $propertyName, $className, $fieldName)
-    {
+    public function testGetTranslationKey(
+        string $expected,
+        string $propertyName,
+        string $className,
+        ?string  $fieldName
+    ) {
         $result = EntityLabelBuilder::getTranslationKey($propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);
     }
 
-    public function getTranslationKeyProvider()
+    public function getTranslationKeyProvider(): array
     {
         return [
             [

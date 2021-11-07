@@ -232,7 +232,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function buildJoinIdentifierProvider()
+    public function buildJoinIdentifierProvider(): array
     {
         return [
             ['alias.fld', null, null, null, null, 'alias.fld'],
@@ -247,7 +247,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function buildColumnJoinIdentifierProvider()
+    public function buildColumnJoinIdentifierProvider(): array
     {
         return [
             [self::ROOT_ENTITY . '::column1', 'column1'],
@@ -257,7 +257,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function explodeColumnNameProvider()
+    public function explodeColumnNameProvider(): array
     {
         return [
             ['column1', ['']],
@@ -291,7 +291,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function explodeJoinIdentifierProvider()
+    public function explodeJoinIdentifierProvider(): array
     {
         return [
             ['', ['']],
@@ -335,7 +335,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function splitJoinIdentifierProvider()
+    public function splitJoinIdentifierProvider(): array
     {
         return [
             ['', ['']],
@@ -362,7 +362,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getParentJoinIdentifierProvider()
+    public function getParentJoinIdentifierProvider(): array
     {
         return [
             ['Acme\E1::column1', ''],
@@ -386,7 +386,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function buildSiblingJoinIdentifierProvider()
+    public function buildSiblingJoinIdentifierProvider(): array
     {
         return [
             ['', 'siblingColumn', self::ROOT_ENTITY . '::siblingColumn'],
@@ -424,7 +424,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getEntityClassNameProvider()
+    public function getEntityClassNameProvider(): array
     {
         return [
             // column names
@@ -450,7 +450,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getUnidirectionalJoinEntityNameProvider()
+    public function getUnidirectionalJoinEntityNameProvider(): array
     {
         return [
             // column names
@@ -476,7 +476,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getFieldNameProvider()
+    public function getFieldNameProvider(): array
     {
         return [
             // column names
@@ -506,7 +506,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function isUnidirectionalJoinProvider()
+    public function isUnidirectionalJoinProvider(): array
     {
         return [
             ['', false],
@@ -525,7 +525,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function isUnidirectionalJoinWithConditionProvider()
+    public function isUnidirectionalJoinWithConditionProvider(): array
     {
         return [
             ['', false],
@@ -545,7 +545,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinProvider()
+    public function getJoinProvider(): array
     {
         return [
             ['', ''],
@@ -560,7 +560,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinTypeProvider()
+    public function getJoinTypeProvider(): array
     {
         return [
             ['', null],
@@ -589,7 +589,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinConditionTypeProvider()
+    public function getJoinConditionTypeProvider(): array
     {
         return [
             ['', null],
@@ -618,7 +618,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinConditionProvider()
+    public function getJoinConditionProvider(): array
     {
         return [
             ['', null],

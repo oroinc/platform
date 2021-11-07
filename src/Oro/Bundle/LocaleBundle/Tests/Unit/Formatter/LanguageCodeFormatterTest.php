@@ -52,10 +52,7 @@ class LanguageCodeFormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($value));
     }
 
-    /**
-     * @return array
-     */
-    public function formatLanguageCodeProvider()
+    public function formatLanguageCodeProvider(): array
     {
         return [
             [
@@ -93,10 +90,7 @@ class LanguageCodeFormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->formatLocale($value));
     }
 
-    /**
-     * @return array
-     */
-    public function formatLocaleCodeProvider()
+    public function formatLocaleCodeProvider(): array
     {
         return [
             [

@@ -60,10 +60,7 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
         DateTimeParser::parse($strDate);
     }
 
-    /**
-     * @return array
-     */
-    public function parseFailureProvider()
+    public function parseFailureProvider(): array
     {
         return [
             [

@@ -77,10 +77,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSet($event);
     }
 
-    /**
-     * @return array
-     */
-    public function formDataProvider()
+    public function formDataProvider(): array
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
@@ -14,8 +15,8 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProp';
         $type     = 'integer';
 
-        $guesser1 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser2 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser1 = $this->createMock(ColumnOptionsGuesserInterface::class);
+        $guesser2 = $this->createMock(ColumnOptionsGuesserInterface::class);
 
         $formatterGuess = new ColumnGuess(
             ['formatter_prop1' => 'prop1', 'formatter_prop2' => 'prop2'],
@@ -33,29 +34,29 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
         $guesser1->expects($this->once())
             ->method('guessFormatter')
             ->with($class, $property, $type)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $guesser2->expects($this->once())
             ->method('guessFormatter')
             ->with($class, $property, $type)
-            ->will($this->returnValue($formatterGuess));
+            ->willReturn($formatterGuess);
 
         $guesser1->expects($this->once())
             ->method('guessSorter')
             ->with($class, $property, $type)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $guesser2->expects($this->once())
             ->method('guessSorter')
             ->with($class, $property, $type)
-            ->will($this->returnValue($sorterGuess));
+            ->willReturn($sorterGuess);
 
         $guesser1->expects($this->once())
             ->method('guessFilter')
             ->with($class, $property, $type)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $guesser2->expects($this->once())
             ->method('guessFilter')
             ->with($class, $property, $type)
-            ->will($this->returnValue($filterGuess));
+            ->willReturn($filterGuess);
 
         $datagridGuesser = new DatagridGuesser([$guesser1, $guesser2]);
         $columnOptions   = [

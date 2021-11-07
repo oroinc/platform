@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DistributionBundle\DependencyInjection\OroDistributionExtension;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
+use Oro\Bundle\TranslationBundle\OroTranslationBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
@@ -28,11 +29,9 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->containerBuilder->expects($this->any())
             ->method('getParameter')
-            ->willReturnMap(
-                [
-                    ['kernel.bundles', $kernelBundles],
-                ]
-            );
+            ->willReturnMap([
+                ['kernel.bundles', $kernelBundles],
+            ]);
 
         $parameters = [];
 
@@ -49,33 +48,31 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedParameters, $parameters);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function loadDataProvider()
+    public function loadDataProvider(): array
     {
         $parameters = [
             'oro_distribution.composer_json' => '%kernel.project_dir%/composer.json',
             'twig.form.resources' => [],
         ];
 
-        yield 'with OroTranslationBundle' => [
-            'kernelBundles' => [
-                'OroTranslationBundle' => 'Oro\Bundle\TranslationBundle\OroTranslationBundle'
-            ],
-            'expectedParameters' => array_merge(
-                $parameters,
-                [
-                    'twig.form.resources' => [
-                        '@OroTranslation/Form/fields.html.twig'
+        return [
+            'with OroTranslationBundle' => [
+                'kernelBundles' => [
+                    'OroTranslationBundle' => OroTranslationBundle::class
+                ],
+                'expectedParameters' => array_merge(
+                    $parameters,
+                    [
+                        'twig.form.resources' => [
+                            '@OroTranslation/Form/fields.html.twig'
+                        ]
                     ]
-                ]
-            )
-        ];
-
-        yield 'without OroTranslationBundle' => [
-            'kernelBundles' => [],
-            'expectedParameters' => array_merge($parameters, ['translator.class' => Translator::class])
+                )
+            ],
+            'without OroTranslationBundle' => [
+                'kernelBundles' => [],
+                'expectedParameters' => array_merge($parameters, ['translator.class' => Translator::class])
+            ]
         ];
     }
 }

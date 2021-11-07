@@ -20,7 +20,7 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
         $this->listener = new ConsoleCommandListener($this->featureChecker);
     }
 

@@ -208,7 +208,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertTrue($form->isSynchronized());
-        static::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
+        self::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
     public function testSubmitWhenNoTitle(): void
@@ -225,7 +225,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
         $this->assertEquals($defaultData, $form->getViewData());
 
         $sourceFile = new File();
-        $sourceFile->setFile($file = new SymfonyFile('sample-path', false));
+        $sourceFile->setFile(new SymfonyFile('sample-path', false));
 
         $form->submit(
             [
@@ -236,7 +236,7 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
         $this->assertFalse($form->isValid());
         $this->assertTrue($form->isSynchronized());
-        static::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
+        self::assertStringContainsString('This value should not be blank', (string)$form->getErrors(true, false));
     }
 
     /**

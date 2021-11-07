@@ -92,7 +92,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
             ->with($config)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->assertFalse($this->extension->isApplicable($config));
         $this->assertArrayNotHasKey('board', $config->offsetGet(AppearanceExtension::APPEARANCE_CONFIG_PATH));
     }
@@ -129,22 +129,22 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         ]);
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->assertTrue($this->extension->isApplicable($config));
 
         $this->processor->expects($this->once())
             ->method('getBoardOptions')
-            ->will($this->returnValue(['options']));
+            ->willReturn(['options']);
 
         $this->translator->expects($this->once())
             ->method('trans')
             ->with('board label')
-            ->will($this->returnValue('translated board label'));
+            ->willReturn('translated board label');
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('update_acl_resource')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $data = MetadataObject::create([]);
         $this->extension->visitMetadata($config, $data);
@@ -201,7 +201,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         ]);
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->isApplicable($config);
         $this->expectException(RuntimeException::class);
         $data = MetadataObject::create([]);
@@ -231,7 +231,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         ];
         $this->processor->expects($this->once())
             ->method('getBoardOptions')
-            ->will($this->returnValue($options));
+            ->willReturn($options);
 
         $appearanceData = [
             'id' => 'board-id',
@@ -247,7 +247,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($dataSource, $appearanceData, $config);
         $this->restrictionManager->expects($this->once())
             ->method('boardViewEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->isApplicable($config);
 
         $this->extension->visitDatasource($config, $dataSource);

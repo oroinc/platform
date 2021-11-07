@@ -9,26 +9,22 @@ class PdoMysqlTest extends AbstractPdoTest
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->driver = new PdoMysql();
     }
 
     /**
      * @dataProvider getJoiAttributesDataProvider
-     * @param string|array $fieldName
-     * @param string $type
-     * @param array $existingAliases
-     * @param array $expected
      */
-    public function testGetJoinAttributes($fieldName, $type, array $existingAliases, array $expected)
-    {
+    public function testGetJoinAttributes(
+        string|array $fieldName,
+        string $type,
+        array $existingAliases,
+        array $expected
+    ) {
         $this->assertEquals($expected, $this->driver->getJoinAttributes($fieldName, $type, $existingAliases));
     }
 
-    /**
-     * @return array
-     */
-    public function getJoiAttributesDataProvider()
+    public function getJoiAttributesDataProvider(): array
     {
         return [
             [

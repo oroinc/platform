@@ -16,14 +16,10 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 {
     use LoggerAwareTraitTestTrait;
 
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedClient;
 
-    /**
-     * @var LoggerAwareWebsocketClientDecorator
-     */
+    /** @var LoggerAwareWebsocketClientDecorator */
     private $loggerAwareClientDecorator;
 
     protected function setUp(): void
@@ -31,7 +27,6 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $this->decoratedClient = $this->createMock(WebsocketClientInterface::class);
 
         $this->loggerAwareClientDecorator = new LoggerAwareWebsocketClientDecorator($this->decoratedClient);
-
         $this->setUpLoggerMock($this->loggerAwareClientDecorator);
     }
 
@@ -39,8 +34,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
     {
         $connectionSession = 'sampleSession';
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('connect')
             ->willReturn($connectionSession);
 
@@ -51,8 +45,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 
     public function testConnectWithException()
     {
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('connect')
             ->willThrowException(new WebsocketException());
 
@@ -63,8 +56,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 
     public function testDisconnect()
     {
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('disconnect')
             ->willReturn(true);
 
@@ -75,8 +67,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 
     public function testDisconnectFailed()
     {
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('disconnect')
             ->willReturn(false);
 
@@ -87,8 +78,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
 
     public function testIsConnected()
     {
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('isConnected')
             ->willReturn(true);
 
@@ -102,8 +92,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $exclude = ['sampleExclude'];
         $eligible = ['sampleEligible'];
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('publish')
             ->with($topicUri, $payload, $exclude, $eligible)
             ->willReturn(true);
@@ -123,8 +112,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $exclude = ['sampleExclude'];
         $eligible = ['sampleEligible'];
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('publish')
             ->with($topicUri, $payload, $exclude, $eligible)
             ->willThrowException($exception);
@@ -139,8 +127,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('prefix')
             ->with($prefix, $uri)
             ->willReturn(true);
@@ -155,8 +142,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('prefix')
             ->with($prefix, $uri)
             ->willThrowException(new WebsocketException());
@@ -170,8 +156,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
     {
         $exception = new BadResponseException();
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('prefix')
             ->willThrowException($exception);
 
@@ -187,8 +172,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('call')
             ->with($procUri, $arguments)
             ->willReturn(true);
@@ -203,8 +187,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('call')
             ->with($procUri, $arguments)
             ->willThrowException(new WebsocketException());
@@ -219,8 +202,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('event')
             ->with($topicUri, $payload)
             ->willReturn(true);
@@ -238,8 +220,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
 
-        $this->decoratedClient
-            ->expects(self::once())
+        $this->decoratedClient->expects(self::once())
             ->method('event')
             ->with($topicUri, $payload)
             ->willThrowException($exception);

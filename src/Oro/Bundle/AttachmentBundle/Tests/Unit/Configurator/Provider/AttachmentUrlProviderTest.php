@@ -33,17 +33,14 @@ class AttachmentUrlProviderTest extends \PHPUnit\Framework\TestCase
         $filterName = 'filterName';
         $filter = ['filterName' => ['option' => 'value']];
 
-        $this->attachmentPostProcessorsProvider
-            ->expects($this->once())
+        $this->attachmentPostProcessorsProvider->expects($this->once())
             ->method('isPostProcessingEnabled')
             ->willReturn(false);
 
-        $this->attachmentFilterConfiguration
-            ->expects($this->never())
+        $this->attachmentFilterConfiguration->expects($this->never())
             ->method('get');
 
-        $this->attachmentFilterConfiguration
-            ->expects($this->once())
+        $this->attachmentFilterConfiguration->expects($this->once())
             ->method('getOriginal')
             ->with($filterName)
             ->willReturn($filter);
@@ -57,19 +54,16 @@ class AttachmentUrlProviderTest extends \PHPUnit\Framework\TestCase
         $filterName = 'filterName';
         $filter = ['filterName' => ['option' => 'value']];
 
-        $this->attachmentPostProcessorsProvider
-            ->expects($this->once())
+        $this->attachmentPostProcessorsProvider->expects($this->once())
             ->method('isPostProcessingEnabled')
             ->willReturn(true);
 
-        $this->attachmentFilterConfiguration
-            ->expects($this->once())
+        $this->attachmentFilterConfiguration->expects($this->once())
             ->method('get')
             ->with($filterName)
             ->willReturn($filter);
 
-        $this->attachmentFilterConfiguration
-            ->expects($this->never())
+        $this->attachmentFilterConfiguration->expects($this->never())
             ->method('getOriginal');
 
         $hash = $this->attachmentHashProvider->getFilterConfigHash($filterName);

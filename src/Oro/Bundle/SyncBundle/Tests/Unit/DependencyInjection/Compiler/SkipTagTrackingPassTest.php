@@ -2,6 +2,18 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AuditField;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\PageState;
+use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
+use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
+use Oro\Bundle\SearchBundle\Entity\IndexInteger;
+use Oro\Bundle\SearchBundle\Entity\IndexText;
+use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -37,18 +49,18 @@ class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
         }
         self::assertEquals(
             [
-                'Oro\Bundle\DataAuditBundle\Entity\Audit',
-                'Oro\Bundle\DataAuditBundle\Entity\AuditField',
-                'Oro\Bundle\NavigationBundle\Entity\PageState',
-                'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem',
-                'Oro\Bundle\SearchBundle\Entity\Item',
-                'Oro\Bundle\SearchBundle\Entity\IndexText',
-                'Oro\Bundle\SearchBundle\Entity\IndexInteger',
-                'Oro\Bundle\SearchBundle\Entity\IndexDecimal',
-                'Oro\Bundle\SearchBundle\Entity\IndexDatetime',
-                'Oro\Bundle\BatchBundle\Entity\JobExecution',
-                'Oro\Bundle\BatchBundle\Entity\StepExecution',
-                'Oro\Bundle\MessageQueueBundle\Entity\Job',
+                Audit::class,
+                AuditField::class,
+                PageState::class,
+                NavigationHistoryItem::class,
+                Item::class,
+                IndexText::class,
+                IndexInteger::class,
+                IndexDecimal::class,
+                IndexDatetime::class,
+                JobExecution::class,
+                StepExecution::class,
+                Job::class,
             ],
             $skippedEntityClasses
         );

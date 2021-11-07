@@ -10,7 +10,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldBeConstructedWithAllRequiredArguments()
     {
-        new  CommandRunner($this->createProducerMock());
+        new  CommandRunner($this->createMock(MessageProducerInterface::class));
     }
 
     public function testShouldSendMessageWithCommandParams()
@@ -18,9 +18,8 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
         $testCommandName = 'oro:test';
         $testCommandArguments = ['argument' => 'value'];
 
-        $producer = $this->createProducerMock();
-        $producer
-            ->expects($this->once())
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->once())
             ->method('send')
             ->with(
                 Topics::RUN_COMMAND,
@@ -28,18 +27,9 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
                     'command' => $testCommandName,
                     'arguments' => $testCommandArguments
                 ]
-            )
-        ;
+            );
 
         $runner = new CommandRunner($producer);
         $runner->run($testCommandName, $testCommandArguments);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | MessageProducerInterface
-     */
-    private function createProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
     }
 }

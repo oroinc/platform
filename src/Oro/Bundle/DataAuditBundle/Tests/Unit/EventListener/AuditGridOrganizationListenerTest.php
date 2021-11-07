@@ -28,7 +28,9 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->repository = $this->createMock(OrganizationRepository::class);
-        $this->doctrineHelper->expects($this->any())->method('getEntityRepository')->willReturn($this->repository);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->willReturn($this->repository);
 
         $this->listener = new AuditGridOrganizationListener($this->doctrineHelper);
 
@@ -45,7 +47,8 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $record = new ResultRecord([]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
-        $this->repository->expects($this->never())->method('find');
+        $this->repository->expects($this->never())
+            ->method('find');
         $this->listener->addOrganizationSupport($event);
         $this->assertNull($record->getValue('organization'));
     }
@@ -54,7 +57,9 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $record = new ResultRecord(['organization' => 1]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
-        $this->repository->expects($this->once())->method('find')->willReturn(null);
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->willReturn(null);
         $this->listener->addOrganizationSupport($event);
         $this->assertNull($record->getValue('organization'));
     }
@@ -65,7 +70,9 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
         $organization->setName('Org Name');
         $record = new ResultRecord(['organization' => 1]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
-        $this->repository->expects($this->once())->method('find')->willReturn($organization);
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->willReturn($organization);
         $this->listener->addOrganizationSupport($event);
         $this->assertSame($organization->getName(), $record->getValue('organization'));
     }
@@ -80,12 +87,12 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
         $record = new ResultRecord(['organization' => 1]);
         $record2 = new ResultRecord(['organization' => 2]);
         $event = new OrmResultAfter($this->datagrid, [$record, $record2]);
-        $this->repository->expects($this->exactly(2))->method('find')->willReturnMap(
-            [
+        $this->repository->expects($this->exactly(2))
+            ->method('find')
+            ->willReturnMap([
                 [1, null, null, $organization],
                 [2, null, null, $organization2],
-            ]
-        );
+            ]);
         $this->listener->addOrganizationSupport($event);
 
         $this->assertSame($organization->getName(), $record->getValue('organization'));

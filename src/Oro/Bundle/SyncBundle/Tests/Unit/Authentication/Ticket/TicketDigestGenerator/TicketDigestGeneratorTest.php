@@ -7,19 +7,13 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $passwordEncoder;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $secret;
 
-    /**
-     * @var TicketDigestGenerator
-     */
+    /** @var TicketDigestGenerator */
     private $ticketDigestGenerator;
 
     protected function setUp(): void
@@ -38,9 +32,7 @@ class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
         $raw = 'sampleNonce|sampleCreated|samplePassword';
 
         $expectedDigest = 'sampleDigest';
-        $this
-            ->passwordEncoder
-            ->expects(self::once())
+        $this->passwordEncoder->expects(self::once())
             ->method('encodePassword')
             ->with($raw, $this->secret)
             ->willReturn($expectedDigest);

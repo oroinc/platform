@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\Extension\Configuration;
@@ -14,20 +15,20 @@ use Oro\Component\Testing\ReflectionUtil;
 class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AbstractExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->extension = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\AbstractExtension');
+        $this->extension = $this->getMockForAbstractClass(AbstractExtension::class);
         $this->extension->setParameters(new ParameterBag());
     }
 
     public function testParameters()
     {
-        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters = $this->createMock(ParameterBag::class);
 
         $this->extension->setParameters($parameters);
-        $this->assertEquals($parameters, $this->extension->getParameters($parameters));
+        $this->assertEquals($parameters, $this->extension->getParameters());
     }
 
     public function testGetPriority()
@@ -40,8 +41,8 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testVisitDatasource()
     {
-        $datasourceMock = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
-        $config         = DatagridConfiguration::create([]);
+        $datasourceMock = $this->createMock(DatasourceInterface::class);
+        $config = DatagridConfiguration::create([]);
 
         $this->extension->visitDatasource($config, $datasourceMock);
     }
@@ -70,7 +71,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testVisitMetadata()
     {
-        $data   = MetadataObject::create([]);
+        $data = MetadataObject::create([]);
         $config = DatagridConfiguration::create([]);
 
         $this->extension->visitMetadata($config, $data);
@@ -79,7 +80,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     public function testValidateConfiguration()
     {
         $configBody = [Configuration::NODE => 'test'];
-        $config     = [Configuration::ROOT => $configBody];
+        $config = [Configuration::ROOT => $configBody];
 
         $this->assertSame(
             $configBody,

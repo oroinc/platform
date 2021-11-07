@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 /**
@@ -13,7 +14,7 @@ use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
-    protected $configuration;
+    private $configuration;
 
     protected function setUp(): void
     {
@@ -33,7 +34,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrmQueryForNotOrmDatasourceType()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The expected data grid source type is "orm". Actual source type is "another".');
 
         $this->configuration->setDatasourceType('another');
@@ -76,17 +77,15 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $params
-     * @param bool $expected
      * @dataProvider getAclResourceDataProvider
      */
-    public function testGetAclResource(array $params, $expected)
+    public function testGetAclResource(array $params, bool $expected)
     {
         $this->configuration->merge($params);
         $this->assertEquals($expected, $this->configuration->getAclResource());
     }
 
-    public function getAclResourceDataProvider()
+    public function getAclResourceDataProvider(): array
     {
         return [
             [
@@ -143,17 +142,15 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $params
-     * @param bool $expected
      * @dataProvider isDatasourceSkipAclApplyDataProvider
      */
-    public function testIsDatasourceSkipAclApply(array $params, $expected)
+    public function testIsDatasourceSkipAclApply(array $params, bool $expected)
     {
         $this->configuration->merge($params);
         $this->assertEquals($expected, $this->configuration->isDatasourceSkipAclApply());
     }
 
-    public function isDatasourceSkipAclApplyDataProvider()
+    public function isDatasourceSkipAclApplyDataProvider(): array
     {
         return [
             [
@@ -197,21 +194,14 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addColumnDataProvider
-     *
-     * @param array  $expected
-     * @param string $name
-     * @param string $select
-     * @param array  $definition
-     * @param array  $sorter
-     * @param array  $filter
      */
     public function testAddColumn(
-        $expected,
-        $name,
-        $definition,
-        $select = null,
-        $sorter = [],
-        $filter = []
+        array $expected,
+        string $name,
+        array  $definition,
+        string $select = null,
+        array $sorter = [],
+        array $filter = []
     ) {
         $this->configuration->addColumn(
             $name,
@@ -238,7 +228,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
 
-        $this->configuration->updateLabel(null, []);
+        $this->configuration->updateLabel(null, 'label1');
     }
 
     public function testUpdateLabel()
@@ -338,10 +328,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
     }
 
-    /**
-     * @return array
-     */
-    public function addColumnDataProvider()
+    public function addColumnDataProvider(): array
     {
         return [
             'all data supplied'         => [

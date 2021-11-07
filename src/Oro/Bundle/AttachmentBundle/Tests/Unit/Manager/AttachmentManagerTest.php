@@ -11,7 +11,6 @@ use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileIconProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -40,9 +39,6 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentManager */
     private $attachmentManager;
 
-    /** @var TestFile */
-    private $file;
-
     protected function setUp(): void
     {
         $this->fileUrlProvider = $this->createMock(FileUrlProviderInterface::class);
@@ -51,10 +47,6 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $this->associationManager = $this->createMock(AssociationManager::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->registry = $this->createMock(ManagerRegistry::class);
-
-        $this->file = new TestFile();
-        $this->file->setFilename('testFile.txt');
-        $this->file->setOriginalFilename('testFile.txt');
 
         $this->attachmentManager = new AttachmentManager(
             $this->fileUrlProvider,
@@ -68,8 +60,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileRestApiUrl(): void
     {
-        $this->urlGenerator
-            ->expects(self::once())
+        $this->urlGenerator->expects(self::once())
             ->method('generate')
             ->with('oro_api_get_file', ['id' => $fileId = 1, '_format' => 'binary'])
             ->willReturn($url = '/sample-url');
@@ -79,8 +70,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileUrl(): void
     {
-        $this->fileUrlProvider
-            ->expects(self::once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getFileUrl')
             ->with($file = new File(), $action = 'sample-action', $referenceType = 1)
             ->willReturn($url = '/sample-url');
@@ -90,8 +80,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetResizedImageUrl(): void
     {
-        $this->fileUrlProvider
-            ->expects(self::once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getResizedImageUrl')
             ->with($file = new File(), $width = 10, $height = 20, $referenceType = 1)
             ->willReturn($url = '/sample-url');
@@ -101,8 +90,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageUrl(): void
     {
-        $this->fileUrlProvider
-            ->expects(self::once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file = new File(), $filter = 'sample-filter', $referenceType = 1)
             ->willReturn($url = '/sample-url');
@@ -112,26 +100,22 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageUrlByIdAndFilename(): void
     {
-        $this->registry
-            ->expects(self::once())
+        $this->registry->expects(self::once())
             ->method('getManagerForClass')
             ->with(File::class)
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
-        $entityManager
-            ->expects(self::once())
+        $entityManager->expects(self::once())
             ->method('getRepository')
             ->with(File::class)
             ->willReturn($repo = $this->createMock(EntityRepository::class));
 
-        $repo
-            ->expects(self::once())
+        $repo->expects(self::once())
             ->method('find')
             ->with($fileId = 1)
             ->willReturn($file = (new File())->setFilename($filename = 'sample-filename'));
 
-        $this->fileUrlProvider
-            ->expects(self::once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file, $filter = 'sample-filter', $referenceType = 1)
             ->willReturn($url = '/sample-url');
@@ -144,26 +128,22 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageUrlByIdAndFilenameWhenNoFile(): void
     {
-        $this->registry
-            ->expects(self::once())
+        $this->registry->expects(self::once())
             ->method('getManagerForClass')
             ->with(File::class)
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
-        $entityManager
-            ->expects(self::once())
+        $entityManager->expects(self::once())
             ->method('getRepository')
             ->with(File::class)
             ->willReturn($repo = $this->createMock(EntityRepository::class));
 
-        $repo
-            ->expects(self::once())
+        $repo->expects(self::once())
             ->method('find')
             ->with($fileId = 1)
             ->willReturn(null);
 
-        $this->fileUrlProvider
-            ->expects(self::never())
+        $this->fileUrlProvider->expects(self::never())
             ->method('getFilteredImageUrl');
 
         self::assertEmpty($this->attachmentManager->getFilteredImageUrlByIdAndFilename(
@@ -178,8 +158,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
     {
         $file = $this->createMock(FileExtensionInterface::class);
 
-        $this->fileIconProvider
-            ->expects(self::once())
+        $this->fileIconProvider->expects(self::once())
             ->method('getExtensionIconClass')
             ->with($file)
             ->willReturn($icon = 'sample-icon');
@@ -189,7 +168,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsImageType(): void
     {
-        $this->mimeTypeChecker
+        $this->mimeTypeChecker->expects($this->any())
             ->method('isImageMimeType')
             ->withConsecutive([$mimeType1 = 'sample/type'], [$mimeType2 = 'sample/not-image'])
             ->willReturnOnConsecutiveCalls(true, false);
@@ -200,7 +179,7 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileIcons(): void
     {
-        $this->fileIconProvider
+        $this->fileIconProvider->expects($this->any())
             ->method('getFileIcons')
             ->willReturn($fileIcons = ['icon1', 'icon2']);
 
@@ -209,15 +188,13 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttachmentTargets(): void
     {
-        $this->associationManager
-            ->expects(self::once())
+        $this->associationManager->expects(self::once())
             ->method('getSingleOwnerFilter')
             ->with('attachment')
             ->willReturn(function () {
             });
 
-        $this->associationManager
-            ->expects(self::once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(
                 AttachmentScope::ATTACHMENT,

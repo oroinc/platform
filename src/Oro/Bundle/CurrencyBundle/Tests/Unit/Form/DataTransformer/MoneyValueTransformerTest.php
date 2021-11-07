@@ -27,7 +27,7 @@ class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValue, $this->transformer->reverseTransform($rawValue));
     }
 
-    public function reverseTransformProvider()
+    public function reverseTransformProvider(): array
     {
         return [
             'Not numeric' => [

@@ -7,8 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class WindowsStateTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WindowsState */
-    private $windowState;
+    private WindowsState $windowState;
 
     protected function setUp(): void
     {
@@ -16,13 +15,9 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test getters and setters
-     *
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testGetSet($property, $value)
+    public function testGetSet(string $property, mixed $value)
     {
         $setMethod = 'set' . ucfirst($property);
         $getMethod = 'get' . ucfirst($property);
@@ -37,10 +32,7 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->windowState->isRenderedSuccessfully());
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         $userMock = $this->createMock(UserInterface::class);
 

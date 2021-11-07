@@ -89,7 +89,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function entityProvider()
+    public function entityProvider(): array
     {
         return [
             'excluded'                                    => ['Test\Entity\Entity3', true],
@@ -98,7 +98,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function fieldProvider()
+    public function fieldProvider(): array
     {
         return [
             'excluded'                                               => [
