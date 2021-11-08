@@ -57,6 +57,19 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
+    private function createRelationConfigObject(array $definition = null, array $testSection = null): Config
+    {
+        $config = new Config();
+        if (null !== $definition) {
+            $config->setDefinition($this->createConfigObject($definition));
+        }
+        if (null !== $testSection) {
+            $config->set('test_section', $testSection);
+        }
+
+        return $config;
+    }
+
     public function testProcessWhenConfigAlreadyCompleted()
     {
         $this->doctrineHelper->expects(self::never())
@@ -372,6 +385,74 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                         'fields' => [
                             'account' => null
                         ]
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForManageableEntityWithMaxResultsAndOrderBy()
+    {
+        $entityDefinition = $this->createConfigObject([
+            'fields' => [
+                'accounts' => [
+                    'max_results' => 10,
+                    'order_by'    => ['name' => 'ASC']
+                ]
+            ]
+        ]);
+        $this->context->setResult($entityDefinition);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['accounts']),
+            new TestConfigSection('test_section')
+        ]);
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfig')
+            ->with(
+                'Test\Account',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new TestConfigSection('test_section')]
+            )
+            ->willReturn($this->createRelationConfigObject([]));
+
+        $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('accounts')
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with('accounts')
+            ->willReturn('Test\Account');
+        $metadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('accounts')
+            ->willReturn(true);
+        $accountMetadata = new ClassMetadata('Test\Account');
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $metadata],
+                ['Test\Account', true, $accountMetadata]
+            ]);
+
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'accounts' => [
+                        'max_results'  => 10,
+                        'order_by'     => ['name' => 'ASC'],
+                        'target_class' => 'Test\Account',
+                        'target_type'  => 'to-many'
                     ]
                 ]
             ],
@@ -744,24 +825,5 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ],
             $this->context->getResult()
         );
-    }
-
-    /**
-     * @param array|null $definition
-     * @param array|null $testSection
-     *
-     * @return Config
-     */
-    private function createRelationConfigObject(array $definition = null, array $testSection = null)
-    {
-        $config = new Config();
-        if (null !== $definition) {
-            $config->setDefinition($this->createConfigObject($definition));
-        }
-        if (null !== $testSection) {
-            $config->set('test_section', $testSection);
-        }
-
-        return $config;
     }
 }

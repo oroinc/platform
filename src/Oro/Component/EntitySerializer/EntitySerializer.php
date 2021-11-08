@@ -591,7 +591,7 @@ class EntitySerializer
         }
 
         return $this->loadRelatedItems(
-            $this->queryFactory->getRelatedItemsIds(
+            $this->loadRelatedItemsIds(
                 $this->queryFactory->getNotInitializedToManyAssociationQueryBuilder($associationMapping),
                 $associationMapping['sourceEntity'],
                 $targetEntityClass,
@@ -638,7 +638,7 @@ class EntitySerializer
         }
 
         return $this->loadRelatedItems(
-            $this->queryFactory->getRelatedItemsIds(
+            $this->loadRelatedItemsIds(
                 clone $associationQuery->getQueryBuilder(),
                 $entityClass,
                 $targetEntityClass,
@@ -718,6 +718,30 @@ class EntitySerializer
         return
             null === $config->getMaxResults()
             && !$this->hasAssociations($entityClass, $config);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param string       $targetEntityClass
+     * @param array        $entityIds
+     * @param EntityConfig $config
+     *
+     * @return array [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
+     */
+    protected function loadRelatedItemsIds(
+        QueryBuilder $qb,
+        $entityClass,
+        $targetEntityClass,
+        array $entityIds,
+        EntityConfig $config
+    ) {
+        $orderBy = $config->getOrderBy();
+        foreach ($orderBy as $field => $direction) {
+            $qb->addOrderBy(QueryBuilderUtil::getField('r', $field), QueryBuilderUtil::getSortOrder($direction));
+        }
+
+        return $this->queryFactory->getRelatedItemsIds($qb, $entityClass, $targetEntityClass, $entityIds, $config);
     }
 
     /**

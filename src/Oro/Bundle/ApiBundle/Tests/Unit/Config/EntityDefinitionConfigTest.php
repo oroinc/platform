@@ -547,6 +547,23 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
+    public function testOrderBy()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertFalse($config->hasOrderBy());
+        self::assertSame([], $config->getOrderBy());
+
+        $config->setOrderBy(['name' => 'ASC']);
+        self::assertTrue($config->hasOrderBy());
+        self::assertEquals(['name' => 'ASC'], $config->getOrderBy());
+        self::assertEquals(['order_by' => ['name' => 'ASC']], $config->toArray());
+
+        $config->setOrderBy();
+        self::assertFalse($config->hasOrderBy());
+        self::assertSame([], $config->getOrderBy());
+        self::assertSame([], $config->toArray());
+    }
+
     public function testMaxResults()
     {
         $config = new EntityDefinitionConfig();
