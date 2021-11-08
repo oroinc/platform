@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
-use Oro\Bundle\ApiBundle\Filter\SearchFieldResolver;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

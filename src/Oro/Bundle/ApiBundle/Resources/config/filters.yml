@@ -70,22 +70,6 @@ services:
             - '@oro_entity_extend.association_manager'
             - '@oro_api.entity_override_provider_registry'
 
-    oro_api.filter_factory.search_query:
-        class: Oro\Bundle\ApiBundle\Filter\SearchQueryFilterFactory
-        arguments:
-            - '@oro_search.provider.search_mapping'
-            - '@oro_api.search_field_resolver_factory'
-
-    oro_api.filter_factory.search_aggregation:
-        class: Oro\Bundle\ApiBundle\Filter\SearchAggregationFilterFactory
-        arguments:
-            - '@oro_api.search_field_resolver_factory'
-
-    oro_api.search_field_resolver_factory:
-        class: Oro\Bundle\ApiBundle\Filter\SearchFieldResolverFactory
-        arguments:
-            - '@oro_search.provider.search_mapping'
-
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory
         arguments:

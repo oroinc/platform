@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Filter;
+namespace Oro\Bundle\SearchBundle\Api\Filter;
 
 /**
  * The factory to create SearchAggregationFilter.

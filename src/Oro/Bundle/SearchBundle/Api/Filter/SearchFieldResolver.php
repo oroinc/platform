@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Filter;
+namespace Oro\Bundle\SearchBundle\Api\Filter;
 
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\SearchBundle\Query\Expression\FieldResolverInterface;
@@ -27,7 +27,7 @@ class SearchFieldResolver implements FieldResolverInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function resolveFieldName(string $fieldName): string
     {
@@ -35,7 +35,7 @@ class SearchFieldResolver implements FieldResolverInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function resolveFieldType(string $fieldName): string
     {

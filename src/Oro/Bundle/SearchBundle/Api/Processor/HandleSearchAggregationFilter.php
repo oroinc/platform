@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\SearchBundle\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Filter\SearchAggregationFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class HandleSearchAggregationFilter implements ProcessorInterface
 {
-    /** @var string */
-    private $aggregationFilterName;
+    private string $aggregationFilterName;
 
     public function __construct(string $aggregationFilterName = 'aggregations')
     {
@@ -23,7 +22,7 @@ class HandleSearchAggregationFilter implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context)
     {

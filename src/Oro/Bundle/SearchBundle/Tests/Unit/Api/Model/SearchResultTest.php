@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Model;
 
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\DriverException;
-use Oro\Bundle\ApiBundle\Model\SearchResult;
+use Oro\Bundle\SearchBundle\Api\Exception\InvalidSearchQueryException;
+use Oro\Bundle\SearchBundle\Api\Model\SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
@@ -121,7 +122,7 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRecordsForInvalidQuery()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
+        $this->expectException(InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -133,7 +134,7 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRecordsForInvalidQueryAndLazyResult()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
+        $this->expectException(InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
         $result = $this->createMock(Result::class);
 
@@ -179,7 +180,7 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRecordsCountForInvalidQuery()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
+        $this->expectException(InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())
@@ -234,7 +235,7 @@ class SearchResultTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAggregatedDataForInvalidQuery()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException::class);
+        $this->expectException(InvalidSearchQueryException::class);
         $searchResult = new SearchResult($this->query);
 
         $this->query->expects(self::once())

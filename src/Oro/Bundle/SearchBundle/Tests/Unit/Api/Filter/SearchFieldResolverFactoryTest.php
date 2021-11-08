@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
-use Oro\Bundle\ApiBundle\Filter\SearchFieldResolver;
-use Oro\Bundle\ApiBundle\Filter\SearchFieldResolverFactory;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
 class SearchFieldResolverFactoryTest extends \PHPUnit\Framework\TestCase

@@ -262,12 +262,6 @@ oro_api:
         nestedTree:
             class: Oro\Bundle\ApiBundle\Filter\NestedTreeFilter
             supported_operators: ['>', '>=']
-        searchQuery:
-            factory: ['@oro_api.filter_factory.search_query', 'createFilter']
-            supported_operators: ['=']
-        searchAggregation:
-            factory: ['@oro_api.filter_factory.search_aggregation', 'createFilter']
-            supported_operators: ['=']
 
     error_title_overrides:
         'percent range constraint': 'range constraint'

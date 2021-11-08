@@ -1,11 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Filter;
+namespace Oro\Bundle\SearchBundle\Api\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
+use Oro\Bundle\ApiBundle\Filter\FieldFilterInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer as SearchQueryLexer;
@@ -61,7 +64,7 @@ class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {

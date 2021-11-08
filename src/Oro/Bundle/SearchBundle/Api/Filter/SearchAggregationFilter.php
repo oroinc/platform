@@ -1,9 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Filter;
+namespace Oro\Bundle\SearchBundle\Api\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
+use Oro\Bundle\ApiBundle\Filter\FieldFilterInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\SearchBundle\Query\Expression\TokenInfo;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
@@ -43,7 +46,7 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {

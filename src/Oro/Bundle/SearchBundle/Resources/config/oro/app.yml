@@ -32,3 +32,12 @@ fos_rest:
             'Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError': true
         codes:
             'Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError': HTTP_BAD_REQUEST
+
+oro_api:
+    filters:
+        searchQuery:
+            factory: ['@oro_search.api.filter_factory.search_query', 'createFilter']
+            supported_operators: ['=']
+        searchAggregation:
+            factory: ['@oro_search.api.filter_factory.search_aggregation', 'createFilter']
+            supported_operators: ['=']
