@@ -55,11 +55,11 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->any())
             ->method('getRepository')
             ->with('OroDataGridBundle:GridView')
-            ->will($this->returnValue($this->gridViewRepository));
+            ->willReturn($this->gridViewRepository);
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->gridViewsLoadListener = new GridViewsLoadListener(
             $this->registry,
@@ -79,7 +79,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($currentUser));
+            ->willReturn($currentUser);
 
         $systemView = new View('first');
         $view1 = new GridView();

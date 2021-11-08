@@ -10,11 +10,11 @@ use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\TestEntity;
 
 class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
+
     /** @var TaggableHelper */
     private $helper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
 
     protected function setUp(): void
     {
@@ -25,45 +25,37 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getEntityIdDataProvider
-     *
-     * @param object $object
-     * @param bool   $expectedId
      */
-    public function testGetEntityId($object, $expectedId)
+    public function testGetEntityId(object $object, int $expectedId)
     {
         $this->assertEquals($expectedId, TaggableHelper::getEntityId($object));
     }
 
     /**
      * @dataProvider isImplementsTaggableDataProvider
-     *
-     * @param object $object
-     * @param bool   $result
      */
-    public function testIsImplementsTaggable($object, $result)
+    public function testIsImplementsTaggable(object $object, bool $result)
     {
         $this->assertEquals($result, TaggableHelper::isImplementsTaggable($object));
     }
 
     /**
      * @dataProvider isTaggableDataProvider
-     *
-     * @param object $object
-     * @param bool   $result
-     * @param bool   $needSetConfig
-     * @param bool   $hasConfig
-     * @param bool   $isEnabled
      */
-    public function testIsTaggable($object, $result, $needSetConfig = false, $hasConfig = false, $isEnabled = false)
-    {
+    public function testIsTaggable(
+        object $object,
+        bool $result,
+        bool $needSetConfig = false,
+        bool $hasConfig = false,
+        bool $isEnabled = false
+    ) {
         if ($needSetConfig) {
             $this->setConfigProvider($object, $hasConfig, $isEnabled);
         }
         $this->assertEquals($result, $this->helper->isTaggable($object));
     }
 
-    /** @return array */
-    public function isTaggableDataProvider()
+    public function isTaggableDataProvider(): array
     {
         return [
             'implements Taggable' => [new Taggable(), true],
@@ -75,19 +67,13 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isTaggableDataProvider
-     *
-     * @param object $object
-     * @param bool   $expected
-     * @param bool   $needSetConfig
-     * @param bool   $hasConfig
-     * @param bool   $isEnableGridColumn
      */
     public function testIsEnableGridColumn(
-        $object,
-        $expected,
-        $needSetConfig = false,
-        $hasConfig = false,
-        $isEnableGridColumn = false
+        object $object,
+        bool $expected,
+        bool $needSetConfig = false,
+        bool $hasConfig = false,
+        bool $isEnableGridColumn = false
     ) {
         if ($needSetConfig) {
             $this->setConfigProvider($object, $hasConfig, $isEnableGridColumn);
@@ -97,19 +83,13 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isTaggableDataProvider
-     *
-     * @param object $object
-     * @param bool   $expected
-     * @param bool   $needSetConfig
-     * @param bool   $hasConfig
-     * @param bool   $isEnableGridFilter
      */
     public function testIsEnableGridFilter(
-        $object,
-        $expected,
-        $needSetConfig = false,
-        $hasConfig = false,
-        $isEnableGridFilter = false
+        object $object,
+        bool $expected,
+        bool $needSetConfig = false,
+        bool $hasConfig = false,
+        bool $isEnableGridFilter = false
     ) {
         if ($needSetConfig) {
             $this->setConfigProvider($object, $hasConfig, $isEnableGridFilter);
@@ -119,18 +99,14 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider shouldRenderDefaultDataProvider
-     *
-     * @param object $object
-     * @param bool   $expected
-     * @param bool   $shouldRenderDefault
      */
-    public function testShouldRenderDefault($object, $expected, $shouldRenderDefault)
+    public function testShouldRenderDefault(object $object, bool $expected, bool $shouldRenderDefault)
     {
         $this->setConfigProvider($object, true, $shouldRenderDefault);
         $this->assertEquals($expected, $this->helper->shouldRenderDefault($object));
     }
 
-    public function shouldRenderDefaultDataProvider()
+    public function shouldRenderDefaultDataProvider(): array
     {
         return [
             'not implements Taggable' => [new \stdClass(), false, false],
@@ -139,8 +115,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /** @return array */
-    public function isImplementsTaggableDataProvider()
+    public function isImplementsTaggableDataProvider(): array
     {
         return [
             'implements Taggable'     => [new Taggable(), true],
@@ -148,8 +123,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /** @return array */
-    public function getEntityIdDataProvider()
+    public function getEntityIdDataProvider(): array
     {
         return [
             'from Taggable interface method' => [new Taggable(['id' => 100]), 100],
@@ -157,7 +131,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function setConfigProvider($object, $hasConfig, $isEnabled)
+    private function setConfigProvider(object|string $object, bool $hasConfig, bool $isEnabled)
     {
         $class = is_object($object) ? get_class($object) : $object;
 

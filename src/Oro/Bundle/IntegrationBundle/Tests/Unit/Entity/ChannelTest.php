@@ -70,10 +70,7 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($newValue, $this->entity->$referenceGetter());
     }
 
-    /**
-     * @return array
-     */
-    public function integrationSettingFieldsProvider()
+    public function integrationSettingFieldsProvider(): array
     {
         return [
             ['synchronizationSettings'],

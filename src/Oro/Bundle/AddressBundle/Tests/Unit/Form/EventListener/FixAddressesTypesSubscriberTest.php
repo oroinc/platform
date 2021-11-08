@@ -25,7 +25,7 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
-            array(FormEvents::POST_SUBMIT => 'postSubmit'),
+            [FormEvents::POST_SUBMIT => 'postSubmit'],
             $this->subscriber->getSubscribedEvents()
         );
     }
@@ -46,39 +46,39 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function postSubmitDataProvider()
+    public function postSubmitDataProvider(): array
     {
         $billing = new AddressType('billing');
         $shipping = new AddressType('shipping');
 
-        return array(
-            'unset_primary_and_remove_type' => array(
-                'allAddresses' => array(
+        return [
+            'unset_primary_and_remove_type' => [
+                'allAddresses' => [
                     'foo' => $this->createAddress()->addType($billing),
                     'bar' => $this->createAddress()->addType($billing),
                     'baz' => $this->createAddress()->addType($shipping),
-                ),
+                ],
                 'formAddressKey' => 'foo',
-                'expectedAddressesData' => array(
-                    'foo' => array('typeNames' => array('billing')),
-                    'bar' => array('typeNames' => array()),
-                    'baz' => array('typeNames' => array('shipping'))
-                )
-            ),
-            'nothing_to_do' => array(
-                'allAddresses' => array(
+                'expectedAddressesData' => [
+                    'foo' => ['typeNames' => ['billing']],
+                    'bar' => ['typeNames' => []],
+                    'baz' => ['typeNames' => ['shipping']]
+                ]
+            ],
+            'nothing_to_do' => [
+                'allAddresses' => [
                     'foo' => $this->createAddress(),
                     'bar' => $this->createAddress()->addType($billing),
                     'baz' => $this->createAddress()->addType($shipping),
-                ),
+                ],
                 'formAddressKey' => 'foo',
-                'expectedAddressesData' => array(
-                    'foo' => array('typeNames' => array()),
-                    'bar' => array('typeNames' => array('billing')),
-                    'baz' => array('typeNames' => array('shipping'))
-                )
-            ),
-        );
+                'expectedAddressesData' => [
+                    'foo' => ['typeNames' => []],
+                    'bar' => ['typeNames' => ['billing']],
+                    'baz' => ['typeNames' => ['shipping']]
+                ]
+            ],
+        ];
     }
 
     /**

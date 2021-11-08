@@ -52,10 +52,7 @@ class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->formExtension->buildForm($builder, [StripTagsExtension::OPTION_NAME => $stripTags]);
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
         return [
             'positive' => ['stripTags' => true],

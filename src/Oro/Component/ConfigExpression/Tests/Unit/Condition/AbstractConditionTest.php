@@ -82,13 +82,13 @@ class AbstractConditionTest extends \PHPUnit\Framework\TestCase
         $context = new \stdClass();
 
         $result = $allowedCondition->xdoEvaluate($context);
-        static::assertTrue($result);
-        static::assertNull($allowedCondition->xgetErrors());
+        self::assertTrue($result);
+        self::assertNull($allowedCondition->xgetErrors());
 
         $notAllowedCondition->setMessage('test_message');
         $result = $notAllowedCondition->xdoEvaluate($context);
-        static::assertFalse($result);
-        static::assertEquals(
+        self::assertFalse($result);
+        self::assertEquals(
             new \ArrayObject([['message' => 'test_message', 'parameters' => []]]),
             $notAllowedCondition->xgetErrors()
         );

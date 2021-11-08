@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
-use Oro\Bundle\ApiBundle\Filter\SearchFieldResolverFactory;
-use Oro\Bundle\ApiBundle\Filter\SearchQueryFilter;
-use Oro\Bundle\ApiBundle\Filter\SearchQueryFilterFactory;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilter;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilterFactory;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
 class SearchQueryFilterFactoryTest extends \PHPUnit\Framework\TestCase

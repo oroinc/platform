@@ -44,7 +44,7 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isSupported, $this->provider->supports($entity));
     }
 
-    public function supportsProvider()
+    public function supportsProvider(): array
     {
         return [
             [true],

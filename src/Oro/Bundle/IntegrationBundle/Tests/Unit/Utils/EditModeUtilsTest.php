@@ -26,7 +26,7 @@ class EditModeUtilsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function isSwitchEnableAllowedDataProvider()
+    public function isSwitchEnableAllowedDataProvider(): array
     {
         return [
             [Channel::EDIT_MODE_ALLOW, true],

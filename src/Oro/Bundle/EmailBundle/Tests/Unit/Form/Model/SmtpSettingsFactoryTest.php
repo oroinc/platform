@@ -81,10 +81,7 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($factorySmtpSettings->isEligible());
     }
 
-    /**
-     * @return array
-     */
-    public function validParametersDataProvider()
+    public function validParametersDataProvider(): array
     {
         return [
             [
@@ -112,10 +109,7 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function partialParametersDataProvider()
+    public function partialParametersDataProvider(): array
     {
         return [
             [
@@ -139,10 +133,7 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function invalidParametersDataProvider()
+    public function invalidParametersDataProvider(): array
     {
         return [
             [

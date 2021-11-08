@@ -6,8 +6,6 @@ use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter;
 
 class WidgetTitleConverterTest extends \PHPUnit\Framework\TestCase
 {
-    protected $converter;
-
     public function testGetConvertedValue()
     {
         $converter = new WidgetTitleConverter();

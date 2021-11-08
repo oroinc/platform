@@ -54,10 +54,7 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedVote, $this->dependencyVoter->vote($feature));
     }
 
-    /**
-     * @return array
-     */
-    public function voteDataProvider()
+    public function voteDataProvider(): array
     {
         return [
             [true, DependencyVoter::FEATURE_ENABLED],

@@ -12,8 +12,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
  */
 class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityAliasStorage */
-    private $storage;
+    private EntityAliasStorage $storage;
 
     protected function setUp(): void
     {
@@ -91,11 +90,11 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyAliasDataProvider
+     * @dataProvider emptyAliasDataProvider
      */
-    public function testValidateEmptyEntityAlias($value)
+    public function testValidateEmptyEntityAlias(?string $value)
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException::class);
+        $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage('The alias for the "Test\Entity1" entity must not be empty.');
 
         $this->storage->addEntityAlias(
@@ -105,11 +104,11 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyAliasDataProvider
+     * @dataProvider emptyAliasDataProvider
      */
-    public function testValidateEmptyEntityPluralAlias($value)
+    public function testValidateEmptyEntityPluralAlias(?string $value)
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException::class);
+        $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage('The plural alias for the "Test\Entity1" entity must not be empty.');
 
         $this->storage->addEntityAlias(
@@ -118,7 +117,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function emptyAliasDataProvider()
+    public function emptyAliasDataProvider(): array
     {
         return [
             [null],
@@ -129,7 +128,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityAlias($value)
+    public function testValidateInvalidEntityAlias(string $value)
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
@@ -151,7 +150,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityPluralAlias($value)
+    public function testValidateInvalidEntityPluralAlias(string $value)
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
@@ -170,7 +169,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidAliasDataProvider()
+    public function invalidAliasDataProvider(): array
     {
         return [
             ['Alias'],

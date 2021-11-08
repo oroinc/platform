@@ -38,7 +38,7 @@ class OroExposeLoaderTest extends AbstractLoaderTest
     /**
      * {@inheritdoc}
      */
-    public function loadDataProvider()
+    public function loadDataProvider(): array
     {
         return [
             [

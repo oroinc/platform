@@ -134,8 +134,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $this->getDate()]);
 
-        $this->userProvider
-            ->expects(self::once())
+        $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
             ->willThrowException(new UsernameNotFoundException());
@@ -157,12 +156,10 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token = new UsernamePasswordToken('', $invalidTicketDigest, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
-        $this->userProvider
-            ->expects(self::never())
+        $this->userProvider->expects(self::never())
             ->method('loadUserByUsername');
 
-        $this->ticketDigestGenerator
-            ->expects(self::once())
+        $this->ticketDigestGenerator->expects(self::once())
             ->method('generateDigest')
             ->with(self::NONCE, $created, self::SECRET)
             ->willReturn(self::TICKET_DIGEST);
@@ -183,12 +180,10 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token = new UsernamePasswordToken('', self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
-        $this->userProvider
-            ->expects(self::never())
+        $this->userProvider->expects(self::never())
             ->method('loadUserByUsername');
 
-        $this->ticketDigestGenerator
-            ->expects(self::once())
+        $this->ticketDigestGenerator->expects(self::once())
             ->method('generateDigest')
             ->with(self::NONCE, $created, self::SECRET)
             ->willReturn(self::TICKET_DIGEST);
@@ -215,14 +210,12 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->setPassword($userPassword)
             ->setUserRoles($userRoles);
 
-        $this->userProvider
-            ->expects(self::once())
+        $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
             ->willReturn($user);
 
-        $this->ticketDigestGenerator
-            ->expects(self::once())
+        $this->ticketDigestGenerator->expects(self::once())
             ->method('generateDigest')
             ->with(self::NONCE, $created, $userPassword)
             ->willReturn(self::TICKET_DIGEST);

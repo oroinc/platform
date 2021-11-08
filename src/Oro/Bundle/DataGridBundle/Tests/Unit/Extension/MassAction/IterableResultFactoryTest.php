@@ -36,7 +36,6 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicable()
     {
-        /** @var OrmDatasource $dataSource */
         $dataSource = $this->createMock(OrmDatasource::class);
 
         $this->assertTrue($this->iterableResultFactory->isApplicable($dataSource));
@@ -44,7 +43,6 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateIterableResultWithNotSupportedDatasource()
     {
-        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);
 

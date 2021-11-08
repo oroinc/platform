@@ -19,8 +19,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        /** @var FeatureChecker $featureChecker */
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->extension = new FeatureAwareMenuFactoryExtension($this->featureChecker);
     }
@@ -57,10 +56,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildOptions($options);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [

@@ -30,10 +30,11 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->pager = $this->createMock(ArrayPager::class);
         $this->config = $this->createMock(DatagridConfiguration::class);
-        $this->arrayPagerExtension = new ArrayPagerExtension($this->pager);
-        $this->arrayPagerExtension->setParameters(new ParameterBag());
         $this->arrayDatasource = new ArrayDatasource();
         $this->arrayDatasource->setArraySource([]);
+
+        $this->arrayPagerExtension = new ArrayPagerExtension($this->pager);
+        $this->arrayPagerExtension->setParameters(new ParameterBag());
     }
 
     public function testGetPriority()

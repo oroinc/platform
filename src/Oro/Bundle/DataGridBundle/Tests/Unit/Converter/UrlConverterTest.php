@@ -11,30 +11,27 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
     private $router;
 
     /** @var UrlConverter */
-    private $datagridUrlConverter;
+    private $urlConverter;
 
-    /** {@inheritdoc} */
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
-        $this->datagridUrlConverter = new UrlConverter($this->router);
+
+        $this->urlConverter = new UrlConverter($this->router);
     }
 
     /**
      * @dataProvider convertGridUrlToPageUrlInvalidUrlProvider
      */
-    public function testConvertGridUrlToPageUrlInvalidUrl($url, $gridName, $expectedResult)
+    public function testConvertGridUrlToPageUrlInvalidUrl(string $url, string $gridName, string $expectedResult)
     {
         $this->assertEquals(
             $expectedResult,
-            $this->datagridUrlConverter->convertGridUrlToPageUrl($gridName, $url)
+            $this->urlConverter->convertGridUrlToPageUrl($gridName, $url)
         );
     }
 
-    /**
-     * @return array
-     */
-    public function convertGridUrlToPageUrlInvalidUrlProvider()
+    public function convertGridUrlToPageUrlInvalidUrlProvider(): array
     {
         $gridName = 'gridName';
         $gridRequestParams = \http_build_query(
@@ -91,16 +88,14 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
 
         $requestUri = '/admin/sale/quote?'  . \http_build_query($pageParams);
 
-        $this->router
-            ->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_sale_quote_index')
             ->willReturn('/admin/sale/quote');
-        ;
 
         $this->assertEquals(
             $requestUri,
-            $this->datagridUrlConverter->convertGridUrlToPageUrl($gridName, $requestUri)
+            $this->urlConverter->convertGridUrlToPageUrl($gridName, $requestUri)
         );
     }
 
@@ -129,15 +124,14 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
         ];
 
         $requestUri = '/admin/datagrid/quotes-grid?' . \http_build_query($pageParams);
-        $this->router
-            ->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_sale_quote_index')
             ->willReturn('/admin/sale/quote');
 
         $this->assertEquals(
             '/admin/sale/quote?' . \http_build_query([$gridName => $pageParams[$gridName]]),
-            $this->datagridUrlConverter->convertGridUrlToPageUrl($gridName, $requestUri)
+            $this->urlConverter->convertGridUrlToPageUrl($gridName, $requestUri)
         );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopedDataType;
@@ -14,10 +15,28 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /**
-     * @var ScopedDataType
-     */
-    protected $formType;
+    /** @var ScopedDataType */
+    private $formType;
+
+    protected function setUp(): void
+    {
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->any())
+            ->method('getReference')
+            ->with(Scope::class)
+            ->willReturnCallback(function ($class, $id) {
+                return $this->getEntity($class, ['id' => $id]);
+            });
+
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($em);
+
+        $this->formType = new ScopedDataType($registry);
+
+        parent::setUp();
+    }
 
     /**
      * {@inheritdoc}
@@ -33,32 +52,6 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
                 []
             ),
         ];
-    }
-
-    protected function setUp(): void
-    {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $em->expects($this->any())
-            ->method('getReference')
-            ->with(Scope::class)
-            ->will(
-                $this->returnCallback(
-                    function ($class, $id) {
-                        return $this->getEntity($class, ['id' => $id]);
-                    }
-                )
-            );
-
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->method('getManagerForClass')->willReturn($em);
-
-        $this->formType = new ScopedDataType($registry);
-
-        parent::setUp();
     }
 
     public function testSubmit()
@@ -133,10 +126,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
         $this->assertSame($scopes, $view->vars['scopes']);
     }
 
-    /**
-     * @return array
-     */
-    public function finishViewDataProvider()
+    public function finishViewDataProvider(): array
     {
         return [
             [

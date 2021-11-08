@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
@@ -251,8 +252,24 @@ class ExpandRelatedEntities implements ProcessorInterface
             if (!$field->getTargetClass()) {
                 $field->setTargetClass($targetClass);
             }
-            $field->setTargetEntity($targetEntity);
+            $this->mergeAssociationTargetEntity($field, $targetEntity);
         }
+    }
+
+    private function mergeAssociationTargetEntity(
+        EntityDefinitionFieldConfig $field,
+        EntityDefinitionConfig $targetEntity
+    ): void {
+        $existingTargetEntity = $field->getTargetEntity();
+        if (null !== $existingTargetEntity) {
+            if ($existingTargetEntity->hasMaxResults()) {
+                $targetEntity->setMaxResults($existingTargetEntity->getMaxResults());
+            }
+            if ($existingTargetEntity->hasOrderBy()) {
+                $targetEntity->setOrderBy($existingTargetEntity->getOrderBy());
+            }
+        }
+        $field->setTargetEntity($targetEntity);
     }
 
     /**

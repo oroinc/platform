@@ -39,8 +39,8 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         $tester = new CommandTester($this->command);
         $tester->execute([]);
 
-        static::assertStringContainsString('Started reindex task for all mapped entities', $tester->getDisplay());
-        static::assertStringContainsString('Reindex finished successfully', $tester->getDisplay());
+        self::assertStringContainsString('Started reindex task for all mapped entities', $tester->getDisplay());
+        self::assertStringContainsString('Reindex finished successfully', $tester->getDisplay());
     }
 
     public function testShouldReindexOnlySingleClassIfClassArgumentExists()
@@ -62,7 +62,7 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
             'class' => $shortClassName
         ]);
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             sprintf('Started reindex task for "%s" entity', $fullClassName),
             $tester->getDisplay()
         );
@@ -77,6 +77,6 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         $tester = new CommandTester($this->command);
         $tester->execute(['--scheduled' => true]);
 
-        static::assertStringContainsString('Started reindex task for all mapped entities', $tester->getDisplay());
+        self::assertStringContainsString('Started reindex task for all mapped entities', $tester->getDisplay());
     }
 }

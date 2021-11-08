@@ -12,7 +12,8 @@ class TopicManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WampServerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $app;
 
-    private TopicManager $manager;
+    /** @var TopicManager */
+    private $manager;
 
     protected function setUp(): void
     {
@@ -26,13 +27,11 @@ class TopicManagerTest extends \PHPUnit\Framework\TestCase
     {
         $connection = $this->createMock(ConnectionInterface::class);
 
-        $this->app
-            ->expects($this->once())
+        $this->app->expects($this->once())
             ->method('onClose')
             ->with($connection);
 
-        $this->app
-            ->expects($this->never())
+        $this->app->expects($this->never())
             ->method('onUnsubscribe');
 
         $this->manager->onClose($connection);
@@ -44,21 +43,18 @@ class TopicManagerTest extends \PHPUnit\Framework\TestCase
         $connection->WAMP = new \stdClass();
         $connection->WAMP->subscriptions = new \SplObjectStorage();
 
-        $this->app
-            ->expects($this->once())
+        $this->app->expects($this->once())
             ->method('onClose')
             ->with($connection);
 
         $topicName = 'sample/topic';
-        $this->app
-            ->expects($this->once())
+        $this->app->expects($this->once())
             ->method('onSubscribe')
             ->willReturnCallback(function (ConnectionInterface $connection, Topic $topic) use ($topicName) {
                 $this->assertEquals($topicName, $topic->getId());
             });
 
-        $this->app
-            ->expects($this->once())
+        $this->app->expects($this->once())
             ->method('onUnsubscribe')
             ->willReturnCallback(function (ConnectionInterface $connection, Topic $topic) use ($topicName) {
                 $this->assertEquals($topicName, $topic->getId());

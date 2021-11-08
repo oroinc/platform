@@ -15,32 +15,33 @@ use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
 
 class MergeListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MergeListener */
-    private $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
-    private $entityMetadata;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TagManager */
+    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityData */
+    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
+
+    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityMetadata;
+
+    /** @var EntityData|\PHPUnit\Framework\MockObject\MockObject */
     private $entityData;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
-    private $helper;
+    /** @var MergeListener */
+    private $listener;
 
     protected function setUp(): void
     {
         $this->manager = $this->createMock(TagManager::class);
         $this->helper = $this->createMock(TaggableHelper::class);
-        $this->listener = new MergeListener($this->manager, $this->helper);
         $this->entityMetadata = $this->createMock(EntityMetadata::class);
         $this->entityData = $this->createMock(EntityData::class);
 
         $this->entityData->expects($this->any())
             ->method('getMetadata')
             ->willReturn($this->entityMetadata);
+
+        $this->listener = new MergeListener($this->manager, $this->helper);
     }
 
     public function testOnBuildMetadata()

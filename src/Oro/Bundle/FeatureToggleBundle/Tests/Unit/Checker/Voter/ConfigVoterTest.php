@@ -26,12 +26,9 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureConfigManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->featureConfigManager = $this->createMock(ConfigurationManager::class);
+
         $this->configVoter = new ConfigVoter($this->configManager, $this->featureConfigManager);
     }
 
@@ -59,10 +56,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedVote, $this->configVoter->vote($feature, $scopeIdentifier));
     }
 
-    /**
-     * @return array
-     */
-    public function voteDataProvider()
+    public function voteDataProvider(): array
     {
         return [
             [true, VoterInterface::FEATURE_ENABLED],

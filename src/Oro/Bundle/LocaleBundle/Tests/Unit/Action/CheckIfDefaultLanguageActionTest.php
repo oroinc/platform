@@ -20,17 +20,16 @@ class CheckIfDefaultLanguageActionTest extends \PHPUnit\Framework\TestCase
     private CheckIfDefaultLanguageAction $action1;
     private CheckIfDefaultLanguageAction $action2;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
-        $configManager = $this->createMock(ConfigManager::class);
-
         $this->otherCode = 'fr_FR';
         $this->defaultCode = 'de_DE';
 
-        $configManager->method('get')->willReturnMap([
-            [Configuration::getConfigKeyByName(Configuration::LANGUAGE), false, false, null, $this->defaultCode]
-        ]);
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects(self::any())
+            ->method('get')
+            ->with(Configuration::getConfigKeyByName(Configuration::LANGUAGE))
+            ->willReturn($this->defaultCode);
 
         $this->otherLanguage = (new Language())->setCode($this->otherCode);
         $this->defaultLanguage = (new Language())->setCode($this->defaultCode);
@@ -52,14 +51,14 @@ class CheckIfDefaultLanguageActionTest extends \PHPUnit\Framework\TestCase
             'result' => new PropertyPath('$.result1')
         ]);
         $this->action1->execute($context);
-        static::assertFalse($context['$']['result1']);
+        self::assertFalse($context['$']['result1']);
 
         $this->action2->initialize([
             'language' => $this->defaultCode,
             'result' => new PropertyPath('$.result2')
         ]);
         $this->action2->execute($context);
-        static::assertTrue($context['$']['result2']);
+        self::assertTrue($context['$']['result2']);
     }
 
     public function testWithLanguageEntity(): void
@@ -71,13 +70,13 @@ class CheckIfDefaultLanguageActionTest extends \PHPUnit\Framework\TestCase
             'result' => new PropertyPath('$.result1')
         ]);
         $this->action1->execute($context);
-        static::assertFalse($context['$']['result1']);
+        self::assertFalse($context['$']['result1']);
 
         $this->action2->initialize([
             'language' => $this->defaultLanguage,
             'result' => new PropertyPath('$.result2')
         ]);
         $this->action2->execute($context);
-        static::assertTrue($context['$']['result2']);
+        self::assertTrue($context['$']['result2']);
     }
 }

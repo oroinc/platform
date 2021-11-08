@@ -24,10 +24,7 @@ class PriceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['value', self::VALUE],
@@ -38,7 +35,7 @@ class PriceTest extends \PHPUnit\Framework\TestCase
     public function testCreate()
     {
         $price = Price::create(self::VALUE, self::CURRENCY);
-        $this->assertInstanceOf('Oro\Bundle\CurrencyBundle\Entity\Price', $price);
+        $this->assertInstanceOf(Price::class, $price);
         $this->assertEquals(self::VALUE, $price->getValue());
         $this->assertEquals(self::CURRENCY, $price->getCurrency());
     }

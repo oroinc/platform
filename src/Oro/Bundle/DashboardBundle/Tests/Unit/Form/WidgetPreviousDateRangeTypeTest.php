@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 class WidgetPreviousDateRangeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetPreviousDateRangeType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {

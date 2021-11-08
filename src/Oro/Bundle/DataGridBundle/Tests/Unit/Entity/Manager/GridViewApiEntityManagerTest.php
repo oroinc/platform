@@ -2,16 +2,22 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
+use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = "Oro\\Bundle\\DataGridBundle\\Entity\\GridView";
+    const CLASS_NAME = GridView::class;
 
     /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $gridViewManager;
@@ -42,30 +48,19 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetViewSystemAll()
     {
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
 
-        $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $registry = $this->createMock(Registry::class);
 
         $registry->expects($this->any())
             ->method('getRepository')
             ->willReturn($repo);
 
-        $dataGridManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dataGridManager = $this->createMock(Manager::class);
 
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $aclHelper = $this->createMock(AclHelper::class);
 
-        $restrictionManager = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $restrictionManager = $this->createMock(RestrictionManager::class);
 
         $gridViewManager = new GridViewManager(
             $aclHelper,

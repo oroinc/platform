@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Filter;
+namespace Oro\Bundle\SearchBundle\Api\Filter;
 
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;

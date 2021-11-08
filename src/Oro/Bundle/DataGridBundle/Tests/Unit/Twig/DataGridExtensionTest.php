@@ -37,9 +37,6 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var DataGridExtension */
-    private $extension;
-
     /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $datagridRouteHelper;
 
@@ -48,6 +45,9 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
+
+    /** @var DataGridExtension */
+    private $extension;
 
     protected function setUp(): void
     {

@@ -46,10 +46,7 @@ class EmailBodyTest extends TestCase
         $this->assertEquals($expected, $this->emailBody->getOriginalContentType());
     }
 
-    /**
-     * @return array
-     */
-    public function originalContentTypeProvider()
+    public function originalContentTypeProvider(): array
     {
         return [
             'string' => [

@@ -10,16 +10,17 @@ class ChainTagGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateDataProvider
      */
-    public function testGenerate(ChainTagGenerator $generator, $data, $includeCollection, $expectedTags)
-    {
+    public function testGenerate(
+        ChainTagGenerator $generator,
+        mixed $data,
+        bool $includeCollection,
+        array $expectedTags
+    ) {
         $result = $generator->generate($data, $includeCollection);
         $this->assertSame($expectedTags, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function generateDataProvider()
+    public function generateDataProvider(): array
     {
         return [
             'Expect one tag from one generator w/o collection'            => [
@@ -61,21 +62,14 @@ class ChainTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param array $generators
-     * @param mixed $data
-     * @param bool  $result
      */
-    public function testSupports(array $generators, $data, $result)
+    public function testSupports(array $generators, ?string $data, bool $result)
     {
         $chain = new ChainTagGenerator($generators);
         $this->assertEquals($result, $chain->supports($data));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             'should not supports if no one generator given' => [[], null, false],

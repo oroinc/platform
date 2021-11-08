@@ -29,7 +29,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['gridName', 'testGridName'],

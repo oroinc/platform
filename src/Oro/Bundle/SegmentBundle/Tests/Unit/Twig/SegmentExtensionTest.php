@@ -12,9 +12,11 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private EventDispatcherInterface $dispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
 
-    private SegmentExtension $segmentExtension;
+    /** @var SegmentExtension */
+    private $segmentExtension;
 
     protected function setUp(): void
     {
@@ -61,7 +63,7 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $eventOptions = ['eventOpt1' => 'eventVal1'];
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), WidgetOptionsLoadEvent::EVENT_NAME)
+            ->with(self::anything(), WidgetOptionsLoadEvent::EVENT_NAME)
             ->willReturnCallback(function ($event) use ($eventOptions) {
                 $event->setWidgetOptions($eventOptions);
 
@@ -83,8 +85,8 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $eventOptions = ['eventOpt1' => 'eventVal1'];
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), ConditionBuilderOptionsLoadEvent::EVENT_NAME)
-            ->willReturnCallback(function ($event, $eventName) use ($eventOptions) {
+            ->with(self::anything(), ConditionBuilderOptionsLoadEvent::EVENT_NAME)
+            ->willReturnCallback(function ($event) use ($eventOptions) {
                 $event->setOptions($eventOptions);
 
                 return $event;

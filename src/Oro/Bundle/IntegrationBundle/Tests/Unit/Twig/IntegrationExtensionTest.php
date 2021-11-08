@@ -54,7 +54,7 @@ class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(static::anything(), LoadIntegrationThemesEvent::NAME)
+            ->with(self::anything(), LoadIntegrationThemesEvent::NAME)
             ->willReturnCallback(function (LoadIntegrationThemesEvent $event) use ($themes) {
                 $event->setThemes($themes);
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategy;
+use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -27,7 +28,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validGridNamesDataProvider
      */
-    public function testParseGridNameWorks($name, $expectedGridName)
+    public function testParseGridNameWorks(string $name, string $expectedGridName)
     {
         $this->assertEquals($expectedGridName, $this->nameStrategy->parseGridName($name));
     }
@@ -35,7 +36,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validGridNamesDataProvider
      */
-    public function testParseGridScopeWorks($name, $expectedGridName, $expectedGridScope)
+    public function testParseGridScopeWorks(string $name, string $expectedGridName, string $expectedGridScope)
     {
         $this->assertEquals($expectedGridScope, $this->nameStrategy->parseGridScope($name));
     }
@@ -43,7 +44,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validGridNamesDataProvider
      */
-    public function testBuildGridFullNameWorks($expectedFullName, $gridName, $gridScope)
+    public function testBuildGridFullNameWorks(string $expectedFullName, string $gridName, string $gridScope)
     {
         $this->assertEquals(
             $gridScope ? $expectedFullName : $gridName,
@@ -51,7 +52,7 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function validGridNamesDataProvider()
+    public function validGridNamesDataProvider(): array
     {
         return [
             [
@@ -75,9 +76,9 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidGridNamesDataProvider
      */
-    public function testParseGridNameFails($expectedMessage, $name)
+    public function testParseGridNameFails(string $expectedMessage, string $name)
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
         $this->nameStrategy->parseGridName($name);
     }
@@ -85,9 +86,9 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidGridNamesDataProvider
      */
-    public function testParseGridScopeFails($expectedMessage, $name)
+    public function testParseGridScopeFails(string $expectedMessage, string $name)
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
         $this->nameStrategy->parseGridScope($name);
     }
@@ -95,19 +96,23 @@ class NameStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidGridNamesDataProvider
      */
-    public function testBuildGridFullNameFails($expectedMessage, $name, $gridName, $gridScope)
-    {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException::class);
+    public function testBuildGridFullNameFails(
+        string $expectedMessage,
+        string $name,
+        string $gridName,
+        string $gridScope
+    ) {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
         $this->nameStrategy->buildGridFullName($gridName, $gridScope);
     }
 
-    public function invalidGridNamesDataProvider()
+    public function invalidGridNamesDataProvider(): array
     {
         return [
             'too many delimiters' => [
-                'Grid name "test_grid:test_scope:test_scope" is invalid, ' .
-                'it should not contain more than one occurrence of ":".',
+                'Grid name "test_grid:test_scope:test_scope" is invalid, '
+                . 'it should not contain more than one occurrence of ":".',
                 'test_grid:test_scope:test_scope',
                 'test_grid',
                 'test_scope:test_scope',

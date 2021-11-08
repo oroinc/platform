@@ -63,12 +63,9 @@ class AddressTypeTest extends AddressFormExtensionTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
-        list($country, $region) = $this->getValidCountryAndRegion();
+        [$country, $region] = $this->getValidCountryAndRegion();
 
         $filledAddress = new Address();
         $filledAddress

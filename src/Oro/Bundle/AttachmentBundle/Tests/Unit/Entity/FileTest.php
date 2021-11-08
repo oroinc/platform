@@ -42,7 +42,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
         ];
 
-        static::assertPropertyAccessors($this->entity, $properties);
+        self::assertPropertyAccessors($this->entity, $properties);
     }
 
     public function testPrePersists(): void

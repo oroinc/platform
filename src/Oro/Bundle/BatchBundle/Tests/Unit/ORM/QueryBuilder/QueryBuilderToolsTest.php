@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\QueryBuilder;
 
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Select;
+use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 
 /**
@@ -16,15 +20,11 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         $subSelectAlias = 'subSelectAlias';
 
         $selects = [
-            $this->getSelectMock(['e.id', 'e.name']),
-            $this->getSelectMock(['e.data as eData']),
-            $this->getSelectMock(['someTable.field aS alias']),
-            $this->getSelectMock(['someTable.field2 AS alias2']),
-            $this->getSelectMock(
-                [
-                    "$subSelectExpression AS $subSelectAlias"
-                ]
-            ),
+            $this->getSelect(['e.id', 'e.name']),
+            $this->getSelect(['e.data as eData']),
+            $this->getSelect(['someTable.field aS alias']),
+            $this->getSelect(['someTable.field2 AS alias2']),
+            $this->getSelect(["$subSelectExpression AS $subSelectAlias"]),
         ];
 
         $tools = new QueryBuilderTools($selects);
@@ -48,11 +48,11 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
             AND a.name != :param2 AND a.status = ?1';
         $parameters = [
-            $this->getParameterMock(0),
-            $this->getParameterMock(1),
-            $this->getParameterMock('param1'),
-            $this->getParameterMock('param2'),
-            $this->getParameterMock('param3'),
+            $this->getParameter(0),
+            $this->getParameter(1),
+            $this->getParameter('param1'),
+            $this->getParameter('param2'),
+            $this->getParameter('param3'),
         ];
         $expectedParameters = [
             1 => '1_value',
@@ -60,15 +60,13 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
             'param2' => 'param2_value'
         ];
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('getDql')
-            ->will($this->returnValue($dql));
+            ->willReturn($dql);
         $qb->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue($parameters));
+            ->willReturn($parameters);
         $qb->expects($this->once())
             ->method('setParameters')
             ->with($expectedParameters);
@@ -79,20 +77,14 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dqlParametersDataProvider
-     * @param string $dql
-     * @param string $parameter
-     * @param bool $expected
      */
-    public function testDqlContainsParameter($dql, $parameter, $expected)
+    public function testDqlContainsParameter(string $dql, string|int $parameter, bool $expected)
     {
         $tools = new QueryBuilderTools();
         $this->assertEquals($expected, $tools->dqlContainsParameter($dql, $parameter));
     }
 
-    /**
-     * @return array
-     */
-    public function dqlParametersDataProvider()
+    public function dqlParametersDataProvider(): array
     {
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
             AND a.name != :param2 AND a.status = ?1';
@@ -108,25 +100,20 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider aliasConditionDataProvider
-     * @param string $condition
-     * @param string $expected
      */
-    public function testReplaceAliasesWithFields($condition, $expected)
+    public function testReplaceAliasesWithFields(string $condition, string $expected)
     {
         $selects = [
-            $this->getSelectMock(['e.data as eData']),
-            $this->getSelectMock(['someTable.field aS alias1']),
-            $this->getSelectMock(['someTable.field2 AS alias2']),
+            $this->getSelect(['e.data as eData']),
+            $this->getSelect(['someTable.field aS alias1']),
+            $this->getSelect(['someTable.field2 AS alias2']),
         ];
 
         $tools = new QueryBuilderTools($selects);
         $this->assertEquals($expected, $tools->replaceAliasesWithFields($condition));
     }
 
-    /**
-     * @return array
-     */
-    public function aliasConditionDataProvider()
+    public function aliasConditionDataProvider(): array
     {
         return [
             [
@@ -162,25 +149,20 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider usedAliasesDataProvider
-     * @param string|array $condition
-     * @param array $expected
      */
-    public function testGetUsedAliases($condition, $expected)
+    public function testGetUsedAliases(string|array $condition, array $expected)
     {
         $selects = [
-            $this->getSelectMock(['e.data as eData']),
-            $this->getSelectMock(['someTable.field aS alias1']),
-            $this->getSelectMock(['someTable.field2 AS alias2']),
+            $this->getSelect(['e.data as eData']),
+            $this->getSelect(['someTable.field aS alias1']),
+            $this->getSelect(['someTable.field2 AS alias2']),
         ];
 
         $tools = new QueryBuilderTools($selects);
         $this->assertEquals($expected, $tools->getUsedAliases($condition));
     }
 
-    /**
-     * @return array
-     */
-    public function usedAliasesDataProvider()
+    public function usedAliasesDataProvider(): array
     {
         return [
             [
@@ -197,25 +179,20 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider usedTableAliasesDataProvider
-     * @param string|array $condition
-     * @param array $expected
      */
-    public function testGetUsedTableAliases($condition, $expected)
+    public function testGetUsedTableAliases(string|array $condition, array $expected)
     {
         $selects = [
-            $this->getSelectMock(['e.data as eData']),
-            $this->getSelectMock(['someTable.field aS alias1']),
-            $this->getSelectMock(['someTable.field2 AS alias2']),
+            $this->getSelect(['e.data as eData']),
+            $this->getSelect(['someTable.field aS alias1']),
+            $this->getSelect(['someTable.field2 AS alias2']),
         ];
 
         $tools = new QueryBuilderTools($selects);
         $this->assertEquals($expected, $tools->getUsedTableAliases($condition));
     }
 
-    /**
-     * @return array
-     */
-    public function usedTableAliasesDataProvider()
+    public function usedTableAliasesDataProvider(): array
     {
         return [
             [
@@ -235,17 +212,14 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider joinAliasesDataProvider
-     * @param array $joins
-     * @param array $aliases
-     * @param array $expected
      */
-    public function testGetUsedJoinAliases($joins, $aliases, $expected)
+    public function testGetUsedJoinAliases(array $joins, array $aliases, array $expected)
     {
         $selects = [
-            $this->getSelectMock(['e.data as eData']),
-            $this->getSelectMock(['t1.field aS alias1']),
-            $this->getSelectMock(['t2.field2 AS alias2']),
-            $this->getSelectMock(['t3.field2 AS alias3']),
+            $this->getSelect(['e.data as eData']),
+            $this->getSelect(['t1.field aS alias1']),
+            $this->getSelect(['t2.field2 AS alias2']),
+            $this->getSelect(['t3.field2 AS alias3']),
         ];
 
         $tools = new QueryBuilderTools($selects);
@@ -255,16 +229,13 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function joinAliasesDataProvider()
+    public function joinAliasesDataProvider(): array
     {
         return [
             [
                 [
                     'root' => [
-                        $this->getJoinMock('t2', 'alias1 = :test', 't3')
+                        $this->getJoin('t2', 'alias1 = :test', 't3')
                     ]
                 ],
                 [],
@@ -273,9 +244,9 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'root' => [
-                        $this->getJoinMock('e', 't1.id = e.id', 't1'),
-                        $this->getJoinMock('t1', 't2.id = t1.id', 't2'),
-                        $this->getJoinMock('t2', 'alias1 = :test', 't3')
+                        $this->getJoin('e', 't1.id = e.id', 't1'),
+                        $this->getJoin('t1', 't2.id = t1.id', 't2'),
+                        $this->getJoin('t2', 'alias1 = :test', 't3')
                     ]
                 ],
                 ['t2'],
@@ -284,9 +255,9 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'root' => [
-                        $this->getJoinMock('e', 't1.id = e.id', 't1'),
-                        $this->getJoinMock('t1', 't2.id = t3.id', 't2'),
-                        $this->getJoinMock('t2', 'alias1 = :test', 't3')
+                        $this->getJoin('e', 't1.id = e.id', 't1'),
+                        $this->getJoin('t1', 't2.id = t3.id', 't2'),
+                        $this->getJoin('t2', 'alias1 = :test', 't3')
                     ]
                 ],
                 ['t2'],
@@ -295,9 +266,9 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'root' => [
-                        $this->getJoinMock('e', 't1.id = e.id', 't1'),
-                        $this->getJoinMock('t1', 't2.id = alias3', 't2'),
-                        $this->getJoinMock('t2', 'alias1 = :test', 't3')
+                        $this->getJoin('e', 't1.id = e.id', 't1'),
+                        $this->getJoin('t1', 't2.id = alias3', 't2'),
+                        $this->getJoin('t2', 'alias1 = :test', 't3')
                     ]
                 ],
                 ['t2'],
@@ -355,19 +326,14 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider fieldsDataProvider
-     * @param string $condition
-     * @param array $expected
      */
-    public function testGetFields($condition, $expected)
+    public function testGetFields(string $condition, array $expected)
     {
         $tools = new QueryBuilderTools();
         $this->assertEquals($expected, $tools->getFields($condition));
     }
 
-    /**
-     * @return array
-     */
-    public function fieldsDataProvider()
+    public function fieldsDataProvider(): array
     {
         return [
             ['2 < 3', []],
@@ -381,63 +347,41 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $join
-     * @param string $condition
-     * @param string $alias
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getJoinMock($join, $condition, $alias)
+    private function getJoin(string $join, string $condition, string $alias): Join
     {
-        $joinExpr = $this->getMockBuilder('Doctrine\ORM\Query\Expr\Join')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $joinExpr = $this->createMock(Join::class);
         $joinExpr->expects($this->any())
             ->method('getJoin')
-            ->will($this->returnValue($join));
+            ->willReturn($join);
         $joinExpr->expects($this->any())
             ->method('getCondition')
-            ->will($this->returnValue($condition));
+            ->willReturn($condition);
         $joinExpr->expects($this->any())
             ->method('getAlias')
-            ->will($this->returnValue($alias));
+            ->willReturn($alias);
 
         return $joinExpr;
     }
 
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getParameterMock($name)
+    private function getParameter(string $name): Parameter
     {
-        $parameter = $this->getMockBuilder('\Doctrine\ORM\Query\Parameter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameter = $this->createMock(Parameter::class);
         $parameter->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
         $parameter->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($name . '_value'));
+            ->willReturn($name . '_value');
 
         return $parameter;
     }
 
-    /**
-     * @param array $parts
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getSelectMock($parts)
+    private function getSelect(array $parts): Select
     {
-        $parts = (array)$parts;
-
-        $select = $this->getMockBuilder('Doctrine\ORM\Query\Expr\Select')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $select = $this->createMock(Select::class);
         $select->expects($this->any())
             ->method('getParts')
-            ->will($this->returnValue($parts));
+            ->willReturn($parts);
 
         return $select;
     }

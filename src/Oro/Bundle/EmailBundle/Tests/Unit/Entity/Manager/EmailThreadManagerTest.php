@@ -85,7 +85,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedReferences, $emailReferences);
     }
 
-    public function updateThreadsDataProvider()
+    public function updateThreadsDataProvider(): array
     {
         return [
             'new email without thread' => [
@@ -149,7 +149,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedEmails, $updatedEmails);
     }
 
-    public function updateHeadsDataProvider()
+    public function updateHeadsDataProvider(): array
     {
         return [
             'new emails are not updated' => [

@@ -7,9 +7,7 @@ use Oro\Bundle\DataGridBundle\Serializer\ParameterBagNormalizer;
 
 class ParameterBagNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ParameterBagNormalizer
-     */
+    /** @var ParameterBagNormalizer */
     private $normalizer;
 
     protected function setUp(): void
@@ -19,10 +17,8 @@ class ParameterBagNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     * @param mixed $object
-     * @param bool $expected
      */
-    public function testSupportsNormalization($object, $expected)
+    public function testSupportsNormalization(object $object, bool $expected)
     {
         $this->assertSame($expected, $this->normalizer->supportsNormalization($object));
     }

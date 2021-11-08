@@ -9,7 +9,6 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
 {
     public function testWhenNoEntityManagerInStorage()
     {
-        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $storage = new AdditionalEntityChangesToAuditStorage();
 
@@ -19,7 +18,6 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
 
     public function testWhenAddNewEntityManagerAndEntity()
     {
-        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entity = new \stdClass();
         $storage = new AdditionalEntityChangesToAuditStorage();
@@ -33,7 +31,6 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
 
     public function testWhenAddNewEntity()
     {
-        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entity = new \stdClass();
         $newEntity = new \stdClass();
@@ -50,7 +47,6 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
 
     public function testWhenAddNewChangesToOldEntity()
     {
-        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entity = new \stdClass();
         $storage = new AdditionalEntityChangesToAuditStorage();

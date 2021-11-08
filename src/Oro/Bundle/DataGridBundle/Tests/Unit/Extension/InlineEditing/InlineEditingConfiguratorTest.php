@@ -6,17 +6,23 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    private InlineEditColumnOptionsGuesser|MockObject $guesser;
-    private EntityClassNameHelper|MockObject $entityClassNameHelper;
-    private AuthorizationCheckerInterface|MockObject $authorizationChecker;
-    private InlineEditingConfigurator $configurator;
+    /** @var InlineEditColumnOptionsGuesser|\PHPUnit\Framework\MockObject\MockObject */
+    private $guesser;
+
+    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassNameHelper;
+
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
+
+    /** @var InlineEditingConfigurator */
+    private $configurator;
 
     protected function setUp(): void
     {
@@ -41,11 +47,13 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->configurator->isInlineEditingSupported($config));
     }
 
-    public function paramsDataProvider(): \Generator
+    public function paramsDataProvider(): array
     {
-        yield [[], false];
-        yield [['inline_editing' => ['entity_name' => 'Test']], true];
-        yield [['extended_entity_name' => 'Test'], true];
+        return [
+            [[], false],
+            [['inline_editing' => ['entity_name' => 'Test']], true],
+            [['extended_entity_name' => 'Test'], true]
+        ];
     }
 
     public function testConfigureInlineEditingForGrid()

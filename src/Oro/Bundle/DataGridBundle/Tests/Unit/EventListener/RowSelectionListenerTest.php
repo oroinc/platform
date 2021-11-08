@@ -14,42 +14,27 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datagrid;
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagrid;
 
-    /**
-     * @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $datasource;
+    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
+    private $datasource;
 
-    /**
-     * @var RowSelectionListener
-     */
-    protected $listener;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var RowSelectionListener */
+    private $listener;
 
     protected function setUp(): void
     {
-        $this->event = $this->getMockBuilder(BuildAfter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(BuildAfter::class);
         $this->datagrid = $this->createMock(DatagridInterface::class);
-        $this->datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+        $this->datasource = $this->createMock(OrmDatasource::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->listener = new RowSelectionListener($this->doctrineHelper);
     }
@@ -75,22 +60,23 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->event->expects($this->once())
             ->method('getDatagrid')
-            ->will($this->returnValue($this->datagrid));
+            ->willReturn($this->datagrid);
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($this->datasource));
+            ->willReturn($this->datasource);
 
         $this->datagrid->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         if (!empty($expectedBindParameters)) {
             $this->datasource->expects($this->once())
                 ->method('bindParameters')
                 ->with($expectedBindParameters);
         } else {
-            $this->datasource->expects($this->never())->method($this->anything());
+            $this->datasource->expects($this->never())
+                ->method($this->anything());
         }
 
         $this->listener->onBuildAfter($this->event);
@@ -101,7 +87,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function onBuildAfterDataProvider()
+    public function onBuildAfterDataProvider(): array
     {
         return [
             'applicable config' => [
@@ -285,19 +271,20 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->event->expects($this->once())
             ->method('getDatagrid')
-            ->will($this->returnValue($this->datagrid));
+            ->willReturn($this->datagrid);
 
         $datasource = $this->createMock(DatasourceInterface::class);
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')
-            ->will($this->returnValue($datasource));
+            ->willReturn($datasource);
 
         $this->datagrid->expects($this->never())
             ->method('getConfig')
-            ->will($this->returnValue($datasource));
+            ->willReturn($datasource);
 
-        $this->datasource->expects($this->never())->method($this->anything());
+        $this->datasource->expects($this->never())
+            ->method($this->anything());
 
         $this->listener->onBuildAfter($this->event);
     }

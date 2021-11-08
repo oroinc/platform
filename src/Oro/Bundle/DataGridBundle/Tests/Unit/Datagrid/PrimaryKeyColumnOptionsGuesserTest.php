@@ -8,6 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Datagrid\PrimaryKeyColumnOptionsGuesser;
+use Symfony\Component\Form\Guess\Guess;
 
 class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +16,7 @@ class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     private $registry;
 
     /** @var DefaultColumnOptionsGuesser */
-    protected $guesser;
+    private $guesser;
 
     protected function setUp(): void
     {
@@ -52,7 +53,7 @@ class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         return [
             'testProp is primary key' => [
                 'identifier' => ['testProp'],
-                'expected' => new ColumnGuess(['frontend_type' => 'string'], ColumnGuess::MEDIUM_CONFIDENCE),
+                'expected' => new ColumnGuess(['frontend_type' => 'string'], Guess::MEDIUM_CONFIDENCE),
             ],
 
             'testProp not primary key' => [
@@ -62,7 +63,7 @@ class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
             'testProp in part of composite primary key' => [
                 'identifier' => ['propA', 'testProp', 'propC'],
-                'expected' => new ColumnGuess(['frontend_type' => 'string'], ColumnGuess::MEDIUM_CONFIDENCE),
+                'expected' => new ColumnGuess(['frontend_type' => 'string'], Guess::MEDIUM_CONFIDENCE),
             ],
 
             'testProp not in part of composite primary key' => [

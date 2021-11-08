@@ -80,13 +80,12 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return \Generator
-     */
-    public function getLanguageChoicesDataProvider()
+    public function getLanguageChoicesDataProvider(): array
     {
-        yield 'all languages' => ['onlyEnabled' => false];
-        yield 'only enabled languages' => ['onlyEnabled' => true];
+        return [
+            'all languages' => ['onlyEnabled' => false],
+            'only enabled languages' => ['onlyEnabled' => true]
+        ];
     }
 
     public function testGetFormattingChoices()

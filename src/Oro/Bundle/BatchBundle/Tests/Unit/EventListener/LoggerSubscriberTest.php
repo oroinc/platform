@@ -19,11 +19,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private BufferingLogger $logger;
+    /** @var BufferingLogger */
+    private $logger;
 
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private LoggerSubscriber $subscriber;
+    /** @var LoggerSubscriber */
+    private $subscriber;
 
     protected function setUp(): void
     {

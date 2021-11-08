@@ -15,13 +15,13 @@ use Oro\Bundle\SearchBundle\Query\Query;
 class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BaseDriver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $driver;
+    private $driver;
 
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $qb;
+    private $qb;
 
     /** @var OrmExpressionVisitor */
-    protected $visitor;
+    private $visitor;
 
     protected function setUp(): void
     {
@@ -33,12 +33,8 @@ class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filteringOperatorProvider
-     *
-     * @param string $operator
-     * @param string $fieldName
-     * @param string $expected
      */
-    public function testWalkComparisonFilteringOperator($operator, $fieldName, $expected)
+    public function testWalkComparisonFilteringOperator(string $operator, string $fieldName, string $expected)
     {
         $index = 42;
         $type = Query::TYPE_INTEGER;
@@ -93,10 +89,7 @@ class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function filteringOperatorProvider()
+    public function filteringOperatorProvider(): array
     {
         return [
             'EXISTS single parameter' => [

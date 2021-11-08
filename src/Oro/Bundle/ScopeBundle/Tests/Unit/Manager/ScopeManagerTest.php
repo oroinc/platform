@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
 use Oro\Bundle\ScopeBundle\Manager\ScopeDataAccessor;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
@@ -288,7 +289,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testFindWithInvalidScalarValueInContext()
     {
-        $this->expectException(\Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException::class);
+        $this->expectException(NotSupportedCriteriaValueException::class);
         $this->expectExceptionMessage(
             'The type string is not supported for context[field]. Expected stdClass, null, array or "IS_NOT_NULL".'
         );
@@ -306,10 +307,10 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testFindWithInvalidObjectValueInContext()
     {
-        $this->expectException(\Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException::class);
+        $this->expectException(NotSupportedCriteriaValueException::class);
         $this->expectExceptionMessage(\sprintf(
             'The type %s is not supported for context[field]. Expected stdClass, null, array or "IS_NOT_NULL".',
-            \Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope::class
+            StubScope::class
         ));
 
         $context = ['field' => new StubScope()];
@@ -656,8 +657,11 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isScopeMatchCriteriaDataProvider
      */
-    public function testIsScopeMatchCriteria($expectedResult, $criteriaContext, $scopeFieldValue)
-    {
+    public function testIsScopeMatchCriteria(
+        bool $expectedResult,
+        array $criteriaContext,
+        string|object|null $scopeFieldValue
+    ) {
         $scope = new StubScope();
         $scope->setScopeField($scopeFieldValue);
         $scopeCriteria = new ScopeCriteria($criteriaContext, $this->classMetadataFactory);
@@ -675,10 +679,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function isScopeMatchCriteriaDataProvider()
+    public function isScopeMatchCriteriaDataProvider(): array
     {
         return [
             'scope match criteria'                             => [

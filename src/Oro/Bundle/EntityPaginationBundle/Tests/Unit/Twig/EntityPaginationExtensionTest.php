@@ -14,16 +14,16 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
     private $navigation;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var StorageDataCollector|\PHPUnit\Framework\MockObject\MockObject */
     private $dataCollector;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MessageManager|\PHPUnit\Framework\MockObject\MockObject */
     private $messageManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
     /** @var EntityPaginationExtension */

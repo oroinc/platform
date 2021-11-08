@@ -141,10 +141,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['subject', 'testSubject'],
@@ -160,7 +157,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function refsDataProvider()
+    public function refsDataProvider(): array
     {
         return [
             [null, []],

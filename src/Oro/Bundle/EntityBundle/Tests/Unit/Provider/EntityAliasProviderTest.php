@@ -60,7 +60,7 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEntityAlias($expectedAlias, $result);
     }
 
-    public function getEntityAliasDataProvider()
+    public function getEntityAliasDataProvider(): array
     {
         $translationNamespace = 'Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\Translation';
 

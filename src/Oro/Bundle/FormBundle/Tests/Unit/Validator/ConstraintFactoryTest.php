@@ -21,10 +21,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $factory->create($name, $options));
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         return [
             'short name'        => [
@@ -59,10 +56,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $factory->parse($constraints));
     }
 
-    /**
-     * @return array
-     */
-    public function constraintsProvider()
+    public function constraintsProvider(): array
     {
         return [
             'empty'              => [
@@ -115,10 +109,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->parse($constraints);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidConstraintsProvider()
+    public function invalidConstraintsProvider(): array
     {
         return [
             [

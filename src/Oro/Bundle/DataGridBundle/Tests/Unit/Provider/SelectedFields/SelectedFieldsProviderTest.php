@@ -51,16 +51,10 @@ class SelectedFieldsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedFields, $selectedFields);
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return SelectedFieldsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function createSelectedFieldsProvider(array $fields): SelectedFieldsProviderInterface
     {
         $selectedFieldsProvider = $this->createMock(SelectedFieldsProvider::class);
-        $selectedFieldsProvider
-            ->expects(self::once())
+        $selectedFieldsProvider->expects(self::once())
             ->method('getSelectedFields')
             ->with($this->datagridConfiguration, $this->datagridParameters)
             ->willReturn($fields);

@@ -32,26 +32,20 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
         $this->gridViewManager = $this->createMock(GridViewManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->datagridParametersHelper = $this->createMock(DatagridParametersHelper::class);
-
         $this->datagridConfiguration = $this->createMock(DatagridConfiguration::class);
         $this->datagridParameters = $this->createMock(ParameterBag::class);
     }
 
     protected function mockGridName(string $gridName): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('getName')
             ->willReturn($gridName);
     }
 
-    /**
-     * @param string|null $viewId
-     */
-    protected function mockCurrentGridViewId($viewId): void
+    protected function mockCurrentGridViewId(?string $viewId): void
     {
-        $this->datagridParameters
-            ->expects(self::exactly(2))
+        $this->datagridParameters->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
                 [GridViewsExtension::GRID_VIEW_ROOT_PARAM, [], []],
@@ -62,8 +56,7 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
     protected function mockGridView(string $method, array $state): ViewInterface
     {
         $gridView = $this->createMock(ViewInterface::class);
-        $gridView
-            ->expects(self::once())
+        $gridView->expects(self::once())
             ->method($method)
             ->willReturn($state);
 
@@ -74,37 +67,32 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockCurrentGridViewId(null);
 
-        $this->gridViewManager
-            ->expects(self::never())
+        $this->gridViewManager->expects(self::never())
             ->method('getView');
     }
 
     protected function assertNoCurrentNoDefaultGridView(): void
     {
-        $this->mockGridName($gridName = 'sample-datagrid');
+        $this->mockGridName('sample-datagrid');
 
         $this->assertNoCurrentGridView();
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
 
-        $this->gridViewManager
-            ->expects(self::never())
+        $this->gridViewManager->expects(self::never())
             ->method('getDefaultView');
     }
 
     protected function assertGridViewsDisabled(): void
     {
-        $this->datagridParameters
-            ->expects(self::once())
+        $this->datagridParameters->expects(self::once())
             ->method('get')
             ->with(GridViewsExtension::GRID_VIEW_ROOT_PARAM, [])
             ->willReturn([GridViewsExtension::DISABLED_PARAM => 1]);
 
-        $this->datagridConfiguration
-            ->expects(self::never())
+        $this->datagridConfiguration->expects(self::never())
             ->method('getName');
     }
 }

@@ -53,10 +53,7 @@ class FormattingCodeFormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($value));
     }
 
-    /**
-     * @return array
-     */
-    public function formatLanguageCodeProvider()
+    public function formatLanguageCodeProvider(): array
     {
         return [
             [

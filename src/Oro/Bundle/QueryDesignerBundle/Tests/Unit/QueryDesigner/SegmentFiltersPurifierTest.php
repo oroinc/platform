@@ -6,10 +6,8 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SegmentFiltersPurifier;
 
 class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SegmentFiltersPurifier
-     */
-    protected $segmentFiltersPurifier;
+    /** @var SegmentFiltersPurifier */
+    private $segmentFiltersPurifier;
 
     protected function setUp(): void
     {
@@ -21,14 +19,13 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
      */
     public function testPurifyFilters(array $filters, array $expectedFilters)
     {
-        static::assertEquals($expectedFilters, $this->segmentFiltersPurifier->purifyFilters($filters));
+        self::assertEquals($expectedFilters, $this->segmentFiltersPurifier->purifyFilters($filters));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function purifyFiltersDataProvider()
+    public function purifyFiltersDataProvider(): array
     {
         return [
             'empty tokens (filter or group) are skipped along with operator' => [
@@ -180,7 +177,7 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
                             'columnName' => 'status',
                             'criterion' => [
                                 'filter' => 'string',
-                                'data' => ['value' => "", 'type' => "filter_empty_option"]
+                                'data' => ['value' => '', 'type' => 'filter_empty_option']
                             ]
                         ]
                     ],
@@ -199,7 +196,7 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
                             'columnName' => 'status',
                             'criterion' => [
                                 'filter' => 'string',
-                                'data' => ['value' => "", 'type' => "filter_empty_option"]
+                                'data' => ['value' => '', 'type' => 'filter_empty_option']
                             ]
                         ]
                     ],

@@ -69,7 +69,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertToPHPValueDataProvider()
+    public function testConvertToPHPValueDataProvider(): array
     {
         return [
             'null input' => [
@@ -84,7 +84,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToDatabaseValueDataProvider()
+    public function testConvertToDatabaseValueDataProvider(): array
     {
         return [
             'null input' => [

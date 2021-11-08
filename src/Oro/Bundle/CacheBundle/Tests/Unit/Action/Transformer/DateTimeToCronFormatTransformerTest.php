@@ -12,7 +12,7 @@ class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
         $cronDefinition = '05 15 01 09 *';
         $dateTime = \DateTime::createFromFormat('i H d m *', $cronDefinition, new \DateTimeZone('UTC'));
 
-        static::assertSame($cronDefinition, $transformer->transform($dateTime));
+        self::assertSame($cronDefinition, $transformer->transform($dateTime));
     }
 
     public function testReverseTransform()
@@ -21,7 +21,7 @@ class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
         $cronDefinition = '05 15 01 09 *';
         $expected = \DateTime::createFromFormat('i H d m *', $cronDefinition, new \DateTimeZone('UTC'));
 
-        static::assertEquals($expected, $transformer->reverseTransform($cronDefinition));
+        self::assertEquals($expected, $transformer->reverseTransform($cronDefinition));
     }
 
     public function testReverseTransformWrongString()
@@ -29,6 +29,6 @@ class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer = new DateTimeToCronFormatTransformer();
         $cronDefinition = '70 15 1';
 
-        static::assertNull($transformer->reverseTransform($cronDefinition));
+        self::assertNull($transformer->reverseTransform($cronDefinition));
     }
 }

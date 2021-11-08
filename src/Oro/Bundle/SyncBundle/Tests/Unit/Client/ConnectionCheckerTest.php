@@ -9,20 +9,22 @@ use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $client;
+    private $client;
 
     /** @var ConnectionChecker */
-    protected $checker;
+    private $checker;
 
     protected function setUp(): void
     {
         $this->client = $this->createMock(WebsocketClientInterface::class);
+
         $this->checker = new ConnectionChecker($this->client);
     }
 
     public function testCheckConnection()
     {
-        $this->client->expects($this->once())->method('connect');
+        $this->client->expects($this->once())
+            ->method('connect');
         $this->client->expects($this->once())
             ->method('isConnected')
             ->willReturn(true);
@@ -32,7 +34,8 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testWsConnectedFail()
     {
-        $this->client->expects($this->once())->method('connect');
+        $this->client->expects($this->once())
+            ->method('connect');
         $this->client->expects($this->once())
             ->method('isConnected')
             ->willReturn(false);

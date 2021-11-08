@@ -62,10 +62,8 @@ class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function setParametersDataProvider()
+    public function setParametersDataProvider(): array
     {
         return [
             'Not applicable column type' => [

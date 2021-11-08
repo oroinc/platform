@@ -20,22 +20,21 @@ class DownloadUpdateLanguageTranslationActionTest extends \PHPUnit\Framework\Tes
     private DownloadUpdateLanguageTranslationAction $action1;
     private DownloadUpdateLanguageTranslationAction $action2;
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function setUp(): void
     {
         $this->codeWithoutTranslations = 'fr_FR';
         $this->codeWithTranslations = 'de_DE';
 
         $translationDownloader = $this->createMock(TranslationDownloader::class);
-        $translationDownloader->method('downloadAndApplyTranslations')->willReturnCallback(
-            function (string $languageCode) {
+        $translationDownloader->expects(self::any())
+            ->method('downloadAndApplyTranslations')
+            ->willReturnCallback(function (string $languageCode) {
                 if ($this->codeWithoutTranslations === $languageCode) {
                     throw new TranslationDownloaderException(
-                        \sprintf('No available translations found for "%s".', $languageCode)
+                        sprintf('No available translations found for "%s".', $languageCode)
                     );
                 }
-            }
-        );
+            });
 
         $this->action1 = new DownloadUpdateLanguageTranslationAction(new ContextAccessor(), $translationDownloader);
         $this->action2 = new DownloadUpdateLanguageTranslationAction(new ContextAccessor(), $translationDownloader);
@@ -57,14 +56,14 @@ class DownloadUpdateLanguageTranslationActionTest extends \PHPUnit\Framework\Tes
             'result' => new PropertyPath('$.result1')
         ]);
         $this->action1->execute($context);
-        static::assertFalse($context['$']['result1']);
+        self::assertFalse($context['$']['result1']);
 
         $this->action2->initialize([
             'language' => $this->codeWithTranslations,
             'result' => new PropertyPath('$.result2')
         ]);
         $this->action2->execute($context);
-        static::assertTrue($context['$']['result2']);
+        self::assertTrue($context['$']['result2']);
     }
 
     public function testWithLanguageEntity(): void
@@ -76,13 +75,13 @@ class DownloadUpdateLanguageTranslationActionTest extends \PHPUnit\Framework\Tes
             'result' => new PropertyPath('$.result1')
         ]);
         $this->action1->execute($context);
-        static::assertFalse($context['$']['result1']);
+        self::assertFalse($context['$']['result1']);
 
         $this->action2->initialize([
             'language' => $this->languageWithTranslations,
             'result' => new PropertyPath('$.result2')
         ]);
         $this->action2->execute($context);
-        static::assertTrue($context['$']['result2']);
+        self::assertTrue($context['$']['result2']);
     }
 }

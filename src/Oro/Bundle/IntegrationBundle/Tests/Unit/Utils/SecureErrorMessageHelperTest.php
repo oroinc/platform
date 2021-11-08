@@ -18,10 +18,7 @@ class SecureErrorMessageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMessage, $sanitisedMessage);
     }
 
-    /**
-     * @return array
-     */
-    public function messageProvider()
+    public function messageProvider(): array
     {
         return [
             'some other text' => [

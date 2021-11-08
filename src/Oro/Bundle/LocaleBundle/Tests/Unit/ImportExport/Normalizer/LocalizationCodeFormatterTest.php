@@ -26,10 +26,7 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->formatter->formatName($localization));
     }
 
-    /**
-     * @return array
-     */
-    public function nameDataProvider()
+    public function nameDataProvider(): array
     {
         return [
             [null, 'default'],
@@ -52,10 +49,7 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->formatter->formatKey($localization));
     }
 
-    /**
-     * @return array
-     */
-    public function keyDataProvider()
+    public function keyDataProvider(): array
     {
         return [
             [null, null],

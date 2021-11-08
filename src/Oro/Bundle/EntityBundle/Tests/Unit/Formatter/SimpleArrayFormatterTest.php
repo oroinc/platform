@@ -30,7 +30,7 @@ class SimpleArrayFormatterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedValue, $this->formatter->format($value, $arguments));
     }
 
-    public function formatDataProvider()
+    public function formatDataProvider(): array
     {
         return [
             'empty'                                  => [

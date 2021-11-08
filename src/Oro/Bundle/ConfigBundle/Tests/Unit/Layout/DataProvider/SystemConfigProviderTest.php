@@ -7,14 +7,10 @@ use Oro\Bundle\ConfigBundle\Layout\DataProvider\SystemConfigProvider;
 
 class SystemConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var SystemConfigProvider
-     */
+    /** @var SystemConfigProvider */
     private $provider;
 
     protected function setUp(): void
@@ -29,18 +25,14 @@ class SystemConfigProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetValue(array $arguments)
     {
-        $this->configManager
-            ->expects(static::once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->withConsecutive($arguments);
 
         call_user_func_array([$this->provider, 'getValue'], $arguments);
     }
 
-    /**
-     * @return array
-     */
-    public function getValueDataProvider()
+    public function getValueDataProvider(): array
     {
         return [
             'with config parameter only' => [['oro_config.test']],

@@ -56,9 +56,8 @@ class CountQueryOptimizationListenerTest extends OrmTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function getCountQueryBuilderDataProvider()
+    public function getCountQueryBuilderDataProvider(): array
     {
         return [
             'primary_left_join_value=true'                   => [

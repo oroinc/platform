@@ -26,7 +26,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals(ColumnGuess::LOW_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function guessFilterProvider()
+    public function guessFilterProvider(): array
     {
         return [
             [

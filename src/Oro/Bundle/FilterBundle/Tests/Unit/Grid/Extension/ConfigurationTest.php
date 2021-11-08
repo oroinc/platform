@@ -54,10 +54,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processor->processConfiguration($this->configuration, $configs);
     }
 
-    /**
-     * @return array
-     */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'empty' => [

@@ -13,14 +13,14 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ReminderListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ReminderListener */
-    private $listener;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ReminderManager */
     private $reminderManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
     private $entityManager;
+
+    /** @var ReminderListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -35,12 +35,9 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $entity
-     * @param bool $expected
-     *
      * @dataProvider entityDataProvider
      */
-    public function testPostLoad($entity, $expected)
+    public function testPostLoad(?object $entity, bool $expected)
     {
         $event = new LifecycleEventArgs($entity, $this->entityManager);
 
@@ -54,12 +51,9 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $entity
-     * @param bool $expected
-     *
      * @dataProvider entityDataProvider
      */
-    public function testPostPersist($entity, $expected)
+    public function testPostPersist(?object $entity, bool $expected)
     {
         $event = new LifecycleEventArgs($entity, $this->entityManager);
 
@@ -72,10 +66,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postPersist($event);
     }
 
-    /**
-     * @return array
-     */
-    public function entityDataProvider()
+    public function entityDataProvider(): array
     {
         $event = new RemindableEntity();
         $event->setReminders(new ArrayCollection([new Reminder()]));

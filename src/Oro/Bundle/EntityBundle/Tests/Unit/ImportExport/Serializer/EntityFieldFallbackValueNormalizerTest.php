@@ -39,10 +39,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
 
-    /**
-     * @return array
-     */
-    public function normalizeDataProvider()
+    public function normalizeDataProvider(): array
     {
         return [
             'scalar' => [
@@ -99,10 +96,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    /**
-     * @return array
-     */
-    public function denormalizeDataProvider()
+    public function denormalizeDataProvider(): array
     {
         return [
             'scalar value' => ['val', false, $this->getEntity(

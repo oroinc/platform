@@ -139,7 +139,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function applyProvider()
+    public function applyProvider(): array
     {
         return [
             'GREATER_EQUAL' => [
@@ -321,7 +321,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function parseDataProvider()
+    public function parseDataProvider(): array
     {
         return [
             'invalid data, no array' => [

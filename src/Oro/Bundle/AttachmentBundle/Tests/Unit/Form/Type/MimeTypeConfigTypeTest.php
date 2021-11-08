@@ -38,7 +38,7 @@ class MimeTypeConfigTypeTest extends FormIntegrationTestCase
         self::assertSame(implode("\n", $value), $form->getData());
     }
 
-    public function validValuesDataProvider()
+    public function validValuesDataProvider(): array
     {
         return [
             'empty'              => [
@@ -64,7 +64,7 @@ class MimeTypeConfigTypeTest extends FormIntegrationTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function invalidValuesDataProvider()
+    public function invalidValuesDataProvider(): array
     {
         return [
             'invalid one MIME type'     => [
@@ -90,7 +90,7 @@ class MimeTypeConfigTypeTest extends FormIntegrationTestCase
         self::assertSame(implode("\n", $value), $form->getData());
     }
 
-    public function validModelDataProvider()
+    public function validModelDataProvider(): array
     {
         return [
             'LF delimiter'                     => [

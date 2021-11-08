@@ -158,7 +158,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals('', $errors[0]->getCause()->getPropertyPath());
     }
 
-    public function invalidNumberOfAttributesDataProvider()
+    public function invalidNumberOfAttributesDataProvider(): array
     {
         return [
             'empty'                    => [

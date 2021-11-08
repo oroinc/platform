@@ -9,18 +9,16 @@ use Oro\Component\Layout\LayoutContext;
 
 class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DatagridConfigContextConfigurator */
-    protected $contextConfigurator;
-
     /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dataGridManager;
+    private $dataGridManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var DatagridConfigContextConfigurator */
+    private $contextConfigurator;
+
     protected function setUp(): void
     {
-        $this->dataGridManager = $this->getMockBuilder(Manager::class)->disableOriginalConstructor()->getMock();
+        $this->dataGridManager = $this->createMock(Manager::class);
+
         $this->contextConfigurator = new DatagridConfigContextConfigurator($this->dataGridManager);
     }
 
@@ -29,14 +27,12 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context = new LayoutContext();
         $context['grid_config'] = ['grid_name'];
 
-        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config */
-        $config = $this->getMockBuilder(DatagridConfiguration::class)->disableOriginalConstructor()->getMock();
+        $config = $this->createMock(DatagridConfiguration::class);
         $config->expects($this->once())
             ->method('toArray')
             ->willReturn(['config']);
 
-        $this->dataGridManager
-            ->expects($this->once())
+        $this->dataGridManager->expects($this->once())
             ->method('getConfigurationForGrid')
             ->with('grid_name')
             ->willReturn($config);
@@ -55,8 +51,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->dataGridManager
-            ->expects($this->never())
+        $this->dataGridManager->expects($this->never())
             ->method('getConfigurationForGrid');
 
         $this->assertEquals([], $context->get('grid_config'));

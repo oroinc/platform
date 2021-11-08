@@ -14,17 +14,20 @@ use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
 
 class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityToEntityChangeArrayConverter */
-    private $converter;
-
     /** @var AuditFieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $provider;
 
+    /** @var EntityToEntityChangeArrayConverter */
+    private $converter;
+
     protected function setUp(): void
     {
-        $this->converter = new EntityToEntityChangeArrayConverter();
         $this->provider = $this->createMock(AuditFieldTypeProvider::class);
-        $this->provider->expects($this->any())->method('getFieldType')->willReturn(AuditFieldTypeRegistry::TYPE_STRING);
+        $this->provider->expects($this->any())
+            ->method('getFieldType')
+            ->willReturn(AuditFieldTypeRegistry::TYPE_STRING);
+
+        $this->converter = new EntityToEntityChangeArrayConverter();
         $this->converter->setAuditFieldTypeProvider(new AuditFieldTypeProvider());
     }
 
@@ -34,19 +37,16 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     public function testEntityConversionToArray(array $changeSet, array $expectedChangeSet)
     {
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory
-            ->expects($this->any())
+        $metadataFactory->expects($this->any())
             ->method('hasMetadataFor')
             ->willReturn(false);
         $metadata = $this->createMock(ClassMetadata::class);
 
         $em = $this->getEntityManager();
-        $em
-            ->expects($this->any())
+        $em->expects($this->any())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
-        $em
-            ->expects($this->any())
+        $em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
@@ -70,14 +70,12 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     public function testAdditionalFieldsAddedIfEntityHasThem(array $fields, array $expectedFields)
     {
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory
-            ->expects($this->any())
+        $metadataFactory->expects($this->any())
             ->method('hasMetadataFor')
             ->willReturn(false);
 
         $em = $this->getEntityManager();
-        $em
-            ->expects($this->any())
+        $em->expects($this->any())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
 
@@ -90,19 +88,16 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     public function testConvertCollection()
     {
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory
-            ->expects($this->any())
+        $metadataFactory->expects($this->any())
             ->method('hasMetadataFor')
             ->willReturn(true);
         $metadata = $this->createMock(ClassMetadata::class);
 
         $em = $this->getEntityManager();
-        $em
-            ->expects($this->any())
+        $em->expects($this->any())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
-        $em
-            ->expects($this->any())
+        $em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
@@ -153,10 +148,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('additional_fields', $converted);
     }
 
-    /**
-     * @return array
-     */
-    public function additionalFieldsDataProvider()
+    public function additionalFieldsDataProvider(): array
     {
         $dateTime = new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'));
         $resource = fopen(__FILE__, 'rb');
@@ -177,10 +169,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function entityConversionDataProvider()
+    public function entityConversionDataProvider(): array
     {
         $dateTime = new \DateTime('2017-11-10 10:00:00', new \DateTimeZone('Europe/London'));
         $resource = fopen(__FILE__, 'rb');

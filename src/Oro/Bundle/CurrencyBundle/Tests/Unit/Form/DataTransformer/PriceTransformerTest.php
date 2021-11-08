@@ -34,10 +34,7 @@ class PriceTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->transformer->reverseTransform($data));
     }
 
-    /**
-     * @return array
-     */
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         $zeroPrice = Price::create(0, 'USD');
         $price = Price::create(100, 'USD');

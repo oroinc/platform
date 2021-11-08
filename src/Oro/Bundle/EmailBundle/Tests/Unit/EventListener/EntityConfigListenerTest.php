@@ -48,10 +48,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushConfigEvent([$scope => $config], $configManager));
     }
 
-    /**
-     * @return array
-     */
-    public function changeSetProvider()
+    public function changeSetProvider(): array
     {
         return [
             'email config changed'     => [

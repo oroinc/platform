@@ -48,26 +48,23 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
         $this->user = new User();
         $this->user->setUsername('username');
 
-        /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject $aclHelper */
         $aclHelper = $this->createMock(AclHelper::class);
 
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);
         $this->gridViewUserRepository = $this->createMock(GridViewUserRepository::class);
 
-        /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $manager */
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
             ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [self::GRID_VIEW_CLASS_NAME, $this->gridViewRepository],
-                    [self::GRID_VIEW_USER_CLASS_NAME, $this->gridViewUserRepository]
-                ]
-            );
+            ->willReturnMap([
+                [self::GRID_VIEW_CLASS_NAME, $this->gridViewRepository],
+                [self::GRID_VIEW_USER_CLASS_NAME, $this->gridViewUserRepository]
+            ]);
 
-        /** @var Registry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(Registry::class);
-        $registry->expects($this->any())->method('getManagerForClass')->willReturn($manager);
+        $registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($manager);
 
         $this->dataGridManager = $this->createMock(Manager::class);
 
@@ -88,15 +85,22 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
         $systemView = new View('view1');
         $systemView->setDefault(true);
 
-        /** @var TranslatorInterface|\ $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $viewList = new ViewListStub($translator);
 
         $config = $this->createMock(DatagridConfiguration::class);
-        $config->expects($this->once())->method('offsetGetOr')->with('views_list', false)->willReturn($viewList);
+        $config->expects($this->once())
+            ->method('offsetGetOr')
+            ->with('views_list', false)
+            ->willReturn($viewList);
 
-        $this->dataGridManager->expects($this->once())->method('getConfigurationForGrid')->willReturn($config);
+        $this->dataGridManager->expects($this->once())
+            ->method('getConfigurationForGrid')
+            ->willReturn($config);
 
-        $this->assertEquals($systemView, $this->gridViewManager->getDefaultView($this->user, 'sales-opportunity-grid'));
+        $this->assertEquals(
+            $systemView,
+            $this->gridViewManager->getDefaultView($this->user, 'sales-opportunity-grid')
+        );
     }
 }

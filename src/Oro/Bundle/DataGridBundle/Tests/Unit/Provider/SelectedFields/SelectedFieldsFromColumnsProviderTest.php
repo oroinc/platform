@@ -53,8 +53,7 @@ class SelectedFieldsFromColumnsProviderTest extends AbstractSelectedFieldsProvid
      */
     protected function mockGetConfiguration(array $configuration): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('offsetGet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn($configuration);

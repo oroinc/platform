@@ -33,12 +33,10 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
      */
     public function testVisitMetadata(array $sorters, array $columns, array $expectedData): void
     {
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->sortersStateProvider->expects($this->once())
             ->method('getState')
             ->willReturn([]);
-        $this->sortersStateProvider
-            ->expects(self::once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getDefaultState')
             ->willReturn([]);
 
@@ -262,17 +260,15 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
         $config = DatagridConfiguration::create(['sorters' => ['columns' => []]]);
         $datagridParameters = new ParameterBag();
 
-        $this->sortersStateProvider
-            ->expects(self::once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getState')
             ->with($config, $datagridParameters)
-            ->willReturn($state = ['name' => 'DESC']);
+            ->willReturn(['name' => 'DESC']);
 
-        $this->sortersStateProvider
-            ->expects(self::once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getDefaultState')
             ->with($config)
-            ->willReturn($initialState = ['name' => 'ASC']);
+            ->willReturn(['name' => 'ASC']);
 
         $data = MetadataObject::create([]);
         $this->extension->setParameters($datagridParameters);
@@ -295,12 +291,8 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     /**
      * @dataProvider visitMetadataUnknownColumnDataProvider
-     *
-     * @param array $sorters
-     * @param array $columns
-     * @param string $expectedMessage
      */
-    public function testVisitMetadataUnknownColumn(array $sorters, array $columns, $expectedMessage): void
+    public function testVisitMetadataUnknownColumn(array $sorters, array $columns, string $expectedMessage): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage($expectedMessage);

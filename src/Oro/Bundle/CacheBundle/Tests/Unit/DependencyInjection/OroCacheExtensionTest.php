@@ -15,11 +15,10 @@ class OroCacheExtensionTest extends ExtensionTestCase
         $containerBuilder = parent::buildContainerMock();
 
         $warmerServiceDefinition = $this->createMock(Definition::class);
-        $warmerServiceDefinition->expects(static::once())
+        $warmerServiceDefinition->expects(self::once())
             ->method('replaceArgument')
-            ->with(0, static::isType('array'));
-        $containerBuilder
-            ->expects(static::once())
+            ->with(0, self::isType('array'));
+        $containerBuilder->expects(self::once())
             ->method('getDefinition')
             ->with('oro.cache.serializer.mapping.cache_warmer')
             ->willReturn($warmerServiceDefinition);

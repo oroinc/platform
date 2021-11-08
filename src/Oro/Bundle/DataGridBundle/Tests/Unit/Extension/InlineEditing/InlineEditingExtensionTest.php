@@ -9,19 +9,20 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    private InlineEditingConfigurator|MockObject $configurator;
-    private InlineEditingExtension $extension;
+    /** @var InlineEditingConfigurator|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurator;
+
+    /** @var InlineEditingExtension */
+    private $extension;
 
     protected function setUp(): void
     {
         $this->configurator = $this->createMock(InlineEditingConfigurator::class);
-        $this->extension = new InlineEditingExtension(
-            $this->configurator
-        );
+
+        $this->extension = new InlineEditingExtension($this->configurator);
         $this->extension->setParameters(new ParameterBag());
     }
 

@@ -11,7 +11,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
     /**
      * @dataProvider invalidFiltersStructureProvider
      */
-    public function testInvalidFiltersStructure($expectedExceptionMessage, $filters)
+    public function testInvalidFiltersStructure(string $expectedExceptionMessage, array $filters)
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [
@@ -45,7 +45,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
         }
     }
 
-    public function invalidFiltersStructureProvider()
+    public function invalidFiltersStructureProvider(): array
     {
         return [
             [
@@ -60,7 +60,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,
@@ -70,7 +70,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '2',
                                 'type'  => 1,
@@ -86,7 +86,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,
@@ -101,7 +101,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,
@@ -117,7 +117,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,

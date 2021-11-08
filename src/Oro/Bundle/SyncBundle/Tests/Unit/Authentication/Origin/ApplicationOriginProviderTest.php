@@ -10,6 +10,7 @@ class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
+
     /** @var OriginExtractor|\PHPUnit\Framework\MockObject\MockObject */
     private $originExtractor;
 
@@ -21,7 +22,10 @@ class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->originExtractor = $this->createMock(OriginExtractor::class);
 
-        $this->applicationOriginProvider = new ApplicationOriginProvider($this->configManager, $this->originExtractor);
+        $this->applicationOriginProvider = new ApplicationOriginProvider(
+            $this->configManager,
+            $this->originExtractor
+        );
     }
 
     /**
@@ -29,14 +33,12 @@ class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetOrigins(?string $origin, array $expectedOrigins): void
     {
-        $this->configManager
-            ->expects(self::once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('oro_ui.application_url', null)
             ->willReturn($appUrl = 'sampleAppUrl');
 
-        $this->originExtractor
-            ->expects(self::once())
+        $this->originExtractor->expects(self::once())
             ->method('fromUrl')
             ->with($appUrl)
             ->willReturn($origin);

@@ -6,35 +6,18 @@ use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 
 class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DateTimeFormatter
-     */
-    protected $dateTimeFormatter;
+    /** @var DateTimeFormatter */
+    private $dateTimeFormatter;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         $this->dateTimeFormatter = new DateTimeFormatter();
     }
 
     /**
-     * @inheritDoc
-     */
-    protected function tearDown(): void
-    {
-        unset($this->dateTimeFormatter);
-    }
-
-    /**
      * @dataProvider formatProvider
-     *
-     * @param string $dateTimeString
-     * @param string $dateTimeZone
-     * @param string $expectedDateTimeString
      */
-    public function testFormat($dateTimeString, $dateTimeZone, $expectedDateTimeString)
+    public function testFormat(string $dateTimeString, string $dateTimeZone, string $expectedDateTimeString)
     {
         $dateTime = new \DateTime($dateTimeString, new \DateTimeZone($dateTimeZone));
         $this->assertEquals(
@@ -43,7 +26,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function formatProvider()
+    public function formatProvider(): array
     {
         return [
             [

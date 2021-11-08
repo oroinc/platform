@@ -18,10 +18,7 @@ class ColorUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedColor, ColorUtils::shadeColor($color, $shade));
     }
 
-    /**
-     * @return array
-     */
-    public function shadeColorProvider()
+    public function shadeColorProvider(): array
     {
         return [
             'shade by 20%' => ['#acd39c', 0.2, '#cefdbb'],
@@ -47,7 +44,7 @@ class ColorUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedColors, $shadeColors);
     }
 
-    public function insertShadeColorsProvider()
+    public function insertShadeColorsProvider(): array
     {
         return [
             [

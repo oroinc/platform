@@ -211,9 +211,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRootEntityWithEntityClassResolver()
     {
-        $entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects(self::once())
             ->method('getEntityClass')
             ->with('Test:Entity')
@@ -293,9 +291,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testFindRootEntityWithEntityClassResolver()
     {
-        $entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects(self::any())
             ->method('getEntityClass')
             ->willReturnCallback(function ($className) {

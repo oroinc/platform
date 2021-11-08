@@ -81,13 +81,11 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->messageParamsProvider->expects($this->exactly(3))
             ->method('getMessageParams')
-            ->willReturnMap(
-                [
-                    [$fooReminder, $fooMessage],
-                    [$barReminder, $barMessage],
-                    [$bazReminder, $bazMessage]
-                ]
-            );
+            ->willReturnMap([
+                [$fooReminder, $fooMessage],
+                [$barReminder, $barMessage],
+                [$bazReminder, $bazMessage]
+            ]);
 
         $this->connectionChecker->expects($this->exactly(2))
             ->method('checkConnection')
@@ -144,7 +142,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->websocketClient->expects($this->once())
             ->method('publish')
             ->with("oro/reminder_remind/{$fooUserId}", [$fooMessage, $barMessage])
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $fooReminder->expects($this->once())
             ->method('setState')

@@ -52,7 +52,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         $this->assertEquals($expected['where'], $where);
     }
 
-    public function applyRangeProvider()
+    public function applyRangeProvider(): array
     {
         return [
             'BETWEEN x AND y'        => [
@@ -114,7 +114,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ];
     }
 
-    public function parseDataProvider()
+    public function parseDataProvider(): array
     {
         return [
             'invalid data, no value'                 => [

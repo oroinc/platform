@@ -10,22 +10,18 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var PermissionsHandler */
-    private $handler;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Process|\PHPUnit\Framework\MockObject\MockObject */
     private $process;
 
     /** @var string */
     private $directory;
 
+    /** @var PermissionsHandler */
+    private $handler;
+
     protected function setUp(): void
     {
-        $this->process = $this
-            ->getMockBuilder(Process::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->process = $this->createMock(Process::class);
         $this->directory = $this->getTempDir('permissions_handler');
 
         $this->handler = $this->getMockBuilder(PermissionsHandler::class)
@@ -33,7 +29,7 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testSetPermissionsSetfacl()
+    public function testSetPermissionsSetFACL()
     {
         $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')

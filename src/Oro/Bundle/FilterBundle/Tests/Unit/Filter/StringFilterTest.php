@@ -84,7 +84,7 @@ class StringFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected['where'], $where);
     }
 
-    public function applyProvider()
+    public function applyProvider(): array
     {
         return [
             'NO_TYPE'               => [

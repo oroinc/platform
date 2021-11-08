@@ -7,12 +7,11 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroPlaceholderPasswordType
-     */
+    /** @var OroPlaceholderPasswordType */
     private $formType;
 
     protected function setUp(): void
@@ -38,15 +37,10 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewProvider
-     * @param string|null $defaultData
-     * @param mixed $submitted
-     * @param string|null $exceptedModel
-     * @param string|null $exceptedView
-     * @param bool $isError
      */
     public function testBuildView(
         ?string $defaultData,
-        $submitted,
+        mixed $submitted,
         ?string $exceptedModel,
         string $exceptedView,
         bool $isError = false
@@ -68,7 +62,7 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
         $this->assertSame($exceptedView, $view->vars['value'], 'Different view value ($view->vars[\'value\'])');
     }
 
-    public function buildViewProvider()
+    public function buildViewProvider(): array
     {
         return [
             'empty form submit empty string' => [
@@ -177,7 +171,7 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
      */
     public function testAlwaysEmptyCanNotBeSetToFalse()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessage(
             'The option "always_empty" with value false is invalid. Accepted values are: true.'
         );
@@ -187,11 +181,11 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        static::assertSame(PasswordType::class, $this->formType->getParent());
+        self::assertSame(PasswordType::class, $this->formType->getParent());
     }
 
     public function testGetBlockPrefix()
     {
-        static::assertSame('oro_placeholder_password', $this->formType->getBlockPrefix());
+        self::assertSame('oro_placeholder_password', $this->formType->getBlockPrefix());
     }
 }

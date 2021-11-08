@@ -3,63 +3,65 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Form;
 
 use Composer\Package\Package;
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\PlatformBundle\Form\UrlGenerator;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 
 class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var UrlGenerator */
-    protected $generator;
-
     /** @var PackageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $packageProvider;
+    private $packageProvider;
 
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cacheProvider;
+    private $cacheProvider;
+
+    /** @var UrlGenerator */
+    private $generator;
 
     protected function setUp(): void
     {
-        $this->packageProvider = $this->getMockBuilder('Oro\Bundle\PlatformBundle\Provider\PackageProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->packageProvider = $this->createMock(PackageProvider::class);
+        $this->cacheProvider = $this->createMock(ArrayCache::class);
 
         $this->generator = new UrlGenerator($this->packageProvider, $this->cacheProvider);
     }
 
     public function testGetFormUrlCacheHit()
     {
-        $this->cacheProvider->expects($this->once())->method('contains')->willReturn(true);
-        $this->cacheProvider->expects($this->once())->method('fetch')->willReturn(UrlGenerator::URL);
+        $this->cacheProvider->expects($this->once())
+            ->method('contains')
+            ->willReturn(true);
+        $this->cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->willReturn(UrlGenerator::URL);
 
         $this->assertEquals(UrlGenerator::URL, $this->generator->getFormUrl());
     }
 
     /**
-     * @param array $packages
-     * @param string $expectedUrl
-     *
      * @dataProvider urlDataProvider
      */
-    public function testGetFormUrl($expectedUrl, array $packages = [])
+    public function testGetFormUrl(string $expectedUrl, array $packages = [])
     {
-        $this->cacheProvider->expects($this->once())->method('contains')->willReturn(false);
-        $this->cacheProvider->expects($this->never())->method('fetch');
-        $this->cacheProvider->expects($this->once())->method('save')->with($this->isType('string'), $expectedUrl);
+        $this->cacheProvider->expects($this->once())
+            ->method('contains')
+            ->willReturn(false);
+        $this->cacheProvider->expects($this->never())
+            ->method('fetch');
+        $this->cacheProvider->expects($this->once())
+            ->method('save')
+            ->with($this->isType('string'), $expectedUrl);
 
-        $this->packageProvider->expects($this->once())->method('getOroPackages')->with(false)->willReturn($packages);
+        $this->packageProvider->expects($this->once())
+            ->method('getOroPackages')
+            ->with(false)
+            ->willReturn($packages);
 
         $this->assertEquals($expectedUrl, $this->generator->getFormUrl());
     }
 
-    /**
-     * @return array
-     */
-    public function urlDataProvider()
+    public function urlDataProvider(): array
     {
         return [
             'beta commerce packages' => [
@@ -101,12 +103,7 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $version
-     * @return Package
-     */
-    protected function getPackage($name, $version)
+    private function getPackage(string $name, string $version): Package
     {
         return new Package($name, $version, $version);
     }

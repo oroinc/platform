@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
-use Oro\Bundle\ApiBundle\Filter\SearchAggregationFilter;
-use Oro\Bundle\ApiBundle\Filter\SearchFieldResolver;
-use Oro\Bundle\ApiBundle\Filter\SearchFieldResolverFactory;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;

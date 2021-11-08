@@ -17,11 +17,9 @@ class AuthorProviderTest extends \PHPUnit\Framework\TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                static function (string $key) {
-                    return sprintf('[trans]%s[/trans]', $key);
-                }
-            );
+            ->willReturnCallback(function (string $key) {
+                return sprintf('[trans]%s[/trans]', $key);
+            });
 
         $this->provider = new AuthorProvider($translator);
     }

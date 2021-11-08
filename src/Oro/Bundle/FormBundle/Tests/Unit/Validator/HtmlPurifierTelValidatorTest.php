@@ -30,10 +30,7 @@ class HtmlPurifierTelValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $this->validator->doValidate($this->uri, null, null));
     }
 
-    /**
-     * @return array
-     */
-    public function phoneProvider()
+    public function phoneProvider(): array
     {
         return [
             [

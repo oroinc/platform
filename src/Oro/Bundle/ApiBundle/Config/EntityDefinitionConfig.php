@@ -833,6 +833,16 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
+     * Indicates whether the ordering of items is set.
+     *
+     * @return bool
+     */
+    public function hasOrderBy()
+    {
+        return $this->has(ConfigUtil::ORDER_BY);
+    }
+
+    /**
      * Indicates whether the maximum number of items is set.
      *
      * @return bool

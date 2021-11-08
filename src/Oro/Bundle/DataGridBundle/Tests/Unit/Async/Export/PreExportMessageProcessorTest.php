@@ -10,15 +10,17 @@ use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Component\MessageQueue\Client\Message;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Client\Message as ClientMessage;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -32,10 +34,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
-    /**
-     * @return array
-     */
-    public function invalidMessageBodyProvider()
+    public function invalidMessageBodyProvider(): array
     {
         return [
             [
@@ -51,32 +50,31 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidMessageBodyProvider
-     *
-     * @param string $loggerMessage
-     * @param array  $messageBody
      */
-    public function testShouldRejectMessageAndLogCriticalIfRequiredParametersAreMissing($loggerMessage, $messageBody)
-    {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects(self::once())
+    public function testShouldRejectMessageAndLogCriticalIfRequiredParametersAreMissing(
+        string $loggerMessage,
+        array $messageBody
+    ) {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('critical')
             ->with($this->stringContains($loggerMessage));
 
         $processor = new PreExportMessageProcessor(
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createTokenStorageMock(),
-            $this->createDependentJobServiceMock(),
+            $this->createMock(JobRunner::class),
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(DependentJobService::class),
             $logger,
             $this->createMock(DefaultExportHandler::class),
             100
         );
 
-        $message = $this->createTransportMessage($messageBody);
-        $result = $processor->process($message, $this->createSessionMock());
+        $message = new Message();
+        $message->setBody(JSON::encode($messageBody));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessor::REJECT, $result);
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     /**
@@ -85,25 +83,30 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnMessageACKOnExportSuccess()
     {
         $jobUniqueName = 'oro_datagrid.pre_export.grid_name.user_1.csv';
-        $message = $this->createTransportMessage(['format' => 'csv', 'parameters' => ['gridName' => 'grid_name']], 123);
+        $message = new Message();
+        $message->setMessageId('123');
+        $message->setBody(JSON::encode([
+            'format' => 'csv',
+            'parameters' => ['gridName' => 'grid_name']
+        ]));
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects(self::once())
             ->method('runUnique')
-            ->with($this->equalTo(123), $this->equalTo($jobUniqueName))
-            ->will($this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+            ->with('123', $jobUniqueName)
+            ->willReturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
                 return $callback($jobRunner, $childJob);
-            }));
+            });
         $jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with($jobUniqueName . '.chunk.1')
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
                 return $callback($jobRunner, $childJob);
-            }));
+            });
 
-        $dependentJobContext = $this->createDependentJobContextMock();
+        $dependentJobContext = $this->createMock(DependentJobContext::class);
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
@@ -120,28 +123,28 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $dependentJob = $this->createDependentJobMock();
+        $dependentJob = $this->createMock(DependentJobService::class);
         $dependentJob->expects(self::once())
             ->method('createDependentJobContext')
-            ->with($this->equalTo($job))
+            ->with($job)
             ->willReturn($dependentJobContext);
         $dependentJob->expects(self::once())
             ->method('saveDependentJob')
-            ->with($this->equalTo($dependentJobContext));
+            ->with($dependentJobContext);
 
-        $user = $this->createUserStub();
+        $user = $this->createMock(User::class);
         $user->expects(self::any())
             ->method('getId')
             ->willReturn(1);
         $user->expects(self::once())
             ->method('getEmail');
 
-        $token = $this->createTokenMock();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
 
-        $tokenStorage = $this->createTokenStorageMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects(self::any())
             ->method('getToken')
             ->willReturn($token);
@@ -151,12 +154,12 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             self::getMessageProducer(),
             $tokenStorage,
             $dependentJob,
-            $this->createLoggerMock(),
+            $this->createMock(LoggerInterface::class),
             $this->createMock(DefaultExportHandler::class),
             100
         );
 
-        $exportHandler = $this->createExportHandlerMock();
+        $exportHandler = $this->createMock(ExportHandler::class);
         $exportHandler->expects(self::once())
             ->method('getExportingEntityIds')
             ->willReturn([]);
@@ -165,13 +168,13 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn('Acme');
 
         $processor->setExportHandler($exportHandler);
-        $processor->setExportIdFetcher($this->createExportIdFetcherMock());
-        $result = $processor->process($message, $this->createSessionMock());
+        $processor->setExportIdFetcher($this->createMock(DatagridExportIdFetcher::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessor::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
             Topics::EXPORT,
-            new Message(
+            new ClientMessage(
                 [
                     'format'       => 'csv',
                     'batchSize'    => 100,
@@ -191,13 +194,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $id
-     * @param Job $rootJob
-     *
-     * @return Job
-     */
-    private function createJob($id, $rootJob = null)
+    private function createJob(int $id, Job $rootJob = null): Job
     {
         $job = new Job();
         $job->setId($id);
@@ -206,121 +203,5 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         }
 
         return $job;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
-     */
-    private function createExportHandlerMock()
-    {
-        return $this->createMock(ExportHandler::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DatagridExportIdFetcher
-     */
-    private function createExportIdFetcherMock()
-    {
-        return $this->createMock(DatagridExportIdFetcher::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
-     */
-    private function createTokenStorageMock()
-    {
-        return $this->createMock(TokenStorageInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
-     */
-    private function createDependentJobServiceMock()
-    {
-        return $this->createMock(DependentJobService::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenInterface
-     */
-    private function createTokenMock()
-    {
-        return $this->createMock(TokenInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
-     */
-    private function createDependentJobContextMock()
-    {
-        return $this->createMock(DependentJobContext::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
-     */
-    private function createDependentJobMock()
-    {
-        return $this->createMock(DependentJobService::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
-     */
-    private function createUserStub()
-    {
-        return $this->getMockBuilder(UserInterface::class)
-            ->onlyMethods(get_class_methods(UserInterface::class))
-            ->addMethods(['getId', 'getEmail'])
-            ->getMock();
-    }
-
-    /**
-     * @param array $body
-     * @param null $id
-     *
-     * @return TransportMessage
-     */
-    private function createTransportMessage($body = [], $id = null): TransportMessage
-    {
-        $message = new TransportMessage();
-        $message->setBody(json_encode($body));
-        if ($id) {
-            $message->setMessageId($id);
-        }
-
-        return $message;
     }
 }

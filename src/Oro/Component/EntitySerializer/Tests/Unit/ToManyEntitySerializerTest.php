@@ -688,6 +688,108 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testManyToManyBidirectionalAndMasResultsAndOrderBy()
+    {
+        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->addQueryExpectation(
+            'SELECT u0_.id AS id_0, u0_.name AS name_1'
+            . ' FROM user_table u0_'
+            . ' WHERE u0_.id = ?',
+            [
+                [
+                    'id_0'   => 1,
+                    'name_1' => 'user_name'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'SELECT u0_.id AS id_0, p1_.id AS id_1'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
+            . ' WHERE u0_.id = ?'
+            . ' ORDER BY p1_.name DESC'
+            . ' LIMIT 10',
+            [
+                [
+                    'id_0' => 1,
+                    'id_1' => 10
+                ],
+                [
+                    'id_0' => 1,
+                    'id_1' => 20
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'SELECT p0_.id AS id_0, p0_.name AS name_1'
+            . ' FROM product_table p0_'
+            . ' WHERE p0_.id IN (?, ?)',
+            [
+                [
+                    'id_0'   => 10,
+                    'name_1' => 'product_name1'
+                ],
+                [
+                    'id_0'   => 20,
+                    'name_1' => 'product_name2'
+                ]
+            ],
+            [1 => 10, 2 => 20],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+        );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'products' => [
+                        'exclusion_policy' => 'all',
+                        'max_results'      => 10,
+                        'order_by'         => ['name' => 'DESC'],
+                        'fields'           => [
+                            'id'   => null,
+                            'name' => null
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'       => 1,
+                    'name'     => 'user_name',
+                    'products' => [
+                        [
+                            'id'   => 10,
+                            'name' => 'product_name1'
+                        ],
+                        [
+                            'id'   => 20,
+                            'name' => 'product_name2'
+                        ]
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
+
     public function testSerializeWithFieldsFilterAndEnabledToManyAssociation()
     {
         $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')

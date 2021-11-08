@@ -26,31 +26,31 @@ class PieChartDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData->toArray(), $this->transformer->transform($data, $chartOptions)->toArray());
     }
 
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
-        return array(
-            array(
+        return [
+            [
                 'data' => new ArrayData(
-                    array(
-                        array('label' => 'Foo', 'value' => 50),
-                        array('label' => 'Foo', 'value' => 200),
-                        array('label' => 'Foo', 'value' => 250),
-                    )
+                    [
+                        ['label' => 'Foo', 'value' => 50],
+                        ['label' => 'Foo', 'value' => 200],
+                        ['label' => 'Foo', 'value' => 250],
+                    ]
                 ),
-                'chartOptions' => array(
-                    'settings' => array(
+                'chartOptions' => [
+                    'settings' => [
                         PieChartDataTransformer::FRACTION_INPUT_DATA_FIELD => 'value',
                         PieChartDataTransformer::FRACTION_OUTPUT_DATA_FIELD => 'fraction',
-                    )
-                ),
+                    ]
+                ],
                 'expectedData' => new ArrayData(
-                    array(
-                        array('label' => 'Foo', 'value' => 50, 'fraction' => 0.1),
-                        array('label' => 'Foo', 'value' => 200, 'fraction' => 0.4),
-                        array('label' => 'Foo', 'value' => 250, 'fraction' => 0.5),
-                    )
+                    [
+                        ['label' => 'Foo', 'value' => 50, 'fraction' => 0.1],
+                        ['label' => 'Foo', 'value' => 200, 'fraction' => 0.4],
+                        ['label' => 'Foo', 'value' => 250, 'fraction' => 0.5],
+                    ]
                 )
-            )
-        );
+            ]
+        ];
     }
 }

@@ -42,16 +42,18 @@ class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
         $grid->setAcceptor($acceptor);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())->method('getDQLPart')->with($this->equalTo('from'))
-            ->will($this->returnValue([new From(self::TEST_ENTITY_NAME, 'alias')]));
+        $qb->expects($this->once())
+            ->method('getDQLPart')
+            ->with('from')
+            ->willReturn([new From(self::TEST_ENTITY_NAME, 'alias')]);
         $datasourceMock = $this->createMock(OrmDatasource::class);
         $datasourceMock->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
         $this->generator->expects($this->once())
             ->method('generate')
             ->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $grid->setDatasource($datasourceMock);
 

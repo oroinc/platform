@@ -8,12 +8,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    private function processConfiguration(array $config)
+    private function processConfiguration(array $config): array
     {
         $processor = new Processor();
 
@@ -23,7 +18,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidEntityAliasDataProvider
      */
-    public function testEntityAliasesForInvalidAlias($alias)
+    public function testEntityAliasesForInvalidAlias(string $alias)
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(sprintf(
@@ -48,7 +43,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidEntityAliasDataProvider
      */
-    public function testEntityAliasesForInvalidPluralAlias($alias)
+    public function testEntityAliasesForInvalidPluralAlias(string $alias)
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(sprintf(
@@ -70,7 +65,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidEntityAliasDataProvider()
+    public function invalidEntityAliasDataProvider(): array
     {
         return [
             ['1a'],
@@ -81,7 +76,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testEntityNameFormatsForFallbackToUndefinedType()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The undefined text representation format "unknown" cannot be used as a fallback format for the format'
             . ' "long".'
@@ -100,7 +95,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testEntityNameFormatsForSelfCyclicDependency()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The text representation format "long" have a cyclic dependency on itself.');
 
         $this->processConfiguration(
@@ -116,7 +111,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testEntityNameFormatsForOneLevelCyclicDependency()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The text representation format "short" have a cyclic dependency "long -> short".'
         );
@@ -137,7 +132,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testEntityNameFormatsForTwoLevelCyclicDependency()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The text representation format "html" have a cyclic dependency "long -> short -> html".'
         );
@@ -161,7 +156,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testEntityNameFormatsForCyclicDependency()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The text representation format "short" have a cyclic dependency "html -> full -> long -> short".'
         );

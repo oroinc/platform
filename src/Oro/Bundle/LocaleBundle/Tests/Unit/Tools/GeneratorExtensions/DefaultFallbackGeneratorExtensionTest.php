@@ -26,19 +26,19 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new DefaultFallbackGeneratorExtension([
             'testClass' => []
         ], $this->defaultFallbackMethodsNamesProvider);
-        static::assertTrue($extension->supports(['class' => 'testClass']));
+        self::assertTrue($extension->supports(['class' => 'testClass']));
     }
 
     public function testSupportsWithoutClass(): void
     {
         $extension = new DefaultFallbackGeneratorExtension([], $this->defaultFallbackMethodsNamesProvider);
-        static::assertFalse($extension->supports([]));
+        self::assertFalse($extension->supports([]));
     }
 
     public function testSupportsWithoutExtension(): void
     {
         $extension = new DefaultFallbackGeneratorExtension([], $this->defaultFallbackMethodsNamesProvider);
-        static::assertFalse($extension->supports(['class' => 'testClass']));
+        self::assertFalse($extension->supports(['class' => 'testClass']));
     }
 
     public function testMethodNotGenerated(): void
@@ -81,8 +81,8 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         ], $this->defaultFallbackMethodsNamesProvider);
         $extension->generate(['class' => 'Test\Entity'], $class);
 
-        static::assertEquals($class, $clonedClass);
-        static::assertEmpty($class->getMethods());
+        self::assertEquals($class, $clonedClass);
+        self::assertEmpty($class->getMethods());
     }
 
     public function testMethodGenerated(): void
@@ -126,7 +126,7 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function getParameter(string $name, ?string $type = null, bool $nullable = false): Parameter
+    private function getParameter(string $name, ?string $type = null, bool $nullable = false): Parameter
     {
         $parameter = new Parameter($name);
         $parameter->setType($type);
@@ -138,19 +138,19 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         return $parameter;
     }
 
-    protected function assertMethod(
+    private function assertMethod(
         ClassGenerator $class,
         string $methodName,
         string $methodBody,
         string $docblock,
         array $parameters = []
     ): void {
-        static::assertTrue($class->hasMethod($methodName));
+        self::assertTrue($class->hasMethod($methodName));
 
         $method = $class->getMethod($methodName);
 
-        static::assertEquals($methodBody, $method->getBody());
-        static::assertEquals($docblock, $method->getComment());
-        static::assertEquals($parameters, $method->getParameters());
+        self::assertEquals($methodBody, $method->getBody());
+        self::assertEquals($docblock, $method->getComment());
+        self::assertEquals($parameters, $method->getParameters());
     }
 }

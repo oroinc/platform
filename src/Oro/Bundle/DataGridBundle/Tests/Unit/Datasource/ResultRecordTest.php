@@ -28,16 +28,16 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueProvider
      */
-    public function testGetValue($data, $itemName, $expectedValue)
+    public function testGetValue(mixed $data, string $itemName, mixed $expectedValue)
     {
         $resultRecord = new ResultRecord($data);
 
         $this->assertEquals($expectedValue, $resultRecord->getValue($itemName));
     }
 
-    public function getValueProvider()
+    public function getValueProvider(): array
     {
-        $obj        = new \stdClass();
+        $obj = new \stdClass();
         $obj->item1 = 'val1';
 
         $dateTime = new \DateTime();
@@ -94,16 +94,16 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRootEntityProvider
      */
-    public function testGetRootEntity($data, $expectedValue)
+    public function testGetRootEntity(mixed $data, mixed $expectedValue)
     {
         $resultRecord = new ResultRecord($data);
 
         $this->assertEquals($expectedValue, $resultRecord->getRootEntity());
     }
 
-    public function getRootEntityProvider()
+    public function getRootEntityProvider(): array
     {
-        $obj        = new \stdClass();
+        $obj = new \stdClass();
         $obj->item1 = 'val1';
 
         return [
@@ -129,7 +129,7 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setValueProvider
      */
-    public function testSetValue($data, $itemName, $itemValue)
+    public function testSetValue(mixed $data, string $itemName, mixed $itemValue)
     {
         $resultRecord = new ResultRecord($data);
 
@@ -138,9 +138,9 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($itemValue, $resultRecord->getValue($itemName));
     }
 
-    public function setValueProvider()
+    public function setValueProvider(): array
     {
-        $obj        = new \stdClass();
+        $obj = new \stdClass();
         $obj->item1 = 'val1';
 
         return [

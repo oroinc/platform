@@ -1,0 +1,16 @@
+services:
+    oro_search.api.search_field_resolver_factory:
+        class: Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory
+        arguments:
+            - '@oro_search.provider.search_mapping'
+
+    oro_search.api.filter_factory.search_query:
+        class: Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilterFactory
+        arguments:
+            - '@oro_search.provider.search_mapping'
+            - '@oro_search.api.search_field_resolver_factory'
+
+    oro_search.api.filter_factory.search_aggregation:
+        class: Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilterFactory
+        arguments:
+            - '@oro_search.api.search_field_resolver_factory'

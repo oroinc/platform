@@ -20,7 +20,7 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expects, $result);
     }
 
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'minimal_config' => [
@@ -110,7 +110,7 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
         $processor->processConfiguration($configuration, [$options]);
     }
 
-    public function processConfigurationFailsDataProvider()
+    public function processConfigurationFailsDataProvider(): array
     {
         return [
             'invalid_resource'                 => [

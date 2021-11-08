@@ -68,10 +68,7 @@ class UpdatePriceByValueAndCurrencyTest extends CustomizeFormDataProcessorTestCa
         self::assertEquals($expectedEntity, $entity);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function requestDataProvider()
+    public function requestDataProvider(): array
     {
         return [
             'empty request'             => [

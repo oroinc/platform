@@ -15,34 +15,33 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DataFixturesLoader */
-    private $loader;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $fixtureRepo;
+
+    /** @var DataFixturesLoader */
+    private $loader;
 
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
-
         $this->fixtureRepo = $this->createMock(EntityRepository::class);
-        $this->em = $this->createMock(EntityManager::class);
-        $this->em->expects($this->any())->method('getRepository')->with(DataFixture::class)
+
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->with(DataFixture::class)
             ->willReturn($this->fixtureRepo);
 
-        $this->loader = new DataFixturesLoader($this->em, $this->container);
+        $this->loader = new DataFixturesLoader($em, $this->container);
     }
 
     /**
      * @dataProvider getFixturesProvider
      */
-    public function testGetFixtures($bundles, $loadedDataFixtureClasses, $expectedFixtureClasses)
+    public function testGetFixtures(array $bundles, array $loadedDataFixtureClasses, array $expectedFixtureClasses)
     {
         /** @var \Symfony\Component\HttpKernel\Bundle\Bundle $bundle */
         foreach ($bundles as $bundle) {
@@ -56,14 +55,16 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
             $loadedDataFixtures[] = $this->createDataFixture($className, $version);
         }
 
-        $this->fixtureRepo->expects($this->any())->method('findAll')->willReturn($loadedDataFixtures);
+        $this->fixtureRepo->expects($this->any())
+            ->method('findAll')
+            ->willReturn($loadedDataFixtures);
 
-        $fixtures       = $this->loader->getFixtures();
+        $fixtures = $this->loader->getFixtures();
         $fixtureClasses = $this->getFixturesClasses($fixtures);
         $this->assertEquals($expectedFixtureClasses, $fixtureClasses);
     }
 
-    private function getFixturesClasses(array $fixtures)
+    private function getFixturesClasses(array $fixtures): array
     {
         $result = [];
         foreach ($fixtures as $fixture) {
@@ -73,13 +74,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @param string $className
-     * @param string $version
-     *
-     * @return DataFixture
-     */
-    private function createDataFixture($className, $version)
+    private function createDataFixture(string $className, string $version): DataFixture
     {
         $result = new DataFixture();
         $result->setClassName($className);
@@ -91,7 +86,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getFixturesProvider()
+    public function getFixturesProvider(): array
     {
         $test1BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle';
         $test2BundleNamespace = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle';

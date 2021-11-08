@@ -24,25 +24,21 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    const DATA_CLASS = Localization::class;
+    private const DATA_CLASS = Localization::class;
 
     /** @var LocalizationType */
-    protected $formType;
+    private $formType;
 
-    /** @var array */
-    protected static $languages = [
+    private static array $languages = [
         '0' => 'en',
         '1' => 'ru',
         '2' => 'en_US'
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->formType = new LocalizationType();
-        $this->formType->setDataClass(static::DATA_CLASS);
+        $this->formType->setDataClass(self::DATA_CLASS);
         parent::setUp();
     }
 
@@ -53,17 +49,13 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param mixed $defaultData
-     * @param array $submittedData
-     * @param array $expectedData
      */
-    public function testSubmit($defaultData, array $submittedData, $expectedData)
+    public function testSubmit(?Localization $defaultData, array $submittedData, Localization $expectedData)
     {
         $form = $this->factory->create(LocalizationType::class, $defaultData);
 
         $formConfig = $form->getConfig();
-        $this->assertEquals(static::DATA_CLASS, $formConfig->getOption('data_class'));
+        $this->assertEquals(self::DATA_CLASS, $formConfig->getOption('data_class'));
 
         $this->assertEquals($defaultData, $form->getData());
 
@@ -113,7 +105,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function createLocalization(
+    private function createLocalization(
         string $name,
         string $title,
         string $languageId,
@@ -142,7 +134,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {

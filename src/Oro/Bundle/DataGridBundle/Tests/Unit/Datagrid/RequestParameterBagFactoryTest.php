@@ -13,7 +13,6 @@ class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
     private const PARAMETERS_CLASS = ParameterBag::class;
 
     private RequestStack $requestStack;
-
     private RequestParameterBagFactory $factory;
 
     protected function setUp(): void

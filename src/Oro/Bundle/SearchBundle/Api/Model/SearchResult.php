@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Model;
+namespace Oro\Bundle\SearchBundle\Api\Model;
 
 use Doctrine\DBAL\Exception\DriverException;
-use Oro\Bundle\ApiBundle\Exception\InvalidSearchQueryException;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\SearchBundle\Api\Exception\InvalidSearchQueryException;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use Oro\Component\EntitySerializer\ConfigUtil;
 
 /**
  * Represents a search query result.

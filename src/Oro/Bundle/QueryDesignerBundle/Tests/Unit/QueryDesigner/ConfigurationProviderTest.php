@@ -16,18 +16,10 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('QueryDesignerConfigurationProvider');
-
         $this->configurationProvider = new ConfigurationProvider(
-            $this->cacheFile,
+            $this->getTempFile('QueryDesignerConfigurationProvider'),
             false,
             new Configuration(['string', 'integer', 'number', 'boolean'])
         );
@@ -54,7 +46,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
         return [
             'filters'    => [

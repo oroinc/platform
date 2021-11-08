@@ -21,12 +21,10 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionInterface::class);
-        $extension
-            ->expects(self::any())
+        $extension->expects(self::any())
             ->method('getAlias')
-            ->willReturn(static::EXTENSION);
+            ->willReturn(self::EXTENSION);
 
         $this->builder = new ExtendedContainerBuilder();
         $this->builder->registerExtension($extension);
@@ -34,19 +32,19 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testSetExtensionConfigShouldOverwriteCurrentConfig(): void
     {
-        $originalConfig    = ['prop' => 'val'];
+        $originalConfig = ['prop' => 'val'];
         $overwrittenConfig = [['p' => 'v']];
 
-        $this->builder->prependExtensionConfig(static::EXTENSION, $originalConfig);
-        self::assertEquals([$originalConfig], $this->builder->getExtensionConfig(static::EXTENSION));
+        $this->builder->prependExtensionConfig(self::EXTENSION, $originalConfig);
+        self::assertEquals([$originalConfig], $this->builder->getExtensionConfig(self::EXTENSION));
 
-        $this->builder->setExtensionConfig(static::EXTENSION, $overwrittenConfig);
-        self::assertEquals($overwrittenConfig, $this->builder->getExtensionConfig(static::EXTENSION));
+        $this->builder->setExtensionConfig(self::EXTENSION, $overwrittenConfig);
+        self::assertEquals($overwrittenConfig, $this->builder->getExtensionConfig(self::EXTENSION));
     }
 
     public function testMoveCompilerPassBefore(): void
     {
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         [
             $resolveClassPass,
@@ -102,8 +100,8 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $registerEnvVarsProcessorsPass,
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
-        $srcPass     = new CompilerPass1();
-        $targetPass  = new CompilerPass2();
+        $srcPass = new CompilerPass1();
+        $targetPass = new CompilerPass2();
         $anotherPass = new CompilerPass3();
         $this->builder->addCompilerPass($anotherPass);
         $this->builder->addCompilerPass($targetPass);
@@ -136,8 +134,8 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass     = new CompilerPass1();
-        $targetPass  = new CompilerPass2();
+        $srcPass = new CompilerPass1();
+        $targetPass = new CompilerPass2();
         $anotherPass = new CompilerPass3();
         $this->builder->addCompilerPass($targetPass);
         $this->builder->addCompilerPass($srcPass);
@@ -170,7 +168,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass);
         $this->builder->addCompilerPass($targetPass);
@@ -201,7 +199,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass     = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $target1Pass = new CompilerPass2();
         $target2Pass = new CompilerPass2();
         $this->builder->addCompilerPass($target1Pass);
@@ -228,7 +226,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown compiler pass "%s"', CompilerPass1::class));
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
     }
@@ -237,7 +235,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown compiler pass "%s"', CompilerPass1::class));
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($targetPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
@@ -247,7 +245,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Unknown compiler pass "%s"', CompilerPass2::class));
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
@@ -264,7 +262,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
@@ -295,7 +293,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
@@ -326,7 +324,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
@@ -362,7 +360,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             $extensionCompilerPass
         ] = $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);

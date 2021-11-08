@@ -17,10 +17,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, UnidirectionalFieldHelper::isFieldUnidirectional($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function isFieldUnidirectionalDataProvider()
+    public function isFieldUnidirectionalDataProvider(): array
     {
         return [
             'unidirectional' => [
@@ -53,10 +50,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldName($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function getRealFieldNameDataProvider()
+    public function getRealFieldNameDataProvider(): array
     {
         return [
             'unidirectional' => [
@@ -89,10 +83,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldClass($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function getRealFieldClassDataProvider()
+    public function getRealFieldClassDataProvider(): array
     {
         return [
             'unidirectional' => [

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -16,14 +17,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ConfigurationProviderTest extends SegmentDefinitionTestCase
 {
-    /** @var ConfigurationProvider */
-    private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
+
+    /** @var ConfigurationProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -77,11 +78,8 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
 
     /**
      * @dataProvider definitionProvider
-     *
-     * @param mixed $definition
-     * @param bool  $expectedResult
      */
-    public function testIsConfigurationValid($definition, $expectedResult)
+    public function testIsConfigurationValid(mixed $definition, bool $expectedResult)
     {
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
@@ -97,10 +95,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function definitionProvider()
+    public function definitionProvider(): array
     {
         return [
             'valid'     => [$this->getDefaultDefinition(), true],

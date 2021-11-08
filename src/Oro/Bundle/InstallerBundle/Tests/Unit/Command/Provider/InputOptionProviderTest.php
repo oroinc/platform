@@ -78,10 +78,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function confirmationQuestionDataProvider()
+    public function confirmationQuestionDataProvider(): array
     {
         return [
             'n equals false as it starts from n' => [

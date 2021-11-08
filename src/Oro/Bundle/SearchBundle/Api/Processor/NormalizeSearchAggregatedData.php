@@ -1,25 +1,22 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\SearchBundle\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Filter\SearchAggregationFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueTransformer;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Normalizes values of aggregated data returned by search query.
+ * Normalizes values of aggregated data returned by a search query.
  */
 class NormalizeSearchAggregatedData implements ProcessorInterface
 {
-    /** @var ValueTransformer */
-    private $valueTransformer;
-
-    /** @var string */
-    private $aggregationFilterName;
+    private ValueTransformer $valueTransformer;
+    private string $aggregationFilterName;
 
     public function __construct(
         ValueTransformer $valueTransformer,
@@ -30,7 +27,7 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context)
     {
@@ -82,13 +79,7 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
         return $aggregatedData;
     }
 
-    /**
-     * @param float|int $timestamp
-     * @param array     $normalizationContext
-     *
-     * @return string|null
-     */
-    private function normalizeDateTime($timestamp, array $normalizationContext): ?string
+    private function normalizeDateTime(float|int $timestamp, array $normalizationContext): ?string
     {
         return $this->valueTransformer->transformValue(
             new \DateTime('@' . $timestamp),

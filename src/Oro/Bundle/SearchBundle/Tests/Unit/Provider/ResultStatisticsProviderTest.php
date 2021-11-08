@@ -12,50 +12,35 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ResultStatisticsProvider
-     */
-    protected $target;
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
+    private $indexer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Indexer
-     */
-    protected $indexer;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
-     */
-    protected $configManager;
+    /** @var ResultStatisticsProvider */
+    private $provider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->indexer = $this->createMock(Indexer::class);
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($string) {
                 return $string . ' TRANS';
             });
 
-        $this->target = new ResultStatisticsProvider($this->indexer, $this->configManager, $this->translator);
+        $this->provider = new ResultStatisticsProvider($this->indexer, $this->configManager, $translator);
     }
 
     public function testGetGroupedResultsWithNoDocumentsFound()
     {
         $searchString = 'product';
 
-        $this->indexer
-            ->expects($this->once())
+        $this->indexer->expects($this->once())
             ->method('getDocumentsCountGroupByEntityFQCN')
             ->with($searchString)
             ->willReturn([]);
@@ -69,7 +54,7 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->target->getGroupedResultsBySearchQuery($searchString);
+        $result = $this->provider->getGroupedResultsBySearchQuery($searchString);
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -85,42 +70,35 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
     ) {
         $searchString = 'product';
 
-        $this->indexer
-            ->expects($this->once())
+        $this->indexer->expects($this->once())
             ->method('getDocumentsCountGroupByEntityFQCN')
             ->with($searchString)
             ->willReturn($documentsCountToClassName);
 
-        $this->indexer
-            ->expects($this->exactly(count($documentsCountToClassName)))
+        $this->indexer->expects($this->exactly(count($documentsCountToClassName)))
             ->method('getEntityAlias')
             ->willReturnCallback(function ($entityFQCN) use ($entityAliasMaps) {
                 return $entityAliasMaps[$entityFQCN];
             });
 
-        $this->configManager
-            ->expects($this->exactly(count($documentsCountToClassName)))
+        $this->configManager->expects($this->exactly(count($documentsCountToClassName)))
             ->method('hasConfig')
             ->willReturnCallback(function ($entityFQCN) use ($entityConfigMaps) {
                 return isset($entityConfigMaps[$entityFQCN]);
             });
 
-        $this->configManager
-            ->expects($this->exactly(count($entityConfigMaps)))
+        $this->configManager->expects($this->exactly(count($entityConfigMaps)))
             ->method('getConfig')
             ->willReturnCallback(function (EntityConfigId $configId) use ($entityConfigMaps) {
                 return $entityConfigMaps[$configId->getClassName()];
             });
 
-        $result = $this->target->getGroupedResultsBySearchQuery($searchString);
+        $result = $this->provider->getGroupedResultsBySearchQuery($searchString);
 
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getGroupedResultsBySearchQueryProvider()
+    public function getGroupedResultsBySearchQueryProvider(): array
     {
         return [
             'General flow' => [
@@ -211,7 +189,7 @@ class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getConfigEntity(string $fqcn, string $label = null, string $icon = null): ConfigInterface
+    private function getConfigEntity(string $fqcn, string $label = null, string $icon = null): ConfigInterface
     {
         $values = [];
         if ($label) {

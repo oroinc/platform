@@ -32,9 +32,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->acceptor = $this->getMockBuilder(Acceptor::class)
-            ->disableOriginalConstructor()->getMock();
-
+        $this->acceptor = $this->createMock(Acceptor::class);
         $this->parameters = new ParameterBag();
         $this->memoryCacheProvider = $this->createMock(MemoryCacheProviderInterface::class);
 
@@ -64,8 +62,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
     {
         $this->memoryCacheProvider->expects($this->once())
             ->method('reset');
-        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockBuilder $dataSource */
-        $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
+        $dataSource = $this->createMock(DatasourceInterface::class);
 
         $this->assertNull($this->grid->getDatasource());
         $this->grid->setDatasource($dataSource);
@@ -94,7 +91,6 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetData()
     {
-        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(DatasourceInterface::class);
 
         $rows1 = [
@@ -106,10 +102,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         ];
         $dataSource->expects($this->exactly(2))
             ->method('getResults')
-            ->willReturnOnConsecutiveCalls(
-                $rows1,
-                $rows2
-            );
+            ->willReturnOnConsecutiveCalls($rows1, $rows2);
 
         $cacheCallCounter = 0;
         $cache = new ArrayCache();
@@ -164,11 +157,11 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetAcceptedDataSource()
     {
-        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockBuilder $dataSource */
-        $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
+        $dataSource = $this->createMock(DatasourceInterface::class);
         $this->grid->setDatasource($dataSource);
 
-        $this->acceptor->expects($this->once())->method('acceptDatasource')
+        $this->acceptor->expects($this->once())
+            ->method('acceptDatasource')
             ->with($dataSource);
 
         $result = $this->grid->getAcceptedDatasource();

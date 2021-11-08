@@ -11,13 +11,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetJobExecutionLogFileSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private BatchLogHandler|\PHPUnit\Framework\MockObject\MockObject $logger;
+    /** @var BatchLogHandler|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private SetJobExecutionLogFileSubscriber $subscriber;
+    /** @var SetJobExecutionLogFileSubscriber */
+    private $subscriber;
 
     protected function setUp(): void
     {
         $this->logger = $this->createMock(BatchLogHandler::class);
+
         $this->subscriber = new SetJobExecutionLogFileSubscriber($this->logger);
     }
 

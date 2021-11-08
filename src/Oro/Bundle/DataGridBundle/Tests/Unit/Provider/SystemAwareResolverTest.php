@@ -8,34 +8,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
+
     /** @var SystemAwareResolver */
-    protected $resolver;
+    private $resolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /**
-     * setup mock and test object
-     */
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects(self::any())
             ->method('get')
             ->willReturnMap([
-                ['oro_datagrid.some_class', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new SomeClass(),]
+                ['oro_datagrid.some_class', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new SomeClass()]
             ]);
+
         $this->resolver  = new SystemAwareResolver($this->container);
     }
 
     /**
      * @dataProvider staticProvider
-     *
-     * @param string $gridName
-     * @param array $gridDefinition
-     * @param mixed $expect
      */
-    public function testResolveStatic(string $gridName, array $gridDefinition, $expect): void
+    public function testResolveStatic(string $gridName, array $gridDefinition, int $expect): void
     {
         if ($gridName === 'test2') {
             $this->container->expects(self::once())
@@ -143,7 +137,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      */
     public function testResolveEmpty(): void
     {
-        $definition     = [];
+        $definition = [];
         $gridDefinition = $this->resolver->resolve('test', $definition);
 
         self::assertEmpty($gridDefinition);

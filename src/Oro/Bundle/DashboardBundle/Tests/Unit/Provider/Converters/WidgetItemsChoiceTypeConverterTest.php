@@ -7,7 +7,7 @@ use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverte
 class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetItemsChoiceTypeConverter */
-    protected $converter;
+    private $converter;
 
     protected function setUp(): void
     {
@@ -23,17 +23,15 @@ class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDefaultValue()
     {
-        $choises = [
-            ['first' => 1],
-            ['second' => 2],
-        ];
-
         $config = [
             'converter_attributes' => [
                 'default_selected' => 'all'
             ],
             'options'              => [
-                'choices' => $choises
+                'choices' => [
+                    ['first' => 1],
+                    ['second' => 2]
+                ]
             ]
         ];
 

@@ -34,9 +34,6 @@ class ClientEventListenerTest extends TestCase
     /** @var ClientStorage */
     private $clientStorage;
 
-    /** @var ClientEventListener */
-    private $clientEventListener;
-
     /** @var GosClientEventListener|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedClientEventListener;
 
@@ -45,6 +42,9 @@ class ClientEventListenerTest extends TestCase
 
     /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
+
+    /** @var ClientEventListener */
+    private $clientEventListener;
 
     protected function setUp(): void
     {
@@ -59,21 +59,22 @@ class ClientEventListenerTest extends TestCase
         );
         $this->decoratedClientEventListener->setLogger($this->decoratedListenerLogger);
 
+        $this->connection = $this->createMock(ConnectionInterface::class);
+        $this->connection->WAMP = (object)['sessionId' => '12345', 'prefixes' => []];
+        $this->connection->remoteAddress = 'localhost';
+        $this->connection->resourceId = self::CONNECTION_RESOURCE_ID;
+
         $this->clientEventListener = new ClientEventListener(
             $this->decoratedClientEventListener,
             $this->websocketAuthenticationProvider,
             $this->clientStorage
         );
-
         $this->setUpLoggerMock($this->clientEventListener);
-
-        $this->connection = $this->createConnection();
     }
 
     public function testOnClientConnectAuthenticationFailed(): void
     {
-        $this->websocketAuthenticationProvider
-            ->expects(self::once())
+        $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($this->connection)
             ->willThrowException(new BadCredentialsException());
@@ -89,14 +90,12 @@ class ClientEventListenerTest extends TestCase
     public function testOnClientConnectWithStorageException(): void
     {
         $token = new TicketToken('sampleUser', 'sampleTicketDigest', 'sampleKey', ['sampleRole']);
-        $this->websocketAuthenticationProvider
-            ->expects(self::once())
+        $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($this->connection)
             ->willReturn($token);
 
-        $this->clientStorage
-            ->expects(self::once())
+        $this->clientStorage->expects(self::once())
             ->method('addClient')
             ->willThrowException(new StorageException());
 
@@ -117,8 +116,7 @@ class ClientEventListenerTest extends TestCase
             AuthenticationProviderInterface::USERNAME_NONE_PROVIDED
         );
 
-        $this->websocketAuthenticationProvider
-            ->expects(self::once())
+        $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($this->connection)
             ->willReturn($token);
@@ -135,8 +133,7 @@ class ClientEventListenerTest extends TestCase
     {
         $user = 'sampleUser';
         $token = new TicketToken($user, 'sampleTicketDigest', 'sampleKey', ['sampleRole']);
-        $this->websocketAuthenticationProvider
-            ->expects(self::once())
+        $this->websocketAuthenticationProvider->expects(self::once())
             ->method('authenticate')
             ->with($this->connection)
             ->willReturn($token);
@@ -156,8 +153,7 @@ class ClientEventListenerTest extends TestCase
         $this->clientStorage->expects(self::once())
             ->method('hasClient')
             ->willReturn(true);
-        $this->decoratedListenerLogger
-            ->expects(self::once())
+        $this->decoratedListenerLogger->expects(self::once())
             ->method('info');
 
         $this->clientEventListener->onClientDisconnect($disconnectEvent);
@@ -167,8 +163,7 @@ class ClientEventListenerTest extends TestCase
     {
         $clientRejectedEvent = new ClientRejectedEvent('sampleOrigin');
 
-        $this->decoratedListenerLogger
-            ->expects(self::once())
+        $this->decoratedListenerLogger->expects(self::once())
             ->method('warning')
             ->with('Client rejected, bad origin');
 
@@ -190,17 +185,14 @@ class ClientEventListenerTest extends TestCase
         $clientErrorEvent = new ClientErrorEvent($this->connection);
         $clientErrorEvent->setException(new BadCredentialsException());
 
-        $this->decoratedListenerLogger
-            ->expects(self::never())
+        $this->decoratedListenerLogger->expects(self::never())
             ->method('error');
 
         $closingResponse = new Response(403);
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('send')
             ->with($closingResponse);
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('close');
 
         $this->assertLoggerInfoMethodCalled();
@@ -208,15 +200,5 @@ class ClientEventListenerTest extends TestCase
         $this->clientEventListener->onClientError($clientErrorEvent);
 
         self::assertTrue($clientErrorEvent->isPropagationStopped());
-    }
-
-    private function createConnection(): ConnectionInterface
-    {
-        $connection = $this->createMock(ConnectionInterface::class);
-        $connection->WAMP = (object)['sessionId' => '12345', 'prefixes' => []];
-        $connection->remoteAddress = 'localhost';
-        $connection->resourceId = self::CONNECTION_RESOURCE_ID;
-
-        return $connection;
     }
 }

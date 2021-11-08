@@ -10,7 +10,7 @@ class OriginRegistryFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var OriginProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $originProvider;
 
-    /** @var OriginRegistryFactory|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OriginRegistryFactory */
     private $factory;
 
     protected function setUp(): void

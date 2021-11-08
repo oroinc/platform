@@ -18,7 +18,7 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
     /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fileConstraintsProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileValidator */
+    /** @var FileValidator|\PHPUnit\Framework\MockObject\MockObject */
     private $fileValidator;
 
     /** @var FileConstraintFromEntityFieldConfigValidator */
@@ -77,8 +77,7 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
             ->with($entityClass, $fieldName)
             ->willReturn(self::MAX_SIZE);
 
-        $this->fileValidator
-            ->expects($this->once())
+        $this->fileValidator->expects($this->once())
             ->method('validate')
             ->with(
                 $file = new \stdClass(),

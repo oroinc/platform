@@ -41,24 +41,31 @@ class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
 
         $config = DatagridConfiguration::create(['columns' => ['id']]);
 
-        /** @var ResultsObject|MockObject $resultObject */
         $resultObject = $this->createMock(ResultsObject::class);
 
-        /** @var DatasourceInterface|MockObject $dataSource */
         $dataSource = $this->createMock(DatasourceInterface::class);
 
-        /** @var Datagrid|MockObject $dataGrid */
         $dataGrid = $this->createMock(Datagrid::class);
-        $dataGrid->expects(static::once())->method('getConfig')->willReturn($config);
-        $dataGrid->method('getDatasource')->willReturn($dataSource);
-        $dataGrid->method('getParameters')->willReturn($gridParametersBag);
-        $dataGrid->method('getData')->willReturn($resultObject);
+        $dataGrid->expects(self::once())
+            ->method('getConfig')->willReturn($config);
+        $dataGrid->expects(self::any())
+            ->method('getDatasource')
+            ->willReturn($dataSource);
+        $dataGrid->expects(self::any())
+            ->method('getParameters')
+            ->willReturn($gridParametersBag);
+        $dataGrid->expects(self::any())
+            ->method('getData')
+            ->willReturn($resultObject);
 
-        /** @var Manager|MockObject $gridManager */
         $gridManager = $this->createMock(Manager::class);
-        $gridManager->expects(static::once())->method('getDatagrid')->willReturn($dataGrid);
+        $gridManager->expects(self::once())
+            ->method('getDatagrid')
+            ->willReturn($dataGrid);
 
-        $this->gridManagerLink->expects(static::once())->method('getService')->willReturn($gridManager);
+        $this->gridManagerLink->expects(self::once())
+            ->method('getService')
+            ->willReturn($gridManager);
 
         $context = new Context([
             'pageSize' => $batchSize,
@@ -69,7 +76,7 @@ class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
         $this->connector->setImportExportContext($context);
         $this->connector->count();
 
-        static::assertEquals($batchSize, $this->connector->xgetPageSize());
-        static::assertEquals(['id'], $context->getValue('columns'));
+        self::assertEquals($batchSize, $this->connector->xgetPageSize());
+        self::assertEquals(['id'], $context->getValue('columns'));
     }
 }

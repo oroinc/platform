@@ -14,7 +14,7 @@ class WidgetProviderFilterTest extends \PHPUnit\Framework\TestCase
         $filter = $this->createMock(WidgetProviderFilterInterface::class);
         $filter->expects($this->once())
             ->method('filter')
-            ->willReturnCallback(function (QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions) {
+            ->willReturnCallback(function (QueryBuilder $queryBuilder) {
                 $queryBuilder->addSelect();
             });
 

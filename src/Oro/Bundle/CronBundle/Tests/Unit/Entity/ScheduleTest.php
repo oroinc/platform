@@ -3,64 +3,51 @@
 namespace Oro\Bundle\CronBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CronBundle\Entity\Schedule;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    protected $object;
+    private Schedule $object;
 
     protected function setUp(): void
     {
-        $this->object = new class() extends Schedule {
-            public function xsetId(int $id): void
-            {
-                $this->id = $id;
-            }
-        };
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->object);
+        $this->object = new Schedule();
     }
 
     public function testConstructorSetsDefaultArguments()
     {
-        static::assertEquals([], $this->object->getArguments());
-        static::assertEquals(\md5(\json_encode([])), $this->object->getArgumentsHash());
+        self::assertEquals([], $this->object->getArguments());
+        self::assertEquals(\md5(\json_encode([])), $this->object->getArgumentsHash());
     }
 
     public function testGetId()
     {
-        static::assertNull($this->object->getId());
+        self::assertNull($this->object->getId());
 
         $testValue = 42;
-        $this->object->xsetId($testValue);
+        ReflectionUtil::setId($this->object, $testValue);
 
-        static::assertEquals($testValue, $this->object->getId());
+        self::assertEquals($testValue, $this->object->getId());
     }
 
     /**
      * @dataProvider setGetDataProvider
-     *
-     * @param string $propertyName
-     * @param mixed $testValue
-     * @param mixed $defaultValue
-     * @param mixed $expectedValue
      */
-    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null, $expectedValue = null)
-    {
+    public function testSetGetEntity(
+        string $propertyName,
+        mixed $testValue,
+        mixed $defaultValue = null,
+        mixed $expectedValue = null
+    ) {
         $setter = 'set' . \ucfirst($propertyName);
         $getter = 'get' . \ucfirst($propertyName);
 
-        static::assertEquals($defaultValue, $this->object->$getter());
-        static::assertSame($this->object, $this->object->$setter($testValue));
-        static::assertSame($expectedValue !== null ? $expectedValue : $testValue, $this->object->$getter());
+        self::assertEquals($defaultValue, $this->object->$getter());
+        self::assertSame($this->object, $this->object->$setter($testValue));
+        self::assertSame($expectedValue ?? $testValue, $this->object->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             'command' => [
@@ -86,8 +73,8 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $this->object->setArguments($args);
 
         sort($args);
-        static::assertEquals($args, $this->object->getArguments());
-        static::assertEquals(\md5(\json_encode($args)), $this->object->getArgumentsHash());
+        self::assertEquals($args, $this->object->getArguments());
+        self::assertEquals(\md5(\json_encode($args)), $this->object->getArgumentsHash());
     }
 
     public function testGetHash()
@@ -101,9 +88,8 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testToString()
     {
-        $testValue = 42;
-        $this->object->xsetId($testValue);
+        ReflectionUtil::setId($this->object, 42);
 
-        static::assertSame('42', (string)$this->object);
+        self::assertSame('42', (string)$this->object);
     }
 }

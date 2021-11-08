@@ -31,8 +31,7 @@ class PostProcessingVoterTest extends \PHPUnit\Framework\TestCase
      */
     public function testVote(int $jpegQuality, int $pngQuality, int $expected): void
     {
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->willReturnOnConsecutiveCalls($pngQuality, $jpegQuality);
 

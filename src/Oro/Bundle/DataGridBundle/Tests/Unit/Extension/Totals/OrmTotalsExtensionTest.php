@@ -24,9 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrmTotalsExtensionTest extends OrmTestCase
 {
-    /** @var OrmTotalsExtension */
-    private $extension;
-
     /** @var DatagridConfiguration */
     private $config;
 
@@ -38,6 +35,9 @@ class OrmTotalsExtensionTest extends OrmTestCase
 
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
+
+    /** @var OrmTotalsExtension */
+    private $extension;
 
     protected function setUp(): void
     {

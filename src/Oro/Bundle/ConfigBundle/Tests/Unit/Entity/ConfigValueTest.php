@@ -41,10 +41,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['name', 'testName'],
@@ -70,7 +67,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedType, $obj->getType());
     }
 
-    public function valuesDataProvider()
+    public function valuesDataProvider(): array
     {
         return [
             ['string', ConfigValue::FIELD_SCALAR_TYPE],

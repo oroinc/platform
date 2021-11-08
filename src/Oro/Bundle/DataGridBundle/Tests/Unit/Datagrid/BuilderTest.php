@@ -42,23 +42,15 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildProvider
-     *
-     * @param DatagridConfiguration $config
-     * @param string                $resultFQCN
-     * @param array                 $raisedEvents
-     * @param int                   $extensionsCount
-     * @param array                 $extensionsMocks
-     * @param array                 $minifiedParams
-     * @param array                 $additionalParams
      */
     public function testBuild(
-        $config,
-        $resultFQCN,
-        $raisedEvents,
-        $extensionsCount,
-        $extensionsMocks = [],
-        $minifiedParams = [],
-        $additionalParams = []
+        DatagridConfiguration $config,
+        string $resultFQCN,
+        array $raisedEvents,
+        int $extensionsCount,
+        array $extensionsMocks = [],
+        array $minifiedParams = [],
+        array $additionalParams = []
     ): void {
         $config->setDatasourceType(self::TEST_DATASOURCE_TYPE);
         $builder = $this->getBuilder(
@@ -138,8 +130,8 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
                 $baseEventList,
                 1,
                 [
-                    $this->getExtensionVisitorMock(),
-                    $this->getExtensionVisitorMock(false)
+                    $this->getExtensionVisitor(),
+                    $this->getExtensionVisitor(false)
                 ]
             ],
             'Both extensions passed check'                               => [
@@ -148,9 +140,9 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
                 $baseEventList,
                 2,
                 [
-                    $this->getExtensionVisitorMock(),
-                    $this->getExtensionVisitorMock(false),
-                    $this->getExtensionVisitorMock()
+                    $this->getExtensionVisitor(),
+                    $this->getExtensionVisitor(false),
+                    $this->getExtensionVisitor()
                 ]
             ],
             'With minified parameters without grid params'               => [
@@ -175,17 +167,12 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildDatasourceProvider
-     *
-     * @param DatagridConfiguration $config
-     * @param array                 $dataSources
-     * @param array                 $expectedException
-     * @param int                   $processCallExpects
      */
     public function testBuildDatasource(
-        $config,
-        $dataSources = [],
-        array $expectedException = null,
-        $processCallExpects = 0
+        DatagridConfiguration $config,
+        array $dataSources,
+        ?array $expectedException,
+        bool $processCallExpects = false
     ): void {
         $builder = $this->getBuilder($dataSources);
         $grid = $this->createMock(DatagridInterface::class);
@@ -249,10 +236,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         return $builder;
     }
 
-    /**
-     * @return ExtensionVisitorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getExtensionVisitorMock(bool $isApplicable = true)
+    private function getExtensionVisitor(bool $isApplicable = true): ExtensionVisitorInterface
     {
         $extension = $this->createMock(ExtensionVisitorInterface::class);
         $extension->expects($this->any())

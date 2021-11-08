@@ -9,24 +9,15 @@ use Symfony\Component\Mime\MimeTypesInterface;
 
 class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GuessMimeTypeByFileContentFactory
-     */
-    private $factory;
-
-    /**
-     * @var MimeTypeGuesserInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MimeTypeGuesserInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $mimeTypeGuesser;
 
-    /**
-     * @var MimeTypesInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MimeTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $mimeTypes;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @var GuessMimeTypeByFileContentFactory */
+    private $factory;
+
     protected function setUp(): void
     {
         $this->mimeTypeGuesser = $this->createMock(MimeTypeGuesserInterface::class);
@@ -43,17 +34,17 @@ class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
         $content = 'binary_content';
         $mimeType = 'image/jpeg';
 
-        $this->mimeTypeGuesser
+        $this->mimeTypeGuesser->expects(self::any())
             ->method('guess')
             ->with($content)
             ->willReturn($mimeType);
 
-        $this->mimeTypes
+        $this->mimeTypes->expects(self::any())
             ->method('getExtensions')
             ->with($mimeType)
             ->willReturn($extensions);
 
-        static::assertEquals(
+        self::assertEquals(
             new Binary($content, $mimeType, $expectedFormat),
             $this->factory->createImagineBinary($content)
         );

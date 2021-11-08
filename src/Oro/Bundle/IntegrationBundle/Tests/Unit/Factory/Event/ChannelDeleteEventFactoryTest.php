@@ -15,6 +15,6 @@ class ChannelDeleteEventFactoryTest extends \PHPUnit\Framework\TestCase
 
         $factory = new ChannelDeleteEventFactory();
 
-        static::assertEquals($event, $factory->create($channel));
+        self::assertEquals($event, $factory->create($channel));
     }
 }

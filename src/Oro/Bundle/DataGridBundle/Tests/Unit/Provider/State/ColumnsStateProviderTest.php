@@ -42,14 +42,12 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     private function mockParametersState(array $state, string $minifiedState): void
     {
-        $this->datagridParametersHelper
-            ->expects(self::once())
+        $this->datagridParametersHelper->expects(self::once())
             ->method('getFromParameters')
             ->with($this->datagridParameters, ColumnsExtension::COLUMNS_PARAM)
             ->willReturn($state);
 
-        $this->datagridParametersHelper
-            ->expects(self::exactly(1 - (int)$state))
+        $this->datagridParametersHelper->expects(self::exactly(1 - (int)$state))
             ->method('getFromMinifiedParameters')
             ->with($this->datagridParameters, ColumnsExtension::MINIFIED_COLUMNS_PARAM)
             ->willReturn($minifiedState);
@@ -57,8 +55,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     private function mockColumns(array $columns): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('offsetGet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn($columns);
@@ -440,11 +437,10 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         $this->mockGridName($gridName = 'sample-datagrid');
         $this->mockCurrentGridViewId($viewId = 'sample-view');
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->gridViewManager->expects(self::once())
             ->method('getView')
             ->with($viewId, 1, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getColumnsData', $state));
+            ->willReturn($this->mockGridView('getColumnsData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 
@@ -466,16 +462,14 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
         $user  = $this->getEntity(User::class, ['id' => 42]);
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->gridViewManager->expects(self::once())
             ->method('getDefaultView')
             ->with($user, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getColumnsData', $state));
+            ->willReturn($this->mockGridView('getColumnsData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 

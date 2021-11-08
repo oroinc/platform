@@ -56,7 +56,7 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        static::assertSame([$guesser1, $guesser2, $guesser3], $chainGuesser->xgetGuessers());
+        self::assertSame([$guesser1, $guesser2, $guesser3], $chainGuesser->xgetGuessers());
     }
 
     public function testGuessFormatter()
@@ -83,22 +83,22 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
         $guess1 = new ColumnGuess([], ColumnGuess::LOW_CONFIDENCE);
         $guess2 = new ColumnGuess([], ColumnGuess::HIGH_CONFIDENCE);
 
-        $guesser1 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser2 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser3 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser1 = $this->createMock(ColumnOptionsGuesserInterface::class);
+        $guesser2 = $this->createMock(ColumnOptionsGuesserInterface::class);
+        $guesser3 = $this->createMock(ColumnOptionsGuesserInterface::class);
 
         $guesser1->expects($this->once())
             ->method($guessMethodName)
             ->with($class, $property, $type)
-            ->will($this->returnValue($guess1));
+            ->willReturn($guess1);
         $guesser2->expects($this->once())
             ->method($guessMethodName)
             ->with($class, $property, $type)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $guesser3->expects($this->once())
             ->method($guessMethodName)
             ->with($class, $property, $type)
-            ->will($this->returnValue($guess2));
+            ->willReturn($guess2);
 
         $chainGuesser = new ColumnOptionsGuesserChain([$guesser1, $guesser2, $guesser3]);
 

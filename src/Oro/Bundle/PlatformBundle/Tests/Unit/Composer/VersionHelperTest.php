@@ -31,7 +31,7 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasCacheDataProvider
      */
-    public function testGetVersion($hasCache)
+    public function testGetVersion(bool $hasCache)
     {
         if ($hasCache) {
             $cache = $this->createMock(Cache::class);
@@ -61,7 +61,7 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::VERSION, $helper->getVersion());
     }
 
-    public function hasCacheDataProvider()
+    public function hasCacheDataProvider(): array
     {
         return [
             [false],

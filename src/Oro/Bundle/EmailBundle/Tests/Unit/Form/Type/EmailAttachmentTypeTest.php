@@ -117,10 +117,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $this->emailAttachmentType->initAttachmentEntity($formEvent);
     }
 
-    /**
-     * @return array
-     */
-    public function attachmentProvider()
+    public function attachmentProvider(): array
     {
         return [
             [

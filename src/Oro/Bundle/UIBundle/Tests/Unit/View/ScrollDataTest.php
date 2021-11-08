@@ -10,10 +10,7 @@ use Oro\Bundle\UIBundle\View\ScrollData;
  */
 class ScrollDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ScrollData
-     */
-    protected $scrollData;
+    private ScrollData $scrollData;
 
     protected function setUp(): void
     {
@@ -30,23 +27,20 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $expected
-     * @param string $title
-     * @param int|null $priority
-     * @param string|null $class
-     * @param bool $useSubBlockDivider
      * @dataProvider addBlockDataProvider
      */
-    public function testAddBlock(array $expected, $title, $priority = null, $class = null, $useSubBlockDivider = true)
-    {
+    public function testAddBlock(
+        array $expected,
+        string $title,
+        int $priority = null,
+        string $class = null,
+        bool $useSubBlockDivider = true
+    ) {
         $this->assertEquals(0, $this->scrollData->addBlock($title, $priority, $class, $useSubBlockDivider));
         $this->assertEquals($expected, $this->scrollData->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function addBlockDataProvider()
+    public function addBlockDataProvider(): array
     {
         return [
             'minimum parameters' => [
@@ -82,23 +76,16 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     * @param int $blockId
-     * @param string|null $title
      * @dataProvider addSubBlockDataProvider
      */
-    public function testAddSubBlock(array $source, array $expected, $blockId, $title = null)
+    public function testAddSubBlock(array $source, array $expected, int $blockId, string $title = null)
     {
         $this->scrollData->setData($source);
         $this->assertEquals(0, $this->scrollData->addSubBlock($blockId, $title));
         $this->assertEquals($expected, $this->scrollData->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function addSubBlockDataProvider()
+    public function addSubBlockDataProvider(): array
     {
         $source = [
             ScrollData::DATA_BLOCKS => [
@@ -137,23 +124,16 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     * @param int $blockId
-     * @param string|null $title
      * @dataProvider addSubBlockAsFirstDataProvider
      */
-    public function testAddSubBlockAsFirst(array $source, array $expected, $blockId, $title = null)
+    public function testAddSubBlockAsFirst(array $source, array $expected, int $blockId, string $title = null)
     {
         $this->scrollData->setData($source);
         $this->assertEquals(0, $this->scrollData->addSubBlockAsFirst($blockId, $title));
         $this->assertEquals($expected, $this->scrollData->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function addSubBlockAsFirstDataProvider()
+    public function addSubBlockAsFirstDataProvider(): array
     {
         $source = [
             ScrollData::DATA_BLOCKS => [
@@ -197,10 +177,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function addSubBlockDataDataProvider()
+    public function addSubBlockDataDataProvider(): array
     {
         $initialData = [
             ScrollData::DATA_BLOCKS => [
@@ -216,7 +193,8 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         ];
 
         $html = 'another data';
-        $expectedFieldNameData = $expectedData = $initialData;
+        $expectedFieldNameData = $initialData;
+        $expectedData = $initialData;
         $expectedData[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][0][ScrollData::DATA][] = $html;
 
         $expectedData0 = $initialData;
@@ -253,14 +231,14 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addSubBlockDataDataProvider
-     * @param string $html
-     * @param string|null $fieldName
-     * @param int|string $expectedId
-     * @param array $initialData
-     * @param array $expectedData
      */
-    public function testAddSubBlockData($html, $fieldName, $expectedId, array $initialData, array $expectedData)
-    {
+    public function testAddSubBlockData(
+        string $html,
+        string|int|null $fieldName,
+        string|int $expectedId,
+        array $initialData,
+        array $expectedData
+    ) {
         $this->scrollData->setData($initialData);
         $this->assertEquals($expectedId, $this->scrollData->addSubBlockData(0, 0, $html, $fieldName));
         $this->assertEquals($expectedData, $this->scrollData->getData());
@@ -293,10 +271,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData->addSubBlockData(0, 0, 'html');
     }
 
-    /**
-     * @return array
-     */
-    public function addNamedBlockDataProvider()
+    public function addNamedBlockDataProvider(): array
     {
         $someBlock = [
             'title' => 'SomeBlock title',
@@ -361,20 +336,13 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addNamedBlockDataProvider
-     * @param string $blockName
-     * @param mixed|string $title
-     * @param int|null $priority
-     * @param string|null $class
-     * @param bool $useDivider
-     * @param array $initialData
-     * @param array $expectedData
      */
     public function testAddNamedBlock(
-        $blockName,
-        $title,
-        $priority,
-        $class,
-        $useDivider,
+        string $blockName,
+        string $title,
+        ?int $priority,
+        ?string $class,
+        bool $useDivider,
         array $initialData,
         array $expectedData
     ) {
@@ -384,10 +352,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $this->scrollData->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function removeNamedBlockDataProvider()
+    public function removeNamedBlockDataProvider(): array
     {
         $newBlock = [
             'title' => 'OldBlock title',
@@ -421,21 +386,15 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider removeNamedBlockDataProvider
-     * @param string $blockName
-     * @param array $initialData
-     * @param array $expectedData
      */
-    public function testRemoveNamedBlock($blockName, array $initialData, array $expectedData)
+    public function testRemoveNamedBlock(string $blockName, array $initialData, array $expectedData)
     {
         $this->scrollData->setData($initialData);
         $this->scrollData->removeNamedBlock($blockName);
         $this->assertEquals($expectedData, $this->scrollData->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function hasNamedFieldDataProvider()
+    public function hasNamedFieldDataProvider(): array
     {
         $blockData = [
             ScrollData::DATA_BLOCKS => [
@@ -469,20 +428,14 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hasNamedFieldDataProvider
-     * @param array $blockData
-     * @param string $fieldName
-     * @param bool $isExistingBlock
      */
-    public function testHasNamedField(array $blockData, $fieldName, $isExistingBlock)
+    public function testHasNamedField(array $blockData, string $fieldName, bool $isExistingBlock)
     {
         $this->scrollData->setData($blockData);
         $this->assertEquals($isExistingBlock, $this->scrollData->hasNamedField($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function moveFieldToBlockDataProvider()
+    public function moveFieldToBlockDataProvider(): array
     {
         $blockData = [
             ScrollData::DATA_BLOCKS => [
@@ -548,12 +501,8 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider moveFieldToBlockDataProvider
-     * @param array $blocksData
-     * @param array $expectedData
-     * @param string $blockId
-     * @param string $fieldId
      */
-    public function testMoveFieldToBlock(array $blocksData, array $expectedData, $blockId, $fieldId)
+    public function testMoveFieldToBlock(array $blocksData, array $expectedData, string|int $blockId, string $fieldId)
     {
         $this->scrollData->setData($blocksData);
         $this->scrollData->moveFieldToBlock($fieldId, $blockId);

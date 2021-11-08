@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
 use Oro\Component\ConfigExpression\AbstractExpression;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class AbstractExpressionTest extends TestCase
+class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractExpression|MockObject */
+    /** @var AbstractExpression|\PHPUnit\Framework\MockObject\MockObject */
     private $condition;
 
     protected function setUp(): void
@@ -53,7 +51,7 @@ class AbstractExpressionTest extends TestCase
     public function testSetMessage()
     {
         $result = $this->condition->setMessage('Test Message');
-        static::assertSame($this->condition, $result);
+        self::assertSame($this->condition, $result);
     }
 
     public function testEvaluate()
@@ -68,15 +66,15 @@ class AbstractExpressionTest extends TestCase
 
         $result = $this->condition->evaluate($context, $errors);
 
-        static::assertEquals([
+        self::assertEquals([
             'message' => 'test message',
             'parameters' => [
                 'x' => 'y',
                 '{{ reason }}' => 'test reason'
             ]
         ], $errors[0]);
-        static::assertNull($this->condition->xgetErrors());
-        static::assertSame($context, $result);
+        self::assertNull($this->condition->xgetErrors());
+        self::assertSame($context, $result);
     }
 
     public function testAddError()
@@ -87,7 +85,7 @@ class AbstractExpressionTest extends TestCase
 
         $this->condition->evaluate($context, $errors);
 
-        static::assertEquals([
+        self::assertEquals([
             'message' => 'test message',
             'parameters' => [
                 'x' => 'y',

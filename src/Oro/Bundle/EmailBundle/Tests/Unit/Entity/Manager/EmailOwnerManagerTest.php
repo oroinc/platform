@@ -105,7 +105,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->emailOwnerManager->handleChangedAddresses($emailAddressData));
     }
 
-    public function handleChangedAddressesDataProvider()
+    public function handleChangedAddressesDataProvider(): array
     {
         $created1 = new TestEmailOwner(null, 'created1');
         $deleted1 = new TestEmailOwner(2, 'deleted1');
@@ -160,7 +160,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->emailOwnerManager->createEmailAddressData($uow));
     }
 
-    public function createEmailAddressDataProvider()
+    public function createEmailAddressDataProvider(): array
     {
         $created1 = new TestEmailOwner(null, 'created1');
         $created2 = new TestEmailOwner(null, 'created2');

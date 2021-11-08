@@ -13,11 +13,8 @@ class ScriptManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $kernel = $this->getMockBuilder(KernelInterface::class)
-            ->getMockForAbstractClass();
-
-        $kernel
-            ->expects(self::any())
+        $kernel = $this->createMock(KernelInterface::class);
+        $kernel->expects(self::any())
             ->method('getProjectDir')
             ->willReturn(__DIR__ . '/Fixture/app');
 
@@ -26,8 +23,7 @@ class ScriptManagerTest extends \PHPUnit\Framework\TestCase
             new TestPackageTest2Bundle(),
         ];
 
-        $kernel
-            ->expects(self::any())
+        $kernel->expects(self::any())
             ->method('getBundles')
             ->willReturn($bundles);
 

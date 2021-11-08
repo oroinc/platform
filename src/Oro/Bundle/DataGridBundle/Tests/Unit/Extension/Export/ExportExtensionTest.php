@@ -58,44 +58,36 @@ class ExportExtensionTest extends \PHPUnit\Framework\TestCase
         $datagridConfiguration = $this->createMock(DatagridConfiguration::class);
 
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata
-            ->expects($this->once())
+        $metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
 
         $em = $this->createMock(EntityManager::class);
-        $em
-            ->expects($this->once())
+        $em->expects($this->once())
             ->method('getClassMetadata')
             ->with('Test')
             ->willReturn($metadata);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb
-            ->expects($this->once())
+        $qb->expects($this->once())
             ->method('getRootAliases')
             ->willReturn(['o']);
-        $qb
-            ->expects($this->once())
+        $qb->expects($this->once())
             ->method('getEntityManager')
             ->willReturn($em);
-        $qb
-            ->expects($this->once())
+        $qb->expects($this->once())
             ->method('getRootEntities')
             ->willReturn(['Test']);
-        $qb
-            ->expects($this->once())
+        $qb->expects($this->once())
             ->method('andWhere')
             ->with('o.id IN (:exportIds)')
             ->willReturn($qb);
-        $qb
-            ->expects($this->once())
+        $qb->expects($this->once())
             ->method('setParameter')
             ->with('exportIds', [1,2]);
 
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource
-            ->expects($this->once())
+        $datasource->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
 

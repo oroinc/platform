@@ -61,10 +61,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->apply($ds, ['type' => $filterType, 'value' => $fieldValue]));
     }
 
-    /**
-     * @return array
-     */
-    public function applyDataProvider()
+    public function applyDataProvider(): array
     {
         return [
             '>=' => [

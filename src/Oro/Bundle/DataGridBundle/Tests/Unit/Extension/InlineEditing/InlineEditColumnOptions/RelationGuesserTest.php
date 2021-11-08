@@ -4,14 +4,10 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEdi
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\RelationGuesser;
 
-/**
- * Class RelationGuesserTest
- * @package Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption
- */
 class RelationGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RelationGuesser */
-    protected $guesser;
+    private $guesser;
 
     protected function setUp(): void
     {
@@ -19,19 +15,16 @@ class RelationGuesserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $column
-     * @param array $expected
-     *
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess($column, $expected)
+    public function testRelationGuess(array $column, array $expected)
     {
         $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);
 
         $this->assertEquals($expected, $guessed);
     }
 
-    public function setParametersDataProvider()
+    public function setParametersDataProvider(): array
     {
         return [
             'empty' => [

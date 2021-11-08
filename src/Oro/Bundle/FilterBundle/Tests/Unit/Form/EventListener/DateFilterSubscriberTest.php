@@ -31,7 +31,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $providerMock = $this->createMock(DateModifierProvider::class);
         $providerMock->expects(self::any())
             ->method('getVariableKey')
-            ->willReturnCallback(function ($variable) {
+            ->willReturnCallback(function () {
                 return DateModifierInterface::LABEL_VAR_PREFIX . DateModifierInterface::VAR_THIS_YEAR;
             });
 
@@ -71,21 +71,17 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $formConfig = $this->createMock(FormConfigInterface::class);
         $event = new FormEvent($form, $data);
 
-        $form
-            ->expects(self::any())
+        $form->expects(self::any())
             ->method('get')
-            ->with(self::equalTo('value'))
+            ->with('value')
             ->willReturn($valueForm);
-        $form
-            ->expects(self::any())
+        $form->expects(self::any())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->willReturnMap([['submit_context', null, $submitContext]]);
-        $valueForm
-            ->expects(self::any())
+        $valueForm->expects(self::any())
             ->method('all')
             ->willReturn(['start' => 'start subform']);
 
@@ -103,31 +99,27 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProvider
-     *
-     * @param array $data
-     * @param array $expectedData
-     * @param array $valueSubforms
-     * @param array $shouldAddFields
      */
-    public function testPreSubmit(array $data, array $expectedData, $valueSubforms = [], $shouldAddFields = []): void
-    {
+    public function testPreSubmit(
+        array $data,
+        array $expectedData,
+        array $valueSubforms = [],
+        array $shouldAddFields = []
+    ): void {
         $submitContext = new DateFilterSubmitContext();
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
         $valueForm = $this->createMock(FormInterface::class);
         $event = new FormEvent($form, $data);
 
-        $form
-            ->expects(self::any())
+        $form->expects(self::any())
             ->method('get')
-            ->with(self::equalTo('value'))
+            ->with('value')
             ->willReturn($valueForm);
-        $form
-            ->expects(self::any())
+        $form->expects(self::any())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->willReturnMap([['submit_context', null, $submitContext]]);
         $valueForm->expects(self::any())

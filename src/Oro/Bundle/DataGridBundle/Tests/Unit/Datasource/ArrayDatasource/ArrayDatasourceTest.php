@@ -54,7 +54,9 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
     public function testProcess()
     {
         $grid = $this->createMock(DatagridInterface::class);
-        $grid->expects($this->once())->method('setDatasource')->with(clone $this->arrayDatasource);
+        $grid->expects($this->once())
+            ->method('setDatasource')
+            ->with(clone $this->arrayDatasource);
         $this->arrayDatasource->process($grid, []);
     }
 
@@ -62,7 +64,7 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $this->arrayDatasource->setArraySource($this->arraySource);
 
-        $this->assertEquals(count($this->arraySource), count($this->arrayDatasource->getResults()));
+        $this->assertSameSize($this->arraySource, $this->arrayDatasource->getResults());
     }
 
     public function testResultsByType()

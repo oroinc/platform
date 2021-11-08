@@ -5,6 +5,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
@@ -14,50 +15,45 @@ use Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Form;
 
 class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub';
-    const TEST_ENTITY_ALIAS = 'OroSyncBundle:EntityStub';
-    const TEST_NEW_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub';
-    const TEST_ASSOCIATION_FIELD = 'testField';
+    private const TEST_ENTITY_NAME = EntityStub::class;
+    private const TEST_ENTITY_ALIAS = 'OroSyncBundle:EntityStub';
+    private const TEST_NEW_ENTITY_NAME = NewEntityStub::class;
+    private const TEST_ASSOCIATION_FIELD = 'testField';
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
+    private $uow;
 
     /** @var DoctrineTagGenerator */
-    protected $generator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UnitOfWork */
-    protected $uow;
+    private $generator;
 
     protected function setUp(): void
     {
-        $this->em  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()->getMock();
+        $this->em = $this->createMock(EntityManager::class);
+        $this->uow = $this->createMock(UnitOfWork::class);
 
         $this->em->expects($this->any())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($this->uow));
+            ->willReturn($this->uow);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine */
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturnCallback(
-                function ($class) {
-                    $allowedClassNames = [self::TEST_ENTITY_NAME, self::TEST_ENTITY_ALIAS, self::TEST_NEW_ENTITY_NAME];
-                    if (in_array($class, $allowedClassNames, true)) {
-                        return $this->em;
-                    }
-
-                    return null;
+            ->willReturnCallback(function ($class) {
+                $allowedClassNames = [self::TEST_ENTITY_NAME, self::TEST_ENTITY_ALIAS, self::TEST_NEW_ENTITY_NAME];
+                if (in_array($class, $allowedClassNames, true)) {
+                    return $this->em;
                 }
-            );
 
-        /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject $entityClassResolver */
+                return null;
+            });
+
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects($this->any())
             ->method('getEntityClass')
@@ -70,26 +66,15 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new DoctrineTagGenerator($doctrine, $entityClassResolver);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->em, $this->resolver, $this->generator);
-    }
-
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param mixed $data
-     * @param bool  $expectedResult
      */
-    public function testSupports($data, $expectedResult)
+    public function testSupports(mixed $data, bool $expectedResult)
     {
         $this->assertSame($expectedResult, $this->generator->supports($data));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             'real entity object given'           => [new EntityStub(), true],
@@ -103,34 +88,28 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider generateDataProvider
-     *
-     * @param mixed $data
-     * @param bool  $includeCollectionTag
-     * @param int   $expectedCount
-     * @param bool  $isManaged
      */
-    public function testGenerate($data, $includeCollectionTag, $expectedCount, $isManaged = false)
-    {
+    public function testGenerate(
+        mixed $data,
+        bool $includeCollectionTag,
+        int $expectedCount,
+        bool $isManaged = false
+    ) {
         // only once if it's object
-        $this->uow->expects($this->exactly(is_object($data) ? 1 : 0))->method('getEntityState')
-            ->will(
-                $this->returnCallback(
-                    function ($object) use ($isManaged) {
-                        return $isManaged ? UnitOfWork::STATE_MANAGED : UnitOfWork::STATE_NEW;
-                    }
-                )
-            );
-        $this->uow->expects($this->exactly((int)$isManaged))->method('getEntityIdentifier')
-            ->will($this->returnValue(['someIdentifierValue']));
+        $this->uow->expects($this->exactly(is_object($data) ? 1 : 0))
+            ->method('getEntityState')
+            ->willReturnCallback(function () use ($isManaged) {
+                return $isManaged ? UnitOfWork::STATE_MANAGED : UnitOfWork::STATE_NEW;
+            });
+        $this->uow->expects($this->exactly((int)$isManaged))
+            ->method('getEntityIdentifier')
+            ->willReturn(['someIdentifierValue']);
 
         $result = $this->generator->generate($data, $includeCollectionTag);
         $this->assertCount($expectedCount, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function generateDataProvider()
+    public function generateDataProvider(): array
     {
         return [
             'Should not generate any tags for new entity'                           => [
@@ -166,17 +145,13 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
                 1
             ],
             'Should take data from form and return tags for managed entity'         => [
-                $this->getFormMock(
-                    new EntityStub()
-                ),
+                $this->getFormMock(new EntityStub()),
                 true,
                 2,
                 true
             ],
             'Should take data from form and generate collection tag for new entity' => [
-                $this->getFormMock(
-                    new NewEntityStub()
-                ),
+                $this->getFormMock(new NewEntityStub()),
                 true,
                 1,
                 false
@@ -186,28 +161,24 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider generateFromAliasDataProvider
-     *
-     * @param string $data
-     * @param array $expectedResult
      */
-    public function testGenerateFromAlias($data, $expectedResult)
+    public function testGenerateFromAlias(string $data, array $expectedResult)
     {
         $configurationMock = $this->createMock(Configuration::class);
-        $configurationMock->method('getEntityNamespace')
+        $configurationMock->expects(self::any())
+            ->method('getEntityNamespace')
             ->with('OroSyncBundle')
             ->willReturn('Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub');
 
-        $this->em->method('getConfiguration')
+        $this->em->expects(self::any())
+            ->method('getConfiguration')
             ->willReturn($configurationMock);
 
         $result = $this->generator->generate($data, true);
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function generateFromAliasDataProvider()
+    public function generateFromAliasDataProvider(): array
     {
         return [
             'generate tag from fqcn' => [
@@ -223,12 +194,8 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider collectNestingDataDataProvider
-     *
-     * @param array $associations
-     * @param array $mappings
-     * @param int   $expectedCount
      */
-    public function testCollectNestingData($associations, $mappings, $expectedCount)
+    public function testCollectNestingData(array $associations, array $mappings, int $expectedCount)
     {
         $testData = new EntityStub();
         $this->uow->expects($this->any())
@@ -252,17 +219,11 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertCount($expectedCount, $result, 'Should not generate collection tag for associations');
     }
 
-    /**
-     * @return array
-     */
-    public function collectNestingDataDataProvider()
+    public function collectNestingDataDataProvider(): array
     {
-        $entityManagerMock = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetadataMock = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+
         return [
             'should not return any data when no association on entity' => [[], [], 0],
             'should collect one to one associations' => [
@@ -337,19 +298,12 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param mixed $data
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormMock($data)
+    private function getFormMock(mixed $data): Form
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->getMock();
-        $form->expects($this->any())->method('getData')
-            ->will($this->returnValue($data));
+        $form = $this->createMock(Form::class);
+        $form->expects($this->any())
+            ->method('getData')
+            ->willReturn($data);
 
         return $form;
     }

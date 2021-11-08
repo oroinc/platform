@@ -90,7 +90,7 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
     public function testShouldBePossibleToSetInheritedEntity()
     {
         $entityClass = get_class(new \stdClass());
-        $entity = $this->getMockBuilder($entityClass)->getMock();
+        $entity = $this->createMock($entityClass);
 
         // guard
         self::assertNotEquals($entityClass, get_class($entity));

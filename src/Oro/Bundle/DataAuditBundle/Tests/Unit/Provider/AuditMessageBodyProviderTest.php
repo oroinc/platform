@@ -191,7 +191,6 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var OrganizationAwareTokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
         $securityToken = $this->createMock(OrganizationAwareTokenInterface::class);
 
         $securityToken->expects(self::once())

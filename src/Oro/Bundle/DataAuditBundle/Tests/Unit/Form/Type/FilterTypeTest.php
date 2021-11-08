@@ -5,12 +5,15 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,25 +27,17 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $validator = $this->createMock(ValidatorInterface::class);
-        $validator->method('validate')->will($this->returnValue(new ConstraintViolationList()));
+        $validator->expects($this->any())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
-            ->addTypeExtension(
-                new FormTypeValidatorExtension(
-                    $validator
-                )
-            )
-            ->addTypeGuesser(
-                $this->getMockBuilder(
-                    'Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser'
-                )
-                    ->disableOriginalConstructor()
-                    ->getMock()
-            )
+            ->addTypeExtension(new FormTypeValidatorExtension($validator))
+            ->addTypeGuesser($this->createMock(ValidatorTypeGuesser::class))
             ->getFormFactory();
 
-        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
@@ -69,7 +64,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
     protected function getExtensions()
     {
-        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $filterType = new FilterType($translator);
 

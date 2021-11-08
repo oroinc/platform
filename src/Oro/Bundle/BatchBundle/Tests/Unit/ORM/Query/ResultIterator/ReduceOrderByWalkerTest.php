@@ -15,66 +15,37 @@ class ReduceOrderByWalkerTest extends \PHPUnit\Framework\TestCase
 {
     use SqlWalkerHelperTrait;
 
-    /**
-     * @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $query;
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $parserResult;
-
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $queryComponents = [];
-
-    /**
-     * @var ReduceOrderByWalker
-     */
-    protected $reduceOrderByWalker;
-
-    /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $connection;
-
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var ReduceOrderByWalker */
+    private $reduceOrderByWalker;
 
     protected function setUp(): void
     {
-        $this->query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->any())
+        $this->connection = $this->createMock(Connection::class);
+
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->any())
             ->method('getConnection')
             ->willReturn($this->connection);
 
-        $this->query->expects($this->any())
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects($this->any())
             ->method('getEntityManager')
-            ->willReturn($this->em);
+            ->willReturn($em);
 
         $this->reduceOrderByWalker = new ReduceOrderByWalker(
-            $this->query,
-            $this->parserResult,
+            $query,
+            null,
             $this->getQueryComponents()
         );
     }
 
-    public function testWalkSelectStatementShouldRemoveUnnecesseryOrderBy()
+    public function testWalkSelectStatementShouldRemoveUnnecessaryOrderBy()
     {
-        $AST = $this->getDefaultAST();
-        $AST->orderByClause = new OrderByClause(
+        $ast = $this->getDefaultAST();
+        $ast->orderByClause = new OrderByClause(
             [
                 new OrderByItem(
                     new PathExpression(
@@ -93,16 +64,16 @@ class ReduceOrderByWalkerTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->reduceOrderByWalker->walkSelectStatement($AST);
-        $this->assertCount(1, $AST->orderByClause->orderByItems);
+        $this->reduceOrderByWalker->walkSelectStatement($ast);
+        $this->assertCount(1, $ast->orderByClause->orderByItems);
     }
 
     public function testWalkShouldSkipIfThereIsNoOrderBy()
     {
-        $AST = $this->getDefaultAST();
+        $ast = $this->getDefaultAST();
 
-        $this->reduceOrderByWalker->walkSelectStatement($AST);
+        $this->reduceOrderByWalker->walkSelectStatement($ast);
 
-        $this->assertNull($AST->orderByClause);
+        $this->assertNull($ast->orderByClause);
     }
 }

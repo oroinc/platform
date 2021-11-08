@@ -25,7 +25,7 @@ class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
-            array(FormEvents::POST_SUBMIT => 'postSubmit'),
+            [FormEvents::POST_SUBMIT => 'postSubmit'],
             $this->subscriber->getSubscribedEvents()
         );
     }
@@ -47,36 +47,36 @@ class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function postSubmitDataProvider()
+    public function postSubmitDataProvider(): array
     {
-        return array(
-            'reset_other_primary' => array(
-                'allAddresses' => array(
+        return [
+            'reset_other_primary' => [
+                'allAddresses' => [
                     'foo' => $this->createAddress()->setPrimary(true),
                     'bar' => $this->createAddress(),
                     'baz' => $this->createAddress()->setPrimary(true),
-                ),
+                ],
                 'formAddressKey' => 'foo',
-                'expectedAddressesData' => array(
-                    'foo' => array('isPrimary' => true),
-                    'bar' => array('isPrimary' => false),
-                    'baz' => array('isPrimary' => false)
-                )
-            ),
-            'set_primary' => array(
-                'allAddresses' => array(
+                'expectedAddressesData' => [
+                    'foo' => ['isPrimary' => true],
+                    'bar' => ['isPrimary' => false],
+                    'baz' => ['isPrimary' => false]
+                ]
+            ],
+            'set_primary' => [
+                'allAddresses' => [
                     'foo' => $this->createAddress(),
                     'bar' => $this->createAddress(),
                     'baz' => $this->createAddress()->setPrimary(true),
-                ),
+                ],
                 'formAddressKey' => 'foo',
-                'expectedAddressesData' => array(
-                    'foo' => array('isPrimary' => false),
-                    'bar' => array('isPrimary' => false),
-                    'baz' => array('isPrimary' => true)
-                )
-            ),
-        );
+                'expectedAddressesData' => [
+                    'foo' => ['isPrimary' => false],
+                    'bar' => ['isPrimary' => false],
+                    'baz' => ['isPrimary' => true]
+                ]
+            ],
+        ];
     }
 
     /**

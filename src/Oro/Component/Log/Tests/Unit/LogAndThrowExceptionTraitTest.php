@@ -16,7 +16,7 @@ class LogAndThrowExceptionTraitTest extends \PHPUnit\Framework\TestCase
         $previousException = new \UnexpectedValueException('Unexpected value.');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(static::once())
+        $logger->expects(self::once())
             ->method('error')
             ->with(
                 'Some message with {value1} and {value2}.',
@@ -63,7 +63,7 @@ class LogAndThrowExceptionTraitTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionCode(12345);
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(static::once())
+        $logger->expects(self::once())
             ->method('error')
             ->with(
                 'Some message with {value1} and {value2}.',
@@ -92,7 +92,7 @@ class LogAndThrowExceptionTraitTest extends \PHPUnit\Framework\TestCase
         $previousException = new \UnexpectedValueException('Unexpected value.');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(static::once())
+        $logger->expects(self::once())
             ->method('critical')
             ->with(
                 'Some message with {value1} and {value2}.',
@@ -139,7 +139,7 @@ class LogAndThrowExceptionTraitTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionCode(12345);
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(static::once())
+        $logger->expects(self::once())
             ->method('critical')
             ->with(
                 'Some message with {value1} and {value2}.',

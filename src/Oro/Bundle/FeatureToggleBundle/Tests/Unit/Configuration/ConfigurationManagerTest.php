@@ -19,9 +19,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
         $this->configurationManager = new ConfigurationManager($this->configurationProvider);
     }
 
@@ -131,7 +129,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResources, $this->configurationManager->getResourcesByType($resourceType));
     }
 
-    public function getResourcesByTypeProvider()
+    public function getResourcesByTypeProvider(): array
     {
         return [
             'non existing resource' => [

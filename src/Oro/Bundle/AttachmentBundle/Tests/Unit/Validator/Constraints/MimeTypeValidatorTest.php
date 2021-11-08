@@ -65,7 +65,7 @@ class MimeTypeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function invalidValuesDataProvider()
+    public function invalidValuesDataProvider(): array
     {
         return [
             'invalid one MIME type'             => [
