@@ -7,6 +7,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -309,6 +310,22 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
             ['sed do eiusmod tempor incididunt ut labore et dolore magna aliqua', 'sed_do_eiusmod_tempor_i_a5e72088'],
             ['broken_value_nameºss', '5eff4cfd']
         ];
+    }
+
+    public function testBuildEnumValueIdWithCustomLocale()
+    {
+        $locale = setlocale(LC_CTYPE, 0);
+        if (false === $locale) {
+            self::markTestSkipped('The locale functionality is not implemented on your platform.');
+        }
+
+        setlocale(LC_CTYPE, 'en_US.UTF-8');
+        try {
+            $result = ExtendHelper::buildEnumValueId('broken_value_nameºss');
+        } finally {
+            setlocale(LC_CTYPE, $locale);
+        }
+        $this->assertEquals('5eff4cfd', $result);
     }
 
     /**
