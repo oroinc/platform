@@ -381,6 +381,9 @@ services:
             - [] # names of system variables providers
             - [] # names of entity variables providers
 
+    Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider:
+        alias: oro_email.emailtemplate.variable_provider
+
     oro_email.emailtemplate.variable_provider.entity:
         class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
         arguments:
@@ -530,6 +533,9 @@ services:
             - '@oro_security.encoder.default'
             - '@oro_email.tools.email_origin_helper'
             - '@mime_types'
+
+    Oro\Bundle\EmailBundle\Mailer\Processor:
+        alias: oro_email.mailer.processor
 
     oro_email.workflow.action.send_email:
         class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
