@@ -21,7 +21,7 @@ class JsonExpressionEncoderTest extends \PHPUnit\Framework\TestCase
                 [
                     'expression' => 'true',
                     'node' => [
-                        'Symfony\Component\ExpressionLanguage\Node\ConstantNode' => [
+                        ConstantNode::class => [
                             'attributes' => ['value' => false],
                         ]
                     ]
@@ -35,7 +35,7 @@ class JsonExpressionEncoderTest extends \PHPUnit\Framework\TestCase
 
     public function testEncodeActions()
     {
-        $expressionManipulator = $this->createExpressionManipulator();
+        $expressionManipulator = new ExpressionManipulator();
         $encoder = new JsonExpressionEncoder($expressionManipulator);
         $result = $encoder->encodeActions(
             [
@@ -47,15 +47,5 @@ class JsonExpressionEncoderTest extends \PHPUnit\Framework\TestCase
             '{"@actions":[{"name":"add","args":["val1"]},{"name":"remove","args":["val2"]}]}',
             $result
         );
-    }
-
-    /**
-     * @return ExpressionManipulator
-     */
-    protected function createExpressionManipulator()
-    {
-        $expressionManipulator = new ExpressionManipulator();
-
-        return $expressionManipulator;
     }
 }

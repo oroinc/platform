@@ -12,6 +12,8 @@ use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
 
 class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    private const TYPE = 'sample-type';
+
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
@@ -21,9 +23,6 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var PinbarTabTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $pinbarTabTitleProvider;
 
-    /** @var string */
-    private $type;
-
     /** @var PinbarTabBuilder */
     private $builder;
 
@@ -32,28 +31,23 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->pinbarTabUrlNormalizer = $this->createMock(PinbarTabUrlNormalizer::class);
         $this->pinbarTabTitleProvider = $this->createMock(PinbarTabTitleProvider::class);
-        $this->type = 'sample-type';
 
         $this->builder = new PinbarTabBuilder(
             $this->entityManager,
             $this->pinbarTabUrlNormalizer,
             $this->pinbarTabTitleProvider,
-            $this->type
+            self::TYPE
         );
-
-        $this->builder
-            ->setNavigationItemClassName(NavigationItemStub::class)
-            ->setClassName(PinbarTabStub::class);
+        $this->builder->setNavigationItemClassName(NavigationItemStub::class);
+        $this->builder->setClassName(PinbarTabStub::class);
     }
 
     public function testBuildItemWhenNoUrl(): void
     {
-        $this->pinbarTabUrlNormalizer
-            ->expects(self::never())
+        $this->pinbarTabUrlNormalizer->expects(self::never())
             ->method('getNormalizedUrl');
 
-        $this->pinbarTabTitleProvider
-            ->expects(self::once())
+        $this->pinbarTabTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with(self::isInstanceOf(NavigationItemStub::class), PinbarTabStub::class)
             ->willReturn([$title = 'sample-title', $titleShort = 'sample-title-short']);
@@ -62,7 +56,7 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 
         self::assertInstanceOf(PinbarTabStub::class, $pinbarTab);
         self::assertInstanceOf(NavigationItemStub::class, $pinbarTab->getItem());
-        self::assertEquals($this->type, $pinbarTab->getItem()->getType());
+        self::assertEquals(self::TYPE, $pinbarTab->getItem()->getType());
         self::assertEquals($title, $pinbarTab->getTitle());
         self::assertEquals($titleShort, $pinbarTab->getTitleShort());
         self::assertNotNull($pinbarTab->getMaximized());
@@ -70,8 +64,7 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildItemWhenNotMaximized(): void
     {
-        $this->pinbarTabTitleProvider
-            ->expects(self::once())
+        $this->pinbarTabTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with(self::isInstanceOf(NavigationItemStub::class))
             ->willReturn([$title = 'sample-title', $titleShort = 'sample-title-short']);
@@ -80,7 +73,7 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 
         self::assertInstanceOf(PinbarTabStub::class, $pinbarTab);
         self::assertInstanceOf(NavigationItemStub::class, $pinbarTab->getItem());
-        self::assertEquals($this->type, $pinbarTab->getItem()->getType());
+        self::assertEquals(self::TYPE, $pinbarTab->getItem()->getType());
         self::assertEquals($title, $pinbarTab->getTitle());
         self::assertEquals($titleShort, $pinbarTab->getTitleShort());
         self::assertNull($pinbarTab->getMaximized());
@@ -88,14 +81,12 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildItem(): void
     {
-        $this->pinbarTabUrlNormalizer
-            ->expects(self::once())
+        $this->pinbarTabUrlNormalizer->expects(self::once())
             ->method('getNormalizedUrl')
             ->with($url = '/sample-url')
             ->willReturn($urlNormalized = '/sample-url-normalized');
 
-        $this->pinbarTabTitleProvider
-            ->expects(self::once())
+        $this->pinbarTabTitleProvider->expects(self::once())
             ->method('getTitles')
             ->with(self::isInstanceOf(NavigationItemStub::class))
             ->willReturn([$title = 'sample-title', $titleShort = 'sample-title-short']);
@@ -104,7 +95,7 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 
         self::assertInstanceOf(PinbarTabStub::class, $pinbarTab);
         self::assertInstanceOf(NavigationItemStub::class, $pinbarTab->getItem());
-        self::assertEquals($this->type, $pinbarTab->getItem()->getType());
+        self::assertEquals(self::TYPE, $pinbarTab->getItem()->getType());
         self::assertEquals($urlNormalized, $pinbarTab->getItem()->getUrl());
         self::assertEquals($title, $pinbarTab->getTitle());
         self::assertEquals($titleShort, $pinbarTab->getTitleShort());
@@ -113,8 +104,7 @@ class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testFindItem(): void
     {
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('find')
             ->with(PinbarTabStub::class, $id = 1)
             ->willReturn($item = new \stdClass());

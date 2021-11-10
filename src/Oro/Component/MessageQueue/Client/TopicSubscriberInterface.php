@@ -1,14 +1,20 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
+/**
+ * An interface for message queue processors that can subscribe to topics on their own.
+ */
 interface TopicSubscriberInterface
 {
     /**
-     * * ['topicName']
-     * * ['topicName' => ['processorName' => 'processor', 'destinationName' => 'destination']]
-     * processorName, destinationName - optional.
-     *
      * @return array
+     *  [
+     *      'topicName1',
+     *      'topicName2' => [],
+     *       // destinationName are optional
+     *      'topicName3' => ['destinationName' => 'sample_destination']
+     *  ]
      */
     public static function getSubscribedTopics();
 }

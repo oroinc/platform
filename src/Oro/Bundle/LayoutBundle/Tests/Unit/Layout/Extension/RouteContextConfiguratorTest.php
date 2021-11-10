@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouteContextConfigurator */
-    protected $configurator;
-
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
+
+    /** @var RouteContextConfigurator */
+    private $configurator;
 
     protected function setUp(): void
     {

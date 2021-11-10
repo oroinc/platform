@@ -8,11 +8,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_SESSION_FIELD_NAME = 'test_session_field';
+    private const TEST_SESSION_FIELD_NAME = 'test_session_field';
 
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private SessionIdProvider $sessionIdProvider;
+    /** @var SessionIdProvider */
+    private $sessionIdProvider;
 
     protected function setUp(): void
     {
@@ -58,7 +60,7 @@ class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldGenerateSessionIdForGetMethod(): void
     {
-        $request = Request::create('http://test', 'GET');
+        $request = Request::create('http://test');
 
         $this->requestStack->expects(self::once())
             ->method('getMainRequest')
@@ -69,7 +71,7 @@ class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRememberGeneratedSessionIdForGetMethod(): void
     {
-        $request = Request::create('http://test', 'GET');
+        $request = Request::create('http://test');
 
         $this->requestStack->expects(self::exactly(2))
             ->method('getMainRequest')

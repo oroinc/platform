@@ -15,7 +15,7 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const SET_THEME_CALL = '$this->env->getExtension("' . LayoutExtension::class . '")->renderer->setTheme';
+    private const SET_THEME_CALL = '$this->env->getExtension("' . LayoutExtension::class . '")->renderer->setTheme';
 
     public function testCompile()
     {
@@ -43,18 +43,15 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
-    protected function getVariableGetter($name)
+    private function getVariableGetter(string $name): string
     {
         if (PHP_VERSION_ID >= 70000) {
             return sprintf('($context["%s"] ?? null)', $name);
-        } elseif (PHP_VERSION_ID >= 50400) {
-            return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
-        } else {
-            return sprintf('$this->getContext($context, "%s")', $name);
         }
+        if (PHP_VERSION_ID >= 50400) {
+            return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
+        }
+
+        return sprintf('$this->getContext($context, "%s")', $name);
     }
 }

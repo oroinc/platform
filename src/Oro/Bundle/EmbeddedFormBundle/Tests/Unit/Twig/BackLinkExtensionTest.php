@@ -11,10 +11,10 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var BackLinkExtension */
@@ -35,10 +35,10 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText()
     {
-        $id = uniqid('id');
-        $url = uniqid('url');
-        $text = uniqid('text');
-        $translatedText = uniqid('translatedText');
+        $id = 'test_id';
+        $url = 'test_url';
+        $text = 'test text';
+        $translatedText = 'test translated text';
         $originalString = 'Before link {back_link|' . $text . '} After link';
         $expectedString = 'Before link <a href="' . $url . '">' . $translatedText . '</a> After link';
 
@@ -59,12 +59,12 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReplacePlaceholderWithReloadLinkAndLinkText()
     {
-        $text = uniqid('text');
-        $translatedText = uniqid('translatedText');
+        $text = 'test text';
+        $translatedText = 'test translated text';
         $originalString = 'Before link {back_link|' . $text . '} After link';
         $expectedLink = '<a href="#" onclick="window.location.reload(true); return false;">'
-                        . $translatedText
-                        . '</a>';
+            . $translatedText
+            . '</a>';
         $expectedString = 'Before link ' . $expectedLink . ' After link';
 
         $this->translator->expects($this->once())
@@ -80,8 +80,8 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReplacePlaceholderWithProvidedUrlAndDefaultLinkText()
     {
-        $id = uniqid('id');
-        $url = uniqid('url');
+        $id = 'test_id';
+        $url = 'test_url';
         $originalString = 'Before link {back_link} After link';
         $expectedString = 'Before link <a href="' . $url . '">Back</a> After link';
 
@@ -102,11 +102,11 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnOriginalStringWhenNoPlaceholderProvided()
     {
-        $originalString = uniqid('any string');
+        $originalString = 'any string';
 
         $this->assertEquals(
             $originalString,
-            self::callTwigFilter($this->extension, 'back_link', [$originalString, uniqid('id')])
+            self::callTwigFilter($this->extension, 'back_link', [$originalString, 'test_id'])
         );
     }
 }

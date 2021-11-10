@@ -37,12 +37,13 @@ class NavigationItemsProviderTest extends \PHPUnit\Framework\TestCase
         $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->provider = new NavigationItemsProvider($this->doctrineHelper, $this->itemFactory, $this->urlMatcher);
-        $this->provider
-            ->setFeatureChecker($this->featureChecker);
+        $this->provider->setFeatureChecker($this->featureChecker);
     }
 
     public function testGetNavigationItems(): void
     {
+        $type = 'sample-type';
+
         $user = $this->createMock(UserInterface::class);
         $organization = $this->createMock(Organization::class);
         $allItems = [
@@ -52,46 +53,41 @@ class NavigationItemsProviderTest extends \PHPUnit\Framework\TestCase
             ['route' => 'route_disabled'],
         ];
 
-        $this->itemFactory
-            ->expects(self::once())
+        $this->itemFactory->expects(self::once())
             ->method('createItem')
-            ->with($type = 'sample-type', [])
-            ->willReturn($entity = new NavigationItemStub());
+            ->with($type, [])
+            ->willReturn(new NavigationItemStub());
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(NavigationItemStub::class)
             ->willReturn($repo = $this->createMock(NavigationRepositoryInterface::class));
 
-        $repo
-            ->expects(self::once())
+        $repo->expects(self::once())
             ->method('getNavigationItems')
-            ->with($user, $organization, $type, $options = [])
+            ->with($user, $organization, $type, [])
             ->willReturn($allItems);
 
-        $this->urlMatcher
-            ->expects(self::exactly(2))
+        $this->urlMatcher->expects(self::exactly(2))
             ->method('match')
             ->willReturnMap([
                 ['/path-no-route', []],
                 ['/path-with-route', ['_route' => 'route_enabled']]
             ]);
 
-        $this->featureChecker
-            ->expects(self::exactly(3))
+        $this->featureChecker->expects(self::exactly(3))
             ->method('isResourceEnabled')
             ->willReturnMap([
                 ['route_enabled', 'routes', null, true],
                 ['route_disabled', 'routes', null, false],
             ]);
 
-        $items = $this->provider->getNavigationItems($user, $organization, $type);
-
-        $expectedItems = [
-            ['url' => '/path-with-route'],
-            ['route' => 'route_enabled'],
-        ];
-        self::assertEquals($expectedItems, $items);
+        self::assertEquals(
+            [
+                ['url' => '/path-with-route'],
+                ['route' => 'route_enabled'],
+            ],
+            $this->provider->getNavigationItems($user, $organization, $type)
+        );
     }
 }

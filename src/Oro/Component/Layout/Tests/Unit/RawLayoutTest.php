@@ -15,7 +15,7 @@ use Oro\Component\Layout\RawLayout;
 class RawLayoutTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
-    protected $rawLayout;
+    private $rawLayout;
 
     protected function setUp(): void
     {

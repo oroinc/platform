@@ -3,8 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -31,7 +29,6 @@ use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -43,50 +40,31 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $configProvider;
 
     /** @var EmailNotificationType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {
-        /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage */
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects($this->any())->method('getToken')->willReturn($this->getToken());
-
         $this->configProvider = $this->createMock(ConfigProvider::class);
 
-        /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router */
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->getToken());
+
         $router = $this->createMock(RouterInterface::class);
         $router->expects($this->any())
             ->method('generate')
             ->with('oro_email_emailtemplate_index')
             ->willReturn('test/url');
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->any())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())
-            ->method('getClassMetadata')
-            ->willReturn($classMetadata);
-
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($entityManager);
-
-        $contactInformationEmailsProvider = $this->createMock(ContactInformationEmailsProvider::class);
-
         $this->formType = new EmailNotificationType(
             new BuildTemplateFormSubscriber($tokenStorage),
             new AdditionalEmailsSubscriber($this->createMock(ChainAdditionalEmailAssociationProvider::class)),
             $router,
-            new ContactInformationEmailsSubscriber($contactInformationEmailsProvider),
+            new ContactInformationEmailsSubscriber($this->createMock(ContactInformationEmailsProvider::class)),
             [
                 'test_1',
                 'test_2'
@@ -112,10 +90,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         $entity = new EmailNotification();
         $entity->setRecipientList(new RecipientList());
@@ -175,7 +150,6 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
             'unsupported' => $childFormView2
         ];
 
-        /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
 
         $this->formType->finishView($formView, $form, []);
@@ -184,16 +158,13 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         $this->assertEquals(['#entity_name_id'], $formView->vars['listenChangeElements']);
     }
 
-    /**
-     * @return UsernamePasswordOrganizationToken
-     */
-    protected function getToken()
+    private function getToken(): UsernamePasswordOrganizationToken
     {
-        return new UsernamePasswordOrganizationToken(new User(2), ['test'], 'key', new Organization(3));
+        return new UsernamePasswordOrganizationToken(new User(), 'test', 'key', new Organization());
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -233,14 +204,11 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                     ],
                 ]
             ),
-            $this->getValidatorExtension(false)
+            $this->getValidatorExtension()
         ];
     }
 
-    /**
-     * @return User
-     */
-    private function getUser()
+    private function getUser(): User
     {
         static $user;
 

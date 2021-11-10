@@ -8,14 +8,15 @@ use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 class ExpressionEncoderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionEncoderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $encoder;
+    private $encoder;
 
     /** @var ExpressionEncoderRegistry */
-    protected $encoderRegistry;
+    private $encoderRegistry;
 
     protected function setUp(): void
     {
         $this->encoder = $this->createMock(ExpressionEncoderInterface::class);
+
         $this->encoderRegistry = new ExpressionEncoderRegistry(
             ['test' => $this->encoder]
         );

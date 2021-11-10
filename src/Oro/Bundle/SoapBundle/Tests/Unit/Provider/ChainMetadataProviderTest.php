@@ -69,6 +69,6 @@ class ChainMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $result = $chain->getMetadataFor($object);
 
         $this->assertIsArray($result);
-        $this->assertEquals($metadata2 + $metadata1, $result);
+        $this->assertEquals(array_merge($metadata2, $metadata1), $result);
     }
 }

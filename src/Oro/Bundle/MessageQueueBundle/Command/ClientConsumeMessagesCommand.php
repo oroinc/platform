@@ -8,7 +8,6 @@ use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Psr\Log\LoggerInterface;
@@ -29,11 +28,10 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
     public function __construct(
         QueueConsumer $queueConsumer,
         DestinationMetaRegistry $destinationMetaRegistry,
-        MessageProcessorInterface $messageProcessor,
         ConsumerState $consumerState,
         LoggerInterface $logger
     ) {
-        parent::__construct($queueConsumer, $destinationMetaRegistry, $messageProcessor);
+        parent::__construct($queueConsumer, $destinationMetaRegistry);
 
         $this->consumerState = $consumerState;
         $this->logger = $logger;

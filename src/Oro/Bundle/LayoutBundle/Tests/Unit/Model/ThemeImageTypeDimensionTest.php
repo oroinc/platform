@@ -6,16 +6,14 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
 class ThemeImageTypeDimensionTest extends \PHPUnit\Framework\TestCase
 {
-    const NAME = 'dim';
-    const WIDTH = 100;
-    const HEIGHT = 200;
-    const OPTION_1 = 'option1';
-    const OPTION_2 = 'option2';
+    private const NAME = 'dim';
+    private const WIDTH = 100;
+    private const HEIGHT = 200;
+    private const OPTION_1 = 'option1';
+    private const OPTION_2 = 'option2';
 
-    /**
-     * @var ThemeImageTypeDimension
-     */
-    protected $imageTypeDimension;
+    /** @var ThemeImageTypeDimension */
+    private $imageTypeDimension;
 
     protected function setUp(): void
     {

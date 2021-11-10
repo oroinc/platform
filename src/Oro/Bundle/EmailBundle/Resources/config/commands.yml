@@ -20,3 +20,37 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\DebugEmailTemplateCommand:
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\DebugEmailTemplateCompileCommand:
+        arguments:
+            - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+            - '@Oro\Bundle\EmailBundle\Provider\EmailRenderer'
+            - '@Oro\Bundle\EmailBundle\Mailer\Processor'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\DebugEmailVariablesCommand:
+        arguments:
+            - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+            - '@Oro\Bundle\EmailBundle\Provider\EmailRenderer'
+            - '@Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\EmailTemplatesExportCommand:
+        arguments:
+            - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\EmailTemplatesImportCommand:
+        arguments:
+            - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+        tags:
+            - { name: console.command }

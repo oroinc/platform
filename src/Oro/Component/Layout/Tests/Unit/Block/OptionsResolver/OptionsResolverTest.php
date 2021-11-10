@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\Block\OptionsResolver;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Options;
 
 class OptionsResolverTest extends \PHPUnit\Framework\TestCase
@@ -93,7 +94,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testOffsetSet()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\AccessException::class);
+        $this->expectException(AccessException::class);
         $this->expectExceptionMessage('Setting options via array access is not supported. Use setDefault() instead.');
 
         $this->optionResolver->setDefault('default_option', 'default_value');

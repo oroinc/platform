@@ -25,19 +25,19 @@ class LayoutBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RawLayoutBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $rawLayoutBuilder;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DeferredLayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManipulator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var BlockFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $renderer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $expressionProcessor;
 
     /** @var LayoutBuilder|\PHPUnit\Framework\MockObject\MockObject */

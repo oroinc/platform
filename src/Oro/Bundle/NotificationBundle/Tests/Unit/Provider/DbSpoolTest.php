@@ -13,17 +13,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DbSpoolTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DbSpool */
-    private $spool;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityPool */
+    /** @var EntityPool|\PHPUnit\Framework\MockObject\MockObject */
     private $entityPool;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
+
+    /** @var DbSpool */
+    private $spool;
 
     protected function setUp(): void
     {

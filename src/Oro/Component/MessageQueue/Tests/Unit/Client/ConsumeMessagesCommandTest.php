@@ -6,163 +6,147 @@ use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConsumeMessagesCommand */
-    private $command;
+    private ConsumeMessagesCommand $command;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $consumer;
+    private QueueConsumer|\PHPUnit\Framework\MockObject\MockObject $consumer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
+    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
     protected function setUp(): void
     {
         $this->consumer = $this->createMock(QueueConsumer::class);
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
-        $this->processor = $this->createMock(MessageProcessorInterface::class);
 
-        $this->command = new ConsumeMessagesCommand($this->consumer, $this->registry, $this->processor);
+        $this->command = new ConsumeMessagesCommand($this->consumer, $this->registry);
     }
 
-    public function testShouldHaveCommandName()
+    public function testShouldHaveCommandName(): void
     {
-        $this->assertEquals('oro:message-queue:consume', $this->command->getName());
+        self::assertEquals('oro:message-queue:consume', $this->command->getName());
     }
 
-    public function testShouldHaveExpectedOptions()
+    public function testShouldHaveExpectedOptions(): void
     {
         $options = $this->command->getDefinition()->getOptions();
 
-        $this->assertCount(5, $options);
-        $this->assertArrayHasKey('memory-limit', $options);
-        $this->assertArrayHasKey('message-limit', $options);
-        $this->assertArrayHasKey('time-limit', $options);
-        $this->assertArrayHasKey('object-limit', $options);
-        $this->assertArrayHasKey('gc-limit', $options);
+        self::assertCount(5, $options);
+        self::assertArrayHasKey('memory-limit', $options);
+        self::assertArrayHasKey('message-limit', $options);
+        self::assertArrayHasKey('time-limit', $options);
+        self::assertArrayHasKey('object-limit', $options);
+        self::assertArrayHasKey('gc-limit', $options);
     }
 
-    public function testShouldHaveExpectedAttributes()
+    public function testShouldHaveExpectedAttributes(): void
     {
         $arguments = $this->command->getDefinition()->getArguments();
 
-        $this->assertCount(1, $arguments);
-        $this->assertArrayHasKey('clientDestinationName', $arguments);
+        self::assertCount(1, $arguments);
+        self::assertArrayHasKey('clientDestinationName', $arguments);
     }
 
-    public function testShouldExecuteConsumptionAndUseDefaultQueueName()
+    public function testShouldExecuteConsumptionAndUseDefaultQueueName(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('close');
 
-        $this->consumer->expects($this->once())
+        $this->consumer->expects(self::once())
             ->method('bind')
-            ->with('aprefixt.adefaultqueuename', $this->identicalTo($this->processor));
-        $this->consumer->expects($this->once())
+            ->with('aprefixt.adefaultqueuename');
+        $this->consumer->expects(self::once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class));
-        $this->consumer->expects($this->once())
+            ->with(self::isInstanceOf(ChainExtension::class));
+        $this->consumer->expects(self::once())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
+            ->willReturn($connection);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
-            ->willReturn([
-                new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')
-            ]);
+            ->willReturn([new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')]);
 
         $tester = new CommandTester($this->command);
         $tester->execute([]);
     }
 
-    public function testShouldExecuteConsumptionAndUseCustomClientDestinationName()
+    public function testShouldExecuteConsumptionAndUseCustomClientDestinationName(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('close');
 
-        $this->consumer->expects($this->once())
+        $this->consumer->expects(self::once())
             ->method('bind')
-            ->with('aprefixt.non-default-queue', $this->identicalTo($this->processor));
-        $this->consumer->expects($this->once())
+            ->with('aprefixt.non-default-queue');
+        $this->consumer->expects(self::once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class));
-        $this->consumer->expects($this->once())
+            ->with(self::isInstanceOf(ChainExtension::class));
+        $this->consumer->expects(self::once())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
+            ->willReturn($connection);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getDestinationMeta')
             ->with('non-default-queue')
             ->willReturn(new DestinationMeta('aclient', 'aprefixt.non-default-queue'));
 
         $tester = new CommandTester($this->command);
-        $tester->execute([
-            'clientDestinationName' => 'non-default-queue'
-        ]);
+        $tester->execute(['clientDestinationName' => 'non-default-queue']);
     }
 
-    public function testShouldExecuteConsumptionAndUseCustomClientDestinationNameWithCustomQueueFromArgument()
+    public function testShouldExecuteConsumptionAndUseCustomClientDestinationNameWithCustomQueueFromArgument(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('close');
 
-        $this->consumer->expects($this->once())
+        $this->consumer->expects(self::once())
             ->method('bind')
-            ->with('non-default-transport-queue', $this->identicalTo($this->processor));
-        $this->consumer->expects($this->once())
+            ->with('non-default-transport-queue');
+        $this->consumer->expects(self::once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class));
-        $this->consumer->expects($this->once())
+            ->with(self::isInstanceOf(ChainExtension::class));
+        $this->consumer->expects(self::once())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
+            ->willReturn($connection);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getDestinationMeta')
             ->with('non-default-queue')
             ->willReturn(new DestinationMeta('aclient', 'non-default-transport-queue'));
 
         $tester = new CommandTester($this->command);
-        $tester->execute([
-            'clientDestinationName' => 'non-default-queue'
-        ]);
+        $tester->execute(['clientDestinationName' => 'non-default-queue']);
     }
 
-    public function testShouldLogErrorAndThrowExceptionIfConsumeThrowsException()
+    public function testShouldLogErrorAndThrowExceptionIfConsumeThrowsException(): void
     {
         $expectedException = new \Exception('the message');
 
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('close');
 
-        $this->consumer->expects($this->once())
+        $this->consumer->expects(self::once())
             ->method('bind')
-            ->with('aprefixt.adefaultqueuename', $this->identicalTo($this->processor));
-        $this->consumer->expects($this->once())
+            ->with('aprefixt.adefaultqueuename');
+        $this->consumer->expects(self::once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class))
+            ->with(self::isInstanceOf(ChainExtension::class))
             ->willThrowException($expectedException);
-        $this->consumer->expects($this->once())
+        $this->consumer->expects(self::once())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
+            ->willReturn($connection);
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
-            ->willReturn([
-                new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')
-            ]);
+            ->willReturn([new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')]);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage($expectedException->getMessage());

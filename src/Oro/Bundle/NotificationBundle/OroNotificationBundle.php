@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle;
 
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,7 +23,7 @@ class OroNotificationBundle extends Bundle
         $container->addCompilerPass(new EventsCompilerPass());
 
         $container->addCompilerPass(
-            AddTopicMetaPass::create()
+            AddTopicDescriptionPass::create()
                 ->add(Topics::SEND_NOTIFICATION_EMAIL, 'Sending email notifications')
         );
     }

@@ -10,19 +10,15 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
     use MenuItemTestTrait;
 
     /** @var MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuUpdateHelper;
+    private $menuUpdateHelper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);
@@ -44,8 +40,7 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         $expectedUpdate->setMenu('menu');
         $expectedUpdate->setDefaultTitle('item-1-1-1');
 
-        $this->menuUpdateHelper
-            ->expects($this->once())
+        $this->menuUpdateHelper->expects($this->once())
             ->method('applyLocalizedFallbackValue')
             ->with($update, 'item-1-1-1', 'title', 'string');
 
@@ -61,9 +56,9 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
             ->getChild('item-1-1-1');
 
         $firstLocalization = new Localization();
-        $this->setValue($firstLocalization, 'id', 1);
+        ReflectionUtil::setId($firstLocalization, 1);
         $secondLocalization = new Localization();
-        $this->setValue($secondLocalization, 'id', 2);
+        ReflectionUtil::setId($secondLocalization, 2);
 
         $update = new MenuUpdateStub();
         $update->setKey('item-1-1-1');
@@ -87,7 +82,6 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         $expectedItem->setExtra('description', 'second test description');
         $expectedItem->setLinkAttribute('testAttribute', 'testValue');
 
-        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         $localizationHelper->expects($this->atLeastOnce())
             ->method('getCurrentLocalization')
@@ -107,7 +101,6 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         $update->setParentKey('item-2');
         $update->setUri('URI');
 
-        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
@@ -129,7 +122,6 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         $expectedItem->setUri('URI');
         $update->setCustom(true);
 
-        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
@@ -146,7 +138,6 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         $update->setParentKey('item-1');
         $update->setCustom(true);
 
-        /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper */
         $localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $options = ['extras' => ['test' => 'test']];
@@ -199,7 +190,9 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
     public function testGenerateKey()
     {
         $menuName = 'application_menu';
-        $scope = $this->getEntity(Scope::class, ['id' => 1]);
+
+        $scope = new Scope();
+        ReflectionUtil::setId($scope, 1);
 
         $this->assertEquals('application_menu_1', MenuUpdateUtils::generateKey($menuName, $scope));
     }

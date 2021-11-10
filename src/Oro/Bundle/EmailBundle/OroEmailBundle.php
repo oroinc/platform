@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -54,7 +54,7 @@ class OroEmailBundle extends Bundle
         ));
         $container->addCompilerPass(new Compiler\SwiftMailerTransportPass(), PassConfig::TYPE_OPTIMIZE);
 
-        $addTopicPass = AddTopicMetaPass::create()
+        $addTopicPass = AddTopicDescriptionPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
             ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
             ->add(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, 'Update associations to emails')

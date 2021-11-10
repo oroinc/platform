@@ -9,11 +9,14 @@ use Oro\Component\Layout\LayoutRenderer;
 
 class LayoutRendererTest extends \PHPUnit\Framework\TestCase
 {
-    protected FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject $innerRenderer;
+    /** @var FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerRenderer;
 
-    protected LayoutRenderer $renderer;
+    /** @var FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formRenderer;
 
-    protected FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject $formRenderer;
+    /** @var LayoutRenderer */
+    private $renderer;
 
     protected function setUp(): void
     {

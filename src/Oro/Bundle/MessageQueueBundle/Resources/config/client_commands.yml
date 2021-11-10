@@ -1,10 +1,8 @@
 services:
-    _defaults:
-        public: false
-
     Oro\Component\MessageQueue\Client\Meta\TopicsCommand:
         arguments:
             - '@oro_message_queue.client.meta.topic_meta_registry'
+            - '@oro_message_queue.client.meta.topic_description_provider'
         tags:
             - { name: console.command }
 

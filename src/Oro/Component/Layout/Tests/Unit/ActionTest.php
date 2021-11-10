@@ -7,7 +7,7 @@ use Oro\Component\Layout\Action;
 class ActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Action */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {

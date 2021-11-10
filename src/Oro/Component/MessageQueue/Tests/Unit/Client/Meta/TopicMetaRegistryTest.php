@@ -1,86 +1,55 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 
 class TopicMetaRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithTopics()
+    public function testShouldAllowGetTopicByNameWithDefaultInfo(): void
     {
-        $topics = [
-            'aTopicName' => [],
-            'anotherTopicName' => []
-        ];
+        $registry = new TopicMetaRegistry([], []);
 
-        $registry = new class($topics) extends TopicMetaRegistry {
-            public function xgetTopicsMeta(): array
-            {
-                return $this->topicsMeta;
-            }
-        };
+        $topic = $registry->getTopicMeta('sample_topic');
 
-        static::assertEquals($topics, $registry->xgetTopicsMeta());
+        self::assertSame('sample_topic', $topic->getName());
+        self::assertEmpty($topic->getMessageProcessorName('sample_queue'));
+        self::assertEquals([Config::DEFAULT_QUEUE_NAME], $topic->getQueueNames());
     }
 
-    public function testThrowIfThereIsNotMetaForRequestedTopicName()
+    public function testShouldAllowGetTopicByNameWithCustomInfo(): void
     {
-        $registry = new TopicMetaRegistry([]);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The topic meta not found. Requested name `aName`');
+        $queuesByTopic = ['sample_topic' => ['sample_queue']];
+        $messageProcessorsByTopicAndQueue = ['sample_topic' => ['sample_queue' => 'message_processor']];
 
-        $registry->getTopicMeta('aName');
+        $registry = new TopicMetaRegistry($queuesByTopic, $messageProcessorsByTopicAndQueue);
+
+        $topic = $registry->getTopicMeta('sample_topic');
+
+        self::assertSame('sample_topic', $topic->getName());
+        self::assertSame('message_processor', $topic->getMessageProcessorName('sample_queue'));
+        self::assertSame(['sample_queue'], $topic->getQueueNames());
     }
 
-    public function testShouldAllowGetTopicByNameWithDefaultInfo()
+    public function testShouldAllowGetAllTopics(): void
     {
-        $topics = [
-            'theTopicName' => [],
+        $queuesByTopic = ['sample_topic1' => ['sample_queue1'], 'sample_topic2' => ['sample_queue2']];
+        $messageProcessorsByTopicAndQueue = [
+            'sample_topic1' => ['sample_queue1' => 'message_processor1'],
+            'sample_topic2' => ['sample_queue2' => 'message_processor2'],
         ];
 
-        $registry = new TopicMetaRegistry($topics);
-
-        $topic = $registry->getTopicMeta('theTopicName');
-        $this->assertInstanceOf(TopicMeta::class, $topic);
-        $this->assertSame('theTopicName', $topic->getName());
-        $this->assertSame('', $topic->getDescription());
-        $this->assertSame([], $topic->getSubscribers());
-    }
-
-    public function testShouldAllowGetTopicByNameWithCustomInfo()
-    {
-        $topics = [
-            'theTopicName' => ['description' => 'theDescription', 'subscribers' => ['theSubscriber']],
-        ];
-
-        $registry = new TopicMetaRegistry($topics);
-
-        $topic = $registry->getTopicMeta('theTopicName');
-        $this->assertInstanceOf(TopicMeta::class, $topic);
-        $this->assertSame('theTopicName', $topic->getName());
-        $this->assertSame('theDescription', $topic->getDescription());
-        $this->assertSame(['theSubscriber'], $topic->getSubscribers());
-    }
-
-    public function testShouldAllowGetAllTopics()
-    {
-        $topics = [
-            'fooTopicName' => [],
-            'barTopicName' => [],
-        ];
-
-        $registry = new TopicMetaRegistry($topics);
+        $registry = new TopicMetaRegistry($queuesByTopic, $messageProcessorsByTopicAndQueue);
 
         $topics = $registry->getTopicsMeta();
-        $this->assertInstanceOf(\Generator::class, $topics);
-
         $topics = iterator_to_array($topics);
-        /** @var TopicMeta[] $topics */
 
-        $this->assertContainsOnly(TopicMeta::class, $topics);
-        $this->assertCount(2, $topics);
+        self::assertContainsOnly(TopicMeta::class, $topics);
+        self::assertCount(2, $topics);
 
-        $this->assertSame('fooTopicName', $topics[0]->getName());
-        $this->assertSame('barTopicName', $topics[1]->getName());
+        self::assertSame('sample_topic1', $topics[0]->getName());
+        self::assertSame('sample_topic2', $topics[1]->getName());
     }
 }

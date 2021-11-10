@@ -22,7 +22,7 @@ class ImportLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
 
         $phpClass->addMethod('testMethod')->addBody($visitContext->getUpdateMethodBody());
 
-        static::assertSame(
+        self::assertSame(
             <<<'CODE'
 class ImportedLayoutUpdate implements Oro\Component\Layout\LayoutUpdateImportInterface, Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {

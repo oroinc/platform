@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder;
@@ -12,29 +13,29 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
     /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $navigationItemsProvider;
 
-    /** @var \Knp\Menu\Matcher\Matcher|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
     private $matcher;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var NavigationHistoryBuilder */
-    private $builder;
-
     /** @var MenuManipulator|\PHPUnit\Framework\MockObject\MockObject */
     private $menuManipulator;
+
+    /** @var NavigationHistoryBuilder */
+    private $builder;
 
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);
-        $this->matcher = $this->createMock(\Knp\Menu\Matcher\Matcher::class);
+        $this->matcher = $this->createMock(Matcher::class);
         $this->menuManipulator = $this->createMock(MenuManipulator::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
@@ -54,18 +55,15 @@ class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
 
         $user = $this->createMock(User::class);
 
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->navigationItemsProvider
-            ->expects(self::once())
+        $this->navigationItemsProvider->expects(self::once())
             ->method('getNavigationItems')
             ->with($user, $organization, $type)
             ->willReturn($items = [
@@ -77,41 +75,31 @@ class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
 
         $childMock = $this->createMock(\Knp\Menu\ItemInterface::class);
         $childMock2 = clone $childMock;
-        $children = array($childMock, $childMock2);
+        $children = [$childMock, $childMock2];
 
-        $this->matcher
-            ->expects($this->once())
+        $this->matcher->expects($this->once())
             ->method('isCurrent')
             ->willReturn(true);
 
-        $menu
-            ->expects($this->exactly(2))
+        $menu->expects($this->exactly(2))
             ->method('addChild');
-
-        $menu
-            ->expects($this->once())
+        $menu->expects($this->once())
             ->method('setExtra')
             ->with('type', $type);
-
-        $menu
-            ->expects($this->once())
+        $menu->expects($this->once())
             ->method('getChildren')
             ->willReturn($children);
-
-        $menu
-            ->expects($this->once())
+        $menu->expects($this->once())
             ->method('removeChild');
 
         $n = random_int(1, 10);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_navigation.max_items')
             ->willReturn($n);
 
-        $this->menuManipulator
-            ->expects($this->once())
+        $this->menuManipulator->expects($this->once())
             ->method('slice')
             ->with($menu, 0, $n);
 

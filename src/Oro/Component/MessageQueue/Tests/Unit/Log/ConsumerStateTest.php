@@ -3,127 +3,126 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Log;
 
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 class ConsumerStateTest extends \PHPUnit\Framework\TestCase
 {
-    public function testInitialState()
+    public function testInitialState(): void
     {
         $consumerState = new ConsumerState();
 
-        $this->assertFalse($consumerState->isConsumptionStarted());
-        $this->assertNull($consumerState->getExtension());
-        $this->assertNull($consumerState->getMessageProcessor());
-        $this->assertNull($consumerState->getMessage());
-        $this->assertNull($consumerState->getJob());
-        $this->assertNull($consumerState->getStartTime());
-        $this->assertNull($consumerState->getStartMemoryUsage());
-        $this->assertNull($consumerState->getPeakMemory());
+        self::assertFalse($consumerState->isConsumptionStarted());
+        self::assertNull($consumerState->getExtension());
+        self::assertSame('', $consumerState->getMessageProcessorName());
+        self::assertNull($consumerState->getMessage());
+        self::assertNull($consumerState->getJob());
+        self::assertNull($consumerState->getStartTime());
+        self::assertNull($consumerState->getStartMemoryUsage());
+        self::assertNull($consumerState->getPeakMemory());
     }
 
-    public function testStartAndStopConsumption()
+    public function testStartAndStopConsumption(): void
     {
         $consumerState = new ConsumerState();
 
         $consumerState->startConsumption();
-        $this->assertTrue($consumerState->isConsumptionStarted());
+        self::assertTrue($consumerState->isConsumptionStarted());
 
         $consumerState->stopConsumption();
-        $this->assertFalse($consumerState->isConsumptionStarted());
+        self::assertFalse($consumerState->isConsumptionStarted());
     }
 
-    public function testSetExtension()
+    public function testSetExtension(): void
     {
         $consumerState = new ConsumerState();
 
         $extension = $this->createMock(ExtensionInterface::class);
         $consumerState->setExtension($extension);
 
-        $this->assertSame($extension, $consumerState->getExtension());
+        self::assertSame($extension, $consumerState->getExtension());
 
         $consumerState->setExtension();
 
-        $this->assertNull($consumerState->getExtension());
+        self::assertNull($consumerState->getExtension());
     }
 
-    public function testSetMessageProcessor()
+    public function testSetMessageProcessorName(): void
     {
         $consumerState = new ConsumerState();
 
-        $messageProcessor = $this->createMock(MessageProcessorInterface::class);
-        $consumerState->setMessageProcessor($messageProcessor);
+        $messageProcessorName = 'sample_processor';
+        $consumerState->setMessageProcessorName($messageProcessorName);
 
-        $this->assertSame($messageProcessor, $consumerState->getMessageProcessor());
+        self::assertSame($messageProcessorName, $consumerState->getMessageProcessorName());
 
-        $consumerState->setMessageProcessor();
+        $consumerState->setMessageProcessorName();
 
-        $this->assertNull($consumerState->getMessageProcessor());
+        self::assertSame('', $consumerState->getMessageProcessorName());
     }
 
-    public function testSetMessage()
+    public function testSetMessage(): void
     {
         $consumerState = new ConsumerState();
 
         $message = $this->createMock(MessageInterface::class);
         $consumerState->setMessage($message);
 
-        $this->assertSame($message, $consumerState->getMessage());
+        self::assertSame($message, $consumerState->getMessage());
 
         $time = (int)(microtime(true) * 1000);
         $consumerState->setMessage();
 
-        $this->assertNull($consumerState->getMessage());
+        self::assertNull($consumerState->getMessage());
 
-        $this->assertGreaterThanOrEqual($time, $consumerState->getStartTime());
-        $this->assertIsInt($consumerState->getStartMemoryUsage());
-        $this->assertEquals($consumerState->getStartMemoryUsage(), $consumerState->getPeakMemory());
+        self::assertGreaterThanOrEqual($time, $consumerState->getStartTime());
+        self::assertIsInt($consumerState->getStartMemoryUsage());
+        self::assertEquals($consumerState->getStartMemoryUsage(), $consumerState->getPeakMemory());
     }
 
-    public function testSetJob()
+    public function testSetJob(): void
     {
         $consumerState = new ConsumerState();
 
         $job = $this->createMock(Job::class);
         $consumerState->setJob($job);
 
-        $this->assertSame($job, $consumerState->getJob());
+        self::assertSame($job, $consumerState->getJob());
 
         $consumerState->setJob();
 
-        $this->assertNull($consumerState->getJob());
+        self::assertNull($consumerState->getJob());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $consumerState = new ConsumerState();
         $consumerState->setExtension($this->createMock(ExtensionInterface::class));
-        $consumerState->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
+        $consumerState->setMessageProcessorName('sample_processor');
         $consumerState->setMessage($this->createMock(MessageInterface::class));
         $consumerState->setJob($this->createMock(Job::class));
 
         $consumerState->clear();
 
-        $this->assertNull($consumerState->getExtension());
-        $this->assertNull($consumerState->getMessageProcessor());
-        $this->assertNull($consumerState->getMessage());
-        $this->assertNull($consumerState->getJob());
-        $this->assertNull($consumerState->getStartTime());
-        $this->assertEquals(0, $consumerState->getStartMemoryUsage());
-        $this->assertEquals(0, $consumerState->getPeakMemory());
+        self::assertNull($consumerState->getExtension());
+        self::assertSame('', $consumerState->getMessageProcessorName());
+        self::assertNull($consumerState->getMessage());
+        self::assertNull($consumerState->getJob());
+        self::assertNull($consumerState->getStartTime());
+        self::assertEquals(0, $consumerState->getStartMemoryUsage());
+        self::assertEquals(0, $consumerState->getPeakMemory());
     }
 
-    public function testSetPeakMemory()
+    public function testSetPeakMemory(): void
     {
         $consumerState = new ConsumerState();
 
-        $this->assertNull($consumerState->getPeakMemory());
+        self::assertNull($consumerState->getPeakMemory());
         $peakMemory = 5;
         $consumerState->setPeakMemory($peakMemory);
-        $this->assertEquals($peakMemory, $consumerState->getPeakMemory());
+        self::assertEquals($peakMemory, $consumerState->getPeakMemory());
         $consumerState->setPeakMemory(4); // lower value
-        $this->assertEquals($peakMemory, $consumerState->getPeakMemory()); // value remains the same
+        self::assertEquals($peakMemory, $consumerState->getPeakMemory()); // value remains the same
     }
 }

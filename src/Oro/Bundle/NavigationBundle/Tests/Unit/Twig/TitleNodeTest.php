@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
 use Oro\Bundle\NavigationBundle\Twig\TitleNode;
 use Twig\Compiler;
+use Twig\Error\SyntaxError;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Node;
 
@@ -27,12 +28,10 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
         $this->titleNode = new TitleNode($this->node);
     }
 
-    /**
-     * Tests error in twig tag call
-     */
     public function testFailedCompile()
     {
-        $this->expectException(\Twig\Error\SyntaxError::class);
+        $this->expectException(SyntaxError::class);
+
         $this->node->expects($this->once())
             ->method('getIterator')
             ->willReturn([]);
@@ -40,9 +39,6 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
         $this->titleNode->compile($this->compiler);
     }
 
-    /**
-     * Tests success node compiling
-     */
     public function testSuccessCompile()
     {
         $expr = $this->createMock(ArrayExpression::class);

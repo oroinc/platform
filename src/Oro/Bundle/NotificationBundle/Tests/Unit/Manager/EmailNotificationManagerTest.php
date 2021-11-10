@@ -101,8 +101,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             $entity
         );
 
-        $this->emailNotificationSender
-            ->expects($this->exactly(2))
+        $this->emailNotificationSender->expects($this->exactly(2))
             ->method('send')
             ->withConsecutive(
                 [$expectedEnglishNotification, $englishEmailTemplateModel],
@@ -152,8 +151,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             $sender
         );
 
-        $this->emailNotificationSender
-            ->expects($this->once())
+        $this->emailNotificationSender->expects($this->once())
             ->method('sendMass')
             ->with($expectedNotification, $customSubjectEmailTemplateModel);
 
@@ -234,8 +232,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
         $expectedNotification1 = new TemplateEmailNotification($notification1->getTemplateCriteria(), [$recipient]);
         $expectedNotification2 = new TemplateEmailNotification($notification2->getTemplateCriteria(), [$recipient]);
 
-        $this->emailNotificationSender
-            ->expects($this->exactly(2))
+        $this->emailNotificationSender->expects($this->exactly(2))
             ->method('send')
             ->withConsecutive(
                 [$expectedNotification1, $emailTemplateModel1],
@@ -262,8 +259,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger
-            ->expects($this->exactly(2))
+        $logger->expects($this->exactly(2))
             ->method('error')
             ->withConsecutive(
                 ['An error occurred while processing notification', ['exception' => $exception]],

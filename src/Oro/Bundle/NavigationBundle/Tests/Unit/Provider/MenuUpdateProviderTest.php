@@ -13,24 +13,16 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeManager;
 
-    /**
-     * @var MenuUpdateManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MenuUpdateManager|\PHPUnit\Framework\MockObject\MockObject */
     private $menuUpdateManager;
 
-    /**
-     * @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $menuItem;
 
-    /**
-     * @var MenuUpdateProvider
-     */
+    /** @var MenuUpdateProvider */
     private $menuUpdateProvider;
 
     protected function setUp(): void
@@ -38,6 +30,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
         $this->menuItem = $this->createMock(ItemInterface::class);
         $this->scopeManager = $this->createMock(ScopeManager::class);
         $this->menuUpdateManager = $this->createMock(MenuUpdateManager::class);
+
         $this->menuUpdateProvider = new MenuUpdateProvider(
             $this->scopeManager,
             $this->menuUpdateManager
@@ -46,50 +39,50 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyMenuUpdates()
     {
-        $this->menuItem->expects(static::exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getExtra')
             ->with('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE)
             ->willReturn(ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
-        $this->menuUpdateManager->expects(static::exactly(2))
+        $this->menuUpdateManager->expects(self::exactly(2))
             ->method('getScopeType')
             ->willReturn('test_scope');
-        static::assertEmpty($this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem));
-        static::assertEmpty($this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem));
+        self::assertEmpty($this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem));
+        self::assertEmpty($this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem));
     }
 
     public function testGetMenuUpdatesCalledMoreThanOnce()
     {
         $options = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => new \stdClass()]];
-        $this->menuItem->expects(static::exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getExtra')
             ->with('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE)
             ->willReturn('test_scope');
-        $this->menuItem->expects(static::exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getName')
             ->willReturn('my_menu');
 
-        $this->menuUpdateManager->expects(static::exactly(2))
+        $this->menuUpdateManager->expects(self::exactly(2))
             ->method('getScopeType')
             ->willReturn('test_scope');
 
         $scopeIds = [1];
-        $this->scopeManager->expects(static::once())
+        $this->scopeManager->expects(self::once())
             ->method('findRelatedScopeIdsWithPriority')
-            ->with('test_scope', $this->equalTo(['scopeAttribute' => new \stdClass()]))
+            ->with('test_scope', ['scopeAttribute' => new \stdClass()])
             ->willReturn($scopeIds);
 
         $repository = $this->createMock(MenuUpdateRepository::class);
 
-        $this->menuUpdateManager->expects(static::any())
+        $this->menuUpdateManager->expects(self::any())
             ->method('getRepository')
             ->willReturn($repository);
 
         $updates = [new MenuUpdate()];
-        $repository->expects(static::exactly(2))
+        $repository->expects(self::exactly(2))
             ->method('findMenuUpdatesByScopeIds')
             ->with('my_menu', $scopeIds)
             ->willReturn($updates);
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('getUsedScopesByMenu')
             ->willReturn(['my_menu' => [1]]);
 
@@ -102,25 +95,25 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
         $options1 = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => new \stdClass()]];
         $options2 = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => $user]];
-        $this->menuItem->expects(static::exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getExtra')
             ->with('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE)
             ->willReturn('test_scope');
-        $this->menuItem->expects(static::exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getName')
             ->willReturn('my_menu');
 
-        $this->menuUpdateManager->expects(static::exactly(2))
+        $this->menuUpdateManager->expects(self::exactly(2))
             ->method('getScopeType')
             ->willReturn('test_scope');
 
         $scopeIds1 = [1];
         $scopeIds2 = [2];
-        $this->scopeManager->expects(static::exactly(2))
+        $this->scopeManager->expects(self::exactly(2))
             ->method('findRelatedScopeIdsWithPriority')
             ->withConsecutive(
-                ['test_scope', $this->equalTo(['scopeAttribute' => new \stdClass()])],
-                ['test_scope', $this->equalTo(['scopeAttribute' => $user])]
+                ['test_scope', ['scopeAttribute' => new \stdClass()]],
+                ['test_scope', ['scopeAttribute' => $user]]
             )
             ->willReturnOnConsecutiveCalls(
                 $scopeIds1,
@@ -129,19 +122,19 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
 
         $repository = $this->createMock(MenuUpdateRepository::class);
 
-        $this->menuUpdateManager->expects(static::any())
+        $this->menuUpdateManager->expects(self::any())
             ->method('getRepository')
             ->willReturn($repository);
 
         $updates = [new MenuUpdate()];
-        $repository->expects(static::exactly(2))
+        $repository->expects(self::exactly(2))
             ->method('findMenuUpdatesByScopeIds')
             ->withConsecutive(
                 ['my_menu', $scopeIds1],
                 ['my_menu', $scopeIds2]
             )
             ->willReturn($updates);
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('getUsedScopesByMenu')
             ->willReturn(['my_menu' => [1, 2]]);
 
@@ -152,35 +145,35 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetMenuUpdatesForMenuWithLimitedScopes()
     {
         $options = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => new \stdClass()]];
-        $this->menuItem->expects(static::any())
+        $this->menuItem->expects(self::any())
             ->method('getExtra')
             ->with('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE)
             ->willReturn('test_scope');
-        $this->menuItem->expects(static::any())
+        $this->menuItem->expects(self::any())
             ->method('getName')
             ->willReturn('my_menu');
 
-        $this->menuUpdateManager->expects(static::any())
+        $this->menuUpdateManager->expects(self::any())
             ->method('getScopeType')
             ->willReturn('test_scope');
 
         $scopeIds = [1, 2];
-        $this->scopeManager->expects(static::once())
+        $this->scopeManager->expects(self::once())
             ->method('findRelatedScopeIdsWithPriority')
-            ->with('test_scope', $this->equalTo(['scopeAttribute' => new \stdClass()]))
+            ->with('test_scope', ['scopeAttribute' => new \stdClass()])
             ->willReturn($scopeIds);
 
         $repository = $this->createMock(MenuUpdateRepository::class);
 
-        $this->menuUpdateManager->expects(static::any())
+        $this->menuUpdateManager->expects(self::any())
             ->method('getRepository')
             ->willReturn($repository);
 
         $updates = [new MenuUpdate()];
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('getUsedScopesByMenu')
             ->willReturn(['my_menu' => [1]]);
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('findMenuUpdatesByScopeIds')
             ->with('my_menu', [1])
             ->willReturn($updates);

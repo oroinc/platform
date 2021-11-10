@@ -11,7 +11,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentifierHydrator;
-use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\MessageQueue\Client\Message;
@@ -51,23 +50,16 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
     private $logger;
 
     /**
-     * @var EntityChangesToAuditEntryConverter
-     */
-    private $entityChangesToAuditEntryConverter;
-
-    /**
      * @var int
      */
     private $batchSize = 500;
 
     public function __construct(
         ManagerRegistry $doctrine,
-        EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         LoggerInterface $logger
     ) {
-        $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->doctrine = $doctrine;
         $this->jobRunner = $jobRunner;
         $this->producer = $producer;
@@ -344,6 +336,6 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
      */
     public static function getSubscribedTopics(): array
     {
-        return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED];
+        return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS];
     }
 }

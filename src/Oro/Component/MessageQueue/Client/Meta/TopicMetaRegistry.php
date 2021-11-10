@@ -1,44 +1,87 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Config;
+
+/**
+ * Registry of topics-queues-subscribers relations.
+ */
 class TopicMetaRegistry
 {
     /**
      * @var array
+     *  [
+     *      'topic_name1' => [
+     *          'queue_name1' => 'message_processor1',
+     *          // ...
+     *      ],
+     *      // ...
+     *  ]
      */
-    protected $topicsMeta;
+    private array $messageProcessorsByTopicAndQueue;
 
-    public function __construct(array $topicsMeta)
+    /**
+     * @var array
+     *  [
+     *      'topic_name1' => [
+     *          'queue_name1',
+     *          'queue_name2',
+     *          // ...
+     *      ],
+     *      // ...
+     *  ]
+     */
+    private array $queuesByTopic;
+
+    /**
+     * @param array $messageProcessorsByTopicAndQueue
+     *  [
+     *      'topic_name1' => [
+     *          'queue_name1' => 'message_processor1',
+     *          // ...
+     *      ],
+     *      // ...
+     *  ]
+     * @param array $queuesByTopic
+     *  [
+     *      'topic_name1' => [
+     *          'queue_name1',
+     *          'queue_name2',
+     *          // ...
+     *      ],
+     *      // ...
+     *  ]
+     */
+    public function __construct(array $queuesByTopic, array $messageProcessorsByTopicAndQueue)
     {
-        $this->topicsMeta = $topicsMeta;
+        $this->messageProcessorsByTopicAndQueue = $messageProcessorsByTopicAndQueue;
+        $this->queuesByTopic = $queuesByTopic;
     }
 
     /**
-     * @param string $name
+     * @param string $topicName
      *
      * @return TopicMeta
      */
-    public function getTopicMeta($name)
+    public function getTopicMeta(string $topicName): TopicMeta
     {
-        if (false == array_key_exists($name, $this->topicsMeta)) {
-            throw new \InvalidArgumentException(sprintf('The topic meta not found. Requested name `%s`', $name));
-        }
+        $topicName = strtolower($topicName);
 
-        $topic = array_replace([
-            'description' => '',
-            'subscribers' => [],
-        ], $this->topicsMeta[$name]);
-
-        return new TopicMeta($name, $topic['description'], $topic['subscribers']);
+        return new TopicMeta(
+            $topicName,
+            $this->queuesByTopic[$topicName] ?? [Config::DEFAULT_QUEUE_NAME],
+            $this->messageProcessorsByTopicAndQueue[$topicName] ?? []
+        );
     }
 
     /**
-     * @return \Generator|TopicMeta[]
+     * @return iterable<TopicMeta>
      */
-    public function getTopicsMeta()
+    public function getTopicsMeta(): iterable
     {
-        foreach (array_keys($this->topicsMeta) as $name) {
-            yield $this->getTopicMeta($name);
+        foreach (array_keys($this->queuesByTopic) as $topicName) {
+            yield $this->getTopicMeta($topicName);
         }
     }
 }

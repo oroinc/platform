@@ -4,11 +4,10 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class EntityPoolTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|EntityManagerInterface */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var EntityPool */
@@ -22,7 +21,8 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
 
     public function testPersistAndClearWithNoEntities()
     {
-        $this->entityManager->expects(static::never())->method(static::anything());
+        $this->entityManager->expects(self::never())
+            ->method(self::anything());
 
         $this->entityPool->persistAndClear($this->entityManager);
     }
@@ -34,25 +34,29 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
         $this->entityPool->addPersistEntity($fooEntity);
         $this->entityPool->addPersistEntity($barEntity);
 
-        $this->entityManager->expects(static::exactly(2))
+        $this->entityManager->expects(self::exactly(2))
             ->method('persist')
             ->withConsecutive(
-                [static::identicalTo($fooEntity)],
-                [static::identicalTo($barEntity)]
+                [self::identicalTo($fooEntity)],
+                [self::identicalTo($barEntity)]
             );
-        $this->entityManager->expects(static::never())->method('flush');
+        $this->entityManager->expects(self::never())
+            ->method('flush');
 
         $this->entityPool->persistAndClear($this->entityManager);
 
-        $this->entityManager->expects(static::never())->method('persist');
-        $this->entityManager->expects(static::never())->method('flush');
+        $this->entityManager->expects(self::never())
+            ->method('persist');
+        $this->entityManager->expects(self::never())
+            ->method('flush');
 
         $this->entityPool->persistAndClear($this->entityManager);
     }
 
     public function testPersistAndFlushWithNoEntities()
     {
-        $this->entityManager->expects(static::never())->method(static::anything());
+        $this->entityManager->expects(self::never())
+            ->method(self::anything());
 
         $this->entityPool->persistAndFlush($this->entityManager);
     }
@@ -64,18 +68,21 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
         $this->entityPool->addPersistEntity($fooEntity);
         $this->entityPool->addPersistEntity($barEntity);
 
-        $this->entityManager->expects(static::exactly(2))
+        $this->entityManager->expects(self::exactly(2))
             ->method('persist')
             ->withConsecutive(
-                [static::identicalTo($fooEntity)],
-                [static::identicalTo($barEntity)]
+                [self::identicalTo($fooEntity)],
+                [self::identicalTo($barEntity)]
             );
-        $this->entityManager->expects(static::once())->method('flush');
+        $this->entityManager->expects(self::once())
+            ->method('flush');
 
         $this->entityPool->persistAndFlush($this->entityManager);
 
-        $this->entityManager->expects(static::never())->method('persist');
-        $this->entityManager->expects(static::never())->method('flush');
+        $this->entityManager->expects(self::never())
+            ->method('persist');
+        $this->entityManager->expects(self::never())
+            ->method('flush');
 
         $this->entityPool->persistAndFlush($this->entityManager);
     }

@@ -11,16 +11,14 @@ use Oro\Component\Layout\LayoutContext;
 class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $themeManager;
+    private $themeManager;
 
     /** @var ThemePathProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {
-        $this->themeManager = $this->getMockBuilder(ThemeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->themeManager = $this->createMock(ThemeManager::class);
 
         $this->provider = new ThemePathProvider($this->themeManager);
     }
@@ -141,7 +139,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function setUpThemeManager(array $themes)
+    private function setUpThemeManager(array $themes)
     {
         $map = [];
 
@@ -149,7 +147,9 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
             $map[] = [$themeName, $theme];
         }
 
-        $this->themeManager->expects($this->any())->method('getTheme')->willReturnMap($map);
+        $this->themeManager->expects($this->any())
+            ->method('getTheme')
+            ->willReturnMap($map);
     }
 
     /**
@@ -159,12 +159,17 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getThemeMock($directory = null, $parent = null, PageTemplate $pageTemplate = null)
+    private function getThemeMock($directory = null, $parent = null, PageTemplate $pageTemplate = null)
     {
         $theme = $this->createMock(Theme::class);
-        $theme->expects($this->any())->method('getParentTheme')->willReturn($parent);
-        $theme->expects($this->any())->method('getDirectory')->willReturn($directory);
-        $theme->expects($this->any())->method('getPageTemplate')
+        $theme->expects($this->any())
+            ->method('getParentTheme')
+            ->willReturn($parent);
+        $theme->expects($this->any())
+            ->method('getDirectory')
+            ->willReturn($directory);
+        $theme->expects($this->any())
+            ->method('getPageTemplate')
             ->willReturn($pageTemplate);
 
         return $theme;

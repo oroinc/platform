@@ -8,17 +8,12 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
 {
-    const TYPE_NAME = 'custom_type';
+    protected const TYPE_NAME = 'custom_type';
 
-    /**
-     * @var BlockTypeInterface
-     */
+    /** @var BlockTypeInterface */
     protected $type;
 
-    /**
-     * @return array
-     */
-    protected function getOptionsConfig()
+    protected function getOptionsConfig(): array
     {
         return [
             'option' => null,
@@ -78,10 +73,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         $this->assertBlockView($expected, $view, false);
     }
 
-    /**
-     * @return array
-     */
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         $id = '_' . static::TYPE_NAME . '_id';
         $options = [
@@ -166,7 +158,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
     /**
      * @param OptionsConfigTrait $object
      */
-    protected function assertSetOptionException($object)
+    protected function assertSetOptionException($object): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(

@@ -13,11 +13,9 @@ use Oro\Component\MessageQueue\Transport\Queue;
 
 class DbalDriverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
+    private DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
 
-    /** @var DbalDriver */
-    private $driver;
+    private DbalDriver $driver;
 
     /**
      * {@inheritdoc}
@@ -26,7 +24,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
     {
         $this->session = $this->createMock(DbalSessionInterface::class);
 
-        $config = new Config('oro', '', '', '');
+        $config = new Config('oro', '');
         $this->driver = new DbalDriver($this->session, $config);
     }
 
@@ -38,17 +36,17 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
         $queue = new Queue('queue name');
 
         $this->session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createMessage')
             ->willReturn(new DbalMessage());
 
         $producer = $this->createMock(MessageProducerInterface::class);
-        $producer->expects($this->once())
+        $producer->expects(self::once())
             ->method('send')
             ->with($queue, $expectedTransportMessage);
 
         $this->session
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('createProducer')
             ->willReturn($producer);
 
@@ -59,39 +57,33 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
     {
         $queue = new Queue('queue name');
 
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('createQueue')
             ->with('queue name')
             ->willReturn($queue);
 
         $result = $this->driver->createQueue('queue name');
 
-        $this->assertEquals($queue, $result);
+        self::assertEquals($queue, $result);
     }
 
     public function testCreateTransportMessage(): void
     {
         $transportMessage = $this->getTransportMessage('message id', 'message body');
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('createMessage')
             ->willReturn($transportMessage);
 
-        $this->assertEquals($transportMessage, $this->driver->createTransportMessage());
+        self::assertEquals($transportMessage, $this->driver->createTransportMessage());
     }
 
     public function testGetConfig(): void
     {
-        $config = new Config(
-            'prefix',
-            'message processor name',
-            'router queue name',
-            'default queue name',
-            'default topic name'
-        );
+        $config = new Config('prefix', 'default queue name', 'default topic name');
 
         $driver = new DbalDriver($this->session, $config);
 
-        $this->assertEquals($config, $driver->getConfig());
+        self::assertEquals($config, $driver->getConfig());
     }
 
     public function messageDataProvider(): array
@@ -106,7 +98,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
                         'content_type' => 'content type',
                     ],
                     []
-                )
+                ),
             ],
             'message with timestamp' => [
                 'message' => $this->getMessage('message id', 'message body', 3),
@@ -118,7 +110,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
                         'timestamp' => '3',
                     ],
                     []
-                )
+                ),
             ],
             'message with delay' => [
                 'message' => $this->getMessage('message id', 'message body', null, 10),
@@ -131,7 +123,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
                     [
                         'delay' => '10',
                     ]
-                )
+                ),
             ],
             'message with priority' => [
                 'message' => $this->getMessage(
@@ -149,7 +141,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
                         'priority' => '4',
                     ],
                     []
-                )
+                ),
             ],
             'full message' => [
                 'message' => $this->getMessage(
@@ -170,7 +162,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
                     [
                         'delay' => '10',
                     ]
-                )
+                ),
             ],
         ];
     }

@@ -3,10 +3,15 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldsType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\Form\FormView;
 
@@ -14,20 +19,14 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 {
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
-    public function testConfigureOptions($options, $expected)
+    public function testConfigureOptions(array $options, array $expected)
     {
         $resolvedOptions = $this->resolveOptions(EmbedFormFieldsType::NAME, $options);
         $this->assertEquals($expected, $resolvedOptions);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'no options'                     => [
@@ -109,22 +108,22 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
 
         $this->context->set($formName, $formAccessor);
 
-        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($this->context));
+            ->willReturn($this->context);
 
-        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
 
         $type = new EmbedFormFieldsType($formLayoutBuilder);
         $options = new Options($this->resolveOptions(
             $type,
             [
-                'form_name'       => $formName,
+                'form_name' => $formName
             ]
         ));
 
@@ -145,10 +144,10 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: test_form.');
 
-        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($this->context));
+            ->willReturn($this->context);
 
         $type = $this->getBlockType(EmbedFormFieldsType::NAME);
         $options = $this->resolveOptions(
@@ -160,20 +159,20 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testBuildBlockWithInvalidForm()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf(
             'Invalid "context[test_form]" argument type. Expected "%s", "integer" given.',
-            \Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface::class
+            FormAccessorInterface::class
         ));
 
         $formName = 'test_form';
 
         $this->context->set($formName, 123);
 
-        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($this->context));
+            ->willReturn($this->context);
 
         $type = $this->getBlockType(EmbedFormFieldsType::NAME);
         $options = $this->resolveOptions(
@@ -185,11 +184,11 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testBuildView()
     {
-        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
         $type = new EmbedFormFieldsType($formLayoutBuilder);
 
         $view = new BlockView();
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
 
         $type->buildView(
             $view,
@@ -203,19 +202,19 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testFinishView()
     {
-        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
         $type = new EmbedFormFieldsType($formLayoutBuilder);
 
         $formName = 'form';
         $rootView = new BlockView();
         $view = new BlockView($rootView);
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $block = $this->createMock(BlockInterface::class);
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $context = new LayoutContext();
         $formView = new FormView();
         $formAccessor->expects($this->any())
             ->method('getView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $view->vars['form_name'] = $formName;
 
         $formView->children['field1'] = new FormView($formView);
@@ -241,18 +240,16 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $formAccessor->expects($this->once())
             ->method('getProcessedFields')
-            ->will(
-                $this->returnValue(
-                    [
-                        'field1'         => 'block1',
-                        'field2'         => 'block2',
-                        'field3.field31' => 'block3',
-                        'field3.field32' => 'block4'
-                    ]
-                )
+            ->willReturn(
+                [
+                    'field1'         => 'block1',
+                    'field2'         => 'block2',
+                    'field3.field31' => 'block3',
+                    'field3.field32' => 'block4'
+                ]
             );
 
         $type->finishView($view, $block);
@@ -266,17 +263,17 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testFinishViewWhenFormBlockIsRoot()
     {
-        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
         $type = new EmbedFormFieldsType($formLayoutBuilder);
 
         $view = new BlockView();
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $block = $this->createMock(BlockInterface::class);
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $context = new LayoutContext();
         $formView = new FormView();
         $formAccessor->expects($this->any())
             ->method('getView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $view->vars['form_name'] = 'form';
 
         $formView->children['field1'] = new FormView($formView);
@@ -297,18 +294,16 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $formAccessor->expects($this->once())
             ->method('getProcessedFields')
-            ->will(
-                $this->returnValue(
-                    [
-                        'field1'         => 'block1',
-                        'field2'         => 'block2',
-                        'field3.field31' => 'block3',
-                        'field3.field32' => 'block4'
-                    ]
-                )
+            ->willReturn(
+                [
+                    'field1'         => 'block1',
+                    'field2'         => 'block2',
+                    'field3.field31' => 'block3',
+                    'field3.field32' => 'block4'
+                ]
             );
 
         $type->finishView($view, $block);

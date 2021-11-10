@@ -11,7 +11,7 @@ use Oro\Component\Layout\HierarchyCollection;
 class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HierarchyCollection */
-    protected $hierarchyCollection;
+    private $hierarchyCollection;
 
     protected function setUp(): void
     {

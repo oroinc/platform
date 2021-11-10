@@ -19,11 +19,16 @@ class TopicsCommand extends Command
 
     private TopicMetaRegistry $topicMetaRegistry;
 
-    public function __construct(TopicMetaRegistry $topicMetaRegistry)
-    {
+    private TopicDescriptionProvider $topicDescriptionProvider;
+
+    public function __construct(
+        TopicMetaRegistry $topicMetaRegistry,
+        TopicDescriptionProvider $topicDescriptionProvider
+    ) {
         parent::__construct();
 
         $this->topicMetaRegistry = $topicMetaRegistry;
+        $this->topicDescriptionProvider = $topicDescriptionProvider;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -58,7 +63,14 @@ HELP
                 $table->addRow(new TableSeparator());
             }
 
-            $table->addRow([$topic->getName(), $topic->getDescription(), implode(PHP_EOL, $topic->getSubscribers())]);
+            $topicName = $topic->getName();
+            $table->addRow(
+                [
+                    $topicName,
+                    $this->topicDescriptionProvider->getTopicDescription($topicName),
+                    implode(PHP_EOL, $topic->getAllMessageProcessors()),
+                ]
+            );
 
             $count++;
             $firstRow = false;
@@ -68,6 +80,6 @@ HELP
         $output->writeln('');
         $table->render();
 
-        return 0;
+        return self::SUCCESS;
     }
 }

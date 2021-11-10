@@ -19,7 +19,7 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
-    oro_message_queue.consumption.docrine_clear_identity_map_extension:
+    oro_message_queue.consumption.doctrine_clear_identity_map_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
         arguments:
             - '@service_container'
@@ -114,6 +114,7 @@ services:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
             - '@oro_message_queue.log.consumer_state'
+            - '@oro_message_queue.client.message_processor_registry'
 
     oro_message_queue.listener.update_schema:
         class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
@@ -170,13 +171,6 @@ services:
             - 'oro_message_queue.message_queue_heartbeat'
         tags:
             - { name: gos_web_socket.topic }
-
-    oro_message_queue.processor_locator:
-        class: Symfony\Component\DependencyInjection\ServiceLocator
-        arguments:
-            - [] # processors. Will be set in Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass
-        tags:
-            - { name: container.service_locator }
 
     oro_message_queue.cache.doctrine_metadata:
         parent: oro.cache.abstract.without_memory_cache

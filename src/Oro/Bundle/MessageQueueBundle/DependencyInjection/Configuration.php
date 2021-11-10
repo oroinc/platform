@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\TransportFactoryInterface;
+use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -13,14 +14,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /** @var TransportFactoryInterface[] */
-    private $factories;
+    private array $factories;
+
+    private string $environment;
 
     /**
      * @param TransportFactoryInterface[] $factories
      */
-    public function __construct(array $factories)
+    public function __construct(array $factories, string $environment)
     {
         $this->factories = $factories;
+        $this->environment = $environment;
     }
 
     /**
@@ -127,13 +131,6 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('prefix')
                         ->defaultValue('oro')
                     ->end()
-                    ->scalarNode('router_processor')
-                        ->defaultValue('oro_message_queue.client.route_message_processor')
-                    ->end()
-                    ->scalarNode('router_destination')
-                        ->defaultValue('default')
-                        ->cannotBeEmpty()
-                    ->end()
                     ->scalarNode('default_destination')
                         ->defaultValue('default')
                         ->cannotBeEmpty()
@@ -163,6 +160,22 @@ class Configuration implements ConfigurationInterface
                                 )
                             ->end()
                         ->end()
+                    ->end()
+                    ->enumNode('noop_status')
+                        ->info('Status that must be set for messages not claimed by any message processor.')
+                        ->defaultValue(
+                            $this->environment === 'prod'
+                                ? NoopMessageProcessor::REQUEUE
+                                : NoopMessageProcessor::THROW_EXCEPTION
+                        )
+                        ->values(
+                            [
+                                NoopMessageProcessor::ACK,
+                                NoopMessageProcessor::REJECT,
+                                NoopMessageProcessor::REQUEUE,
+                                NoopMessageProcessor::THROW_EXCEPTION
+                            ]
+                        )
                     ->end()
                 ->end()
             ->end();

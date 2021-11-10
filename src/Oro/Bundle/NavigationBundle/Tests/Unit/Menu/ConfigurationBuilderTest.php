@@ -13,9 +13,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationBuilder */
-    private $configurationBuilder;
-
     /** @var MenuFactory */
     private $factory;
 
@@ -28,22 +25,22 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationProvider;
 
+    /** @var ConfigurationBuilder */
+    private $configurationBuilder;
+
     protected function setUp(): void
     {
-        $resolver = new SystemAwareResolver();
-
+        $this->factory = new MenuFactory();
         $this->menuFactory = $this->createMock(FactoryInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $this->configurationBuilder = new ConfigurationBuilder(
-            $resolver,
+            new SystemAwareResolver(),
             $this->menuFactory,
             $this->eventDispatcher,
             $this->configurationProvider
         );
-
-        $this->factory = new MenuFactory();
     }
 
     /**

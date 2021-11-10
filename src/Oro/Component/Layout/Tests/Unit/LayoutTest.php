@@ -11,9 +11,11 @@ use Symfony\Component\Templating\TemplateReference;
 
 class LayoutTest extends LayoutTestCase
 {
-    protected LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject $renderer;
+    /** @var LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $renderer;
 
-    protected LayoutRendererRegistry $rendererRegistry;
+    /** @var LayoutRendererRegistry */
+    private $rendererRegistry;
 
     protected function setUp(): void
     {

@@ -9,36 +9,24 @@ use Oro\Bundle\LayoutBundle\Exception\InvalidLayoutCacheMetadataException;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class CacheMetadataProviderTest extends TestCase
+class CacheMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CacheMetadataProvider
-     */
-    private $cacheMetadataProvider;
-
-    /**
-     * @var CacheMetadataProviderInterface|MockObject
-     */
+    /** @var CacheMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultProvider;
 
-    /**
-     * @var CacheMetadataProviderInterface[]|MockObject[]
-     */
+    /** @var CacheMetadataProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $providers;
 
-    /**
-     * @var ContextInterface|MockObject
-     */
+    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    /**
-     * @var MockObject|LoggerInterface
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
+
+    /** @var CacheMetadataProvider */
+    private $cacheMetadataProvider;
 
     protected function setUp(): void
     {
@@ -46,20 +34,20 @@ class CacheMetadataProviderTest extends TestCase
         $provider1 = $this->createMock(CacheMetadataProviderInterface::class);
         $provider2 = $this->createMock(CacheMetadataProviderInterface::class);
         $this->providers = [$provider1, $provider2];
-        $contextHolder = $this->createMock(LayoutContextHolder::class);
         $this->context = $this->createMock(ContextInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $contextHolder = $this->createMock(LayoutContextHolder::class);
         $contextHolder->expects($this->any())
             ->method('getContext')
             ->willReturn($this->context);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $debug = false;
 
         $this->cacheMetadataProvider = new CacheMetadataProvider(
             $this->defaultProvider,
             $this->providers,
             $contextHolder,
             $this->logger,
-            $debug
+            false
         );
     }
 
@@ -104,7 +92,6 @@ class CacheMetadataProviderTest extends TestCase
         $blockView->vars['id'] = 'blockID';
         $blockView->vars['cache_key'] = 'cache key';
 
-        $metadata = new LayoutCacheMetadata();
         $exception = new InvalidLayoutCacheMetadataException('error message');
         $this->defaultProvider->expects($this->once())
             ->method('getCacheMetadata')

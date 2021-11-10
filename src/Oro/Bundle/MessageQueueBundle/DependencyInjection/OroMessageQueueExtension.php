@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroMessageQueueExtension extends Extension
 {
     /** @var TransportFactoryInterface[] */
-    private $factories = [];
+    private array $factories = [];
 
     public function addTransportFactory(TransportFactoryInterface $transportFactory)
     {
@@ -32,7 +32,8 @@ class OroMessageQueueExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $config = $this->processConfiguration(new Configuration($this->factories), $configs);
+        $environment = $container->getParameter('kernel.environment');
+        $config = $this->processConfiguration(new Configuration($this->factories, $environment), $configs);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -55,8 +56,6 @@ class OroMessageQueueExtension extends Extension
             $configDef = $container->getDefinition('oro_message_queue.client.config');
             $configDef->setArguments([
                 $config['client']['prefix'],
-                $config['client']['router_processor'],
-                $config['client']['router_destination'],
                 $config['client']['default_destination'],
                 $config['client']['default_topic'],
             ]);
@@ -67,6 +66,8 @@ class OroMessageQueueExtension extends Extension
                     ->setDecoratedService('oro_message_queue.client.message_producer')
                     ->addArgument(new Reference($producerId . '.inner'));
             }
+
+            $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);
         }
 
         if (isset($config['consumer'])) {
@@ -74,6 +75,7 @@ class OroMessageQueueExtension extends Extension
                 'oro_message_queue.consumer_heartbeat_update_period',
                 $config['consumer']['heartbeat_update_period']
             );
+            $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);
         }
 
         $this->createTransport($config, $container);
@@ -82,7 +84,7 @@ class OroMessageQueueExtension extends Extension
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
         $this->setJobConfigurationProvider($config, $container);
 
-        if ('test' === $container->getParameter('kernel.environment')) {
+        if ('test' === $environment) {
             $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
@@ -99,7 +101,7 @@ class OroMessageQueueExtension extends Extension
 
         $container->addResource(new FileResource($rc->getFileName()));
 
-        return new Configuration($this->factories);
+        return new Configuration($this->factories, $container->getParameter('kernel.environment'));
     }
 
     private function createTransport(array $config, ContainerBuilder $container)

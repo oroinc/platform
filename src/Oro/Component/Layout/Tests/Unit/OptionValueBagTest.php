@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Tests;
+namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\OptionValueBag;
 
@@ -64,11 +64,7 @@ class OptionValueBagTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $actions
-     * @return OptionValueBag
-     */
-    protected function createOptionValueBag(array $actions)
+    private function createOptionValueBag(array $actions): OptionValueBag
     {
         $bag = new OptionValueBag();
         foreach ($actions as $action) {

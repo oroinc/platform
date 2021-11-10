@@ -12,12 +12,13 @@ use Oro\Component\Layout\LayoutContext;
 class RtlModeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private ThemeManager $themeManager;
+    private $themeManager;
 
     /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private LocalizationProviderInterface $localizationProvider;
+    private $localizationProvider;
 
-    private RtlModeContextConfigurator $contextConfigurator;
+    /** @var RtlModeContextConfigurator */
+    private $contextConfigurator;
 
     protected function setUp(): void
     {

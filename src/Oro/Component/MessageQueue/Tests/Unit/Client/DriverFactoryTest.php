@@ -13,7 +13,7 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate(): void
     {
-        $config = new Config('', '', '', '');
+        $config = new Config('', '');
 
         /** @var Connection|\PHPUnit\Framework\MockObject\MockObject $doctrineConnection */
         $doctrineConnection = $this->createMock(Connection::class);
@@ -35,6 +35,6 @@ class DriverFactoryTest extends \PHPUnit\Framework\TestCase
 
         /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection */
         $connection = $this->createMock(ConnectionInterface::class);
-        $factory->create($connection, new Config('', '', '', ''));
+        $factory->create($connection, new Config('', ''));
     }
 }

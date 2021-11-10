@@ -6,10 +6,7 @@ use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 
 class SpoolItemTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SpoolItem
-     */
-    protected $entity;
+    private SpoolItem $entity;
 
     protected function setUp(): void
     {
@@ -17,11 +14,6 @@ class SpoolItemTest extends \PHPUnit\Framework\TestCase
 
         // get id should return null cause this entity was not loaded from DB
         $this->assertNull($this->entity->getId());
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->entity);
     }
 
     public function testSetterGetterStatus()
@@ -37,7 +29,7 @@ class SpoolItemTest extends \PHPUnit\Framework\TestCase
         // empty from construct
         $this->assertNull($this->entity->getMessage());
 
-        $message = $this->createMock('Swift_Mime_SimpleMessage');
+        $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
 
         $this->entity->setMessage($message);
         $this->assertEquals($message, $this->entity->getMessage());

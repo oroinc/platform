@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeContextConfigurator */
-    protected $contextConfigurator;
-
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
+
+    /** @var ThemeContextConfigurator */
+    private $contextConfigurator;
 
     protected function setUp(): void
     {

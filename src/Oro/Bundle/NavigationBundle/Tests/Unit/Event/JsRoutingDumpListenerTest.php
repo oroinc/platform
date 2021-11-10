@@ -33,12 +33,10 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
         $this->assetVersionManager->expects($this->never())
             ->method($this->anything());
 
-        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->never())
             ->method($this->anything());
 
-        /** @var InputDefinition|\PHPUnit\Framework\MockObject\MockObject $inputDefinition */
         $inputDefinition = $this->createMock(InputDefinition::class);
         $inputDefinition->expects($this->never())
             ->method($this->anything());
@@ -52,7 +50,6 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
             ->method('updateAssetVersion')
             ->with('routing');
 
-        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
@@ -68,23 +65,19 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
             ->method('setDefault')
             ->with(implode(DIRECTORY_SEPARATOR, [self::PROJECT_DIR, 'public', 'media', 'js', 'prefix_routes.json']));
 
-        /** @var InputDefinition|\PHPUnit\Framework\MockObject\MockObject $inputDefinition */
         $inputDefinition = $this->createMock(InputDefinition::class);
         $inputDefinition->expects($this->any())
             ->method('getOption')
-            ->willReturnMap(
-                [
-                    ['format', $formatOption],
-                    ['target', $targetOption],
-                ]
-            );
+            ->willReturnMap([
+                ['format', $formatOption],
+                ['target', $targetOption],
+            ]);
 
         $this->listener->onConsoleCommand($this->getEvent('fos:js-routing:dump', $input, $inputDefinition));
     }
 
     private function getEvent(string $commandName, InputInterface $input, InputDefinition $def): ConsoleCommandEvent
     {
-        /** @var Command|\PHPUnit\Framework\MockObject\MockObject $command */
         $command = $this->createMock(Command::class);
         $command->expects($this->once())
             ->method('getName')
@@ -93,7 +86,6 @@ class JsRoutingDumpListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition')
             ->willReturn($def);
 
-        /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject $output */
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->never())
             ->method($this->anything());

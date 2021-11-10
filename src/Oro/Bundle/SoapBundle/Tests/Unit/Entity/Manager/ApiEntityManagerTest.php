@@ -84,7 +84,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $objectManager->expects($this->once())
             ->method('getRepository')
-            ->with($this->equalTo($className))
+            ->with($className)
             ->willReturn($repository);
 
         $queryBuilder->expects($this->once())
@@ -126,12 +126,12 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $objectManager->expects($this->once())
             ->method('getRepository')
-            ->with($this->equalTo($className))
+            ->with($className)
             ->willReturn($repository);
 
         $queryBuilder->expects($this->once())
             ->method('addCriteria')
-            ->with($this->equalTo($criteria));
+            ->with($criteria);
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
 

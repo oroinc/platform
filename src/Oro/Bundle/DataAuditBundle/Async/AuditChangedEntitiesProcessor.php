@@ -96,6 +96,7 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
             $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $nextMessage);
         }
         $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $nextMessage);
+        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS, $nextMessage);
 
         return self::ACK;
     }

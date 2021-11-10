@@ -29,9 +29,6 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     private $blockViewCache;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
@@ -138,8 +135,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
             ->setAppRootDir($appRootDir);
 
         $this->loader->expects($this->never())
-            ->method('getUpdateFileNamePatterns')
-            ->willReturn(['/\.yml$/']);
+            ->method('getUpdateFileNamePatterns');
 
         $this->lastModificationDateProvider->expects($this->never())
             ->method('updateLastModificationDate');

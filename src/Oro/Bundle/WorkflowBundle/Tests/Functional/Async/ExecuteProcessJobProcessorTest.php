@@ -18,32 +18,31 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
      */
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([
             LoadProcessDefinitions::class,
         ]);
     }
 
-    public function testProcessJobWithEntityManagerCleanup()
+    public function testProcessJobWithEntityManagerCleanup(): void
     {
         /** @var UserManager $userManager */
-        $userManager = $this->getContainer()->get('oro_user.manager');
+        $userManager = self::getContainer()->get('oro_user.manager');
 
         /** @var User $user */
         $user = $userManager->findUserByUsername('admin');
         $user->setFirstName('New First Name');
         $userManager->updateUser($user);
 
-        $messageProcessor = $this->getContainer()->get('oro_message_queue.client.delegate_message_processor');
-        $consumer = $this->getContainer()->get('oro_message_queue.consumption.queue_consumer');
+        $consumer = self::getContainer()->get('oro_message_queue.consumption.queue_consumer');
         $logger = new TestLogger();
 
-        $consumer->bind('oro.default', $messageProcessor);
+        $consumer->bind('oro.default');
         $consumer->consume(new ChainExtension([
             new LimitConsumptionTimeExtension(new \DateTime('+5 seconds')),
             new LoggerExtension($logger)
         ]));
 
-        $this->assertFalse($logger->hasErrorRecords());
+        self::assertFalse($logger->hasErrorRecords());
     }
 }

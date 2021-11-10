@@ -16,7 +16,7 @@ use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -24,19 +24,17 @@ use Psr\Log\LoggerInterface;
  */
 class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     private const USER_ID = 24;
 
     public function testShouldConstructWithRequiredArguments()
     {
         new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
-            $this->createLoggerMock(),
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(TemplateEmailMessageSender::class)
         );
     }
 
@@ -51,213 +49,187 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectIfBodyEmpty()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid message');
 
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $sender = From::emailAddress('from@email.com');
         $message = new Message();
-        $message->setBody(
-            json_encode(
-                [
-                    'toEmail' => 'to@email.com',
-                    'sender'  => $sender->toArray(),
-                ]
-            )
+        $message->setBody(JSON::encode([
+            'toEmail' => 'to@email.com',
+            'sender'  => $sender->toArray(),
+        ]));
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectIfSenderNotSet()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid message');
 
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $message = new Message();
-        $message->setBody(
-            json_encode(
-                [
-                    'body'    => 'body',
-                    'toEmail' => 'to@email.com',
-                ]
-            )
+        $message->setBody(JSON::encode([
+            'body'    => 'body',
+            'toEmail' => 'to@email.com',
+        ]));
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectIfRecepientNotSet()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid message');
 
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $sender = From::emailAddress('from@email.com');
         $message = new Message();
-        $message->setBody(
-            json_encode(
-                [
-                    'body'   => 'body',
-                    'sender' => $sender->toArray(),
-                ]
-            )
+        $message->setBody(JSON::encode([
+            'body'   => 'body',
+            'sender' => $sender->toArray(),
+        ]));
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectIfTemplatePassedButBodyIsNotArray()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid message');
 
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $message = new Message();
         $sender = From::emailAddress('from@email.com');
-        $message->setBody(
-            json_encode(
-                [
-                    'sender'   => $sender->toArray(),
-                    'toEmail'  => 'to@email.com',
-                    'template' => 'template_name',
-                ]
-            )
+        $message->setBody(JSON::encode([
+            'sender'   => $sender->toArray(),
+            'toEmail'  => 'to@email.com',
+            'template' => 'template_name',
+        ]));
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectIfSendingFailed()
     {
-        $mailer = $this->createMailerMock();
-        $mailer
-            ->expects($this->once())
+        $mailer = $this->createMock(DirectMailer::class);
+        $mailer->expects($this->once())
             ->method('send')
             ->willReturn(0);
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('error')
             ->with('Cannot send message');
 
         $processor = new SendEmailMessageProcessor(
             $mailer,
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $message = new Message();
         $sender = From::emailAddress('from@email.com');
-        $message->setBody(
-            json_encode(
-                [
-                    'body'    => 'Message body',
-                    'toEmail' => 'to@email.com',
-                    'sender'  => $sender->toArray(),
-                ]
-            )
+        $message->setBody(JSON::encode([
+            'body'    => 'Message body',
+            'toEmail' => 'to@email.com',
+            'sender'  => $sender->toArray(),
+        ]));
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldSendEmailAndReturmACKIfAllParametersCorrect()
+    public function testShouldSendEmailAndReturnAckIfAllParametersCorrect()
     {
-        $mailer = $this->createMailerMock();
-        $mailer
-            ->expects($this->once())
+        $mailer = $this->createMock(DirectMailer::class);
+        $mailer->expects($this->once())
             ->method('send')
             ->willReturn(1);
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
             ->method('critical');
 
         $processor = new SendEmailMessageProcessor(
             $mailer,
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $message = new Message();
         $sender = From::emailAddress('from@email.com');
-        $message->setBody(
-            json_encode(
-                [
-                    'body'    => 'Message body',
-                    'toEmail' => 'to@email.com',
-                    'sender'  => $sender->toArray(),
-                ]
-            )
+        $message->setBody(JSON::encode([
+            'body'    => 'Message body',
+            'toEmail' => 'to@email.com',
+            'sender'  => $sender->toArray(),
+        ]));
+
+        self::assertEquals(
+            MessageProcessorInterface::ACK,
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     public function testShouldRenderCorrectEmailTemplate()
@@ -265,121 +237,105 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $emailTemplate = $this->createMock(EmailTemplate::class);
 
         $repository = $this->createMock(EmailTemplateRepository::class);
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('findByName')
-            ->with($this->equalTo('template_name'))
+            ->with('template_name')
             ->willReturn($emailTemplate);
 
         $manager = $this->createMock(EntityManager::class);
-        $manager
-            ->expects($this->once())
+        $manager->expects($this->once())
             ->method('getRepository')
-            ->with($this->equalTo(EmailTemplate::class))
+            ->with(EmailTemplate::class)
             ->willReturn($repository);
 
-        $managerRegistry = $this->createManagerRegistryMock();
-        $managerRegistry
-            ->expects($this->once())
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->once())
             ->method('getManagerForClass')
-            ->with($this->equalTo(EmailTemplate::class))
+            ->with(EmailTemplate::class)
             ->willReturn($manager);
 
-        $emailRenderer = $this->createEmailRendererMock();
-        $emailRenderer
-            ->expects($this->once())
+        $emailRenderer = $this->createMock(EmailRenderer::class);
+        $emailRenderer->expects($this->once())
             ->method('compileMessage')
-            ->with($this->isInstanceOf(EmailTemplate::class), $this->equalTo(['body_parameter' => 'value']))
+            ->with($this->isInstanceOf(EmailTemplate::class), ['body_parameter' => 'value'])
             ->willReturn(['email subject', 'email body']);
 
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
             $managerRegistry,
             $emailRenderer,
-            $this->createLoggerMock(),
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $message = new Message();
         $sender = From::emailAddress('from@email.com');
-        $message->setBody(
-            json_encode(
-                [
-                    'toEmail'  => 'to@email.com',
-                    'sender'   => $sender->toArray(),
-                    'template' => 'template_name',
-                    'body'     => ['body_parameter' => 'value'],
-                ]
-            )
-        );
+        $message->setBody(JSON::encode([
+            'toEmail'  => 'to@email.com',
+            'sender'   => $sender->toArray(),
+            'template' => 'template_name',
+            'body'     => ['body_parameter' => 'value'],
+        ]));
 
-        $processor->process($message, $this->createSessionMock());
+        $processor->process($message, $this->createMock(SessionInterface::class));
     }
 
     public function testShouldThrowExceptionIfTemplateNotFound()
     {
         $this->expectException(\RuntimeException::class);
         $repository = $this->createMock(EmailTemplateRepository::class);
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('findByName')
-            ->with($this->equalTo('template_name'))
+            ->with('template_name')
             ->willReturn(null);
 
         $manager = $this->createMock(EntityManager::class);
-        $manager
-            ->expects($this->once())
+        $manager->expects($this->once())
             ->method('getRepository')
-            ->with($this->equalTo(EmailTemplate::class))
+            ->with(EmailTemplate::class)
             ->willReturn($repository);
 
-        $managerRegistry = $this->createManagerRegistryMock();
-        $managerRegistry
-            ->expects($this->once())
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->once())
             ->method('getManagerForClass')
-            ->with($this->equalTo(EmailTemplate::class))
+            ->with(EmailTemplate::class)
             ->willReturn($manager);
 
-        $emailRenderer = $this->createEmailRendererMock();
-        $emailRenderer
-            ->expects($this->never())
+        $emailRenderer = $this->createMock(EmailRenderer::class);
+        $emailRenderer->expects($this->never())
             ->method('compileMessage');
 
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
             $managerRegistry,
             $emailRenderer,
-            $this->createLoggerMock(),
-            $this->createTemplateEmailMessageSenderMock()
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(TemplateEmailMessageSender::class)
         );
 
         $message = new Message();
         $sender = From::emailAddress('from@email.com');
-        $message->setBody(
-            json_encode(
-                [
-                    'toEmail'  => 'to@email.com',
-                    'sender'   => $sender->toArray(),
-                    'template' => 'template_name',
-                    'body'     => ['body_parameter' => 'value'],
-                ]
-            )
-        );
+        $message->setBody(JSON::encode([
+            'toEmail'  => 'to@email.com',
+            'sender'   => $sender->toArray(),
+            'template' => 'template_name',
+            'body'     => ['body_parameter' => 'value'],
+        ]));
 
-        $processor->process($message, $this->createSessionMock());
+        $processor->process($message, $this->createMock(SessionInterface::class));
     }
 
     public function testProcessWhenMessageIsTranslatableAndMessageSent()
     {
-        $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
+        $templateEmailMessageSender = $this->createMock(TemplateEmailMessageSender::class);
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
-            $this->createLoggerMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
+            $this->createMock(LoggerInterface::class),
             $templateEmailMessageSender
         );
 
@@ -393,33 +349,30 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $message = new Message();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody(JSON::encode($messageBody));
 
-        $templateEmailMessageSender
-            ->expects($this->any())
+        $templateEmailMessageSender->expects($this->any())
             ->method('isTranslatable')
             ->with(
-                $this->callback(
-                    function ($message) use ($messageBody) {
-                        return $message == array_replace_recursive($message, $messageBody);
-                    }
-                )
+                $this->callback(function ($message) use ($messageBody) {
+                    return $message == array_replace_recursive($message, $messageBody);
+                })
             )
             ->willReturn(true);
 
-        $templateEmailMessageSender
-            ->expects($this->any())
+        $templateEmailMessageSender->expects($this->any())
             ->method('sendTranslatedMessage')
             ->with(
-                $this->callback(
-                    function ($message) use ($messageBody) {
-                        return $message == array_replace_recursive($message, $messageBody);
-                    }
-                )
+                $this->callback(function ($message) use ($messageBody) {
+                    return $message == array_replace_recursive($message, $messageBody);
+                })
             )
             ->willReturn(1);
 
-        self::assertEquals(MessageProcessorInterface::ACK, $processor->process($message, $this->createSessionMock()));
+        self::assertEquals(
+            MessageProcessorInterface::ACK,
+            $processor->process($message, $this->createMock(SessionInterface::class))
+        );
     }
 
     public function testProcessWhenMessageIsTranslatableAndMessageNotSent()
@@ -433,113 +386,48 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'userId'   => self::USER_ID,
         ];
         $message = new Message();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody(JSON::encode($messageBody));
 
-        $logger = $this->createLoggerMock();
-        $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
+        $logger = $this->createMock(LoggerInterface::class);
+        $templateEmailMessageSender = $this->createMock(TemplateEmailMessageSender::class);
         $processor = new SendEmailMessageProcessor(
-            $this->createMailerMock(),
-            $this->createEmailProcessorMock(),
-            $this->createManagerRegistryMock(),
-            $this->createEmailRendererMock(),
+            $this->createMock(DirectMailer::class),
+            $this->createMock(Processor::class),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(EmailRenderer::class),
             $logger,
             $templateEmailMessageSender
         );
 
-        $templateEmailMessageSender
-            ->expects($this->once())
+        $templateEmailMessageSender->expects($this->once())
             ->method('isTranslatable')
             ->with(
-                $this->callback(
-                    function ($message) use ($messageBody) {
-                        return $message == array_replace_recursive($message, $messageBody);
-                    }
-                )
+                $this->callback(function ($message) use ($messageBody) {
+                    return $message == array_replace_recursive($message, $messageBody);
+                })
             )
             ->willReturn(true);
 
-        $templateEmailMessageSender
-            ->expects($this->any())
+        $templateEmailMessageSender->expects($this->any())
             ->method('sendTranslatedMessage')
             ->with(
-                $this->callback(
-                    function ($message) use ($messageBody) {
-                        return $message == array_replace_recursive($message, $messageBody);
-                    }
-                )
+                $this->callback(function ($message) use ($messageBody) {
+                    return $message == array_replace_recursive($message, $messageBody);
+                })
             )
-            ->willReturnCallback(
-                function ($message, &$failedRecipients) {
-                    $failedRecipients = ['to@email.com'];
+            ->willReturnCallback(function ($message, &$failedRecipients) {
+                $failedRecipients = ['to@email.com'];
 
-                    return 0;
-                }
-            );
+                return 0;
+            });
 
-        $logger
-            ->expects($this->once())
+        $logger->expects($this->once())
             ->method('error')
             ->with("Cannot send message to the following recipients: Array\n(\n    [0] => to@email.com\n)\n");
 
         self::assertEquals(
             MessageProcessorInterface::REJECT,
-            $processor->process($message, $this->createSessionMock())
+            $processor->process($message, $this->createMock(SessionInterface::class))
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | DirectMailer
-     */
-    private function createMailerMock()
-    {
-        return $this->createMock(DirectMailer::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | TemplateEmailMessageSender
-     */
-    private function createTemplateEmailMessageSenderMock()
-    {
-        return $this->createMock(TemplateEmailMessageSender::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | Processor
-     */
-    private function createEmailProcessorMock()
-    {
-        return $this->createMock(Processor::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    private function createManagerRegistryMock()
-    {
-        return $this->createMock(ManagerRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EmailRenderer
-     */
-    private function createEmailRendererMock()
-    {
-        return $this->createMock(EmailRenderer::class);
     }
 }

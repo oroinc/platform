@@ -9,10 +9,8 @@ use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 
 class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
 {
-    /**
-     * @var ConfigurableTypeExtension
-     */
-    protected $extension;
+    /** @var ConfigurableTypeExtension */
+    private $extension;
 
     /**
      * {@inheritdoc}
@@ -21,7 +19,7 @@ class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
-        $this->type = new CustomType(ConfigurableBlockTestCase::TYPE_NAME);
+        $this->type = new CustomType(self::TYPE_NAME);
         $this->extension = new ConfigurableTypeExtension();
         $this->extension->setExtendedType($this->type->getName())
             ->setOptionsConfig($this->getOptionsConfig());
@@ -39,7 +37,7 @@ class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
 
     public function testGetName()
     {
-        $this->assertEquals(ConfigurableBlockTestCase::TYPE_NAME, $this->extension->getExtendedType());
+        $this->assertEquals(self::TYPE_NAME, $this->extension->getExtendedType());
     }
 
     public function testSetNameExceptionType()

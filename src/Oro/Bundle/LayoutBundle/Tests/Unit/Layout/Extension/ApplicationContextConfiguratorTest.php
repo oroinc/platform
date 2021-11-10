@@ -4,24 +4,21 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $kernel;
+    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $kernel;
 
     /** @var ApplicationContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-        $this->contextConfigurator = new ApplicationContextConfigurator($this->kernel);
-    }
+        $this->kernel = $this->createMock(KernelInterface::class);
 
-    protected function tearDown(): void
-    {
-        unset($this->contextConfigurator, $this->kernel);
+        $this->contextConfigurator = new ApplicationContextConfigurator($this->kernel);
     }
 
     public function testConfigureContext()

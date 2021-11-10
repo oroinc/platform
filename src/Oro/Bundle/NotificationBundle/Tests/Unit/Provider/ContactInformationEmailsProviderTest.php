@@ -10,14 +10,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContactInformationEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
-
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
+
+    /** @var ContactInformationEmailsProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -28,13 +28,6 @@ class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
             $this->configManager,
             $this->translator
         );
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->provider);
-        unset($this->configManager);
-        unset($this->translator);
     }
 
     public function testGetRecipients()

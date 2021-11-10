@@ -2,99 +2,49 @@
 
 namespace Oro\Component\MessageQueue\Client;
 
+/**
+ * Contains basic configuration data for message consuming.
+ */
 class Config
 {
-    const PARAMETER_TOPIC_NAME = 'oro.message_queue.client.topic_name';
-    const PARAMETER_PROCESSOR_NAME = 'oro.message_queue.client.processor_name';
-    const PARAMETER_QUEUE_NAME = 'oro.message_queue.client.queue_name';
-    const DEFAULT_QUEUE_NAME = 'default';
-    const DEFAULT_TOPIC_NAME = 'default';
+    public const PARAMETER_TOPIC_NAME = 'oro.message_queue.client.topic_name';
+    public const PARAMETER_QUEUE_NAME = 'oro.message_queue.client.queue_name';
+    public const DEFAULT_QUEUE_NAME = 'default';
+    public const DEFAULT_TOPIC_NAME = 'default';
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $transportPrefix;
 
-    /**
-     * @var string
-     */
-    private $defaultQueueName;
+    private string $defaultQueueName;
 
-    /**
-     * @var string
-     */
-    private $routerMessageProcessorName;
+    private string $defaultTopicName;
 
-    /**
-     * @var string
-     */
-    private $routerQueueName;
-
-    /**
-     * @var string
-     */
-    private $defaultTopicName;
-
-    /**
-     * @param string $prefix
-     * @param string $routerMessageProcessorName
-     * @param string $routerQueueName
-     * @param string $defaultQueueName
-     * @param string $defaultTopicName
-     */
     public function __construct(
-        $prefix,
-        $routerMessageProcessorName,
-        $routerQueueName,
-        $defaultQueueName,
-        $defaultTopicName = self::DEFAULT_TOPIC_NAME
+        string $transportPrefix,
+        string $defaultQueueName,
+        string $defaultTopicName = self::DEFAULT_TOPIC_NAME
     ) {
-        $this->prefix = $prefix;
-        $this->routerMessageProcessorName = $routerMessageProcessorName;
-        $this->routerQueueName = $routerQueueName;
+        $this->transportPrefix = $transportPrefix;
         $this->defaultQueueName = $defaultQueueName;
         $this->defaultTopicName = $defaultTopicName;
     }
 
-    /**
-     * @return string
-     */
-    public function getRouterMessageProcessorName()
+    public function getDefaultQueueName(): string
     {
-        return $this->routerMessageProcessorName;
+        return $this->addTransportPrefix($this->defaultQueueName);
     }
 
-    /**
-     * @return string
-     */
-    public function getRouterQueueName()
+    public function getDefaultTopicName(): string
     {
-        return $this->formatName($this->routerQueueName);
+        return $this->addTransportPrefix($this->defaultTopicName);
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultQueueName()
+    public function addTransportPrefix(string $name): string
     {
-        return $this->formatName($this->defaultQueueName);
+        return strtolower(trim(trim($this->transportPrefix) . '.' . trim($name), '.'));
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultTopicName()
+    public function removeTransportPrefix(string $name): string
     {
-        return $this->formatName($this->defaultTopicName);
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public function formatName($name)
-    {
-        return trim(strtolower(trim($this->prefix) . '.' . trim($name)), '.');
+        return strtolower(str_ireplace(trim($this->transportPrefix) . '.', '', trim($name)));
     }
 }

@@ -10,9 +10,6 @@ use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
 class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BreadcrumbManager */
-    private $manager;
-
     /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
     private $matcher;
 
@@ -21,6 +18,9 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 
     /** @var MenuFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $factory;
+
+    /** @var BreadcrumbManager */
+    private $manager;
 
     protected function setUp(): void
     {

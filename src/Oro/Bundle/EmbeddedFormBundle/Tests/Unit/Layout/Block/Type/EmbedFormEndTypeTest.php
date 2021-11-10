@@ -3,8 +3,10 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormEndType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormView;
 
 class EmbedFormEndTypeTest extends BlockTypeTestCase
@@ -20,11 +22,11 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
         $formName = 'test_form';
         $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -50,10 +52,10 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
 
     public function testGetBlockViewViewWithInvalidForm()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf(
             'Invalid "context[test_form]" argument type. Expected "%s", "integer" given.',
-            \Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface::class
+            FormAccessorInterface::class
         ));
 
         $formName = 'test_form';

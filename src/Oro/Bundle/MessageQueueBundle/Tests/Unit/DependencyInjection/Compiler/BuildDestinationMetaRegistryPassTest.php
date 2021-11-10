@@ -5,155 +5,113 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildDestinationMetaRegistryPass;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\DestinationNameTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
-use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
 use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class BuildDestinationMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
 {
+    private const REGISTRY_ID = 'oro_message_queue.client.meta.destination_meta_registry';
+
     private BuildDestinationMetaRegistryPass $compiler;
+
+    private ContainerBuilder $container;
+
+    private Definition $registryDefinition;
 
     protected function setUp(): void
     {
         $this->compiler = new BuildDestinationMetaRegistryPass();
+
+        $this->container = new ContainerBuilder();
+        $this->registryDefinition = $this->container->register(self::REGISTRY_ID);
     }
 
-    public function testShouldDoNothingIfRegistryServicesNotSetToContainer()
+    public function testWhenRegistryIsNotDefined(): void
     {
         $container = new ContainerBuilder();
 
-        $container->register('processor_id')
-            ->addTag('oro_message_queue.client.message_processor', ['processorName' => 'processor']);
+        $container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
+            ->addTag('oro_message_queue.client.message_processor', []);
 
         $this->compiler->process($container);
     }
 
-    public function testShouldBuildDestinationMetaRegistry()
+    public function testProcessWhenTopicIsNotSet(): void
     {
-        $container = new ContainerBuilder();
-        $registryDef = $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
-
-        $container->register('processor_id')
-            ->addTag('oro_message_queue.client.message_processor', ['processorName' => 'processor']);
-
-        $this->compiler->process($container);
-
-        $this->assertEquals(
-            [
-                Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['processor']]
-            ],
-            $registryDef->getArgument(1)
-        );
-    }
-
-    public function testShouldSetServiceIdAdProcessorIdIfIsNotSetInTag()
-    {
-        $container = new ContainerBuilder();
-        $registryDef = $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
-
-        $container->register('processor_id')
+        $this->container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
             ->addTag('oro_message_queue.client.message_processor');
 
-        $this->compiler->process($container);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Attribute "topicName" of tag "oro_message_queue.client.message_processor" '
+            . 'was expected to be set on service "processor_id"'
+        );
 
-        $this->assertEquals(
+        $this->compiler->process($this->container);
+    }
+
+    public function testProcessWhenTopicIsSet(): void
+    {
+        $this->container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
+            ->addTag('oro_message_queue.client.message_processor', ['topicName' => 'sample_topic']);
+
+        $this->compiler->process($this->container);
+
+        self::assertEquals(
             [
-                Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['processor_id']]
+                Config::DEFAULT_QUEUE_NAME => ['processor_id'],
             ],
-            $registryDef->getArgument(1)
+            $this->registryDefinition->getArgument('$messageProcessorsByQueue')
         );
     }
 
-    public function testShouldSetDestinationTIfSetInTag()
+    public function testProcessWhenDestinationIsSet(): void
     {
-        $container = new ContainerBuilder();
-        $registryDef = $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
+        $this->container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'topic_name', 'destinationName' => 'sample_destination']
+            );
 
-        $container->register('processor_id')
-            ->addTag('oro_message_queue.client.message_processor', ['destinationName' => 'destination']);
+        $this->compiler->process($this->container);
 
-        $this->compiler->process($container);
-
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'destination' =>  ['subscribers' => ['processor_id']],
+                'sample_destination' => ['processor_id'],
             ],
-            $registryDef->getArgument(1)
+            $this->registryDefinition->getArgument('$messageProcessorsByQueue')
         );
     }
 
-    public function testShouldBuildDestinationFromSubscriberIfOnlyTopicNameSpecified()
+    public function testProcessWhenTopicSubscriberWithTopicName(): void
     {
-        $container = new ContainerBuilder();
-        $registryDef = $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
+        $this->container->register('processor_id', OnlyTopicNameTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor', ['topicName' => 'sample_topic']);
 
-        $container->register('processor_id', OnlyTopicNameTopicSubscriber::class)
+        $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                Config::DEFAULT_QUEUE_NAME => ['processor_id'],
+            ],
+            $this->registryDefinition->getArgument('$messageProcessorsByQueue')
+        );
+    }
+
+    public function testProcessWhenTopicSubscriberWithDestinationName(): void
+    {
+        $this->container->register('processor_id', DestinationNameTopicSubscriber::class)
             ->addTag('oro_message_queue.client.message_processor');
 
-        $this->compiler->process($container);
+        $this->compiler->process($this->container);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['processor_id']]
+                'subscriber_destination_name' => ['processor_id'],
             ],
-            $registryDef->getArgument(1)
+            $this->registryDefinition->getArgument('$messageProcessorsByQueue')
         );
-    }
-
-    public function testShouldBuildDestinationFromSubscriberIfProcessorNameSpecified()
-    {
-        $container = new ContainerBuilder();
-        $registryDef = $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
-
-        $container->register('processor_id', ProcessorNameTopicSubscriber::class)
-            ->addTag('oro_message_queue.client.message_processor');
-
-        $this->compiler->process($container);
-
-        $this->assertEquals(
-            [
-                Config::DEFAULT_QUEUE_NAME =>  ['subscribers' => ['subscriber-processor-name']]
-            ],
-            $registryDef->getArgument(1)
-        );
-    }
-
-    public function testShouldBuildDestinationFromSubscriberIfDestinationNameSpecified()
-    {
-        $container = new ContainerBuilder();
-        $registryDef = $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
-
-        $container->register('processor_id', DestinationNameTopicSubscriber::class)
-            ->addTag('oro_message_queue.client.message_processor');
-
-        $this->compiler->process($container);
-
-        $this->assertEquals(
-            [
-                'subscriber-destination-name' => ['subscribers' => ['processor_id']],
-            ],
-            $registryDef->getArgument(1)
-        );
-    }
-
-    public function testShouldMarkTaggedServicePublic()
-    {
-        $container = new ContainerBuilder();
-        $container->register('oro_message_queue.client.meta.destination_meta_registry')
-            ->setArguments([null, []]);
-
-        $processorDef = $container->register('processor_id', DestinationNameTopicSubscriber::class)
-            ->addTag('oro_message_queue.client.message_processor')
-            ->setPublic(false);
-
-        $this->compiler->process($container);
-
-        $this->assertTrue($processorDef->isPublic());
     }
 }

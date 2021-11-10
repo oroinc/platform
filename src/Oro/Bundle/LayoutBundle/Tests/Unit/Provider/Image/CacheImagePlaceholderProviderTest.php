@@ -10,12 +10,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private ImagePlaceholderProviderInterface $imagePlaceholderProvider;
+    private $imagePlaceholderProvider;
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    private Cache $cache;
+    private $cache;
 
-    private CacheImagePlaceholderProvider $decorator;
+    /** @var CacheImagePlaceholderProvider */
+    private $decorator;
 
     protected function setUp(): void
     {

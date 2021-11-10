@@ -3,38 +3,26 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTags;
+use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTagsValidator;
+use Symfony\Component\Validator\Constraint;
 
 class NoTagsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NoTags
-     */
-    protected $constraint;
+    /** @var NoTags */
+    private $constraint;
 
     protected function setUp(): void
     {
         $this->constraint = new NoTags();
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnValidatorClass()
+    public function testShouldReturnValidatorClass()
     {
-        $this->assertEquals(
-            'Oro\\Bundle\\EmbeddedFormBundle\\Validator\\Constraints\\NoTagsValidator',
-            $this->constraint->validatedBy()
-        );
+        $this->assertEquals(NoTagsValidator::class, $this->constraint->validatedBy());
     }
 
-    /**
-     * @test
-     */
-    public function shouldReturnPropertiesTarget()
+    public function testShouldReturnPropertiesTarget()
     {
-        $this->assertEquals(
-            NoTags::PROPERTY_CONSTRAINT,
-            $this->constraint->getTargets()
-        );
+        $this->assertEquals(Constraint::PROPERTY_CONSTRAINT, $this->constraint->getTargets());
     }
 }

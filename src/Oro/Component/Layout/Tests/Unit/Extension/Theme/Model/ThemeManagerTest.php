@@ -133,8 +133,9 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 
         $themeMock = $this->createMock(Theme::class);
 
-        $this->factory->expects($this->once())->method('create')
-            ->with($this->equalTo('base'), $this->equalTo(['label' => 'Oro Base theme']))
+        $this->factory->expects($this->once())
+            ->method('create')
+            ->with('base', ['label' => 'Oro Base theme'])
             ->willReturn($themeMock);
 
         $this->assertSame($themeMock, $manager->getTheme('base'));
@@ -173,7 +174,8 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $theme1Mock = $this->createMock(Theme::class);
         $theme2Mock = $this->createMock(Theme::class);
 
-        $this->factory->expects($this->exactly(2))->method('create')
+        $this->factory->expects($this->exactly(2))
+            ->method('create')
             ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
 
         $this->assertSame(['base' => $theme1Mock, 'oro-black' => $theme2Mock], $manager->getAllThemes());
@@ -184,11 +186,16 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
         $theme1Mock = $this->createMock(Theme::class);
-        $theme1Mock->expects($this->any())->method('getGroups')->willReturn(['base', 'frontend']);
+        $theme1Mock->expects($this->any())
+            ->method('getGroups')
+            ->willReturn(['base', 'frontend']);
         $theme2Mock = $this->createMock(Theme::class);
-        $theme2Mock->expects($this->any())->method('getGroups')->willReturn(['frontend']);
+        $theme2Mock->expects($this->any())
+            ->method('getGroups')
+            ->willReturn(['frontend']);
 
-        $this->factory->expects($this->exactly(2))->method('create')
+        $this->factory->expects($this->exactly(2))
+            ->method('create')
             ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
 
         $this->assertCount(2, $manager->getAllThemes());

@@ -15,7 +15,7 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    protected $cacheDir;
+    private string $cacheDir;
 
     protected function setUp(): void
     {
@@ -24,12 +24,7 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $this->cacheDir = $this->getTempDir('layouts', false);
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    private function getPath($path)
+    private function getPath(string $path): string
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
@@ -46,7 +41,9 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
 
-        $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback([$this, 'buildClass']);
 
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.yml';
         $path = $this->getPath($path);
@@ -60,7 +57,9 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
 
-        $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback([$this, 'buildClass']);
 
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.yml';
         $path = $this->getPath($path);
@@ -79,17 +78,16 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $path = $this->getPath($path);
         $resource = $path;
 
-        $generator->expects($this->once())->method('generate')
-            ->willReturnCallback(
-                function ($className, $data, VisitorCollection $collection) use ($resource) {
-                    $this->assertContainsOnlyInstancesOf(
-                        ElementDependentVisitor::class,
-                        $collection
-                    );
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback(function ($className, $data, VisitorCollection $collection) {
+                $this->assertContainsOnlyInstancesOf(
+                    ElementDependentVisitor::class,
+                    $collection
+                );
 
-                    return $this->buildClass($className, $data);
-                }
-            );
+                return $this->buildClass($className, $data);
+            });
 
         $loader->load($resource);
     }
@@ -102,19 +100,18 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.yml';
         $path = $this->getPath($path);
 
-        $generator->expects($this->once())->method('generate')
-            ->willReturnCallback(
-                function ($className, GeneratorData $data) use ($path) {
-                    $this->assertNotEmpty($data);
-                    $this->assertSame(
-                        ['actions' => [['@add' => ['id' => 'root', 'parent' => null]]]],
-                        $data->getSource()
-                    );
-                    $this->assertSame($path, $data->getFilename());
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback(function ($className, GeneratorData $data) use ($path) {
+                $this->assertNotEmpty($data);
+                $this->assertSame(
+                    ['actions' => [['@add' => ['id' => 'root', 'parent' => null]]]],
+                    $data->getSource()
+                );
+                $this->assertSame($path, $data->getFilename());
 
-                    return $this->buildClass($className);
-                }
-            );
+                return $this->buildClass($className);
+            });
 
         $loader->load($path);
     }
@@ -132,7 +129,9 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
             ['add' => ['id' => 'myId', 'parentId' => 'myParentId']],
             'actions.0'
         );
-        $generator->expects($this->once())->method('generate')->willThrowException($exception);
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willThrowException($exception);
 
         $message = <<<MESSAGE
 Syntax error: action name should start with "@" symbol, current name "add" at "actions.0"
@@ -156,12 +155,7 @@ MESSAGE;
         $this->assertEquals('/\.yml$/', $loader->getUpdateFilenamePattern('yml'));
     }
 
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
-    public function buildClass($className)
+    public function buildClass(string $className): string
     {
         return <<<CLASS
 <?php
@@ -177,19 +171,15 @@ MESSAGE;
 CLASS;
     }
 
-    /**
-     * @param null|LayoutUpdateGeneratorInterface $generator
-     * @param bool                                $debug
-     * @param bool                                $cache
-     *
-     * @return YamlDriver
-     */
-    protected function getLoader($generator = null, $debug = false, $cache = false)
-    {
-        $generator = null === $generator
-            ? $this->createMock(LayoutUpdateGeneratorInterface::class)
-            : $generator;
-
-        return new YamlDriver($generator, $debug, $cache);
+    private function getLoader(
+        ?LayoutUpdateGeneratorInterface $generator,
+        bool $debug = false,
+        string $cacheDir = ''
+    ): YamlDriver {
+        return new YamlDriver(
+            $generator ?? $this->createMock(LayoutUpdateGeneratorInterface::class),
+            $debug,
+            $cacheDir
+        );
     }
 }

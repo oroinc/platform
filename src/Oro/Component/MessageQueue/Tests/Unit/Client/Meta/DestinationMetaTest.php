@@ -1,23 +1,24 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 
 class DestinationMetaTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithExpectedArguments()
+    public function testCouldBeConstructedWithExpectedArguments(): void
     {
-        $destination = new DestinationMeta('aClientName', 'aTransportName');
+        $destination = new DestinationMeta('queue_name', 'transport_queue_name');
 
-        static::assertEquals('aClientName', $destination->getClientName());
-        static::assertEquals('aTransportName', $destination->getTransportName());
-        static::assertEquals([], $destination->getSubscribers());
+        self::assertEquals('queue_name', $destination->getQueueName());
+        self::assertEquals('transport_queue_name', $destination->getTransportQueueName());
+        self::assertEquals([], $destination->getMessageProcessors());
     }
 
-    public function testShouldAllowGetSubscribersSetInConstructor()
+    public function testShouldAllowGetSubscribersSetInConstructor(): void
     {
-        $destination = new DestinationMeta('aClientName', 'aTransportName', ['aSubscriber']);
+        $destination = new DestinationMeta('queue_name', 'transport_queue_name', ['message_processor1']);
 
-        static::assertSame(['aSubscriber'], $destination->getSubscribers());
+        self::assertSame(['message_processor1'], $destination->getMessageProcessors());
     }
 }

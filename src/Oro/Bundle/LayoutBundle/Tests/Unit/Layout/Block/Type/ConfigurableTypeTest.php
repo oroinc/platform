@@ -9,9 +9,7 @@ use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 
 class ConfigurableTypeTest extends ConfigurableBlockTestCase
 {
-    /**
-     * @var ConfigurableType
-     */
+    /** @var ConfigurableType */
     protected $type;
 
     /**
@@ -22,7 +20,7 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
         $this->type = new ConfigurableType();
-        $this->type->setName(ConfigurableBlockTestCase::TYPE_NAME)
+        $this->type->setName(self::TYPE_NAME)
             ->setParent(BaseType::NAME)
             ->setOptionsConfig($this->getOptionsConfig());
         $layoutFactoryBuilder->addType($this->type);

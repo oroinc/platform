@@ -9,11 +9,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DestinationsCommand */
-    private $command;
+    private DestinationsCommand $command;
 
-    /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
     protected function setUp(): void
     {
@@ -22,12 +20,12 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new DestinationsCommand($this->registry);
     }
 
-    public function testShouldHaveCommandName()
+    public function testShouldHaveCommandName(): void
     {
-        $this->assertEquals('oro:message-queue:destinations', $this->command->getName());
+        self::assertEquals('oro:message-queue:destinations', $this->command->getName());
     }
 
-    public function testShouldShowMessageFoundZeroDestinationsIfAnythingInRegistry()
+    public function testShouldShowMessageFoundZeroDestinationsIfAnythingInRegistry(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
@@ -38,28 +36,30 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
         static::assertStringContainsString('Found 0 destinations', $output);
     }
 
-    public function testShouldShowMessageFoundTwoDestinations()
+    public function testShouldShowMessageFoundTwoDestinations(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
             ->willReturn([
-                new DestinationMeta('aClientName', 'aDestinationName'),
-                new DestinationMeta('anotherClientName', 'anotherDestinationName')
-            ]);
+                             new DestinationMeta('aClientName', 'aDestinationName'),
+                             new DestinationMeta('anotherClientName', 'anotherDestinationName'),
+                         ]);
 
         $output = $this->executeCommand();
 
         static::assertStringContainsString('Found 2 destinations', $output);
     }
 
-    public function testShouldShowInfoAboutDestinations()
+    public function testShouldShowInfoAboutDestinations(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
-            ->willReturn([
-                new DestinationMeta('aFooClientName', 'aFooDestinationName', ['fooSubscriber']),
-                new DestinationMeta('aBarClientName', 'aBarDestinationName', ['barSubscriber']),
-            ]);
+            ->willReturn(
+                [
+                    new DestinationMeta('aFooClientName', 'aFooDestinationName', ['fooSubscriber']),
+                    new DestinationMeta('aBarClientName', 'aBarDestinationName', ['barSubscriber']),
+                ]
+            );
 
         $output = $this->executeCommand();
 
@@ -76,7 +76,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
      *
      * @return string
      */
-    protected function executeCommand(array $arguments = [])
+    private function executeCommand(array $arguments = []): string
     {
         $tester = new CommandTester($this->command);
         $tester->execute($arguments);

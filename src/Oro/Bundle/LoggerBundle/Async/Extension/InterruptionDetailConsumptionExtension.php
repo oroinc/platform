@@ -43,9 +43,8 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     public function onPostReceived(Context $context)
     {
         // remember the current processor
-        $this->lastProcessorClassName = $this->messageProcessorClassProvider->getMessageProcessorClass(
-            $context->getMessageProcessor(),
-            $context->getMessage()
+        $this->lastProcessorClassName = $this->messageProcessorClassProvider->getMessageProcessorClassByName(
+            $context->getMessageProcessorName()
         );
     }
 

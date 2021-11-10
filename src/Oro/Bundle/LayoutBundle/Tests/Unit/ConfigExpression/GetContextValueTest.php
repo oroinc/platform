@@ -8,7 +8,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 class GetContextValueTest extends \PHPUnit\Framework\TestCase
 {
     /** @var GetContextValue */
-    protected $function;
+    private $function;
 
     protected function setUp(): void
     {

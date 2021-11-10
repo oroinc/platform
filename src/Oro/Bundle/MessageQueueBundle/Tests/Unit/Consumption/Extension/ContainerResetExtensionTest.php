@@ -5,30 +5,22 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\ChainExtensionAwareClearer;
-use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|ClearerInterface */
-    private $clearer1;
+    private ClearerInterface|\PHPUnit\Framework\MockObject\MockObject $clearer1;
 
-    /** @var MockObject|ClearerInterface */
-    private $clearer2;
+    private ClearerInterface|\PHPUnit\Framework\MockObject\MockObject $clearer2;
 
-    /** @var ChainExtensionAwareClearer|MockObject */
-    private $chainExtensionAwareClearer;
+    private ChainExtensionAwareClearer|\PHPUnit\Framework\MockObject\MockObject $chainExtensionAwareClearer;
 
-    /** @var ContainerResetExtension */
-    private $extension;
+    private ContainerResetExtension $extension;
 
-    /** @var MockObject|LoggerInterface */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {
@@ -40,23 +32,25 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
         $this->chainExtensionAwareClearer = $this->createMock(ChainExtensionAwareClearer::class);
 
-        $this->extension = new ContainerResetExtension([
-            $this->clearer1,
-            $this->clearer2,
-            $this->chainExtensionAwareClearer
-        ]);
+        $this->extension = new ContainerResetExtension(
+            [
+                $this->clearer1,
+                $this->clearer2,
+                $this->chainExtensionAwareClearer,
+            ]
+        );
 
         $this->logger = $this->createMock(LoggerInterface::class);
     }
 
-    public function testOnPostReceivedForPersistentAndNonPersistentProcessors()
+    public function testOnPostReceivedForPersistentAndNonPersistentProcessors(): void
     {
         $this->extension->setPersistentProcessors(['persistent_processor1']);
         $this->extension->setPersistentProcessors(['persistent_processor2']);
 
         // verify that clearers are called only for non-persistent processors
-        $this->clearer1->expects(static::exactly(1))->method('clear')->with(static::identicalTo($this->logger));
-        $this->clearer2->expects(static::exactly(1))->method('clear')->with(static::identicalTo($this->logger));
+        $this->clearer1->expects(static::once())->method('clear')->with(static::identicalTo($this->logger));
+        $this->clearer2->expects(static::once())->method('clear')->with(static::identicalTo($this->logger));
 
         $this->extension->onPostReceived($this->createMessageContextForProcessor('non_persistent_processor'));
 
@@ -69,7 +63,7 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPostReceived($this->createMessageContextForProcessor('persistent_processor1'));
     }
 
-    public function testSetChainExtensionSetsItOnlyOnChainExtensionAwareInterfaceClearers()
+    public function testSetChainExtensionSetsItOnlyOnChainExtensionAwareInterfaceClearers(): void
     {
         $chainExtension = $this->createMock(ExtensionInterface::class);
 
@@ -84,12 +78,8 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function createMessageContextForProcessor(string $processorName): Context
     {
-        $message = new Message();
-        $message->setProperties([Config::PARAMETER_PROCESSOR_NAME => $processorName]);
-
         $context = new Context($this->createMock(SessionInterface::class));
-        $context->setMessage($message);
-
+        $context->setMessageProcessorName($processorName);
         $context->setLogger($this->logger);
 
         return $context;

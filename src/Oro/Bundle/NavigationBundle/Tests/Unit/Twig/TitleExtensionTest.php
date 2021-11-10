@@ -6,7 +6,6 @@ use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -14,10 +13,10 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TitleServiceInterface|MockObject */
+    /** @var TitleServiceInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $titleService;
 
-    /** @var RequestStack|MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
     /** @var TitleExtension */

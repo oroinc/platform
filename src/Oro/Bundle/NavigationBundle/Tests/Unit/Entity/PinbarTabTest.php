@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
@@ -11,7 +12,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
 
     public function testSetMaximizedNotEmpty()
     {
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
+        $item = $this->createMock(NavigationItem::class);
 
         $pinbarTab = new PinbarTab();
         $pinbarTab->setItem($item);
@@ -22,7 +23,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
 
     public function testSetMaximizedEmpty()
     {
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
+        $item = $this->createMock(NavigationItem::class);
 
         $pinbarTab = new PinbarTab();
         $pinbarTab->setItem($item);
@@ -33,7 +34,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
 
     public function testSetGet()
     {
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
+        $item = $this->createMock(NavigationItem::class);
 
         $this->assertPropertyAccessors(
             new PinbarTab(),
@@ -47,7 +48,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
 
     public function testDoPrePersist()
     {
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
+        $item = $this->createMock(NavigationItem::class);
 
         $pinbarTab = new PinbarTab();
         $pinbarTab->setItem($item);
@@ -58,8 +59,8 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValues()
     {
-        $values = array('maximized' => '2022-02-02 22:22:22', 'url' => '/');
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
+        $values = ['maximized' => '2022-02-02 22:22:22', 'url' => '/'];
+        $item = $this->createMock(NavigationItem::class);
         $item->expects($this->once())
             ->method('setValues')
             ->with($values);
@@ -77,11 +78,11 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUser()
     {
-        $user = $this->createMock('stdClass');
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItem');
+        $user = $this->createMock(\stdClass::class);
+        $item = $this->createMock(NavigationItem::class);
         $item->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
         $pinbarTab = new PinbarTab();
         $pinbarTab->setItem($item);
         $this->assertSame($user, $pinbarTab->getUser());

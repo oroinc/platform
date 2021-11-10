@@ -3,7 +3,6 @@
 namespace Oro\Component\MessageQueue\Log;
 
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
@@ -19,8 +18,8 @@ class ConsumerState
     /** @var ExtensionInterface */
     private $extension;
 
-    /** @var MessageProcessorInterface */
-    private $messageProcessor;
+    /** @var string */
+    private string $messageProcessorName = '';
 
     /** @var MessageInterface */
     private $message;
@@ -84,19 +83,19 @@ class ConsumerState
     /**
      * Returns a message processor that is executed at the moment.
      *
-     * @return MessageProcessorInterface|null
+     * @return string
      */
-    public function getMessageProcessor()
+    public function getMessageProcessorName(): string
     {
-        return $this->messageProcessor;
+        return $this->messageProcessorName ?? '';
     }
 
     /**
-     * Sets a message processor that is executed at the moment.
+     * Sets a message processor name that is executed at the moment.
      */
-    public function setMessageProcessor(MessageProcessorInterface $messageProcessor = null)
+    public function setMessageProcessorName(string $messageProcessorName = ''): void
     {
-        $this->messageProcessor = $messageProcessor;
+        $this->messageProcessorName = $messageProcessorName;
     }
 
     /**
@@ -180,7 +179,7 @@ class ConsumerState
     public function clear()
     {
         $this->extension = null;
-        $this->messageProcessor = null;
+        $this->messageProcessorName = '';
         $this->message = null;
         $this->job = null;
         $this->startTime = null;

@@ -3,7 +3,6 @@
 namespace Oro\Component\MessageQueue\Log\Processor;
 
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverterInterface;
@@ -18,14 +17,11 @@ use ProxyManager\Proxy\ValueHolderInterface;
  */
 class AddConsumerStateProcessor
 {
-    /** @var ConsumerState */
-    private $consumerState;
+    private ConsumerState $consumerState;
 
-    /** @var MessageProcessorClassProvider */
-    private $messageProcessorClassProvider;
+    private MessageProcessorClassProvider $messageProcessorClassProvider;
 
-    /** @var MessageToArrayConverterInterface */
-    private $messageToArrayConverter;
+    private MessageToArrayConverterInterface $messageToArrayConverter;
 
     public function __construct(
         ConsumerState $consumerState,
@@ -55,12 +51,10 @@ class AddConsumerStateProcessor
             // add info about a message and a message processor
             $message = $this->consumerState->getMessage();
             if (null !== $message) {
-                $messageProcessor = $this->consumerState->getMessageProcessor();
-                if (null !== $messageProcessor) {
-                    $record['extra']['processor'] = $this->getMessageProcessorClass(
-                        $messageProcessor,
-                        $message
-                    );
+                $messageProcessorName = $this->consumerState->getMessageProcessorName();
+                if ($messageProcessorName !== '') {
+                    $record['extra']['processor'] = $this->messageProcessorClassProvider
+                        ->getMessageProcessorClassByName($messageProcessorName);
                 }
                 $this->addMessageInfo($message, $record['extra']);
             }
@@ -140,18 +134,5 @@ class AddConsumerStateProcessor
         }
 
         return get_class($extension);
-    }
-
-    /**
-     * Gets the class name of the given message processor.
-     *
-     * @param MessageProcessorInterface $messageProcessor
-     * @param MessageInterface          $message
-     *
-     * @return string
-     */
-    protected function getMessageProcessorClass(MessageProcessorInterface $messageProcessor, MessageInterface $message)
-    {
-        return $this->messageProcessorClassProvider->getMessageProcessorClass($messageProcessor, $message);
     }
 }

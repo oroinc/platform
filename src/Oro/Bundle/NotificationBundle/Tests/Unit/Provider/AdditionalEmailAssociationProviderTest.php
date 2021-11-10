@@ -21,9 +21,6 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
     /** @var AdditionalEmailAssociationProvider */
     private $provider;
 
@@ -31,19 +28,19 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->provider = new AdditionalEmailAssociationProvider(
-            $this->doctrine,
-            $this->configProvider,
-            $this->translator
-        );
-
-        $this->translator->expects(self::any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($value) {
                 return 'translated_' . $value;
             });
+
+        $this->provider = new AdditionalEmailAssociationProvider(
+            $this->doctrine,
+            $this->configProvider,
+            $translator
+        );
     }
 
     public function testGetAssociationsWithNonSupportedEntity()

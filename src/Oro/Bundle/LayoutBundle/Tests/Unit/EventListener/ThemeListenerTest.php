@@ -80,7 +80,7 @@ class ThemeListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('oldRoute', $subRequestEvent->getRequest()->attributes->get('_master_request_route'));
     }
 
-    protected function createMasterRequestEvent(array $query = [], array $attributes = []): RequestEvent
+    private function createMasterRequestEvent(array $query = [], array $attributes = []): RequestEvent
     {
         return new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -89,7 +89,7 @@ class ThemeListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function createSubRequestEvent(array $attributes = []): RequestEvent
+    private function createSubRequestEvent(array $attributes = []): RequestEvent
     {
         return new RequestEvent(
             $this->createMock(HttpKernelInterface::class),

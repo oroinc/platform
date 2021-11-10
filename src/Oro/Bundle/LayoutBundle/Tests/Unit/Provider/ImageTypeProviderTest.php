@@ -6,25 +6,25 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const DIMENSION_ORIGINAL = 'product_original';
-    const DIMENSION_LARGE = 'product_large';
-    const DIMENSION_SMALL = 'product_small';
-    const DIMENSION_CUSTOM = 'product_custom';
+    private const DIMENSION_ORIGINAL = 'product_original';
+    private const DIMENSION_LARGE = 'product_large';
+    private const DIMENSION_SMALL = 'product_small';
+    private const DIMENSION_CUSTOM = 'product_custom';
+
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $themeManager;
 
     /** @var ImageTypeProvider */
-    protected $provider;
-
-    /** @var ThemeManager|MockObject */
-    protected $themeManager;
+    private $provider;
 
     protected function setUp(): void
     {
-        $this->themeManager = static::createMock(ThemeManager::class);
+        $this->themeManager = $this->createMock(ThemeManager::class);
+
         $this->provider = new ImageTypeProvider($this->themeManager);
     }
 
@@ -38,16 +38,17 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
 
         $imageTypes = $this->provider->getImageTypes();
 
-        static::assertCount(2, $imageTypes);
-        static::assertValidImageType($imageTypes['main'], 'main', 'Main', 1, $theme1MainDimensions);
-        static::assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5, $theme2ListingDimensions);
-        static::assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
+        self::assertCount(2, $imageTypes);
+        self::assertValidImageType($imageTypes['main'], 'main', 'Main', 1, $theme1MainDimensions);
+        self::assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5, $theme2ListingDimensions);
+        self::assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
     }
 
     public function testInvalidConfig()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->themeManager->method('getAllThemes')
+        $this->themeManager->expects(self::any())
+            ->method('getAllThemes')
             ->willReturn([
                 $this->prepareTheme('theme1', [
                     'main' => ['Main', 1, ['non_existing_dimension']],
@@ -70,19 +71,13 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         $dimensions = $this->provider->getImageDimensions();
 
         $dimensionLarge = $dimensions[self::DIMENSION_LARGE];
-        static::assertCount(4, $dimensions);
-        static::assertEquals(400, $dimensionLarge->getWidth());
-        static::assertEquals(400, $dimensionLarge->getHeight());
-        static::assertTrue($dimensionLarge->getOption('option1'));
+        self::assertCount(4, $dimensions);
+        self::assertEquals(400, $dimensionLarge->getWidth());
+        self::assertEquals(400, $dimensionLarge->getHeight());
+        self::assertTrue($dimensionLarge->getOption('option1'));
     }
 
-    /**
-     * @param string $name
-     * @param array $imageTypes
-     * @param array $dimensions
-     * @return Theme
-     */
-    private function prepareTheme($name, array $imageTypes, array $dimensions)
+    private function prepareTheme(string $name, array $imageTypes, array $dimensions): Theme
     {
         $config = [
             'images' => [
@@ -92,7 +87,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         ];
 
         foreach ($imageTypes as $key => $imageType) {
-            list($label, $maxNumber, $dimensionNames) = $imageType;
+            [$label, $maxNumber, $dimensionNames] = $imageType;
             $config['images']['types'][$key] = [
                 'label' => $label,
                 'dimensions' => $dimensionNames,
@@ -100,12 +95,12 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
             ];
         }
 
-        foreach ($dimensions as $name => $dimension) {
-            list($width, $height) = $dimension;
-            $config['images']['dimensions'][$name] = ['width' => $width, 'height' => $height];
+        foreach ($dimensions as $dimensionName => $dimension) {
+            [$width, $height] = $dimension;
+            $config['images']['dimensions'][$dimensionName] = ['width' => $width, 'height' => $height];
 
             if (isset($dimension[2])) {
-                $config['images']['dimensions'][$name]['options'] = $dimension[2];
+                $config['images']['dimensions'][$dimensionName]['options'] = $dimension[2];
             }
         }
 
@@ -115,28 +110,27 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         return $theme;
     }
 
-    /**
-     * @param ThemeImageType $imageType
-     * @param string $name
-     * @param string $label
-     * @param int $maxNumber
-     * @param array $dimensions
-     */
-    private function assertValidImageType(ThemeImageType $imageType, $name, $label, $maxNumber, array $dimensions)
-    {
-        static::assertEquals($name, $imageType->getName());
-        static::assertEquals($label, $imageType->getLabel());
-        static::assertEquals($maxNumber, $imageType->getMaxNumber());
-        static::assertCount(count($dimensions), $imageType->getDimensions());
-        static::assertEquals($dimensions, array_keys($imageType->getDimensions()));
+    private static function assertValidImageType(
+        ThemeImageType $imageType,
+        string $name,
+        string $label,
+        int $maxNumber,
+        array $dimensions
+    ): void {
+        self::assertEquals($name, $imageType->getName());
+        self::assertEquals($label, $imageType->getLabel());
+        self::assertEquals($maxNumber, $imageType->getMaxNumber());
+        self::assertCount(count($dimensions), $imageType->getDimensions());
+        self::assertEquals($dimensions, array_keys($imageType->getDimensions()));
     }
 
     private function prepareThemeManager(
         array $theme1MainDimensions,
         array $theme1ListingDimensions,
         array $theme2ListingDimensions
-    ) {
-        $this->themeManager->method('getAllThemes')
+    ): void {
+        $this->themeManager->expects(self::any())
+            ->method('getAllThemes')
             ->willReturn([
                 $this->prepareTheme(
                     'theme1',

@@ -9,33 +9,25 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptConsumptionExtensionTest extends WebTestCase
 {
-    /** @var MessageProducerInterface */
-    private $producer;
+    private MessageProducerInterface $messageProducer;
 
-    /** @var MessageProcessorInterface */
-    private $messageProcessor;
+    private QueueConsumer $consumer;
 
-    /** @var TestLogger */
-    private $logger;
-
-    /** @var QueueConsumer */
-    private $consumer;
+    private TestLogger $logger;
 
     protected function setUp(): void
     {
         $this->initClient();
         $container = self::getContainer();
-        $this->producer = $container->get('oro_message_queue.message_producer');
-        $this->messageProcessor = $container->get('oro_message_queue.client.delegate_message_processor');
-        $this->logger = new TestLogger();
+        $this->messageProducer = $container->get('oro_message_queue.message_producer');
         $this->consumer = $container->get('oro_message_queue.consumption.queue_consumer');
+        $this->logger = new TestLogger();
         $this->clearMessages();
     }
 
@@ -44,12 +36,12 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->clearMessages();
     }
 
-    public function testMessageConsumptionIsNotInterruptedByMessageLimit()
+    public function testMessageConsumptionIsInterruptedByMessageLimit(): void
     {
-        $this->producer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
-        $this->producer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
+        $this->messageProducer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
+        $this->messageProducer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
 
-        $this->consumer->bind('oro.default', $this->messageProcessor);
+        $this->consumer->bind('oro.default', 'oro_message_queue.async.change_config');
         $this->consumer->consume(new ChainExtension([
             new LimitConsumedMessagesExtension(2),
             new LoggerExtension($this->logger)
@@ -58,12 +50,12 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->assertInterruptionMessage('Consuming interrupted, reason: The message limit reached.');
     }
 
-    public function testMessageConsumptionIsInterruptedByConfigCacheChanged()
+    public function testMessageConsumptionIsInterruptedByConfigCacheChanged(): void
     {
-        $this->producer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
-        $this->producer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
+        $this->messageProducer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
+        $this->messageProducer->send(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
 
-        $this->consumer->bind('oro.default', $this->messageProcessor);
+        $this->consumer->bind('oro.default', 'oro_message_queue.async.change_config');
         $this->consumer->consume(new ChainExtension([
             new LimitConsumedMessagesExtension(2),
             new LoggerExtension($this->logger)
@@ -74,7 +66,7 @@ class InterruptConsumptionExtensionTest extends WebTestCase
 
     private function assertInterruptionMessage(string $expectedMessage): void
     {
-        $this->assertTrue($this->logger->hasRecord($expectedMessage, 'warning'));
+        self::assertTrue($this->logger->hasRecord($expectedMessage, 'warning'));
     }
 
     private function clearMessages(): void

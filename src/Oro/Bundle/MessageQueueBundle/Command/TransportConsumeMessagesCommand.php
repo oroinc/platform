@@ -9,7 +9,6 @@ use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Log\ConsumerState;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,15 +22,15 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
     protected static $defaultName = 'oro:message-queue:transport:consume';
 
     private ConsumerState $consumerState;
+
     private LoggerInterface $logger;
 
     public function __construct(
         QueueConsumer $queueConsumer,
-        ContainerInterface $processorLocator,
         ConsumerState $consumerState,
         LoggerInterface $logger
     ) {
-        parent::__construct($queueConsumer, $processorLocator);
+        parent::__construct($queueConsumer);
 
         $this->consumerState = $consumerState;
         $this->logger = $logger;

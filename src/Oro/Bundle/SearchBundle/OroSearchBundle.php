@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle;
 
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,7 +18,7 @@ class OroSearchBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        $addTopicPass = AddTopicMetaPass::create()
+        $addTopicPass = AddTopicDescriptionPass::create()
             ->add(Topics::REINDEX, 'Search index reindex')
             ->add(Topics::INDEX_ENTITIES, 'Index entities by id')
             ->add(Topics::INDEX_ENTITY_TYPE, 'Index entities by class name')

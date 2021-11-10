@@ -15,40 +15,31 @@ use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    private const TEST_SENDER_EMAIL = 'admin@example.com';
+    private const TEST_SENDER_NAME = 'sender name';
+    private const TEMPLATE_NAME = 'test template';
 
-    const TEST_SENDER_EMAIL = 'admin@example.com';
-    const TEST_SENDER_NAME  = 'sender name';
-    const TEMPLATE_NAME     = 'test template';
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UserRepository */
+    /** @var UserRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $userRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityPool */
+    /** @var EntityPool|\PHPUnit\Framework\MockObject\MockObject */
     private $entityPool;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|NotificationSettings */
+    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettings;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotificationManager */
+    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
     /** @var MassNotificationSender */
     private $sender;
 
-    /** @var array */
-    private $massNotificationParams;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
@@ -75,7 +66,7 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $body = 'Test Body';
         $subject = 'Test Subject';
 
-        $this->configureNotificationSettins([]);
+        $this->configureNotificationSettings([]);
 
         $recipient1 = ['id' => 333, 'email' => 'test1@test.com'];
         $recipient2 = ['id' => 777, 'email' => 'test2@test.com'];
@@ -122,22 +113,13 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testSendToConfigEmailsWithEmptyTemplate()
     {
-        $body = "Test Body";
+        $body = 'Test Body';
         $subject = null;
-        $senderName = "Sender Name";
-        $senderEmail = "sender@test.com";
+        $senderName = 'Sender Name';
+        $senderEmail = 'sender@test.com';
         $recipientEmails = ['test1@test.com', 'test2@test.com'];
 
-        $this->configureNotificationSettins($recipientEmails);
-
-        $this->massNotificationParams = [
-            'sender_name'      => $senderName,
-            'sender_email'     => $senderEmail,
-            'recipients'       => [
-                new EmailAddressWithContext(reset($recipientEmails)),
-                new EmailAddressWithContext(end($recipientEmails)),
-            ]
-        ];
+        $this->configureNotificationSettings($recipientEmails);
 
         $expectedMassNotification = new TemplateMassNotification(
             From::emailAddress($senderEmail, $senderName),
@@ -159,20 +141,17 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(2, $this->sender->send($body, $subject, From::emailAddress($senderEmail, $senderName)));
     }
 
-    private function configureNotificationSettins(array $recipientEmails): void
+    private function configureNotificationSettings(array $recipientEmails): void
     {
-        $this->notificationSettings
-            ->expects($this->any())
+        $this->notificationSettings->expects($this->any())
             ->method('getSender')
             ->willReturn(From::emailAddress(self::TEST_SENDER_EMAIL, self::TEST_SENDER_NAME));
 
-        $this->notificationSettings
-            ->expects($this->any())
+        $this->notificationSettings->expects($this->any())
             ->method('getMassNotificationEmailTemplateName')
             ->willReturn(self::TEMPLATE_NAME);
 
-        $this->notificationSettings
-            ->expects($this->any())
+        $this->notificationSettings->expects($this->any())
             ->method('getMassNotificationRecipientEmails')
             ->willReturn($recipientEmails);
 

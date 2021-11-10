@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -21,7 +21,7 @@ class OroDataAuditBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(
-            AddTopicMetaPass::create()
+            AddTopicDescriptionPass::create()
                 ->add(Topics::ENTITIES_CHANGED, 'Creates audit for usual entity properties')
                 ->add(Topics::ENTITIES_RELATIONS_CHANGED, '[Internal] Creates audit for entity rel.')
                 ->add(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, '[Internal] Create audit for entity inverse rel.')

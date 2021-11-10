@@ -88,12 +88,19 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         $layoutItem = $this->createMock(LayoutItemInterface::class);
-        $layoutItem->expects($this->once())->method('getId')->willReturn($id);
+        $layoutItem->expects($this->once())
+            ->method('getId')
+            ->willReturn($id);
         $layoutItemUnknown = $this->createMock(LayoutItemInterface::class);
-        $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
+        $layoutItemUnknown->expects($this->once())
+            ->method('getId')
+            ->willReturn('unknown');
         $layoutItemAlias = $this->createMock(LayoutItemInterface::class);
-        $layoutItemAlias->expects($this->never())->method('getId');
-        $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
+        $layoutItemAlias->expects($this->never())
+            ->method('getId');
+        $layoutItemAlias->expects($this->once())
+            ->method('getAlias')
+            ->willReturn($id);
 
         $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
         $this->assertCount(1, $layoutUpdates);
@@ -120,12 +127,19 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         $layoutItem = $this->createMock(LayoutItemInterface::class);
-        $layoutItem->expects($this->once())->method('getId')->willReturn($id);
+        $layoutItem->expects($this->once())
+            ->method('getId')
+            ->willReturn($id);
         $layoutItemUnknown = $this->createMock(LayoutItemInterface::class);
-        $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
+        $layoutItemUnknown->expects($this->once())
+            ->method('getId')
+            ->willReturn('unknown');
         $layoutItemAlias = $this->createMock(LayoutItemInterface::class);
-        $layoutItemAlias->expects($this->never())->method('getId');
-        $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
+        $layoutItemAlias->expects($this->never())
+            ->method('getId');
+        $layoutItemAlias->expects($this->once())
+            ->method('getAlias')
+            ->willReturn($id);
 
         $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
         $this->assertFalse($extension->hasLayoutUpdates($layoutItemUnknown));

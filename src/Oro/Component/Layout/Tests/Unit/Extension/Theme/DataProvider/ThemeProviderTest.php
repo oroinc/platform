@@ -11,13 +11,13 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected ThemeManager $themeManager;
+    private $themeManager;
 
     /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected LocalizationProviderInterface $localizationProvider;
+    private $localizationProvider;
 
     /** @var ThemeProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {

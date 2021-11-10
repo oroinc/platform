@@ -38,9 +38,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 2);
 
-        $scope = $this->getMockBuilder(Scope::class)
-            ->addMethods(['getOrganization', 'getUser'])
-            ->getMock();
+        $scope = $this->createMock(Scope::class);
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -72,9 +70,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 3);
 
-        $scope = $this->getMockBuilder(Scope::class)
-            ->addMethods(['getOrganization', 'getUser'])
-            ->getMock();
+        $scope = $this->createMock(Scope::class);
 
         $update = new MenuUpdateStub();
         $update->setScope($scope);
@@ -84,8 +80,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $update->setUri('#');
         $update->setCustom(true);
 
-        $this->builderChainProvider
-            ->expects($this->once())
+        $this->builderChainProvider->expects($this->once())
             ->method('get')
             ->with('menu', ['ignoreCache' => true, 'scopeContext' => $scope])
             ->willReturn($menu);
@@ -111,9 +106,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
 
         $update = new MenuUpdateStub();
 
-        $scope = $this->getMockBuilder(Scope::class)
-            ->addMethods(['getOrganization', 'getUser'])
-            ->getMock();
+        $scope = $this->createMock(Scope::class);
 
         $update->setScope($scope);
         $update->setMenu('menu');

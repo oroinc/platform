@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
@@ -16,14 +16,10 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|NotificationSettings
-     */
+    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettings;
 
-    /**
-     * @var EmailNotificationSender
-     */
+    /** @var EmailNotificationSender */
     private $sender;
 
     protected function setUp(): void
@@ -43,8 +39,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $testContentType = 'text/html';
 
         $sender = From::emailAddress($testSenderEmail, $testSenderName);
-        $this->notificationSettings
-            ->expects($this->any())
+        $this->notificationSettings->expects($this->any())
             ->method('getSender')
             ->willReturn($sender);
 
@@ -58,7 +53,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
+            Topics::SEND_NOTIFICATION_EMAIL,
             [
                 'sender'      => $sender->toArray(),
                 'toEmail'     => $testReceiverEmail->getEmail(),
@@ -78,9 +73,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $testReceiverEmail = new EmailHolderStub('test_receiver@email.com');
         $testContentType = 'text/html';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
-        $this->notificationSettings
-            ->expects($this->never())
+        $this->notificationSettings->expects($this->never())
             ->method('getSender');
 
         $sender = From::emailAddress($testSenderEmail, $testSenderName);
@@ -99,7 +92,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
+            Topics::SEND_NOTIFICATION_EMAIL,
             [
                 'sender'      => $sender->toArray(),
                 'toEmail'     => $testReceiverEmail->getEmail(),
@@ -120,8 +113,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $testContentType = 'text/html';
 
         $sender = From::emailAddress($testSenderEmail, $testSenderName);
-        $this->notificationSettings
-            ->expects($this->any())
+        $this->notificationSettings->expects($this->any())
             ->method('getSender')
             ->willReturn($sender);
 
@@ -134,7 +126,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
+            Topics::SEND_NOTIFICATION_EMAIL,
             [
                 'sender'      => $sender->toArray(),
                 'toEmail'     => $testReceiverEmail->getEmail(),
@@ -155,8 +147,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $testContentType = 'text/html';
 
         $sender = From::emailAddress($testSenderEmail, $testSenderName);
-        $this->notificationSettings
-            ->expects($this->any())
+        $this->notificationSettings->expects($this->any())
             ->method('getSender')
             ->willReturn($sender);
 
@@ -168,6 +159,6 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
 
         $this->sender->send($notification, $emailTemplateModel);
 
-        self::assertMessagesCount(\Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL, 0);
+        self::assertMessagesCount(Topics::SEND_NOTIFICATION_EMAIL, 0);
     }
 }

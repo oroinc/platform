@@ -8,8 +8,6 @@ use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer;
 use Oro\Bundle\LayoutBundle\Layout\Serializer\TypeNameConverter;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCollection;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
 /**
@@ -22,7 +20,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var TypeNameConverter|\PHPUnit\Framework\MockObject\MockObject */
     private $typeNameConverter;
 
-    /** @var NormalizerInterface|DenormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
     private $serializer;
 
     /** @var BlockViewNormalizer */

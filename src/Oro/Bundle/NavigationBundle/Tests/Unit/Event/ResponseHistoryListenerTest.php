@@ -19,11 +19,14 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    private NavigationHistoryLogger|\PHPUnit\Framework\MockObject\MockObject $navigationHistoryLogger;
+    /** @var NavigationHistoryLogger|\PHPUnit\Framework\MockObject\MockObject */
+    private $navigationHistoryLogger;
 
-    private ResponseHistoryListener $listener;
+    /** @var ResponseHistoryListener */
+    private $listener;
 
     protected function setUp(): void
     {
