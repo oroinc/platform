@@ -276,17 +276,25 @@ class ExtendHelper
     private static function convertEnumNameToCode($name)
     {
         if ($name && function_exists('iconv')) {
-            $originalName = $name;
-            $name = @iconv('utf-8', 'ascii//TRANSLIT', $name);
-            if (false === $name) {
+            $locale = setlocale(LC_CTYPE, 0);
+            if ('C' === $locale || false === $locale) {
+                $transliteratedName = @iconv('utf-8', 'ascii//TRANSLIT', $name);
+            } else {
+                setlocale(LC_CTYPE, 'C');
+                $transliteratedName = @iconv('utf-8', 'ascii//TRANSLIT', $name);
+                setlocale(LC_CTYPE, $locale);
+            }
+            if (false === $transliteratedName) {
                 throw new \RuntimeException(sprintf(
                     "Can't convert the string '%s' with the 'iconv' function. " .
                     "Please check that the 'iconv' extension is configured correctly.",
-                    $originalName
+                    $name
                 ));
             }
-            if (strpos($name, '?') !== false) {
-                $name = hash('crc32', $originalName);
+            if (strpos($transliteratedName, '?') !== false) {
+                $name = hash('crc32', $name);
+            } else {
+                $name = $transliteratedName;
             }
         }
 
