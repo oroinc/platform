@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\Command\DebugCommand;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -189,7 +190,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testBlockTypeWithoutAlias(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "alias" is required for "block1" service.');
 
         $container = $this->getContainer();
@@ -202,7 +203,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testBlockTypeExtensionWithoutAlias(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "alias" is required for "extension1" service.');
 
         $container = $this->getContainer();
@@ -215,7 +216,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testLayoutUpdateWithoutId(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "id" is required for "update1" service.');
 
         $container = $this->getContainer();
@@ -228,7 +229,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     public function testDataProviderWithoutAlias(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "alias" is required for "dataProvider1" service.');
 
         $container = $this->getContainer();

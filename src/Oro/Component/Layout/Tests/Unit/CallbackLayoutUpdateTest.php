@@ -20,18 +20,18 @@ class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
     {
         $layoutUpdate = new CallbackLayoutUpdate([$this, 'callbackFunction']);
 
-        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $item              = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
+        $item = $this->createMock(LayoutItemInterface::class);
 
         $layoutManipulator->expects($this->once())
             ->method('add')
             ->with('id', 'parentId', 'blockType');
         $item->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('parentId'));
+            ->willReturn('parentId');
         $item->expects($this->once())
             ->method('getTypeName')
-            ->will($this->returnValue('blockType'));
+            ->willReturn('blockType');
 
         $layoutUpdate->updateLayout($layoutManipulator, $item);
     }

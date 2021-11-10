@@ -9,19 +9,13 @@ use Oro\Component\DependencyInjection\ServiceLink;
 
 class ImagineFilterConfigurationDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     private $filterConfiguration;
 
-    /**
-     * @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
     private $filterLoaderServiceLink;
 
-    /**
-     * @var ImagineFilterConfigurationDecorator
-     */
+    /** @var ImagineFilterConfigurationDecorator */
     private $imagineFilterConfigurationDecorator;
 
     protected function setUp(): void
@@ -41,17 +35,15 @@ class ImagineFilterConfigurationDecoratorTest extends \PHPUnit\Framework\TestCas
         $filterConfig = ['some' => 'config'];
         $filterResults = ['filter' => 'results'];
 
-        $this->filterLoaderServiceLink
-            ->expects(self::never())
+        $this->filterLoaderServiceLink->expects(self::never())
             ->method('getService');
 
-        $this->filterConfiguration
-            ->expects(self::once())
+        $this->filterConfiguration->expects(self::once())
             ->method('set')
             ->with($filterName, $filterConfig)
             ->willReturn($filterResults);
 
-        self::assertEquals($filterResults, $this->imagineFilterConfigurationDecorator->set($filterName, $filterConfig));
+        $this->imagineFilterConfigurationDecorator->set($filterName, $filterConfig);
     }
 
     public function testGet(): void
@@ -60,17 +52,14 @@ class ImagineFilterConfigurationDecoratorTest extends \PHPUnit\Framework\TestCas
         $filterResults = ['filter' => 'results'];
 
         $filterLoader = $this->createMock(ImageFilterLoader::class);
-        $filterLoader
-            ->expects(self::once())
+        $filterLoader->expects(self::once())
             ->method('load');
 
-        $this->filterLoaderServiceLink
-            ->expects(self::once())
+        $this->filterLoaderServiceLink->expects(self::once())
             ->method('getService')
             ->willReturn($filterLoader);
 
-        $this->filterConfiguration
-            ->expects(self::once())
+        $this->filterConfiguration->expects(self::once())
             ->method('get')
             ->with($filterName)
             ->willReturn($filterResults);
@@ -83,17 +72,14 @@ class ImagineFilterConfigurationDecoratorTest extends \PHPUnit\Framework\TestCas
         $filterResults = ['filter' => 'results'];
 
         $filterLoader = $this->createMock(ImageFilterLoader::class);
-        $filterLoader
-            ->expects(self::once())
+        $filterLoader->expects(self::once())
             ->method('load');
 
-        $this->filterLoaderServiceLink
-            ->expects(self::once())
+        $this->filterLoaderServiceLink->expects(self::once())
             ->method('getService')
             ->willReturn($filterLoader);
 
-        $this->filterConfiguration
-            ->expects(self::once())
+        $this->filterConfiguration->expects(self::once())
             ->method('all')
             ->willReturn($filterResults);
 

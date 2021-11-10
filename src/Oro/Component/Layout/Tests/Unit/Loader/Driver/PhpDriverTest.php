@@ -13,7 +13,7 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    protected $cacheDir;
+    private string $cacheDir;
 
     protected function setUp(): void
     {
@@ -22,12 +22,7 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
         $this->cacheDir = $this->getTempDir('layouts', false);
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    private function getPath($path)
+    private function getPath(string $path): string
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
@@ -44,7 +39,9 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, true, $this->cacheDir);
 
-        $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback([$this, 'buildClass']);
 
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update.php';
         $path = $this->getPath($path);
@@ -58,7 +55,9 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
 
-        $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback([$this, 'buildClass']);
 
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update2.php';
         $path = $this->getPath($path);
@@ -78,7 +77,9 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
             "\$layoutManipulator->add('header', 'root', 'header');\n",
             0
         );
-        $generator->expects($this->once())->method('generate')->willThrowException($exception);
+        $generator->expects($this->once())
+            ->method('generate')
+            ->willThrowException($exception);
 
         $message = <<<MESSAGE
 Syntax error: Some error found at "0"
@@ -103,13 +104,7 @@ MESSAGE;
         $this->assertEquals('/^(?!.*html\.php$).*\.php$/', $loader->getUpdateFilenamePattern('php'));
     }
 
-    /**
-     * @param string        $className
-     * @param GeneratorData $data
-     *
-     * @return string
-     */
-    public function buildClass($className, GeneratorData $data)
+    public function buildClass(string $className, GeneratorData $data): string
     {
         $data = str_replace(['<?php', '<?', '?>'], '', $data->getSource());
 
@@ -128,19 +123,15 @@ MESSAGE;
 CLASS;
     }
 
-    /**
-     * @param null|LayoutUpdateGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $generator
-     * @param bool                                                                         $debug
-     * @param bool                                                                         $cache
-     *
-     * @return PhpDriver
-     */
-    protected function getLoader($generator = null, $debug = false, $cache = false)
-    {
-        $generator = null === $generator
-            ? $this->createMock(LayoutUpdateGeneratorInterface::class)
-            : $generator;
-
-        return new PhpDriver($generator, $debug, $cache);
+    private function getLoader(
+        ?LayoutUpdateGeneratorInterface $generator,
+        bool $debug = false,
+        string $cacheDir = ''
+    ): PhpDriver {
+        return new PhpDriver(
+            $generator ?? $this->createMock(LayoutUpdateGeneratorInterface::class),
+            $debug,
+            $cacheDir
+        );
     }
 }

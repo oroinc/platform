@@ -11,9 +11,10 @@ class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     private const DEFAULT_PATH = '/some/default/image.png';
 
     /** @var CacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    private CacheManager $imagineCacheManager;
+    private $imagineCacheManager;
 
-    private DefaultImagePlaceholderProvider $provider;
+    /** @var DefaultImagePlaceholderProvider */
+    private $provider;
 
     protected function setUp(): void
     {

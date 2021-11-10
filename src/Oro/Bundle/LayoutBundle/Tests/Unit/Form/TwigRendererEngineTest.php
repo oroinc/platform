@@ -11,27 +11,22 @@ use Twig\Template;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
-    /**
-     * @var TwigRendererEngine
-     */
-    protected $twigRendererEngine;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /**
-     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $environment;
+    /** @var TwigRendererEngine */
+    private $twigRendererEngine;
 
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
+
         $this->twigRendererEngine = $this->createRendererEngine();
     }
 
     public function testRenderBlock()
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects(self::once())
             ->method('get')
             ->with('oro_layout.debug_block_info')
@@ -39,13 +34,12 @@ class TwigRendererEngineTest extends RendererEngineTest
 
         $this->twigRendererEngine->setConfigManager($configManager);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
-        $view = $this->createMock('Symfony\Component\Form\FormView');
+        $view = $this->createMock(FormView::class);
         $view->vars['cache_key'] = 'cache_key';
         $template = $this->createMock(Template::class);
         $template->expects($this->once())
             ->method('getTemplateName')
-            ->will($this->returnValue('theme'));
+            ->willReturn('theme');
 
         ReflectionUtil::setPropertyValue($this->twigRendererEngine, 'template', $template);
         ReflectionUtil::setPropertyValue($this->twigRendererEngine, 'resources', ['cache_key' => []]);
@@ -64,7 +58,7 @@ class TwigRendererEngineTest extends RendererEngineTest
         $this->environment->expects($this->once())
             ->method('mergeGlobals')
             ->with($result)
-            ->will($this->returnValue([$template, 'root']));
+            ->willReturn([$template, 'root']);
 
         $this->twigRendererEngine->renderBlock($view, [$template, 'root'], 'root', $variables);
     }

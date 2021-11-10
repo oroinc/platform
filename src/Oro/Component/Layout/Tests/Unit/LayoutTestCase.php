@@ -81,7 +81,6 @@ class LayoutTestCase extends \PHPUnit\Framework\TestCase
     protected function convertBlockViewToArray(BlockView $view, $removeAuxiliaryVariables = true)
     {
         $children = [];
-        /** @var BlockView $childView */
         foreach ($view->children as $childView) {
             $children[] = $this->convertBlockViewToArray($childView, $removeAuxiliaryVariables);
         }

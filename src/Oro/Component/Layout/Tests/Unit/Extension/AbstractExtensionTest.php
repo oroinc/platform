@@ -2,7 +2,14 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension;
 
+use Oro\Component\Layout\BlockTypeExtensionInterface;
+use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 
 /**
@@ -26,15 +33,12 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetType()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\BlockTypeInterface',
-            $extension->getType('test')
-        );
+        $this->assertInstanceOf(BlockTypeInterface::class, $extension->getType('test'));
     }
 
     public function testGetUnknownType()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The block type "unknown" can not be loaded by this extension.');
 
         $extension = $this->getAbstractExtension();
@@ -52,10 +56,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $extension = $this->getAbstractExtension();
         $this->assertCount(1, $extension->getTypeExtensions('test'));
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\BlockTypeExtensionInterface',
-            $extension->getTypeExtensions('test')[0]
-        );
+        $this->assertInstanceOf(BlockTypeExtensionInterface::class, $extension->getTypeExtensions('test')[0]);
         $this->assertSame([], $extension->getTypeExtensions('unknown'));
     }
 
@@ -67,7 +68,9 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
         // test by alias
         $layoutItem = $this->getLayoutItem('unknown');
-        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $layoutItem->expects($this->once())
+            ->method('getAlias')
+            ->willReturn('test');
         $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
     }
 
@@ -75,19 +78,21 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $layoutItem = $this->getLayoutItem('test');
 
-        $extension     = $this->getAbstractExtension();
+        $extension = $this->getAbstractExtension();
         $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
         $this->assertCount(1, $layoutUpdates);
-        $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $layoutUpdates[0]);
+        $this->assertInstanceOf(LayoutUpdateInterface::class, $layoutUpdates[0]);
 
         $this->assertSame([], $extension->getLayoutUpdates($this->getLayoutItem('unknown')));
 
         // test by alias
         $layoutItem = $this->getLayoutItem('unknown');
-        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $layoutItem->expects($this->once())
+            ->method('getAlias')
+            ->willReturn('test');
         $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
         $this->assertCount(1, $layoutUpdates);
-        $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $layoutUpdates[0]);
+        $this->assertInstanceOf(LayoutUpdateInterface::class, $layoutUpdates[0]);
     }
 
     public function testHasContextConfigurators()
@@ -98,13 +103,10 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetContextConfigurators()
     {
-        $extension     = $this->getAbstractExtension();
+        $extension = $this->getAbstractExtension();
         $configurators = $extension->getContextConfigurators();
         $this->assertCount(1, $configurators);
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\ContextConfiguratorInterface',
-            $configurators[0]
-        );
+        $this->assertInstanceOf(ContextConfiguratorInterface::class, $configurators[0]);
     }
 
     public function testHasContextConfiguratorsWhenNoAnyRegistered()
@@ -131,12 +133,12 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetDataProvider()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertTrue(is_object($extension->getDataProvider('test')));
+        $this->assertIsObject($extension->getDataProvider('test'));
     }
 
     public function testGetUnknownDataProvider()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The data provider "unknown" can not be loaded by this extension.');
 
         $extension = $this->getAbstractExtension();
@@ -145,7 +147,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadInvalidBlockTypeExtensions()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\BlockTypeExtensionInterface", "integer" given.'
         );
@@ -156,7 +158,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadInvalidLayoutUpdates()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\LayoutUpdateInterface", "integer" given.'
         );
@@ -167,14 +169,14 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadLayoutUpdatesWithInvalidId()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Invalid "layout item id" argument type. Expected "string", "integer" given.');
 
         $extension = new AbstractExtensionStub(
             [],
             [],
             [
-                [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')]
+                [$this->createMock(LayoutUpdateInterface::class)]
             ],
             [],
             []
@@ -184,14 +186,14 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadLayoutUpdatesWithInvalidFormatOfReturnedData()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Invalid "layout updates for item "test"" argument type. Expected "array",');
 
         $extension = new AbstractExtensionStub(
             [],
             [],
             [
-                'test' => $this->createMock('Oro\Component\Layout\LayoutUpdateInterface')
+                'test' => $this->createMock(LayoutUpdateInterface::class)
             ],
             [],
             []
@@ -201,7 +203,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadInvalidContextConfigurators()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\ContextConfiguratorInterface", "integer" given.'
         );
@@ -212,7 +214,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadInvalidBlockTypes()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\BlockTypeInterface", "integer" given.'
         );
@@ -221,42 +223,43 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasType('test');
     }
 
-    protected function getAbstractExtension()
+    private function getAbstractExtension(): AbstractExtensionStub
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $type->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
-        $extension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $extension = $this->createMock(BlockTypeExtensionInterface::class);
         $extension->expects($this->any())
             ->method('getExtendedType')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         return new AbstractExtensionStub(
             [$type],
             [$extension],
             [
                 'test' => [
-                    $this->createMock('Oro\Component\Layout\LayoutUpdateInterface')
+                    $this->createMock(LayoutUpdateInterface::class)
                 ]
             ],
-            [$this->createMock('Oro\Component\Layout\ContextConfiguratorInterface')],
+            [$this->createMock(ContextConfiguratorInterface::class)],
             ['test' => $this->createMock(\stdClass::class)]
         );
     }
 
     /**
-     * @param string $id
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|LayoutItemInterface
+     * @return LayoutItemInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getLayoutItem($id)
+    private function getLayoutItem(string $id)
     {
-        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
-        $layoutItem->expects($this->any())->method('getContext')
-            ->willReturn($this->createMock('Oro\Component\Layout\ContextInterface'));
+        $layoutItem = $this->createMock(LayoutItemInterface::class);
+        $layoutItem->expects($this->any())
+            ->method('getId')
+            ->willReturn($id);
+        $layoutItem->expects($this->any())
+            ->method('getContext')
+            ->willReturn($this->createMock(ContextInterface::class));
 
         return $layoutItem;
     }

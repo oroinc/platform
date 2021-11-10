@@ -11,10 +11,10 @@ use Oro\Component\Layout\BlockView;
 class DataCollectorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutDataCollector|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dataCollector;
+    private $dataCollector;
 
     /** @var DataCollectorExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -30,13 +30,10 @@ class DataCollectorExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testFinishView()
     {
-        /** @var BlockView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(BlockView::class);
-        /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
         $block = $this->createMock(BlockInterface::class);
 
-        $this->dataCollector
-            ->expects($this->once())
+        $this->dataCollector->expects($this->once())
             ->method('collectBlockView')
             ->with($block, $view);
 

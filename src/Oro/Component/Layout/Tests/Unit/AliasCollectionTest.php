@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\AliasCollection;
+use Oro\Component\Layout\Exception\AliasAlreadyExistsException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -10,7 +11,7 @@ use Oro\Component\Layout\AliasCollection;
 class AliasCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AliasCollection */
-    protected $aliasCollection;
+    private $aliasCollection;
 
     protected function setUp(): void
     {
@@ -69,7 +70,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testRedefine()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\AliasAlreadyExistsException::class);
+        $this->expectException(AliasAlreadyExistsException::class);
         $this->expectExceptionMessage(
             'The "test_alias" sting cannot be used as an alias for "another_id" item'
             . ' because it is already used for "test_id" item.'

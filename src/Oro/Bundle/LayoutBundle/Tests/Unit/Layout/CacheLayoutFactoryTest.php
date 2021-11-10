@@ -14,19 +14,13 @@ use Oro\Component\Layout\LayoutFactoryInterface;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistryInterface;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class CacheLayoutFactoryTest extends TestCase
+class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LayoutFactoryInterface|MockObject
-     */
+    /** @var LayoutFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $baseLayoutFactory;
 
-    /**
-     * @var CacheLayoutFactory
-     */
+    /** @var CacheLayoutFactory */
     private $cacheLayoutFactory;
 
     protected function setUp(): void
@@ -35,6 +29,7 @@ class CacheLayoutFactoryTest extends TestCase
         $expressionProcessor = $this->createMock(ExpressionProcessor::class);
         $renderCache = $this->createMock(RenderCache::class);
         $blockViewCache = $this->createMock(BlockViewCache::class);
+
         $this->cacheLayoutFactory = new CacheLayoutFactory(
             $this->baseLayoutFactory,
             $expressionProcessor,

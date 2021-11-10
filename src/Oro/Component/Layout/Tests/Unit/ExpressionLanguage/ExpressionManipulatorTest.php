@@ -49,14 +49,10 @@ class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return ParsedExpression
-     */
-    protected function createParsedExpression()
+    private function createParsedExpression(): ParsedExpression
     {
         $node = new BinaryNode('===', new UnaryNode('!', new ConstantNode(true)), new ConstantNode(false));
-        $parsedExpression = new ParsedExpression('!true === false', $node);
 
-        return $parsedExpression;
+        return new ParsedExpression('!true === false', $node);
     }
 }

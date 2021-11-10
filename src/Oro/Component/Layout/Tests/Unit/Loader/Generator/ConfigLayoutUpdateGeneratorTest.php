@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
+use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -16,35 +16,35 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected ConfigLayoutUpdateGenerator $generator;
-    protected ExpressionLanguageCacheWarmer|MockObject $cacheWarmer;
-    private ValidatorInterface|MockObject $expressionValidator;
+    /** @var ExpressionLanguageCacheWarmer|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheWarmer;
+
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $expressionValidator;
+
+    /** @var ConfigLayoutUpdateGenerator */
+    private $generator;
 
     protected function setUp(): void
     {
         $this->expressionValidator = $this->createMock(ValidatorInterface::class);
         $this->cacheWarmer = $this->createMock(ExpressionLanguageCacheWarmer::class);
-        $this->generator = new ConfigLayoutUpdateGenerator($this->expressionValidator, $this->cacheWarmer);
-    }
 
-    protected function tearDown(): void
-    {
-        unset($this->generator);
+        $this->generator = new ConfigLayoutUpdateGenerator($this->expressionValidator, $this->cacheWarmer);
     }
 
     public function testShouldCallExtensions(): void
     {
         $source = ['actions' => []];
 
-        /** @var ConfigLayoutUpdateGeneratorExtensionInterface|MockObject $extension */
         $extension = $this->createMock(ConfigLayoutUpdateGeneratorExtensionInterface::class);
         $this->generator->addExtension($extension);
 
-        $extension->expects(static::once())
+        $extension->expects(self::once())
             ->method('prepare')
             ->with(
                 new GeneratorData($source),
-                static::isInstanceOf(VisitorCollection::class)
+                self::isInstanceOf(VisitorCollection::class)
             );
 
         $this->generator->generate('testClassName', new GeneratorData($source));
@@ -53,10 +53,10 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resourceDataProvider
      */
-    public function testShouldValidateData($data, ?string $exception = null): void
+    public function testShouldValidateData(mixed $data, ?string $exception = null): void
     {
         if (null !== $exception) {
-            $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
+            $this->expectException(SyntaxException::class);
             $this->expectExceptionMessage($exception);
         }
 
@@ -112,7 +112,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     public function testShouldValidateExpressionLanguageSyntax(): void
     {
         $constraintErrorMessage = '"Unclosed "[" around position 4 for expression `data[["foo"].bar()`."';
-        $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
+        $this->expectException(SyntaxException::class);
         $this->expectExceptionMessage(
             'Syntax error: ' . $constraintErrorMessage . ' at "actions.0.@setOption.optionValue"'
         );
@@ -219,7 +219,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     public function testGenerate(): void
     {
-        static::assertSame(
+        self::assertSame(
             <<<'CODE'
 <?php
 

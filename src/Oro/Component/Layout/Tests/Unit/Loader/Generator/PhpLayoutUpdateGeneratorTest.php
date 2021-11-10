@@ -10,16 +10,11 @@ use Oro\Component\Layout\Tests\Unit\Loader\Stubs\StubConditionVisitor;
 
 class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected PhpLayoutUpdateGenerator $generator;
+    private PhpLayoutUpdateGenerator $generator;
 
     protected function setUp(): void
     {
         $this->generator = new PhpLayoutUpdateGenerator();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->generator);
     }
 
     // @codingStandardsIgnoreStart
@@ -30,7 +25,7 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     {
         $data = new GeneratorData($code, 'testfilename.php');
 
-        static::assertSame(
+        self::assertSame(
             <<<'CODE'
 <?php
 
@@ -54,7 +49,7 @@ CODE
     }
     // @codingStandardsIgnoreEnd
 
-    public function sourceCodeProvider()
+    public function sourceCodeProvider(): array
     {
         return [
             'should take whole code given' => ['$code' => 'echo 123;'],
@@ -67,7 +62,7 @@ CODE
     // @codingStandardsIgnoreStart
     public function testShouldCompileConditions()
     {
-        static::assertSame(
+        self::assertSame(
             <<<'CODE'
 <?php
 

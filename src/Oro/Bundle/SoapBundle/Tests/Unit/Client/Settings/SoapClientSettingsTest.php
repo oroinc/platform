@@ -3,9 +3,8 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Client\Settings;
 
 use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettings;
-use PHPUnit\Framework\TestCase;
 
-class SoapClientSettingsTest extends TestCase
+class SoapClientSettingsTest extends \PHPUnit\Framework\TestCase
 {
     public function testAccessors()
     {
@@ -15,8 +14,8 @@ class SoapClientSettingsTest extends TestCase
 
         $settings = new SoapClientSettings($wsdlFilePath, $methodName, $soapOptions);
 
-        static::assertSame($wsdlFilePath, $settings->getWsdlFilePath());
-        static::assertSame($methodName, $settings->getMethodName());
-        static::assertSame($soapOptions, $settings->getSoapOptions());
+        self::assertSame($wsdlFilePath, $settings->getWsdlFilePath());
+        self::assertSame($methodName, $settings->getMethodName());
+        self::assertSame($soapOptions, $settings->getSoapOptions());
     }
 }

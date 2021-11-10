@@ -6,10 +6,8 @@ use Oro\Component\Layout\Block\Type\Options;
 
 class OptionsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Options
-     */
-    protected $options;
+    /** @var Options */
+    private $options;
 
     protected function setUp(): void
     {

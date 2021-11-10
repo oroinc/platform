@@ -18,16 +18,15 @@ class BlockViewCacheTest extends LayoutTestCase
     /** @var BlockView */
     private $blockView;
 
-    /** @var BlockViewCache */
-    private $blockViewCache;
-
     /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
+
+    /** @var BlockViewCache */
+    private $blockViewCache;
 
     protected function setUp(): void
     {
         $this->blockView = new BlockView();
-
         $this->cacheProvider = $this->createMock(CacheProvider::class);
 
         $normalizer = new ObjectNormalizer();
@@ -109,7 +108,7 @@ class BlockViewCacheTest extends LayoutTestCase
             ->willReturn(true);
         $normalizer->expects($this->any())
             ->method('normalize')
-            ->willReturnCallback(function ($data, $format, $context) {
+            ->willReturnCallback(function ($data) {
                 return $data->vars;
             });
         $normalizer->expects($this->any())

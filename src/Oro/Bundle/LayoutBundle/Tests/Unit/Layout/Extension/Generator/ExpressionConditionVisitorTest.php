@@ -14,13 +14,10 @@ class ExpressionConditionVisitorTest extends \PHPUnit\Framework\TestCase
 {
     public function testVisit()
     {
-        /** @var ParsedExpression $expression */
-        $expression = $this->getMockBuilder(ParsedExpression::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expression = $this->createMock(ParsedExpression::class);
 
         $expressionLanguage = $this->createMock(ExpressionLanguage::class);
-        $expressionLanguage->expects(static::once())
+        $expressionLanguage->expects(self::once())
             ->method('compile')
             ->with($expression)
             ->willReturn('(true == $context["enabled"])');
@@ -39,7 +36,7 @@ class ExpressionConditionVisitorTest extends \PHPUnit\Framework\TestCase
 
         $method->setBody($visitContext->getUpdateMethodBody());
 
-        static::assertSame(
+        self::assertSame(
             <<<CLASS
 namespace Test;
 

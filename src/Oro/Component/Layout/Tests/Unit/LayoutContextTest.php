@@ -2,7 +2,9 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\ContextDataCollection;
 use Oro\Component\Layout\ContextItemInterface;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\LayoutContext;
 
 /**
@@ -11,7 +13,7 @@ use Oro\Component\Layout\LayoutContext;
 class LayoutContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     protected function setUp(): void
     {
@@ -21,7 +23,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueDataProvider
      */
-    public function testGetSetHasRemove($value)
+    public function testGetSetHasRemove(mixed $value)
     {
         $this->assertFalse(
             $this->context->has('test'),
@@ -75,7 +77,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function valueDataProvider()
+    public function valueDataProvider(): array
     {
         return [
             [null],
@@ -89,11 +91,11 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(\sprintf(
             'Failed to resolve the context variables.'
             . ' Reason: The option "test" has invalid type. Expected "%s", but "stdClass" given.',
-            \Oro\Component\Layout\ContextItemInterface::class
+            ContextItemInterface::class
         ));
 
         $this->context->getResolver()->setDefined(['test']);
@@ -142,7 +144,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveThrowsExceptionWhenInvalidData()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Failed to resolve the context variables.');
 
         $this->context->set('test', 'val');
@@ -151,7 +153,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveThrowsExceptionWhenDataAlreadyResolved()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The context variables are already resolved.');
 
         $this->context->resolve();
@@ -177,7 +179,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNewValueThrowsExceptionWhenDataAlreadyResolved()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             'The item "test" cannot be added because the context variables are already resolved.'
         );
@@ -196,7 +198,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveExistingValueThrowsExceptionWhenDataAlreadyResolved()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             'The item "test" cannot be removed because the context variables are already resolved.'
         );
@@ -210,10 +212,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetData()
     {
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\ContextDataCollection',
-            $this->context->data()
-        );
+        $this->assertInstanceOf(ContextDataCollection::class, $this->context->data());
     }
 
     public function testGetHash()
@@ -227,7 +226,9 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
     public function testGetHashWithContextItemInterfaceDescendantItems()
     {
         $item = $this->createMock(ContextItemInterface::class);
-        $item->expects($this->once())->method('getHash')->willReturn('value');
+        $item->expects($this->once())
+            ->method('getHash')
+            ->willReturn('value');
 
         $this->context->getResolver()->setDefined(['item']);
         $this->context->set('item', $item);
@@ -238,7 +239,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHashThrowAnException()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The context is not resolved.');
 
         $this->context->getHash();

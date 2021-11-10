@@ -211,7 +211,6 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
     public function testConfigureOptions()
     {
         $name = 'test';
-        /** @var OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
 
         $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
@@ -305,7 +304,8 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $id = 'test';
         $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
         $item = $this->createMock(LayoutItemInterface::class);
-        $item->expects($this->once())->method('getContext')
+        $item->expects($this->once())
+            ->method('getContext')
             ->willReturn($this->createMock(ContextInterface::class));
 
         $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);

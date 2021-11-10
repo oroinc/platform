@@ -6,8 +6,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
 
 class ResourceIteratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
-    protected $resources = [
+    private array $resources = [
         'base'  => [
             'default.yml',
             'oro_dashboard_view' => [

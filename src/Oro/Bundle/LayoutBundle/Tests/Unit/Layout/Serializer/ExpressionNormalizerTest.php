@@ -19,6 +19,7 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->cache = $this->createMock(ExpressionLanguageCache::class);
+
         $this->normalizer = new ExpressionNormalizer($this->cache);
     }
 
@@ -50,8 +51,12 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $nodes = $this->createMock(ConstantNode::class);
 
-        $parsedExpression->expects($this->once())->method('getNodes')->willReturn($nodes);
-        $parsedExpression->expects($this->once())->method('__toString')->willReturn($expression);
+        $parsedExpression->expects($this->once())
+            ->method('getNodes')
+            ->willReturn($nodes);
+        $parsedExpression->expects($this->once())
+            ->method('__toString')
+            ->willReturn($expression);
 
         $expected = ['e' => $expression, 'n' => serialize($nodes)];
 
@@ -63,7 +68,9 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
         $expression = '5';
 
         $parsedExpression = $this->createMock(ParsedExpression::class);
-        $parsedExpression->expects($this->once())->method('__toString')->willReturn($expression);
+        $parsedExpression->expects($this->once())
+            ->method('__toString')
+            ->willReturn($expression);
 
         $this->cache->expects($this->once())
             ->method('getClosure')

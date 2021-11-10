@@ -11,6 +11,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private const CONFIG_KEY = 'oro_test.key';
+
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
@@ -19,9 +21,6 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attachmentManager;
-
-    /** @var string */
-    private $configKey = 'oro_test.key';
 
     /** @var ConfigImagePlaceholderProvider */
     private $provider;
@@ -36,7 +35,7 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             $this->configManager,
             $this->doctrineHelper,
             $this->attachmentManager,
-            $this->configKey
+            self::CONFIG_KEY
         );
     }
 
@@ -46,7 +45,7 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with($this->configKey)
+            ->with(self::CONFIG_KEY)
             ->willReturn($id);
 
         $image = new File();
@@ -70,7 +69,7 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with($this->configKey)
+            ->with(self::CONFIG_KEY)
             ->willReturn(null);
 
         $this->doctrineHelper->expects($this->never())
@@ -88,7 +87,7 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with($this->configKey)
+            ->with(self::CONFIG_KEY)
             ->willReturn($id);
 
         $this->doctrineHelper->expects($this->once())

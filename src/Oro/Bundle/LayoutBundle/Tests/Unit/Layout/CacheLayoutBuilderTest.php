@@ -32,33 +32,29 @@ class CacheLayoutBuilderTest extends LayoutBuilderTest
 
         $renderCache = $this->createMock(RenderCache::class);
         $this->layoutBuilder = $this->getMockBuilder(CacheLayoutBuilder::class)
-            ->setConstructorArgs(
-                [
-                    $this->registry,
-                    $this->rawLayoutBuilder,
-                    $this->layoutManipulator,
-                    $this->blockFactory,
-                    $rendererRegistry,
-                    $this->expressionProcessor,
-                    $renderCache,
-                    $this->blockViewCache,
-                ]
-            )
+            ->setConstructorArgs([
+                $this->registry,
+                $this->rawLayoutBuilder,
+                $this->layoutManipulator,
+                $this->blockFactory,
+                $rendererRegistry,
+                $this->expressionProcessor,
+                $renderCache,
+                $this->blockViewCache,
+            ])
             ->onlyMethods(['createLayout'])
             ->getMock();
 
         $this->layoutBuilderWithoutCache = $this->getMockBuilder(CacheLayoutBuilder::class)
-            ->setConstructorArgs(
-                [
-                    $this->registry,
-                    $this->rawLayoutBuilder,
-                    $this->layoutManipulator,
-                    $this->blockFactory,
-                    $rendererRegistry,
-                    $this->expressionProcessor,
-                    $renderCache,
-                ]
-            )
+            ->setConstructorArgs([
+                $this->registry,
+                $this->rawLayoutBuilder,
+                $this->layoutManipulator,
+                $this->blockFactory,
+                $rendererRegistry,
+                $this->expressionProcessor,
+                $renderCache,
+            ])
             ->onlyMethods(['createLayout'])
             ->getMock();
     }

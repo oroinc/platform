@@ -9,19 +9,16 @@ use Twig\Template;
 
 class BaseTwigRendererEngineTest extends RendererEngineTest
 {
-    /**
-     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
 
-    /**
-     * @var BaseTwigRendererEngine
-     */
-    protected $engine;
+    /** @var BaseTwigRendererEngine */
+    private $engine;
 
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
+
         $this->engine = $this->createRendererEngine();
     }
 
@@ -33,13 +30,12 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $template = $this->createTheme($blockName);
         $resource = [$template, $blockName];
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
-        $view = $this->createMock('Symfony\Component\Form\FormView');
+        $view = $this->createMock(FormView::class);
         $view->vars['cache_key'] = $cacheKey;
 
         $this->environment->expects($this->any())
             ->method('mergeGlobals')
-            ->will($this->returnValue($variables));
+            ->willReturn($variables);
 
         $template->expects($this->once())
             ->method('displayBlock')
@@ -57,8 +53,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $firstTheme = $this->createTheme($blockName);
         $secondTheme = $this->createTheme($blockName);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
-        $view = $this->createMock('Symfony\Component\Form\FormView');
+        $view = $this->createMock(FormView::class);
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme, $secondTheme]);
@@ -82,8 +77,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
             '__datagrid__datagrid',
         ];
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
-        $view = $this->createMock('Symfony\Component\Form\FormView');
+        $view = $this->createMock(FormView::class);
         $view->vars['cache_key'] = '_customer_role_datagrid';
 
         $this->engine->addDefaultThemes([
@@ -119,10 +113,9 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
     }
 
     /**
-     * @param string $blockName
      * @return Template|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createTheme($blockName)
+    private function createTheme(string $blockName)
     {
         $theme = $this->createMock(Template::class);
         $theme->expects($this->any())

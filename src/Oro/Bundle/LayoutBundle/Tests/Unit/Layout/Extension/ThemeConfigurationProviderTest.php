@@ -17,12 +17,6 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeConfigurationProvider */
     private $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $bundle1 = new TestBundle();
@@ -34,10 +28,8 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->cacheFile = $this->getTempFile('ConfigurationProvider');
-
         $this->configurationProvider = new ThemeConfigurationProvider(
-            $this->cacheFile,
+            $this->getTempFile('ConfigurationProvider'),
             false,
             new ThemeConfiguration(),
             '[a-zA-Z][a-zA-Z0-9_\-:]*'

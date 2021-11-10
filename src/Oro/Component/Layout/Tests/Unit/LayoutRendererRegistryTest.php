@@ -2,12 +2,13 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 
 class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRendererRegistry */
-    protected $registry;
+    private $registry;
 
     protected function setUp(): void
     {
@@ -33,8 +34,8 @@ class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
     public function testGetRenderer()
     {
         // prepare data
-        $renderer1 = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
-        $renderer2 = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
+        $renderer1 = $this->createMock(LayoutRendererInterface::class);
+        $renderer2 = $this->createMock(LayoutRendererInterface::class);
         $this->registry->addRenderer('test1', $renderer1);
         $this->registry->addRenderer('test2', $renderer2);
         $this->registry->setDefaultRenderer('test2');

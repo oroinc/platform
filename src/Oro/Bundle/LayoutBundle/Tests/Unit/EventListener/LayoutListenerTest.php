@@ -25,11 +25,14 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private LayoutManager|\PHPUnit\Framework\MockObject\MockObject $layoutManager;
+    /** @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $layoutManager;
 
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private LayoutListener $listener;
+    /** @var LayoutListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -46,7 +49,8 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldNotModifyResponseWithoutLayoutAnnotation(): void
     {
-        $this->layoutManager->expects(self::never())->method('getLayoutBuilder');
+        $this->layoutManager->expects(self::never())
+            ->method('getLayoutBuilder');
         $responseEvent = $this->createResponseForControllerResultEvent([], []);
         $this->listener->onKernelView($responseEvent);
         self::assertFalse($responseEvent->hasResponse());
@@ -78,7 +82,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                 'vars'        => ['var1', 'var2']
             ]
         );
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             ['_layout' => $layoutAnnotation],
             [
                 'var1' => 'value1',
@@ -104,7 +108,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                 'blockTheme' => 'blockTheme.html.twig'
             ]
         );
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             ['_layout' => $layoutAnnotation],
             []
         );
@@ -127,7 +131,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                 'blockThemes' => 'blockTheme.html.twig'
             ]
         );
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             ['_layout' => $layoutAnnotation],
             []
         );
@@ -150,7 +154,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             '_layout' => $layoutAnnotation,
             'layout_block_ids' => array_keys($blocks),
         ];
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             $attributes,
             []
         );
@@ -193,7 +197,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             '_layout' => $layoutAnnotation,
             'layout_block_ids' => ['block1', 'block2'],
         ];
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             $attributes,
             []
         );
@@ -270,12 +274,10 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         array $options
     ): void {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(
-            \sprintf(
-                'The empty @Layout() annotation must be used when the controller returns an instance of "%s".',
-                Layout::class
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'The empty @Layout() annotation must be used when the controller returns an instance of "%s".',
+            Layout::class
+        ));
 
         $attributes = ['_layout' => new LayoutAnnotation($options)];
         $layout = $this->createMock(Layout::class);
@@ -308,7 +310,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                 'action' => 'default_action'
             ]
         );
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             ['_layout' => $layoutAnnotation],
             [
                 'action' => 'updated_action'
@@ -332,7 +334,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                 'theme' => 'default_theme'
             ]
         );
-        $responseEvent    = $this->createResponseForControllerResultEvent(
+        $responseEvent = $this->createResponseForControllerResultEvent(
             ['_layout' => $layoutAnnotation],
             [
                 'theme' => 'updated_theme'

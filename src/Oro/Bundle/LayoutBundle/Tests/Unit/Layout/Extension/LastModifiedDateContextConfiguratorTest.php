@@ -9,15 +9,16 @@ use Oro\Component\Layout\LayoutContext;
 
 class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActionContextConfigurator */
-    private $contextConfigurator;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|LastModificationDateProvider */
     private $lastModificationDateProvider;
+
+    /** @var ActionContextConfigurator */
+    private $contextConfigurator;
 
     protected function setUp(): void
     {
         $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
+
         $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->lastModificationDateProvider);
     }
 
@@ -28,7 +29,7 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCas
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertTrue(is_string($context['last_modification_date']));
+        $this->assertIsString($context['last_modification_date']);
     }
 
     public function testConfigureContext()

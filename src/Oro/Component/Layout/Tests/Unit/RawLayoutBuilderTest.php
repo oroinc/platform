@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
@@ -15,7 +16,7 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
 class RawLayoutBuilderTest extends LayoutTestCase
 {
     /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
+    private $rawLayoutBuilder;
 
     protected function setUp(): void
     {
@@ -156,7 +157,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
 
     public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $this->rawLayoutBuilder->add('root', null, $type);
         $this->assertSame(
             $type,
@@ -500,7 +501,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
 
     public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject()
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $this->rawLayoutBuilder->add('root', null, $type);
         $this->assertSame(
             $type,

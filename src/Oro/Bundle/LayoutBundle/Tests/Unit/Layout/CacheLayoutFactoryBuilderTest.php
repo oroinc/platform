@@ -8,20 +8,14 @@ use Oro\Bundle\LayoutBundle\Layout\CacheLayoutFactory;
 use Oro\Bundle\LayoutBundle\Layout\CacheLayoutFactoryBuilder;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class CacheLayoutFactoryBuilderTest extends TestCase
+class CacheLayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CacheLayoutFactoryBuilder
-     */
-    private $cacheLayoutFactoryBuilder;
-
-    /**
-     * @var CacheMetadataProvider|MockObject
-     */
+    /** @var CacheMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheMetadataProvider;
+
+    /** @var CacheLayoutFactoryBuilder */
+    private $cacheLayoutFactoryBuilder;
 
     protected function setUp(): void
     {

@@ -49,23 +49,18 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
                 ]
             )
         );
-        $this->rawLayoutBuilder  = new RawLayoutBuilder();
+        $this->rawLayoutBuilder = new RawLayoutBuilder();
         $this->layoutManipulator = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
-        $expressionLanguage      = new ExpressionLanguage();
-        $expressionProcessor     = new ExpressionProcessor($expressionLanguage, new ExpressionEncoderRegistry([]));
-        $this->blockFactory      = new BlockFactory($this->registry, $this->layoutManipulator, $expressionProcessor);
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionProcessor = new ExpressionProcessor($expressionLanguage, new ExpressionEncoderRegistry([]));
+        $this->blockFactory = new BlockFactory($this->registry, $this->layoutManipulator, $expressionProcessor);
     }
 
-    /**
-     * @param string|null $rootId
-     *
-     * @return BlockView
-     */
-    protected function getLayoutView($rootId = null)
+    protected function getLayoutView(): BlockView
     {
         $this->layoutManipulator->applyChanges($this->context, true);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
+        return $this->blockFactory->createBlockView($rawLayout, $this->context);
     }
 }

@@ -8,10 +8,8 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ThemesRelativePathGeneratorExtension
-     */
-    protected $extension;
+    /** @var ThemesRelativePathGeneratorExtension */
+    private $extension;
 
     protected function setUp(): void
     {

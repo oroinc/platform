@@ -16,10 +16,10 @@ use Symfony\Component\VarDumper\Cloner\Data;
 class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextHolder;
+    private $contextHolder;
 
     /** @var LayoutDataCollector */
-    protected $dataCollector;
+    private $dataCollector;
 
     protected function setUp(): void
     {
@@ -29,17 +29,12 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             'oro_layout.debug_developer_toolbar' => true,
         ];
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($configs) {
-                        return $configs[$code];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($configs) {
+                return $configs[$code];
+            });
 
         $this->dataCollector = new LayoutDataCollector($this->contextHolder, $configManager, true);
     }
@@ -74,10 +69,9 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             $context->data()->set($name, $item);
         }
 
-        $this->contextHolder
-            ->expects($this->once())
+        $this->contextHolder->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $notAppliedActions =  [
             [
                 'name' => 'add',
@@ -101,7 +95,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $this->dataCollector->setNotAppliedActions($notAppliedActions);
-        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
+        $this->dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
         $this->assertEquals($contextItems, $this->dataCollector->getData()['context']['items']);
         $this->assertArrayHasKey('views', $this->dataCollector->getData());
@@ -161,21 +155,19 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         foreach ($blockViews as $blockView) {
             $blockView->vars = $options[$blockView->vars['id']];
 
-            /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
             $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
-                ->will($this->returnValue($blockView->vars['id']));
+                ->willReturn($blockView->vars['id']);
 
             $this->dataCollector->collectBlockView($block, $blockView);
         }
 
-        $this->contextHolder
-            ->expects($this->once())
+        $this->contextHolder->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue(new LayoutContext()));
+            ->willReturn(new LayoutContext());
 
-        $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
+        $this->dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
         $data = $this->dataCollector->getData();
         $this->assertEquals('root', $data['views']['root']['id']);
@@ -191,7 +183,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
      *
      * @return BlockView[]
      */
-    protected function getBlockViews(BlockView $rootBlock, $tree, &$blockViews = [])
+    private function getBlockViews(BlockView $rootBlock, array $tree, ?array &$blockViews = []): array
     {
         $blockViews[] = $rootBlock;
 
@@ -205,21 +197,5 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         }
 
         return $blockViews;
-    }
-
-    /**
-     * @return Request|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockRequest()
-    {
-        return $this->createMock(Request::class);
-    }
-
-    /**
-     * @return Response|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockResponse()
-    {
-        return $this->createMock(Response::class);
     }
 }

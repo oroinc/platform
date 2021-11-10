@@ -14,16 +14,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $cm;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $cm;
 
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private EntityMetadataProvider $provider;
+    /** @var EntityMetadataProvider */
+    private $provider;
 
     protected function setUp(): void
     {
         $this->cm = $this->createMock(ConfigManager::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->provider = new EntityMetadataProvider($this->cm, $this->translator);
     }
 
@@ -37,11 +41,6 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configValuesProvider
-     *
-     * @param string $entityName
-     * @param bool $hasConfig
-     * @param array $configValuesMap
-     * @param array $expectedResult
      */
     public function testGetMetadata(
         string $entityName,
@@ -52,8 +51,7 @@ class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $classMetadata = new ClassMetadataInfo($entityName);
         $object = $this->createMock(EntityManagerAwareInterface::class);
 
-        $apiManager = $this->getMockBuilder(ApiEntityManager::class)
-            ->disableOriginalConstructor()->getMock();
+        $apiManager = $this->createMock(ApiEntityManager::class);
         $apiManager->expects(self::once())
             ->method('getMetadata')
             ->willReturn($classMetadata);

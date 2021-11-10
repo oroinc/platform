@@ -65,10 +65,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepare(new GeneratorData($source), $collection);
     }
 
-    /**
-     * @return array
-     */
-    public function prepareWithoutNodeImportsDataProvider()
+    public function prepareWithoutNodeImportsDataProvider(): array
     {
         return [
             'without imports' => [
@@ -108,8 +105,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 
         $collection = $this->createMock(VisitorCollection::class);
         $collection->expects($this->never())
-            ->method('append')
-            ->with(new ImportLayoutUpdateVisitor());
+            ->method('append');
 
         $this->extension->prepare(new GeneratorData([], $filename), $collection);
     }

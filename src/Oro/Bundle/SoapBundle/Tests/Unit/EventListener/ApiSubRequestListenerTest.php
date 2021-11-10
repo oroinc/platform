@@ -78,7 +78,6 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
 
     private function createEvent(Request $request, int $type = HttpKernelInterface::SUB_REQUEST): RequestEvent
     {
-        /** @var HttpKernelInterface $httpKernel */
         $httpKernel = $this->createMock(HttpKernelInterface::class);
 
         return new RequestEvent($httpKernel, $request, $type);

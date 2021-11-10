@@ -12,7 +12,7 @@ class VisitContextTest extends \PHPUnit\Framework\TestCase
     {
         $class = new ClassGenerator(\uniqid('testClassName', false));
         $visitContext = new VisitContext($class);
-        static::assertSame($class, $visitContext->getClass());
+        self::assertSame($class, $visitContext->getClass());
     }
 
     public function testAppendToUpdateMethodBody()
@@ -20,7 +20,7 @@ class VisitContextTest extends \PHPUnit\Framework\TestCase
         $visitContext = new VisitContext(new ClassGenerator());
         $visitContext->setUpdateMethodBody('echo "123";');
         $visitContext->appendToUpdateMethodBody('echo "456";');
-        static::assertSame(
+        self::assertSame(
             <<<'CODE'
 echo "123";
 echo "456";

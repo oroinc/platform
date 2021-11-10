@@ -8,7 +8,7 @@ use Oro\Component\Layout\LayoutContext;
 class ExpressionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
     protected function setUp(): void
     {

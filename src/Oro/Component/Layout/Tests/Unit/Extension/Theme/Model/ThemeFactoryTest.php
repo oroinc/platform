@@ -20,11 +20,6 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new ThemeFactory(new PropertyAccessor());
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->factory);
-    }
-
     /**
      * @dataProvider themeDefinitionDataProvider
      *

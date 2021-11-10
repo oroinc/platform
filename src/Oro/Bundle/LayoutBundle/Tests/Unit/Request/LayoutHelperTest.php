@@ -47,38 +47,24 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
-    public function testIsLayoutRequest(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null
-    ) {
+    public function testIsLayoutRequest(?Request $request, ?LayoutAnnotation $annotation)
+    {
         $this->setUpRequestStack($request, $annotation);
         $this->assertEquals(null !== $annotation, $this->helper->isLayoutRequest($request));
     }
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
-    public function testIsTemplateRequest(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null
-    ) {
+    public function testIsTemplateRequest(?Request $request, ?LayoutAnnotation $annotation)
+    {
         $this->setUpRequestStack($request, $annotation);
         $this->assertEquals(null === $annotation, $this->helper->isTemplateRequest($request));
     }
 
-    /**
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
-     */
-    private function setUpRequestStack(
-        \PHPUnit\Framework\MockObject\MockObject $request = null,
-        \PHPUnit\Framework\MockObject\MockObject $annotation = null
-    ) {
+    private function setUpRequestStack(?Request $request, ?LayoutAnnotation $annotation): void
+    {
         if ($request) {
             $this->requestStack->expects($this->never())
                 ->method('getCurrentRequest');
@@ -89,7 +75,6 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn($request);
         }
 
-        /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject $attributes */
         $attributes = $this->createMock(ParameterBag::class);
         $request->attributes = $attributes;
         $attributes->expects($this->once())

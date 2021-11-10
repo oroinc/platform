@@ -12,7 +12,7 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 class ThemeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Theme */
-    protected $theme;
+    private $theme;
 
     protected function setUp(): void
     {

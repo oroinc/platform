@@ -19,7 +19,7 @@ class ElementDependentVisitorTest extends \PHPUnit\Framework\TestCase
         $conditionObject->startVisit($visitContext);
         $conditionObject->endVisit($visitContext);
 
-        static::assertSame(
+        self::assertSame(
             <<<CONTENT
 class LayoutUpdateClass implements Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface
 {

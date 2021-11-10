@@ -33,7 +33,7 @@ class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
 
         $phpClass->addMethod('testMethod')->addBody($visitContext->getUpdateMethodBody());
 
-        static::assertSame(
+        self::assertSame(
             <<<CODE
 namespace Test;
 

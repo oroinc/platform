@@ -13,21 +13,15 @@ class TwigRendererTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetEnvironment()
     {
-        /** @var Environment $environment */
         $environment = $this->createMock(Environment::class);
+        $rendererCache = $this->createMock(RenderCache::class);
+        $placeholderRenderer = $this->createMock(PlaceholderRenderer::class);
+        $logger = $this->createMock(LoggerInterface::class);
 
-        /** @var TwigRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject $engine */
-        $engine = $this->createMock('Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface');
+        $engine = $this->createMock(TwigRendererEngineInterface::class);
         $engine->expects($this->once())
             ->method('setEnvironment')
             ->with($environment);
-
-        /** @var RenderCache $rendererCache */
-        $rendererCache = $this->createMock(RenderCache::class);
-        /** @var PlaceholderRenderer $placeholderRenderer */
-        $placeholderRenderer = $this->createMock(PlaceholderRenderer::class);
-        /** @var LoggerInterface $engine */
-        $logger = $this->createMock(LoggerInterface::class);
 
         $renderer = new TwigRenderer($engine, $rendererCache, $placeholderRenderer, $logger);
         $renderer->setEnvironment($environment);

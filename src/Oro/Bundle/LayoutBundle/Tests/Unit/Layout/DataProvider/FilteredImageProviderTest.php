@@ -18,13 +18,11 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FilteredImageProvider */
     private $placeholderDataProvider;
 
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->imagePlaceholderProvider = $this->createMock(ImagePlaceholderProviderInterface::class);
+
         $this->placeholderDataProvider = new FilteredImageProvider(
             $this->attachmentManager,
             $this->imagePlaceholderProvider
@@ -36,14 +34,12 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $filter = 'filter';
 
-        $this->attachmentManager
-            ->expects($this->once())
+        $this->attachmentManager->expects($this->once())
             ->method('getFilteredImageUrl')
             ->with($file, $filter)
             ->willReturn('/path/to/filtered/image');
 
-        $this->imagePlaceholderProvider
-            ->expects($this->never())
+        $this->imagePlaceholderProvider->expects($this->never())
             ->method('getPath');
 
         $this->assertEquals(
@@ -57,12 +53,10 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetImageUrlWithoutFile(?string $path, string $expectedPath): void
     {
-        $this->attachmentManager
-            ->expects($this->never())
+        $this->attachmentManager->expects($this->never())
             ->method('getFilteredImageUrl');
 
-        $this->imagePlaceholderProvider
-            ->expects($this->once())
+        $this->imagePlaceholderProvider->expects($this->once())
             ->method('getPath')
             ->with('filter')
             ->willReturn($path);
@@ -75,8 +69,7 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetPlaceholder(?string $path, string $expectedPath): void
     {
-        $this->imagePlaceholderProvider
-            ->expects($this->once())
+        $this->imagePlaceholderProvider->expects($this->once())
             ->method('getPath')
             ->with('filter')
             ->willReturn($path);

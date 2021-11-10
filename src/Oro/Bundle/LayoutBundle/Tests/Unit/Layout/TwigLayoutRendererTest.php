@@ -12,18 +12,14 @@ class TwigLayoutRendererTest extends \PHPUnit\Framework\TestCase
 {
     public function testEnvironmentSet()
     {
-        /** @var TwigRendererInterface|\PHPUnit\Framework\MockObject\MockObject $innerRenderer */
         $innerRenderer = $this->createMock(TwigRendererInterface::class);
-        /** @var Environment $environment */
-        $environment   = $this->createMock(Environment::class);
+        $environment = $this->createMock(Environment::class);
+        $formRenderer = $this->createMock(FormRendererEngineInterface::class);
+        $placeholderRenderer = $this->createMock(PlaceholderRenderer::class);
 
         $innerRenderer->expects($this->once())
             ->method('setEnvironment')
             ->with($this->identicalTo($environment));
-        /** @var FormRendererEngineInterface $formRenderer */
-        $formRenderer = $this->createMock(FormRendererEngineInterface::class);
-        /** @var PlaceholderRenderer $placeholderRenderer */
-        $placeholderRenderer = $this->createMock(PlaceholderRenderer::class);
 
         new TwigLayoutRenderer($innerRenderer, $formRenderer, $environment, $placeholderRenderer);
     }

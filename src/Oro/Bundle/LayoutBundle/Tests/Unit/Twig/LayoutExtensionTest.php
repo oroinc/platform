@@ -17,13 +17,13 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var TwigRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $renderer;
+    private $renderer;
 
     /** @var TextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $textHelper;
+    private $textHelper;
 
     /** @var LayoutExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -40,7 +40,6 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testInitRuntime()
     {
-        /** @var Environment $environment */
         $environment = $this->createMock(Environment::class);
 
         $this->renderer->expects($this->once())
@@ -77,7 +76,6 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'merge_context', [$parent, [$name => $value]])
         );
 
-        /** @var BlockView $view */
         foreach ([$parent, $firstChild, $secondChild] as $view) {
             $this->assertArrayHasKey($name, $view->vars);
             $this->assertEquals($value, $view->vars[$name]);
@@ -85,13 +83,9 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $attr
-     * @param array $defaultAttr
-     * @param array $expected
-     *
      * @dataProvider attributeProvider
      */
-    public function testDefaultAttributes($attr, $defaultAttr, $expected)
+    public function testDefaultAttributes(array $attr, array $defaultAttr, array $expected)
     {
         $this->assertEquals(
             $expected,
@@ -99,10 +93,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function attributeProvider()
+    public function attributeProvider(): array
     {
         return [
             'attributes with tilde' => [
@@ -204,23 +195,20 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->setClassPrefixToForm($formView, 'foo');
 
-        $this->assertEquals($formView->vars['class_prefix'], 'foo');
-        $this->assertEquals($childView->vars['class_prefix'], 'foo');
-        $this->assertEquals($prototypeView->vars['class_prefix'], 'foo');
+        $this->assertEquals('foo', $formView->vars['class_prefix']);
+        $this->assertEquals('foo', $childView->vars['class_prefix']);
+        $this->assertEquals('foo', $prototypeView->vars['class_prefix']);
     }
 
     /**
      * @dataProvider convertValueToStringDataProvider
      */
-    public function testConvertValueToString($value, $expectedConvertedValue)
+    public function testConvertValueToString(mixed $value, string $expectedConvertedValue)
     {
         $this->assertSame($expectedConvertedValue, $this->extension->convertValueToString($value));
     }
 
-    /**
-     * @return array
-     */
-    public function convertValueToStringDataProvider()
+    public function convertValueToStringDataProvider(): array
     {
         return [
             'object conversion' => [

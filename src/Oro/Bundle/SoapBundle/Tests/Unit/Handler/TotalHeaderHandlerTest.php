@@ -16,21 +16,22 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    use ContextAwareTest;
-
     /** @var TotalHeaderHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $handler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     protected function setUp(): void
@@ -60,9 +61,20 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($configuration);
     }
 
+    private function createContext(object $controller = null, string $action = null): Context
+    {
+        return new Context(
+            $controller ?: new \stdClass(),
+            new Request(),
+            new Response(),
+            $action ?: 'test_action',
+            []
+        );
+    }
+
     public function testSupportsWithTotalCountAndAction()
     {
-        $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_LIST);
+        $context = $this->createContext(null, RestApiReadInterface::ACTION_LIST);
         $context->set('totalCount', 22);
 
         $this->assertTrue($this->handler->supports($context));
@@ -70,7 +82,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testDoesNotSupportWithOtherThenListActions()
     {
-        $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_READ);
+        $context = $this->createContext(null, RestApiReadInterface::ACTION_READ);
         $context->set('totalCount', 22);
 
         $this->assertFalse($this->handler->supports($context));
@@ -78,7 +90,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testSupportsWithValidQueryAndAction()
     {
-        $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_LIST);
+        $context = $this->createContext(null, RestApiReadInterface::ACTION_LIST);
         $context->set('query', $this->getMockForAbstractClass(AbstractQuery::class, [], '', false));
 
         $this->assertTrue($this->handler->supports($context));
@@ -86,7 +98,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testDoesNotSupportWithOtherThenListActionsButValidQuery()
     {
-        $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_READ);
+        $context = $this->createContext(null, RestApiReadInterface::ACTION_READ);
         $context->set('query', $this->getMockForAbstractClass(AbstractQuery::class, [], '', false));
 
         $this->assertFalse($this->handler->supports($context));
@@ -96,8 +108,6 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $context = $this->createContext(
             $this->createMock(EntityManagerAwareInterface::class),
-            null,
-            null,
             RestApiReadInterface::ACTION_LIST
         );
 
@@ -108,8 +118,6 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $context = $this->createContext(
             $this->createMock(EntityManagerAwareInterface::class),
-            null,
-            null,
             RestApiReadInterface::ACTION_READ
         );
 
@@ -142,7 +150,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $testCount = 22;
 
         $query = new Query($this->em);
-        $qb    = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+        $qb = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
         $qb->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
@@ -184,7 +192,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $testCount = 22;
 
         $dbalQb = $this->createMock(QueryBuilder::class);
-        $conn   = $this->createMock(Connection::class);
+        $conn = $this->createMock(Connection::class);
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects($this->once())
             ->method('getDefaultQueryHints')
@@ -247,7 +255,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $query  = new SqlQuery($em);
+        $query = new SqlQuery($em);
         $dbalQb = $this->createMock(SqlQueryBuilder::class);
         $query->setSqlQueryBuilder($dbalQb);
 

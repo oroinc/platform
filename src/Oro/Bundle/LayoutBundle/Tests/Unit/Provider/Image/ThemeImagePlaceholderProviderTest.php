@@ -21,9 +21,6 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CacheManager|\PHPUnit\Framework\MockObject\MockObject */
     private $imagineCacheManager;
 
-    /** @var string */
-    private $placeholderName = 'pl2';
-
     /** @var ThemeImagePlaceholderProvider */
     private $provider;
 
@@ -37,7 +34,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             $this->contextHolder,
             $this->themeManager,
             $this->imagineCacheManager,
-            $this->placeholderName
+            'pl2'
         );
     }
 
