@@ -2,10 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Oro\Component\MessageQueue\Client\Router\MessageRouterInterface;
 use Oro\Component\MessageQueue\Exception\InvalidArgumentException;
-use Oro\Component\MessageQueue\Exception\TopicSubscriberNotFoundException;
-use Oro\Component\MessageQueue\Router\RecipientListRouterInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
 /**
@@ -14,23 +12,14 @@ use Oro\Component\MessageQueue\Util\JSON;
  */
 class MessageProducer implements MessageProducerInterface
 {
-    /** @var DriverInterface */
-    private $driver;
+    private DriverInterface $driver;
 
-    /** @var RecipientListRouterInterface */
-    private $router;
+    private MessageRouterInterface $messageRouter;
 
-    /** @var DestinationMetaRegistry */
-    private $destinationMetaRegistry;
-
-    public function __construct(
-        DriverInterface $driver,
-        RecipientListRouterInterface $router,
-        DestinationMetaRegistry $destinationMetaRegistry
-    ) {
+    public function __construct(DriverInterface $driver, MessageRouterInterface $messageRouter)
+    {
         $this->driver = $driver;
-        $this->router = $router;
-        $this->destinationMetaRegistry = $destinationMetaRegistry;
+        $this->messageRouter = $messageRouter;
     }
 
     /**
@@ -38,32 +27,19 @@ class MessageProducer implements MessageProducerInterface
      */
     public function send($topic, $message): void
     {
-        $subscribers = $this->router->getTopicSubscribers($topic);
-        if (!$subscribers) {
-            throw new TopicSubscriberNotFoundException(
-                sprintf('There is no message processors subscribed for topic "%s".', $topic)
-            );
-        }
-
-        foreach ($subscribers as [$processorName, $queueName]) {
-            $queueName = $this->destinationMetaRegistry->getDestinationMeta($queueName)->getTransportName();
-
-            $message = $this->getMessage($message);
-            $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topic);
-            $message->setProperty(Config::PARAMETER_PROCESSOR_NAME, $processorName);
-            $message->setProperty(Config::PARAMETER_QUEUE_NAME, $queueName);
-
-            $queue = $this->driver->createQueue($queueName);
-            $this->driver->send($queue, $message);
+        $message = $this->createMessage($topic, $message);
+        foreach ($this->messageRouter->handle($message) as $envelope) {
+            $this->driver->send($envelope->getQueue(), $envelope->getMessage());
         }
     }
 
     /**
+     * @param string $topicName
      * @param Message|MessageBuilderInterface|array|string|null $rawMessage
      *
      * @return Message
      */
-    private function getMessage($rawMessage): Message
+    private function createMessage(string $topicName, mixed $rawMessage): Message
     {
         if ($rawMessage instanceof MessageBuilderInterface) {
             $rawMessage = $rawMessage->getMessage();
@@ -88,6 +64,8 @@ class MessageProducer implements MessageProducerInterface
             $message->setPriority(MessagePriority::NORMAL);
         }
 
+        $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topicName);
+
         return $message;
     }
 
@@ -111,16 +89,18 @@ class MessageProducer implements MessageProducerInterface
         $body = $message->getBody();
 
         if (null === $body || is_scalar($body)) {
-            return (string) $body;
+            return (string)$body;
         }
 
         if (is_array($body)) {
             return JSON::encode($body);
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'The message\'s body must be either null, scalar or array. Got: %s',
-            is_object($body) ? get_class($body) : gettype($body)
-        ));
+        throw new InvalidArgumentException(
+            sprintf(
+                'The message\'s body must be either null, scalar or array. Got: %s',
+                get_debug_type($body)
+            )
+        );
     }
 }

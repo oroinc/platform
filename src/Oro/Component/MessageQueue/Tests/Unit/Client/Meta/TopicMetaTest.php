@@ -1,55 +1,51 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 
 class TopicMetaTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithNameOnly()
+    public function testGetName(): void
     {
         $topic = new TopicMeta('aName');
 
-        static::assertEquals('aName', $topic->getName());
-        static::assertEquals('', $topic->getDescription());
-        static::assertEquals([], $topic->getSubscribers());
+        self::assertEquals('aName', $topic->getName());
     }
 
-    public function testCouldBeConstructedWithNameAndDescriptionOnly()
+    public function testGetDefaultQueueNames(): void
     {
-        $topic = new TopicMeta('aName', 'aDescription');
+        $topic = new TopicMeta('aName');
 
-        static::assertEquals('aName', $topic->getName());
-        static::assertEquals('aDescription', $topic->getDescription());
-        static::assertEquals([], $topic->getSubscribers());
+        self::assertEquals([Config::DEFAULT_QUEUE_NAME], $topic->getQueueNames());
     }
 
-    public function testCouldBeConstructedWithNameAndDescriptionAndSubscribers()
+    public function testGetQueueNames(): void
     {
-        $topic = new TopicMeta('aName', 'aDescription', ['aSubscriber']);
+        $topic = new TopicMeta('aName', ['sampleQueue']);
 
-        static::assertEquals('aName', $topic->getName());
-        static::assertEquals('aDescription', $topic->getDescription());
-        static::assertEquals(['aSubscriber'], $topic->getSubscribers());
+        self::assertEquals(['sampleQueue'], $topic->getQueueNames());
     }
 
-    public function testShouldAllowGetNameSetInConstructor()
+    public function testGetMessageProcessorName(): void
     {
-        $topic = new TopicMeta('theName', 'aDescription');
+        $topic = new TopicMeta('aName', ['sampleQueue'], ['sampleQueue' => 'aSubscriber']);
 
-        static::assertSame('theName', $topic->getName());
+        self::assertEquals('aSubscriber', $topic->getMessageProcessorName('sampleQueue'));
     }
 
-    public function testShouldAllowGetDescriptionSetInConstructor()
+    public function testGetMessageProcessorNameReturnsEmptyString(): void
     {
-        $topic = new TopicMeta('aName', 'theDescription');
+        $topic = new TopicMeta('aName', ['sampleQueue'], ['sampleQueue' => 'aSubscriber']);
 
-        static::assertSame('theDescription', $topic->getDescription());
+        self::assertEquals('', $topic->getMessageProcessorName());
     }
 
-    public function testShouldAllowGetSubscribersSetInConstructor()
+    public function testGetMessageProcessorNameReturnsProcessorForDefaultQueue(): void
     {
-        $topic = new TopicMeta('aName', '', ['aSubscriber']);
+        $topic = new TopicMeta('aName', [Config::DEFAULT_QUEUE_NAME], [Config::DEFAULT_QUEUE_NAME => 'aSubscriber']);
 
-        static::assertSame(['aSubscriber'], $topic->getSubscribers());
+        self::assertEquals('aSubscriber', $topic->getMessageProcessorName());
     }
 }

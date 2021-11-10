@@ -41,8 +41,7 @@ services:
         lazy: true
         arguments:
             - '@oro_message_queue.client.driver'
-            - '@oro_message_queue.client.router'
-            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - '@oro_message_queue.router.message_router'
 
     Oro\Component\MessageQueue\Client\MessageProducerInterface:
         alias: 'oro_message_queue.client.message_producer'
@@ -51,53 +50,59 @@ services:
         alias: 'oro_message_queue.client.message_producer'
         public: true
 
-    oro_message_queue.client.router:
-        class: 'Oro\Component\MessageQueue\Client\Router'
-        public: false
+    oro_message_queue.router.message_router:
+        class: 'Oro\Component\MessageQueue\Client\Router\MessageRouter'
         arguments:
             - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.client.meta.topic_meta_registry'
             - '@oro_message_queue.client.meta.destination_meta_registry'
-            - []
-
-    oro_message_queue.client.route_message_processor:
-        class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
-        arguments:
-            - '@oro_message_queue.client.router'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.route_message' }
 
     oro_message_queue.client.message_processor_registry:
-        class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
+        class: 'Oro\Component\MessageQueue\Client\MessageProcessorRegistry'
         arguments:
-            - []
-            - '@service_container'
+            - !abstract message processors defined in BuildMessageProcessorRegistryPass
+        tags: ['container.service_locator']
 
     oro_message_queue.client.meta.topic_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry'
         arguments:
-            - []
+            - $queuesByTopic: defined in BuildTopicMetaRegistryPass
+            - $messageProcessorsByTopicAndQueue: defined in BuildTopicMetaRegistryPass
 
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
         public: true
         arguments:
             - '@oro_message_queue.client.config'
-            - []
-            - 'default'
+            - $messageProcessorsByQueue: !abstract defined in BuildDestinationMetaRegistryPass
 
-    oro_message_queue.client.delegate_message_processor:
-        class: 'Oro\Component\MessageQueue\Client\DelegateMessageProcessor'
+    oro_message_queue.client.meta.topic_description_provider:
+        class: 'Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider'
         arguments:
-            - '@oro_message_queue.client.message_processor_registry'
+            - [] # !abstract defined in AddTopicDescriptionPass
+
+    oro_message_queue.client.noop_message_processor:
+        class: 'Oro\Component\MessageQueue\Client\NoopMessageProcessor'
+        arguments:
+            - '%oro_message_queue.client.noop_status%'
 
     oro_message_queue.client.extension.create_queue:
         class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension'
-        public: false
         arguments:
             - '@oro_message_queue.client.driver'
             - '@oro_message_queue.client.created_queues'
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: -10 }
+
+    oro_message_queue.client.extension.message_processor_router:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension'
+        arguments:
+            - '@oro_message_queue.client.meta.topic_meta_registry'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - 'oro_message_queue.client.noop_message_processor'
+        tags:
+            # Priority should be high enough to ensure that extensions which need message processor are called later.
+            - { name: 'oro_message_queue.consumption.extension', persistent: true, priority: 128 }
 
     oro_message_queue.client.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
@@ -105,6 +110,7 @@ services:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
             - '@oro_message_queue.log.consumer_state'
+            - '@oro_message_queue.client.message_processor_registry'
 
     oro_message_queue.client.created_queues:
         class: 'Oro\Component\MessageQueue\Transport\QueueCollection'

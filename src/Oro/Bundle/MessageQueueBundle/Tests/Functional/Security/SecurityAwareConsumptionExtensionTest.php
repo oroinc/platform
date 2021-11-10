@@ -11,7 +11,6 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
@@ -21,35 +20,20 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class SecurityAwareConsumptionExtensionTest extends WebTestCase
 {
-    /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
+    private MessageProducerInterface $producer;
 
-    /**
-     * @var MessageProcessorInterface
-     */
-    private $messageProcessor;
+    private QueueConsumer $consumer;
 
-    /**
-     * @var QueueConsumer
-     */
-    private $consumer;
-
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {
         $this->initClient();
         $this->clearMessages();
         $container = self::getContainer();
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->consumer = $container->get('oro_message_queue.consumption.queue_consumer');
         $this->producer = $container->get('oro_message_queue.message_producer');
-        $this->messageProcessor = $container->get('oro_message_queue.client.delegate_message_processor');
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     protected function tearDown(): void
@@ -62,7 +46,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     {
         $serializedToken = 'organizationId=1;userId=1;userClass=Oro\\Bundle\\UserBundle\\Entity\\User;roles=';
         $this->producer->send(BasicMessageProcessor::TEST_TOPIC, $this->createMessage($serializedToken));
-        $this->consumer->bind('oro.default', $this->messageProcessor);
+        $this->consumer->bind('oro.default', 'oro_message_queue.async.basic_message_processor');
         $this->consumer->consume(new ChainExtension([
             new LimitConsumedMessagesExtension(1),
             new SecurityAwareConsumptionExtension(
@@ -79,7 +63,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         // This message stop consumer using an extension LimitConsumedMessagesExtension
         // and checks whether the consumer continues to work after an unsuccessful deserialization of the token
         $this->producer->send(BasicMessageProcessor::TEST_TOPIC, 'message');
-        $this->consumer->bind('oro.default', $this->messageProcessor);
+        $this->consumer->bind('oro.default', 'oro_message_queue.async.basic_message_processor');
         $this->expectException(InvalidSecurityTokenException::class);
         $this->expectExceptionMessage('Security token is invalid');
 

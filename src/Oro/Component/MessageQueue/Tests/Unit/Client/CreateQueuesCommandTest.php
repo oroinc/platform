@@ -10,14 +10,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
-    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
+    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
 
-    /** @var CreateQueuesCommand */
-    private $command;
+    private CreateQueuesCommand $command;
 
     protected function setUp(): void
     {
@@ -27,28 +24,28 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new CreateQueuesCommand($this->driver, $this->registry);
     }
 
-    public function testShouldHaveCommandName()
+    public function testShouldHaveCommandName(): void
     {
-        $this->assertEquals('oro:message-queue:create-queues', $this->command->getName());
+        self::assertEquals('oro:message-queue:create-queues', $this->command->getName());
     }
 
-    public function testShouldCreateQueues()
+    public function testShouldCreateQueues(): void
     {
         $destinationMeta1 = new DestinationMeta('', 'queue1');
         $destinationMeta2 = new DestinationMeta('', 'queue2');
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
             ->willReturn([$destinationMeta1, $destinationMeta2]);
 
-        $this->driver->expects($this->exactly(2))
+        $this->driver->expects(self::exactly(2))
             ->method('createQueue')
             ->withConsecutive(['queue1'], ['queue2']);
 
         $tester = new CommandTester($this->command);
         $tester->execute([]);
 
-        static::assertStringContainsString('Creating queue: queue1', $tester->getDisplay());
-        static::assertStringContainsString('Creating queue: queue2', $tester->getDisplay());
+        self::assertStringContainsString('Creating queue: queue1', $tester->getDisplay());
+        self::assertStringContainsString('Creating queue: queue2', $tester->getDisplay());
     }
 }

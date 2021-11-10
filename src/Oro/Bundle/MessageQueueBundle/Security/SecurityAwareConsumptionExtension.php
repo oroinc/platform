@@ -4,7 +4,6 @@ namespace Oro\Bundle\MessageQueueBundle\Security;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -49,7 +48,7 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
      */
     public function onPreReceived(Context $context)
     {
-        if (isset($this->securityAgnosticProcessors[$this->getProcessorName($context)])) {
+        if (isset($this->securityAgnosticProcessors[$context->getMessageProcessorName()])) {
             return;
         }
 
@@ -77,15 +76,5 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
     {
         // reset the security context after processing of each message
         $this->tokenStorage->setToken(null);
-    }
-
-    /**
-     * @param Context $context
-     *
-     * @return string
-     */
-    private function getProcessorName(Context $context)
-    {
-        return $context->getMessage()->getProperty(Config::PARAMETER_PROCESSOR_NAME);
     }
 }

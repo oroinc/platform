@@ -49,9 +49,9 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $meta) {
-            $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportName()));
+            $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportQueueName()));
 
-            $this->clientDriver->createQueue($meta->getTransportName());
+            $this->clientDriver->createQueue($meta->getTransportQueueName());
         }
 
         return 0;

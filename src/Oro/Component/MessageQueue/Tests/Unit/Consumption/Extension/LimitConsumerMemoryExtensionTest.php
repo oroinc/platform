@@ -3,7 +3,6 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -129,7 +128,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger($this->createMock(LoggerInterface::class));
         $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
+        $context->setMessageProcessorName('sample_processor');
 
         return $context;
     }

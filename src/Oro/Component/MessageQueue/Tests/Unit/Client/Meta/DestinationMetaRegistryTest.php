@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Config;
@@ -7,83 +8,61 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 
 class DestinationMetaRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testThrowIfThereIsNotMetaForRequestedClientDestinationName()
+    public function testGetDestinationMetaWhenDestinationNotPresent(): void
     {
-        $registry = new DestinationMetaRegistry(
-            new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            [],
-            'default'
-        );
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The destination meta not found. Requested name `aName`');
+        $registry = new DestinationMetaRegistry(new Config('transport_prefix', 'default_queue'), []);
 
-        $registry->getDestinationMeta('aName');
+        self::assertEquals(
+            new DestinationMeta('queue_name', 'transport_prefix.queue_name', []),
+            $registry->getDestinationMeta('queue_name')
+        );
     }
 
-    public function testShouldAllowGetDestinationByNameWithDefaultInfo()
+    public function testGetDestinationMetaWhenSubscribers(): void
     {
         $destinations = [
-            'theDestinationName' => [],
+            'queue_name' => ['message_processor1'],
         ];
 
-        $registry = new DestinationMetaRegistry(
-            new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations,
-            'theDestinationName'
-        );
+        $registry = new DestinationMetaRegistry(new Config('transport_prefix', 'default_queue'), $destinations);
 
-        $destination = $registry->getDestinationMeta('theDestinationName');
-        $this->assertInstanceOf(DestinationMeta::class, $destination);
-        $this->assertSame('theDestinationName', $destination->getClientName());
-        $this->assertSame('aprefix.adefaultqueuename', $destination->getTransportName());
-        $this->assertSame([], $destination->getSubscribers());
+        self::assertEquals(
+            new DestinationMeta('queue_name', 'transport_prefix.queue_name', ['message_processor1']),
+            $registry->getDestinationMeta('queue_name')
+        );
     }
 
-    public function testShouldAllowGetDestinationByNameWithCustomInfo()
+    public function testGetDestinationMetaByTransportQueueName(): void
     {
-        $destinations = [
-            'theClientDestinationName' => ['transportName' => 'theTransportName', 'subscribers' => ['theSubscriber']],
-        ];
+        $registry = new DestinationMetaRegistry(new Config('transport_prefix', 'default_queue'), []);
 
-        $registry = new DestinationMetaRegistry(
-            new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations,
-            'default'
+        self::assertEquals(
+            new DestinationMeta('queue_name', 'transport_prefix.queue_name', []),
+            $registry->getDestinationMetaByTransportQueueName('transport_prefix.queue_name')
         );
-
-        $destination = $registry->getDestinationMeta('theClientDestinationName');
-        $this->assertInstanceOf(DestinationMeta::class, $destination);
-        $this->assertSame('theClientDestinationName', $destination->getClientName());
-        $this->assertSame('theTransportName', $destination->getTransportName());
-        $this->assertSame(['theSubscriber'], $destination->getSubscribers());
     }
 
-    public function testShouldAllowGetAllDestinations()
+    public function testShouldAllowGetAllDestinations(): void
     {
         $destinations = [
-            'fooDestinationName' => [],
-            'barDestinationName' => [],
+            'foo_queue_name' => [],
+            'bar_queue_name' => [],
         ];
 
-        $registry = new DestinationMetaRegistry(
-            new Config('aPrefix', 'aRouterProcessorName', 'aRouterQueueName', 'aDefaultQueueName'),
-            $destinations,
-            'default'
-        );
+        $registry = new DestinationMetaRegistry(new Config('transport_prefix', 'default_queue'), $destinations);
 
         $destinations = $registry->getDestinationsMeta();
-        $this->assertInstanceOf(\Generator::class, $destinations);
+        self::assertInstanceOf(\Generator::class, $destinations);
 
         $destinations = iterator_to_array($destinations);
-        /** @var DestinationMeta[] $destinations */
 
-        $this->assertContainsOnly(DestinationMeta::class, $destinations);
-        $this->assertCount(2, $destinations);
+        self::assertContainsOnly(DestinationMeta::class, $destinations);
+        self::assertCount(2, $destinations);
 
-        $this->assertSame('fooDestinationName', $destinations[0]->getClientName());
-        $this->assertSame('aprefix.foodestinationname', $destinations[0]->getTransportName());
+        self::assertSame('foo_queue_name', $destinations[0]->getQueueName());
+        self::assertSame('transport_prefix.foo_queue_name', $destinations[0]->getTransportQueueName());
 
-        $this->assertSame('barDestinationName', $destinations[1]->getClientName());
-        $this->assertSame('aprefix.bardestinationname', $destinations[1]->getTransportName());
+        self::assertSame('bar_queue_name', $destinations[1]->getQueueName());
+        self::assertSame('transport_prefix.bar_queue_name', $destinations[1]->getTransportQueueName());
     }
 }

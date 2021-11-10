@@ -208,7 +208,6 @@ services:
         class: Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsProcessor
         arguments:
             - '@doctrine'
-            - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.client.message_producer'
             - '@logger'

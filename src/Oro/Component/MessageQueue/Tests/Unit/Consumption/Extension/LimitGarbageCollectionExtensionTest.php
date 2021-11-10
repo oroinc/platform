@@ -4,7 +4,6 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitGarbageCollectionExtension;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\Test\TestLogger;
@@ -16,7 +15,7 @@ class LimitGarbageCollectionExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         if (!function_exists('gc_status')) {
-            $this->markTestSkipped('gc_status function required');
+            self::markTestSkipped('gc_status function required');
         }
 
         $this->gcEnabled = gc_enabled();
@@ -29,36 +28,45 @@ class LimitGarbageCollectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->gcEnabled ? gc_enable() : gc_disable();
     }
 
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new LimitGarbageCollectionExtension(12345);
     }
 
-    public function testShouldThrowExceptionIfMessageLimitIsNotInt()
+    public function testShouldThrowExceptionIfMessageLimitIsNotInt(): void
     {
         $this->expectException(\TypeError::class);
         new LimitGarbageCollectionExtension('test');
     }
 
-    public function testInterruptWhenGarbageCollectionLimitReached()
+    public function testInterruptWhenGarbageCollectionLimitReached(): void
     {
         $context = $this->createContext();
 
-        $this->assertFalse($context->isExecutionInterrupted());
+        self::assertFalse($context->isExecutionInterrupted());
 
-        $extension = new LimitGarbageCollectionExtension(5);
-
-        $objects = [];
-        for ($i = 1; $i < 10; $i++) {
-            gc_collect_cycles();
+        // This code makes garbage collector do 3 cycles.
+        $a = new \stdClass();
+        $a->b = $a->c = $a->d = [];
+        for ($i = 0; $i < 10000; $i++) {
+            $b = new \stdClass();
+            $a->b[] = $b;
+            $c = new \stdClass();
+            $a->c[] = $c;
+            $d = new \stdClass();
+            $a->d[] = $d;
         }
 
-        $extension->onBeforeReceive($context);
-        $this->assertTrue($context->isExecutionInterrupted());
+        gc_collect_cycles();
 
-        $this->assertTrue(
+        $extension = new LimitGarbageCollectionExtension(2);
+        $extension->onBeforeReceive($context);
+
+        self::assertTrue($context->isExecutionInterrupted());
+
+        self::assertTrue(
             $context->getLogger()->hasDebug(
-                'Message consumption is interrupted since the GC runs limit reached. limit: "5"'
+                'Message consumption is interrupted since the GC runs limit reached. limit: "2"'
             )
         );
     }
@@ -68,7 +76,7 @@ class LimitGarbageCollectionExtensionTest extends \PHPUnit\Framework\TestCase
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger(new TestLogger());
         $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
+        $context->setMessageProcessorName('sample_processor');
 
         return $context;
     }

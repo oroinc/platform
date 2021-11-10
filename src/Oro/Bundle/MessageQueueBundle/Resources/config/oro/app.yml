@@ -27,8 +27,7 @@ oro_message_queue:
     persistent_services:
         - 'kernel'
         - 'oro_message_queue.client.message_processor_registry'
-        - 'oro_message_queue.client.delegate_message_processor'
-        - 'oro_message_queue.client.route_message_processor'
+        - 'oro_message_queue.client.noop_message_processor'
         - 'oro_message_queue.client.config'
         - 'oro_message_queue.client.created_queues'
         - 'oro_message_queue.log.consumer_state'
@@ -36,14 +35,14 @@ oro_message_queue:
         - 'oro_message_queue.log.message_processor_class_provider'
         - 'oro_platform.optional_listeners.manager'
     persistent_processors:
-        - 'oro_message_queue.client.route_message_processor'
+        - 'oro_message_queue.client.noop_message_processor'
         - 'oro_message_queue.job.calculate_root_job_status_processor'
         - 'oro_message_queue.job.dependent_job_processor'
     security_agnostic_topics:
         - 'oro.message_queue.job.calculate_root_job_status'
         - 'oro.message_queue.job.root_job_stopped'
     security_agnostic_processors:
-        - 'oro_message_queue.client.route_message_processor'
+        - 'oro_message_queue.client.noop_message_processor'
     time_before_stale:
         default: 1800
         jobs: ~

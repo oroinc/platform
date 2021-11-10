@@ -2,26 +2,18 @@
 
 namespace Oro\Component\MessageQueue\Log;
 
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
+use ProxyManager\Proxy\LazyLoadingInterface;
 use ProxyManager\Proxy\ValueHolderInterface;
 
 /**
- * This class can be used to extract the class name of executing message queue processor.
+ * This class can be used to extract the class name by message queue processor name.
  */
 class MessageProcessorClassProvider
 {
-    /** @var MessageProcessorRegistryInterface */
-    private $messageProcessorRegistry;
+    private MessageProcessorRegistryInterface $messageProcessorRegistry;
 
-    /** @var string|null */
-    private $lastProcessorKey;
-
-    /** @var string|null */
-    private $lastProcessorClass;
+    private array $messageProcessorClassByName = [];
 
     public function __construct(MessageProcessorRegistryInterface $messageProcessorRegistry)
     {
@@ -29,44 +21,27 @@ class MessageProcessorClassProvider
     }
 
     /**
-     * Gets the class name of the given message processor.
+     * Gets the class name of the message processor by its name.
      *
-     * @param MessageProcessorInterface $messageProcessor
-     * @param MessageInterface          $message
+     * @param string $messageProcessorName
      *
      * @return string
      */
-    public function getMessageProcessorClass(MessageProcessorInterface $messageProcessor, MessageInterface $message)
+    public function getMessageProcessorClassByName(string $messageProcessorName): string
     {
-        if ($messageProcessor instanceof DelegateMessageProcessor) {
-            $processorName = $message->getProperty(Config::PARAMETER_PROCESSOR_NAME);
-            if ($processorName) {
-                if ($processorName === $this->lastProcessorKey) {
-                    return $this->lastProcessorClass;
+        if (!isset($this->messageProcessorClassByName[$messageProcessorName])) {
+            $messageProcessor = $this->messageProcessorRegistry->get($messageProcessorName);
+            if ($messageProcessor instanceof ValueHolderInterface) {
+                if ($messageProcessor instanceof LazyLoadingInterface && !$messageProcessor->isProxyInitialized()) {
+                    $messageProcessor->initializeProxy();
                 }
 
-                $this->lastProcessorKey = $processorName;
-                try {
-                    $messageProcessor = $this->messageProcessorRegistry->get($processorName);
-                } catch (\Exception $e) {
-                    // ignore any exception here
-                }
-            }
-        } else {
-            $processorHash = spl_object_hash($messageProcessor);
-            if ($processorHash === $this->lastProcessorKey) {
-                return $this->lastProcessorClass;
+                $messageProcessor = $messageProcessor->getWrappedValueHolderValue();
             }
 
-            $this->lastProcessorKey = $processorHash;
+            $this->messageProcessorClassByName[$messageProcessorName] = get_class($messageProcessor);
         }
 
-        if ($messageProcessor instanceof ValueHolderInterface) {
-            $messageProcessor = $messageProcessor->getWrappedValueHolderValue();
-        }
-
-        $this->lastProcessorClass = $messageProcessor ? get_class($messageProcessor) : null;
-
-        return $this->lastProcessorClass;
+        return $this->messageProcessorClassByName[$messageProcessorName];
     }
 }

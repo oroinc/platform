@@ -81,8 +81,6 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
                 ],
                 'properties' => [
                     'oro.message_queue.client.topic_name' => 'oro.message_queue.test_topic',
-                    'oro.message_queue.client.processor_name' =>
-                        'oro_message_queue.async.dependent_message_processor',
                     'oro.message_queue.client.queue_name' => 'oro.default',
                 ],
                 'redelivered' => false,

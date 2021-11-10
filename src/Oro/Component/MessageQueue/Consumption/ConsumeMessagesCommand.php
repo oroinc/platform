@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,14 +21,12 @@ class ConsumeMessagesCommand extends Command
     protected static $defaultName = 'oro:message-queue:transport:consume';
 
     protected QueueConsumer $queueConsumer;
-    protected ContainerInterface $processorLocator;
 
-    public function __construct(QueueConsumer $queueConsumer, ContainerInterface $processorLocator)
+    public function __construct(QueueConsumer $queueConsumer)
     {
         parent::__construct();
 
         $this->queueConsumer = $queueConsumer;
-        $this->processorLocator = $processorLocator;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -38,15 +35,15 @@ class ConsumeMessagesCommand extends Command
         $this->configureLimitsExtensions();
 
         $this
-            ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
-            ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
-            ->setDescription('Processes a message-queue with a specific processor.')
+            ->addArgument('queue', InputArgument::REQUIRED, 'Queue to consume from')
+            ->addArgument('processor-service', InputArgument::OPTIONAL, 'The message processor service id')
+            ->setDescription('Processes messages from the specified queue with the specified processor.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command consumes message from a specified message queue.
-The message processor service should be specified as the second argument.
+The message processor service id can be specified as the second argument.
 
-  <info>php %command.full_name% <queue> <processor-service></info>
+  <info>php %command.full_name% <queue-name> <message-processor-service-id></info>
 
 HELP
             )
@@ -57,15 +54,15 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $queueName = $input->getArgument('queue');
-        $messageProcessor = $this->getMessageProcessor($input->getArgument('processor-service'));
+        $messageProcessorName = (string) $input->getArgument('processor-service');
 
         $extensions = $this->getLimitsExtensions($input, $output);
         array_unshift($extensions, $this->getLoggerExtension($input, $output));
 
-        $this->queueConsumer->bind($queueName, $messageProcessor);
+        $this->queueConsumer->bind($queueName, $messageProcessorName);
         $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
 
-        return 0;
+        return self::SUCCESS;
     }
 
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
@@ -89,19 +86,5 @@ HELP
     protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension(new ConsoleLogger($output));
-    }
-
-    private function getMessageProcessor(string $processorServiceId): MessageProcessorInterface
-    {
-        $processor = $this->processorLocator->get($processorServiceId);
-        if (!$processor instanceof MessageProcessorInterface) {
-            throw new \LogicException(sprintf(
-                'Invalid message processor service given. It must be an instance of %s but %s',
-                MessageProcessorInterface::class,
-                get_class($processor)
-            ));
-        }
-
-        return $processor;
     }
 }

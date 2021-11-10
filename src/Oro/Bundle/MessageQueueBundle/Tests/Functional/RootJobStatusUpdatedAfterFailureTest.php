@@ -15,9 +15,6 @@ use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 
 class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 {
-    /** @var * MessageProducerInterface */
-    private $messageProcessor;
-
     /** @var QueueConsumer */
     private $consumer;
 
@@ -34,7 +31,6 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
         ]);
 
         $container = self::getContainer();
-        $this->messageProcessor = $container->get('oro_message_queue.client.delegate_message_processor');
         $this->consumer = $container->get('oro_message_queue.consumption.queue_consumer');
     }
 
@@ -50,7 +46,7 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
             ->findOneBy(['name' => $dependentJobName, 'jobProgress' => 0]);
         self::assertNotEmpty($stuckRootJobDependent);
 
-        $this->consumer->bind('oro.default', $this->messageProcessor);
+        $this->consumer->bind('oro.default');
         $this->consumer->consume(new ChainExtension([
             new LimitConsumptionTimeExtension(new \DateTime('+5 seconds'))
         ]));

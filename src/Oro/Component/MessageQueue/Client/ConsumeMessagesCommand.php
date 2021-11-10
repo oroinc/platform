@@ -8,7 +8,6 @@ use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,19 +26,17 @@ class ConsumeMessagesCommand extends Command
     protected static $defaultName = 'oro:message-queue:consume';
 
     protected QueueConsumer $queueConsumer;
+
     protected DestinationMetaRegistry $destinationMetaRegistry;
-    protected MessageProcessorInterface $messageProcessor;
 
     public function __construct(
         QueueConsumer $queueConsumer,
-        DestinationMetaRegistry $destinationMetaRegistry,
-        MessageProcessorInterface $messageProcessor
+        DestinationMetaRegistry $destinationMetaRegistry
     ) {
         parent::__construct();
 
         $this->queueConsumer = $queueConsumer;
         $this->destinationMetaRegistry = $destinationMetaRegistry;
-        $this->messageProcessor = $messageProcessor;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -72,15 +69,11 @@ HELP
         $clientDestinationName = $input->getArgument('clientDestinationName');
         if ($clientDestinationName) {
             $this->queueConsumer->bind(
-                $this->destinationMetaRegistry->getDestinationMeta($clientDestinationName)->getTransportName(),
-                $this->messageProcessor
+                $this->destinationMetaRegistry->getDestinationMeta($clientDestinationName)->getTransportQueueName()
             );
         } else {
             foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $destinationMeta) {
-                $this->queueConsumer->bind(
-                    $destinationMeta->getTransportName(),
-                    $this->messageProcessor
-                );
+                $this->queueConsumer->bind($destinationMeta->getTransportQueueName());
             }
         }
 

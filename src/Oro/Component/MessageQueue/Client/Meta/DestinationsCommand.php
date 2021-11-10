@@ -59,9 +59,9 @@ HELP
             }
 
             $table->addRow([
-                $destination->getClientName(),
-                $destination->getTransportName(),
-                implode(PHP_EOL, $destination->getSubscribers())
+                $destination->getQueueName(),
+                $destination->getTransportQueueName(),
+                implode(PHP_EOL, $destination->getMessageProcessors())
             ]);
 
             $count++;

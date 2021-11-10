@@ -11,8 +11,7 @@ use Oro\Component\MessageQueue\Log\ConsumerState;
  */
 class ConsumptionExtension extends AbstractExtension
 {
-    /** @var ConsumerState */
-    private $consumerState;
+    private ConsumerState $consumerState;
 
     public function __construct(ConsumerState $consumerState)
     {
@@ -22,7 +21,7 @@ class ConsumptionExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onBeforeReceive(Context $context)
+    public function onBeforeReceive(Context $context): void
     {
         $this->consumerState->clear();
     }
@@ -30,18 +29,18 @@ class ConsumptionExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function onPreReceived(Context $context)
+    public function onPreReceived(Context $context): void
     {
-        $this->consumerState->setMessageProcessor($context->getMessageProcessor());
+        $this->consumerState->setMessageProcessorName($context->getMessageProcessorName());
         $this->consumerState->setMessage($context->getMessage());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onPostReceived(Context $context)
+    public function onPostReceived(Context $context): void
     {
-        $this->consumerState->setMessageProcessor();
+        $this->consumerState->setMessageProcessorName();
         $this->consumerState->setMessage();
     }
 }

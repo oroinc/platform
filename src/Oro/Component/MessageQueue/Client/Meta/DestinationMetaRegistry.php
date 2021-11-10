@@ -1,71 +1,70 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Config;
 
+/**
+ * Registry of queues-subscribers relations.
+ */
 class DestinationMetaRegistry
 {
+    private Config $config;
+
     /**
      * @var array
+     *  [
+     *      'queue_name' => [
+     *          'message_processor1',
+     *          'message_processor2',
+     *          // ...
+     *      ],
+     *      // ...
+     *  ]
      */
-    private $destinationsMeta;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var string
-     */
-    private $defaultQueueClientName;
+    private array $messageProcessorsByQueue;
 
     /**
      * @param Config $config
-     * @param array $destinationsMeta
-     * @param string $defaultQueueClientName
+     * @param array $messageProcessorsByQueue
+     *  [
+     *      'queue_name' => [
+     *          'message_processor1',
+     *          'message_processor2',
+     *          // ...
+     *      ],
+     *      // ...
+     *  ]
      */
-    public function __construct(Config $config, array $destinationsMeta, $defaultQueueClientName)
+    public function __construct(Config $config, array $messageProcessorsByQueue)
     {
         $this->config = $config;
-        $this->destinationsMeta = $destinationsMeta;
-        $this->defaultQueueClientName = $defaultQueueClientName;
+        $this->messageProcessorsByQueue = $messageProcessorsByQueue;
+    }
+
+    public function getDestinationMeta(string $queueName): DestinationMeta
+    {
+        $queueName = strtolower($queueName);
+
+        return new DestinationMeta(
+            $queueName,
+            $this->config->addTransportPrefix($queueName),
+            $this->messageProcessorsByQueue[$queueName] ?? []
+        );
+    }
+
+    public function getDestinationMetaByTransportQueueName(string $transportQueueName): DestinationMeta
+    {
+        return $this->getDestinationMeta($this->config->removeTransportPrefix($transportQueueName));
     }
 
     /**
-     * @param string $clientDestinationName
-     *
-     * @return DestinationMeta
+     * @return iterable<DestinationMeta>
      */
-    public function getDestinationMeta($clientDestinationName)
+    public function getDestinationsMeta(): iterable
     {
-        if (false == array_key_exists($clientDestinationName, $this->destinationsMeta)) {
-            throw new \InvalidArgumentException(sprintf(
-                'The destination meta not found. Requested name `%s`',
-                $clientDestinationName
-            ));
-        }
-
-        $transportName = $this->defaultQueueClientName === $clientDestinationName ?
-            $this->config->getDefaultQueueName() :
-            $this->config->formatName($clientDestinationName)
-        ;
-
-        $destination = array_replace([
-            'subscribers' => [],
-            'transportName' => $transportName,
-        ], $this->destinationsMeta[$clientDestinationName]);
-
-        return new DestinationMeta($clientDestinationName, $destination['transportName'], $destination['subscribers']);
-    }
-
-    /**
-     * @return \Generator|DestinationMeta[]
-     */
-    public function getDestinationsMeta()
-    {
-        foreach (array_keys($this->destinationsMeta) as $name) {
-            yield $this->getDestinationMeta($name);
+        foreach (array_keys($this->messageProcessorsByQueue) as $queueName) {
+            yield $this->getDestinationMeta($queueName);
         }
     }
 }

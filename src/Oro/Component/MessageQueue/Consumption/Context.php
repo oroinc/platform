@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
@@ -7,6 +8,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Holds information about message consuming.
+ */
 class Context
 {
     /**
@@ -20,9 +24,9 @@ class Context
     private $messageConsumer;
 
     /**
-     * @var MessageProcessorInterface
+     * @var string
      */
-    private $messageProcessor;
+    private string $messageProcessorName = '';
 
     /**
      * @var LoggerInterface
@@ -108,21 +112,14 @@ class Context
         $this->messageConsumer = $messageConsumer;
     }
 
-    /**
-     * @return MessageProcessorInterface
-     */
-    public function getMessageProcessor()
+    public function getMessageProcessorName(): string
     {
-        return $this->messageProcessor;
+        return $this->messageProcessorName;
     }
 
-    public function setMessageProcessor(MessageProcessorInterface $messageProcessor)
+    public function setMessageProcessorName(string $messageProcessorName): void
     {
-        if ($this->messageProcessor) {
-            throw new IllegalContextModificationException('The message processor could be set once');
-        }
-
-        $this->messageProcessor = $messageProcessor;
+        $this->messageProcessorName = $messageProcessorName;
     }
 
     /**

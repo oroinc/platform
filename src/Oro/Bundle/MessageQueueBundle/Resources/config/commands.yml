@@ -12,7 +12,6 @@ services:
         arguments:
             - '@oro_message_queue.client.queue_consumer'
             - '@oro_message_queue.client.meta.destination_meta_registry'
-            - '@oro_message_queue.client.delegate_message_processor'
             - '@oro_message_queue.log.consumer_state'
             - '@monolog.logger.consumer'
         tags:
@@ -30,7 +29,6 @@ services:
     Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand:
         arguments:
             - '@oro_message_queue.consumption.queue_consumer'
-            - '@oro_message_queue.processor_locator'
             - '@oro_message_queue.log.consumer_state'
             - '@monolog.logger.consumer'
         tags:

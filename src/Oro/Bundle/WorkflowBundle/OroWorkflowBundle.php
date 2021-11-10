@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle;
 
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
-use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
@@ -42,11 +40,6 @@ class OroWorkflowBundle extends Bundle
                 'oro_workflow.simple_processor_registry.inner'
             ),
             PassConfig::TYPE_BEFORE_REMOVING
-        );
-
-        $container->addCompilerPass(
-            AddTopicMetaPass::create()
-                ->add(Topics::EXECUTE_PROCESS_JOB)
         );
     }
 }

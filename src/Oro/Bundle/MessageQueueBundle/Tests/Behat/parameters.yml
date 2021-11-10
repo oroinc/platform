@@ -10,7 +10,6 @@ services:
 
     oro_message_queue.client.mock_lifecycle_message_producer:
         class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\MockLifecycleMessageProducer
-        public: false
         decorates: oro_message_queue.client.message_producer
         decoration_priority: -254
         arguments:
@@ -19,9 +18,7 @@ services:
 
     oro_message_queue.client.mock_lifecycle_message_extension:
         class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\ConsumptionExtension\MockLifecycleMessageExtension
-        public: false
         arguments:
-            - '@oro_message_queue.client.config'
             - '@oro_message_queue.mock_lifecycle_message.cache'
         tags:
             - { name: 'oro_message_queue.consumption.extension', persistent: true }

@@ -90,7 +90,7 @@ class ResettableExtensionWrapper implements ResettableExtensionInterface
     /**
      * @return ExtensionInterface
      */
-    private function getExtension()
+    public function getExtension()
     {
         if (null === $this->extension) {
             $this->extension = $this->container->get($this->extensionServiceId);
