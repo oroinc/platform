@@ -13,7 +13,6 @@ use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\NotificationAlert\TestNotificationAlert;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -80,7 +79,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockMetadata(): MockObject
+    private function mockMetadata(): ClassMetadata
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects(self::any())

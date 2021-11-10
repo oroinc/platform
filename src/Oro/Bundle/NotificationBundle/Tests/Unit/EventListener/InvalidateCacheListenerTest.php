@@ -11,13 +11,13 @@ use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
 
 class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|NotificationManager */
+    /** @var NotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UnitOfWork */
+    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
     private $uow;
 
     /** @var InvalidateCacheListener */

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -10,8 +11,9 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
 {
     public function testMatchingWithoutRequest()
     {
-        $item = $this->createMock('Knp\Menu\ItemInterface');
-        $item->expects($this->never())->method('getExtra');
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())
+            ->method('getExtra');
 
         $voter = new RoutePatternVoter(new RequestStack());
 
@@ -19,27 +21,22 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string       $route
-     * @param array        $parameters
-     * @param string|array $itemRoutes
-     * @param array        $itemsRoutesParameters
-     * @param boolean      $expected
-     *
      * @dataProvider matchingDataProvider
      */
-    public function testMatching($route, array $parameters, $itemRoutes, array $itemsRoutesParameters, $expected)
-    {
-        $item = $this->createMock('Knp\Menu\ItemInterface');
+    public function testMatching(
+        ?string $route,
+        array $parameters,
+        array|string|null $itemRoutes,
+        array $itemsRoutesParameters,
+        ?bool $expected
+    ) {
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->any())
             ->method('getExtra')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['routes', [], $itemRoutes],
-                        ['routesParameters', [], $itemsRoutesParameters],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['routes', [], $itemRoutes],
+                ['routesParameters', [], $itemsRoutesParameters],
+            ]);
 
         $request = new Request();
         $request->attributes->set('_route', $route);
@@ -54,7 +51,7 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $voter->matchItem($item));
     }
 
-    public function matchingDataProvider()
+    public function matchingDataProvider(): array
     {
         return [
             'no request route'                                 => [null, [], 'foo', [], null],

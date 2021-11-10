@@ -12,7 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
     /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -45,8 +45,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit\Framework\TestCase
 
         $user = $this->createMock(User::class);
 
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
@@ -54,8 +53,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->navigationItemsProvider
-            ->expects($this->once())
+        $this->navigationItemsProvider->expects($this->once())
             ->method('getNavigationItems')
             ->with(
                 $user,
@@ -68,8 +66,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn([]);
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_navigation.max_items')
             ->willReturn($maxItems);

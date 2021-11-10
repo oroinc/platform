@@ -17,7 +17,7 @@ class NoTagsValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider valuesWithoutErrors
      */
-    public function testShouldValidateWithoutErrors($value)
+    public function testShouldValidateWithoutErrors(?string $value)
     {
         $constraint = new NoTags();
         $this->validator->validate($value, $constraint);
@@ -49,7 +49,7 @@ class NoTagsValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider valuesWithErrors
      */
-    public function testShouldValidateWithErrors($value)
+    public function testShouldValidateWithErrors(string $value)
     {
         $constraint = new NoTags();
         $this->validator->validate($value, $constraint);
@@ -76,7 +76,7 @@ class NoTagsValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider invalidValues
      */
-    public function testShouldFailWithInvalidValue($value, $exceptionMessage)
+    public function testShouldFailWithInvalidValue(mixed $value, string $exceptionMessage)
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage($exceptionMessage);

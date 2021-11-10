@@ -14,13 +14,13 @@ use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
 
 class NotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     protected function setUp(): void
@@ -57,11 +57,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($rules);
     }
 
-    /**
-     * @param string $eventName
-     * @param object $entity
-     */
-    private function expectFetchRulesCache($eventName, $entity)
+    private function expectFetchRulesCache(string $eventName, object $entity)
     {
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -71,13 +67,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('save');
     }
 
-    /**
-     * @param string $eventName
-     * @param object $entity
-     *
-     * @return EmailNotification
-     */
-    private function createRule($eventName, $entity)
+    private function createRule(string $eventName, object $entity): EmailNotification
     {
         $rule = new EmailNotification();
         $rule->setEntityName(get_class($entity));

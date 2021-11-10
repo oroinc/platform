@@ -11,34 +11,27 @@ use Twig\TokenStream;
 
 class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * Tests token parser
-     */
     public function testParsing()
     {
         $node = $this->createMock(Node::class);
 
-        $exprParser = $this->getMockBuilder(ExpressionParser::class)
-                           ->disableOriginalConstructor()
-                           ->getMock();
+        $exprParser = $this->createMock(ExpressionParser::class);
         $exprParser->expects($this->once())
-                   ->method('parseArguments')
-                   ->will($this->returnValue($node));
+           ->method('parseArguments')
+           ->willReturn($node);
 
         $stream = new TokenStream([
             new Token(Token::BLOCK_END_TYPE, '', 1),
             new Token(Token::EOF_TYPE, '', 1),
         ]);
 
-        $parser = $this->getMockBuilder(Parser::class)
-                       ->disableOriginalConstructor()
-                       ->getMock();
+        $parser = $this->createMock(Parser::class);
         $parser->expects($this->once())
-               ->method('getExpressionParser')
-               ->will($this->returnValue($exprParser));
+           ->method('getExpressionParser')
+           ->willReturn($exprParser);
         $parser->expects($this->once())
-               ->method('getStream')
-               ->will($this->returnValue($stream));
+           ->method('getStream')
+           ->willReturn($stream);
 
         $token = new Token(Token::NAME_TYPE, 'oro_title_set', 1);
         $tokenParser = new TitleSetTokenParser();
@@ -46,9 +39,6 @@ class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
         $tokenParser->parse($token);
     }
 
-    /**
-     * Tests tag name
-     */
     public function testTagName()
     {
         $tokenParser = new TitleSetTokenParser();

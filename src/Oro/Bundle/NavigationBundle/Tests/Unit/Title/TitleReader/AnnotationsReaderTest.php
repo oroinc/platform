@@ -23,21 +23,13 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
     /** @var AnnotationsReader */
     private $annotationReader;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('AnnotationsReader');
-
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
         $this->reader = $this->createMock(Reader::class);
 
         $this->annotationReader = new AnnotationsReader(
-            $this->cacheFile,
+            $this->getTempFile('AnnotationsReader'),
             false,
             $this->controllerClassProvider,
             $this->reader

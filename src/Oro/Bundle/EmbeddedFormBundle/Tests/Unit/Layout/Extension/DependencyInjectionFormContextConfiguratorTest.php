@@ -10,14 +10,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    private $container;
 
     /** @var DependencyInjectionFormContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
 
         $this->contextConfigurator = new DependencyInjectionFormContextConfigurator($this->container);
     }
@@ -46,7 +46,10 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\
         $formAccessor = $context->get($contextOptionName);
         $this->assertInstanceOf(DependencyInjectionFormAccessor::class, $formAccessor);
 
-        $this->container->expects(static::once())->method('get')->with($serviceId);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with($serviceId);
+
         $formAccessor->getForm();
     }
 }

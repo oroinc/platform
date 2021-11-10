@@ -11,19 +11,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 {
-    const STATIC_CLASS = 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest';
-    const CONST1 = 'const1';
-    const CONST2 = 'const2';
+    public const CONST1 = 'const1';
+    public const CONST2 = 'const2';
+
+    private const STATIC_CLASS = SystemAwareResolverTest::class;
 
     /** @var SystemAwareResolver */
-    protected $resolver;
+    private $resolver;
 
-    /**
-     * setup mock and test object
-     */
     protected function setUp(): void
     {
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock(ContainerInterface::class);
         $this->resolver = new SystemAwareResolver();
         $this->resolver->setContainer($container);
 
@@ -32,22 +30,18 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 
         $container->expects(self::any())
             ->method('getParameter')
-            ->willReturnMap(
-                [
-                    ['test.param1', 'val1'],
-                    ['test.other_param', ['val', 2]],
-                    ['test.class', 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest'],
-                ]
-            );
+            ->willReturnMap([
+                ['test.param1', 'val1'],
+                ['test.other_param', ['val', 2]],
+                ['test.class', self::STATIC_CLASS],
+            ]);
         $container->expects(self::any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['test.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new \stdClass()],
-                    ['test.service1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service1],
-                    ['test.other_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service2],
-                ]
-            );
+            ->willReturnMap([
+                ['test.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new \stdClass()],
+                ['test.service1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service1],
+                ['test.other_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service2],
+            ]);
     }
 
     public static function func1(): string
@@ -56,23 +50,14 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         return 'static_func1';
     }
 
-    /**
-     * @param mixed $val
-     * @return string
-     */
-    public static function func2($val): string
+    public static function func2(mixed $val): string
     {
-        return 'static_func2 + ' . ((null === $val) ? 'NULL' : $val);
+        return 'static_func2 + ' . ($val ?? 'NULL');
     }
 
-    /**
-     * @param mixed $val1
-     * @param mixed $val2
-     * @return string
-     */
-    public static function func3($val1, $val2): string
+    public static function func3(mixed $val1, mixed $val2): string
     {
-        return 'static_func2 + ' . ((null === $val1) ? 'NULL' : $val1) . ' + ' . ((null === $val2) ? 'NULL' : $val2);
+        return 'static_func2 + ' . ($val1 ?? 'NULL') . ' + ' . ($val2 ?? 'NULL');
     }
 
     public static function otherFunc(): array
@@ -83,7 +68,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveProvider
      */
-    public function testResolve($config, $expected): void
+    public function testResolve(array $config, array $expected): void
     {
         $result = $this->resolver->resolve($config, [
             'testVar' => 'test context var',
@@ -93,7 +78,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Data provider for testResolve
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function resolveProvider(): array

@@ -19,39 +19,34 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $navigationItemsProvider;
 
+    /** @var KnpItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $menu;
+
     /** @var NavigationItemBuilder */
     private $builder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|KnpItemInterface */
-    private $menu;
 
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);
+        $this->menu = $this->createMock(KnpItemInterface::class);
 
         $this->builder = new NavigationItemBuilder($this->tokenAccessor, $this->navigationItemsProvider);
-
-        $this->menu = $this->createMock(KnpItemInterface::class);
     }
 
     public function testBuildAnonUser(): void
     {
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn(null);
 
-        $this->tokenAccessor
-            ->expects($this->never())
+        $this->tokenAccessor->expects($this->never())
             ->method('getOrganization');
 
-        $this->menu
-            ->expects($this->never())
+        $this->menu->expects($this->never())
             ->method('addChild');
 
-        $this->menu
-            ->expects($this->once())
+        $this->menu->expects($this->once())
             ->method('setExtra')
             ->with('type', 'pinbar');
 
@@ -63,18 +58,15 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
         $organization = new Organization();
         $user = $this->createMock(User::class);
 
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenAccessor
-            ->expects($this->once())
+        $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->navigationItemsProvider
-            ->expects(self::once())
+        $this->navigationItemsProvider->expects(self::once())
             ->method('getNavigationItems')
             ->with($user, $organization, self::ITEM_TYPE)
             ->willReturn($items = [
@@ -82,13 +74,11 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
                 ['id' => 2, 'title' => 'sample-title-2', 'url' => 'sample-url-2', 'type' => self::ITEM_TYPE],
             ]);
 
-        $this->menu
-            ->expects($this->once())
+        $this->menu->expects($this->once())
             ->method('setExtra')
             ->with('type', self::ITEM_TYPE);
 
-        $this->menu
-            ->expects($this->exactly(2))
+        $this->menu->expects($this->exactly(2))
             ->method('addChild')
             ->withConsecutive(
                 [

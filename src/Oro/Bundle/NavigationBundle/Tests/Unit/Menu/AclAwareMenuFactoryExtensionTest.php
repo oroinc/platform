@@ -276,7 +276,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->urlMatcher->expects($this->once())
             ->method('match')
-            ->will($this->throwException(new ResourceNotFoundException('Route not found')));
+            ->willThrowException(new ResourceNotFoundException('Route not found'));
 
         $this->classAuthorizationChecker->expects($this->never())
             ->method('isClassMethodGranted');
@@ -402,22 +402,22 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $options = ['extras' => ['acl_resource_id' => 'resource_id']];
 
-        $this->tokenAccessor->expects(static::exactly(2))
+        $this->tokenAccessor->expects(self::exactly(2))
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));
-        $this->tokenAccessor->expects(static::exactly(2))
+        $this->tokenAccessor->expects(self::exactly(2))
             ->method('hasUser')
             ->willReturn(true);
 
-        $this->authorizationChecker->expects(static::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($options['extras']['acl_resource_id'])
             ->willReturn(true);
 
         for ($i = 0; $i < 2; $i++) {
             $item = $this->factory->createItem('test', $options);
-            static::assertTrue($item->getExtra('isAllowed'));
-            static::assertInstanceOf(MenuItem::class, $item);
+            self::assertTrue($item->getExtra('isAllowed'));
+            self::assertInstanceOf(MenuItem::class, $item);
         }
     }
 
@@ -425,23 +425,23 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $options = ['route' => 'route_name'];
 
-        $this->tokenAccessor->expects(static::exactly(2))
+        $this->tokenAccessor->expects(self::exactly(2))
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));
-        $this->tokenAccessor->expects(static::exactly(2))
+        $this->tokenAccessor->expects(self::exactly(2))
             ->method('hasUser')
             ->willReturn(true);
 
         $this->assertClassAuthorizationCheckerCalls(true, 1);
 
         $item = $this->factory->createItem('test', $options);
-        static::assertTrue($item->getExtra('isAllowed'));
-        static::assertInstanceOf(MenuItem::class, $item);
+        self::assertTrue($item->getExtra('isAllowed'));
+        self::assertInstanceOf(MenuItem::class, $item);
 
         $options['new_key'] = 'new_value';
         $item = $this->factory->createItem('test', $options);
-        static::assertTrue($item->getExtra('isAllowed'));
-        static::assertInstanceOf(MenuItem::class, $item);
+        self::assertTrue($item->getExtra('isAllowed'));
+        self::assertInstanceOf(MenuItem::class, $item);
     }
 
     public function testBuildOptionsWithoutToken()

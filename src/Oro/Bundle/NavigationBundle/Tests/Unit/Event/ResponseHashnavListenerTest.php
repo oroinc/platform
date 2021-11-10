@@ -15,22 +15,28 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
     private const TEST_URL = 'http://test_url/';
     private const TEMPLATE = '@OroNavigation/HashNav/redirect.html.twig';
 
-    private ResponseHashnavListener $listener;
+    /** @var Request */
+    private $request;
 
-    private Request $request;
+    /** @var Response */
+    private $response;
 
-    private Response $response;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
+    /** @var ResponseEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    private ResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
-    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
+    /** @var ResponseHashnavListener */
+    private $listener;
 
     protected function setUp(): void
     {
         $this->response = new Response();
-        $this->request  = Request::create(self::TEST_URL);
+        $this->request = Request::create(self::TEST_URL);
         $this->request->headers->add([ResponseHashnavListener::HASH_NAVIGATION_HEADER => true]);
         $this->event = new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -122,8 +128,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         $this->response->setStatusCode(503);
 
         $template = 'rendered_template_content';
-        $this->twig
-            ->expects(self::once())
+        $this->twig->expects(self::once())
             ->method('render')
             ->with('@OroNavigation/HashNav/redirect.html.twig', $expected)
             ->willReturn($template);
@@ -139,7 +144,8 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         $listener = $this->getListener(true);
         $this->response->headers->add(['location' => self::TEST_URL]);
         $this->response->setStatusCode(503);
-        $this->twig->expects(self::never())->method('render');
+        $this->twig->expects(self::never())
+            ->method('render');
 
         $listener->onResponse($this->event);
 

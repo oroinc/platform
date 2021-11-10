@@ -12,16 +12,16 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_PHP_SESSION_NAME = 'test_php_sid';
-    private const TEST_ROUTE_NAME       = 'test_route';
-    private const TEST_CSRF_TOKEN_ID    = 'test_token_id';
+    private const TEST_ROUTE_NAME = 'test_route';
+    private const TEST_CSRF_TOKEN_ID = 'test_token_id';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $mainTokenStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var CsrfTokenStorage|\PHPUnit\Framework\MockObject\MockObject */
     private $embeddedFormTokenStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
     /** @var CsrfTokenStorageDecorator */

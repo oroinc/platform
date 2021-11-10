@@ -11,19 +11,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MassEmailDirectMailerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DirectMailer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DirectMailer|\PHPUnit\Framework\MockObject\MockObject */
     private $directMailer;
 
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /**
-     * @var MassEmailDirectMailer
-     */
+    /** @var MassEmailDirectMailer */
     private $mailer;
 
     protected function setUp(): void
@@ -56,7 +50,6 @@ class MassEmailDirectMailerTest extends \PHPUnit\Framework\TestCase
 
     public function testRegisterPlugin()
     {
-        /** @var \Swift_Events_EventListener $plugin */
         $plugin = $this->createMock(\Swift_Events_EventListener::class);
         $this->directMailer->expects($this->once())
             ->method('registerPlugin')
@@ -67,7 +60,6 @@ class MassEmailDirectMailerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTransport()
     {
-        /** @var \Swift_Transport $plugin */
         $transport = $this->createMock(\Swift_Transport::class);
         $this->directMailer->expects($this->once())
             ->method('getTransport')

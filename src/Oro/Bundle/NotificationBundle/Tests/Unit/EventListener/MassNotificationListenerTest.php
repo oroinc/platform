@@ -12,7 +12,7 @@ use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 
 class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var MassNotificationListener */
@@ -34,12 +34,22 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
     public function testLogMassNotification()
     {
         $date = new \DateTime('now');
-        $message = $this->createMock('Swift_Mime_SimpleMessage');
-        $message->expects(self::once())->method('getTo')->willReturn(['to@test.com' => 'test']);
-        $message->expects(self::once())->method('getFrom')->willReturn(['from@test.com' => 'test']);
-        $message->expects(self::once())->method('getDate')->willReturn($date);
-        $message->expects(self::once())->method('getSubject')->willReturn('test subject');
-        $message->expects(self::once())->method('getBody')->willReturn('test body');
+        $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
+        $message->expects(self::once())
+            ->method('getTo')
+            ->willReturn(['to@test.com' => 'test']);
+        $message->expects(self::once())
+            ->method('getFrom')
+            ->willReturn(['from@test.com' => 'test']);
+        $message->expects(self::once())
+            ->method('getDate')
+            ->willReturn($date);
+        $message->expects(self::once())
+            ->method('getSubject')
+            ->willReturn('test subject');
+        $message->expects(self::once())
+            ->method('getBody')
+            ->willReturn('test body');
 
         $spoolItem = new SpoolItem();
         $spoolItem->setMessage($message);
@@ -50,12 +60,12 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects(self::once())
             ->method('persist')
             ->willReturnCallback(function (MassNotification $logEntity) use ($date) {
-                self::assertEquals($logEntity->getEmail(), 'test <to@test.com>');
-                self::assertEquals($logEntity->getSender(), 'test <from@test.com>');
-                self::assertEquals($logEntity->getSubject(), 'test subject');
-                self::assertEquals($logEntity->getBody(), 'test body');
-                self::assertGreaterThanOrEqual($logEntity->getScheduledAt(), $date);
-                self::assertEquals($logEntity->getStatus(), MassNotification::STATUS_SUCCESS);
+                self::assertEquals('test <to@test.com>', $logEntity->getEmail());
+                self::assertEquals('test <from@test.com>', $logEntity->getSender());
+                self::assertEquals('test subject', $logEntity->getSubject());
+                self::assertEquals('test body', $logEntity->getBody());
+                self::assertGreaterThanOrEqual($date, $logEntity->getScheduledAt());
+                self::assertEquals(MassNotification::STATUS_SUCCESS, $logEntity->getStatus());
 
                 return true;
             });

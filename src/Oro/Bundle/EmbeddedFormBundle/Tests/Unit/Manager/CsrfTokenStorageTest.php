@@ -11,18 +11,18 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_SESSION_ID          = 'test_sid';
-    const TEST_CSRF_TOKEN_ID       = 'test_token_id';
-    const TEST_CSRF_TOKEN_LIFETIME = 123;
+    private const TEST_SESSION_ID = 'test_sid';
+    private const TEST_CSRF_TOKEN_ID = 'test_token_id';
+    private const TEST_CSRF_TOKEN_LIFETIME = 123;
 
     /** @var ArrayAdapter */
-    protected $tokenCache;
+    private $tokenCache;
 
     /** @var SessionIdProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $sessionIdProvider;
+    private $sessionIdProvider;
 
     /** @var CsrfTokenStorage */
-    protected $csrfTokenStorage;
+    private $csrfTokenStorage;
 
     protected function setUp(): void
     {
@@ -82,9 +82,7 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
         $cacheItem = new CacheItem();
         $tokenCache->expects(self::once())
             ->method('getItem')
-            ->with(
-                self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID
-            )
+            ->with(self::TEST_CSRF_TOKEN_ID . self::TEST_SESSION_ID)
             ->willReturn($cacheItem);
         $tokenCache->expects(self::once())
             ->method('save');

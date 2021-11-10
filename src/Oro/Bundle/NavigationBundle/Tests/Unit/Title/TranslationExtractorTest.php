@@ -9,18 +9,15 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslationExtractorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslationExtractor */
-    private $translatorExtractor;
-
     /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $titleReaderRegistry;
 
     /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $controllerClassProvider;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var TranslationExtractor */
+    private $translatorExtractor;
+
     protected function setUp(): void
     {
         $this->titleReaderRegistry = $this->createMock(TitleReaderRegistry::class);

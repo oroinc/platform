@@ -19,8 +19,8 @@ use Symfony\Component\Form\ResolvedFormType;
 
 class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    private const ROOT_ID      = 'rootId';
-    private const FORM_NAME    = 'testForm';
+    private const ROOT_ID = 'rootId';
+    private const FORM_NAME = 'testForm';
     private const FIELD_PREFIX = 'testForm_';
     private const GROUP_PREFIX = 'testForm:group_';
 

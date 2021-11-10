@@ -9,32 +9,34 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var MenuUpdateHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $this->helper = new MenuUpdateHelper($this->translator, $this->localizationHelper);
+    }
+
+    private function getLanguage(string $code): Language
+    {
+        $language = new Language();
+        $language->setCode($code);
+
+        return $language;
     }
 
     public function testApplyLocalizedFallbackValue()
@@ -44,31 +46,25 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $this->translator
             ->expects($this->exactly(3))
             ->method('trans')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['test.title', [], null, 'en', 'EN Test Title'],
-                        ['test.title', [], null, 'de', 'DE Test Title'],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['test.title', [], null, 'en', 'EN Test Title'],
+                ['test.title', [], null, 'de', 'DE Test Title'],
+            ]);
 
         $enLocalization = new Localization();
-        $enLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'en']));
+        $enLocalization->setLanguage($this->getLanguage('en'));
 
         $deLocalization = new Localization();
-        $deLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'de']));
+        $deLocalization->setLanguage($this->getLanguage('de'));
 
         $this->localizationHelper
             ->expects($this->once())
             ->method('getLocalizations')
-            ->will(
-                $this->returnValue(
-                    [
-                        $enLocalization,
-                        $deLocalization,
-                    ]
-                )
+            ->willReturn(
+                [
+                    $enLocalization,
+                    $deLocalization,
+                ]
             );
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
