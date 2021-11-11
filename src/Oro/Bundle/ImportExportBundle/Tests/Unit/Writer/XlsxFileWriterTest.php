@@ -12,34 +12,25 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
+
     /** @var XlsxFileWriter */
     private $writer;
-
-    /** @var ContextRegistry|MockObject */
-    private $contextRegistry;
 
     protected function setUp(): void
     {
         $this->getTempDir('XlsxFileWriterTest');
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
-        $this->writer = new class($this->contextRegistry) extends XlsxFileWriter {
-            public function xgetHeader(): ?array
-            {
-                return $this->header;
-            }
 
-            public function xisFirstLineIsHeader(): bool
-            {
-                return $this->firstLineIsHeader;
-            }
-        };
+        $this->writer = new XlsxFileWriter($this->contextRegistry);
     }
 
     protected function tearDown(): void
@@ -52,18 +43,14 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of XLSX writer must contain "filePath".');
 
-        $this->writer->setStepExecution($this->getMockStepExecution([]));
+        $this->writer->setStepExecution($this->getStepExecution([]));
     }
 
     public function testUnknownFileException()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->writer->setStepExecution(
-            $this->getMockStepExecution(
-                [
-                    'filePath' => __DIR__ . '/unknown/new_file.xlsx'
-                ]
-            )
+            $this->getStepExecution(['filePath' => __DIR__ . '/unknown/new_file.xlsx'])
         );
     }
 
@@ -75,34 +62,36 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
             'header'            => ['one', 'two']
         ];
 
-        static::assertTrue($this->writer->xisFirstLineIsHeader());
-        static::assertEmpty($this->writer->xgetHeader());
+        self::assertTrue(ReflectionUtil::getPropertyValue($this->writer, 'firstLineIsHeader'));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($this->writer, 'header'));
 
-        $this->writer->setStepExecution($this->getMockStepExecution($options));
+        $this->writer->setStepExecution($this->getStepExecution($options));
 
-        static::assertEquals($options['firstLineIsHeader'], $this->writer->xisFirstLineIsHeader());
-        static::assertEquals($options['header'], $this->writer->xgetHeader());
+        self::assertEquals(
+            $options['firstLineIsHeader'],
+            ReflectionUtil::getPropertyValue($this->writer, 'firstLineIsHeader')
+        );
+        self::assertEquals(
+            $options['header'],
+            ReflectionUtil::getPropertyValue($this->writer, 'header')
+        );
     }
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array  $options
-     * @param array  $data
-     * @param string $expected
      */
-    public function testWrite($options, $data, $expected)
+    public function testWrite(array $options, array $data, string $expected)
     {
-        $stepExecution = $this->getMockStepExecution($options);
+        $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write($data);
         $this->writer->close();
 
-        static::assertFileExists($expected);
+        self::assertFileExists($expected);
         $this->assertXlsx($expected, $options['filePath']);
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         $filePath = $this->getFilePath();
 
@@ -153,19 +142,14 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array  $options
-     * @param array  $data
-     * @param string $expected
      */
-    public function testWriteWithClearWriter($options, $data, $expected)
+    public function testWriteWithClearWriter(array $options, array $data, string $expected)
     {
-        $stepExecution = $this->getMockStepExecution($options);
+        $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
 
-        /** @var DoctrineClearWriter|MockObject $clearWriter */
         $clearWriter = $this->createMock(DoctrineClearWriter::class);
-        $clearWriter->expects(static::once())
+        $clearWriter->expects(self::once())
             ->method('write')
             ->with($data);
 
@@ -173,21 +157,16 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write($data);
         $this->writer->close();
 
-        static::assertFileExists($expected);
+        self::assertFileExists($expected);
         $this->assertXlsx($expected, $options['filePath']);
     }
 
-    /**
-     * @param array $jobInstanceRawConfiguration
-     *
-     * @return MockObject|StepExecution
-     */
-    protected function getMockStepExecution(array $jobInstanceRawConfiguration)
+    private function getStepExecution(array $jobInstanceRawConfiguration): StepExecution
     {
         $stepExecution = $this->createMock(StepExecution::class);
 
         $context = new Context($jobInstanceRawConfiguration);
-        $this->contextRegistry->expects(static::any())
+        $this->contextRegistry->expects(self::any())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
@@ -212,10 +191,10 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         /** @var Sheet[] $actualSheets */
         $actualSheets = iterator_to_array($actualReader->getSheetIterator());
 
-        static::assertCount(count($exceptedSheets), $actualSheets);
+        self::assertCount(count($exceptedSheets), $actualSheets);
 
         foreach ($exceptedSheets as $sheetIndex => $sheet) {
-            static::assertEquals(
+            self::assertEquals(
                 iterator_to_array($sheet->getRowIterator()),
                 iterator_to_array($actualSheets[$sheetIndex]->getRowIterator())
             );

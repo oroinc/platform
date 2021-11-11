@@ -12,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
@@ -30,25 +32,35 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $validator;
 
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $extendConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    private ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject $configurableDataConverter;
+    /** @var ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurableDataConverter;
 
-    private AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    private OwnerChecker|\PHPUnit\Framework\MockObject\MockObject $ownerChecker;
+    /** @var OwnerChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownerChecker;
 
-    private ImportStrategyHelper $helper;
+    /** @var ImportStrategyHelper */
+    private $helper;
 
     protected function setUp(): void
     {
@@ -78,19 +90,19 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testImportEntityException(): void
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Basic and imported entities must be instances of the same class');
 
         $basicEntity = new \stdClass();
         $importedEntity = new \DateTime();
-        $excludedProperties = array();
+        $excludedProperties = [];
 
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
     }
 
     public function testGetEntityManagerWithException(): void
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage("Can't find entity manager for stdClass");
 
         $this->managerRegistry->expects(self::once())
@@ -132,12 +144,10 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->willReturnMap(
-                [
-                    [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
-                    [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-                ]
-            );
+            ->willReturnMap([
+                [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
+                [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
+            ]);
 
         $this->fieldHelper->expects(self::exactly(3))
             ->method('setObjectValue')
@@ -146,7 +156,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
                 [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo]
             );
 
-        $this->extendConfigProvider
+        $this->extendConfigProvider->expects(self::any())
             ->method('hasConfig')
             ->willReturn(false);
 
@@ -191,12 +201,10 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldHelper->expects(self::any())
             ->method('getObjectValue')
-            ->willReturnMap(
-                [
-                    [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
-                    [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-                ]
-            );
+            ->willReturnMap([
+                [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
+                [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
+            ]);
 
         $this->fieldHelper->expects(self::exactly(3))
             ->method('setObjectValue')
@@ -205,15 +213,15 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
                 [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo]
             );
 
-        $this->extendConfigProvider
+        $this->extendConfigProvider->expects(self::any())
             ->method('hasConfig')
             ->willReturn(true);
 
-        $this->extendConfigProvider
+        $this->extendConfigProvider->expects(self::any())
             ->method('getConfig')
             ->willReturnCallback(function ($className, $fieldName) {
                 $configField = $this->createMock(Config::class);
-                $configField
+                $configField->expects(self::any())
                     ->method('is')
                     ->with('is_deleted')
                     ->willReturn($fieldName === 'deletedField');
@@ -243,21 +251,20 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $violation = $this->getMockBuilder(ConstraintViolationInterface::class)
-            ->getMock();
+        $violation = $this->createMock(ConstraintViolationInterface::class);
         $violation->expects(self::once())
             ->method('getPropertyPath')
             ->willReturn($path);
         $violation->expects(self::once())
             ->method('getMessage')
             ->willReturn($error);
-        $violations = array($violation);
+        $violations = [$violation];
         $this->validator->expects(self::once())
             ->method('validate')
             ->with($entity)
             ->willReturn($violations);
 
-        self::assertEquals(array($expectedMessage), $this->helper->validateEntity($entity));
+        self::assertEquals([$expectedMessage], $this->helper->validateEntity($entity));
     }
 
     public function validateDataProvider(): array
@@ -281,7 +288,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testAddValidationErrors(?string $prefix): void
     {
-        $validationErrors = array('Error1', 'Error2');
+        $validationErrors = ['Error1', 'Error2'];
         $expectedPrefix = $prefix;
 
         $context = $this->createMock(ContextInterface::class);
@@ -291,7 +298,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(10);
             $this->translator->expects(self::once())
                 ->method('trans')
-                ->with('oro.importexport.import.error %number%', array('%number%' => 10))
+                ->with('oro.importexport.import.error %number%', ['%number%' => 10])
                 ->willReturn('TranslatedError 10');
             $expectedPrefix = 'TranslatedError 10';
         }
@@ -358,14 +365,13 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isGrantedWhenUsingCacheDataProvider
-     *
-     * @param bool $isGranted
-     * @param array $isGrantedCalls
-     * @param string|string[] $attributes
-     * @param object|string $object
      */
-    public function testIsGrantedWhenUsingCache(bool $isGranted, array $isGrantedCalls, $attributes, $object): void
-    {
+    public function testIsGrantedWhenUsingCache(
+        bool $isGranted,
+        array $isGrantedCalls,
+        array|string $attributes,
+        object|string $object
+    ): void {
         $this->tokenAccessor->expects(self::any())
             ->method('hasUser')
             ->willReturn(true);
@@ -428,18 +434,12 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isGrantedForPropertyWhenUsingCacheDataProvider
-     *
-     * @param bool $isGranted
-     * @param array $isGrantedCalls
-     * @param string|string[] $attributes
-     * @param object|string $object
-     * @param string|null $property
      */
     public function testIsGrantedForPropertyWhenUsingCache(
         bool $isGranted,
         array $isGrantedCalls,
-        $attributes,
-        $object,
+        array|string $attributes,
+        object|string $object,
         ?string $property
     ): void {
         $this->tokenAccessor->expects(self::any())
@@ -497,7 +497,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckPermissionGrantedForEntity(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $this->assertIsGrantedCall(true, 'CREATE', $entity);
@@ -507,7 +506,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckPermissionGrantedForEntityIsDenied(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $this->assertIsGrantedCall(false, 'CREATE', $entity);
@@ -519,7 +517,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckEntityOwnerPermissions(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
 
@@ -535,9 +532,8 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckEntityOwnerPermissionsDenied(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
-        $context
+        $context->expects(self::any())
             ->method('getReadOffset')
             ->willReturn(1);
 
@@ -556,7 +552,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     public function testCheckEntityOwnerPermissionsDeniedWhenSuppressErrors(): void
     {
         $context = $this->createMock(ContextInterface::class);
-        $context
+        $context->expects(self::any())
             ->method('getReadOffset')
             ->willReturn(1);
 
@@ -575,7 +571,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckImportedEntityFieldsAclGrantedForNewEntity(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $existingEntity = null;
@@ -598,7 +593,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckImportedEntityFieldsAclGrantedForExistingEntity(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $existingEntity = new \stdClass();
@@ -621,7 +615,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckImportedEntityFieldsAclNotGrantedForExistingEntityNoValue(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $existingEntity = new \stdClass();
@@ -645,7 +638,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckImportedEntityFieldsAclAccessDeniedNewEntity(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $existingEntity = null;
@@ -669,7 +661,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckImportedEntityFieldsAclAccessDeniedExistingEntity(): void
     {
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(ContextInterface::class);
         $entity = new \stdClass();
         $existingEntity = new \stdClass();
@@ -700,14 +691,12 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         return array_map(static fn ($fieldName) => ['name' => $fieldName], $fieldNames);
     }
 
-    /**
-     * @param bool $isGranted
-     * @param string $attribute
-     * @param mixed $object
-     * @param string|null $property
-     */
-    protected function assertIsGrantedCall(bool $isGranted, string $attribute, $object, ?string $property = null): void
-    {
+    private function assertIsGrantedCall(
+        bool $isGranted,
+        string $attribute,
+        mixed $object,
+        ?string $property = null
+    ): void {
         $this->tokenAccessor->expects(self::once())
             ->method('hasUser')
             ->willReturn(true);
@@ -726,7 +715,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
      * @param ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context
      * @param string $error
      */
-    protected function assertAddValidationErrorCalled(ContextInterface $context, string $error): void
+    private function assertAddValidationErrorCalled(ContextInterface $context, string $error): void
     {
         $this->translator->expects(self::exactly(2))
             ->method('trans')
@@ -747,7 +736,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
      * @param ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context
      * @param string $msg
      */
-    protected function assertAddError($context, string $msg): void
+    private function assertAddError(ContextInterface $context, string $msg): void
     {
         $this->translator->expects(self::once())
             ->method('trans')
@@ -764,8 +753,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetCurrentRowNumber(): void
     {
         $context = $this->createMock(ContextInterface::class);
-        $context
-            ->expects(self::once())
+        $context->expects(self::once())
             ->method('getReadOffset')
             ->willReturn($rowNumber = 10);
 
@@ -774,22 +762,14 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCurrentRowNumberWhenBatchContextInterface(): void
     {
-        /** @var Context|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->getMockBuilder(Context::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $context
-            ->expects(self::once())
+        $context = $this->createMock(Context::class);
+        $context->expects(self::once())
             ->method('getReadOffset')
             ->willReturn(10);
-
-        $context
-            ->expects(self::once())
+        $context->expects(self::once())
             ->method('getBatchSize')
             ->willReturn(100);
-
-        $context
-            ->expects(self::once())
+        $context->expects(self::once())
             ->method('getBatchNumber')
             ->willReturn(2);
 

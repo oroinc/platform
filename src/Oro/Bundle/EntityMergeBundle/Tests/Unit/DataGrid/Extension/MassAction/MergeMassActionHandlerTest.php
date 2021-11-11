@@ -147,7 +147,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getEntitiesByIds')
             ->with(
-                $this->equalTo('AccountTestEntityName'),
+                'AccountTestEntityName',
                 $this->callback(function ($param) use ($expectedIdFirst, $expectedIdSecond) {
                     return $param[0] === $expectedIdFirst && $param[1] === $expectedIdSecond;
                 })

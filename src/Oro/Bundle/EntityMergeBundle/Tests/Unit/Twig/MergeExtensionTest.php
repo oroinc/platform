@@ -13,13 +13,13 @@ class MergeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $accessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MergeRenderer|\PHPUnit\Framework\MockObject\MockObject */
     private $renderer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var MergeExtension */
@@ -28,9 +28,7 @@ class MergeExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->accessor = $this->createMock(AccessorInterface::class);
-        $this->renderer = $this->getMockBuilder(MergeRenderer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->renderer = $this->createMock(MergeRenderer::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $container = self::getContainerBuilder()
@@ -52,7 +50,7 @@ class MergeExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->atLeastOnce())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $this->assertEquals(
             $expectedFields,

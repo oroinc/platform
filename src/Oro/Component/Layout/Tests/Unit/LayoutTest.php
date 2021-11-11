@@ -19,7 +19,8 @@ class LayoutTest extends LayoutTestCase
 
     protected function setUp(): void
     {
-        $this->renderer         = $this->createMock(LayoutRendererInterface::class);
+        $this->renderer = $this->createMock(LayoutRendererInterface::class);
+
         $this->rendererRegistry = new LayoutRendererRegistry();
         $this->rendererRegistry->addRenderer('test', $this->renderer);
         $this->rendererRegistry->setDefaultRenderer('test');
@@ -55,7 +56,7 @@ class LayoutTest extends LayoutTestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The layout renderer named "unknown" was not found.');
 
-        $view   = new BlockView();
+        $view = new BlockView();
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setRenderer('unknown')->render();
     }
@@ -82,7 +83,7 @@ class LayoutTest extends LayoutTestCase
     public function testRenderWithBlockTheme(): void
     {
         $expected = 'some rendered string';
-        $theme    = '@My/blocks.html.twig';
+        $theme = '@My/blocks.html.twig';
 
         $view = new BlockView();
 
@@ -104,11 +105,11 @@ class LayoutTest extends LayoutTestCase
     public function testRenderWithBlockThemeForChild(): void
     {
         $expected = 'some rendered string';
-        $theme    = '@My/blocks.html.twig';
+        $theme = '@My/blocks.html.twig';
 
         $view = new BlockView();
 
-        $childView                  = new BlockView($view);
+        $childView = new BlockView($view);
         $view->children['child_id'] = $childView;
         $this->setLayoutBlocks(['root' => $view]);
 
@@ -146,7 +147,7 @@ class LayoutTest extends LayoutTestCase
     /**
      * @dataProvider renderWithAbsoluteUrlBlockThemeDataProvider
      */
-    public function testRenderWithAbsoluteUrlBlockTheme($themes, $expected): void
+    public function testRenderWithAbsoluteUrlBlockTheme(mixed $themes, mixed $expected): void
     {
         $view = new BlockView();
 
@@ -164,8 +165,7 @@ class LayoutTest extends LayoutTestCase
                     self::assertSame(\gettype($expected), \gettype($themes));
                     self::assertEquals($expected, $themes);
                 }
-            })
-        ;
+            });
 
         $this->renderer->expects(self::once())
             ->method('renderBlock')

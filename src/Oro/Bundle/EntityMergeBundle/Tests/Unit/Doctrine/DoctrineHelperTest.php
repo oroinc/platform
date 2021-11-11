@@ -12,6 +12,7 @@ use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 /**
@@ -19,25 +20,25 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
  */
 class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $metadata;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $queryBuilder;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
     private $query;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Expr|\PHPUnit\Framework\MockObject\MockObject */
     private $expression;
 
     /** @var DoctrineHelper */
@@ -132,8 +133,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntitiesByIdsForEmptyArray()
     {
-        $className = 'TestEntity';
-        $this->assertEquals([], $this->doctrineHelper->getEntitiesByIds($className, []));
+        $this->assertEquals([], $this->doctrineHelper->getEntitiesByIds('TestEntity', []));
     }
 
     public function testGetSingleIdentifierFieldName()
@@ -176,7 +176,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityIdentifierValueFails()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Multiple id is not supported.');
 
         $entity = new EntityStub();
@@ -227,8 +227,13 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEntityEqualDataProvider
      */
-    public function testIsEntityEqualForSameClass($firstObject, $firstId, $secondObject, $secondId, $expected)
-    {
+    public function testIsEntityEqualForSameClass(
+        object $firstObject,
+        int $firstId,
+        object $secondObject,
+        int $secondId,
+        bool $expected
+    ) {
         $this->entityManager->expects($this->exactly(2))
             ->method('getMetadataFactory')
             ->willReturn($this->metadataFactory);
@@ -281,7 +286,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsEntityEqualFailsForFirstNotObject()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('$entity argument must be an object, "string" given.');
 
         $this->doctrineHelper->isEntityEqual('scalar', new \stdClass());
@@ -289,7 +294,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsEntityEqualFailsForSecondNotObject()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('$other argument must be an object, "string" given.');
 
         $this->doctrineHelper->isEntityEqual(new \stdClass(), 'scalar');

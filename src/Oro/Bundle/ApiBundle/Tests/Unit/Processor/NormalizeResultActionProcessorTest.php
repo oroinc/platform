@@ -9,8 +9,6 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBag;
@@ -33,20 +31,11 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_ACTION = 'test';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
+    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorRegistry;
 
     /** @var ProcessorBagConfigBuilder */
     private $processorBagConfigBuilder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var ProcessorBag */
-    private $processorBag;
 
     /** @var NormalizeResultActionProcessor */
     private $processor;
@@ -55,16 +44,12 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
         $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -1);
         $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -2);
         $this->processorBagConfigBuilder->addGroup(ApiActionGroup::NORMALIZE_RESULT, self::TEST_ACTION, -3);
 
-        $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->metadataProvider = $this->createMock(MetadataProvider::class);
-
         $this->processor = new NormalizeResultActionProcessor(
-            $this->processorBag,
+            new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry),
             self::TEST_ACTION
         );
     }
@@ -97,9 +82,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessors(array $processors)
+    private function addProcessors(array $processors): array
     {
         $createdProcessors = [];
         $processorRegistryMap = [];
@@ -121,10 +106,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         return $createdProcessors;
     }
 
-    /**
-     * @return array
-     */
-    public function loggerProvider()
+    public function loggerProvider(): array
     {
         return [
             [false],
@@ -1199,7 +1181,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->will(new \PHPUnit\Framework\MockObject\Stub\Exception($internalPhpError));
+            ->willThrowException($internalPhpError);
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -1285,10 +1267,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function safeExceptionProvider()
+    public function safeExceptionProvider(): array
     {
         return [
             [new HttpException(Response::HTTP_BAD_REQUEST)],
@@ -1349,10 +1328,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function httpInternalServerErrorExceptionProvider()
+    public function httpInternalServerErrorExceptionProvider(): array
     {
         return [
             [new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR)],
@@ -1403,10 +1379,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function errorForLogConversionProvider()
+    public function errorForLogConversionProvider(): array
     {
         return [
             [

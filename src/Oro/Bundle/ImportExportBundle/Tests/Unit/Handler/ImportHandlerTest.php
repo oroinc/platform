@@ -23,28 +23,28 @@ class ImportHandlerTest extends \PHPUnit\Framework\TestCase
     private $jobExecutor;
 
     /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $processorRegistry;
+    private $processorRegistry;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var WriterChain|\PHPUnit\Framework\MockObject\MockObject */
-    protected $writerChain;
+    private $writerChain;
 
     /** @var ReaderChain|\PHPUnit\Framework\MockObject\MockObject */
-    protected $readerChain;
+    private $readerChain;
 
     /** @var BatchFileManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $batchFileManager;
+    private $batchFileManager;
 
     /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
+    private $fileManager;
 
     /** @var ImportHandler */
-    protected $importHandler;
+    private $importHandler;
 
     protected function setUp(): void
     {

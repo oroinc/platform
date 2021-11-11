@@ -23,8 +23,8 @@ class ImportProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContextAwareProcessor */
     protected $processor;
 
-    protected array $item = ['test' => 'test'];
-    protected \stdClass $object;
+    private array $item = ['test' => 'test'];
+    private \stdClass $object;
 
     protected function setUp(): void
     {

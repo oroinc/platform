@@ -9,75 +9,53 @@ use Oro\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
 use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessStepExecutor;
 
 class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PostProcessStepExecutor
-     */
-    protected $executor;
+    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobExecutor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor
-     */
-    protected $jobExecutor;
+    /** @var ItemReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $reader;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ItemReaderInterface
-     */
-    protected $reader;
+    /** @var ItemProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $processor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ItemProcessorInterface
-     */
-    protected $processor;
+    /** @var ItemWriterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $writer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ItemWriterInterface
-     */
-    protected $writer;
+    /** @var PostProcessStepExecutor */
+    private $executor;
 
     protected function setUp(): void
     {
-        $this->executor = new PostProcessStepExecutor();
-
-        $this->jobExecutor = $this->getMockBuilder(JobExecutor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->executor->setJobExecutor($this->jobExecutor);
-
+        $this->jobExecutor = $this->createMock(JobExecutor::class);
         $this->reader = $this->createMock(ItemReaderInterface::class);
-        $this->executor->setReader($this->reader);
-
         $this->processor = $this->createMock(ItemProcessorInterface::class);
-        $this->executor->setProcessor($this->processor);
-
         $this->writer = $this->createMock(ItemWriterInterface::class);
-        $this->executor->setWriter($this->writer);
 
+        $this->executor = new PostProcessStepExecutor();
+        $this->executor->setJobExecutor($this->jobExecutor);
+        $this->executor->setReader($this->reader);
+        $this->executor->setProcessor($this->processor);
+        $this->executor->setWriter($this->writer);
         $this->executor->setBatchSize(2);
     }
 
     /**
-     * @param array $contextSharedKeys
-     * @param array $context
-     * @param array $job
-     * @param bool $isJobSuccess
-     * @param int $jobExecutions
-     * @param array $expectedContext
-     *
      * @dataProvider executeDataProvider
      */
     public function testExecute(
         array $contextSharedKeys,
         array $context,
         array $job,
-        $isJobSuccess = true,
-        $jobExecutions = 0,
-        $expectedContext = []
+        bool $isJobSuccess = true,
+        int $jobExecutions = 0,
+        array $expectedContext = []
     ) {
         if ($job) {
             [$jobType, $jobName] = $job;
@@ -87,10 +65,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
 
         $this->executor->setContextSharedKeys($contextSharedKeys);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $executionContext = new ExecutionContext();
         foreach ($context as $key => $value) {
@@ -101,28 +76,31 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
         $jobInstance = $this->createMock(JobInstance::class);
         $jobExecution->expects($this->any())
             ->method('getJobInstance')
-            ->will($this->returnValue($jobInstance));
+            ->willReturn($jobInstance);
         $jobExecution->expects($this->any())
             ->method('getExecutionContext')
-            ->will($this->returnValue($executionContext));
+            ->willReturn($executionContext);
         $stepExecution->expects($this->any())
             ->method('getJobExecution')
-            ->will($this->returnValue($jobExecution));
+            ->willReturn($jobExecution);
 
         $this->executor->setStepExecution($stepExecution);
 
         $jobResult = new JobResult();
         $jobResult->setSuccessful($isJobSuccess);
         if (!$isJobSuccess) {
-            $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\RuntimeException::class);
+            $this->expectException(RuntimeException::class);
         }
 
         $this->jobExecutor->expects($this->exactly($jobExecutions))
             ->method('executeJob')
             ->willReturn($jobResult);
 
-        $this->processor->expects($this->any())->method('process')->willReturnArgument(0);
-        $this->reader->expects($this->atLeastOnce())->method('read')
+        $this->processor->expects($this->any())
+            ->method('process')
+            ->willReturnArgument(0);
+        $this->reader->expects($this->atLeastOnce())
+            ->method('read')
             ->willReturnOnConsecutiveCalls(new \stdClass(), new \stdClass(), new \stdClass(), null);
 
         $this->executor->execute();
@@ -130,10 +108,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedContext, $executionContext->getKeys());
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             'empty keys' => [[], [], []],

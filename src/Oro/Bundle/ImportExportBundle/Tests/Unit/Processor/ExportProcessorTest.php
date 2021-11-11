@@ -23,9 +23,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->context = $this->getMockBuilder(ContextInterface::class)
-            ->onlyMethods(['getOption'])
-            ->getMockForAbstractClass();
+        $this->context = $this->createMock(ContextInterface::class);
         $this->context->expects(self::any())
             ->method('getConfiguration')
             ->willReturn([]);
@@ -110,7 +108,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetImportExportContextWithQueryBuilderIgnored()
     {
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $this->context->expects(self::once())
             ->method('getOption')
@@ -126,7 +124,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetImportExportContextWithQueryBuilder()
     {
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $this->context->expects(self::once())
             ->method('getOption')

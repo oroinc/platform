@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
+use Oro\Component\MessageQueue\Util\JSON;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -132,8 +133,8 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with(
-                $this->equalTo('oro_importexport_job_error_log'),
-                $this->equalTo(['jobId' => $job->getId()])
+                'oro_importexport_job_error_log',
+                ['jobId' => $job->getId()]
             )
             ->willReturn('/log/12345');
 
@@ -175,7 +176,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.json')
-            ->willReturn(json_encode(['Tests error in import.'], JSON_THROW_ON_ERROR));
+            ->willReturn(JSON::encode(['Tests error in import.']));
 
         $summary = $this->summarizer->getErrorLog($job);
 
@@ -269,8 +270,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
                 })
             );
 
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->with('oro_ui.application_url')
             ->willReturn('127.0.0.1');

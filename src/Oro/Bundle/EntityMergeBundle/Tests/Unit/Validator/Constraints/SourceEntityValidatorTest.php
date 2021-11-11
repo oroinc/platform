@@ -43,7 +43,7 @@ class SourceEntityValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider invalidArgumentProvider
      */
-    public function testInvalidArgument($value, $expectedExceptionMessage)
+    public function testInvalidArgument(mixed $value, string $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

@@ -19,7 +19,7 @@ class MaxEntitiesCountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider invalidArgumentProvider
      */
-    public function testInvalidArgument($value, string $expectedExceptionMessage)
+    public function testInvalidArgument(mixed $value, string $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

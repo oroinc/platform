@@ -10,15 +10,16 @@ use Symfony\Component\Validator\ConstraintViolationList;
 
 class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigurableTableDataConverter */
-    protected $configurableDataConverter;
+    /** @var ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurableDataConverter;
 
     /** @var StrategyValidationEventListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {
         $this->configurableDataConverter = $this->createMock(ConfigurableTableDataConverter::class);
+
         $this->listener = new StrategyValidationEventListener($this->configurableDataConverter);
     }
 
@@ -35,7 +36,8 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
     {
         $violations = new ConstraintViolationList([$this->getViolation()]);
         $event = new StrategyValidationEvent($violations);
-        $this->configurableDataConverter->expects($this->never())->method('getFieldHeaderWithRelation');
+        $this->configurableDataConverter->expects($this->never())
+            ->method('getFieldHeaderWithRelation');
         $this->listener->buildErrors($event);
 
         $this->assertEquals(['testerror'], $event->getErrors());
@@ -45,8 +47,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
     {
         $violations = new ConstraintViolationList([$this->getViolation('prop')]);
         $event = new StrategyValidationEvent($violations);
-        $this->configurableDataConverter
-            ->expects($this->once())
+        $this->configurableDataConverter->expects($this->once())
             ->method('getFieldHeaderWithRelation')
             ->willReturn(null);
         $this->listener->buildErrors($event);
@@ -58,8 +59,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
     {
         $violations = new ConstraintViolationList([$this->getViolation('prop')]);
         $event = new StrategyValidationEvent($violations);
-        $this->configurableDataConverter
-            ->expects($this->once())
+        $this->configurableDataConverter->expects($this->once())
             ->method('getFieldHeaderWithRelation')
             ->willReturn('header');
         $this->listener->buildErrors($event);
@@ -73,7 +73,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
             'testerror',
             'test',
             [],
-            new \StdClass,
+            new \stdClass(),
             $propertyPath,
             'fail'
         );

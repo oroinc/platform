@@ -10,38 +10,26 @@ use Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter;
 
 class InsertFromSelectWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var InsertFromSelectQueryExecutor|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $queryExecutor;
+    /** @var InsertFromSelectQueryExecutor|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryExecutor;
 
-    /**
-     * @var InsertFromSelectWriter
-     */
-    protected $writer;
+    /** @var InsertFromSelectWriter */
+    private $writer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->queryExecutor = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor')
-            ->disableOriginalConstructor()->getMock();
+        $this->queryExecutor = $this->createMock(InsertFromSelectQueryExecutor::class);
 
         $this->writer = new InsertFromSelectWriter($this->queryExecutor);
     }
 
     public function testWrite()
     {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $firstQueryBuilder */
-        $firstQueryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()->getMock();
+        $firstQueryBuilder = $this->createMock(QueryBuilder::class);
 
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
 
         // Used for showing difference between first and second QueryBuilders
-        /** @var QueryBuilder $secondQueryBuilder */
         $secondQueryBuilder = new QueryBuilder($em);
 
         $items = [

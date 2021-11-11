@@ -14,62 +14,39 @@ use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessItemStep;
 
 class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PostProcessItemStep
-     */
-    protected $itemStep;
+    /** @var PostProcessItemStep */
+    private $itemStep;
 
     protected function setUp(): void
     {
         $this->itemStep = new PostProcessItemStep('step_name');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor $jobExecutor */
-        $jobExecutor = $this->getMockBuilder(JobExecutor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->itemStep->setJobExecutor($jobExecutor);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ItemReaderInterface $reader */
-        $reader = $this->createMock(ItemReaderInterface::class);
-        $this->itemStep->setReader($reader);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ItemProcessorInterface $processor */
-        $processor = $this->createMock(ItemProcessorInterface::class);
-        $this->itemStep->setProcessor($processor);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ItemWriterInterface $writer */
-        $writer = $this->createMock(ItemWriterInterface::class);
-        $this->itemStep->setWriter($writer);
-
+        $this->itemStep->setJobExecutor($this->createMock(JobExecutor::class));
+        $this->itemStep->setReader($this->createMock(ItemReaderInterface::class));
+        $this->itemStep->setProcessor($this->createMock(ItemProcessorInterface::class));
+        $this->itemStep->setWriter($this->createMock(ItemWriterInterface::class));
         $this->itemStep->setBatchSize(1);
     }
 
     /**
-     * @param string $jobName
-     * @param string $contextKeys
-     *
      * @dataProvider executeDataProvider
      */
-    public function testDoExecute($jobName, $contextKeys)
+    public function testDoExecute(string|int|null $jobName, string|int|null $contextKeys)
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $executionContext = $this->createMock(ExecutionContext::class);
         $jobExecution = $this->createMock(JobExecution::class);
         $jobInstance = $this->createMock(JobInstance::class);
         $jobExecution->expects($this->any())
             ->method('getJobInstance')
-            ->will($this->returnValue($jobInstance));
+            ->willReturn($jobInstance);
         $jobExecution->expects($this->any())
             ->method('getExecutionContext')
-            ->will($this->returnValue($executionContext));
+            ->willReturn($executionContext);
 
         $stepExecution->expects($this->any())
             ->method('getJobExecution')
-            ->will($this->returnValue($jobExecution));
+            ->willReturn($jobExecution);
 
         $this->itemStep->setPostProcessingJobs($jobName);
         $jobInstance->expects($jobName ? $this->once() : $this->never())
@@ -81,10 +58,7 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
         $this->itemStep->doExecute($stepExecution);
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             'empty job' => [null, null],

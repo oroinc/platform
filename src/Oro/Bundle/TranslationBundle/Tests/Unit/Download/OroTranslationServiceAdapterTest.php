@@ -232,8 +232,7 @@ class OroTranslationServiceAdapterTest extends TestCase
             . '?packages=PackageA,PackageB'
             . '&version=' . OroTranslationServiceAdapter::TRANSLATIONS_VERSION
             . '&language=uk-UA'
-            . '&key=SOME-API-KEY'
-        ;
+            . '&key=SOME-API-KEY';
         $this->client->expects(self::once())
             ->method('send')
             ->with(
@@ -446,8 +445,7 @@ class OroTranslationServiceAdapterTest extends TestCase
         );
         $expectedUriString = 'https://translations.oroinc.com/api/stats'
             . '?packages=PackageA,PackageB'
-            . '&version=' . OroTranslationServiceAdapter::TRANSLATIONS_VERSION
-        ;
+            . '&version=' . OroTranslationServiceAdapter::TRANSLATIONS_VERSION;
         $response = new Response(200, [], Utils::jsonEncode(array_values(self::METRICS)));
         $this->client->expects(self::once())
             ->method('send')
@@ -470,8 +468,7 @@ class OroTranslationServiceAdapterTest extends TestCase
         $expectedLogUri = 'https://translations.oroinc.com/api/stats'
             . '?packages=PackageA,PackageB'
             . '&version=' . OroTranslationServiceAdapter::TRANSLATIONS_VERSION
-            . '&key=********'
-        ;
+            . '&key=********';
         $expectedLogData = [
             'packages' => 'PackageA,PackageB',
             'version' => OroTranslationServiceAdapter::TRANSLATIONS_VERSION,

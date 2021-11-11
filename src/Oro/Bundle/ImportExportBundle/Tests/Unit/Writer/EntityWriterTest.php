@@ -13,16 +13,16 @@ use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class EntityWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDetachFixer */
+    /** @var EntityDetachFixer|\PHPUnit\Framework\MockObject\MockObject */
     protected $detachFixer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
     /** @var EntityWriter */
@@ -30,23 +30,14 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->detachFixer = $this->createMock(EntityDetachFixer::class);
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($this->entityManager));
-
-        $this->detachFixer = $this->getMockBuilder(EntityDetachFixer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+            ->willReturn($this->entityManager);
 
         $this->writer = new EntityWriter(
             $this->doctrineHelper,
@@ -56,11 +47,9 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     *
      * @dataProvider configurationProvider
      */
-    public function testWrite($configuration)
+    public function testWrite(array $configuration)
     {
         $fooItem = $this->createMock(\stdClass::class);
         $barItem = $this->createMock(\ArrayObject::class);
@@ -76,20 +65,17 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->once())
             ->method('flush');
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
             $this->entityManager->expects($this->once())
@@ -116,10 +102,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->method('flush')
             ->willThrowException(new \Exception());
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())
@@ -129,7 +112,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
 
@@ -155,10 +138,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->method('flush')
             ->willThrowException($exception);
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())
@@ -168,7 +148,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->contextRegistry->expects($this->any())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
 
@@ -184,20 +164,17 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('entityName not resolved');
 
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write([]);
@@ -205,20 +182,17 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testClassResolvedOnce()
     {
-        /** @var StepExecution $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $context = $this->createMock(ContextInterface::class);
         $context->expects($this->once())
             ->method('getConfiguration')
-            ->will($this->returnValue(['entityName' => \stdClass::class]));
+            ->willReturn(['entityName' => \stdClass::class]);
 
         $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write([]);
@@ -227,10 +201,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([]);
     }
 
-    /**
-     * @return array
-     */
-    public function configurationProvider()
+    public function configurationProvider(): array
     {
         return [
             'no clear flag'    => [[]],

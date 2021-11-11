@@ -12,7 +12,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array[][] */
     private const INTEGER_CONSTRAINT = [
         [
             'Regex' => [
@@ -23,14 +22,14 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var TypeValidationLoader */
-    private $loader;
-
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendConfigProvider;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldConfigProvider;
+
+    /** @var TypeValidationLoader */
+    private $loader;
 
     protected function setUp(): void
     {
@@ -44,12 +43,10 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $className = \stdClass::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->never())
+        $this->fieldConfigProvider->expects($this->never())
             ->method('hasConfig');
 
-        $this->fieldConfigProvider
-            ->expects($this->never())
+        $this->fieldConfigProvider->expects($this->never())
             ->method('getConfigs');
 
         $this->loader->loadClassMetadata($classMetaData);
@@ -61,14 +58,12 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $className = \stdClass::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(false);
 
-        $this->fieldConfigProvider
-            ->expects($this->never())
+        $this->fieldConfigProvider->expects($this->never())
             ->method('getConfigs')
             ->with($className);
 
@@ -81,14 +76,12 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $className = User::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
 
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['invalidProperty' => 'integer']));
@@ -104,27 +97,23 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $className = User::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
 
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer']));
 
         $extendConfigFieldMock = $this->createMock(ConfigInterface::class);
-        $extendConfigFieldMock
-            ->expects($this->once())
+        $extendConfigFieldMock->expects($this->once())
             ->method('is')
             ->with('is_deleted')
             ->willReturn(true);
 
-        $this->extendConfigProvider
-            ->expects($this->once())
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, 'id')
             ->willReturn($extendConfigFieldMock);
@@ -140,21 +129,18 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $className = User::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
 
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer']));
 
         $extendConfigFieldMock = $this->createMock(ConfigInterface::class);
-        $extendConfigFieldMock
-            ->expects($this->exactly(2))
+        $extendConfigFieldMock->expects($this->exactly(2))
             ->method('is')
             ->withConsecutive(
                 ['is_deleted'],
@@ -162,8 +148,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(false, false);
 
-        $this->extendConfigProvider
-            ->expects($this->once())
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, 'id')
             ->willReturn($extendConfigFieldMock);
@@ -179,20 +164,17 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $className = User::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
 
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer'], ['id' => ['excluded' => true]]));
 
-        $this->extendConfigProvider
-            ->expects($this->never())
+        $this->extendConfigProvider->expects($this->never())
             ->method('getConfig');
 
         $this->loader->loadClassMetadata($classMetaData);
@@ -206,21 +188,18 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $className = User::class;
         $classMetaData = new ClassMetadata($className);
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
 
-        $this->fieldConfigProvider
-            ->expects($this->once())
+        $this->fieldConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn($this->getFieldConfigs($className, ['id' => 'integer']));
 
         $extendConfigFieldMock = $this->createMock(ConfigInterface::class);
-        $extendConfigFieldMock
-            ->expects($this->exactly(2))
+        $extendConfigFieldMock->expects($this->exactly(2))
             ->method('is')
             ->withConsecutive(
                 ['is_deleted'],
@@ -228,8 +207,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->extendConfigProvider
-            ->expects($this->once())
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, 'id')
             ->willReturn($extendConfigFieldMock);

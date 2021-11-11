@@ -11,6 +11,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -59,8 +60,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger
             ->expects($this->once())
             ->method('error')
-            ->with('Expected array but got: "NULL"')
-        ;
+            ->with('Expected array but got: "NULL"');
 
         $message = new Message();
         $message->setBody('');
@@ -74,13 +74,12 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldLogErrorIfNotEnoughDataToBuildJobName()
     {
         $message = new Message();
-        $message->setBody(json_encode(['class' => 'class-name']));
+        $message->setBody(JSON::encode(['class' => 'class-name']));
 
         $this->logger
             ->expects($this->once())
             ->method('error')
-            ->with('Expected array with keys "class" and "context" but given: "class"')
-        ;
+            ->with('Expected array with keys "class" and "context" but given: "class"');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -91,19 +90,17 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->logger
             ->expects($this->never())
-            ->method('error')
-        ;
+            ->method('error');
 
         $this->jobRunner
             ->expects($this->once())
             ->method('runUnique')
             ->willReturn(true)
-            ->with('message id', 'search_reindex|d0d06767b38da968e7118c69f821bc1e')
-        ;
+            ->with('message id', 'search_reindex|d0d06767b38da968e7118c69f821bc1e');
 
         $message = new Message();
         $message->setMessageId('message id');
-        $message->setBody(json_encode(['class' => 'class-name', 'entityIds' => ['id']]));
+        $message->setBody(JSON::encode(['class' => 'class-name', 'entityIds' => ['id']]));
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 

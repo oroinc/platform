@@ -48,11 +48,8 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $businessUnit = $this->getEntity(BusinessUnit::class, ['id' => 1]);
 
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
-        /** @var ClassMetadata $classMetadata */
         $classMetadata = $this->createMock(ClassMetadata::class);
-        /** @var PersistentCollection $collection */
         $collection = new PersistentCollection($em, $classMetadata, new ArrayCollection([$businessUnit]));
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class);

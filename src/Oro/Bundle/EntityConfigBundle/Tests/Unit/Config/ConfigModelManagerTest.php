@@ -17,7 +17,6 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Component\Testing\ReflectionUtil;
-use PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -28,10 +27,10 @@ use PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls;
  */
 class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_ENTITY  = 'Test\Entity\TestEntity';
+    private const TEST_ENTITY = 'Test\Entity\TestEntity';
     private const TEST_ENTITY2 = 'Test\Entity\TestEntity2';
-    private const TEST_FIELD   = 'testField';
-    private const TEST_FIELD2  = 'testField2';
+    private const TEST_FIELD = 'testField';
+    private const TEST_FIELD2 = 'testField2';
 
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
@@ -47,10 +46,10 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->databaseChecker = $this->createMock(ConfigDatabaseChecker::class);
-
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->repo = $this->createMock(EntityRepository::class);
+        $this->databaseChecker = $this->createMock(ConfigDatabaseChecker::class);
+
         $this->em->expects($this->any())
             ->method('getRepository')
             ->with(EntityConfigModel::class)
@@ -100,7 +99,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ignoredEntitiesProvider
      */
-    public function testFindEntityModelIgnore($className)
+    public function testFindEntityModelIgnore(string $className)
     {
         $this->assertNull(
             $this->configModelManager->findEntityModel($className)
@@ -110,7 +109,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ignoredEntitiesProvider
      */
-    public function testFindFieldModelIgnore($className)
+    public function testFindFieldModelIgnore(string $className)
     {
         $this->assertNull(
             $this->configModelManager->findFieldModel($className, self::TEST_FIELD)
@@ -385,7 +384,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testFindFieldModel()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
         $this->prepareEntityConfigRepository(
             [$entityModel],
@@ -418,7 +417,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testFindFieldModelDetachedEntity()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
         $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
@@ -454,7 +453,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testFindFieldModelAllEntitiesDetached()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
         $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
@@ -492,7 +491,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testFindFieldModelDetached()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
         $this->prepareEntityConfigRepository(
             [$entityModel],
@@ -598,7 +597,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFieldEntityModel()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $this->prepareEntityConfigRepository(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED, UnitOfWork::STATE_MANAGED]
@@ -719,12 +718,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
             [UnitOfWork::STATE_MANAGED]
         );
 
-        $result = $this->configModelManager->createFieldModel(
-            self::TEST_ENTITY,
-            $fieldName,
-            'int',
-            ConfigModel::MODE_DEFAULT
-        );
+        $result = $this->configModelManager->createFieldModel(self::TEST_ENTITY, $fieldName, 'int');
         $this->assertEquals($expectedResult, $result);
 
         // test that the created model is NOT stored in a local cache
@@ -750,12 +744,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $result = $this->configModelManager->createFieldModel(
-            self::TEST_ENTITY,
-            self::TEST_FIELD,
-            'int',
-            ConfigModel::MODE_DEFAULT
-        );
+        $result = $this->configModelManager->createFieldModel(self::TEST_ENTITY, self::TEST_FIELD, 'int');
         $this->assertEquals($expectedResult, $result);
 
         // test that the created model is stored in a local cache
@@ -823,7 +812,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testChangeFieldName()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $this->prepareEntityConfigRepository(
             [$entityModel],
             [
@@ -882,7 +871,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testChangeFieldTypeWithTheSameType()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $this->prepareEntityConfigRepository(
             [$entityModel],
             [
@@ -913,7 +902,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testChangeFieldType()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $this->prepareEntityConfigRepository(
             [$entityModel],
             [
@@ -969,7 +958,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testChangeFieldModeWithTheSameMode()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $fieldModel->setMode(ConfigModel::MODE_HIDDEN);
         $this->prepareEntityConfigRepository(
             [$entityModel],
@@ -1001,7 +990,7 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
     public function testChangeFieldMode()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $this->prepareEntityConfigRepository(
             [$entityModel],
             [
@@ -1123,10 +1112,10 @@ class ConfigModelManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($uow);
         $uow->expects($this->exactly(count($entityStates)))
             ->method('getEntityState')
-            ->will(new ConsecutiveCalls($entityStates));
+            ->willReturnOnConsecutiveCalls(...$entityStates);
     }
 
-    private static function createEntityModel(string $className): EntityConfigModel
+    private function createEntityModel(string $className): EntityConfigModel
     {
         return new EntityConfigModel($className);
     }
