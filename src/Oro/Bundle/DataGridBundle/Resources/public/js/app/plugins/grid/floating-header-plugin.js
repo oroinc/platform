@@ -97,15 +97,20 @@ define(function(require) {
             }, 100, true);
             // use capture phase to scroll dropdown toggle into view before dropdown will be opened
             this.$grid[0].addEventListener('click', e => {
+                const targetIsCheckbox = $(e.target).is('input[type=checkbox]');
                 const dropdownToggle = $(e.target).closest('[data-toggle="dropdown"]');
-                if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.show)')) {
+                if (
+                    dropdownToggle.length &&
+                    dropdownToggle.parent().is('thead:first .dropdown:not(.show)') &&
+                    !targetIsCheckbox
+                ) {
                     // this will hide dropdowns and ignore next calls to it
                     debouncedHideDropdowns();
                     this.isHeaderDropdownVisible = true;
                     scrollHelper.scrollIntoView(dropdownToggle[0], void 0, 10, 10);
                 }
             }, true);
-            this.$grid.on('hide.bs.dropdown', '.dropdown.show', () => {
+            this.$grid.on('hide.bs.dropdown', () => {
                 this.isHeaderDropdownVisible = false;
                 this.selectMode();
             });

@@ -190,6 +190,9 @@ oro_behat_extension:
     MassActionHeadCheckbox:
       selector: 'th.grid-header-cell-massAction div.btn-group .icon'
 
+    MassActionCheckbox:
+      selector: 'th.grid-header-cell-massAction div.btn-group .checkbox-view__input'
+
     MassActionButton:
       selector: '.grid-header-row .action-column .dropdown button'
 
