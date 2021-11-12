@@ -10,21 +10,16 @@ class ActionGroupDefinitionTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var ActionGroupDefinition */
-    protected $actionGroupDefinition;
+    private $actionGroupDefinition;
 
     protected function setUp(): void
     {
         $this->actionGroupDefinition = new ActionGroupDefinition();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->actionGroupDefinition);
-    }
-
     public function testGettersAndSetters()
     {
-        static::assertPropertyAccessors(
+        self::assertPropertyAccessors(
             $this->actionGroupDefinition,
             [
                 ['name', 'test'],

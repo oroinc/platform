@@ -24,10 +24,10 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
 {
     private const SUPPORTED_CLASS = User::class;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowRegistry;
 
     /** @var WorkflowEntityVoter */
@@ -198,7 +198,7 @@ class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function setRegistryRepositories(
+    private function setRegistryRepositories(
         array $entityAcls = [],
         ?string $entityClass = null,
         ?int $entityIdentifier = null,

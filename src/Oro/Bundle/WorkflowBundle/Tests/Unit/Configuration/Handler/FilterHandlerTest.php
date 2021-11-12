@@ -20,10 +20,8 @@ class FilterHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function handleProvider()
+    public function handleProvider(): array
     {
         return [
             [

@@ -10,22 +10,17 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var Parameter */
-    protected $parameter;
+    private $parameter;
 
     protected function setUp(): void
     {
         $this->parameter = new Parameter('test');
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->actionGroupDefinition);
-    }
-
     public function testSimpleGettersAndSetters()
     {
         $this->assertEquals('test', $this->parameter->getName());
-        static::assertPropertyAccessors(
+        self::assertPropertyAccessors(
             $this->parameter,
             [
                 ['type', 'TestType'],
@@ -59,9 +54,8 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider defaultValueProvider
-     * @param mixed $value
      */
-    public function testGetDefaultValue($value)
+    public function testGetDefaultValue(mixed $value)
     {
         $this->parameter->setDefault($value);
 
@@ -70,10 +64,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->parameter->getDefault());
     }
 
-    /**
-     * @return array
-     */
-    public function defaultValueProvider()
+    public function defaultValueProvider(): array
     {
         return [
             [''],

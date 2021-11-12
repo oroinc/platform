@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationChecker */
-    protected $checker;
+    private $checker;
 
     protected function setUp(): void
     {
@@ -26,10 +26,8 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return \Generator
      */
-    public function isCleanDataProvider()
+    public function isCleanDataProvider(): \Generator
     {
         yield 'empty configuration' => [
             'config' => [],

@@ -10,19 +10,12 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowRestrictionIdentity
-     */
-    protected $identity;
+    /** @var WorkflowRestrictionIdentity */
+    private $identity;
 
     protected function setUp(): void
     {
         $this->identity = new WorkflowRestrictionIdentity();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->identity);
     }
 
     public function testGetId()
@@ -47,7 +40,7 @@ class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($this->identity, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['restriction', new WorkflowRestriction()],

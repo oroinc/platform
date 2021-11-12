@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
     /** @var CurrentApplicationProvider */
@@ -23,12 +23,7 @@ class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new CurrentApplicationProvider($this->tokenStorage);
     }
 
-    /**
-     * @param UserInterface|string $user
-     *
-     * @return TokenInterface
-     */
-    private function createToken($user): TokenInterface
+    private function createToken(UserInterface|string $user): TokenInterface
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())

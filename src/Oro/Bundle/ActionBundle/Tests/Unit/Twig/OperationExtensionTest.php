@@ -15,22 +15,22 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const ROUTE = 'test_route';
-    const REQUEST_URI = '/test/request/uri';
+    private const ROUTE = 'test_route';
+    private const REQUEST_URI = '/test/request/uri';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RouteProviderInterface */
+    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $routeProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextHelper */
+    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $contextHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsHelper */
+    /** @var OptionsHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $optionsHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonProvider */
+    /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $buttonProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonSearchContextProvider */
+    /** @var ButtonSearchContextProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $buttonSearchContextProvider;
 
     /** @var OperationExtension */
@@ -78,10 +78,7 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function hasButtonsDataProvider()
+    public function hasButtonsDataProvider(): array
     {
         return [
             'has_buttons' => [true],

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\AbstractComparison;
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
@@ -19,17 +20,8 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
+
         $this->condition = new class() extends AbstractComparison {
-            public function xgetLeft()
-            {
-                return $this->left;
-            }
-
-            public function xgetRight()
-            {
-                return $this->right;
-            }
-
             protected function doCompare($left, $right)
             {
             }
@@ -128,8 +120,8 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $result = $this->condition->initialize(['left' => 'foo', 'right' => 'bar']);
 
         self::assertSame($this->condition, $result);
-        self::assertEquals('foo', $this->condition->xgetLeft());
-        self::assertEquals('bar', $this->condition->xgetRight());
+        self::assertEquals('foo', ReflectionUtil::getPropertyValue($this->condition, 'left'));
+        self::assertEquals('bar', ReflectionUtil::getPropertyValue($this->condition, 'right'));
     }
 
     public function testInitializeFailsWithEmptyRightOption()

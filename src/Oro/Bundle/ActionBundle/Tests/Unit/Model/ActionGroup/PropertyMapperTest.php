@@ -18,6 +18,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->mockContextAccessor = $this->createMock(ContextAccessor::class);
+
         $this->propertyMapper = new PropertyMapper($this->mockContextAccessor);
     }
 

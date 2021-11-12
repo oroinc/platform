@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class DuplicatorFilterPassTest extends \PHPUnit\Framework\TestCase
 {
     private const FACTORY_SERVICE_ID = 'oro_action.factory.duplicator_filter_factory';
-    private const TAG_NAME           = 'oro_action.duplicate.filter_type';
+    private const TAG_NAME = 'oro_action.duplicate.filter_type';
 
     /** @var DuplicatorFilterPass */
     private $compiler;

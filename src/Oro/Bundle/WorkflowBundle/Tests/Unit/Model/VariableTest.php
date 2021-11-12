@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
@@ -19,20 +20,14 @@ class VariableTest extends \PHPUnit\Framework\TestCase
     {
         $setter = 'set' . ucfirst($property);
         $obj = new Variable();
-        $this->assertInstanceOf(
-            'Oro\Bundle\WorkflowBundle\Model\Variable',
-            call_user_func_array([$obj, $setter], [$value])
-        );
+        $this->assertInstanceOf(Variable::class, $obj->{$setter}($value));
 
-        static::assertPropertyAccessors($obj, [
+        self::assertPropertyAccessors($obj, [
             [$property, $value, $testDefaultValue]
         ]);
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             'name' => ['name', 'test'],
@@ -96,7 +91,7 @@ class VariableTest extends \PHPUnit\Framework\TestCase
     public function testInstanceAndInternalType()
     {
         $variable = new Variable();
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ParameterInterface', $variable);
+        $this->assertInstanceOf(ParameterInterface::class, $variable);
 
         $this->assertEquals('variable', $variable->getInternalType());
     }

@@ -5,22 +5,16 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessTriggerConfiguration
-     */
-    protected $configuration;
+    /** @var ProcessTriggerConfiguration */
+    private $configuration;
 
     protected function setUp(): void
     {
         $this->configuration = new ProcessTriggerConfiguration();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->configuration);
     }
 
     /**
@@ -31,10 +25,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
 
-    /**
-     * @return array
-     */
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             'minimum data' => [
@@ -116,10 +107,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->configuration->processConfiguration($config);
     }
 
-    /**
-     * @return array
-     */
-    public function processExceptionDataProvider()
+    public function processExceptionDataProvider(): array
     {
         return [
             'invalid time_shift' => [
@@ -127,7 +115,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'time_shift' => 'qwerty'
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration.time_shift": Time shift "qwerty" is not ' .
                     'compatible with DateInterval'
             ],
@@ -136,14 +124,14 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'field' => 'status'
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration": Field is only allowed for update event'
             ],
             'not existing event' => [
                 'config' => [
                     'event' => 'not_existing_event'
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'The value "not_existing_event" is not allowed for path "configuration.event". ' .
                     'Permissible values: "create", "update", "delete"'
             ],
@@ -152,7 +140,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                     'event' => 'update',
                     'cron' => '0 * * * *'
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration": Only one child node "event" or "cron" ' .
                     'must be configured'
             ],
@@ -160,7 +148,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                 'config' => [
                     'cron' => 'a b * * *'
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration.cron": Invalid CRON field value a at ' .
                     'position 0'
             ],
@@ -169,7 +157,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                     'cron' => '0 * * * *',
                     'field' => 'test'
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration": Nodes "field", "queued" and ' .
                     '"time_shift" are only allowed with event node'
             ],
@@ -178,7 +166,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                     'cron' => '0 * * * *',
                     'queued' => true
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration": Nodes "field", "queued" and ' .
                     '"time_shift" are only allowed with event node'
             ],
@@ -187,7 +175,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
                     'cron' => '0 * * * *',
                     'time_shift' => 10
                 ],
-                'exception' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Invalid configuration for path "configuration": Nodes "field", "queued" and ' .
                     '"time_shift" are only allowed with event node'
             ],

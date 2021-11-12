@@ -20,10 +20,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
  */
 class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
     /** @var WorkflowAclMetadataProvider */
@@ -41,7 +41,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
     private function loadWorkflowExpectations()
     {

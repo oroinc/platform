@@ -14,7 +14,6 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Validates if entity can be changed taking into account workflow.
@@ -215,9 +214,7 @@ class WorkflowEntityValidator extends ConstraintValidator
      */
     protected function addFieldViolation($field, $message)
     {
-        /** @var ExecutionContextInterface $context */
-        $context = $this->context;
-        $context
+        $this->context
             ->buildViolation($message)
             ->atPath($field)
             ->addViolation();

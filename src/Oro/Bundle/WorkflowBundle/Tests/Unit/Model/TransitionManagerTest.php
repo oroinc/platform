@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -10,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 class TransitionManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionManager */
-    protected $transitionManager;
+    private $transitionManager;
 
     protected function setUp(): void
     {
@@ -20,7 +21,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetTransitionsEmpty()
     {
         $this->assertInstanceOf(
-            'Doctrine\Common\Collections\ArrayCollection',
+            ArrayCollection::class,
             $this->transitionManager->getTransitions()
         );
     }
@@ -48,10 +49,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transitionManager->getStartTransition($name));
     }
 
-    /**
-     * return \Generator
-     */
-    public function getStartTransitionDataProvider()
+    public function getStartTransitionDataProvider(): \Generator
     {
         $transition = $this->getTransitionMock('test_transition');
         $startTransition = $this->getTransitionMock('test_start_transition', true);
@@ -101,7 +99,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->transitionManager->setTransitions([$transitionOne, $transitionTwo]);
         $transitions = $this->transitionManager->getTransitions();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $expected = ['transition1' => $transitionOne, 'transition2' => $transitionTwo];
         $this->assertEquals($expected, $transitions->toArray());
 
@@ -110,7 +108,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         );
         $this->transitionManager->setTransitions($transitionsCollection);
         $transitions = $this->transitionManager->getTransitions();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
         $expected = ['transition1' => $transitionOne, 'transition2' => $transitionTwo];
         $this->assertEquals($expected, $transitions->toArray());
     }
@@ -121,23 +119,21 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
      * @param Step $step
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getTransitionMock($name, $isStart = false, $step = null)
+    private function getTransitionMock($name, $isStart = false, $step = null)
     {
-        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
         if ($isStart) {
             $transition->expects($this->any())
                 ->method('isStart')
-                ->will($this->returnValue($isStart));
+                ->willReturn($isStart);
         }
         if ($step) {
             $transition->expects($this->any())
                 ->method('getStepTo')
-                ->will($this->returnValue($step));
+                ->willReturn($step);
         }
 
         return $transition;
@@ -171,7 +167,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testExtractTransitionStringUnknown()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectException(InvalidTransitionException::class);
         $this->expectExceptionMessage('Transition "test" is not exist in workflow.');
 
         $transition = 'test';

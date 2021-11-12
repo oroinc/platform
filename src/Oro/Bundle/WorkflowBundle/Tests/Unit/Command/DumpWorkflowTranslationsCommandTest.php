@@ -14,58 +14,33 @@ use Symfony\Component\Yaml\Yaml;
 class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflow;
+    private $workflow;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
+    private $input;
 
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $output;
+    private $output;
 
     /** @var DumpWorkflowTranslationsCommand */
-    protected $command;
+    private $command;
 
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowTranslationHelper;
+    private $workflowTranslationHelper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->workflow = $this->createMock(Workflow::class);
         $this->workflowTranslationHelper = $this->createMock(WorkflowTranslationHelper::class);
-
         $this->input = $this->createMock(InputInterface::class);
         $this->output = $this->createMock(OutputInterface::class);
 
         $this->command = new DumpWorkflowTranslationsCommand(
             $this->workflowManager,
-            $this->workflowTranslationHelper
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset(
-            $this->workflowManager,
-            $this->workfow,
-            $this->input,
-            $this->output,
-            $this->command,
             $this->workflowTranslationHelper
         );
     }
@@ -112,24 +87,26 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->input->expects($this->exactly(1))
+        $this->input->expects($this->once())
             ->method('getArgument')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['workflow', 'workflow1'],
-            ]));
+            ]);
 
-        $this->input->expects($this->exactly(1))
+        $this->input->expects($this->once())
             ->method('getOption')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['locale', 'locale1'],
-            ]));
+            ]);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
             ->with('workflow1')
             ->willReturn($this->workflow);
 
-        $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
+        $this->workflow->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         $this->workflowTranslationHelper->expects($this->any())
             ->method('generateDefinitionTranslationKeys')

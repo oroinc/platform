@@ -23,19 +23,19 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
  */
 class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AttributeNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowAwareSerializer|\PHPUnit\Framework\MockObject\MockObject */
     private $serializer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     private $workflow;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
     private $attribute;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
     protected function setUp(): void
@@ -171,9 +171,10 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($attributeName);
 
         $this->expectException(SerializerException::class);
-        $this->expectExceptionMessage(
-            sprintf('Cannot handle "%s" of attribute "test_attribute" of workflow "test_workflow"', $direction)
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Cannot handle "%s" of attribute "test_attribute" of workflow "test_workflow"',
+            $direction
+        ));
 
         if ($direction === 'normalization') {
             $normalizer->normalize($data);
@@ -304,7 +305,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected)
     {
         $normalizer = $this->getWorkflowDataNormalizer();
         $this->assertEquals($expected, $normalizer->supportsNormalization($data, 'any_value'));

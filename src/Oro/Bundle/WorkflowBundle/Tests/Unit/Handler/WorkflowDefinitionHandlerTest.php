@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
@@ -13,13 +12,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
-    private $entityRepository;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
     /** @var WorkflowDefinitionHandler */
@@ -28,12 +24,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
-        $this->entityRepository = $this->createMock(EntityRepository::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->entityRepository);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())

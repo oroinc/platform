@@ -6,19 +6,12 @@ use Oro\Component\Action\Event\ExtendableConditionEvent;
 
 class ExtendableConditionEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    /**
-     * @var ExtendableConditionEvent
-     */
-    protected $extendableConditionEvent;
+    /** @var ExtendableConditionEvent */
+    private $extendableConditionEvent;
 
     protected function setUp(): void
     {
-        $this->extendableConditionEvent = new ExtendableConditionEvent($this->context);
+        $this->extendableConditionEvent = new ExtendableConditionEvent();
     }
 
     public function testAddError()

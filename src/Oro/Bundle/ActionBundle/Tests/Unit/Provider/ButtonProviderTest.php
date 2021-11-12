@@ -23,7 +23,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ButtonSearchContext */
     private $searchContext;
 
     protected function setUp(): void

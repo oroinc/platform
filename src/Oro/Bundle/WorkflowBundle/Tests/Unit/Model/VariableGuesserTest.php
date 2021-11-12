@@ -4,10 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Validator\Constraints\GreaterThan;
@@ -17,13 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class VariableGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    protected $guesser;
+    private $guesser;
 
     /** @var Variable|\PHPUnit\Framework\MockObject\MockObject */
-    protected $variable;
+    private $variable;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formConfigProvider;
+    private $formConfigProvider;
 
     protected function setUp(): void
     {
@@ -32,19 +34,16 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->formConfigProvider = $this->createMock(ConfigProvider::class);
 
-        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($id, array $parameters, $domain) {
-                    $this->assertIsString($id);
-                    $this->assertEquals([], $parameters);
-                    $this->assertEquals('workflows', $domain);
+            ->willReturnCallback(function ($id, array $parameters, $domain) {
+                $this->assertIsString($id);
+                $this->assertEquals([], $parameters);
+                $this->assertEquals('workflows', $domain);
 
-                    return $id . '_translated';
-                }
-            );
+                return $id . '_translated';
+            });
 
         $this->guesser = new VariableGuesser(
             $formRegistry,
@@ -53,7 +52,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
             $this->formConfigProvider,
             $translator
         );
-        $this->guesser->addFormTypeMapping('string', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $this->guesser->addFormTypeMapping('string', TextType::class);
 
         $this->variable = $this->createMock(Variable::class);
     }
@@ -79,23 +78,22 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
         }
 
         if ($formConfig) {
-            $formConfigId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $formConfigId = $this->createMock(FieldConfigId::class);
             $formConfigObject = new Config($formConfigId, $formConfig);
-            $this->formConfigProvider->expects($this->once())->method('hasConfig')
-                ->with($formConfig['entity'])->will($this->returnValue(true));
-            $this->formConfigProvider->expects($this->once())->method('getConfig')
-                ->with($formConfig['entity'])->will($this->returnValue($formConfigObject));
+            $this->formConfigProvider->expects($this->once())
+                ->method('hasConfig')
+                ->with($formConfig['entity'])
+                ->willReturn(true);
+            $this->formConfigProvider->expects($this->once())
+                ->method('getConfig')
+                ->with($formConfig['entity'])
+                ->willReturn($formConfigObject);
         }
 
         $this->assertEquals($expected, $this->guesser->guessVariableForm($variable));
     }
 
-    /**
-     * @return array
-     */
-    public function guessVariableFormDataProvider()
+    public function guessVariableFormDataProvider(): array
     {
         return [
             'scalar guess' => [ // test guessing scalar variables
@@ -178,7 +176,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
     {
         $this->variable->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue('testType'));
+            ->willReturn('testType');
 
         $typeGuess = $this->guesser->guessVariableForm($this->variable);
 
@@ -225,10 +223,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             ['string', 'label', 'test_label'],
@@ -247,7 +242,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
      *
      * @return Variable
      */
-    protected function createVariable($type, $propertyPath = null, array $options = [], $value = null, $label = null)
+    private function createVariable($type, $propertyPath = null, array $options = [], $value = null, $label = null)
     {
         $variable = new Variable();
         $variable->setType($type)

@@ -10,15 +10,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var WorkflowVariableFormatter */
-    protected $formatter;
+    private $formatter;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -27,18 +24,21 @@ class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $value
-     * @param $type
-     * @param string $expected
-     * @param bool $expectedTranslate
-     *
      * @dataProvider formatWorkflowVariableValueDataProvider
      */
-    public function testFormatWorkflowVariableValue($value, $type, $expected, $expectedTranslate = false)
-    {
+    public function testFormatWorkflowVariableValue(
+        mixed $value,
+        ?string $type,
+        string $expected,
+        bool $expectedTranslate = false
+    ) {
         $variable = $this->createMock(Variable::class);
-        $variable->expects($this->once())->method('getValue')->willReturn($value);
-        $variable->expects($this->any())->method('getType')->willReturn($type);
+        $variable->expects($this->once())
+            ->method('getValue')
+            ->willReturn($value);
+        $variable->expects($this->any())
+            ->method('getType')
+            ->willReturn($type);
         $this->translator->expects($this->exactly((int) $expectedTranslate))
             ->method('trans')
             ->with($expected)
@@ -47,10 +47,7 @@ class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->formatter->formatWorkflowVariableValue($variable));
     }
 
-    /**
-     * @return array
-     */
-    public function formatWorkflowVariableValueDataProvider()
+    public function formatWorkflowVariableValueDataProvider(): array
     {
         $entity = new Item();
         $entity->stringValue = 'string value';

@@ -20,17 +20,22 @@ class WorkflowDefinitionHandleBuilderTest extends \PHPUnit\Framework\TestCase
         $workflowDefinition->setName($processedConfiguration['name']);
 
         $handler = $this->createMock(ConfigurationHandlerInterface::class);
-        $handler->expects($this->once())->method('handle')->with($rawConfiguration)
-            ->will($this->returnValue($handledConfiguration));
+        $handler->expects($this->once())
+            ->method('handle')
+            ->with($rawConfiguration)
+            ->willReturn($handledConfiguration);
 
         $configuration = $this->createMock(WorkflowConfiguration::class);
-        $configuration->expects($this->once())->method('processConfiguration')->with($handledConfiguration)
-            ->will($this->returnValue($processedConfiguration));
+        $configuration->expects($this->once())
+            ->method('processConfiguration')
+            ->with($handledConfiguration)
+            ->willReturn($processedConfiguration);
 
         $configurationBuilder = $this->createMock(WorkflowDefinitionConfigurationBuilder::class);
-        $configurationBuilder->expects($this->once())->method('buildOneFromConfiguration')
+        $configurationBuilder->expects($this->once())
+            ->method('buildOneFromConfiguration')
             ->with($processedConfiguration['name'], $processedConfiguration)
-            ->will($this->returnValue($workflowDefinition));
+            ->willReturn($workflowDefinition);
 
         $handleBuilder = new WorkflowDefinitionHandleBuilder(
             $configuration,

@@ -108,7 +108,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
         ];
         $context = new ItemStub([]);
 
-        $this->registry->expects(static::once())
+        $this->registry->expects(self::once())
             ->method('getManagerForClass')
             ->with(\stdClass::class)
             ->willReturn(null);
@@ -122,8 +122,8 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize(array $source, array $expected)
     {
-        static::assertSame($this->action, $this->action->initialize($source));
-        static::assertEquals($expected, ReflectionUtil::getPropertyValue($this->action, 'options'));
+        self::assertSame($this->action, $this->action->initialize($source));
+        self::assertEquals($expected, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function initializeDataProvider(): array
@@ -358,12 +358,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param mixed $context
-     * @param mixed $identifier
-     * @return mixed
-     */
-    private function processAttribute($context, $identifier)
+    private function processAttribute(mixed $context, mixed $identifier): mixed
     {
         if (is_array($identifier)) {
             foreach ($identifier as $key => $value) {

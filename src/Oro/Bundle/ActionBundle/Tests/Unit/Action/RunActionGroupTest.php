@@ -9,7 +9,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
@@ -17,40 +16,28 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RunActionGroupTest extends \PHPUnit\Framework\TestCase
 {
-    const ACTION_GROUP_NAME = 'test_action_group';
+    private const ACTION_GROUP_NAME = 'test_action_group';
 
-    /** @var MockObject|EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var MockObject|ActionGroupRegistry */
-    protected $mockActionGroupRegistry;
+    /** @var ActionGroupRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $mockActionGroupRegistry;
 
     /** @var RunActionGroup */
-    protected $actionGroup;
+    private $actionGroup;
 
     protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->mockActionGroupRegistry = $this->getMockBuilder(ActionGroupRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockActionGroupRegistry = $this->createMock(ActionGroupRegistry::class);
 
         $this->actionGroup = new RunActionGroup($this->mockActionGroupRegistry, new ContextAccessor());
-        $this->actionGroup->setDispatcher($this->eventDispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->actionGroup, $this->eventDispatcher, $this->mockActionGroupRegistry);
+        $this->actionGroup->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testOptionNamesRequirements()
     {
-        static::assertEquals(RunActionGroup::OPTION_ACTION_GROUP, 'action_group');
-        static::assertEquals(RunActionGroup::OPTION_PARAMETERS_MAP, 'parameters_mapping');
-        static::assertEquals(RunActionGroup::OPTION_RESULTS, 'results');
-        static::assertEquals(RunActionGroup::OPTION_RESULT, 'result');
+        self::assertEquals(RunActionGroup::OPTION_ACTION_GROUP, 'action_group');
+        self::assertEquals(RunActionGroup::OPTION_PARAMETERS_MAP, 'parameters_mapping');
+        self::assertEquals(RunActionGroup::OPTION_RESULTS, 'results');
+        self::assertEquals(RunActionGroup::OPTION_RESULT, 'result');
     }
 
     public function testInitialize()
@@ -67,41 +54,33 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
             RunActionGroup::OPTION_RESULT => new PropertyPath('path')
         ];
 
-        $this->mockActionGroupRegistry->expects(static::once())
+        $this->mockActionGroupRegistry->expects(self::once())
             ->method('getNames')
             ->willReturn([self::ACTION_GROUP_NAME]);
 
         $result = $this->actionGroup->initialize($options);
 
-        static::assertInstanceOf(ActionInterface::class, $result);
+        self::assertInstanceOf(ActionInterface::class, $result);
     }
 
     /**
      * @dataProvider initializeExceptionDataProvider
-     *
-     * @param array $inputData
-     * @param string $exception
-     * @param string $exceptionMessage
      */
-    public function testInitializeException(array $inputData, $exception, $exceptionMessage)
+    public function testInitializeException(array $inputData, string $exception, string $exceptionMessage)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $this->mockActionGroupRegistry
-            ->expects($this->once())
+        $this->mockActionGroupRegistry->expects($this->once())
             ->method('getNames')
             ->willReturn([self::ACTION_GROUP_NAME]);
 
         $this->actionGroup->initialize($inputData);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        $mockGroup = $this->getMockBuilder(ActionGroup::class)->disableOriginalConstructor()->getMock();
+        $mockGroup = $this->createMock(ActionGroup::class);
 
         return [
             'no action group name' => [
@@ -163,25 +142,25 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         array $context,
         array $options,
         ActionData $arguments,
-        $returnVal,
-        $expected
+        ActionData $returnVal,
+        ActionData $expected
     ) {
         $data = new ActionData($context);
 
-        $mockActionGroup = $this->getMockBuilder(ActionGroup::class)->disableOriginalConstructor()->getMock();
+        $mockActionGroup = $this->createMock(ActionGroup::class);
 
         //during initialize
-        $this->mockActionGroupRegistry->expects(static::once())
+        $this->mockActionGroupRegistry->expects(self::once())
             ->method('getNames')
             ->willReturn([self::ACTION_GROUP_NAME]);
 
         //during execute
-        $this->mockActionGroupRegistry->expects(static::once())
+        $this->mockActionGroupRegistry->expects(self::once())
             ->method('get')
             ->with(self::ACTION_GROUP_NAME)
             ->willReturn($mockActionGroup);
 
-        $mockActionGroup->expects(static::once())
+        $mockActionGroup->expects(self::once())
             ->method('execute')
             ->with($arguments)
             ->willReturn($returnVal);
@@ -189,13 +168,10 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->actionGroup->initialize($options);
         $this->actionGroup->execute($data);
 
-        static::assertEquals($expected, $data);
+        self::assertEquals($expected, $data);
     }
 
-    /**
-     * @return array
-     */
-    public function executeActionDataProvider()
+    public function executeActionDataProvider(): array
     {
         $actionData = $this->createActionData(['paramValue' => 'value']);
 
@@ -260,21 +236,12 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $data
-     * @param bool $modified
-     * @return null|ActionData
-     */
-    protected function createActionData(array $data, $modified = false)
+    private function createActionData(array $data, bool $modified = false): ActionData
     {
-        $actionData = null;
-
         if ($modified) {
             $actionData = new ActionData();
-
             foreach ($data as $name => $value) {
-                /** @noinspection PhpVariableVariableInspection */
-                $actionData->$name = $value;
+                $actionData->{$name} = $value;
             }
         } else {
             $actionData = new ActionData($data);

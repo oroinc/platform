@@ -8,80 +8,56 @@ use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AbstractActionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractAction|MockObject */
-    protected $action;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
 
-    /** @var EventDispatcherInterface|MockObject */
-    protected $dispatcher;
+    /** @var AbstractAction|\PHPUnit\Framework\MockObject\MockObject */
+    private $action;
 
     protected function setUp(): void
     {
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $this->action = $this->getMockBuilder(AbstractAction::class)
             ->setConstructorArgs([new ContextAccessor()])
             ->getMockForAbstractClass();
-
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->action->setDispatcher($this->dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->action);
     }
 
     public function testSetCondition()
     {
-        $action = new class(new ContextAccessor()) extends AbstractAction {
-            protected function executeAction($context)
-            {
-            }
-
-            public function initialize(array $options)
-            {
-            }
-
-            public function xgetCondition(): ExpressionInterface
-            {
-                return $this->condition;
-            }
-        };
-
-        /** @var ExpressionInterface|MockObject $condition */
-        $condition = $this->getMockBuilder(ExpressionInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $action->setCondition($condition);
-
-        static::assertSame($condition, $action->xgetCondition());
+        $condition = $this->createMock(ExpressionInterface::class);
+        $this->action->setCondition($condition);
+        self::assertSame($condition, ReflectionUtil::getPropertyValue($this->action, 'condition'));
     }
 
     /**
-     * @param bool $expectedAllowed
-     * @param bool|null $conditionAllowed
      * @dataProvider executeDataProvider
      */
-    public function testExecute($expectedAllowed, $conditionAllowed = null)
+    public function testExecute(bool $expectedAllowed, bool $conditionAllowed = null)
     {
         $context = ['key' => 'value'];
 
         if ($expectedAllowed) {
-            $this->action->expects(static::once())->method('executeAction')->with($context);
-            $this->dispatcher->expects(static::exactly(2))
+            $this->action->expects(self::once())
+                ->method('executeAction')
+                ->with($context);
+            $this->dispatcher->expects(self::exactly(2))
                 ->method('dispatch')
                 ->withConsecutive(
                     [new ExecuteActionEvent($context, $this->action), ExecuteActionEvents::HANDLE_BEFORE],
                     [new ExecuteActionEvent($context, $this->action), ExecuteActionEvents::HANDLE_AFTER]
                 );
         } else {
-            $this->action->expects(static::never())->method('executeAction');
-            $this->dispatcher->expects(static::never())->method('dispatch');
+            $this->action->expects(self::never())
+                ->method('executeAction');
+            $this->dispatcher->expects(self::never())
+                ->method('dispatch');
         }
 
         if ($conditionAllowed !== null) {

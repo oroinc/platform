@@ -23,26 +23,26 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
  */
 class OperationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationDefinition */
-    protected $definition;
+    /** @var OperationDefinition|\PHPUnit\Framework\MockObject\MockObject */
+    private $definition;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
-    protected $actionFactory;
+    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory */
-    protected $conditionFactory;
+    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $conditionFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler */
-    protected $attributeAssembler;
+    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeAssembler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler */
-    protected $formOptionsAssembler;
-
-    /** @var Operation */
-    protected $operation;
+    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $formOptionsAssembler;
 
     /** @var ActionData */
-    protected $data;
+    private $data;
+
+    /** @var Operation */
+    private $operation;
 
     protected function setUp(): void
     {
@@ -51,6 +51,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
+        $this->data = new ActionData();
 
         $this->operation = new Operation(
             $this->actionFactory,
@@ -59,8 +60,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             $this->formOptionsAssembler,
             $this->definition
         );
-
-        $this->data = new ActionData();
     }
 
     public function testGetName()
@@ -110,13 +109,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param ActionData $data
-     * @param array $config
-     * @param array $actions
-     * @param array $conditions
-     * @param string $operationName
-     * @param string $exceptionMessage
-     *
      * @dataProvider executeProvider
      */
     public function testExecute(
@@ -124,11 +116,15 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         array $config,
         array $actions,
         array $conditions,
-        $operationName,
-        $exceptionMessage = ''
+        string $operationName,
+        string $exceptionMessage = ''
     ) {
-        $this->definition->expects($this->any())->method('getName')->willReturn($operationName);
-        $this->definition->expects($this->any())->method('getConditions')->will($this->returnValueMap($config));
+        $this->definition->expects($this->any())
+            ->method('getName')
+            ->willReturn($operationName);
+        $this->definition->expects($this->any())
+            ->method('getConditions')
+            ->willReturnMap($config);
 
         $this->definition->expects($this->any())
             ->method('getActions')
@@ -167,10 +163,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         $data = new ActionData();
 
@@ -249,11 +242,9 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function isAvailableProvider()
+    public function isAvailableProvider(): array
     {
         $data = new ActionData();
 
@@ -438,12 +429,9 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param bool $expected
-     *
      * @dataProvider hasFormProvider
      */
-    public function testHasForm(array $input, $expected)
+    public function testHasForm(array $input, bool $expected)
     {
         $this->definition->expects($this->once())
             ->method('getFormOptions')
@@ -451,10 +439,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->operation->hasForm());
     }
 
-    /**
-     * @return array
-     */
-    public function hasFormProvider()
+    public function hasFormProvider(): array
     {
         return [
             'empty' => [
@@ -472,10 +457,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getFormOptionsDataProvider()
+    public function getFormOptionsDataProvider(): array
     {
         return [
             'empty' => [
@@ -489,15 +471,10 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
-     * @param ActionData $data
-     * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createAction(
+    private function createAction(
         \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data
-    ) {
+    ): ActionInterface {
         $action = $this->createMock(ActionInterface::class);
         $action->expects($expects)
             ->method('execute')
@@ -506,17 +483,11 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         return $action;
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
-     * @param ActionData $data
-     * @param bool $returnValue
-     * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createCondition(
+    private function createCondition(
         \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data,
-        $returnValue
-    ) {
+        bool $returnValue
+    ): ConfigurableCondition {
         $condition = $this->createMock(ConfigurableCondition::class);
         $condition->expects($expects)
             ->method('evaluate')

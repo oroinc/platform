@@ -43,15 +43,12 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
+    /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $optionsResolver;
 
     /** @var WorkflowTransitionAclExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
@@ -70,10 +67,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Transition
-     */
-    private function createStartTransition()
+    private function createStartTransition(): Transition
     {
         $transition = new Transition($this->optionsResolver);
         $transition->setStart(true);
@@ -116,7 +110,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
     }
 
-    public function getPermissionGroupMaskProvider()
+    public function getPermissionGroupMaskProvider(): array
     {
         return [
             [0, null],
@@ -177,15 +171,12 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getServiceBitsProvider
      */
-    public function testGetServiceBits($mask, $expectedMask)
+    public function testGetServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
     }
 
-    /**
-     * @return array
-     */
-    public function getServiceBitsProvider()
+    public function getServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -211,15 +202,12 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeServiceBitsProvider
      */
-    public function testRemoveServiceBits($mask, $expectedMask)
+    public function testRemoveServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
     }
 
-    /**
-     * @return array
-     */
-    public function removeServiceBitsProvider()
+    public function removeServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -245,16 +233,13 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notSupportedObjectProvider
      */
-    public function testDecideIsGrantingForNotSupportedObject($object)
+    public function testDecideIsGrantingForNotSupportedObject(mixed $object)
     {
         $securityToken = $this->createMock(TokenInterface::class);
         self::assertTrue($this->extension->decideIsGranting(0, $object, $securityToken));
     }
 
-    /**
-     * @return array
-     */
-    public function notSupportedObjectProvider()
+    public function notSupportedObjectProvider(): array
     {
         return [
             ['test'],
@@ -358,7 +343,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($transition);
 
         $definition = new WorkflowDefinition();
-        $definition->setRelatedEntity('\stdClass');
+        $definition->setRelatedEntity(\stdClass::class);
 
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects(self::once())
@@ -392,7 +377,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $workflow = $this->createMock(Workflow::class);
 
         $definition = new WorkflowDefinition();
-        $definition->setRelatedEntity('\stdClass');
+        $definition->setRelatedEntity(\stdClass::class);
 
         $workflow->expects(self::once())
             ->method('getDefinition')
@@ -405,7 +390,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
-            ->with('\stdClass')
+            ->with(\stdClass::class)
             ->willReturn(new OwnershipMetadata('user', 'user', 'user'));
 
         $result = $this->extension->getAccessLevelNames($object);
@@ -423,7 +408,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $workflow = $this->createMock(Workflow::class);
 
         $definition = new WorkflowDefinition();
-        $definition->setRelatedEntity('\stdClass');
+        $definition->setRelatedEntity(\stdClass::class);
 
         $workflow->expects(self::once())
             ->method('getDefinition')
@@ -446,7 +431,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
-            ->with('\stdClass')
+            ->with(\stdClass::class)
             ->willReturn(new OwnershipMetadata('user', 'user', 'user'));
 
         $result = $this->extension->getAccessLevelNames($object);

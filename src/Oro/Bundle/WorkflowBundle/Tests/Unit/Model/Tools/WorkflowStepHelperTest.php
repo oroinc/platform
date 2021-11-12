@@ -18,27 +18,19 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var array */
-    protected static $steps;
+    private static array $steps = [];
 
     /**
      * @dataProvider getStepsAfterDataProvider
-     *
-     * @param Step $step
-     * @param array $expected
-     * @param bool $withTree
      */
-    public function testGetStepsAfter(Step $step, array $expected, $withTree = false)
+    public function testGetStepsAfter(Step $step, array $expected, bool $withTree = false)
     {
-        $helper = new WorkflowStepHelper($this->getWorkflowMock());
+        $helper = new WorkflowStepHelper($this->getWorkflow());
 
         $this->assertEquals($expected, $helper->getStepsAfter($step, $withTree));
     }
 
-    /**
-     * @return array
-     */
-    public function getStepsAfterDataProvider()
+    public function getStepsAfterDataProvider(): array
     {
         return [
             [
@@ -85,7 +77,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
         $workflowItem = $this->getWorkflowItem(['step6', 'step1', 'step2', 'step3', 'step1', 'step5', 'step4']);
         $startSteps = ['step6', 'step1'];
 
-        $helper = new WorkflowStepHelper($this->getWorkflowMock());
+        $helper = new WorkflowStepHelper($this->getWorkflow());
         $this->assertEquals(
             [
                 $this->getStepByNumber(1),
@@ -96,10 +88,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Workflow
-     */
-    protected function getWorkflowMock()
+    private function getWorkflow(): Workflow
     {
         $transitionManager = new TransitionManager(
             [
@@ -120,35 +109,34 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
-        $workflow->expects($this->any())->method('getStepManager')->willReturn($stepManager);
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
+        $workflow->expects($this->any())
+            ->method('getStepManager')
+            ->willReturn($stepManager);
 
         return $workflow;
     }
 
-    /**
-     * @param string $name
-     * @param Step $stepTo
-     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getTransition($name, Step $stepTo)
+    private function getTransition(string $name, Step $stepTo): Transition
     {
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->any())->method('getName')->willReturn($name);
-        $transition->expects($this->any())->method('getLabel')->willReturn($name . 'Label');
-        $transition->expects($this->any())->method('getStepTo')->willReturn($stepTo);
+        $transition->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+        $transition->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($name . 'Label');
+        $transition->expects($this->any())
+            ->method('getStepTo')
+            ->willReturn($stepTo);
 
         return $transition;
     }
 
-    /**
-     * @param string $name
-     * @param int $order
-     * @param array $allowedTransitions
-     * @return Step
-     */
-    protected function getStep($name, $order, array $allowedTransitions)
+    private function getStep(string $name, int $order, array $allowedTransitions): Step
     {
         return $this->getEntity(
             Step::class,
@@ -161,11 +149,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $number
-     * @return Step
-     */
-    protected function getStepByNumber($number)
+    private function getStepByNumber(int $number): Step
     {
         if (!self::$steps) {
             self::$steps = [
@@ -180,11 +164,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
         return self::$steps[$number];
     }
 
-    /**
-     * @param array $records
-     * @return WorkflowItem
-     */
-    protected function getWorkflowItem(array $records = [])
+    private function getWorkflowItem(array $records = []): WorkflowItem
     {
         $recordObjects = [];
         foreach ($records as $stepTo) {
@@ -194,11 +174,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
         return $this->getEntity(WorkflowItem::class, ['transitionRecords' => new ArrayCollection($recordObjects)]);
     }
 
-    /**
-     * @param string $stepTo
-     * @return WorkflowTransitionRecord
-     */
-    protected function getWorkflowTransitionRecord($stepTo)
+    private function getWorkflowTransitionRecord(string $stepTo): WorkflowTransitionRecord
     {
         $step = $this->getEntity(WorkflowStep::class, ['name' => $stepTo]);
 

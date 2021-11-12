@@ -21,21 +21,18 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $routeProvider;
 
-    /** @var AbstractButtonProviderExtension */
-    protected $extension;
-
     /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $originalUrlProvider;
 
     /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
+    /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsResolver;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var AbstractButtonProviderExtension */
+    protected $extension;
+
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
@@ -49,14 +46,6 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->workflowRegistry, $this->routeProvider, $this->extension, $this->applicationProvider);
-    }
-
-    /**
      * @return string
      */
     abstract protected function getApplication();
@@ -66,12 +55,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
      */
     abstract protected function createExtension();
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ButtonContext
-     */
-    protected function getButtonContext($entityClass)
+    protected function getButtonContext(string $entityClass): ButtonContext
     {
         $context = new ButtonContext();
         $context->setEntity($entityClass)
@@ -81,13 +65,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
         return $context;
     }
 
-    /**
-     * @param array $transitions
-     * @param string $method
-     *
-     * @return TransitionManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getTransitionManager(array $transitions, $method)
+    protected function getTransitionManager(array $transitions, string $method): TransitionManager
     {
         $manager = $this->createMock(TransitionManager::class);
         $manager->expects($this->any())
@@ -97,12 +75,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
         return $manager;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Transition
-     */
-    protected function getTransition($name)
+    protected function getTransition(string $name): Transition
     {
         $transition = new Transition($this->optionsResolver);
 

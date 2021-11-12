@@ -23,13 +23,13 @@ use Twig\Environment;
 class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    protected $twig;
+    private $twig;
 
     /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $templateDataProviderRegistry;
+    private $templateDataProviderRegistry;
 
     /** @var CustomFormTemplateResponseProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
@@ -44,23 +44,29 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
 
     public function testRenderedResponseResult()
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('getDialogTemplate')->willReturn(null);
-        $transition->expects($this->once())->method('getFormDataProvider')->willReturn('provider_name');
-        $transition->expects($this->once())->method('getFormDataAttribute')->willReturn('entity');
+        $transition->expects($this->once())
+            ->method('getDialogTemplate')
+            ->willReturn(null);
+        $transition->expects($this->once())
+            ->method('getFormDataProvider')
+            ->willReturn('provider_name');
+        $transition->expects($this->once())
+            ->method('getFormDataAttribute')
+            ->willReturn('entity');
 
         $entity = (object)['id' => 42];
 
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
-        $workflowItem->expects($this->once())->method('getData')->willReturn(new WorkflowData(['entity' => $entity]));
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $workflowItem->expects($this->once())
+            ->method('getData')
+            ->willReturn(new WorkflowData(['entity' => $entity]));
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
 
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $context = new TransitionContext();
@@ -73,7 +79,6 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $context->setRequest($request);
         $context->set('template_parameters', ['p1' => 'v1', 'p2' => 'v2']);
 
-        /** @var FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $dataProvider */
         $dataProvider = $this->createMock(FormTemplateDataProviderInterface::class);
         $dataProvider->expects($this->once())
             ->method('getData')
@@ -90,7 +95,8 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
             ->with(
                 CustomFormTemplateResponseProcessor::DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE,
                 ['data' => 'value', 'p1' => 'v1', 'p2' => 'v2']
-            )->willReturn('content');
+            )
+            ->willReturn('content');
 
         $this->processor->process($context);
 
@@ -101,7 +107,6 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
 
     public function testSkipNonCustomFormContext()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
 
         $context->expects($this->once())
@@ -115,37 +120,40 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
             ->method('isCustomForm')
             ->willReturn(false);
 
-        $context->expects($this->never())->method('getTransition');
+        $context->expects($this->never())
+            ->method('getTransition');
 
         $this->processor->process($context);
     }
 
     public function testSkipUnsupportedResultType()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
 
         $context->expects($this->once())
-            ->method('isSaved')->willReturn(false);
+            ->method('isSaved')
+            ->willReturn(false);
 
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 
-        $context->expects($this->never())->method('getTransition');
+        $context->expects($this->never())
+            ->method('getTransition');
 
         $this->processor->process($context);
     }
 
     public function testSkipNotSaved()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
 
         $context->expects($this->once())
-            ->method('isSaved')->willReturn(true);
+            ->method('isSaved')
+            ->willReturn(true);
 
-        $context->expects($this->never())->method('getTransition');
+        $context->expects($this->never())
+            ->method('getTransition');
 
         $this->processor->process($context);
     }

@@ -6,31 +6,19 @@ use Oro\Component\Action\Action\CopyValues;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CopyValuesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CopyValues */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->action = new class(new ContextAccessor()) extends CopyValues {
-            public function xgetAttribute(): PropertyPathInterface
-            {
-                return $this->attribute;
-            }
-
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new CopyValues(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testInitialize()
@@ -41,8 +29,14 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
             []
         ]);
 
-        static::assertEquals(new PropertyPath('attr'), $this->action->xgetAttribute());
-        static::assertEquals([new PropertyPath('prop1'), []], $this->action->xgetOptions());
+        self::assertEquals(
+            new PropertyPath('attr'),
+            ReflectionUtil::getPropertyValue($this->action, 'attribute')
+        );
+        self::assertEquals(
+            [new PropertyPath('prop1'), []],
+            ReflectionUtil::getPropertyValue($this->action, 'options')
+        );
     }
 
     public function testInitializeWithEmptyOptions()
@@ -69,13 +63,10 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals($expectedData, $context->getData());
+        self::assertEquals($expectedData, $context->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         return [
             'object attribute' => [

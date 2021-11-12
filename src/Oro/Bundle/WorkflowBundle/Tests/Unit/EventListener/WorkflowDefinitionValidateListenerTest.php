@@ -11,10 +11,10 @@ use Oro\Component\Action\Exception\AssemblerException;
 class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowAssembler;
+    private $workflowAssembler;
 
     /** @var WorkflowDefinitionValidateListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {
@@ -27,8 +27,9 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('test message');
 
-        $this->workflowAssembler->method('assemble')
-            ->will($this->throwException(new AssemblerException('test message')));
+        $this->workflowAssembler->expects(self::once())
+            ->method('assemble')
+            ->willThrowException(new AssemblerException('test message'));
         $this->listener->onCreateWorkflowDefinition($this->getEvent());
     }
 
@@ -37,8 +38,9 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('test message');
 
-        $this->workflowAssembler->method('assemble')
-            ->will($this->throwException(new AssemblerException('test message')));
+        $this->workflowAssembler->expects(self::once())
+            ->method('assemble')
+            ->willThrowException(new AssemblerException('test message'));
         $this->listener->onUpdateWorkflowDefinition($this->getEvent());
     }
 
@@ -48,9 +50,9 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
     private function getEvent()
     {
         $event = $this->createMock(WorkflowChangesEvent::class);
-        $event->expects($this->any())->method('getDefinition')->willReturn(
-            $this->createMock(WorkflowDefinition::class)
-        );
+        $event->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($this->createMock(WorkflowDefinition::class));
 
         return $event;
     }

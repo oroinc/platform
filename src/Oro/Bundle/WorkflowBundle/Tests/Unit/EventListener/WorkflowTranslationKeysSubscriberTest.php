@@ -20,9 +20,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationManager = $this->createMock(TranslationManager::class);
 
         $this->translationKeysSubscriber = new WorkflowTranslationKeysSubscriber($this->translationManager);
     }
@@ -40,7 +38,8 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->expects($this->once())
             ->method('findTranslationKey')
             ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        $this->translationManager->expects($this->once())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('flush');
 
         $this->translationKeysSubscriber->ensureTranslationKeys($changes);
     }
@@ -76,25 +75,22 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translationManager->expects($this->any())
             ->method('findTranslationKey')
-            ->willReturnCallback(
-                function ($key, $domain) use (&$findTranslationKeys) {
-                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+            ->willReturnCallback(function ($key, $domain) use (&$findTranslationKeys) {
+                $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
 
-                    $findTranslationKeys[] = $key;
-                }
-            );
+                $findTranslationKeys[] = $key;
+            });
 
         $this->translationManager->expects($this->any())
             ->method('removeTranslationKey')
-            ->willReturnCallback(
-                function ($key, $domain) use (&$removeTranslationKeys) {
-                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+            ->willReturnCallback(function ($key, $domain) use (&$removeTranslationKeys) {
+                $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
 
-                    $removeTranslationKeys[] = $key;
-                }
-            );
+                $removeTranslationKeys[] = $key;
+            });
 
-        $this->translationManager->expects($this->once())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('flush');
 
         $this->translationKeysSubscriber->clearTranslationKeys($changes);
 
@@ -133,7 +129,8 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->expects($this->once())
             ->method('removeTranslationKey')
             ->with('label_translation_key');
-        $this->translationManager->expects($this->once())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('flush');
 
         $this->translationKeysSubscriber->deleteTranslationKeys(new WorkflowChangesEvent($deletedDefinition));
     }

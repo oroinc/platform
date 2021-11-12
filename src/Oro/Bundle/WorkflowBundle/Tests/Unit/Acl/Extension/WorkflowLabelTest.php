@@ -7,24 +7,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowLabelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    protected function setUp(): void
-    {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-    }
-
     public function testTrans()
     {
         $label = new WorkflowLabel('test');
 
-        $this->translator->expects(self::once())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::once())
             ->method('trans')
             ->with('test', [], 'workflows')
             ->willReturn('translated');
 
-        self::assertEquals('translated', $label->trans($this->translator));
+        self::assertEquals('translated', $label->trans($translator));
     }
 
     public function testSerialization()

@@ -12,19 +12,12 @@ use Oro\Component\Testing\ReflectionUtil;
  */
 class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessTrigger
-     */
-    protected $entity;
+    /** @var ProcessTrigger */
+    private $entity;
 
     protected function setUp(): void
     {
         $this->entity = new ProcessTrigger();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->entity);
     }
 
     public function testGetId()
@@ -52,10 +45,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testValue, $this->entity->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             'event' => ['event', 'update'],
@@ -90,10 +80,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function dateIntervalAndSecondsDataProvider()
+    public function dateIntervalAndSecondsDataProvider(): array
     {
         return [
             [
@@ -168,7 +155,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
      * @param ProcessTrigger $actualEntity
      * @param bool $isEquals
      */
-    protected function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
+    private function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
     {
         $method = $isEquals ? 'assertEquals' : 'assertNotEquals';
         $this->$method($expectedEntity->getEvent(), $actualEntity->getEvent());

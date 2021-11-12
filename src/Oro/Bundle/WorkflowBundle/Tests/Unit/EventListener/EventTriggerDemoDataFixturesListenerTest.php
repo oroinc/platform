@@ -8,11 +8,11 @@ use Oro\Bundle\WorkflowBundle\EventListener\EventTriggerDemoDataFixturesListener
 
 class EventTriggerDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $listenerManager;
+    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $listenerManager;
 
     /** @var EventTriggerDemoDataFixturesListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

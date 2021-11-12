@@ -50,20 +50,15 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         'conditions' => []
     ];
 
-    /** @var string */
-    private $cacheFile;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Container */
-    private $container;
+    private string $cacheFile;
 
     /** @var ConfigurationProvider */
     private $configurationProvider;
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(Container::class);
-
-        $this->container->expects($this->any())
+        $container = $this->createMock(Container::class);
+        $container->expects($this->any())
             ->method('getParameterBag')
             ->willReturn(new ParameterBag());
 
@@ -83,7 +78,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = new ConfigurationProvider(
             $this->cacheFile,
             false,
-            $this->container,
+            $container,
             CumulativeResourceManager::getInstance()->getBundles()
         );
     }
@@ -94,7 +89,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             'operations' => [],
             'action_groups' => []
         ];
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
 
         $this->assertEquals($cachedConfig, $this->configurationProvider->getConfiguration());
     }

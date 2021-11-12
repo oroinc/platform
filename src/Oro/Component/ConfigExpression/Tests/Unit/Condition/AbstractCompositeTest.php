@@ -6,6 +6,7 @@ use Oro\Component\ConfigExpression\Condition\AbstractComposite;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Exception\UnexpectedTypeException;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,11 +16,6 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->condition = new class() extends AbstractComposite {
-            public function xgetOperands(): array
-            {
-                return $this->operands;
-            }
-
             protected function isConditionAllowed($context)
             {
             }
@@ -35,7 +31,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
         $operands = [$this->createMock(ExpressionInterface::class)];
 
         self::assertSame($this->condition, $this->condition->initialize($operands));
-        self::assertEquals($operands, $this->condition->xgetOperands());
+        self::assertEquals($operands, ReflectionUtil::getPropertyValue($this->condition, 'operands'));
     }
 
     public function testInitializeFailsWithEmptyElements()

@@ -25,10 +25,6 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     *
-     * @param array $configuration
-     * @param string $exception
-     * @param string $message
      */
     public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message): void
     {
@@ -43,17 +39,16 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getWorkflowDefinition()
+    private function getWorkflowDefinition()
     {
         $definition = $this->createMock(WorkflowDefinition::class);
-        $definition->expects($this->any())->method('getLabel')->willReturn('test_workflow_label');
+        $definition->expects($this->any())
+            ->method('getLabel')
+            ->willReturn('test_workflow_label');
 
         return $definition;
     }
 
-    /**
-     * @return array
-     */
     public function invalidOptionsDataProvider(): array
     {
         return [
@@ -135,11 +130,6 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurationDataProvider
-     *
-     * @param array $configuration
-     * @param Attribute $expectedAttribute
-     * @param array $guessedParameters
-     * @param array $transitionConfigurations
      */
     public function testAssemble(
         array $configuration,
@@ -182,7 +172,6 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
     public function configurationDataProvider(): array
     {

@@ -42,10 +42,7 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
         $this->assertEquals($expected, (string) $this->createTriggerCron($data));
     }
 
-    /**
-     * @return array
-     */
-    public function toStringDataProvider()
+    public function toStringDataProvider(): array
     {
         $wd1 = (new WorkflowDefinition())->setName('wd1');
 
@@ -90,10 +87,7 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function equalityDataProvider()
+    public function equalityDataProvider(): array
     {
         $cases = [];
 
@@ -111,7 +105,7 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
 
         foreach ($fieldsSets as $field => $values) {
             $caseTrueName = sprintf('all null and %s is equals', $field);
-            list($first, $second) = $values;
+            [$first, $second] = $values;
             $nullsExceptOne[$caseTrueName] = [
                 true,
                 [$field => $first],
@@ -157,7 +151,7 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
      * @param array $attributes
      * @return TransitionCronTrigger
      */
-    protected function createTriggerCron(array $attributes)
+    private function createTriggerCron(array $attributes)
     {
         $trigger = new TransitionCronTrigger();
 

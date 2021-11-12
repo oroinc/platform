@@ -9,21 +9,16 @@ use Psr\Log\LoggerInterface;
 
 class SignalExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SignalExtension */
-    private $extension;
-
     /** @var Context */
     private $context;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var SignalExtension */
+    private $extension;
+
     protected function setUp(): void
     {
-        $session = $this->createMock(SessionInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $this->context = new Context($session);
-        $this->context->setLogger($logger);
+        $this->context = new Context($this->createMock(SessionInterface::class));
+        $this->context->setLogger($this->createMock(LoggerInterface::class));
 
         $this->extension = new SignalExtension();
         $this->extension->onStart($this->context);
@@ -31,10 +26,8 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider signalDataProvider
-     *
-     * @param string $signal
      */
-    public function testOnBeforeReceive($signal)
+    public function testOnBeforeReceive(int $signal)
     {
         $context = clone $this->context;
         $this->handleSignal($context, $signal);
@@ -58,10 +51,8 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider signalDataProvider
-     *
-     * @param string $signal
      */
-    public function testOnPostReceived($signal)
+    public function testOnPostReceived(int $signal)
     {
         $context = clone $this->context;
         $this->handleSignal($context, $signal);
@@ -85,10 +76,8 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider signalDataProvider
-     *
-     * @param string $signal
      */
-    public function testIdle($signal)
+    public function testIdle(int $signal)
     {
         $context = clone $this->context;
         $this->handleSignal($context, $signal);
@@ -110,10 +99,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($context->getInterruptedReason());
     }
 
-    /**
-     * @return array
-     */
-    public function signalDataProvider()
+    public function signalDataProvider(): array
     {
         return [
             'SIGTERM' => [
@@ -128,30 +114,22 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param Context $context
-     * @param string $signal
-     */
-    private function handleSignal(Context $context, $signal)
+    private function handleSignal(Context $context, int $signal)
     {
         /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $context->getLogger();
         $logger->expects($this->exactly(3))
             ->method('debug')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [sprintf('Caught signal: %s', $signal)],
                 ['Interrupt consumption'],
                 ['Interrupt execution'],
-            ]));
+            ]);
 
         $this->extension->handleSignal($signal);
     }
 
-    /**
-     * @param Context $context
-     * @param string $signal
-     */
-    private function handleInvalidSignal(Context $context, $signal)
+    private function handleInvalidSignal(Context $context, int $signal)
     {
         /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $context->getLogger();

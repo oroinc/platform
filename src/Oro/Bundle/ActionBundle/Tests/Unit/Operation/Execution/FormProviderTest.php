@@ -14,17 +14,14 @@ use Symfony\Component\Form\FormView;
 class FormProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formFactory;
+    private $formFactory;
 
-    /** @var OperationExecutionType */
-    protected $formType;
+    /** @var string */
+    private $formType;
 
     /** @var FormProvider */
-    protected $formProvider;
+    private $formProvider;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->formType = OperationExecutionType::class;
@@ -77,14 +74,5 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($form);
 
         $this->formProvider->getOperationExecutionForm($operation, $actionData);
-    }
-
-    protected function tearDown(): void
-    {
-        unset(
-            $this->formProvider,
-            $this->formFactory,
-            $this->formType
-        );
     }
 }

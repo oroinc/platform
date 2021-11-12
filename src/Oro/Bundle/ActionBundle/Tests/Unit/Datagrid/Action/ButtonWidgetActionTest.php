@@ -8,32 +8,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ButtonWidgetAction */
-    protected $action;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    /** @var ButtonWidgetAction */
+    private $action;
 
     protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
-        $this->action = new ButtonWidgetAction($this->translator);
-    }
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-    protected function tearDown(): void
-    {
-        unset($this->action, $this->translator);
+        $this->action = new ButtonWidgetAction($this->translator);
     }
 
     /**
      * @dataProvider getOptionsProvider
-     *
-     * @param array $config
-     * @param string $link
-     * @param string $title
-     * @param string $translatedTitle
      */
-    public function testGetOptions(array $config, $link, $title, $translatedTitle)
+    public function testGetOptions(array $config, string $link, ?string $title, ?string $translatedTitle)
     {
         $this->action->setOptions(ActionConfiguration::create($config));
 
@@ -41,13 +32,13 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
             $this->translator->expects($this->any())
                 ->method('trans')
                 ->with($title)
-                ->will($this->returnValue($translatedTitle));
+                ->willReturn($translatedTitle);
         }
 
         /** @var \ArrayAccess $options */
         $options = $this->action->getOptions();
 
-        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration', $options);
+        $this->assertInstanceOf(ActionConfiguration::class, $options);
         $this->assertCount(count($config) + 1, $options);
         $this->assertArrayHasKey('link', $options);
         $this->assertEquals($link, $options['link']);
@@ -58,10 +49,7 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getOptionsProvider()
+    public function getOptionsProvider(): array
     {
         $link = 'http://example.com/';
         $title = 'Test Dialog Title';

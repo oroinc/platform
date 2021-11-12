@@ -15,13 +15,17 @@ use Symfony\Component\Serializer\Serializer;
 
 class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    private Serializer|\PHPUnit\Framework\MockObject\MockObject $serializer;
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    private ProcessEntityNormalizer $normalizer;
+    /** @var ProcessEntityNormalizer */
+    private $normalizer;
 
     protected function setUp(): void
     {
@@ -63,7 +67,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->serializer->expects(self::any())
             ->method('normalize')
             ->with(self::isType('int'), $format, $context)
-            ->will(self::returnArgument(0));
+            ->willReturnArgument(0);
 
         self::assertEquals(
             ['className' => get_class($entity), 'entityData' => ['first' => 1, 'second' => 2]],
@@ -107,7 +111,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->serializer->expects(self::any())
             ->method('denormalize')
             ->with(self::isType('int'), '', $format, $context)
-            ->will(self::returnArgument(0));
+            ->willReturnArgument(0);
 
         $normalizedData = ['className' => $className, 'entityData' => ['first' => 1, 'second' => 2]];
         self::assertEquals(
@@ -124,22 +128,18 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fieldNames);
         $metadata->expects(self::any())
             ->method('getFieldValue')
-            ->willReturnCallback(
-                function ($entity, $field) {
-                    return $entity->{$field};
-                }
-            );
+            ->willReturnCallback(function ($entity, $field) {
+                return $entity->{$field};
+            });
         $metadata->expects(self::any())
             ->method('getReflectionClass')
             ->willReturn(new \ReflectionClass($className));
         $metadata->expects(self::any())
             ->method('getReflectionProperty')
             ->with(self::isType('string'))
-            ->willReturnCallback(
-                function ($name) use ($className) {
-                    return new \ReflectionProperty($className, $name);
-                }
-            );
+            ->willReturnCallback(function ($name) use ($className) {
+                return new \ReflectionProperty($className, $name);
+            });
 
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects(self::any())
@@ -156,7 +156,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, bool $expected): void
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         if (is_object($data)) {
             $this->doctrineHelper->expects(self::once())
@@ -184,7 +184,7 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($data, bool $expected): void
+    public function testSupportsDenormalization(mixed $data, bool $expected): void
     {
         self::assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }

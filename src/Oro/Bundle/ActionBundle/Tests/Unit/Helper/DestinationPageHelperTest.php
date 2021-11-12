@@ -11,13 +11,17 @@ use Symfony\Component\Routing\RouterInterface;
 
 class DestinationPageHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject $entityConfigHelper;
+    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigHelper;
 
-    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    private DestinationPageHelper $helper;
+    /** @var DestinationPageHelper */
+    private $helper;
 
     protected function setUp(): void
     {

@@ -15,7 +15,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Component\Testing\ReflectionUtil;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -24,24 +23,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowItem */
-    protected $workflowItem;
+    private $workflowItem;
 
     protected function setUp(): void
     {
         $this->workflowItem = new WorkflowItem();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->workflowItem);
-    }
-
     public function testId()
     {
-        static::assertNull($this->workflowItem->getId());
+        self::assertNull($this->workflowItem->getId());
         $value = 1;
         $this->workflowItem->setId($value);
-        static::assertEquals($value, $this->workflowItem->getId());
+        self::assertEquals($value, $this->workflowItem->getId());
     }
 
     public function testMerge()
@@ -67,19 +61,18 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testWorkflowName()
     {
-        static::assertNull($this->workflowItem->getWorkflowName());
+        self::assertNull($this->workflowItem->getWorkflowName());
         $value = 'example_workflow';
         $this->workflowItem->setWorkflowName($value);
-        static::assertEquals($value, $this->workflowItem->getWorkflowName());
+        self::assertEquals($value, $this->workflowItem->getWorkflowName());
     }
 
     public function testCurrentStepName()
     {
-        static::assertNull($this->workflowItem->getCurrentStep());
-        /** @var WorkflowStep|MockObject $value */
-        $value = $this->getMockBuilder(WorkflowStep::class)->disableOriginalConstructor()->getMock();
+        self::assertNull($this->workflowItem->getCurrentStep());
+        $value = $this->createMock(WorkflowStep::class);
         $this->workflowItem->setCurrentStep($value);
-        static::assertEquals($value, $this->workflowItem->getCurrentStep());
+        self::assertEquals($value, $this->workflowItem->getCurrentStep());
     }
 
     public function testData()
@@ -95,11 +88,11 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDataWithSerialization()
     {
-        /** @var WorkflowDefinition|MockObject $definition */
-        $definition = $this->getMockBuilder(WorkflowDefinition::class)->disableOriginalConstructor()->getMock();
-        $definition->expects(static::once())->method('getEntityAttributeName')->willReturn('attr');
+        $definition = $this->createMock(WorkflowDefinition::class);
+        $definition->expects(self::once())
+            ->method('getEntityAttributeName')
+            ->willReturn('attr');
 
-        /** @var WorkflowItem $workflowItem */
         $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
             ->onlyMethods([])
@@ -112,7 +105,8 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $data->set('foo', 'bar');
 
         $serializer = $this->createMock(WorkflowAwareSerializer::class);
-        $serializer->expects($this->once())->method('deserialize')
+        $serializer->expects($this->once())
+            ->method('deserialize')
             ->with($serializedData, WorkflowData::class, 'json')
             ->willReturn($data);
 
@@ -128,7 +122,6 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Cannot deserialize data of workflow item. Serializer is not available.');
 
-        /** @var WorkflowItem $workflowItem */
         $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
             ->onlyMethods([])
@@ -139,37 +132,36 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDataWithWithEmptySerializedData()
     {
-        /** @var WorkflowItem $workflowItem */
         $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
             ->onlyMethods([])
             ->getMock();
 
         $data = $workflowItem->getData();
-        static::assertInstanceOf(WorkflowData::class, $data);
-        static::assertTrue($data->isEmpty());
+        self::assertInstanceOf(WorkflowData::class, $data);
+        self::assertTrue($data->isEmpty());
     }
 
     public function testSetSerializedData()
     {
-        static::assertEmpty($this->workflowItem->getSerializedData());
+        self::assertEmpty($this->workflowItem->getSerializedData());
         $data = 'serialized_data';
         $this->workflowItem->setSerializedData($data);
-        static::assertEquals($data, $this->workflowItem->getSerializedData());
+        self::assertEquals($data, $this->workflowItem->getSerializedData());
     }
 
     public function testGetSerializedData()
     {
-        static::assertNull($this->workflowItem->getSerializedData());
+        self::assertNull($this->workflowItem->getSerializedData());
         $data = 'serialized_data';
         $this->workflowItem->setSerializedData($data);
-        static::assertEquals($data, $this->workflowItem->getSerializedData());
+        self::assertEquals($data, $this->workflowItem->getSerializedData());
     }
 
     public function testGetResult()
     {
-        static::assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
-        static::assertTrue($this->workflowItem->getResult()->isEmpty());
+        self::assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
+        self::assertTrue($this->workflowItem->getResult()->isEmpty());
     }
 
     /**

@@ -9,35 +9,30 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject $routeProvider;
+    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $routeProvider;
 
-    private DefaultOperationRequestHelper $helper;
+    /** @var DefaultOperationRequestHelper */
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
-
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->helper = new DefaultOperationRequestHelper($this->requestStack, $this->routeProvider);
     }
 
     /**
-     * @param Request|null $masterRequest
-     * @param string $executionRoute
-     * @param string|null $expected
-     *
      * @dataProvider getRequestRouteProvider
      */
     public function testGetRequestRoute(
-        Request $masterRequest = null,
-        string $executionRoute = '',
-        string $expected = null
+        ?Request $masterRequest,
+        string $executionRoute,
+        ?string $expected
     ): void {
         $this->requestStack->expects($this->once())
             ->method('getMainRequest')
@@ -119,9 +114,9 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider isExecutionRouteRequestProvider
      */
     public function isExecutionRouteRequest(
-        Request $masterRequest = null,
-        string $executionRoute = null,
-        bool $expected = null
+        ?Request $masterRequest,
+        ?string $executionRoute,
+        ?bool $expected
     ): void {
         $this->requestStack->expects($this->once())
             ->method('getMainRequest')

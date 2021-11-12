@@ -2,45 +2,37 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 
 class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SyncProcessorRegistry
-     */
-    protected $registry;
+    /** @var SyncProcessorRegistry */
+    private $registry;
 
     protected function setUp(): void
     {
         $this->registry = new SyncProcessorRegistry();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->registry);
-    }
-
     public function testRegistry()
     {
-        $channelOne = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $channelOne = $this->createMock(Channel::class);
         $channelOne->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('test1'));
+            ->willReturn('test1');
 
-        $channelTwo = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $channelTwo = $this->createMock(Channel::class);
         $channelTwo->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('test2'));
+            ->willReturn('test2');
 
-        $customProcessor = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor')
+        $customProcessor = $this->getMockBuilder(AbstractSyncProcessor::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $defaultProcessor = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor')
+        $defaultProcessor = $this->getMockBuilder(AbstractSyncProcessor::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
@@ -56,15 +48,13 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testRegistryException()
     {
-        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Default sync processor was not set');
 
-        $channelOne = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Channel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $channelOne = $this->createMock(Channel::class);
         $channelOne->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('test1'));
+            ->willReturn('test1');
 
         $this->registry->getProcessorForIntegration($channelOne);
     }

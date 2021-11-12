@@ -19,34 +19,36 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const TRIGGER_ID = 42;
-    const MAIN_ENTITY_CLASS = 'stdClass';
-    const MAIN_ENTITY_ID = 105;
+    private const TRIGGER_ID = 42;
+    private const MAIN_ENTITY_CLASS = 'stdClass';
+    private const MAIN_ENTITY_ID = 105;
 
     /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $objectManager;
+    private $objectManager;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var TransitionTriggerHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $handler;
+    private $handler;
 
     /** @var TransitionTriggerProcessor */
-    protected $processor;
+    private $processor;
 
     /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $session;
+    private $session;
 
     protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);
 
         $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->objectManager);
 
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->handler = $this->createMock(TransitionTriggerHandlerInterface::class);
@@ -54,11 +56,6 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new TransitionTriggerProcessor($this->registry, $this->logger, $this->handler);
 
         $this->session = $this->createMock(SessionInterface::class);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->processor, $this->registry, $this->handler, $this->logger, $this->objectManager, $this->session);
     }
 
     public function testProcess()
@@ -69,7 +66,10 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->setUpObjectManager($trigger);
         $this->setUpLogger();
 
-        $this->handler->expects($this->once())->method('process')->with($trigger, $message)->willReturn(true);
+        $this->handler->expects($this->once())
+            ->method('process')
+            ->with($trigger, $message)
+            ->willReturn(true);
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
@@ -92,7 +92,9 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
             'warning'
         );
 
-        $this->handler->expects($this->once())->method('process')->willReturn(false);
+        $this->handler->expects($this->once())
+            ->method('process')
+            ->willReturn(false);
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
@@ -121,10 +123,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
 
-    /**
-     * @return array
-     */
-    public function processWithInvalidMessageProvider()
+    public function processWithInvalidMessageProvider(): array
     {
         return [
             'empty data' => [
@@ -157,11 +156,10 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
      */
     private function getTriggerMock()
     {
-        $trigger = $this->getMockBuilder(BaseTransitionTrigger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $trigger->expects($this->any())->method('getId')->willReturn(self::TRIGGER_ID);
+        $trigger = $this->createMock(BaseTransitionTrigger::class);
+        $trigger->expects($this->any())
+            ->method('getId')
+            ->willReturn(self::TRIGGER_ID);
 
         return $trigger;
     }
@@ -180,7 +178,9 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         }
 
         $message = $this->createMock(MessageInterface::class);
-        $message->expects($this->any())->method('getBody')->willReturn(json_encode($data));
+        $message->expects($this->any())
+            ->method('getBody')
+            ->willReturn(json_encode($data));
 
         return $message;
     }
@@ -207,24 +207,23 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         if ($called) {
             $this->logger->expects($this->once())
                 ->method($type)
-                ->willReturnCallback(
-                    function ($message, array $context) use ($expectedMessage, $expectedContext) {
-                        $this->assertEquals($expectedMessage, $message);
+                ->willReturnCallback(function ($message, array $context) use ($expectedMessage, $expectedContext) {
+                    $this->assertEquals($expectedMessage, $message);
 
-                        foreach ($expectedContext as $key => $value) {
-                            $this->assertArrayHasKey($key, $context);
+                    foreach ($expectedContext as $key => $value) {
+                        $this->assertArrayHasKey($key, $context);
 
-                            if ($value instanceof \Exception) {
-                                $this->assertInstanceOf(get_class($value), $context[$key]);
-                                $this->assertEquals($value->getMessage(), $context[$key]->getMessage());
-                            } else {
-                                $this->assertEquals($value, $context[$key]);
-                            }
+                        if ($value instanceof \Exception) {
+                            $this->assertInstanceOf(get_class($value), $context[$key]);
+                            $this->assertEquals($value->getMessage(), $context[$key]->getMessage());
+                        } else {
+                            $this->assertEquals($value, $context[$key]);
                         }
                     }
-                );
+                });
         } else {
-            $this->logger->expects($this->never())->method($this->anything());
+            $this->logger->expects($this->never())
+                ->method($this->anything());
         }
     }
 }

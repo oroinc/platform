@@ -21,23 +21,19 @@ class OroWorkflowExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad(): void
     {
         $actualDefinitions = [];
-        $actualParameters  = [];
+        $actualParameters = [];
 
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects(self::any())
             ->method('setDefinition')
-            ->willReturnCallback(
-                function ($id, Definition $definition) use (&$actualDefinitions) {
-                    $actualDefinitions[$id] = $definition;
-                }
-            );
+            ->willReturnCallback(function ($id, Definition $definition) use (&$actualDefinitions) {
+                $actualDefinitions[$id] = $definition;
+            });
         $container->expects(self::any())
             ->method('setParameter')
-            ->willReturnCallback(
-                function ($name, $value) use (&$actualParameters) {
-                    $actualParameters[$name] = $value;
-                }
-            );
+            ->willReturnCallback(function ($name, $value) use (&$actualParameters) {
+                $actualParameters[$name] = $value;
+            });
         $container->expects(self::any())
             ->method('getReflectionClass')
             ->willReturnCallback(static fn ($class) =>  new \ReflectionClass($class));

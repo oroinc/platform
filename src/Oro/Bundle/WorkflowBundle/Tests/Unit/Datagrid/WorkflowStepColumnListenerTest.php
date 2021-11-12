@@ -633,18 +633,16 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildAfterNoUpdateDataProvider
-     *
-     * @param \PHPUnit\Framework\MockObject\MockObject|DatasourceInterface $datasource
-     * @param DatagridConfiguration $inputConfig
      */
     public function testOnBuildAfterNoUpdate(DatasourceInterface $datasource, DatagridConfiguration $inputConfig)
     {
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $datasource */
         $datasource->expects($this->never())
             ->method($this->anything());
 
         $event = $this->createBuildAfterEvent($datasource, $inputConfig);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject $datagrid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $event->getDatagrid();
         $datagrid->expects($this->any())
             ->method('getParameters')
@@ -751,7 +749,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject $datagrid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $event->getDatagrid();
         $datagrid->expects($this->exactly(2))
             ->method('getParameters')

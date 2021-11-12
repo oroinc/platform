@@ -8,9 +8,11 @@ use Symfony\Component\Serializer\Serializer;
 
 class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    private Serializer|\PHPUnit\Framework\MockObject\MockObject $serializer;
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    private ProcessTraversableNormalizer $normalizer;
+    /** @var ProcessTraversableNormalizer */
+    private $normalizer;
 
     protected function setUp(): void
     {
@@ -82,7 +84,7 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expected): void
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         self::assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
@@ -100,7 +102,7 @@ class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($data, $expected): void
+    public function testSupportsDenormalization(mixed $data, bool $expected): void
     {
         self::assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }

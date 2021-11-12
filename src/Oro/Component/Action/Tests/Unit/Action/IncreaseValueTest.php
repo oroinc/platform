@@ -7,29 +7,19 @@ use Oro\Component\Action\Action\IncreaseValue;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class IncreaseValueTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
-
     /** @var IncreaseValue */
     private $action;
 
     protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->action = new class(new ContextAccessor()) extends IncreaseValue {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-        $this->action->setDispatcher($this->eventDispatcher);
+        $this->action = new IncreaseValue(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testInitialize()
@@ -39,8 +29,8 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
             'value' => 3
         ];
 
-        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
-        static::assertEquals($options, $this->action->xgetOptions());
+        self::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function testInitializeNoParametersException()
@@ -91,16 +81,13 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(['test' => 101], $context->getValues());
+        self::assertEquals(['test' => 101], $context->getValues());
     }
 
     /**
-     * @dataProvider executeActionDapaProvider
-     *
-     * @param int $value
-     * @param int $expected
+     * @dataProvider executeActionDataProvider
      */
-    public function testExecuteAction($value, $expected)
+    public function testExecuteAction(int $value, int $expected)
     {
         $options = ['attribute' => new PropertyPath('test'), 'value' => $value];
         $context = new StubStorage(['test' => 100]);
@@ -108,16 +95,15 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(['test' => $expected], $context->getValues());
+        self::assertEquals(['test' => $expected], $context->getValues());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function executeActionDapaProvider()
+    public function executeActionDataProvider(): array
     {
-        yield 'positive value' => ['value' => 500, 'expected' => 600];
-        yield 'negative value' => ['value' => -500, 'expected' => -400];
-        yield 'zero value' => ['value' => 0, 'expected' => 100];
+        return [
+            'positive value' => ['value' => 500, 'expected' => 600],
+            'negative value' => ['value' => -500, 'expected' => -400],
+            'zero value'     => ['value' => 0, 'expected' => 100]
+        ];
     }
 }

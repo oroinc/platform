@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class ActionPassTest extends \PHPUnit\Framework\TestCase
 {
     private const ACTION_FACTORY_SERVICE_ID = 'oro_action.action_factory';
-    private const ACTION_TAG                = 'oro_action.action';
+    private const ACTION_TAG = 'oro_action.action';
 
     /** @var AbstractPass */
     private $compiler;

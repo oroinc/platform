@@ -7,43 +7,26 @@ use Oro\Component\Action\Action\FormatString;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormatStringTest extends \PHPUnit\Framework\TestCase
 {
-    const ATTRIBUTE_PATH = 'attribute';
-    const ARGUMENTS_PATH = 'arguments';
+    private const ATTRIBUTE_PATH = 'attribute';
+    private const ARGUMENTS_PATH = 'arguments';
+
+    private string $testString = 'some "%param1%" test "%param2%" string';
+    private array $testArguments = ['param1' => 'first', 'param2' => 'second'];
+    private string $expectedString = 'some "first" test "second" string';
 
     /** @var FormatString */
-    protected $action;
-
-    /** @var string */
-    protected $testString = 'some "%param1%" test "%param2%" string';
-
-    /** @var array */
-    protected $testArguments = ['param1' => 'first', 'param2' => 'second'];
-
-    /** @var string */
-    protected $expectedString = 'some "first" test "second" string';
+    private $action;
 
     protected function setUp(): void
     {
-        $this->action = new class(new ContextAccessor()) extends FormatString {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->action);
+        $this->action = new FormatString(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -53,7 +36,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     {
         $this->action->initialize($options);
 
-        static::assertEquals($options, $this->action->xgetOptions());
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function optionsDataProvider(): array
@@ -96,12 +79,9 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -143,24 +123,21 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $expected
-     * @param mixed $arguments
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, $expected, $arguments = null)
+    public function testExecute(array $options, string $expected, mixed $arguments = null)
     {
         $context = new ItemStub();
         if (null !== $arguments) {
             $argumentsPath = self::ARGUMENTS_PATH;
-            $context->$argumentsPath = $arguments;
+            $context->{$argumentsPath} = $arguments;
         }
 
         $this->action->initialize($options);
         $this->action->execute($context);
 
         $attributePath = self::ATTRIBUTE_PATH;
-        static::assertEquals($expected, $context->$attributePath);
+        self::assertEquals($expected, $context->{$attributePath});
     }
 
     public function testNotTraversableArguments()
@@ -176,7 +153,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
 
         $context = new ItemStub();
         $argumentsPath = self::ARGUMENTS_PATH;
-        $context->$argumentsPath = 'not_traversable_value';
+        $context->{$argumentsPath} = 'not_traversable_value';
 
         $this->action->initialize($options);
         $this->action->execute($context);

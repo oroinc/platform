@@ -27,40 +27,35 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
+
+    /** @var MessageCatalogueInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translatorCatalogue;
 
     /** @var WorkflowStepSelectType */
     private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
-    private $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageCatalogueInterface */
-    private $translatorCatalogue;
-
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
-
+        $this->repository = $this->createMock(EntityRepository::class);
         $this->translatorCatalogue = $this->createMock(MessageCatalogueInterface::class);
 
-        $this->translator = $this->createMock(Translator::class);
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
             ->method('getCatalogue')
             ->willReturn($this->translatorCatalogue);
-        $this->translator->expects($this->any())
+        $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($label) {
-                return 'transtaled_' . $label;
+                return 'translated_' . $label;
             });
 
-        $this->repository = $this->createMock(EntityRepository::class);
-
-        $this->type = new WorkflowStepSelectType($this->workflowRegistry, $this->translator);
+        $this->type = new WorkflowStepSelectType($this->workflowRegistry, $translator);
 
         parent::setUp();
     }
@@ -183,9 +178,9 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->type->finishView($view, $this->createMock(FormInterface::class), ['workflow_name' => 'test']);
 
-        $this->assertEquals('transtaled_step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('translated_step1label', $view->vars['choices'][0]->label);
         $this->assertEquals('step2label', $view->vars['choices'][1]->label);
-        $this->assertEquals('transtaled_step3label', $view->vars['choices'][2]->label);
+        $this->assertEquals('translated_step3label', $view->vars['choices'][2]->label);
     }
 
     public function testFinishViewWithMoreThanOneWorkflow()
@@ -214,8 +209,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ['workflow_entity_class' => \stdClass::class]
         );
 
-        $this->assertEquals('transtaled_wf_l1: transtaled_step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('transtaled_wf_l2: transtaled_step2label', $view->vars['choices'][1]->label);
+        $this->assertEquals('translated_wf_l1: translated_step1label', $view->vars['choices'][0]->label);
+        $this->assertEquals('translated_wf_l2: translated_step2label', $view->vars['choices'][1]->label);
     }
 
     public function testFinishViewException()
@@ -230,11 +225,10 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @return Workflow|WorkflowStep
-     */
-    private function getWorkflowDefinitionAwareClass(string $class, string $definitionLabel = null)
-    {
+    private function getWorkflowDefinitionAwareClass(
+        string $class,
+        string $definitionLabel = null
+    ): Workflow|WorkflowStep {
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->any())
             ->method('getLabel')

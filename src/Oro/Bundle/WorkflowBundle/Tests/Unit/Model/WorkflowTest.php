@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -72,7 +73,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTransitionAllowedStepHasNoAllowedTransitionException(): void
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectException(InvalidTransitionException::class);
         $this->expectExceptionMessage(
             'Step "test_step" of workflow "test_workflow" doesn\'t have allowed transition "test_transition".'
         );
@@ -275,7 +276,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflowName = 'testWorkflow';
         $stepName = 'stepOne';
 
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException::class);
+        $this->expectException(InvalidTransitionException::class);
         $this->expectExceptionMessage(
             \sprintf(
                 'Step "%s" of workflow "%s" doesn\'t have allowed transition "transition".',
@@ -287,7 +288,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepName);
 
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->onlyMethods(['getCurrentStep'])
             ->getMock();
@@ -336,13 +336,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflowItem->expects($this->once())
             ->method('addTransitionRecord')
             ->with($this->isInstanceOf(WorkflowTransitionRecord::class))
-            ->willReturnCallback(
-                static function (WorkflowTransitionRecord $transitionRecord) {
-                    self::assertEquals('transition', $transitionRecord->getTransitionName());
-                    self::assertEquals('stepOne', $transitionRecord->getStepFrom()->getName());
-                    self::assertEquals('stepTwo', $transitionRecord->getStepTo()->getName());
-                }
-            );
+            ->willReturnCallback(function (WorkflowTransitionRecord $transitionRecord) {
+                self::assertEquals('transition', $transitionRecord->getTransitionName());
+                self::assertEquals('stepOne', $transitionRecord->getStepFrom()->getName());
+                self::assertEquals('stepTwo', $transitionRecord->getStepTo()->getName());
+            });
 
         $stepOne = $this->getStepMock($workflowStepOne->getName());
         $stepOne->expects($this->once())
@@ -398,7 +396,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $workflow = $this->createWorkflow();
         $workflow->setDefinition($workflowDefinition);
-        $workflowDefinition->expects($this->once())->method('getName')->willReturn('test');
+        $workflowDefinition->expects($this->once())
+            ->method('getName')
+            ->willReturn('test');
         $workflow->getTransitionManager()->setTransitions([$transition]);
         $workflow->getStepManager()->setSteps([$stepOne]);
         $workflow->transit($workflowItem, 'transition');
@@ -427,7 +427,9 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             ->method('getStepByName')
             ->with($workflowStep->getName())
             ->willReturn($workflowStep);
-        $workflowDefinition->expects($this->any())->method('getName')->willReturn('test_wf_name');
+        $workflowDefinition->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_wf_name');
 
         $entity = new EntityWithWorkflow();
         $entityAttribute = new Attribute();
@@ -471,17 +473,17 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
         $repository = $this->createMock(WorkflowItemRepository::class);
 
-        $this->doctrineHelper->expects($this->any())->method('getEntityRepositoryForClass')->willReturn($repository);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepositoryForClass')
+            ->willReturn($repository);
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
             ->willReturnCallback('Doctrine\Common\Util\ClassUtils::getClass');
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->willReturnCallback(
-                static function ($actual) use ($entityClass, $entityId) {
-                    return $actual instanceof $entityClass ? $entityId : null;
-                }
-            );
+            ->willReturnCallback(function ($actual) use ($entityClass, $entityId) {
+                return $actual instanceof $entityClass ? $entityId : null;
+            });
 
         $workflowStep = (new WorkflowStep())->setName('step_name');
         $transition = $this->assertTransitionCalled($workflowStep, TransitionManager::DEFAULT_START_TRANSITION_NAME);
@@ -491,8 +493,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             ->method('getStepByName')
             ->with($workflowStep->getName())
             ->willReturn($workflowStep);
-        $workflowDefinition->expects($this->once())->method('getEntityAttributeName')->willReturn($entityAttributeName);
-        $workflowDefinition->expects($this->any())->method('getName')->willReturn('test_wf_name');
+        $workflowDefinition->expects($this->once())
+            ->method('getEntityAttributeName')
+            ->willReturn($entityAttributeName);
+        $workflowDefinition->expects($this->any())
+            ->method('getName')
+            ->willReturn('test_wf_name');
 
         $entityAttribute = (new Attribute())->setName('entity');
 
@@ -516,13 +522,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     {
         $variables = new ArrayCollection([$this->createMock(Variable::class)]);
 
-        /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
         $variableAssembler = $this->createMock(VariableAssembler::class);
         $variableAssembler->expects($this->any())
             ->method('assemble')
             ->willReturn($variables);
 
-        /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
         $variableManager = $this->createMock(VariableManager::class);
         $variableManager->expects($this->any())
             ->method('getVariableAssembler')
@@ -537,13 +541,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
     {
         $variables = new ArrayCollection([$this->createMock(Variable::class)]);
 
-        /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
         $variableAssembler = $this->createMock(VariableAssembler::class);
         $variableAssembler->expects($this->once())
             ->method('assemble')
             ->willReturn($variables);
 
-        /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
         $variableManager = $this->createMock(VariableManager::class);
         $variableManager->expects($this->any())
             ->method('getVariableAssembler')
@@ -563,7 +565,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      *
      * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function assertTransitionCalled(
+    private function assertTransitionCalled(
         WorkflowStep $step,
         string $expectedTransitionName,
         ?Collection $errors = null
@@ -582,7 +584,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      *
      * @return Step|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getStepMock(string $name): Step
+    private function getStepMock(string $name): Step
     {
         $step = $this->createMock(Step::class);
         $step->expects($this->any())
@@ -599,7 +601,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      *
      * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition
+    private function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())
@@ -644,7 +646,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedTransitionsUnknownStepException(): void
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\UnknownStepException::class);
+        $this->expectException(UnknownStepException::class);
         $this->expectExceptionMessage('Step "unknown_step" not found');
 
         $workflowStep = new WorkflowStep();
@@ -659,7 +661,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testIsTransitionAvailable(): void
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $errors = new ArrayCollection();
         $transitionName = 'test_transition';
@@ -830,7 +831,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      *
      * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getTransitionRecordMock(string $stepToName): WorkflowTransitionRecord
+    private function getTransitionRecordMock(string $stepToName): WorkflowTransitionRecord
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepToName);
@@ -852,7 +853,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      *
      * @return Workflow
      */
-    protected function createWorkflow(
+    private function createWorkflow(
         string $workflowName = null,
         AclManager $aclManager = null,
         AttributeManager $attributeManager = null,
@@ -863,17 +864,14 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             $aclManager = $this->createMock(AclManager::class);
         }
 
-        /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject $restrictionManager */
         $restrictionManager = $this->createMock(RestrictionManager::class);
 
         if (!$variableManager) {
-            /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
             $variableAssembler = $this->createMock(VariableAssembler::class);
             $variableAssembler->expects($this->any())
                 ->method('assemble')
                 ->willReturn(new ArrayCollection());
 
-            /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
             $variableManager = $this->createMock(VariableManager::class);
             $variableManager->expects($this->any())
                 ->method('getVariableAssembler')
@@ -981,7 +979,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity, $workflow->getWorkflowItemByEntityId(10));
     }
 
-    protected function assertDoctrineHelperCalled(object $entity, ?string $workflowName): void
+    private function assertDoctrineHelperCalled(object $entity, ?string $workflowName): void
     {
         $entityClass = 'stdClass';
         $entityId = 42;

@@ -6,38 +6,21 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignConstantValue;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CONSTANT = 'test_c';
-
-    /** @var ContextAccessor */
-    protected $contextAccessor;
+    public const TEST_CONSTANT = 'test_c';
 
     /** @var ActionInterface */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
-
-        $this->action = new class($this->contextAccessor) extends AssignConstantValue {
-            public function xgetAttribute()
-            {
-                return $this->attribute;
-            }
-
-            public function xgetValue()
-            {
-                return $this->value;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new AssignConstantValue(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -49,10 +32,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             [[]],
@@ -66,22 +46,16 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param string $attribute
-     * @param string $value
      */
-    public function testInitialize(array $options, $attribute, $value)
+    public function testInitialize(array $options, string $attribute, string $value)
     {
-        static::assertSame($this->action, $this->action->initialize($options));
+        self::assertSame($this->action, $this->action->initialize($options));
 
-        static::assertEquals($attribute, $this->action->xgetAttribute());
-        static::assertEquals($value, $this->action->xgetValue());
+        self::assertEquals($attribute, ReflectionUtil::getPropertyValue($this->action, 'attribute'));
+        self::assertEquals($value, ReflectionUtil::getPropertyValue($this->action, 'value'));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [['attr', 'val'], 'attr', 'val'],
@@ -145,12 +119,12 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $attribute = new PropertyPath('attr');
 
         $context = new \stdClass();
-        $context->val = 'Oro\Component\Action\Tests\Unit\Action\AssignConstantValueTest::TEST_CONSTANT';
+        $context->val = __CLASS__ . '::TEST_CONSTANT';
         $context->attr = null;
 
         $this->action->initialize([$attribute, $value]);
         $this->action->execute($context);
 
-        static::assertEquals(self::TEST_CONSTANT, $context->attr);
+        self::assertEquals(self::TEST_CONSTANT, $context->attr);
     }
 }

@@ -68,7 +68,7 @@ class AssignUrl extends AbstractAction
             throw new InvalidParameterException('Route parameters must be an array');
         }
         if (empty($options['attribute'])) {
-            throw new InvalidParameterException('Attribiute parameters is required');
+            throw new InvalidParameterException('Attribute parameters is required');
         }
 
         $this->urlAttribute = $options['attribute'];

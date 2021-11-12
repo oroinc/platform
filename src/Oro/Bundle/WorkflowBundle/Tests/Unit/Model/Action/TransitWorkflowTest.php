@@ -3,58 +3,31 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Component\Action\Exception\ActionException;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitWorkflow */
-    protected $action;
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowManager;
 
-    /** @var MockObject|WorkflowManager */
-    protected $workflowManager;
+    /** @var TransitWorkflow */
+    private $action;
 
     protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
-            ->onlyMethods(['getWorkflowItem', 'transit',])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
 
-        $this->action = new class(new ContextAccessor(), $this->workflowManager) extends TransitWorkflow {
-            public function xgetEntity(): string
-            {
-                return $this->entity;
-            }
-
-            public function xgetTransition(): string
-            {
-                return $this->transition;
-            }
-
-            public function xgetWorkflow(): string
-            {
-                return $this->workflow;
-            }
-
-            public function xgetData(): array
-            {
-                return $this->data;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->router, $this->action);
+        $this->action = new TransitWorkflow(new ContextAccessor(), $this->workflowManager);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testExecuteWorks()
@@ -77,12 +50,12 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
 
         $expectedData = array_merge($options['data'], ['path' => $expectedParameter]);
 
-        $workflowData = $this->createMock('Oro\Bundle\WorkflowBundle\Model\WorkflowData');
+        $workflowData = $this->createMock(WorkflowData::class);
         $workflowData->expects($this->once())
             ->method('add')
             ->with($expectedData);
 
-        $expectedWorkflowItem = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $expectedWorkflowItem = $this->createMock(WorkflowItem::class);
         $expectedWorkflowItem->expects($this->once())
             ->method('getData')
             ->willReturn($workflowData);
@@ -90,12 +63,12 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->workflowManager->expects($this->once())
             ->method('getWorkflowItem')
             ->with($expectedEntity, $options['workflow'])
-            ->will($this->returnValue($expectedWorkflowItem));
+            ->willReturn($expectedWorkflowItem);
 
         $this->workflowManager->expects($this->once())
             ->method('transit')
             ->with($expectedWorkflowItem, $options['transition'])
-            ->will($this->returnValue($expectedWorkflowItem));
+            ->willReturn($expectedWorkflowItem);
 
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -103,7 +76,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteFailsWhenThereIsNoWorkflowItem()
     {
-        $this->expectException(\Oro\Component\Action\Exception\ActionException::class);
+        $this->expectException(ActionException::class);
         $this->expectExceptionMessage('Cannot transit workflow, instance of "stdClass" doesn\'t have workflow item.');
 
         $expectedEntity = new \stdClass();
@@ -119,7 +92,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->workflowManager->expects($this->once())
             ->method('getWorkflowItem')
             ->with($expectedEntity, $options['workflow'])
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->workflowManager->expects($this->never())
             ->method('transit');
@@ -129,31 +102,23 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $expectedEntity
-     * @param string $expectedTransition
-     * @param string $expectedWorkflow
-     * @param array $expectedData
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(
         array $options,
-        $expectedEntity,
-        $expectedTransition,
-        $expectedWorkflow,
+        PropertyPath $expectedEntity,
+        string $expectedTransition,
+        string $expectedWorkflow,
         array $expectedData = []
     ) {
         $this->action->initialize($options);
-        static::assertEquals($expectedEntity, $this->action->xgetEntity());
-        static::assertEquals($expectedTransition, $this->action->xgetTransition());
-        static::assertEquals($expectedWorkflow, $this->action->xgetWorkflow());
-        static::assertEquals($expectedData, $this->action->xgetData());
+        self::assertEquals($expectedEntity, ReflectionUtil::getPropertyValue($this->action, 'entity'));
+        self::assertEquals($expectedTransition, ReflectionUtil::getPropertyValue($this->action, 'transition'));
+        self::assertEquals($expectedWorkflow, ReflectionUtil::getPropertyValue($this->action, 'workflow'));
+        self::assertEquals($expectedData, ReflectionUtil::getPropertyValue($this->action, 'data'));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'associated array options' => [
@@ -216,34 +181,28 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             'no entity' => [
                 'options' => [],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Option "entity" is required.',
             ],
             'no transition provided' => [
                 'options' => [
                     'entity' => new PropertyPath('test'),
                 ],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Option "transition" is required.',
             ],
             'no workflow provided' => [
@@ -251,7 +210,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
                     'entity' => new PropertyPath('test'),
                     'transition' => 'test_transition',
                 ],
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Option "workflow" is required.',
             ],
         ];

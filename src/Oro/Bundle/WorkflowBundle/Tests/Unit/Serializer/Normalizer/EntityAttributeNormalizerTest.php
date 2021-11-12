@@ -12,19 +12,19 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer;
 
 class EntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     private $workflow;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
     private $attribute;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var EntityAttributeNormalizer */

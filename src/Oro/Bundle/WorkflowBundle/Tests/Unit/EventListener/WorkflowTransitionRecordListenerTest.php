@@ -40,23 +40,25 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->listener->setEnabled(false);
 
-        $this->eventDispatcher->expects($this->never())->method('dispatch');
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
 
         $this->listener->postPersist($this->createMock(WorkflowTransitionRecord::class), $this->args);
     }
 
     /**
      * @dataProvider postPersistDataProvider
-     *
-     * @param WorkflowTransitionRecord $transitionRecord
-     * @param TokenInterface|null $token
-     * @param bool $expected
      */
-    public function testPostPersist($transitionRecord, $token, $expected)
-    {
+    public function testPostPersist(
+        WorkflowTransitionRecord $transitionRecord,
+        ?TokenInterface $token,
+        WorkflowNotificationEvent $expected
+    ) {
         $this->listener->setEnabled(true);
 
-        $this->tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
@@ -65,26 +67,28 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postPersist($transitionRecord, $this->args);
     }
 
-    /**
-     * @return array
-     */
-    public function postPersistDataProvider()
+    public function postPersistDataProvider(): array
     {
         $entity = new \stdClass();
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getEntity')->willReturn($entity);
+        $workflowItem->expects($this->any())
+            ->method('getEntity')
+            ->willReturn($entity);
 
-        /** @var WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject $transitionRecord */
         $transitionRecord = $this->createMock(WorkflowTransitionRecord::class);
-        $transitionRecord->expects($this->any())->method('getWorkflowItem')->willReturn($workflowItem);
+        $transitionRecord->expects($this->any())
+            ->method('getWorkflowItem')
+            ->willReturn($workflowItem);
 
         $user = new User();
 
         $token = $this->createMock(TokenInterface::class);
 
         $tokenWithUser = $this->createMock(TokenInterface::class);
-        $tokenWithUser->expects($this->any())->method('getUser')->willReturn($user);
+        $tokenWithUser->expects($this->any())
+            ->method('getUser')
+            ->willReturn($user);
 
         return [
             'without token' => [

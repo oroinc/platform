@@ -40,18 +40,12 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowDataSerializeListener($container, $this->doctrineHelper);
     }
 
-    /**
-     * @return mixed
-     */
-    private function getEntitySerializer(WorkflowItem $entity)
+    private function getEntitySerializer(WorkflowItem $entity): mixed
     {
         return ReflectionUtil::getPropertyValue($entity, 'serializer');
     }
 
-    /**
-     * @return mixed
-     */
-    private function getEntitySerializedData(WorkflowItem $entity)
+    private function getEntitySerializedData(WorkflowItem $entity): mixed
     {
         return ReflectionUtil::getPropertyValue($entity, 'serializedData');
     }

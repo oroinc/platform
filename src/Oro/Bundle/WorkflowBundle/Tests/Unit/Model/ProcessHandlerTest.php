@@ -18,21 +18,21 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessFactory|MockObject */
-    protected $factory;
+    private $factory;
 
     /** @var ProcessLogger|MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var EventDispatcherInterface|MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var ProcessHandler */
-    protected $handler;
+    private $handler;
 
     protected function setUp(): void
     {
-        $this->factory = $this->getMockBuilder(ProcessFactory::class)->disableOriginalConstructor()->getMock();
-        $this->logger = $this->getMockBuilder(ProcessLogger::class)->disableOriginalConstructor()->getMock();
+        $this->factory = $this->createMock(ProcessFactory::class);
+        $this->logger = $this->createMock(ProcessLogger::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->handler = new ProcessHandler($this->factory, $this->logger, $this->eventDispatcher);
@@ -54,47 +54,47 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $processDefinition = $this->createMock(ProcessDefinition::class);
         $processTrigger = $this->createMock(ProcessTrigger::class);
-        $processTrigger->expects(static::once())->method('getDefinition')->willReturn($processDefinition);
+        $processTrigger->expects(self::once())
+            ->method('getDefinition')
+            ->willReturn($processDefinition);
 
-        $process = $this->getMockBuilder(Process::class)->disableOriginalConstructor()->getMock();
-        $process->expects(static::once())
+        $process = $this->createMock(Process::class);
+        $process->expects(self::once())
             ->method('execute')
             ->with($processData)
             ->willReturn($processDefinition);
 
-        $this->factory->expects(static::once())
+        $this->factory->expects(self::once())
             ->method('create')
             ->with($processDefinition)
             ->willReturn($process);
-        $this->logger->expects(static::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with('Process executed', $processTrigger, $processData);
 
-        $this->eventDispatcher->expects(static::exactly(2))
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    static::callback(
-                        function ($event) use ($processTrigger, $processData) {
-                            static::assertInstanceOf(ProcessHandleEvent::class, $event);
-                            /** @var ProcessHandleEvent $event */
-                            static::assertSame($processTrigger, $event->getProcessTrigger());
-                            static::assertSame($processData, $event->getProcessData());
-                            return true;
-                        }
-                    ),
+                    self::callback(function ($event) use ($processTrigger, $processData) {
+                        self::assertInstanceOf(ProcessHandleEvent::class, $event);
+                        /** @var ProcessHandleEvent $event */
+                        self::assertSame($processTrigger, $event->getProcessTrigger());
+                        self::assertSame($processData, $event->getProcessData());
+
+                        return true;
+                    }),
                     ProcessEvents::HANDLE_BEFORE
                 ],
                 [
-                    static::callback(
-                        function ($event) use ($processTrigger, $processData, $process) {
-                            static::assertInstanceOf(ProcessHandleEvent::class, $event);
-                            /** @var ProcessHandleEvent $event */
-                            static::assertSame($processTrigger, $event->getProcessTrigger());
-                            static::assertSame($processData, $event->getProcessData());
-                            return true;
-                        }
-                    ),
+                    self::callback(function ($event) use ($processTrigger, $processData, $process) {
+                        self::assertInstanceOf(ProcessHandleEvent::class, $event);
+                        /** @var ProcessHandleEvent $event */
+                        self::assertSame($processTrigger, $event->getProcessTrigger());
+                        self::assertSame($processData, $event->getProcessData());
+
+                        return true;
+                    }),
                     ProcessEvents::HANDLE_AFTER
                 ]
             );
@@ -110,15 +110,20 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
         $processTrigger = $this->prepareHandleTrigger($data);
 
         $processJob = $this->createMock(ProcessJob::class);
-        $processJob->expects(static::once())->method('getProcessTrigger')->willReturn($processTrigger);
-        $processJob->expects(static::once())->method('getData')->willReturn($data);
+        $processJob->expects(self::once())
+            ->method('getProcessTrigger')
+            ->willReturn($processTrigger);
+        $processJob->expects(self::once())
+            ->method('getData')
+            ->willReturn($data);
 
         $this->handler->handleJob($processJob);
     }
 
-    public function handleJobProvider()
+    public function handleJobProvider(): array
     {
         $entity = new \DateTime();
+
         return [
             'event create or delete' => [
                 'data' => new ProcessData([
@@ -138,21 +143,19 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
     public function testFinishTrigger()
     {
         $processTrigger = $this->createMock(ProcessTrigger::class);
-        /** @var ProcessData|MockObject $processData */
-        $processData = $this->getMockBuilder(ProcessData::class)->disableOriginalConstructor()->getMock();
+        $processData = $this->createMock(ProcessData::class);
 
-        $this->eventDispatcher->expects(static::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                static::callback(
-                    function ($event) use ($processTrigger, $processData) {
-                        static::assertInstanceOf(ProcessHandleEvent::class, $event);
-                        /** @var ProcessHandleEvent $event */
-                        static::assertSame($processTrigger, $event->getProcessTrigger());
-                        static::assertSame($processData, $event->getProcessData());
-                        return true;
-                    }
-                ),
+                self::callback(function ($event) use ($processTrigger, $processData) {
+                    self::assertInstanceOf(ProcessHandleEvent::class, $event);
+                    /** @var ProcessHandleEvent $event */
+                    self::assertSame($processTrigger, $event->getProcessTrigger());
+                    self::assertSame($processData, $event->getProcessData());
+
+                    return true;
+                }),
                 ProcessEvents::HANDLE_AFTER_FLUSH
             );
 
@@ -162,23 +165,26 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
     public function testFinishJob()
     {
         $processTrigger = $this->createMock(ProcessTrigger::class);
-        $processData = $this->getMockBuilder(ProcessData::class)->disableOriginalConstructor()->getMock();
+        $processData = $this->createMock(ProcessData::class);
 
         $processJob = $this->createMock(ProcessJob::class);
-        $processJob->expects(static::once())->method('getProcessTrigger')->willReturn($processTrigger);
-        $processJob->expects(static::once())->method('getData')->willReturn($processData);
+        $processJob->expects(self::once())
+            ->method('getProcessTrigger')
+            ->willReturn($processTrigger);
+        $processJob->expects(self::once())
+            ->method('getData')
+            ->willReturn($processData);
 
-        $this->eventDispatcher->expects(static::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                static::callback(
-                    function ($event) use ($processTrigger, $processData) {
-                        static::assertInstanceOf(ProcessHandleEvent::class, $event);
-                        static::assertSame($processTrigger, $event->getProcessTrigger());
-                        static::assertSame($processData, $event->getProcessData());
-                        return true;
-                    }
-                ),
+                self::callback(function ($event) use ($processTrigger, $processData) {
+                    self::assertInstanceOf(ProcessHandleEvent::class, $event);
+                    self::assertSame($processTrigger, $event->getProcessTrigger());
+                    self::assertSame($processData, $event->getProcessData());
+
+                    return true;
+                }),
                 ProcessEvents::HANDLE_AFTER_FLUSH
             );
 

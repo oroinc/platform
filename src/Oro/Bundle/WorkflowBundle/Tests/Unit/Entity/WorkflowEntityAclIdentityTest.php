@@ -6,24 +6,18 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowEntityAclIdentity
-     */
-    protected $aclIdentity;
+    /** @var WorkflowEntityAclIdentity */
+    private $aclIdentity;
 
     protected function setUp(): void
     {
         $this->aclIdentity = new WorkflowEntityAclIdentity();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->aclIdentity);
     }
 
     public function testGetId()
@@ -47,14 +41,14 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($this->aclIdentity, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            array('acl', new WorkflowEntityAcl()),
-            array('entityClass', new \DateTime()),
-            array('entityId', 123),
-            array('workflowItem', new WorkflowItem()),
-        );
+        return [
+            ['acl', new WorkflowEntityAcl()],
+            ['entityClass', new \DateTime()],
+            ['entityId', 123],
+            ['workflowItem', new WorkflowItem()],
+        ];
     }
 
     public function testImport()
@@ -79,7 +73,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAclAttributeStepKeyNoAclException()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage("Workflow ACL identity with ID 1 doesn't have entity ACL");
 
         ReflectionUtil::setId($this->aclIdentity, 1);

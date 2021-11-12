@@ -11,9 +11,6 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ValidateActionConfigurationCommand */
-    private $command;
-
     /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $provider;
 
@@ -26,11 +23,13 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     /** @var OutputStub */
     private $output;
 
+    /** @var ValidateActionConfigurationCommand */
+    private $command;
+
     protected function setUp(): void
     {
         $this->provider = $this->createMock(ConfigurationProviderInterface::class);
         $this->validator = $this->createMock(ConfigurationValidatorInterface::class);
-
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
 
@@ -50,31 +49,24 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->provider->expects($this->once())
             ->method('getConfiguration')
-            ->willReturnCallback(
-                function () use ($inputData) {
-                    return $inputData['actionConfiguration'];
-                }
-            );
+            ->willReturnCallback(function () use ($inputData) {
+                return $inputData['actionConfiguration'];
+            });
         $this->validator->expects($this->any())
             ->method('validate')
-            ->willReturnCallback(
-                function ($configuration, Collection $errors) use ($inputData) {
-                    $this->assertEquals($inputData['actionConfiguration'], $configuration);
-                    foreach ($inputData['configurationErrors'] as $error) {
-                        $errors->add($error);
-                    }
+            ->willReturnCallback(function ($configuration, Collection $errors) use ($inputData) {
+                $this->assertEquals($inputData['actionConfiguration'], $configuration);
+                foreach ($inputData['configurationErrors'] as $error) {
+                    $errors->add($error);
                 }
-            );
+            });
 
         $this->command->run($this->input, $this->output);
 
         $this->assertEquals($expectedData['messages'], $this->output->messages);
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         return [
             'No configuration' => [

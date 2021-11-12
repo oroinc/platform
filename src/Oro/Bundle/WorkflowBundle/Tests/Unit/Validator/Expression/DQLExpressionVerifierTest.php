@@ -94,7 +94,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|AbstractQuery
+     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createQuery(string $statementClass)
     {

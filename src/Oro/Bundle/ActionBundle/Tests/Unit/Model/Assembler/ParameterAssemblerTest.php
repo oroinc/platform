@@ -8,16 +8,11 @@ use Oro\Bundle\ActionBundle\Model\Parameter;
 class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ParameterAssembler */
-    protected $assembler;
+    private $assembler;
 
     protected function setUp(): void
     {
         $this->assembler = new ParameterAssembler();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->assembler);
     }
 
     /**
@@ -30,10 +25,7 @@ class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $definitions);
     }
 
-    /**
-     * @return array
-     */
-    public function assembleProvider()
+    public function assembleProvider(): array
     {
         $parameter1 = new Parameter('minimum_name');
 

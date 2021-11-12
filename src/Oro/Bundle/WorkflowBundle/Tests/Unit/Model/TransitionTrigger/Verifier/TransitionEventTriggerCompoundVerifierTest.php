@@ -13,7 +13,9 @@ class TransitionEventTriggerCompoundVerifierTest extends \PHPUnit\Framework\Test
         $trigger = new TransitionEventTrigger();
 
         $otherVerifier = $this->createMock(TransitionEventTriggerVerifierInterface::class);
-        $otherVerifier->expects($this->once())->method('verifyTrigger')->with($trigger);
+        $otherVerifier->expects($this->once())
+            ->method('verifyTrigger')
+            ->with($trigger);
 
         $compoundVerifier = new TransitionEventTriggerCompoundVerifier();
         $compoundVerifier->addVerifier($otherVerifier);

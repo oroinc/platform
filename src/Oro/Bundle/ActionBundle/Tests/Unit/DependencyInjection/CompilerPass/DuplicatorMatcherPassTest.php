@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class DuplicatorMatcherPassTest extends \PHPUnit\Framework\TestCase
 {
     private const FACTORY_SERVICE_ID = 'oro_action.factory.duplicator_matcher_factory';
-    private const TAG_NAME           = 'oro_action.duplicate.matcher_type';
+    private const TAG_NAME = 'oro_action.duplicate.matcher_type';
 
     /** @var DuplicatorMatcherPass */
     private $compiler;

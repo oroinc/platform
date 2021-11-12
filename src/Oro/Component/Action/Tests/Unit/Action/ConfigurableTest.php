@@ -6,20 +6,16 @@ use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable;
 use Oro\Component\ConfigExpression\ExpressionInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class ConfigurableTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
-    protected $testConfiguration = ['key' => 'value'];
+    private array $testConfiguration = ['key' => 'value'];
+    private array $testContext = [1, 2, 3];
 
-    /** @var array */
-    protected $testContext = [1, 2, 3];
-
-    /** @var ActionAssembler|MockObject */
+    /** @var ActionAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
-    /** @var ActionInterface|MockObject */
+    /** @var ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dummyAction;
 
     /** @var Configurable */
@@ -31,17 +27,14 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['assemble'])
             ->getMock();
-
-        $this->dummyAction = $this->getMockBuilder(ActionInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->dummyAction = $this->createMock(ActionInterface::class);
 
         $this->configurableAction = new Configurable($this->assembler);
     }
 
     public function testWithoutInitializeUsedEmptyConfigurationForAssembling()
     {
-        $this->assembler->expects(static::once())
+        $this->assembler->expects(self::once())
             ->method('assemble')
             ->with([])
             ->willReturn($this->dummyAction);
@@ -50,7 +43,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
     }
     public function testInitializeSetsConfigurationUsedForAssembling()
     {
-        $this->assembler->expects(static::once())
+        $this->assembler->expects(self::once())
             ->method('assemble')
             ->with($this->testConfiguration)
             ->willReturn($this->dummyAction);
@@ -61,14 +54,15 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute()
     {
-        $this->dummyAction->expects(static::exactly(2))
+        $this->dummyAction->expects(self::exactly(2))
             ->method('execute')
             ->with($this->testContext);
 
         $condition = $this->createMock(ExpressionInterface::class);
-        $condition->expects(static::never())->method('evaluate');
+        $condition->expects(self::never())
+            ->method('evaluate');
 
-        $this->assembler->expects(static::once())
+        $this->assembler->expects(self::once())
             ->method('assemble')
             ->with($this->testConfiguration)
             ->willReturn($this->dummyAction);

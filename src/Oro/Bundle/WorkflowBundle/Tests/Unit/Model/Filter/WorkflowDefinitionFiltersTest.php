@@ -15,23 +15,20 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
 
     private WorkflowDefinitionFilters $filters;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->filters = new WorkflowDefinitionFilters($this->requestStack);
-
         $this->filters->addFilter(new SystemDefinitionFilter());
         $this->filters->addFilter(new DefaultDefinitionFilter());
     }
 
     public function testGetFilters(): void
     {
-        $this->requestStack->expects(self::exactly(2))->method('getMainRequest')->willReturn(null);
+        $this->requestStack->expects(self::exactly(2))
+            ->method('getMainRequest')
+            ->willReturn(null);
 
         self::assertEquals(
             new ArrayCollection([new SystemDefinitionFilter()]),
@@ -41,7 +38,9 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFiltersWithRequest(): void
     {
-        $this->requestStack->expects(self::exactly(2))->method('getMainRequest')->willReturn(new Request());
+        $this->requestStack->expects(self::exactly(2))
+            ->method('getMainRequest')
+            ->willReturn(new Request());
 
         self::assertEquals(
             new ArrayCollection([new SystemDefinitionFilter(), new DefaultDefinitionFilter()]),
@@ -53,7 +52,8 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
     {
         $this->filters->setType(WorkflowDefinitionFilters::TYPE_SYSTEM);
 
-        $this->requestStack->expects(self::never())->method('getMainRequest');
+        $this->requestStack->expects(self::never())
+            ->method('getMainRequest');
 
         self::assertEquals(
             new ArrayCollection([new SystemDefinitionFilter()]),
@@ -65,7 +65,8 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
     {
         $this->filters->setEnabled(false);
 
-        $this->requestStack->expects(self::never())->method('getMainRequest');
+        $this->requestStack->expects(self::never())
+            ->method('getMainRequest');
 
         self::assertEquals(
             new ArrayCollection(),

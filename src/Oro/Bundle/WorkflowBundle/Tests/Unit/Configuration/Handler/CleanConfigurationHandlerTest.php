@@ -10,10 +10,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var CleanConfigurationHandler */
-    protected $handler;
+    private $handler;
 
     protected function setUp(): void
     {
@@ -64,10 +64,8 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return \Generator
      */
-    public function handleDataProvider()
+    public function handleDataProvider(): \Generator
     {
         yield 'empty configuration' => [
             'configuration' => [],

@@ -6,40 +6,26 @@ use Oro\Component\Action\Action\AssignUrl;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
 class AssignUrlTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|RouterInterface */
-    protected $router;
-
     /** @var AssignUrl */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder(RouterInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->router->method('generate')->willReturnCallback([$this, 'generateTestUrl']);
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects(self::any())
+            ->method('generate')
+            ->willReturnCallback(function (string $routeName, array $routeParameters = []): string {
+                return $this->generateTestUrl($routeName, $routeParameters);
+            });
 
-        $this->action = new class(new ContextAccessor(), $this->router) extends AssignUrl {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->router, $this->action);
+        $this->action = new AssignUrl(new ContextAccessor(), $router);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -48,13 +34,10 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        static::assertEquals($options, $this->action->xgetOptions());
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'route' => [
@@ -76,22 +59,16 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             'no name' => [
@@ -113,17 +90,15 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
                     'route' => 'test_route_name'
                 ],
                 'exceptionName' => InvalidParameterException::class,
-                'exceptionMessage' => 'Attribiute parameters is required',
+                'exceptionMessage' => 'Attribute parameters is required',
             ],
         ];
     }
 
     /**
-     * @param array $options
-     * @param string $expectedUrl
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, $expectedUrl)
+    public function testExecute(array $options, string $expectedUrl)
     {
         $context = new ItemStub();
 
@@ -131,15 +106,10 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $urlProperty = $options['attribute'];
-        static::assertEquals($expectedUrl, $context->$urlProperty);
+        self::assertEquals($expectedUrl, $context->{$urlProperty});
     }
 
-    /**
-     * @param string $routeName
-     * @param array $routeParameters
-     * @return string
-     */
-    public function generateTestUrl($routeName, array $routeParameters = [])
+    private function generateTestUrl(string $routeName, array $routeParameters = []): string
     {
         $url = 'url:' . $routeName;
         if ($routeParameters) {

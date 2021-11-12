@@ -8,10 +8,10 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer;
 
 class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     private $workflow;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
     private $attribute;
 
     /** @var StandardAttributeNormalizer */
@@ -28,7 +28,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeScalarsAndArrayDataProvider
      */
-    public function testNormalizeScalarsAndArray(string $type, $value, $expected)
+    public function testNormalizeScalarsAndArray(string $type, mixed $value, mixed $expected)
     {
         $this->workflow->expects($this->never())
             ->method($this->anything());
@@ -94,7 +94,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeObjectDataProvider
      */
-    public function testNormalizeObject($value, string $class, $expected)
+    public function testNormalizeObject(mixed $value, string $class, ?string $expected)
     {
         $type = 'object';
 
@@ -135,7 +135,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeScalarsAndArrayDataProvider
      */
-    public function testDenormalizeScalarsAndArray(string $type, $value, $expected)
+    public function testDenormalizeScalarsAndArray(string $type, mixed $value, mixed $expected)
     {
         $this->workflow->expects($this->never())
             ->method($this->anything());
@@ -206,7 +206,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeObjectDataProvider
      */
-    public function testDenormalizeObject($value, string $class, $expected)
+    public function testDenormalizeObject(string $value, string $class, ?object $expected)
     {
         $type = 'object';
 

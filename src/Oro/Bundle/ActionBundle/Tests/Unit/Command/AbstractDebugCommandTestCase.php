@@ -20,11 +20,11 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var Command */
-    protected $command;
-
     /** @var OutputStub */
     protected $output;
+
+    /** @var Command */
+    protected $command;
 
     protected function setUp(): void
     {
@@ -32,19 +32,19 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
+
         $this->command = $this->getCommandInstance($this->container, $this->factory);
     }
 
     /**
-     * @param array $types
-     * @param array $expected
-     * @param string|null $argument
-     * @param \TypeError|\ErrorException $exception
-     *
      * @dataProvider executeProvider
      */
-    public function testExecute(array $types, array $expected, $argument = null, $exception = null): void
-    {
+    public function testExecute(
+        array $types,
+        array $expected,
+        string $argument = null,
+        \Throwable $exception = null
+    ): void {
         $this->input->expects($this->once())
             ->method('getArgument')
             ->willReturn($argument);
@@ -60,23 +60,21 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
 
         $this->container->expects($this->any())
             ->method('get')
-            ->willReturnCallback(
-                function ($serviceId) use ($exception, $types) {
-                    if ($exception) {
-                        throw $exception;
-                    }
-
-                    $this->assertContains($serviceId, $types);
-
-                    return new TestEntity1();
+            ->willReturnCallback(function ($serviceId) use ($exception, $types) {
+                if ($exception) {
+                    throw $exception;
                 }
-            );
+
+                $this->assertContains($serviceId, $types);
+
+                return new TestEntity1();
+            });
 
         $this->command->run($this->input, $this->output);
 
         $outputContent = implode("\n", $this->output->messages);
         foreach ($expected as $message) {
-            static::assertStringContainsString($message, $outputContent);
+            self::assertStringContainsString($message, $outputContent);
         }
     }
 
