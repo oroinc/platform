@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job\Context;
 
+use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 
@@ -31,7 +32,7 @@ class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAggregatorForNotExistingAggregator()
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The context aggregator "aggregator2" does not exist.');
 
         $aggregator1 = $this->createMock(ContextAggregatorInterface::class);

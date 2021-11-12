@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
@@ -13,78 +12,60 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Filter\Stub\CallbackOperationRegistryFilter;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
-
-    /** @var OperationAssembler */
-    protected $assembler;
+    private $configurationProvider;
 
     /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $applicationProvider;
+    private $applicationProvider;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
-    protected $actionFactory;
+    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionFactory;
 
     /** @var ConditionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $conditionFactory;
+    private $conditionFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler */
-    protected $attributeAssembler;
+    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeAssembler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler */
-    protected $formOptionsAssembler;
+    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $formOptionsAssembler;
 
-    /** @var ContextHelper */
-    private $contextHelper;
+    /** @var OperationAssembler */
+    private $assembler;
 
     protected function setUp(): void
     {
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configurationProvider =
-            $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
-
-        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formOptionsAssembler = $this->getMockBuilder(
-            'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
-        )->disableOriginalConstructor()->getMock();
-
+        $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
+        $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->conditionFactory = $this->createMock(ConditionFactory::class);
+        $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
+        $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $this->applicationProvider->expects($this->any())
             ->method('isApplicationsValid')
-            ->willReturnCallback(
-                function (array $applications) {
-                    if (count($applications) === 0) {
-                        return true;
-                    }
-
-                    return in_array('default', $applications, true);
+            ->willReturnCallback(function (array $applications) {
+                if (count($applications) === 0) {
+                    return true;
                 }
-            );
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+                return in_array('default', $applications, true);
+            });
+
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
             ->willReturnCallback(function ($class) {
@@ -101,15 +82,14 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider findDataProvider
-     *
-     * @param string $entityClass
-     * @param string $route
-     * @param string $datagrid
-     * @param string $group
-     * @param array $expected
      */
-    public function testFind($entityClass, $route, $datagrid, $group, array $expected)
-    {
+    public function testFind(
+        ?string $entityClass,
+        ?string $route,
+        ?string $datagrid,
+        ?string $group,
+        array $expected
+    ) {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn($this->getConfiguration());
@@ -127,10 +107,9 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function findDataProvider()
+    public function findDataProvider(): array
     {
         return [
             'empty parameters' => [
@@ -148,7 +127,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'expected' => []
             ],
             'entity1' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'entityClass' => TestEntity1::class,
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
@@ -169,7 +148,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'expected' => ['operation8', 'operation21']
             ],
             'entity1 group1' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'entityClass' => TestEntity1::class,
                 'route' => null,
                 'datagrid' => null,
                 'group' => 'group1',
@@ -197,7 +176,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'expected' => ['operation9_0', 'operation20']
             ],
             'route1 & entity1' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'entityClass' => TestEntity1::class,
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => null,
@@ -219,7 +198,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'expected' => ['operation4', 'operation8', 'operation10', 'operation21']
             ],
             'route1 & entity1 & datagrid1' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'entityClass' => TestEntity1::class,
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => null,
@@ -235,21 +214,21 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'route1 group1 & entity1 group1 & datagrid1 group1' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'entityClass' => TestEntity1::class,
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => 'group1',
                 'expected' => ['operation5', 'operation7', 'operation9', 'operation11', 'operation15']
             ],
             'entity2' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                'entityClass' => TestEntity2::class,
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
                 'expected' => ['operation10', 'operation13', 'operation14', 'operation20']
             ],
             'entity3 substitution of operation15 by operation16' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                'entityClass' => TestEntity3::class,
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
@@ -263,7 +242,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'expected' => []
             ],
             'substitute conditional only for specific entity and common group' => [
-                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                'entityClass' => TestEntity3::class,
                 'route' => null,
                 'datagrid' => null,
                 'group' => 'limited',
@@ -274,15 +253,10 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider findByNameDataProvider
-     *
-     * @param string $operationName
-     * @param string|null $expected
-     * @param OperationFindCriteria $criteria
-     * @param array $filterResult
      */
     public function testFindByName(
-        $operationName,
-        $expected,
+        string $operationName,
+        ?string $expected,
         OperationFindCriteria $criteria = null,
         array $filterResult = []
     ) {
@@ -307,10 +281,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $operation ? $operation->getName() : $operation);
     }
 
-    /**
-     * @return array
-     */
-    public function findByNameDataProvider()
+    public function findByNameDataProvider(): array
     {
         return [
             'invalid operation name' => [
@@ -343,9 +314,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    protected function getConfiguration()
+    private function getConfiguration(): array
     {
         $configuration = [
             'operation1' => [
@@ -355,9 +325,9 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'label' => 'Label2',
                 'enabled' => false,
                 'entities' => [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                    TestEntity1::class,
+                    TestEntity2::class,
+                    TestEntity3::class,
                 ],
                 'routes' => ['route1', 'route2', 'route3'],
                 'datagrids' => ['datagrid1', 'datagrid2', 'datagrid3']
@@ -367,9 +337,9 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'applications' => ['commerce'],
                 'groups' => ['group1'],
                 'entities' => [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                    TestEntity1::class,
+                    TestEntity2::class,
+                    TestEntity3::class,
                 ],
                 'routes' => ['route1', 'route2', 'route3'],
                 'datagrids' => ['datagrid1', 'datagrid2', 'datagrid3']
@@ -385,12 +355,12 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             ],
             'operation6' => [
                 'label' => 'Label6',
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
+                'entities' => [TestEntity1::class]
             ],
             'operation7' => [
                 'label' => 'Label7',
                 'groups' => ['group1'],
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
+                'entities' => [TestEntity1::class]
             ],
             'operation8' => [
                 'label' => 'Label8',
@@ -409,8 +379,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             'operation10' => [
                 'label' => 'Label10',
                 'entities' => [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                    TestEntity1::class,
+                    TestEntity2::class,
                 ],
                 'routes' => ['route1', 'route2']
             ],
@@ -418,15 +388,15 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'label' => 'Label11',
                 'groups' => ['group1'],
                 'entities' => [
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
-                    'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                    TestEntity1::class,
+                    TestEntity2::class,
                 ],
                 'routes' => ['route1', 'route2']
             ],
             'operation12' => [
                 'label' => 'Label12',
                 'applications' => ['default'],
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'entities' => [TestEntity1::class],
             ],
             'operation13' => [
                 'label' => 'Label13',
@@ -435,12 +405,12 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             'operation14' => [
                 'label' => 'Label14',
                 'for_all_entities' => true,
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'entities' => [TestEntity1::class],
+                'exclude_entities' => [TestEntity1::class],
             ],
             'operation15' => [
                 'label' => 'Label15',
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'entities' => [TestEntity1::class],
                 'groups' => ['', 'group1']
             ],
             'operation16' => [
@@ -460,7 +430,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             'operation19' => [
                 'label' => 'Label18 Specific Entity Replacement',
                 'substitute_operation' => 'operation18',
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
+                'entities' => [TestEntity3::class],
                 'groups' => ['limited']
             ],
             'operation20' => [
@@ -472,18 +442,14 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             'operation21' => [
                 'label' => 'Datagrid and exclude_entities matches',
                 'datagrids' => ['datagrid1'],
-                'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'exclude_entities' => [TestEntity1::class],
             ],
         ];
 
         return array_map([$this, 'createOperationConfig'], $configuration);
     }
 
-    /**
-     * @param array $config
-     * @return array
-     */
-    private function createOperationConfig(array $config)
+    private function createOperationConfig(array $config): array
     {
         return array_merge(
             [
@@ -521,14 +487,14 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
         $filter = $this->createMock(OperationRegistryFilterInterface::class);
 
         $criteria3 = new OperationFindCriteria('e1', 'r1', 'd1');
-        $filter->expects($this->once())->method('filter')->with(
-            $this->callback(
-                function (array $operations) {
+        $filter->expects($this->once())
+            ->method('filter')
+            ->with(
+                $this->callback(function (array $operations) {
                     return $operations['operation1'] instanceof Operation && count($operations) === 1;
-                }
-            ),
-            $criteria3
-        );
+                }),
+                $criteria3
+            );
 
         $registry = $this->getOperationRegistry([$filter]);
         $registry->find($criteria3);
@@ -610,12 +576,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param OperationRegistryFilterInterface[] $filters
-     *
-     * @return OperationRegistry
-     */
-    private function getOperationRegistry(array $filters = [])
+    private function getOperationRegistry(array $filters = []): OperationRegistry
     {
         return new OperationRegistry(
             $filters,
@@ -626,18 +587,14 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param callable $callable
-     * @return CallbackOperationRegistryFilter
-     */
-    private function createFilter(callable $callable)
+    private function createFilter(callable $callable): CallbackOperationRegistryFilter
     {
         return new CallbackOperationRegistryFilter(
             function (array $operations, OperationFindCriteria $criteria) use ($callable) {
                 return array_filter(
                     $operations,
                     function (Operation $operation) use ($criteria, $callable) {
-                        return call_user_func($callable, $operation, $criteria);
+                        return $callable($operation, $criteria);
                     }
                 );
             }

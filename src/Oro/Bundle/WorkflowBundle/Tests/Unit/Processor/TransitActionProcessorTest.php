@@ -18,19 +18,19 @@ use Psr\Log\LoggerInterface;
 class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */
-    protected $processorBagConfigBuilder;
+    private $processorBagConfigBuilder;
 
     /** @var ProcessorBag */
-    protected $processorBag;
+    private $processorBag;
 
     /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $processorRegistry;
+    private $processorRegistry;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var TransitActionProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
@@ -86,8 +86,12 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
                 ['Context processed.', ['context' => $context->toArray()]]
             );
 
-        $processor1->expects(self::once())->method('process')->with(self::identicalTo($context));
-        $processor2->expects(self::once())->method('process')->with(self::identicalTo($context));
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context));
+        $processor2->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context));
 
         $this->processor->process($context);
     }
@@ -110,7 +114,9 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
         $context = new TransitionContext();
         $context->setAction('action1');
 
-        $processor1->expects(self::once())->method('process')->with(self::identicalTo($context));
+        $processor1->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($context));
         $processor2->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))

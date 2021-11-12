@@ -7,25 +7,19 @@ use Oro\Component\Action\Action\CallMethod;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CallMethodTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CallMethod */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->action = new class(new ContextAccessor()) extends CallMethod {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new CallMethod(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testInitializeNoMethod()
@@ -52,8 +46,8 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
             'method_parameters' => null,
             'attribute' => 'test'
         ];
-        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
-        static::assertEquals($options, $this->action->xgetOptions());
+        self::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function testExecuteMethod()
@@ -71,7 +65,7 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(['key' => 'value', 'test' => 'bar'], $context->getData());
+        self::assertEquals(['key' => 'value', 'test' => 'bar'], $context->getData());
     }
 
     public function testExecuteClassMethod()
@@ -87,7 +81,7 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(['object' => $this, 'test' => 'bar'], $context->getData());
+        self::assertEquals(['object' => $this, 'test' => 'bar'], $context->getData());
     }
 
     public function testExecuteClassMethodNoAssign()
@@ -102,12 +96,13 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(['object' => $this], $context->getData());
+        self::assertEquals(['object' => $this], $context->getData());
     }
 
-    public function assertCall($a)
+    public function assertCall(mixed $a): string
     {
-        static::assertEquals('test', $a);
+        self::assertEquals('test', $a);
+
         return 'bar';
     }
 }

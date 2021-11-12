@@ -24,16 +24,16 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AttributeNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowAwareSerializer|\PHPUnit\Framework\MockObject\MockObject */
     private $serializer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     private $workflow;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
     /** @var WorkflowVariableNormalizer */
@@ -108,7 +108,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider testDenormalizeProvider
+     * @dataProvider denormalizeProvider
      */
     public function testDenormalize(
         Variable $variable,
@@ -145,7 +145,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $denormalized);
     }
 
-    public function testDenormalizeProvider(): array
+    public function denormalizeProvider(): array
     {
         return [
             'string_value' => [
@@ -307,7 +307,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data, 'any_value'));
     }

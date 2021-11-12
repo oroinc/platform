@@ -6,21 +6,16 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterfa
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use PHPUnit\Framework\TestCase;
 use Twig\TwigFunction;
 
-class GetImportExportConfigurationExtensionTest extends TestCase
+class GetImportExportConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationRegistry;
 
-    /**
-     * @var GetImportExportConfigurationExtension
-     */
+    /** @var GetImportExportConfigurationExtension */
     private $extension;
 
     protected function setUp(): void
@@ -40,7 +35,7 @@ class GetImportExportConfigurationExtensionTest extends TestCase
             new TwigFunction('get_import_export_configuration', [$this->extension, 'getConfiguration'])
         ];
 
-        static::assertEquals($expected, $this->extension->getFunctions());
+        self::assertEquals($expected, $this->extension->getFunctions());
     }
 
     public function testGetConfiguration()
@@ -49,12 +44,14 @@ class GetImportExportConfigurationExtensionTest extends TestCase
 
         $expectedResult = [$this->createMock(ImportExportConfigurationInterface::class)];
 
-        $this->configurationRegistry
-            ->expects(static::once())
+        $this->configurationRegistry->expects(self::once())
             ->method('getConfigurations')
             ->with($alias)
             ->willReturn($expectedResult);
 
-        static::assertSame($expectedResult, $this->extension->getConfiguration($alias));
+        self::assertSame(
+            $expectedResult,
+            $this->callTwigFunction($this->extension, 'get_import_export_configuration', [$alias])
+        );
     }
 }

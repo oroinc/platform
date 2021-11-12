@@ -9,20 +9,14 @@ class DoctrineTypeMappingProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider doctrineTypesProvider
-     *
-     * @param DoctrineTypeMappingExtensionInterface[] $extensions
-     * @param array                                   $expected
      */
-    public function testGetDoctrineTypeMappings($extensions, array $expected)
+    public function testGetDoctrineTypeMappings(array $extensions, array $expected)
     {
         $provider = new DoctrineTypeMappingProvider($extensions);
         $this->assertEquals($expected, $provider->getDoctrineTypeMappings());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function doctrineTypesProvider()
+    public function doctrineTypesProvider(): array
     {
         $extension1 = $this->createExtension();
         $extension2 = $this->createExtension(
@@ -59,15 +53,12 @@ class DoctrineTypeMappingProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $types
-     *
-     * @return DoctrineTypeMappingExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createExtension(array $types = [])
+    private function createExtension(array $types = []): DoctrineTypeMappingExtensionInterface
     {
         $extension = $this->createMock(DoctrineTypeMappingExtensionInterface::class);
-        $extension->expects($this->any())->method('getDoctrineTypeMappings')->willReturn($types);
+        $extension->expects($this->any())
+            ->method('getDoctrineTypeMappings')
+            ->willReturn($types);
 
         return $extension;
     }

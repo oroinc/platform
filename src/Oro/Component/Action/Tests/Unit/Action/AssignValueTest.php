@@ -5,6 +5,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -20,23 +21,14 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     {
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
 
-        $this->action = new class($this->contextAccessor) extends AssignValue {
-            public function xgetAssigns(): array
-            {
-                return $this->assigns;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new AssignValue($this->contextAccessor);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
      * @dataProvider invalidOptionsNumberDataProvider
-     * @param array $options
      */
-    public function testInitializeExceptionParametersCount($options)
+    public function testInitializeExceptionParametersCount(array $options)
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute and value parameters are required.');
@@ -44,7 +36,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    public function invalidOptionsNumberDataProvider()
+    public function invalidOptionsNumberDataProvider(): array
     {
         return [
             [[]],
@@ -57,9 +49,8 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidOptionsAttributeDataProvider
-     * @param array $options
      */
-    public function testInitializeExceptionInvalidAttribute($options)
+    public function testInitializeExceptionInvalidAttribute(array $options)
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
@@ -67,7 +58,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    public function invalidOptionsAttributeDataProvider()
+    public function invalidOptionsAttributeDataProvider(): array
     {
         return [
             [['test', 'value']],
@@ -93,9 +84,8 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
-    public function testInitialize($options)
+    public function testInitialize(array $options)
     {
         self::assertInstanceOf(AssignValue::class, $this->action->initialize($options));
 
@@ -105,10 +95,10 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
             $expectedAssigns[] = $options;
         }
 
-        self::assertEquals($expectedAssigns, $this->action->xgetAssigns());
+        self::assertEquals($expectedAssigns, ReflectionUtil::getPropertyValue($this->action, 'assigns'));
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         $assigns = [
             'numeric arguments' => [
@@ -133,9 +123,8 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
-    public function testExecute($options)
+    public function testExecute(array $options)
     {
         $context = [];
         $optionsData = array_values($options);

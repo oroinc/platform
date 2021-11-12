@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Definition;
 class ConditionPassTest extends \PHPUnit\Framework\TestCase
 {
     private const EXTENSION_SERVICE_ID = 'oro_action.expression.extension';
-    private const EXPRESSION_TAG       = 'oro_action.condition';
+    private const EXPRESSION_TAG = 'oro_action.condition';
 
     /** @var ConditionPass */
     private $compiler;

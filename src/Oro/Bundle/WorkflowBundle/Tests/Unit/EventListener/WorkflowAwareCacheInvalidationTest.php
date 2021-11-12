@@ -12,19 +12,19 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
 class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayCache */
-    protected $cache;
+    private $cache;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $definitionRepository;
-
-    /** @var WorkflowAwareCache */
-    protected $workflowAwareCache;
+    private $definitionRepository;
 
     /** @var \stdClass */
     private $entity;
+
+    /** @var WorkflowAwareCache */
+    private $workflowAwareCache;
 
     protected function setUp(): void
     {
@@ -33,7 +33,9 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
         $this->definitionRepository = $this->createMock(WorkflowDefinitionRepository::class);
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())->method('getEntityClass')->willReturn(get_class($this->entity));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(get_class($this->entity));
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with(WorkflowDefinition::class)

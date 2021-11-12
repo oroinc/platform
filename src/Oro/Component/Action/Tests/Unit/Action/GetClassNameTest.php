@@ -3,6 +3,7 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\GetClassName;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -10,30 +11,18 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class GetClassNameTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GetClassName
-     */
-    protected $action;
-
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var GetClassName */
+    private $action;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
-        $this->action = new GetClassName($this->contextAccessor);
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new GetClassName(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testInitializeAttributeException()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute name parameter is required');
 
         $this->assertEquals($this->action, $this->action->initialize(['object' => new \stdClass()]));
@@ -41,7 +30,7 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeObjectException()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object parameter is required');
 
         $this->assertEquals($this->action, $this->action->initialize([]));
@@ -49,7 +38,7 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeAttributeWrongException()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
 
         $this->assertEquals(
@@ -60,10 +49,8 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider objectDataProvider
-     * @param mixed $object
-     * @param string|null $class
      */
-    public function testExecute($object, $class)
+    public function testExecute(mixed $object, ?string $class)
     {
         $options = ['object' => $object, 'attribute' => new PropertyPath('attribute')];
         $context = new ItemStub($options);
@@ -73,10 +60,7 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($class, $context->getData()['attribute']);
     }
 
-    /**
-     * @return array
-     */
-    public function objectDataProvider()
+    public function objectDataProvider(): array
     {
         return [
             [new \stdClass(), 'stdClass'],

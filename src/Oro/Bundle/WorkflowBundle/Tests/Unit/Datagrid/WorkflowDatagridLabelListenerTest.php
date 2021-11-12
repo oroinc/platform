@@ -26,8 +26,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testTrans(): void
     {
-        $this->translator
-            ->expects($this->atLeastOnce())
+        $this->translator->expects($this->atLeastOnce())
             ->method('trans')
             ->with(
                 $this->anything(),
@@ -42,10 +41,10 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnBuildBefore(): void
     {
         $datagridConfiguration = $this->getStubConfiguration();
-        $mockEvent = $this->getMockBuilder(BuildBefore::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockEvent->expects($this->atLeastOnce())->method('getConfig')->willReturn($datagridConfiguration);
+        $mockEvent = $this->createMock(BuildBefore::class);
+        $mockEvent->expects($this->atLeastOnce())
+            ->method('getConfig')
+            ->willReturn($datagridConfiguration);
         $this->listener->onBuildBefore($mockEvent);
 
         //Verify Step Name Column
@@ -53,7 +52,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
             [
                 'frontend_type' => 'html',
                 'type' => 'callback',
-                'callable' => [$this->listener, "trans"],
+                'callable' => [$this->listener, 'trans'],
                 'params' => ['c2'],
                 'label' => 'Step Name',
                 'translatable' => false,
@@ -83,7 +82,7 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
             [
                 'frontend_type' => 'html',
                 'type' => 'callback',
-                'callable' => [$this->listener, "trans"],
+                'callable' => [$this->listener, 'trans'],
                 'params' => ['c3'],
                 'label' => 'Workflow Name',
                 'translatable' => false,

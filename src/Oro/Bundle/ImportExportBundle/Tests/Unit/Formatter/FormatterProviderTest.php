@@ -8,25 +8,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FormatterProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormatterProvider
-     */
-    protected $formatter;
+    private array $formatters = ['exist_alias' => 'exist_formatter'];
+    private array $typeFormatters = ['test_format_type' => ['test_type' => 'test_formatter']];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface
-     */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /** @var array */
-    protected $formatters = ['exist_alias' => 'exist_formatter'];
-
-    /** @var array */
-    protected $typeFormatters = ['test_format_type' => ['test_type' => 'test_formatter']];
+    /** @var FormatterProvider */
+    private $formatter;
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
+
         $this->formatter = new FormatterProvider($this->container, $this->formatters, $this->typeFormatters);
     }
 
@@ -62,7 +56,7 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->formatter->getFormatterFor('non_exist_type', 'test_type'));
     }
 
-    protected function setContainerMock($id, \stdClass $testTypeFormatter)
+    private function setContainerMock(string $id, \stdClass $testTypeFormatter): void
     {
         $this->container->expects($this->once())
             ->method('has')

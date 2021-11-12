@@ -4,20 +4,16 @@ declare(strict_types=1);
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
 use Oro\Component\ConfigExpression\AbstractExpression;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AbstractExpression|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractExpression */
     private $condition;
 
     protected function setUp(): void
     {
         $this->condition = new class() extends AbstractExpression {
-            public function xgetErrors(): ?\ArrayAccess
-            {
-                return $this->errors;
-            }
-
             protected function doEvaluate($context)
             {
                 $this->addError($context, 'test reason');
@@ -73,7 +69,7 @@ class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
                 '{{ reason }}' => 'test reason'
             ]
         ], $errors[0]);
-        self::assertNull($this->condition->xgetErrors());
+        self::assertNull(ReflectionUtil::getPropertyValue($this->condition, 'errors'));
         self::assertSame($context, $result);
     }
 

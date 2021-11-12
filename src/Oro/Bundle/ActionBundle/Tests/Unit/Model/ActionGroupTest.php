@@ -19,55 +19,38 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ActionGroupTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
-    protected $actionFactory;
+    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory */
-    protected $conditionFactory;
+    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $conditionFactory;
 
     /** @var ActionGroup */
-    protected $actionGroup;
-
-    /** @var ActionData */
-    protected $data;
+    private $actionGroup;
 
     protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
-        $parametersResolver = $this->createMock(ParametersResolver::class);
 
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
             new ParameterAssembler(),
-            $parametersResolver,
+            $this->createMock(ParametersResolver::class),
             new ActionGroupDefinition()
         );
-
-        $this->data = new ActionData();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->actionGroup, $this->actionFactory, $this->conditionFactory, $this->data);
     }
 
     /**
-     * @param ActionData $data
-     * @param ActionInterface $action
-     * @param ConfigurableCondition $condition
-     * @param string $actionGroupName
-     * @param string $exceptionMessage
-     *
      * @dataProvider executeProvider
      */
     public function testExecute(
         ActionData $data,
         ActionInterface $action,
         ConfigurableCondition $condition,
-        $actionGroupName,
-        $exceptionMessage = ''
+        string $actionGroupName,
+        string $exceptionMessage = ''
     ) {
         $this->actionGroup->getDefinition()->setName($actionGroupName);
         $this->actionGroup->getDefinition()->setActions(['action1']);
@@ -95,10 +78,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($errors->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         $data = new ActionData(['data' => new \stdClass()]);
 
@@ -121,12 +101,8 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAllowedProvider
-     *
-     * @param ActionData $data
-     * @param ConfigurableCondition $condition
-     * @param bool $allowed
      */
-    public function testIsAllowed(ActionData $data, $condition, $allowed)
+    public function testIsAllowed(ActionData $data, ?ConfigurableCondition $condition, bool $allowed)
     {
         if ($condition) {
             $this->actionGroup->getDefinition()->setConditions(['condition1']);
@@ -139,10 +115,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($allowed, $this->actionGroup->isAllowed($data));
     }
 
-    /**
-     * @return array
-     */
-    public function isAllowedProvider()
+    public function isAllowedProvider(): array
     {
         $data = new ActionData(['data' => 'value']);
 
@@ -167,8 +140,6 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getParametersProvider
-     * @param array $config
-     * @param Parameter[] $expected
      */
     public function testGetParameters(array $config, array $expected)
     {
@@ -179,10 +150,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->actionGroup->getParameters());
     }
 
-    /**
-     * @return array
-     */
-    public function getParametersProvider()
+    public function getParametersProvider(): array
     {
         $parameter1 = new Parameter('parameter1');
 
@@ -198,13 +166,10 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
-     * @param ActionData $data
-     * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createActionGroup(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects, ActionData $data)
-    {
+    private function createActionGroup(
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
+        ActionData $data
+    ): ActionInterface {
         $action = $this->createMock(ActionInterface::class);
         $action->expects($expects)
             ->method('execute')
@@ -213,17 +178,11 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         return $action;
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects
-     * @param ActionData $data
-     * @param bool $returnValue
-     * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createCondition(
+    private function createCondition(
         \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data,
-        $returnValue
-    ) {
+        bool $returnValue
+    ): ConfigurableCondition {
         $condition = $this->createMock(ConfigurableCondition::class);
         $condition->expects($expects)
             ->method('evaluate')

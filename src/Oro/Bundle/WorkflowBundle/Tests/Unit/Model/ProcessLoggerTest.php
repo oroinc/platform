@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
+use Psr\Log\LoggerInterface;
 
 class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,9 +18,7 @@ class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
      */
     public function testDebug($hasLogger, $hasCron = false)
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $definitionName = 'test_definition';
         $definition = new ProcessDefinition();
@@ -39,27 +39,33 @@ class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
         if ($hasCron) {
             $data = new ProcessData();
         } else {
-            $data = new ProcessData(array('data' => $entity));
+            $data = new ProcessData(['data' => $entity]);
         }
 
         $message = 'Test debug message';
         if ($hasCron) {
-            $context = array('definition' => $definitionName, 'cron' => $triggerCron);
+            $context = ['definition' => $definitionName, 'cron' => $triggerCron];
         } else {
-            $context = array('definition' => $definitionName, 'event' => $triggerEvent, 'entityId' => $entityId);
+            $context = ['definition' => $definitionName, 'event' => $triggerEvent, 'entityId' => $entityId];
         }
 
         if ($hasLogger) {
             if ($hasCron) {
-                $doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
+                $doctrineHelper->expects($this->never())
+                    ->method('getSingleEntityIdentifier');
             } else {
-                $doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity, false)
-                    ->will($this->returnValue($entityId));
+                $doctrineHelper->expects($this->once())
+                    ->method('getSingleEntityIdentifier')
+                    ->with($entity, false)
+                    ->willReturn($entityId);
             }
-            $logger = $this->createMock('Psr\Log\LoggerInterface');
-            $logger->expects($this->once())->method('debug')->with($message, $context);
+            $logger = $this->createMock(LoggerInterface::class);
+            $logger->expects($this->once())
+                ->method('debug')
+                ->with($message, $context);
         } else {
-            $doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');
+            $doctrineHelper->expects($this->never())
+                ->method('getSingleEntityIdentifier');
             $logger = null;
         }
 
@@ -67,25 +73,21 @@ class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
         $processLogger->debug($message, $trigger, $data);
     }
 
-    /**
-     * @return array
-     */
-    public function debugDataProvider()
+    public function debugDataProvider(): array
     {
-        return array(
-            'with logger and cron'         => array('hasLogger' => true, 'hasCron' => true),
-            'with logger and without cron' => array('hasLogger' => true),
-            'without logger'               => array('hasLogger' => false),
-        );
+        return [
+            'with logger and cron'         => ['hasLogger' => true, 'hasCron' => true],
+            'with logger and without cron' => ['hasLogger' => true],
+            'without logger'               => ['hasLogger' => false],
+        ];
     }
 
     public function testNotEnabled()
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $logger = $this->createMock('Psr\Log\LoggerInterface');
-        $logger->expects($this->never())->method('debug');
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('debug');
         $processLogger = new ProcessLogger($doctrineHelper, null);
         $processLogger->setEnabled(false);
         $trigger = new ProcessTrigger();

@@ -209,15 +209,20 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    private ConfigurableTableDataConverter $converter;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
-    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    /** @var RelationCalculator|\PHPUnit\Framework\MockObject\MockObject */
+    private $relationCalculator;
 
-    private RelationCalculator|\PHPUnit\Framework\MockObject\MockObject $relationCalculator;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-    private LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings;
+    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeConfigHelper;
 
-    private AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject $attributeConfigHelper;
+    /** @var ConfigurableTableDataConverter */
+    private $converter;
 
     protected function setUp(): void
     {

@@ -6,7 +6,7 @@ use Oro\Component\Action\Action\Redirect;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -15,33 +15,19 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     private const REDIRECT_PATH = 'redirectUrl';
 
     /** @var Redirect */
-    protected $action;
-
-    /** @var MockObject|RouterInterface */
-    protected $router;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder(RouterInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->router->method('generate')->willReturnCallback([$this, 'generateTestUrl']);
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects(self::any())
+            ->method('generate')
+            ->willReturnCallback(function (string $routeName, array $routeParameters = []): string {
+                return $this->generateTestUrl($routeName, $routeParameters);
+            });
 
-        $this->action = new class(new ContextAccessor(), $this->router, self::REDIRECT_PATH) extends Redirect {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->router, $this->action);
+        $this->action = new Redirect(new ContextAccessor(), $router, self::REDIRECT_PATH);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -50,7 +36,7 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        static::assertEquals($options, $this->action->xgetOptions());
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function optionsDataProvider(): array
@@ -79,12 +65,9 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -111,11 +94,9 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $expectedUrl
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, $expectedUrl)
+    public function testExecute(array $options, string $expectedUrl)
     {
         $context = new ItemStub();
 
@@ -123,15 +104,10 @@ class RedirectTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $urlProperty = self::REDIRECT_PATH;
-        static::assertEquals($expectedUrl, $context->$urlProperty);
+        self::assertEquals($expectedUrl, $context->{$urlProperty});
     }
 
-    /**
-     * @param string $routeName
-     * @param array $routeParameters
-     * @return string
-     */
-    public function generateTestUrl($routeName, array $routeParameters = [])
+    private function generateTestUrl(string $routeName, array $routeParameters = []): string
     {
         $url = 'url:' . $routeName;
         if ($routeParameters) {

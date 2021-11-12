@@ -23,7 +23,7 @@ class WorkflowRestrictionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($restriction, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['attribute', 'test'],

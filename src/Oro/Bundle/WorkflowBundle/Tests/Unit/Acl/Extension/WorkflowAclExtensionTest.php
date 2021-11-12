@@ -56,9 +56,6 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAclExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->objectIdAccessor = $this->createMock(ObjectIdAccessor::class);
@@ -137,7 +134,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
     }
 
-    public function getPermissionGroupMaskProvider()
+    public function getPermissionGroupMaskProvider(): array
     {
         return [
             [0, null],
@@ -192,12 +189,12 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getServiceBitsProvider
      */
-    public function testGetServiceBits($mask, $expectedMask)
+    public function testGetServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
     }
 
-    public function getServiceBitsProvider()
+    public function getServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -222,12 +219,12 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeServiceBitsProvider
      */
-    public function testRemoveServiceBits($mask, $expectedMask)
+    public function testRemoveServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
     }
 
-    public function removeServiceBitsProvider()
+    public function removeServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -252,13 +249,13 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notSupportedObjectProvider
      */
-    public function testDecideIsGrantingForNotSupportedObject($object)
+    public function testDecideIsGrantingForNotSupportedObject(mixed $object)
     {
         $securityToken = $this->createMock(TokenInterface::class);
         self::assertTrue($this->extension->decideIsGranting(0, $object, $securityToken));
     }
 
-    public function notSupportedObjectProvider()
+    public function notSupportedObjectProvider(): array
     {
         return [
             ['test'],
@@ -333,10 +330,8 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForRootWithSystemAccessLevelProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForRootWithSystemAccessLevel($mask)
+    public function testValidateMaskForRootWithSystemAccessLevel(int $mask)
     {
         $this->metadataProvider->expects($this->any())
             ->method('getMaxAccessLevel')
@@ -353,10 +348,8 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForRootWithoutSystemAccessLevelProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForRootWithoutSystemAccessLevel($mask)
+    public function testValidateMaskForRootWithoutSystemAccessLevel(int $mask)
     {
         $this->metadataProvider->expects($this->any())
             ->method('getMaxAccessLevel')
@@ -373,18 +366,14 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForRootWithoutSystemAccessLevelAndInvalidMasks($mask, $expectedException)
+    public function testValidateMaskForRootWithoutSystemAccessLevelAndInvalidMasks(int $mask, string $expectedException)
     {
         $this->expectException(InvalidAclMaskException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Invalid ACL mask "%s" for ObjectIdentity(workflow, (root)).',
-                $expectedException
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Invalid ACL mask "%s" for ObjectIdentity(workflow, (root)).',
+            $expectedException
+        ));
 
         $this->metadataProvider->expects($this->any())
             ->method('getMaxAccessLevel')
@@ -396,10 +385,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForRootWithSystemAccessLevelProvider()
+    public static function validateMaskForRootWithSystemAccessLevelProvider(): array
     {
         return [
             [1 << 0 /* MASK_VIEW_WORKFLOW_BASIC */],
@@ -415,10 +401,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForRootWithoutSystemAccessLevelProvider()
+    public static function validateMaskForRootWithoutSystemAccessLevelProvider(): array
     {
         return [
             [1 << 0 /* MASK_VIEW_WORKFLOW_BASIC */],
@@ -432,10 +415,7 @@ class WorkflowAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider()
+    public static function validateMaskForRootWithoutSystemAccessLevelAndInvalidMasksProvider(): array
     {
         return [
             [1 << 8 /* MASK_VIEW_WORKFLOW_SYSTEM */, '(PV) system:.V global:.. deep:.. local:.. basic:..'],

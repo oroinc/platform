@@ -21,7 +21,8 @@ class ResolveDestinationPageTest extends BaseTestCase
             ->method('getMainRequest')
             ->willReturn(new Request(['originalUrl' => 'example.com']));
 
-        $this->resolver->expects(self::once())->method('resolveDestinationUrl')
+        $this->resolver->expects(self::once())
+            ->method('resolveDestinationUrl')
             ->with($entity, 'dest1')
             ->willReturn('test.example.com');
 

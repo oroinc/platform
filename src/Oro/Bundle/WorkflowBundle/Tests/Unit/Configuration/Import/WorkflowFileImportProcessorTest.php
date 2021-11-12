@@ -9,7 +9,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 
 class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    const FILE_PATH = './filePath';
+    private const FILE_PATH = './filePath';
 
     /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
@@ -66,8 +66,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $contentSource = new \SplFileInfo('/path/to/source');
 
-        $this->reader
-            ->expects($this->once())
+        $this->reader->expects($this->once())
             ->method('read')
             ->with($this->callback(function (\SplFileInfo $importFile) {
                 $this->assertSame($importFile->getPathname(), '/path/to/test.yml');
@@ -76,12 +75,10 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($contentImported);
 
-        $this->parentProcessor
-            ->expects($this->never())
+        $this->parentProcessor->expects($this->never())
             ->method('process');
 
-        $this->fileLocator
-            ->expects($this->never())
+        $this->fileLocator->expects($this->never())
             ->method('locate');
 
         $processed = $processor->process($contentToProcess, $contentSource);
@@ -116,8 +113,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $contentSource = new \SplFileInfo('/path/to/source');
 
-        $this->reader
-            ->expects($this->once())
+        $this->reader->expects($this->once())
             ->method('read')
             ->with($this->callback(function (\SplFileInfo $importFile) {
                 $this->assertSame(
@@ -129,12 +125,10 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($contentImported);
 
-        $this->parentProcessor
-            ->expects($this->never())
+        $this->parentProcessor->expects($this->never())
             ->method('process');
 
-        $this->fileLocator
-            ->expects($this->once())
+        $this->fileLocator->expects($this->once())
             ->method('locate')
             ->with($relativeFileResource)
             ->willReturn('/full/path/to/bundle/Resources/config/oro/workflow/test.yml');
@@ -180,8 +174,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $contentSource = new \SplFileInfo('/path/to/source');
 
-        $this->reader
-            ->expects($this->once())
+        $this->reader->expects($this->once())
             ->method('read')
             ->with($this->callback(function (\SplFileInfo $importFile) {
                 $this->assertSame($importFile->getPathname(), '/path/to/test.yml');
@@ -190,14 +183,12 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($contentFromFile);
 
-        $this->parentProcessor
-            ->expects($this->once())
+        $this->parentProcessor->expects($this->once())
             ->method('process')
             ->with($contentFromFile, $contentSource)
             ->willReturn($contentModifiedByParentProcess);
 
-        $this->fileLocator
-            ->expects($this->never())
+        $this->fileLocator->expects($this->never())
             ->method('locate');
 
         $processor->setParent($this->parentProcessor);
@@ -243,8 +234,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $contentSource = new \SplFileInfo('/path/to/source');
 
-        $this->reader
-            ->expects($this->once())
+        $this->reader->expects($this->once())
             ->method('read')
             ->with($this->callback(function (\SplFileInfo $importFile) {
                 $this->assertSame(
@@ -256,14 +246,12 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($contentFromFile);
 
-        $this->parentProcessor
-            ->expects($this->once())
+        $this->parentProcessor->expects($this->once())
             ->method('process')
             ->with($contentFromFile, $contentSource)
             ->willReturn($contentModifiedByParentProcess);
 
-        $this->fileLocator
-            ->expects($this->once())
+        $this->fileLocator->expects($this->once())
             ->method('locate')
             ->with($relativeFileResource)
             ->willReturn('/full/path/to/bundle/Resources/config/oro/workflow/test.yml');

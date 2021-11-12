@@ -17,12 +17,10 @@ class EventTriggerCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
     public function testWarmUp(): void
     {
-        /** @var EventTriggerCache|\PHPUnit\Framework\MockObject\MockObject $eventTriggerCache1 */
         $eventTriggerCache1 = $this->createMock(EventTriggerCache::class);
         $eventTriggerCache1->expects($this->once())
             ->method('build');
 
-        /** @var EventTriggerCache|\PHPUnit\Framework\MockObject\MockObject $eventTriggerCache2 */
         $eventTriggerCache2 = $this->createMock(EventTriggerCache::class);
         $eventTriggerCache2->expects($this->once())
             ->method('build');

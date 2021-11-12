@@ -6,38 +6,28 @@ use Oro\Bundle\ActionBundle\Action\FormatName;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormatNameTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
+
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
+
     /** @var FormatName */
-    protected $action;
-
-    /** @var MockObject|ContextAccessor */
-    protected $contextAccessor;
-
-    /** @var MockObject|EntityNameResolver */
-    protected $entityNameResolver;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = $this->getMockBuilder(ContextAccessor::class)->disableOriginalConstructor()->getMock();
-        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
 
-        $this->action = new class($this->contextAccessor, $this->entityNameResolver) extends FormatName {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new FormatName($this->contextAccessor, $this->entityNameResolver);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testInitializeExceptionNoObject()
@@ -45,7 +35,7 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object parameter is required');
 
-        $this->action->initialize(['attribute' => $this->getPropertyPath()]);
+        $this->action->initialize(['attribute' => $this->createMock(PropertyPath::class)]);
     }
 
     public function testInitializeExceptionNoAttribute()
@@ -58,37 +48,32 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
 
     public function testInitialize()
     {
-        $options = ['object' => new \stdClass(), 'attribute' => $this->getPropertyPath()];
-        static::assertEquals($this->action, $this->action->initialize($options));
-        static::assertEquals($options, $this->action->xgetOptions());
+        $options = ['object' => new \stdClass(), 'attribute' => $this->createMock(PropertyPath::class)];
+        self::assertEquals($this->action, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function testExecute()
     {
         $object = new \stdClass();
-        $attribute = $this->getPropertyPath();
+        $attribute = $this->createMock(PropertyPath::class);
         $context = [];
         $options = ['object' => $object, 'attribute' => $attribute];
 
-        static::assertEquals($this->action, $this->action->initialize($options));
+        self::assertEquals($this->action, $this->action->initialize($options));
 
-        $this->entityNameResolver->expects(static::once())
+        $this->entityNameResolver->expects(self::once())
             ->method('getName')
             ->with($object)
             ->willReturn('FORMATTED');
-        $this->contextAccessor->expects(static::once())
+        $this->contextAccessor->expects(self::once())
             ->method('setValue')
             ->with($context, $attribute, 'FORMATTED');
-        $this->contextAccessor->expects(static::once())
+        $this->contextAccessor->expects(self::once())
             ->method('getValue')
             ->with($context, $object)
             ->willReturnArgument(1);
 
         $this->action->execute($context);
-    }
-
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
     }
 }

@@ -43,19 +43,19 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithDoctrineHelperAndProcessHandler()
     {
         new ExecuteProcessJobProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createProcessHandlerMock(),
-            $this->createLoggerMock()
+            $this->createDoctrineHelper(),
+            $this->createMock(ProcessHandler::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testThrowIfMessageBodyIsNotValidJson()
     {
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
         $processor = new ExecuteProcessJobProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createProcessHandlerMock(),
+            $this->createDoctrineHelper(),
+            $this->createMock(ProcessHandler::class),
             $logger
         );
 
@@ -65,30 +65,27 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The malformed json given.');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
     }
 
     public function testShouldRejectMessageIfProcessJobIdNotSet()
     {
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $logger
-            ->expects(self::once())
+        $logger->expects(self::once())
             ->method('critical')
             ->with('Process Job Id not set');
 
         $processor = new ExecuteProcessJobProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createProcessHandlerMock(),
+            $this->createDoctrineHelper(),
+            $this->createMock(ProcessHandler::class),
             $logger
         );
 
         $message = new Message();
         $message->setBody('{}');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -97,31 +94,28 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectMessageIfProcessJobIdWithSuchIdNotFound()
     {
-        $entityManager = $this->createEntityManagerMock();
-        $entityManager
-            ->expects($this->once())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(ProcessJob::class, 'theProcessJobId')
             ->willReturn(null);
 
-        $doctrineHelper = $this->createDoctrineHelperStub($entityManager);
+        $doctrineHelper = $this->createDoctrineHelper($entityManager);
 
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $logger
-            ->expects(self::once())
+        $logger->expects(self::once())
             ->method('critical');
 
         $processor = new ExecuteProcessJobProcessor(
             $doctrineHelper,
-            $this->createProcessHandlerMock(),
+            $this->createMock(ProcessHandler::class),
             $logger
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -130,14 +124,13 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectMessageIfEntityManagerNotExist()
     {
-        $doctrineHelper = $this->createDoctrineHelperStub();
+        $doctrineHelper = $this->createDoctrineHelper();
 
-        $processHandle = $this->createProcessHandlerMock();
+        $processHandle = $this->createMock(ProcessHandler::class);
 
-        $logger = $this->createLoggerMock();
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $logger
-            ->expects(self::once())
+        $logger->expects(self::once())
             ->method('critical');
 
         $processor = new ExecuteProcessJobProcessor(
@@ -149,7 +142,6 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -160,13 +152,11 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $processJob = new ProcessJob();
 
-        $entityManager = $this->createEntityManagerMock();
-        $entityManager
-            ->expects(self::once())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
             ->method('commit');
 
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(ProcessJob::class, 'theProcessJobId')
             ->willReturn($processJob);
@@ -176,29 +166,26 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($processJob)
             ->willReturn(true);
 
-        $processHandle = $this->createProcessHandlerMock();
-        $processHandle
-            ->expects(self::once())
+        $processHandle = $this->createMock(ProcessHandler::class);
+        $processHandle->expects(self::once())
             ->method('handleJob')
             ->with($processJob);
 
-        $processHandle
-            ->expects($this->once())
+        $processHandle->expects($this->once())
             ->method('finishJob')
             ->with($processJob);
 
-        $doctrineHelper = $this->createDoctrineHelperStub($entityManager);
+        $doctrineHelper = $this->createDoctrineHelper($entityManager);
 
         $processor = new ExecuteProcessJobProcessor(
             $doctrineHelper,
             $processHandle,
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -210,9 +197,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $id = 123;
         $processJob = $this->getEntity(ProcessJob::class, ['id' => $id]);
 
-        $entityManager = $this->createEntityManagerMock();
-        $entityManager
-            ->expects(self::once())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
             ->method('commit');
 
         $entityManager->expects($this->exactly(2))
@@ -225,7 +211,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($processJob)
             ->willReturn(false);
 
-        $processHandle = $this->createProcessHandlerMock();
+        $processHandle = $this->createMock(ProcessHandler::class);
         $processHandle->expects($this->once())
             ->method('handleJob')
             ->with($processJob);
@@ -233,18 +219,17 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('finishJob')
             ->with($processJob);
 
-        $doctrineHelper = $this->createDoctrineHelperStub($entityManager);
+        $doctrineHelper = $this->createDoctrineHelper($entityManager);
 
         $processor = new ExecuteProcessJobProcessor(
             $doctrineHelper,
             $processHandle,
-            $this->createLoggerMock()
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['process_job_id' => $id]));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -259,13 +244,12 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $processJobId = 123;
         $processJob = new ProcessJob();
 
-        $entityManager = $this->createEntityManagerMock();
-        $doctrineHelper = $this->createDoctrineHelperStub($entityManager);
-        $processHandle = $this->createProcessHandlerMock();
-        $logger = $this->createLoggerMock();
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $doctrineHelper = $this->createDoctrineHelper($entityManager);
+        $processHandle = $this->createMock(ProcessHandler::class);
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(ProcessJob::class, $processJobId)
             ->willReturn($processJob);
@@ -293,45 +277,14 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
 
         $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle, $logger);
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessHandler
-     */
-    private function createProcessHandlerMock()
-    {
-        return $this->createMock(ProcessHandler::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
-     */
-    private function createEntityManagerMock()
-    {
-        return $this->createMock(EntityManagerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @param null $entityManager
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    private function createDoctrineHelperStub($entityManager = null)
+    private function createDoctrineHelper(EntityManagerInterface $entityManager = null): DoctrineHelper
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper
-            ->expects($this->any())
+        $doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->willReturn($entityManager);
 

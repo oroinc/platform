@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -13,24 +14,17 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
  */
 class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_DEFINITION_NAME = 'test_definition';
+    private const TEST_DEFINITION_NAME = 'test_definition';
 
-    /**
-     * @var ProcessConfigurationBuilder
-     */
-    protected $builder;
+    /** @var ProcessConfigurationBuilder */
+    private $builder;
 
     protected function setUp(): void
     {
         $this->builder = new ProcessConfigurationBuilder();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->builder);
-    }
-
-    protected function assertDefinitionConfiguration(array $expected, ProcessDefinition $definition)
+    private function assertDefinitionConfiguration(array $expected, ProcessDefinition $definition)
     {
         $this->assertEquals($expected['label'], $definition->getLabel());
         $this->assertEquals($expected['entity'], $definition->getRelatedEntity());
@@ -40,7 +34,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected['actions_configuration'], $definition->getActionsConfiguration());
     }
 
-    protected function assertProcessTrigger(
+    private function assertProcessTrigger(
         array $expected,
         ProcessDefinition $definition,
         ProcessTrigger $trigger
@@ -64,15 +58,12 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $definition = $this->builder->buildProcessDefinition($name, $configuration);
 
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition', $definition);
+        $this->assertInstanceOf(ProcessDefinition::class, $definition);
         $this->assertEquals($name, $definition->getName());
         $this->assertDefinitionConfiguration($expected, $definition);
     }
 
-    /**
-     * @return array
-     */
-    public function buildProcessDefinitionDataProvider()
+    public function buildProcessDefinitionDataProvider(): array
     {
         return [
             'minimum data' => [
@@ -121,16 +112,13 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSameSize($expected, $definitions);
         foreach ($definitions as $definition) {
-            $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition', $definition);
+            $this->assertInstanceOf(ProcessDefinition::class, $definition);
             $this->assertArrayHasKey($definition->getName(), $expected);
             $this->assertDefinitionConfiguration($expected[$definition->getName()], $definition);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function buildProcessDefinitionsDataProvider()
+    public function buildProcessDefinitionsDataProvider(): array
     {
         $basicDataProvider = $this->buildProcessDefinitionDataProvider();
 
@@ -157,14 +145,11 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $triggerDefinition = new ProcessDefinition();
         $trigger = $this->builder->buildProcessTrigger($configuration, $triggerDefinition);
-        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
+        $this->assertInstanceOf(ProcessTrigger::class, $trigger);
         $this->assertProcessTrigger($expected, $triggerDefinition, $trigger);
     }
 
-    /**
-     * @return array
-     */
-    public function buildProcessTriggerDataProvider()
+    public function buildProcessTriggerDataProvider(): array
     {
         return [
             'minimum data' => [
@@ -242,17 +227,14 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->buildProcessTrigger($configuration, new ProcessDefinition());
     }
 
-    /**
-     * @return array
-     */
-    public function buildProcessTriggerExceptionDataProvider()
+    public function buildProcessTriggerExceptionDataProvider(): array
     {
         return [
             'not allowed event' => [
                 'configuration' => [
                     'event' => 'my_custom_event',
                 ],
-                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'exception' => InvalidParameterException::class,
                 'message'   => 'Event "my_custom_event" is not allowed'
             ],
             'incorrect time shift' => [
@@ -260,7 +242,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'time_shift' => 'invalid_value',
                 ],
-                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'exception' => InvalidParameterException::class,
                 'message'   => 'Time shift parameter must be either integer or DateInterval'
             ],
             'field is not allowed' => [
@@ -268,7 +250,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'field' => 'someField',
                 ],
-                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'exception' => InvalidParameterException::class,
                 'message'   => 'Field is only allowed for update event'
             ],
             'invalid cron expression' => [
@@ -283,7 +265,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'cron' => '* * * * *'
                 ],
-                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'exception' => InvalidParameterException::class,
                 'message'   => 'Only one parameter "event" or "cron" must be configured.'
             ]
         ];
@@ -317,19 +299,16 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             /** @var ProcessTrigger $trigger */
             $trigger = array_shift($triggers);
 
-            $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
+            $this->assertInstanceOf(ProcessTrigger::class, $trigger);
             $this->assertNotEmpty($trigger->getDefinition());
-            $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition', $trigger->getDefinition());
+            $this->assertInstanceOf(ProcessDefinition::class, $trigger->getDefinition());
             $definitionName = $trigger->getDefinition()->getName();
             $this->assertArrayHasKey($definitionName, $definitionsByName);
             $this->assertProcessTrigger($expectedTrigger, $definitionsByName[$definitionName], $trigger);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function buildProcessTriggersDataProvider()
+    public function buildProcessTriggersDataProvider(): array
     {
         $definitionName = self::TEST_DEFINITION_NAME;
         $basicDataProvider = $this->buildProcessTriggerDataProvider();

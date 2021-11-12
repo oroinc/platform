@@ -41,12 +41,10 @@ class WorkflowPermissionRegistryTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with()
-            ->willReturnMap(
-                [
-                    ['OroWorkflowBundle:WorkflowEntityAcl', $this->aclRepository],
-                    ['OroWorkflowBundle:WorkflowEntityAclIdentity', $this->aclIdentityRepository],
-                ]
-            );
+            ->willReturnMap([
+                ['OroWorkflowBundle:WorkflowEntityAcl', $this->aclRepository],
+                ['OroWorkflowBundle:WorkflowEntityAclIdentity', $this->aclIdentityRepository],
+            ]);
 
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 

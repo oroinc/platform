@@ -14,23 +14,23 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowTransitCommand */
-    private $command;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $managerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowManager */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Input */
+    /** @var Input|\PHPUnit\Framework\MockObject\MockObject */
     private $input;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repo;
 
     /** @var OutputStub */
     private $output;
+
+    /** @var WorkflowTransitCommand */
+    private $command;
 
     protected function setUp(): void
     {
@@ -50,18 +50,6 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = new OutputStub();
     }
 
-    protected function tearDown(): void
-    {
-        unset(
-            $this->repo,
-            $this->workflowManager,
-            $this->managerRegistry,
-            $this->input,
-            $this->output,
-            $this->command
-        );
-    }
-
     public function testConfigure()
     {
         $this->command->configure();
@@ -71,18 +59,13 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $id
-     * @param string $transition
-     * @param array $expectedOutput
-     * @param \Exception $exception
-     * @param \Exception $expectedException
      * @dataProvider executeProvider
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testExecute(
-        $id,
-        $transition,
-        $expectedOutput,
+        string|int $id,
+        ?string $transition,
+        array $expectedOutput,
         \Exception $exception = null,
         \Exception $expectedException = null
     ) {
@@ -96,7 +79,8 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $workflowItem = $this->createWorkflowItem($id);
 
         if (!$transition || !is_numeric($id)) {
-            $this->repo->expects($this->never())->method('find');
+            $this->repo->expects($this->never())
+                ->method('find');
         } else {
             $this->repo->expects($this->once())
                 ->method('find')
@@ -105,12 +89,18 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         }
 
         if ((!$workflowItem) || (!$transition)) {
-            $this->workflowManager->expects($this->never())->method('transit');
+            $this->workflowManager->expects($this->never())
+                ->method('transit');
+        } elseif ($exception) {
+            $this->workflowManager->expects($this->once())
+                ->method('transit')
+                ->with($workflowItem, $transition)
+                ->willThrowException($exception);
         } else {
             $this->workflowManager->expects($this->once())
                 ->method('transit')
                 ->with($workflowItem, $transition)
-                ->will($exception ? $this->throwException($exception) : $this->returnSelf());
+                ->willReturnSelf();
         }
 
         if ($expectedException) {
@@ -132,10 +122,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertCount($found, $expectedOutput);
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         return [
             'valid id' => [
@@ -196,19 +183,14 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int $id
-     * @return WorkflowItem
-     */
-    protected function createWorkflowItem($id)
+    private function createWorkflowItem(string|int $id): ?WorkflowItem
     {
         if ($id > 2) {
             return null;
         }
 
         $workflowItem = new WorkflowItem();
-        $workflowItem
-            ->setId($id);
+        $workflowItem->setId($id);
 
         return $workflowItem;
     }

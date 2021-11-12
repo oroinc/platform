@@ -7,10 +7,8 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class StepHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StepHandler
-     */
-    protected $handler;
+    /** @var StepHandler */
+    private $handler;
 
     protected function setUp(): void
     {
@@ -27,10 +25,8 @@ class StepHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function handleDataProvider()
+    public function handleDataProvider(): array
     {
         return [
             'simple configuration' => [

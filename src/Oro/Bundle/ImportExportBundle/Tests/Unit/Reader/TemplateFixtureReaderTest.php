@@ -9,32 +9,24 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|TemplateManager */
-    protected $templateManager;
+    /** @var TemplateManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $templateManager;
 
-    /**
-     * @var MockObject|ContextRegistry
-     */
-    protected $contextRegistry;
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
 
     /** @var TemplateFixtureReader */
-    protected $reader;
+    private $reader;
 
     protected function setUp(): void
     {
-        $this->templateManager = $this->getMockBuilder(TemplateManager::class)->disableOriginalConstructor()->getMock();
-        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->templateManager = $this->createMock(TemplateManager::class);
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
-        $this->reader = new class($this->contextRegistry, $this->templateManager) extends TemplateFixtureReader {
-            public function xgetStepExecution(): ?StepExecution
-            {
-                return $this->stepExecution;
-            }
-        };
+        $this->reader = new TemplateFixtureReader($this->contextRegistry, $this->templateManager);
     }
 
     public function testInitializeFromContextExceptionNoOption()
@@ -43,15 +35,14 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Configuration of fixture reader must contain "entityName".');
 
         $context = $this->createMock(ContextInterface::class);
-        $context->expects(static::once())
+        $context->expects(self::once())
             ->method('hasOption')
             ->with('entityName')
             ->willReturn(false);
 
-        /** @var StepExecution|MockObject $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
@@ -62,32 +53,33 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
     public function testInitializeFromContext()
     {
         $context = $this->createMock(ContextInterface::class);
-        $context->expects(static::once())
+        $context->expects(self::once())
             ->method('hasOption')
             ->with('entityName')
             ->willReturn(true);
-        $context->expects(static::atLeastOnce())
+        $context->expects(self::atLeastOnce())
             ->method('getOption')
             ->with('entityName')
             ->willReturn('stdClass');
 
-        /** @var StepExecution|MockObject $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
         $iterator = new \ArrayIterator(['test']);
         $fixture = $this->createMock(TemplateFixtureInterface::class);
-        $fixture->expects(static::once())->method('getData')->willReturn($iterator);
-        $this->templateManager->expects(static::once())
+        $fixture->expects(self::once())
+            ->method('getData')
+            ->willReturn($iterator);
+        $this->templateManager->expects(self::once())
             ->method('getEntityFixture')
             ->with('stdClass')
             ->willReturn($fixture);
 
         $this->reader->setStepExecution($stepExecution);
-        static::assertEquals($iterator, $this->reader->getSourceIterator());
+        self::assertEquals($iterator, $this->reader->getSourceIterator());
     }
 }

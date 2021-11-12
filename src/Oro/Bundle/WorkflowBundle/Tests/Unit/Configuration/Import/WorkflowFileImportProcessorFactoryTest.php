@@ -19,7 +19,6 @@ class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
-        /** @var FileLocatorInterface|\PHPUnit\Framework\MockObject\MockObject $fileLocator */
         $fileLocator = $this->createMock(FileLocatorInterface::class);
         $this->factory = new WorkflowFileImportProcessorFactory($this->reader, $fileLocator);
     }

@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 /**
@@ -188,7 +189,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
 
     public function testStartStepNoStep()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow "test" does not contain step "start_step"');
 
         $this->workflowDefinition->setName('test');

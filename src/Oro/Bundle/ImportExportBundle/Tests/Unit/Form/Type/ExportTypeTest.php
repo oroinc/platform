@@ -11,21 +11,15 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ExportTypeTest extends FormIntegrationTestCase
 {
-    const ENTITY_NAME = 'testName';
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorRegistry;
 
-    /**
-     * @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $processorRegistry;
-
-    /**
-     * @var ExportType
-     */
-    protected $exportType;
+    /** @var ExportType */
+    private $exportType;
 
     protected function setUp(): void
     {
-        $this->processorRegistry = $this->getMockBuilder(ProcessorRegistry::class)->getMock();
+        $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
         $this->exportType = new ExportType($this->processorRegistry);
         parent::setUp();
     }
@@ -46,17 +40,13 @@ class ExportTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $processorAliasesFromRegistry
-     * @param array $processorAliasesPassedToForm
-     * @param array $expectedChoices
-     * @param       $usedAlias
-     * @dataProvider processorAliassesDataProvider
+     * @dataProvider processorAliasesDataProvider
      */
     public function testSubmit(
         array $processorAliasesFromRegistry,
-        $processorAliasesPassedToForm,
+        array|string $processorAliasesPassedToForm,
         array $expectedChoices,
-        $usedAlias
+        ?string $usedAlias
     ) {
         $entityName = 'TestEntity';
 
@@ -89,10 +79,7 @@ class ExportTypeTest extends FormIntegrationTestCase
         $this->assertEquals($usedAlias, $data->getProcessorAlias());
     }
 
-    /**
-     * @return array
-     */
-    public function processorAliassesDataProvider()
+    public function processorAliasesDataProvider(): array
     {
         return [
             [

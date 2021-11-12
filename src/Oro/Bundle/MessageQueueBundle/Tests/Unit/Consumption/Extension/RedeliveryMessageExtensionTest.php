@@ -20,9 +20,6 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var RedeliveryMessageExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);
@@ -61,17 +58,16 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
         $delayedMessage->setDelay(10);
         $delayedMessage->setMessageId('test message id');
 
-        $this->driver
-            ->expects($this->once())
+        $this->driver->expects($this->once())
             ->method('send')
             ->with($queue, $delayedMessage);
 
         $logger->expects($this->exactly(2))
             ->method('debug')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['Send delayed message', []],
                 ['Reject redelivered original message by setting reject status to context.', []],
-            ]));
+            ]);
 
         $this->extension->onPreReceived($context);
         $this->assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
@@ -93,17 +89,13 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
         $logger->expects($this->never())
             ->method('debug');
 
-        $this->driver
-            ->expects($this->never())
+        $this->driver->expects($this->never())
             ->method('send');
 
         $this->extension->onPreReceived($context);
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             'without properties' => [

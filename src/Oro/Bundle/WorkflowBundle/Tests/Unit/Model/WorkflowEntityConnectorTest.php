@@ -18,10 +18,10 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var WorkflowEntityConnector */
-    protected $entityConnector;
+    private $entityConnector;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     protected function setUp(): void
     {
@@ -34,14 +34,15 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
      * @param $class
      * @return string
      */
-    protected function cacheKey($class)
+    private function cacheKey($class)
     {
         return WorkflowEntityConnector::WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX . $class;
     }
 
     public function testIsApplicableEntityConvertsObjectToClassName()
     {
-        $this->registry->expects($this->never())->method('getManagerForClass');
+        $this->registry->expects($this->never())
+            ->method('getManagerForClass');
 
         $cache = $this->createMock(Cache::class);
 
@@ -53,7 +54,10 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
             ->with($cacheKey)
             ->willReturn(true);
 
-        $cache->expects($this->once())->method('fetch')->with($cacheKey)->willReturn(true);
+        $cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
+            ->willReturn(true);
 
         $this->assertTrue($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
@@ -66,7 +70,10 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
 
         $key = $this->cacheKey(EntityStub::class);
 
-        $cache->expects($this->once())->method('contains')->with($key)->willReturn(false);
+        $cache->expects($this->once())
+            ->method('contains')
+            ->with($key)
+            ->willReturn(false);
 
         //routine
         $om = $this->createMock(ObjectManager::class);
@@ -76,20 +83,27 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($om);
 
         $metadata = new ClassMetadataInfo(EntityStub::class);
-        $om->expects($this->once())->method('getClassMetadata')->with(EntityStub::class)->willReturn($metadata);
+        $om->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(EntityStub::class)
+            ->willReturn($metadata);
         $metadata->setIdentifier(['a', 'b']);
         //metadata setup is for composite keys so internally isSupportedIdentifierType will return false
 
-        $cache->expects($this->once())->method('save')->with($key, false);
+        $cache->expects($this->once())
+            ->method('save')
+            ->with($key, false);
 
-        $cache->expects($this->never())->method('fetch');
+        $cache->expects($this->never())
+            ->method('fetch');
 
         $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
 
     public function testIsApplicableEntityNonManageable()
     {
-        $this->registry->expects($this->once())->method('getManagerForClass')
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with(EntityStub::class)
             ->willReturn(null);
 
@@ -101,13 +115,17 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
     public function testIsApplicableEntityNotSupportCompositePrimaryKeys()
     {
         $manager = $this->createMock(ObjectManager::class);
-        $this->registry->expects($this->once())->method('getManagerForClass')
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with(EntityStub::class)
             ->willReturn($manager);
         $metadata = new ClassMetadataInfo(EntityStub::class);
         $metadata->setIdentifier(['id', 'other_field']);
 
-        $manager->expects($this->once())->method('getClassMetadata')->with(EntityStub::class)->willReturn($metadata);
+        $manager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(EntityStub::class)
+            ->willReturn($metadata);
 
         $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub([42, 42])));
     }
@@ -120,22 +138,23 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
     public function testIsApplicableEntitySupportedTypes($type, $expected)
     {
         $manager = $this->createMock(ObjectManager::class);
-        $this->registry->expects($this->once())->method('getManagerForClass')
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with(EntityStub::class)
             ->willReturn($manager);
         $metadata = new ClassMetadataInfo(EntityStub::class);
         $metadata->setIdentifier(['id']);
         $metadata->fieldMappings['id'] = ['type' => $type];
 
-        $manager->expects($this->once())->method('getClassMetadata')->with(EntityStub::class)->willReturn($metadata);
+        $manager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(EntityStub::class)
+            ->willReturn($metadata);
 
         $this->assertEquals($expected, $this->entityConnector->isApplicableEntity(new EntityStub([42, 42])));
     }
 
-    /**
-     * @return array[]
-     */
-    public function typeSupportingProvider()
+    public function typeSupportingProvider(): array
     {
         return [
             [Types::BIGINT, true],

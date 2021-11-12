@@ -5,24 +5,18 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowEntityAcl
-     */
-    protected $entityAcl;
+    /** @var WorkflowEntityAcl */
+    private $entityAcl;
 
     protected function setUp(): void
     {
         $this->entityAcl = new WorkflowEntityAcl();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->entityAcl);
     }
 
     public function testGetId()
@@ -46,16 +40,16 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($this->entityAcl, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            array('attribute', 'test'),
-            array('step', new WorkflowStep()),
-            array('definition', new WorkflowDefinition()),
-            array('entityClass', new \DateTime()),
-            array('updatable', false),
-            array('deletable', false),
-        );
+        return [
+            ['attribute', 'test'],
+            ['step', new WorkflowStep()],
+            ['definition', new WorkflowDefinition()],
+            ['entityClass', new \DateTime()],
+            ['updatable', false],
+            ['deletable', false],
+        ];
     }
 
     public function testImport()
@@ -86,7 +80,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttributeStepKeyNoStepException()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage("Workflow entity ACL with ID 1 doesn't have workflow step");
 
         ReflectionUtil::setId($this->entityAcl, 1);

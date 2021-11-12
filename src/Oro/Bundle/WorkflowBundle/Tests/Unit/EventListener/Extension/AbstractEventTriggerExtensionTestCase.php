@@ -14,20 +14,20 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
 {
     use EntityTrait;
 
-    const ENTITY_CLASS = WorkflowAwareEntity::class;
-    const ENTITY_ID = 42;
-    const FIELD = 'name';
+    protected const ENTITY_CLASS = WorkflowAwareEntity::class;
+    protected const ENTITY_ID = 42;
+    protected const FIELD = 'name';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventTriggerCache */
+    /** @var EventTriggerCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $triggerCache;
 
     /** @var AbstractEventTriggerExtension */
@@ -63,10 +63,7 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
         }
     }
 
-    /**
-     * @param array $triggers
-     */
-    protected function prepareRepository(array $triggers = null)
+    protected function prepareRepository(array $triggers = null): void
     {
         $this->repository->expects($this->once())
             ->method('findAllWithDefinitions')
@@ -74,12 +71,7 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
             ->willReturn($triggers ?: $this->getTriggers());
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $event
-     * @param bool $hasTrigger
-     */
-    protected function prepareTriggerCache($entityClass, $event, $hasTrigger = true)
+    protected function prepareTriggerCache(string $entityClass, string $event, bool $hasTrigger = true): void
     {
         $this->triggerCache->expects($this->any())
             ->method('hasTrigger')
@@ -89,15 +81,17 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
 
     /**
      * @param null|string $triggerName
+     *
      * @return EventTriggerInterface[]|EventTriggerInterface
      */
-    abstract protected function getTriggers($triggerName = null);
+    abstract protected function getTriggers(string $triggerName = null): array|object;
 
     /**
      * @param EventTriggerInterface[] $triggers
+     *
      * @return array
      */
-    protected function getExpectedTriggers(array $triggers)
+    protected function getExpectedTriggers(array $triggers): array
     {
         $expectedTriggers = [];
 
@@ -120,12 +114,7 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
         return $expectedTriggers;
     }
 
-    /**
-     * @param int $id
-     * @param array $fields
-     * @return WorkflowAwareEntity|object
-     */
-    protected function getMainEntity($id = self::ENTITY_ID, array $fields = [])
+    protected function getMainEntity(?int $id = self::ENTITY_ID, array $fields = []): WorkflowAwareEntity
     {
         return $this->getEntity(
             self::ENTITY_CLASS,

@@ -12,64 +12,38 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FindEntitiesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FindEntities */
-    protected $function;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /** @var MockObject|ManagerRegistry */
-    protected $registry;
+    /** @var FindEntities */
+    private $action;
 
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
 
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->function = new class(new ContextAccessor(), $this->registry) extends FindEntities {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-        $this->function->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->registry, $this->function);
+        $this->action = new FindEntities(new ContextAccessor(), $this->registry);
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     /**
-     * @return MockObject|PropertyPath
-     */
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * @param array $options
-     * @param string $expectedMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $expectedMessage)
+    public function testInitializeException(array $options, string $expectedMessage)
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $this->function->initialize($options);
+        $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             'no class name' => [
@@ -94,14 +68,14 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
             'no where or order_by' => [
                 'options' => [
                     'class' => 'stdClass',
-                    'attribute' => $this->getPropertyPath()
+                    'attribute' => $this->createMock(PropertyPath::class)
                 ],
                 'message' => 'One of parameters "where" or "order_by" must be defined'
             ],
             'invalid where' => [
                 'options' => [
                     'class' => 'stdClass',
-                    'attribute' => $this->getPropertyPath(),
+                    'attribute' => $this->createMock(PropertyPath::class),
                     'where' => 'scalar_data'
                 ],
                 'message' => 'Parameter "where" must be array'
@@ -109,7 +83,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
             'invalid order_by' => [
                 'options' => [
                     'class' => 'stdClass',
-                    'attribute' => $this->getPropertyPath(),
+                    'attribute' => $this->createMock(PropertyPath::class),
                     'order_by' => 'scalar_data'
                 ],
                 'message' => 'Parameter "order_by" must be array'
@@ -120,21 +94,21 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
     public function testExecuteNotManageableEntity()
     {
         $this->expectException(NotManageableEntityException::class);
-        $this->expectExceptionMessage('Entity class "\stdClass" is not manageable.');
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable.', \stdClass::class));
 
-        $this->registry->expects(static::once())
+        $this->registry->expects(self::once())
             ->method('getManagerForClass')
-            ->with('\stdClass')
+            ->with(\stdClass::class)
             ->willReturn(null);
 
-        $this->function->initialize(
+        $this->action->initialize(
             [
-                'class' => '\stdClass',
-                'attribute' => $this->getPropertyPath(),
+                'class' => \stdClass::class,
+                'attribute' => $this->createMock(PropertyPath::class),
                 'where' => ['and' => []]
             ]
         );
-        $this->function->execute(new ItemStub([]));
+        $this->action->execute(new ItemStub([]));
     }
 
     /**
@@ -142,14 +116,11 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize(array $source, array $expected)
     {
-        static::assertEquals($this->function, $this->function->initialize($source));
-        static::assertEquals($expected, $this->function->xgetOptions());
+        self::assertEquals($this->action, $this->action->initialize($source));
+        self::assertEquals($expected, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    /**
-     * @return array
-     */
-    public function initializeDataProvider()
+    public function initializeDataProvider(): array
     {
         return [
             'where and order by' => [
@@ -157,14 +128,14 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
                     'class' => 'stdClass',
                     'where' => ['name' => 'qwerty'],
                     'order_by' => ['date' => 'asc'],
-                    'attribute' => $this->getPropertyPath(),
+                    'attribute' => $this->createMock(PropertyPath::class),
                     'case_insensitive' => true,
                 ],
                 'expected' => [
                     'class' => 'stdClass',
                     'where' => ['name' => 'qwerty'],
                     'order_by' => ['date' => 'asc'],
-                    'attribute' => $this->getPropertyPath(),
+                    'attribute' => $this->createMock(PropertyPath::class),
                     'case_insensitive' => true,
                 ],
             ]
@@ -176,7 +147,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         $parameters = ['name' => 'Test Name'];
 
         $options = [
-            'class' => '\stdClass',
+            'class' => \stdClass::class,
             'where' => [
                 'and' => ['e.name = :name'],
                 'or' => ['e.label = :label']
@@ -188,58 +159,55 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
 
         $entity = new \stdClass();
 
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getResult'])
-            ->getMockForAbstractClass();
-        $query->expects(static::once())
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
             ->method('getResult')
             ->willReturn([$entity]);
 
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
-        $queryBuilder->expects(static::once())
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
             ->method('andWhere')
             ->with('e.name = :name')
             ->willReturnSelf();
-        $queryBuilder->expects(static::once())
+        $queryBuilder->expects(self::once())
             ->method('orWhere')
             ->with('e.label = :label')
             ->willReturnSelf();
-        $queryBuilder->expects(static::once())
+        $queryBuilder->expects(self::once())
             ->method('setParameters')
             ->with($parameters)
             ->willReturnSelf();
-        $queryBuilder->expects(static::once())
+        $queryBuilder->expects(self::once())
             ->method('orderBy')
             ->with('e.createdDate', strtoupper($options['order_by']['createdDate']))
             ->willReturnSelf();
-        $queryBuilder->expects(static::once())
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
-        $repository->expects(static::once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
 
-        $em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $em->expects(static::once())
+        $em = $this->createMock(EntityManager::class);
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($options['class'])
             ->willReturn($repository);
 
-        $this->registry->expects(static::once())
+        $this->registry->expects(self::once())
             ->method('getManagerForClass')
             ->with($options['class'])
             ->willReturn($em);
 
         $context = new ItemStub();
 
-        $this->function->initialize($options);
-        $this->function->execute($context);
+        $this->action->initialize($options);
+        $this->action->execute($context);
 
         $attributeName = (string)$options['attribute'];
-        static::assertEquals([$entity], $context->$attributeName);
+        self::assertEquals([$entity], $context->{$attributeName});
     }
 }

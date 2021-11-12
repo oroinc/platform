@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -40,7 +39,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onFlushProvider
      */
-    public function testOnFlush($entities, $expected)
+    public function testOnFlush(array $entities, array $expected)
     {
         $unitOfWork = $this->createMock(UnitOfWork::class);
         $unitOfWork->expects(self::once())
@@ -105,18 +104,17 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityUpdates')
             ->willReturn([$processJob]);
 
-        $entityId   = 1;
+        $entityId  = 1;
         $entityHash = ProcessJob::generateEntityHash(self::TEST_CLASS, $entityId);
 
         $this->serializer->expects(self::exactly(2))
             ->method('serialize')
             ->with($processJob->getData(), 'json', ['processJob' => $processJob])
-            ->willReturnCallback(
-                function () use ($processJob, $entityId, $serializedData) {
-                    $processJob->setEntityId($entityId);
-                    return $serializedData;
-                }
-            );
+            ->willReturnCallback(function () use ($processJob, $entityId, $serializedData) {
+                $processJob->setEntityId($entityId);
+
+                return $serializedData;
+            });
 
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects(self::any())
@@ -142,7 +140,6 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('setSerializer')
             ->with(self::identicalTo($this->serializer), 'json');
 
-        $lifecycleEventArgs = new LifecycleEventArgs($entity, $this->createMock(EntityManager::class));
-        $this->listener->postLoad($entity, $lifecycleEventArgs);
+        $this->listener->postLoad($entity);
     }
 }

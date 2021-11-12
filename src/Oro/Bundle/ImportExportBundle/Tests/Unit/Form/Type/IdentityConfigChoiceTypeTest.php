@@ -17,11 +17,11 @@ use Symfony\Component\Form\FormInterface;
 
 class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var IdentityConfigChoiceType */
-    protected $type;
-
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
+
+    /** @var IdentityConfigChoiceType */
+    private $type;
 
     protected function setUp(): void
     {
@@ -34,13 +34,13 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
 
     /**
      * @dataProvider configureOptionsProvider
-     * @param ConfigIdInterface $configId
-     * @param boolean $immutable
-     * @param array $options
-     * @param array $expectedOptions
      */
-    public function testConfigureOptions($configId, $immutable, array $options, array $expectedOptions)
-    {
+    public function testConfigureOptions(
+        ConfigIdInterface $configId,
+        bool $immutable,
+        array $options,
+        array $expectedOptions
+    ) {
         $this->mockRegistry();
         $this->doTestConfigureOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
@@ -67,10 +67,7 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
         $this->assertEquals($expectedChoices, $resolvedOptions['choices']);
     }
 
-    /**
-     * @return array
-     */
-    private function resolveOptions()
+    private function resolveOptions(): array
     {
         $this->typeHelper->expects($this->never())
             ->method('getFieldName');
@@ -84,9 +81,7 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
             'config_id' => new FieldConfigId('importexport', 'Test\Entity', 'id')
         ];
 
-        $resolvedOptions = $resolver->resolve($options);
-
-        return $resolvedOptions;
+        return $resolver->resolve($options);
     }
 
     public function testPreSetDataListener()

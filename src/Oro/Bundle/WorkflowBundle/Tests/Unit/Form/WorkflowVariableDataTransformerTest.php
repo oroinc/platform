@@ -15,7 +15,7 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
      *
      * @return WorkflowVariableDataTransformer
      */
-    protected function createTransformer(array $options = [])
+    private function createTransformer(array $options = [])
     {
         if (array_key_exists('classMetadata', $options)) {
             $classMetadata = $options['classMetadata'];
@@ -36,7 +36,7 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
-        $variable = isset($options['variable']) ? $options['variable'] : null;
+        $variable = $options['variable'] ?? null;
 
         return new WorkflowVariableDataTransformer($managerRegistry, $variable);
     }
@@ -59,10 +59,7 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $transformer->reverseTransform($entity));
     }
 
-    /**
-     * @return array
-     */
-    public function reverseTransformProvider()
+    public function reverseTransformProvider(): array
     {
         return [
             'no_data' => [
@@ -126,7 +123,7 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
      *
      * @return Variable
      */
-    protected function createVariable($name, $type, array $options = [], $value = null)
+    private function createVariable($name, $type, array $options = [], $value = null)
     {
         $variable = new Variable();
         $variable

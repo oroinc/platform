@@ -13,7 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
@@ -30,8 +30,8 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $propertyAccessor = new PropertyAccessor();
         $this->configurableDataConverter = $this->createMock(ConfigurableTableDataConverter::class);
+
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())
             ->method('trans')
@@ -41,7 +41,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener = new ValidateOwnerListener(
             $this->ownershipMetadataProvider,
-            $propertyAccessor,
+            PropertyAccess::createPropertyAccessor(),
             $this->configurableDataConverter,
             $translator
         );
@@ -123,8 +123,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
             ->with(TestEntity::class)
             ->willReturn($metadata);
 
-        $this->configurableDataConverter
-            ->expects(self::once())
+        $this->configurableDataConverter->expects(self::once())
             ->method('getFieldHeaderWithRelation')
             ->with(TestEntity::class, 'userOwner')
             ->willReturn('Owner field');
@@ -153,8 +152,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
             ->with(TestEntity::class)
             ->willReturn($metadata);
 
-        $this->configurableDataConverter
-            ->expects(self::once())
+        $this->configurableDataConverter->expects(self::once())
             ->method('getFieldHeaderWithRelation')
             ->with(TestEntity::class, 'organization')
             ->willReturn('Organization field');
@@ -208,8 +206,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
             ->with(TestEntity::class)
             ->willReturn($metadata);
 
-        $this->configurableDataConverter
-            ->expects(self::once())
+        $this->configurableDataConverter->expects(self::once())
             ->method('getFieldHeaderWithRelation')
             ->with(TestEntity::class, 'businessUnitOwner')
             ->willReturn('BU owner field');
@@ -238,8 +235,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
             ->with(TestEntity::class)
             ->willReturn($metadata);
 
-        $this->configurableDataConverter
-            ->expects(self::once())
+        $this->configurableDataConverter->expects(self::once())
             ->method('getFieldHeaderWithRelation')
             ->with(TestEntity::class, 'organization')
             ->willReturn('Organization field');
@@ -287,8 +283,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
             ->with(TestEntity::class)
             ->willReturn($metadata);
 
-        $this->configurableDataConverter
-            ->expects(self::once())
+        $this->configurableDataConverter->expects(self::once())
             ->method('getFieldHeaderWithRelation')
             ->with(TestEntity::class, 'organization')
             ->willReturn('Org owner field');

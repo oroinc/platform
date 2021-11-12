@@ -7,8 +7,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Symfony\Component\Routing\Route;
 
 class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
@@ -19,7 +19,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
     /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityAliasResolver;
 
-    /** @var SortableRouteCollection */
+    /** @var EnhancedRouteCollection */
     private $routeCollection;
 
     /** @var RouteCollectionAccessor */
@@ -41,7 +41,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
             $this->entityAliasResolver
         );
 
-        $this->routeCollection = new SortableRouteCollection();
+        $this->routeCollection = new EnhancedRouteCollection();
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 
@@ -110,7 +110,6 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
             $route->getRequirements()
         );
 
-        $this->routeCollection->sortByPriority();
         $this->assertEquals(
             [
                 'first_route',

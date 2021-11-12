@@ -18,26 +18,20 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);
-        /** @var FileLocatorInterface|\PHPUnit\Framework\MockObject\MockObject $fileLocator */
         $fileLocator = $this->createMock(FileLocatorInterface::class);
+
         $this->factory = new ResourceFileImportProcessorFactory($this->reader, $fileLocator);
     }
 
     /**
-     * @dataProvider isApplicableTest
-     *
-     * @param array|string $import
-     * @param bool $expected
+     * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable($import, bool $expected)
+    public function testIsApplicable(array|string $import, bool $expected)
     {
         $this->assertEquals($expected, $this->factory->isApplicable($import));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function isApplicableTest()
+    public function isApplicableDataProvider(): \Generator
     {
         /**
          * ```
@@ -95,12 +89,9 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider createTestProvider
-     *
-     * @param array|string $import
-     * @param string $expectedPath
+     * @dataProvider createDataProvider
      */
-    public function testCreate($import, string $expectedPath)
+    public function testCreate(array|string $import, string $expectedPath)
     {
         $processor = $this->factory->create($import);
 
@@ -108,24 +99,21 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->reader, ReflectionUtil::getPropertyValue($processor, 'reader'));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function createTestProvider()
+    public function createDataProvider(): array
     {
-        yield 'string' => [
-            'import' => './stringFileName',
-            'expected' => './stringFileName'
-        ];
-
-        yield 'array' => [
-            'import' => ['./stringFileName'],
-            'expected' => './stringFileName'
-        ];
-
-        yield 'hash' => [
-            'import' => ['resource' => './stringFileName'],
-            'expected' => './stringFileName'
+        return [
+            'string' => [
+                'import' => './stringFileName',
+                'expected' => './stringFileName'
+            ],
+            'array' => [
+                'import' => ['./stringFileName'],
+                'expected' => './stringFileName'
+            ],
+            'hash' => [
+                'import' => ['resource' => './stringFileName'],
+                'expected' => './stringFileName'
+            ]
         ];
     }
 

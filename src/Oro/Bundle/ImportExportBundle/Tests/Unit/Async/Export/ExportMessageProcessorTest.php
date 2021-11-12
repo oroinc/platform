@@ -10,9 +10,11 @@ use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -22,10 +24,7 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([Topics::EXPORT], ExportMessageProcessor::getSubscribedTopics());
     }
 
-    /**
-     * @return array
-     */
-    public function invalidMessageProvider()
+    public function invalidMessageProvider(): array
     {
         return [
             [
@@ -45,31 +44,26 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidMessageProvider
-     *
-     * @param string $loggerMessage
-     * @param array $messageBody
      */
-    public function testShouldRejectMessageAndLogCriticalIfInvalidMessage($loggerMessage, $messageBody)
+    public function testShouldRejectMessageAndLogCriticalIfInvalidMessage(string $loggerMessage, array $messageBody)
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with($this->equalTo($loggerMessage))
-        ;
+            ->with($this->equalTo($loggerMessage));
 
         $message = new Message();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody(JSON::encode($messageBody));
 
         $processor = new ExportMessageProcessor(
-            $this->createJobRunnerMock(),
+            $this->createMock(JobRunner::class),
             $this->createMock(FileManager::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldSetOrganizationAndDoExport()
@@ -78,43 +72,33 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $job = new Job();
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with($this->equalTo(1))
-            ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
+            ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
                 return $callback($jobRunner, $job);
-            }))
-        ;
+            });
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'))
-        ;
+            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'));
 
-        $organizationRepository = $this->createOrganizationRepositoryMock();
-        $organizationRepository
-            ->expects($this->once())
-            ->method('find')
-        ;
+        $organizationRepository = $this->createMock(OrganizationRepository::class);
+        $organizationRepository->expects($this->once())
+            ->method('find');
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with($this->equalTo(Organization::class))
-            ->willReturn($organizationRepository)
-        ;
+            ->willReturn($organizationRepository);
 
-        $exportHandler = $this->createExportHandlerMock();
-        $exportHandler
-            ->expects($this->once())
+        $exportHandler = $this->createMock(ExportHandler::class);
+        $exportHandler->expects($this->once())
             ->method('getExportResult')
-            ->willReturn($exportResult)
-        ;
+            ->willReturn($exportResult);
 
         $processor = new ExportMessageProcessor(
             $jobRunner,
@@ -125,63 +109,15 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setExportHandler($exportHandler);
 
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'jobId' => 1,
             'jobName' => 'name',
             'processorAlias' => 'alias',
             'organizationId' => 2,
         ]));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessor::ACK, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    private function createDoctrineHelperMock()
-    {
-        return $this->createMock(DoctrineHelper::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|OrganizationRepository
-     */
-    private function createOrganizationRepositoryMock()
-    {
-        return $this->createMock(OrganizationRepository::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
-     */
-    private function createExportHandlerMock()
-    {
-        return $this->createMock(ExportHandler::class);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 }

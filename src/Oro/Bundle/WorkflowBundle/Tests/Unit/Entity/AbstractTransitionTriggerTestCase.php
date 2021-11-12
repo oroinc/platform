@@ -10,9 +10,7 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit\Framework\Test
 {
     use EntityTestCaseTrait;
 
-    /**
-     * @var BaseTransitionTrigger
-     */
+    /** @var BaseTransitionTrigger */
     protected $entity;
 
     protected function setUp(): void

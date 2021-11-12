@@ -17,6 +17,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
@@ -27,42 +28,55 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class JobExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    private Connection|\PHPUnit\Framework\MockObject\MockObject $connection;
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    private ConnectorRegistry|\PHPUnit\Framework\MockObject\MockObject $batchJobRegistry;
+    /** @var ConnectorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $batchJobRegistry;
 
-    private ContextRegistry|\PHPUnit\Framework\MockObject\MockObject $contextRegistry;
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
 
-    private DoctrineJobRepository|\PHPUnit\Framework\MockObject\MockObject $batchJobRepository;
+    /** @var DoctrineJobRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $batchJobRepository;
 
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $batchJobManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $batchJobManager;
 
+    /** @var ContextAggregatorRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextAggregatorRegistry;
 
+    /** @var JobExecutor */
     private JobExecutor $executor;
 
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->connection = $this->createMock(Connection::class);
-        $this->entityManager->expects(self::any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->batchJobRegistry = $this->createMock(ConnectorRegistry::class);
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
-        $this->managerRegistry->expects(self::any())->method('getManager')
-            ->willReturn($this->entityManager);
         $this->batchJobManager = $this->createMock(EntityManager::class);
         $this->batchJobRepository = $this->createMock(DoctrineJobRepository::class);
+        $this->contextAggregatorRegistry = $this->createMock(ContextAggregatorRegistry::class);
+
+        $this->entityManager->expects(self::any())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->managerRegistry->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+
         $this->batchJobRepository->expects(self::any())
             ->method('getJobManager')
             ->willReturn($this->batchJobManager);
-        $this->contextAggregatorRegistry = $this->createMock(ContextAggregatorRegistry::class);
 
         $this->executor = new JobExecutor(
             $this->batchJobRegistry,
@@ -124,20 +138,17 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('getFailureExceptions')
             ->willReturn([]);
 
-        $job = $this->getMockBuilder(JobInterface::class)
-            ->getMock();
+        $job = $this->createMock(JobInterface::class);
         $job->expects(self::once())
             ->method('execute')
             ->with(self::isInstanceOf(JobExecution::class))
-            ->willReturnCallback(
-                function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
-                    self::assertEquals('import.test', $jobExecution->getJobInstance()->getLabel());
-                    self::assertEquals($configuration, $jobExecution->getJobInstance()->getRawConfiguration());
+            ->willReturnCallback(function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
+                self::assertEquals('import.test', $jobExecution->getJobInstance()->getLabel());
+                self::assertEquals($configuration, $jobExecution->getJobInstance()->getRawConfiguration());
 
-                    $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
-                    $jobExecution->addStepExecution($stepExecution);
-                }
-            );
+                $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
+                $jobExecution->addStepExecution($stepExecution);
+            });
 
         $this->batchJobRegistry->expects(self::once())
             ->method('getJob')
@@ -157,14 +168,12 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
 
         $this->batchJobRepository->expects(self::any())
             ->method('createJobExecution')
-            ->willReturnCallback(
-                function ($instance) {
-                    $execution = new JobExecution();
-                    $execution->setJobInstance($instance);
+            ->willReturnCallback(function ($instance) {
+                $execution = new JobExecution();
+                $execution->setJobInstance($instance);
 
-                    return $execution;
-                }
-            );
+                return $execution;
+            });
         $result = $this->executor->executeJob('import', 'test', $configuration);
 
         self::assertInstanceOf(JobResult::class, $result);
@@ -198,19 +207,16 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('getFailureExceptions')
             ->willReturn([]);
 
-        $job = $this->getMockBuilder(JobInterface::class)
-            ->getMock();
+        $job = $this->createMock(JobInterface::class);
         $job->expects(self::once())
             ->method('execute')
             ->with(self::isInstanceOf(JobExecution::class))
-            ->willReturnCallback(
-                function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
-                    self::assertEquals('import.test', $jobExecution->getJobInstance()->getLabel());
-                    self::assertEquals($configuration, $jobExecution->getJobInstance()->getRawConfiguration());
-                    $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
-                    $jobExecution->addStepExecution($stepExecution);
-                }
-            );
+            ->willReturnCallback(function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
+                self::assertEquals('import.test', $jobExecution->getJobInstance()->getLabel());
+                self::assertEquals($configuration, $jobExecution->getJobInstance()->getRawConfiguration());
+                $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
+                $jobExecution->addStepExecution($stepExecution);
+            });
 
         $this->batchJobRegistry->expects(self::once())
             ->method('getJob')
@@ -222,19 +228,18 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('hasListeners')
             ->with(Events::AFTER_JOB_EXECUTION)
             ->willReturn(false);
-        $dispatcher->expects(self::never())->method('dispatch');
+        $dispatcher->expects(self::never())
+            ->method('dispatch');
 
         $this->executor->setEventDispatcher($dispatcher);
         $this->batchJobRepository->expects(self::any())
             ->method('createJobExecution')
-            ->willReturnCallback(
-                function ($instance) {
-                    $execution = new JobExecution();
-                    $execution->setJobInstance($instance);
+            ->willReturnCallback(function ($instance) {
+                $execution = new JobExecution();
+                $execution->setJobInstance($instance);
 
-                    return $execution;
-                }
-            );
+                return $execution;
+            });
         $context = $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $result = $this->executor->executeJob('import', 'test', $configuration);
 
@@ -268,20 +273,17 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('getFailureExceptions')
             ->willReturn([]);
 
-        $job = $this->getMockBuilder(JobInterface::class)
-            ->getMock();
+        $job = $this->createMock(JobInterface::class);
         $job->expects(self::once())
             ->method('execute')
             ->with(self::isInstanceOf(JobExecution::class))
-            ->willReturnCallback(
-                function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
-                    self::assertEquals('import.test', $jobExecution->getJobInstance()->getLabel());
-                    self::assertEquals($configuration, $jobExecution->getJobInstance()->getRawConfiguration());
+            ->willReturnCallback(function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
+                self::assertEquals('import.test', $jobExecution->getJobInstance()->getLabel());
+                self::assertEquals($configuration, $jobExecution->getJobInstance()->getRawConfiguration());
 
-                    $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
-                    $jobExecution->addStepExecution($stepExecution);
-                }
-            );
+                $jobExecution->setStatus(new BatchStatus(BatchStatus::COMPLETED));
+                $jobExecution->addStepExecution($stepExecution);
+            });
 
         $this->batchJobRegistry->expects(self::once())
             ->method('getJob')
@@ -293,19 +295,18 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('hasListeners')
             ->with(Events::AFTER_JOB_EXECUTION)
             ->willReturn(false);
-        $dispatcher->expects(self::never())->method('dispatch');
+        $dispatcher->expects(self::never())
+            ->method('dispatch');
 
         $this->executor->setEventDispatcher($dispatcher);
         $this->batchJobRepository->expects(self::any())
             ->method('createJobExecution')
-            ->willReturnCallback(
-                function ($instance) {
-                    $execution = new JobExecution();
-                    $execution->setJobInstance($instance);
+            ->willReturnCallback(function ($instance) {
+                $execution = new JobExecution();
+                $execution->setJobInstance($instance);
 
-                    return $execution;
-                }
-            );
+                return $execution;
+            });
         $context = $this->mockAggregatorContext(SimpleContextAggregator::TYPE);
         $this->executor->setValidationMode(true);
         $result = $this->executor->executeJob('import', 'test', $configuration);
@@ -336,16 +337,13 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         $this->batchJobManager->expects(self::once())
             ->method('flush');
 
-        $job = $this->getMockBuilder(JobInterface::class)
-            ->getMock();
+        $job = $this->createMock(JobInterface::class);
         $job->expects(self::once())
             ->method('execute')
             ->with(self::isInstanceOf(JobExecution::class))
-            ->willReturnCallback(
-                function (JobExecution $jobExecution) use ($configuration) {
-                    $jobExecution->setStatus(new BatchStatus(BatchStatus::STOPPED));
-                }
-            );
+            ->willReturnCallback(function (JobExecution $jobExecution) {
+                $jobExecution->setStatus(new BatchStatus(BatchStatus::STOPPED));
+            });
 
         $this->batchJobRegistry->expects(self::once())
             ->method('getJob')
@@ -381,17 +379,14 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         $this->batchJobManager->expects(self::once())
             ->method('flush');
 
-        $job = $this->getMockBuilder(JobInterface::class)
-            ->getMock();
+        $job = $this->createMock(JobInterface::class);
         $job->expects(self::once())
             ->method('execute')
             ->with(self::isInstanceOf(JobExecution::class))
-            ->willReturnCallback(
-                function (JobExecution $jobExecution) use ($configuration) {
-                    $jobExecution->addFailureException(new \Exception('Error 1'));
-                    $jobExecution->setStatus(new BatchStatus(BatchStatus::FAILED));
-                }
-            );
+            ->willReturnCallback(function (JobExecution $jobExecution) {
+                $jobExecution->addFailureException(new \Exception('Error 1'));
+                $jobExecution->setStatus(new BatchStatus(BatchStatus::FAILED));
+            });
 
         $this->batchJobRegistry->expects(self::once())
             ->method('getJob')
@@ -409,7 +404,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetJobErrorsUnknownInstanceException(): void
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No job instance found with code unknown');
 
         $code = 'unknown';
@@ -427,7 +422,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetJobErrorsUnknownExecutionException(): void
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No job execution found for job instance with code unknown');
 
         $code = 'unknown';
@@ -476,8 +471,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->with(JobInstance::class)
             ->willReturn($repository);
 
-        $context = $this->getMockBuilder(ContextInterface::class)
-            ->getMockForAbstractClass();
+        $context = $this->createMock(ContextInterface::class);
         $context->expects(self::once())
             ->method('getErrors')
             ->willReturn(['Error 1']);
@@ -516,16 +510,14 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Error 1'], $this->executor->getJobFailureExceptions($code));
     }
 
-    protected function mockAggregatorContext($aggregatorType)
+    private function mockAggregatorContext(string $aggregatorType): ContextInterface
     {
         $context = $this->createMock(ContextInterface::class);
         $aggregator = $this->createMock(ContextAggregatorInterface::class);
-        $aggregator
-            ->expects(self::once())
+        $aggregator->expects(self::once())
             ->method('getAggregatedContext')
             ->willReturn($context);
-        $this->contextAggregatorRegistry
-            ->expects(self::once())
+        $this->contextAggregatorRegistry->expects(self::once())
             ->method('getAggregator')
             ->with($aggregatorType)
             ->willReturn($aggregator);
@@ -533,18 +525,16 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    protected function mockCreateJobExecutionWithStepExecution(): void
+    private function mockCreateJobExecutionWithStepExecution(): void
     {
         $this->batchJobRepository->expects(self::any())
             ->method('createJobExecution')
-            ->willReturnCallback(
-                static function ($instance) {
-                    $execution = new JobExecution();
-                    $execution->setJobInstance($instance);
-                    $execution->addStepExecution(new StepExecution('test', $execution));
+            ->willReturnCallback(function ($instance) {
+                $execution = new JobExecution();
+                $execution->setJobInstance($instance);
+                $execution->addStepExecution(new StepExecution('test', $execution));
 
-                    return $execution;
-                }
-            );
+                return $execution;
+            });
     }
 }

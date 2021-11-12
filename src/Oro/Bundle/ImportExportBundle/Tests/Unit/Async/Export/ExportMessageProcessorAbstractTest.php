@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use PHPUnit\Framework\Constraint\IsType;
 use Psr\Log\LoggerInterface;
 
@@ -60,14 +61,14 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessorAbstract::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function runDelayedJobResultProvider(): array
     {
         return [
-            [ true, ExportMessageProcessorAbstract::ACK ],
-            [ false, ExportMessageProcessorAbstract::REJECT ],
+            [ true, MessageProcessorInterface::ACK ],
+            [ false, MessageProcessorInterface::REJECT ],
         ];
     }
 
@@ -78,7 +79,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
-            ->with($this->equalTo(1))
+            ->with(1)
             ->willReturn($jobResult);
 
         $this->processor->expects($this->once())
@@ -100,21 +101,21 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
-            ->with($this->equalTo(1))
+            ->with(1)
             ->willReturnCallback(function ($jobId, $callback) use ($job) {
                 return $callback($this->jobRunner, $job);
             });
 
         $this->logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'));
+            ->with('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0');
 
         $this->processor->expects($this->once())
             ->method('getMessageBody')
             ->willReturn(['jobId' => 1]);
         $this->processor->expects($this->once())
             ->method('handleExport')
-            ->with($this->equalTo(['jobId' => 1]))
+            ->with(['jobId' => 1])
             ->willReturn($exportResult);
 
         $this->fileManager->expects($this->never())
@@ -122,7 +123,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->processor->process(new Message(), $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessorAbstract::ACK, $result);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
         $this->assertArrayNotHasKey('errorLogFile', $job->getData());
     }
 
@@ -144,11 +145,11 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $this->fileManager->expects($this->once())
             ->method('writeToStorage')
-            ->with(json_encode($exportResult['errors'], JSON_THROW_ON_ERROR));
+            ->with(JSON::encode($exportResult['errors']));
 
         $result = $this->processor->process(new Message(), $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(ExportMessageProcessorAbstract::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
         $this->assertArrayHasKey('errorLogFile', $job->getData());
     }
 

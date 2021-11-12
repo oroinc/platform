@@ -22,6 +22,7 @@ use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -35,10 +36,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
-    /**
-     * @return array
-     */
-    public function invalidMessageBodyProvider()
+    public function invalidMessageBodyProvider(): array
     {
         return [
             [
@@ -54,32 +52,28 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidMessageBodyProvider
-     *
-     * @param string $loggerMessage
-     * @param array  $messageBody
      */
-    public function testShouldLogErrorAndRejectMessageIfMessageBodyInvalid($loggerMessage, array $messageBody)
+    public function testShouldLogErrorAndRejectMessageIfMessageBodyInvalid(string $loggerMessage, array $messageBody)
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects(self::once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('critical')
             ->with($loggerMessage);
 
         $processor = new PreExportMessageProcessor(
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createTokenStorageMock(),
-            $this->createDependentJobMock(),
+            $this->createMock(JobRunner::class),
+            $this->createMock(MessageProducerInterface::class),
+            $this->getTokenStorage(),
+            $this->createMock(DependentJobService::class),
             $logger,
-            $this->createExportHandlerMock(),
+            $this->createMock(ExportHandler::class),
             100
         );
 
         $message = new TransportMessage();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody(JSON::encode($messageBody));
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -92,9 +86,9 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $exportHandler = $this->createMock(ExportHandler::class);
         $jobUniqueName = 'oro_importexport.pre_export.test.user_1';
         $message = new TransportMessage();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'jobName'        => 'test',
-            'processor' => ProcessorRegistry::TYPE_EXPORT,
+            'processor'      => ProcessorRegistry::TYPE_EXPORT,
             'processorAlias' => 'test',
             'organizationId' => 22,
         ]));
@@ -103,23 +97,22 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($this->equalTo(123), $this->equalTo($jobUniqueName))
-            ->will($this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+            ->willReturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
                 return $callback($jobRunner, $childJob);
-            }));
+            });
         $jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with($jobUniqueName . '.chunk.1')
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
+            ->willReturnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
                 return $callback($jobRunner, $childJob);
-            }));
+            });
 
-        $dependentJobContext = $this->createDependentJobContextMock();
-        $dependentJobContext
-            ->expects(self::once())
+        $dependentJobContext = $this->createMock(DependentJobContext::class);
+        $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
                 ImportExportTopics::POST_EXPORT,
@@ -135,7 +128,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $dependentJob = $this->createDependentJobMock();
+        $dependentJob = $this->createMock(DependentJobService::class);
         $dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($this->equalTo($job))
@@ -154,30 +147,30 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor = new PreExportMessageProcessor(
             $jobRunner,
             self::getMessageProducer(),
-            $this->createTokenStorageMock(),
+            $this->getTokenStorage(),
             $dependentJob,
-            $this->createLoggerMock(),
+            $this->createMock(LoggerInterface::class),
             $exportHandler,
             100
         );
 
-        $organization = $this->createOrganizationMock();
-        $organizationRepository = $this->createOrganizationRepositoryMock();
+        $organization = $this->createMock(Organization::class);
+        $organizationRepository = $this->createMock(OrganizationRepository::class);
         $organizationRepository->expects(self::once())
             ->method('find')
             ->with($this->equalTo(22))
             ->willReturn($organization);
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
             ->with($this->equalTo(Organization::class))
             ->willReturn($organizationRepository);
         $processor->setDoctrineHelper($doctrineHelper);
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessor::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
             Topics::EXPORT,
             new Message(
@@ -197,96 +190,23 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $id
-     * @param Job $rootJob
-     *
-     * @return Job
-     */
-    private function createJob($id, $rootJob = null)
+    private function createJob(int $id, Job $rootJob = null): Job
     {
         $job = new Job();
         $job->setId($id);
-        if ($rootJob instanceof Job) {
+        if (null !== $rootJob) {
             $job->setRootJob($rootJob);
         }
 
         return $job;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
+    private function getTokenStorage(): TokenStorageInterface
     {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
-     */
-    private function createDependentJobMock()
-    {
-        return $this->createMock(DependentJobService::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
-     */
-    private function createDependentJobContextMock()
-    {
-        return $this->createMock(DependentJobContext::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
-     */
-    private function createExportHandlerMock()
-    {
-        return $this->createMock(ExportHandler::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->createMock(JobRunner::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    private function createDoctrineHelperMock()
-    {
-        return $this->createMock(DoctrineHelper::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
-     */
-    private function createTokenStorageMock()
-    {
-        $token = $this->createTokenMock();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects(self::any())
             ->method('getUser')
-            ->willReturn($this->createUserStub());
+            ->willReturn($this->getUser());
 
         $tokeStorage = $this->createMock(TokenStorageInterface::class);
         $tokeStorage->expects(self::any())
@@ -296,34 +216,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $tokeStorage;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenInterface
-     */
-    private function createTokenMock()
-    {
-        return $this->createMock(TokenInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Organization
-     */
-    private function createOrganizationMock()
-    {
-        return $this->createMock(Organization::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|OrganizationRepository
-     */
-    private function createOrganizationRepositoryMock()
-    {
-        return $this->createMock(OrganizationRepository::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
-     */
-    private function createUserStub()
+    private function getUser(): UserInterface
     {
         $user = $this->getMockBuilder(UserInterface::class)
             ->onlyMethods(get_class_methods(UserInterface::class))

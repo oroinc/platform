@@ -272,11 +272,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
-            ->with(
-                $configuration['form_options'] ?? [],
-                $attributes
-            )
-            ->will($this->returnArgument(0));
+            ->with($configuration['form_options'] ?? [], $attributes)
+            ->willReturnArgument(0);
 
         $transitions = $this->assembler->assemble(
             $fullConfiguration,

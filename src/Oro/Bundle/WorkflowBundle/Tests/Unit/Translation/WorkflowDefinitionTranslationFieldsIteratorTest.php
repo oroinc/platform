@@ -17,10 +17,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
         $this->assertEquals($expected, iterator_to_array($iterator));
     }
 
-    /**
-     * @return array
-     */
-    public function readWorkflowDefinitionFieldsProvider()
+    public function readWorkflowDefinitionFieldsProvider(): array
     {
         $definitionNormal = new WorkflowDefinition();
         $definitionNormal->setName('test_workflow');
@@ -132,10 +129,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
         $this->assertEquals($expectedDefinitionState, $actualDefinition);
     }
 
-    /**
-     * @return array
-     */
-    public function writeWorkflowDefinitionDataProvider()
+    public function writeWorkflowDefinitionDataProvider(): array
     {
         return [
             'normal' => $this->createNormalCase(),
@@ -143,10 +137,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function createNormalCase()
+    private function createNormalCase(): array
     {
         $caseNormalActual = new WorkflowDefinition();
         $caseNormalActual->setName('test_workflow');
@@ -245,10 +236,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
         return ['actual' => $caseNormalActual, 'expected' => $caseNormalExpected];
     }
 
-    /**
-     * @return array
-     */
-    private function createLackCase()
+    private function createLackCase(): array
     {
         $caseLackActual = new WorkflowDefinition();
         $caseLackActual->setName('test_workflow');

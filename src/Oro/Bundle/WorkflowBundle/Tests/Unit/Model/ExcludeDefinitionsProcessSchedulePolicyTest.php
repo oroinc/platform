@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 use Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ExcludeDefinitionsProcessSchedulePolicy
-     */
-    protected $schedulePolicy;
+    /** @var ExcludeDefinitionsProcessSchedulePolicy */
+    private $schedulePolicy;
 
     protected function setUp(): void
     {
@@ -33,7 +33,10 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
         foreach ($expects as $expectation) {
             $this->assertEquals(
                 $expectation['allowed_before'],
-                $this->schedulePolicy->isScheduleAllowed($expectation['trigger'], $this->getMockProcessData())
+                $this->schedulePolicy->isScheduleAllowed(
+                    $expectation['trigger'],
+                    $this->createMock(ProcessData::class)
+                )
             );
         }
 
@@ -44,15 +47,15 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
         foreach ($expects as $expectation) {
             $this->assertEquals(
                 $expectation['allowed_after'],
-                $this->schedulePolicy->isScheduleAllowed($expectation['trigger'], $this->getMockProcessData())
+                $this->schedulePolicy->isScheduleAllowed(
+                    $expectation['trigger'],
+                    $this->createMock(ProcessData::class)
+                )
             );
         }
     }
 
-    /**
-     * @return array
-     */
-    public function isScheduleAllowedDataProvider()
+    public function isScheduleAllowedDataProvider(): array
     {
         return [
             'allowed when processes has no exclude definitions' => [
@@ -129,9 +132,9 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
      * @param ProcessTrigger $processTrigger
      * @return ProcessHandleEvent
      */
-    protected function createProcessHandleEvent(ProcessTrigger $processTrigger)
+    private function createProcessHandleEvent(ProcessTrigger $processTrigger)
     {
-        return new ProcessHandleEvent($processTrigger, $this->getMockProcessData());
+        return new ProcessHandleEvent($processTrigger, $this->createMock(ProcessData::class));
     }
 
     /**
@@ -139,45 +142,21 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
      * @param array $excludeDefinitions
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMockProcessTrigger($processDefinitionName, array $excludeDefinitions = array())
+    private function getMockProcessTrigger($processDefinitionName, array $excludeDefinitions = array())
     {
-        $processDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $processDefinition = $this->createMock(ProcessDefinition::class);
         $processDefinition->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($processDefinitionName));
+            ->willReturn($processDefinitionName);
         $processDefinition->expects($this->any())
             ->method('getExcludeDefinitions')
-            ->will($this->returnValue($excludeDefinitions));
+            ->willReturn($excludeDefinitions);
 
-        $processTrigger = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $processTrigger = $this->createMock(ProcessTrigger::class);
         $processTrigger->expects($this->any())
             ->method('getDefinition')
-            ->will($this->returnValue($processDefinition));
+            ->willReturn($processDefinition);
 
         return $processTrigger;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockProcessData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessData')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMockProcess()
-    {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Process')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

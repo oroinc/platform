@@ -19,11 +19,11 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $managerRegistry;
 
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
     /** @var ImportExportResultManager */
     private $importExportResultManager;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
 
     protected function setUp(): void
     {
@@ -37,27 +37,20 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     *
      * @dataProvider saveResultProvider
      */
-    public function testSaveResult($actual, $expected): void
+    public function testSaveResult(array $actual, array $expected): void
     {
         $expectedResult = $this->getEntity(ImportExportResult::class, $expected);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject */
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('persist')
             ->with($expectedResult);
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('flush');
 
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
@@ -147,25 +140,20 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $importExportRepository = $this->createMock(ImportExportResultRepository::class);
-        $importExportRepository
-            ->expects($this->once())
+        $importExportRepository->expects($this->once())
             ->method('updateExpiredRecords')
             ->with($date, $date);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject */
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('getRepository')
             ->with(ImportExportResult::class)
             ->willReturn($importExportRepository);
 
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('flush');
 
-        $this->managerRegistry
-            ->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 

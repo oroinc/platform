@@ -6,43 +6,29 @@ use Oro\Component\Action\Action\AssignActiveUser;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser as User;
 
 class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
 {
     private const ATTRIBUTE_NAME = 'some_attribute';
 
-    /** @var MockObject */
-    protected $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
     /** @var AssignActiveUser */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->action = new class(new ContextAccessor(), $this->tokenStorage) extends AssignActiveUser {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->tokenStorage);
-        unset($this->action);
+        $this->action = new AssignActiveUser(new ContextAccessor(), $this->tokenStorage);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
@@ -51,10 +37,10 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     public function testInitialize(array $inputOptions, array $expectedOptions)
     {
         $this->action->initialize($inputOptions);
-        static::assertEquals($expectedOptions, $this->action->xgetOptions());
+        self::assertEquals($expectedOptions, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'numeric attribute' => [
@@ -84,22 +70,16 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             'no options' => [
@@ -140,9 +120,13 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     {
         $user = new User('testUser', 'qwerty');
 
-        $token = $this->getMockBuilder(TokenInterface::class)->disableOriginalConstructor()->getMock();
-        $token->expects(static::once())->method('getUser')->willReturn($user);
-        $this->tokenStorage->expects(static::once())->method('getToken')->willReturn($token);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $context = new ItemStub();
 
@@ -150,6 +134,6 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $attributeName = self::ATTRIBUTE_NAME;
-        static::assertEquals($user, $context->$attributeName);
+        self::assertEquals($user, $context->{$attributeName});
     }
 }

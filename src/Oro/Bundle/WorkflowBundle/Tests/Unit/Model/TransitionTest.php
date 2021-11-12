@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
@@ -22,13 +23,16 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    private TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionsResolver;
+    /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $optionsResolver;
 
-    private Transition $transition;
+    /** @var Transition */
+    private $transition;
 
     protected function setUp(): void
     {
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+
         $this->transition = new Transition($this->optionsResolver);
     }
 
@@ -43,7 +47,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
                 ['hidden', true, false],
                 ['start', true, false],
                 ['unavailableHidden', true],
-                ['stepTo', $this->getStepMock('testStep')],
+                ['stepTo', $this->getStep('testStep')],
                 ['frontendOptions', ['key' => 'value'], []],
                 ['formType', 'custom_workflow_transition'],
                 ['displayType', 'page'],
@@ -127,11 +131,16 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $errors = new ArrayCollection();
 
         $action = $this->createMock(ActionInterface::class);
-        $action->expects(self::once())->method('execute')->with($workflowItem);
+        $action->expects(self::once())
+            ->method('execute')
+            ->with($workflowItem);
         $this->transition->setPreAction($action);
 
         $condition = $this->createMock(ExpressionInterface::class);
-        $condition->expects(self::once())->method('evaluate')->with($workflowItem)->willReturn(true);
+        $condition->expects(self::once())
+            ->method('evaluate')
+            ->with($workflowItem)
+            ->willReturn(true);
         $this->transition->setCondition($condition);
 
         self::assertTrue($this->transition->isAllowed($workflowItem, $errors));
@@ -175,12 +184,8 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAvailableDataProvider
-     *
-     * @param bool $isAllowed
-     * @param bool $isAvailable
-     * @param bool $expected
      */
-    public function testIsAvailableWithoutForm($isAllowed, $isAvailable, $expected): void
+    public function testIsAvailableWithoutForm(?bool $isAllowed, ?bool $isAvailable, bool $expected): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $errors = new ArrayCollection();
@@ -266,7 +271,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransitNotAllowed(bool $preConditionAllowed, bool $conditionAllowed): void
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException::class);
+        $this->expectException(ForbiddenTransitionException::class);
         $this->expectExceptionMessage('Transition "test" is not allowed.');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
@@ -314,7 +319,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     {
         $currentStepEntity = $this->createMock(WorkflowStep::class);
 
-        $step = $this->getStepMock('currentStep', $isFinal, $hasAllowedTransition);
+        $step = $this->getStep('currentStep', $isFinal, $hasAllowedTransition);
 
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects(self::once())
@@ -364,19 +369,18 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param bool $isFinal
-     * @param bool $hasAllowedTransitions
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|Step
-     */
-    protected function getStepMock(string $name, bool $isFinal = false, bool $hasAllowedTransitions = true): Step
+    private function getStep(string $name, bool $isFinal = false, bool $hasAllowedTransitions = true): Step
     {
-        $step = $this->getMockBuilder(Step::class)->disableOriginalConstructor()->getMock();
-        $step->expects(self::any())->method('getName')->willReturn($name);
-        $step->expects(self::any())->method('isFinal')->willReturn($isFinal);
-        $step->expects(self::any())->method('hasAllowedTransitions')->willReturn($hasAllowedTransitions);
+        $step = $this->createMock(Step::class);
+        $step->expects(self::any())
+            ->method('getName')
+            ->willReturn($name);
+        $step->expects(self::any())
+            ->method('isFinal')
+            ->willReturn($isFinal);
+        $step->expects(self::any())
+            ->method('hasAllowedTransitions')
+            ->willReturn($hasAllowedTransitions);
 
         return $step;
     }

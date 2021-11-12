@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityDataTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,18 +32,16 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array
      */
-    protected $entities = array();
+    protected $entities = [];
 
     /**
      * @var array
      */
-    protected $entityFieldsMetadata = array();
+    protected $entityFieldsMetadata = [];
 
     protected function setUp(): void
     {
-        $this->entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityMetadata = $this->createMock(EntityMetadata::class);
 
         $this->fieldName = 'foo';
 
@@ -48,29 +49,22 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->entities[] = $this->createTestEntity(2);
         $this->entities[] = $this->createTestEntity(3);
 
-        $this->fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldMetadata = $this->createMock(FieldMetadata::class);
 
         $this->fieldMetadata->expects($this->any())
             ->method('getFieldName')
-            ->will($this->returnValue($this->fieldName));
+            ->willReturn($this->fieldName);
 
-        $this->entityMetadata
-            ->expects($this->once())
+        $this->entityMetadata->expects($this->once())
             ->method('getFieldsMetadata')
-            ->will($this->returnValue(array($this->fieldMetadata)));
+            ->willReturn([$this->fieldMetadata]);
 
         $entityFieldsMetadata = & $this->entityFieldsMetadata;
         $this->entityMetadata->expects($this->any())
             ->method('getFieldsMetadata')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$entityFieldsMetadata) {
-                        return $entityFieldsMetadata;
-                    }
-                )
-            );
+            ->willReturnCallback(function () use (&$entityFieldsMetadata) {
+                return $entityFieldsMetadata;
+            });
 
         $this->entityData = new EntityData($this->entityMetadata, $this->entities);
         $this->entityData->setMasterEntity($this->entities[0]);
@@ -93,7 +87,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $barEntity = $this->createTestEntity(2);
 
         $expectedCount = count($this->entities) + 1;
-        $expectedEntities = array_merge($this->entities, array($fooEntity));
+        $expectedEntities = array_merge($this->entities, [$fooEntity]);
 
         $this->assertEquals($this->entityData, $this->entityData->addEntity($fooEntity));
 
@@ -103,7 +97,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->entityData->addEntity($barEntity);
 
         $expectedCount += 1;
-        $expectedEntities = array_merge($expectedEntities, array($barEntity));
+        $expectedEntities = array_merge($expectedEntities, [$barEntity]);
 
         $this->assertCount($expectedCount, $this->entityData->getEntities());
         $this->assertEquals($expectedEntities, $this->entityData->getEntities());
@@ -146,7 +140,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
     public function testGetField()
     {
         $field = $this->entityData->getField($this->fieldName);
-        $this->assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\FieldData', $field);
+        $this->assertInstanceOf(FieldData::class, $field);
         $this->assertEquals($this->fieldName, $field->getFieldName());
         $this->assertEquals($this->entityData, $field->getEntityData());
         $this->assertEquals($this->fieldMetadata, $field->getMetadata());
@@ -165,7 +159,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
     {
         $fields = $this->entityData->getFields();
         $this->assertCount(1, $fields);
-        $this->assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\FieldData', $fields[$this->fieldName]);
+        $this->assertInstanceOf(FieldData::class, $fields[$this->fieldName]);
     }
 
     protected function createTestEntity($id)

@@ -25,10 +25,10 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowVariableNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $variableNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
     private $variableGuesser;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */

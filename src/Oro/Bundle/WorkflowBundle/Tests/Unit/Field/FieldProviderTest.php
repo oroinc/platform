@@ -274,7 +274,7 @@ class FieldProviderTest extends EntityFieldProviderTest
     /**
      * exclusions are not used in workflow
      *
-     * @return array
+     * {@inheritdoc}
      */
     public function relationsExpectedDataProvider(): array
     {

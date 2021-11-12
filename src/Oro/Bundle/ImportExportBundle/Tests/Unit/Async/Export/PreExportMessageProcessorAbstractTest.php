@@ -9,6 +9,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -51,6 +52,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->dependentJob = $this->createMock(DependentJobService::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->exportHandler = $this->createMock(ExportHandler::class);
+
         $this->processor = new PreExportMessageProcessorStub(
             $this->jobRunner,
             $this->messageProducer,
@@ -68,14 +70,14 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessorStub::REJECT, $result);
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function uniqueJobResultProvider(): array
     {
         return [
-            [ true, PreExportMessageProcessorStub::ACK ],
-            [ false, PreExportMessageProcessorStub::REJECT ],
+            [true, MessageProcessorInterface::ACK],
+            [false, MessageProcessorInterface::REJECT],
         ];
     }
 
@@ -141,7 +143,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->processor->setJobUniqueName($jobUniqueName);
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     public function invalidUserTypeProvider(): array
@@ -164,7 +166,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidUserTypeProvider
      */
-    public function testShouldThrowExceptionOnGetUserIfUserTypeInvalid($user): void
+    public function testShouldThrowExceptionOnGetUserIfUserTypeInvalid(mixed $user): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported user type');
@@ -279,7 +281,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->processor->setJobUniqueName($jobUniqueName);
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     public function testShouldCreateTwoDelayedJobsAddDependentJobAndReturnACKOnTwoExportResultChunks(): void
@@ -353,14 +355,14 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->processor->setExportingEntityIds(range(1, 101));
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     private function createJob(int $id, Job $rootJob = null): Job
     {
         $job = new Job();
         $job->setId($id);
-        if ($rootJob instanceof Job) {
+        if (null !== $rootJob) {
             $job->setRootJob($rootJob);
         }
 

@@ -12,34 +12,18 @@ use Twig\Environment;
 
 class RenderTemplateTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
-    private $contextAccessor;
-
-    /**
-     * @var Environment
-     */
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
     private $twig;
 
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var RenderTemplate
-     */
+    /** @var RenderTemplate */
     private $action;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
         $this->twig = $this->createMock(Environment::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->action = new RenderTemplate($this->contextAccessor, $this->twig);
-        $this->action->setDispatcher($this->eventDispatcher);
+        $this->action = new RenderTemplate(new ContextAccessor(), $this->twig);
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testInitialize(): void

@@ -15,8 +15,10 @@ class StepSorterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    private function createMockDependentStep($mockClassName, array $dependencies = []): DependentMergeStepInterface
-    {
+    private function createMockDependentStep(
+        string $mockClassName,
+        array $dependencies = []
+    ): DependentMergeStepInterface {
         $result = $this->getMockBuilder(DependentMergeStepInterface::class)
             ->setMockClassName($mockClassName)
             ->getMock();

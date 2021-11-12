@@ -15,7 +15,7 @@ class RemoveWorkflowDefinitionsForRelatedEntityQueryTest extends \PHPUnit\Framew
     {
         $entityClassName = 'Some\Entity';
         $query = new RemoveWorkflowDefinitionsForRelatedEntityQuery($entityClassName);
-        static::assertStringContainsString($entityClassName, $query->getDescription());
+        self::assertStringContainsString($entityClassName, $query->getDescription());
     }
 
     public function testExecute()
@@ -24,16 +24,18 @@ class RemoveWorkflowDefinitionsForRelatedEntityQueryTest extends \PHPUnit\Framew
         $query = new RemoveWorkflowDefinitionsForRelatedEntityQuery($entityClassName);
         $logger = $this->createMock(LoggerInterface::class);
         $connection = $this->createMock(Connection::class);
-        $connection->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $connection->expects(self::once())
+            ->method('getDatabasePlatform')
+            ->willReturn(new MySqlPlatform());
 
-        $logger->expects(static::exactly(3))
+        $logger->expects(self::exactly(3))
             ->method('info')
             ->withConsecutive(
                 ['DELETE FROM oro_workflow_definition WHERE related_entity = :entity', []],
                 ['Parameters:', []],
                 ['[entity] = ' . $entityClassName, []],
             );
-        $connection->expects(static::once())
+        $connection->expects(self::once())
             ->method('executeStatement')
             ->with(
                 'DELETE FROM oro_workflow_definition WHERE related_entity = :entity',

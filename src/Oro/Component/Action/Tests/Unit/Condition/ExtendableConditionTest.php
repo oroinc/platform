@@ -13,19 +13,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 {
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    private FlashBag|\PHPUnit\Framework\MockObject\MockObject $flashBag;
+    /** @var FlashBag|\PHPUnit\Framework\MockObject\MockObject */
+    private $flashBag;
 
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private ExtendableCondition $extendableCondition;
+    /** @var ExtendableCondition */
+    private $extendableCondition;
 
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->flashBag = $this->createMock(FlashBag::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->extendableCondition = new ExtendableCondition(
             $this->eventDispatcher,
             $this->flashBag,
@@ -61,14 +66,12 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(
-                function (ExtendableConditionEvent $event) {
-                    $event->addError('First error');
-                    $event->addError('Second error');
+            ->willReturnCallback(function (ExtendableConditionEvent $event) {
+                $event->addError('First error');
+                $event->addError('Second error');
 
-                    return $event;
-                }
-            );
+                return $event;
+            });
     }
 
     /**
@@ -78,11 +81,9 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectsDispatchWithErrors(array_merge(['events' => ['aaa']], $options));
 
-        $this->translator
-            ->expects($this->exactly(2))
+        $this->translator->expects($this->exactly(2))
             ->method('trans');
-        $this->flashBag
-            ->expects($this->never())
+        $this->flashBag->expects($this->never())
             ->method('add');
 
         $this->assertFalse($this->extendableCondition->isConditionAllowed($context));
@@ -122,13 +123,11 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     ): void {
         $this->expectsDispatchWithErrors(array_merge(['events' => ['aaa']], $options));
 
-        $this->translator
-            ->expects($this->exactly(2))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->withConsecutive(['First error'], ['Second error'])
             ->willReturnOnConsecutiveCalls('Translated first error', 'Translated second error');
-        $this->flashBag
-            ->expects($this->exactly(2))
+        $this->flashBag->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
                 [$expectedMessageType, 'Translated first error'],

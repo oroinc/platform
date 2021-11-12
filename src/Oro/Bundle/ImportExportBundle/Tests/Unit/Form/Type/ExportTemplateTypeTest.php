@@ -11,19 +11,15 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ExportTemplateTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $processorRegistry;
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorRegistry;
 
-    /**
-     * @var ExportTemplateType
-     */
-    protected $exportTemplateType;
+    /** @var ExportTemplateType */
+    private $exportTemplateType;
 
     protected function setUp(): void
     {
-        $this->processorRegistry = $this->getMockBuilder(ProcessorRegistry::class)->getMock();
+        $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
         $this->exportTemplateType = new ExportTemplateType($this->processorRegistry);
         parent::setUp();
     }

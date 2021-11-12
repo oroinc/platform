@@ -730,10 +730,9 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     }
 
     /**
-     * @param null|string $triggerName
-     * @return ProcessTrigger[]|ProcessTrigger
+     * {@inheritDoc}
      */
-    protected function getTriggers($triggerName = null)
+    protected function getTriggers(string $triggerName = null): array|object
     {
         if (!$this->triggers) {
             $triggerPriority = 0;
@@ -798,26 +797,17 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         return $entityTrigger;
     }
 
-    /**
-     * @return mixed
-     */
-    private function getExtensionTriggers(AbstractEventTriggerExtension $extension)
+    private function getExtensionTriggers(AbstractEventTriggerExtension $extension): mixed
     {
         return ReflectionUtil::getPropertyValue($extension, 'triggers');
     }
 
-    /**
-     * @return mixed
-     */
-    private function getExtensionScheduledProcesses(AbstractEventTriggerExtension $extension)
+    private function getExtensionScheduledProcesses(AbstractEventTriggerExtension $extension): mixed
     {
         return ReflectionUtil::getPropertyValue($extension, 'scheduledProcesses');
     }
 
-    /**
-     * @return mixed
-     */
-    private function getExtensionRemovedEntityHashes(AbstractEventTriggerExtension $extension)
+    private function getExtensionRemovedEntityHashes(AbstractEventTriggerExtension $extension): mixed
     {
         return ReflectionUtil::getPropertyValue($extension, 'removedEntityHashes');
     }

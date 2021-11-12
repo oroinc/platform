@@ -12,30 +12,29 @@ use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
 class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    private ActionData|\PHPUnit\Framework\MockObject\MockObject $actionData;
+    /** @var ActionData|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionData;
 
-    private AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject $attributeGuesser;
+    /** @var AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeGuesser;
 
-    private AttributeAssembler $assembler;
+    /** @var AttributeAssembler */
+    private $assembler;
 
     protected function setUp(): void
     {
         $this->actionData = $this->createMock(ActionData::class);
+        $this->attributeGuesser = $this->createMock(AttributeGuesser::class);
+
         $this->actionData->expects($this->any())
             ->method('getEntity')
             ->willReturn(new \stdClass());
-
-        $this->attributeGuesser = $this->createMock(AttributeGuesser::class);
 
         $this->assembler = new AttributeAssembler($this->attributeGuesser);
     }
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     *
-     * @param array $configuration
-     * @param string $exception
-     * @param string $message
      */
     public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message): void
     {
@@ -46,7 +45,6 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function invalidOptionsDataProvider(): array
@@ -164,10 +162,6 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurationDataProvider
-     *
-     * @param array $configuration
-     * @param Attribute $expectedAttribute
-     * @param array $guessedParameters
      */
     public function testAssemble(
         array $configuration,
@@ -191,7 +185,6 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function configurationDataProvider(): array

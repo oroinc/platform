@@ -16,44 +16,30 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ImportHandler|MockObject
-     */
+    /** @var ImportHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $importHandler;
 
-    /**
-     * @var JobRunner|MockObject
-     */
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
 
-    /**
-     * @var LoggerInterface|MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var ImportExportResultSummarizer|MockObject
-     */
+    /** @var ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject */
     private $importExportResultSummarizer;
 
-    /**
-     * @var FileManager|MockObject
-     */
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
-    /**
-     * @var PostponedRowsHandler|MockObject
-     */
+    /** @var PostponedRowsHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $postponedRowsHandler;
 
-    /**
-     * @var ImportMessageProcessor
-     */
+    /** @var ImportMessageProcessor */
     private $processor;
 
     protected function setUp(): void
@@ -93,7 +79,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldRequesIfJobRedeliveryExceptionWasThrown()
     {
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
@@ -112,7 +98,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REQUEUE, $result);
     }
 
-    public function testShouldRequesIfDeadlockDetected()
+    public function testShouldRequeueIfDeadlockDetected()
     {
         $job = new Job();
         $job->setId(1);
@@ -128,25 +114,20 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(1)
-            ->willReturnCallback(
-                function ($jobId, $callback) use ($job) {
-                    return $callback($this->jobRunner, $job);
-                }
-            );
+            ->willReturnCallback(function ($jobId, $callback) use ($job) {
+                return $callback($this->jobRunner, $job);
+            });
 
-        $this->importHandler
-            ->expects($this->once())
+        $this->importHandler->expects($this->once())
             ->method('setImportingFileName')
             ->with('123456.csv');
-        $this->importHandler
-            ->expects($this->once())
+        $this->importHandler->expects($this->once())
             ->method('handle')
             ->willReturn([
                 'deadlockDetected' => true
             ]);
 
-        $this->importExportResultSummarizer
-            ->expects($this->never())
+        $this->importExportResultSummarizer->expects($this->never())
             ->method('getImportSummaryMessage');
 
         $this->fileManager->expects($this->once())
@@ -158,7 +139,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('writeToStorage');
 
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
@@ -171,7 +152,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        static::assertEquals(MessageProcessorInterface::REQUEUE, $result);
+        self::assertEquals(MessageProcessorInterface::REQUEUE, $result);
     }
 
     public function testShouldProcessedWithPostponedRows()
@@ -201,11 +182,9 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(1)
-            ->willReturnCallback(
-                function ($jobId, $callback) use ($job) {
-                    return $callback($this->jobRunner, $job);
-                }
-            );
+            ->willReturnCallback(function ($jobId, $callback) use ($job) {
+                return $callback($this->jobRunner, $job);
+            });
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -219,17 +198,14 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'errors' => null,
             'postponedRows' => ['test' => 1]
         ];
-        $this->importHandler
-            ->expects($this->once())
+        $this->importHandler->expects($this->once())
             ->method('setImportingFileName')
             ->with('123456.csv');
-        $this->importHandler
-            ->expects($this->once())
+        $this->importHandler->expects($this->once())
             ->method('handle')
             ->willReturn($result);
 
-        $this->importExportResultSummarizer
-            ->expects($this->once())
+        $this->importExportResultSummarizer->expects($this->once())
             ->method('getImportSummaryMessage')
             ->with()
             ->willReturn('Import of the csv is completed, success: 1, info: imports was done, message: ');
@@ -252,25 +228,22 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->jobRunner, $job, 'postpone.csv', $body, $result);
 
         $message = new Message();
-        $message->setBody(json_encode($body));
+        $message->setBody(JSON::encode($body));
 
         $processResult = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        static::assertEquals(MessageProcessorInterface::ACK, $processResult);
-        static::assertContainsEquals([
+        self::assertEquals(MessageProcessorInterface::ACK, $processResult);
+        self::assertContainsEquals([
             'success' => true,
             'filePath' => 'csv',
         ], $job->getData());
-        static::assertArrayNotHasKey('message', $job->getData());
-        static::assertArrayNotHasKey('importInfo', $job->getData());
-        static::assertArrayNotHasKey('errors', $job->getData());
-        static::assertArrayNotHasKey('postponedRows', $job->getData());
+        self::assertArrayNotHasKey('message', $job->getData());
+        self::assertArrayNotHasKey('importInfo', $job->getData());
+        self::assertArrayNotHasKey('errors', $job->getData());
+        self::assertArrayNotHasKey('postponedRows', $job->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForTestProcessImport()
+    public function processImportDataProvider(): array
     {
         return [
             [
@@ -296,11 +269,11 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider dataProviderForTestProcessImport
+     * @dataProvider processImportDataProvider
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testShouldProcessedDataMessage($body, $writeLog)
+    public function testShouldProcessedDataMessage(array $body, int $writeLog)
     {
         $job = new Job();
         $job->setId(1);
@@ -319,27 +292,22 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with(1)
-            ->willReturnCallback(
-                function ($jobId, $callback) use ($job) {
-                    return $callback($this->jobRunner, $job);
-                }
-            );
+            ->willReturnCallback(function ($jobId, $callback) use ($job) {
+                return $callback($this->jobRunner, $job);
+            });
 
         $this->logger->expects($this->once())
             ->method('info')
             ->with('Import of the csv is completed, success: 1, info: imports was done, message: ');
 
-        $this->importHandler
-            ->expects($this->once())
+        $this->importHandler->expects($this->once())
             ->method('setImportingFileName')
             ->with('123456.csv');
-        $this->importHandler
-            ->expects($this->once())
+        $this->importHandler->expects($this->once())
             ->method('handle')
             ->willReturn($body);
 
-        $this->importExportResultSummarizer
-            ->expects($this->once())
+        $this->importExportResultSummarizer->expects($this->once())
             ->method('getImportSummaryMessage')
             ->with()
             ->willReturn('Import of the csv is completed, success: 1, info: imports was done, message: ');
@@ -353,7 +321,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('writeToStorage');
 
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
@@ -366,14 +334,14 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        static::assertEquals(MessageProcessorInterface::ACK, $result);
-        static::assertContainsEquals([
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertContainsEquals([
             'success' => true,
             'filePath' => 'csv',
         ], $job->getData());
-        static::assertArrayNotHasKey('message', $job->getData());
-        static::assertArrayNotHasKey('importInfo', $job->getData());
-        static::assertArrayNotHasKey('errors', $job->getData());
-        static::assertArrayNotHasKey('postponedRows', $job->getData());
+        self::assertArrayNotHasKey('message', $job->getData());
+        self::assertArrayNotHasKey('importInfo', $job->getData());
+        self::assertArrayNotHasKey('errors', $job->getData());
+        self::assertArrayNotHasKey('postponedRows', $job->getData());
     }
 }

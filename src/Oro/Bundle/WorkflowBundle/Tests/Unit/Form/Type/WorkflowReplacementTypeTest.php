@@ -17,14 +17,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 {
     /** @var WorkflowDeactivationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $helper;
+    private $helper;
 
     /** @var WorkflowReplacementType */
-    protected $formType;
+    private $formType;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->helper = $this->createMock(WorkflowDeactivationHelper::class);
@@ -61,7 +58,6 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 
         $formView = new FormView();
 
-        /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
 
         $this->helper->expects($this->once())
@@ -100,10 +96,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             'empty form' => [
@@ -147,14 +140,18 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
      * @param string $name
      * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getWorkflow($name)
+    private function getWorkflow($name)
     {
         $definition = new WorkflowDefinition();
         $definition->setName($name);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())->method('getName')->willReturn($name);
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         return $workflow;
     }

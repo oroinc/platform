@@ -30,7 +30,6 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
         $barContext = $this->registry->getByStepExecution($barStepExecution);
         static::assertNotSame($barContext, $fooContext);
 
-        /** @var MockObject|JobInstance $jobInstance */
         $jobInstance = $this->createMock(JobInstance::class);
         $jobInstance->method('getAlias')->willReturn('job2');
         $this->registry->clear($jobInstance);
@@ -44,7 +43,7 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
      */
     protected function createStepExecution($alias = null)
     {
-        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         if ($alias) {
             $jobExecution = $this->createMock(JobExecution::class);

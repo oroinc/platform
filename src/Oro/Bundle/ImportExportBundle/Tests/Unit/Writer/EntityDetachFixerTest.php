@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
@@ -14,31 +15,27 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
-    protected $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
     /** @var EntityDetachFixer */
-    protected $fixer;
+    private $fixer;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock('Doctrine\ORM\EntityManager');
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
 
-        $this->doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($this->entityManager));
-
-        $this->fieldHelper = $this->createMock('Oro\Bundle\EntityBundle\Helper\FieldHelper');
+            ->willReturn($this->entityManager);
 
         $this->fixer = new EntityDetachFixer(
-            $this->doctrineHelper,
+            $doctrineHelper,
             $this->fieldHelper,
             PropertyAccess::createPropertyAccessor()
         );
@@ -65,7 +62,7 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->never())
             ->method('getUnitOfWork');
 
-        $this->fixer->fixEntityAssociationFields($entity, 0);
+        $this->fixer->fixEntityAssociationFields($entity);
     }
 
     public function testFixEntityAssociationFields()
@@ -91,18 +88,18 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $metadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->exactly(4))
             ->method('getIdentifierValues')
             ->withAnyParameters()
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
 
         $this->entityManager->expects($this->exactly(4))
             ->method('getClassMetadata')
             ->with(EntityStub::class)
             ->willReturn($metadata);
 
-        $uow = $this->createMock('Doctrine\ORM\UnitOfWork');
+        $uow = $this->createMock(UnitOfWork::class);
         $uow->expects($this->exactly(4))
             ->method('getEntityState')
             ->willReturn(UnitOfWork::STATE_DETACHED);
@@ -110,22 +107,22 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         // 4 entity check + 2 check inside PersistentCollection on set entity
         $this->entityManager->expects($this->exactly(6))
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->willReturn($uow);
 
         $this->entityManager->expects($this->exactly(4))
             ->method('getReference')
             ->with(EntityStub::class, 'id')
-            ->willReturnCallback(
-                function () {
-                    $entity = new EntityStub();
-                    $entity->reloaded = true;
-                    return $entity;
-                }
-            );
+            ->willReturnCallback(function () {
+                $entity = new EntityStub();
+                $entity->reloaded = true;
 
-        $uow->expects($this->never())->method('loadCollection');
+                return $entity;
+            });
 
-        $this->fixer->fixEntityAssociationFields($entity, 0);
+        $uow->expects($this->never())
+            ->method('loadCollection');
+
+        $this->fixer->fixEntityAssociationFields($entity);
 
         $this->assertTrue($entity->getEntity()->reloaded);
 
@@ -142,12 +139,7 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($entity->getCleanNotInitializedPersistentCollection()->first()->reloaded);
     }
 
-    /**
-     * @param bool $isDirty
-     * @param bool $isInitialized
-     * @return PersistentCollection
-     */
-    private function createPersistentCollection($isDirty, $isInitialized)
+    private function createPersistentCollection(bool $isDirty, bool $isInitialized): PersistentCollection
     {
         $changedPersistentCollection = new PersistentCollection(
             $this->entityManager,

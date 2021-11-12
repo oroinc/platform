@@ -78,7 +78,7 @@ class StepManagerTest extends \PHPUnit\Framework\TestCase
      * @param null|int $order
      * @return Step
      */
-    protected function getStep($name, $order = null)
+    private function getStep($name, $order = null)
     {
         return $this->getEntity(Step::class, ['name' => $name, 'order' => $order]);
     }

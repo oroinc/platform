@@ -6,35 +6,19 @@ use Oro\Component\Action\Action\CreateObject;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CreateObjectTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CreateObject */
-    protected $action;
-
-    /** @var ContextAccessor */
-    protected $contextAccessor;
+    private $action;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
-        $this->action = new class($this->contextAccessor) extends CreateObject {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->contextAccessor, $this->action);
+        $this->action = new CreateObject(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testInitializeExceptionNoClassName()
@@ -42,7 +26,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Class name parameter is required');
 
-        $this->action->initialize(['some' => 1, 'attribute' => $this->getPropertyPath()]);
+        $this->action->initialize(['some' => 1, 'attribute' => $this->createMock(PropertyPath::class)]);
     }
 
     public function testInitializeExceptionNoAttribute()
@@ -66,9 +50,11 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object data must be an array.');
 
-        $this->action->initialize(
-            ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'data' => 'string_value']
-        );
+        $this->action->initialize([
+            'class' => 'stdClass',
+            'attribute' => $this->createMock(PropertyPath::class),
+            'data' => 'string_value'
+        ]);
 
         $this->action->execute(new ItemStub());
     }
@@ -78,16 +64,18 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object constructor arguments must be an array.');
 
-        $this->action->initialize(
-            ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'arguments' => 'string_value']
-        );
+        $this->action->initialize([
+            'class' => 'stdClass',
+            'attribute' => $this->createMock(PropertyPath::class),
+            'arguments' => 'string_value'
+        ]);
     }
 
     public function testInitialize()
     {
-        $options = ['class' => 'stdClass', 'attribute' => $this->getPropertyPath()];
-        static::assertEquals($this->action, $this->action->initialize($options));
-        static::assertEquals($options, $this->action->xgetOptions());
+        $options = ['class' => 'stdClass', 'attribute' => $this->createMock(PropertyPath::class)];
+        self::assertEquals($this->action, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     /**
@@ -99,35 +87,32 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $attributeName = (string)$options['attribute'];
         $this->action->initialize($options);
         $this->action->execute($context);
-        static::assertNotNull($context->$attributeName);
-        static::assertInstanceOf($options['class'], $context->$attributeName);
+        self::assertNotNull($context->{$attributeName});
+        self::assertInstanceOf($options['class'], $context->{$attributeName});
 
-        if ($context->$attributeName instanceof ItemStub) {
+        if ($context->{$attributeName} instanceof ItemStub) {
             /** @var ItemStub $entity */
-            $entity = $context->$attributeName;
+            $entity = $context->{$attributeName};
             if (!$expectedData) {
                 $expectedData = !empty($options['data']) ? $options['data'] : [];
             }
-            static::assertInstanceOf($options['class'], $entity);
-            static::assertEquals($expectedData, $entity->getData());
+            self::assertInstanceOf($options['class'], $entity);
+            self::assertEquals($expectedData, $entity->getData());
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             'without data' => [
                 'options' => [
-                    'class'     => 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub',
+                    'class'     => ItemStub::class,
                     'attribute' => new PropertyPath('test_attribute'),
                 ]
             ],
             'with data' => [
                 'options' => [
-                    'class'     => 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub',
+                    'class'     => ItemStub::class,
                     'attribute' => new PropertyPath('test_attribute'),
                     'data'      => ['key1' => new PropertyPath('test_attribute'), 'key2' => 'value2'],
                 ],
@@ -136,14 +121,14 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
             ],
             'with arguments' => [
                 'options' => [
-                    'class'     => '\DateTime',
+                    'class'     => \DateTime::class,
                     'attribute' => new PropertyPath('test_attribute'),
                     'arguments' => ['now'],
                 ]
             ],
             'with complex arguments' => [
                 'options' => [
-                    'class'     => 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub',
+                    'class'     => ItemStub::class,
                     'attribute' => new PropertyPath('test_attribute'),
                     'arguments' => [['test', new PropertyPath('test_attribute')]],
                 ],
@@ -161,10 +146,5 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
                 ['key1' => 'val1']
             ]
         ];
-    }
-
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
     }
 }

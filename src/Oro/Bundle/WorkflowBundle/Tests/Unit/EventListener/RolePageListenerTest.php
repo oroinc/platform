@@ -9,33 +9,35 @@ use Oro\Bundle\WorkflowBundle\EventListener\RolePageListener;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RolePageListener */
-    protected $listener;
-
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
+
+    /** @var RolePageListener */
+    private $listener;
 
     protected function setUp(): void
     {
-        $translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
+        $this->requestStack = new RequestStack();
+
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($value) {
                 return 'translated: ' . $value;
             });
 
-        $this->requestStack = new RequestStack();
         $this->listener = new RolePageListener($translator, $this->requestStack);
     }
 
     public function testOnUpdatePageRenderWithoutRequest()
     {
         $event = new BeforeFormRenderEvent(
-            $this->createMock('Symfony\Component\Form\FormView'),
+            $this->createMock(FormView::class),
             [],
             $this->createMock(Environment::class),
             null
@@ -49,7 +51,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnUpdatePageRenderOnWrongPage()
     {
         $event = new BeforeFormRenderEvent(
-            $this->createMock('Symfony\Component\Form\FormView'),
+            $this->createMock(FormView::class),
             [],
             $this->createMock(Environment::class),
             null
@@ -65,7 +67,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnUpdatePageRenderOnNonCloneRolePage()
     {
         $event = new BeforeFormRenderEvent(
-            $this->createMock('Symfony\Component\Form\FormView'),
+            $this->createMock(FormView::class),
             [],
             $this->createMock(Environment::class),
             null
@@ -87,7 +89,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onUpdatePageRenderRoutesProvider
      */
-    public function testOnUpdatePageRenderWithEntityInEvent($routeName, $routeParameters = [])
+    public function testOnUpdatePageRenderWithEntityInEvent(string $routeName, array $routeParameters = [])
     {
         $entity = new Role();
         $form = new FormView();
@@ -138,7 +140,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onUpdatePageRenderRoutesProvider
      */
-    public function testOnUpdatePageRenderWithoutEntityInEvent($routeName, $routeParameters = [])
+    public function testOnUpdatePageRenderWithoutEntityInEvent(string $routeName, array $routeParameters = [])
     {
         $entity = new Role();
         $form = new FormView();
@@ -186,7 +188,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function onUpdatePageRenderRoutesProvider()
+    public function onUpdatePageRenderRoutesProvider(): array
     {
         return [
             ['oro_user_role_update'],

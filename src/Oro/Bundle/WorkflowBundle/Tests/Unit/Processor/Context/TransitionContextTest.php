@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 class TransitionContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionContext */
-    protected $context;
+    private $context;
 
     protected function setUp(): void
     {
@@ -150,7 +150,9 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     public function accessorsProperties()
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
 
         return [
             ['setTransition', 'getTransition', $this->createMock(Transition::class)],
@@ -221,7 +223,9 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     public function hasAccessors()
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
 
         return [
             ['setWorkflowItem', 'hasWorkflowItem', $workflowItem],

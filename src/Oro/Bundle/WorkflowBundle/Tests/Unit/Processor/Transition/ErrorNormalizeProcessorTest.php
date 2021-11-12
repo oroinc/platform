@@ -21,10 +21,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var ErrorNormalizeProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
@@ -46,14 +46,14 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($message, $context->get('responseMessage'));
     }
 
-    protected function createContextAndLoggingAssertions(\Throwable $error): TransitionContext
+    private function createContextAndLoggingAssertions(\Throwable $error): TransitionContext
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
 
         $context = new TransitionContext();
         $context->setError($error);
@@ -74,10 +74,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @return \Generator
-     */
-    public function errorsProvider()
+    public function errorsProvider(): \Generator
     {
         yield 'http' => [
             new BadRequestHttpException('http message', null, 418),
@@ -124,25 +121,29 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSkipHasNoError()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('hasError')->willReturn(false);
-        $context->expects($this->never())->method('getError');
+        $context->expects($this->once())
+            ->method('hasError')
+            ->willReturn(false);
+        $context->expects($this->never())
+            ->method('getError');
 
         $this->processor->process($context);
     }
 
     public function testSkipAsResponseCodeAndMessageAlreadyDefined()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('hasError')->willReturn(true);
+        $context->expects($this->once())
+            ->method('hasError')
+            ->willReturn(true);
         $context->expects($this->exactly(2))
             ->method('has')
             ->withConsecutive(['responseCode'], ['responseMessage'])
             ->willReturn(true);
 
-        $context->expects($this->never())->method('getError');
+        $context->expects($this->never())
+            ->method('getError');
 
         $this->processor->process($context);
     }

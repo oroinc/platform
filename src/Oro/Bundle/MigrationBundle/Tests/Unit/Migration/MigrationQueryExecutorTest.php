@@ -62,20 +62,8 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteMigrationQuery()
     {
-        $query = $this
-            ->getMockForAbstractClass(
-                MigrationQuery::class,
-                [],
-                '',
-                true,
-                true,
-                true,
-                ['setConnection', 'execute']
-            )
-        ;
+        $query = $this->createMock(MigrationQuery::class);
 
-        $query->expects($this->never())
-            ->method('setConnection');
         $query->expects($this->once())
             ->method('execute')
             ->with($this->identicalTo($this->logger));

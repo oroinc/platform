@@ -3,94 +3,64 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AbstractConditionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDoEvaluate()
+    public function testEvaluateForAllowedCondition()
     {
-        $allowedCondition = new class() extends AbstractCondition {
-            protected function isConditionAllowed($context)
-            {
-                return true;
-            }
-
-            public function xdoEvaluate($context)
-            {
-                return parent::doEvaluate($context);
-            }
-
-            public function xgetErrors(): ?\ArrayAccess
-            {
-                return $this->errors;
-            }
-
-            public function getName()
-            {
-            }
-
-            public function initialize(array $options)
-            {
-            }
-
-            public function toArray()
-            {
-            }
-
-            public function compile($factoryAccessor)
-            {
-            }
-        };
-
-        $notAllowedCondition = new class() extends AbstractCondition {
-            public function __construct()
-            {
-                $this->errors = new \ArrayObject();
-            }
-
-            protected function isConditionAllowed($context)
-            {
-                return false;
-            }
-
-            public function xdoEvaluate($context)
-            {
-                return parent::doEvaluate($context);
-            }
-
-            public function xgetErrors(): ?\ArrayAccess
-            {
-                return $this->errors;
-            }
-
-            public function getName()
-            {
-            }
-
-            public function initialize(array $options)
-            {
-            }
-
-            public function toArray()
-            {
-            }
-
-            public function compile($factoryAccessor)
-            {
-            }
-        };
-
         $context = new \stdClass();
-
-        $result = $allowedCondition->xdoEvaluate($context);
+        $condition = $this->createCondition(true);
+        $errors = new \ArrayObject();
+        $result = $condition->evaluate($context);
         self::assertTrue($result);
-        self::assertNull($allowedCondition->xgetErrors());
+        self::assertNull(ReflectionUtil::getPropertyValue($condition, 'errors'));
+        self::assertCount(0, $errors);
+    }
 
-        $notAllowedCondition->setMessage('test_message');
-        $result = $notAllowedCondition->xdoEvaluate($context);
+    public function testEvaluateForNotAllowedCondition()
+    {
+        $context = new \stdClass();
+        $condition = $this->createCondition(false);
+        $condition->setMessage('test_message');
+        $errors = new \ArrayObject();
+        $result = $condition->evaluate($context, $errors);
         self::assertFalse($result);
-        self::assertEquals(
-            new \ArrayObject([['message' => 'test_message', 'parameters' => []]]),
-            $notAllowedCondition->xgetErrors()
-        );
+        self::assertNull(ReflectionUtil::getPropertyValue($condition, 'errors'));
+        self::assertCount(1, $errors);
+        self::assertEquals(['message' => 'test_message', 'parameters' => []], $errors[0]);
+    }
+
+    private function createCondition(bool $allowed): AbstractCondition
+    {
+        return new class($allowed) extends AbstractCondition {
+            private bool $isConditionAllowed;
+
+            public function __construct($isConditionAllowed)
+            {
+                $this->isConditionAllowed = $isConditionAllowed;
+            }
+
+            protected function isConditionAllowed($context)
+            {
+                return $this->isConditionAllowed;
+            }
+
+            public function getName()
+            {
+            }
+
+            public function initialize(array $options)
+            {
+            }
+
+            public function toArray()
+            {
+            }
+
+            public function compile($factoryAccessor)
+            {
+            }
+        };
     }
 }

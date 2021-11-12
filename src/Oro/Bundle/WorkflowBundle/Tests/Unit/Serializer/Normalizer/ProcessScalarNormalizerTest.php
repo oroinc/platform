@@ -6,10 +6,8 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessScalarNormalizer;
 
 class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessScalarNormalizer
-     */
-    protected $normalizer;
+    /** @var ProcessScalarNormalizer */
+    private $normalizer;
 
     protected function setUp(): void
     {
@@ -31,7 +29,7 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupportsNormalization($data, $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
@@ -39,18 +37,18 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupportsDenormalization($data, $expected)
+    public function testSupportsDenormalization(mixed $data, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
-        return array(
-            'null'   => array(null, true),
-            'scalar' => array('scalar', true),
-            'array' => array(array(), false),
-            'object' => array(new \DateTime(), false),
-        );
+        return [
+            'null'   => [null, true],
+            'scalar' => ['scalar', true],
+            'array' => [[], false],
+            'object' => [new \DateTime(), false],
+        ];
     }
 }

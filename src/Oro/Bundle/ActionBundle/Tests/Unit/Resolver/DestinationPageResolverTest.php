@@ -10,17 +10,14 @@ use Symfony\Component\Routing\RouterInterface;
 class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigHelper;
+    private $entityConfigHelper;
 
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
     /** @var DestinationPageResolver */
-    protected $resolver;
+    private $resolver;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
@@ -58,11 +55,12 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
             ->method('getRoutes')
             ->willReturn(['name' => 'index_route', 'view' => 'view_route']);
 
-        $this->router->expects($this->any())->method('generate')
-            ->will($this->returnValueMap([
+        $this->router->expects($this->any())
+            ->method('generate')
+            ->willReturnMap([
                 ['index_route', [], RouterInterface::ABSOLUTE_PATH, 'example.com/index'],
                 ['view_route', ['id' => 10], RouterInterface::ABSOLUTE_PATH, 'example.com/view'],
-            ]));
+            ]);
 
         $this->assertEquals('example.com/index', $this->resolver->resolveDestinationUrl($entity, 'name'));
         $this->assertEquals('example.com/view', $this->resolver->resolveDestinationUrl($entity, 'view'));

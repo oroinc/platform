@@ -9,50 +9,36 @@ use Oro\Component\Action\Event\ExtendableActionEvent;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ExtendableActionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EventDispatcherInterface|MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dispatcher;
 
-    /**
-     * @var ExtendableAction
-     */
+    /** @var ExtendableAction */
     private $action;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->action = new class(new ContextAccessor()) extends ExtendableAction {
-            public function xgetSubscribedEvents(): array
-            {
-                return $this->subscribedEvents;
-            }
-        };
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->action = new ExtendableAction(new ContextAccessor());
         $this->action->setDispatcher($this->dispatcher);
     }
 
     /**
      * @dataProvider initializeWhenThrowsExceptionProvider
-     * @param array $options
-     * @param string $exceptionMessage
      */
-    public function testInitializeWhenThrowsException(array $options, $exceptionMessage)
+    public function testInitializeWhenThrowsException(array $options, string $exceptionMessage)
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeWhenThrowsExceptionProvider()
+    public function initializeWhenThrowsExceptionProvider(): array
     {
         return [
             'no required options' => [
@@ -70,8 +56,8 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
     {
         $events = ['some_event_name'];
         $result = $this->action->initialize(['events' => $events]);
-        static::assertEquals($events, $this->action->xgetSubscribedEvents());
-        static::assertInstanceOf(ActionInterface::class, $result);
+        self::assertEquals($events, ReflectionUtil::getPropertyValue($this->action, 'subscribedEvents'));
+        self::assertInstanceOf(ActionInterface::class, $result);
     }
 
     public function testExecute()
@@ -81,19 +67,19 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         $eventWithListeners = 'some_event_with_listeners';
         $event = new ExtendableActionEvent($context);
 
-        $this->dispatcher->expects(static::exactly(2))
+        $this->dispatcher->expects(self::exactly(2))
             ->method('hasListeners')
             ->withConsecutive(
                 [$eventWithoutListeners],
                 [$eventWithListeners]
             )
             ->willReturn(false, true);
-        $this->dispatcher->expects(static::exactly(3))
+        $this->dispatcher->expects(self::exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                [static::anything(), ExecuteActionEvents::HANDLE_BEFORE],
+                [self::anything(), ExecuteActionEvents::HANDLE_BEFORE],
                 [$event, $eventWithListeners],
-                [static::anything(), ExecuteActionEvents::HANDLE_AFTER]
+                [self::anything(), ExecuteActionEvents::HANDLE_AFTER]
             );
 
         $this->action->initialize(['events' => [$eventWithoutListeners, $eventWithListeners]]);

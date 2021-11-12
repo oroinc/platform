@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
+use Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestTemplateEntityRepository;
 
 class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityRegistry;
+    /** @var TemplateEntityRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRegistry;
 
     /** @var TemplateManager */
-    protected $templateManager;
+    private $templateManager;
 
     protected function setUp(): void
     {
-        $this->entityRegistry     =
-            $this->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->entityRegistry = $this->createMock(TemplateEntityRegistry::class);
+
         $this->templateManager = new TemplateManager($this->entityRegistry);
     }
 
     public function testHasEntityRepository()
     {
-        $repository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
+        $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity'));
+            ->willReturn('Test\Entity');
 
         $this->templateManager->addEntityRepository($repository);
 
@@ -44,16 +44,16 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     public function testHasEntityFixture()
     {
         $repository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
         $repository->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity1'));
+            ->willReturn('Test\Entity1');
 
-        $fixture = $this->createMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
+        $fixture = $this->createMock(TemplateFixtureInterface::class);
         $fixture->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity2'));
+            ->willReturn('Test\Entity2');
 
         $this->templateManager->addEntityRepository($repository);
         $this->templateManager->addEntityRepository($fixture);
@@ -72,16 +72,16 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityRepository()
     {
         $repository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
         $repository->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity1'));
+            ->willReturn('Test\Entity1');
 
-        $fixture = $this->createMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
+        $fixture = $this->createMock(TemplateFixtureInterface::class);
         $fixture->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity2'));
+            ->willReturn('Test\Entity2');
 
         $this->templateManager->addEntityRepository($repository);
         $this->templateManager->addEntityRepository($fixture);
@@ -102,7 +102,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         $repository = $this->templateManager->getEntityFixture('Test\Entity1');
 
         $this->assertInstanceOf(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture',
+            EmptyFixture::class,
             $repository
         );
         $this->assertEquals('Test\Entity1', $repository->getEntityClass());
@@ -111,16 +111,16 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityFixture()
     {
         $repository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
         $repository->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity1'));
+            ->willReturn('Test\Entity1');
 
-        $fixture = $this->createMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
+        $fixture = $this->createMock(TemplateFixtureInterface::class);
         $fixture->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity2'));
+            ->willReturn('Test\Entity2');
 
         $this->templateManager->addEntityRepository($repository);
         $this->templateManager->addEntityRepository($fixture);
@@ -136,7 +136,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         $fixture = $this->templateManager->getEntityFixture('Test\Entity1');
 
         $this->assertInstanceOf(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture',
+            EmptyFixture::class,
             $fixture
         );
         $this->assertEquals('Test\Entity1', $fixture->getEntityClass());
@@ -145,11 +145,11 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     public function testFrozenTemplateManager()
     {
         $repository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
         $repository->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue('Test\Entity1'));
+            ->willReturn('Test\Entity1');
 
         $this->templateManager->addEntityRepository($repository);
 
@@ -159,7 +159,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         );
 
         $anotherRepository = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
 
         $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);

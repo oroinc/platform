@@ -11,20 +11,24 @@ use Symfony\Component\Routing\RouterInterface;
 
 class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private OriginalUrlProvider $urlProvider;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var UrlConverter|\PHPUnit\Framework\MockObject\MockObject */
+    private $datagridUrlConverter;
 
-    private UrlConverter|\PHPUnit\Framework\MockObject\MockObject $datagridUrlConverter;
+    /** @var OriginalUrlProvider */
+    private $urlProvider;
 
-    /** {@inheritdoc} */
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->datagridUrlConverter = $this->createMock(UrlConverter::class);
+
         $this->urlProvider = new OriginalUrlProvider(
             $this->requestStack,
             $this->router,
@@ -70,15 +74,14 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
             'appearanceType' => 'grid',
         ];
 
-        $requestUri = '/admin/datagrid/quotes-grid?' . \http_build_query($pageParams);
-        $responseUri = '/admin/sale/quote?' . \http_build_query([$datagridName => $pageParams[$datagridName]]);
+        $requestUri = '/admin/datagrid/quotes-grid?' . http_build_query($pageParams);
+        $responseUri = '/admin/sale/quote?' . http_build_query([$datagridName => $pageParams[$datagridName]]);
 
         $this->requestStack->expects(self::once())
             ->method('getMainRequest')
             ->willReturn($this->getRequest($requestUri));
 
-        $this->datagridUrlConverter
-            ->expects(self::once())
+        $this->datagridUrlConverter->expects(self::once())
             ->method('convertGridUrlToPageUrl')
             ->with($datagridName, $requestUri)
             ->willReturn($responseUri);
@@ -91,20 +94,12 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $requestUri
-     * @return Request
-     */
     private function getRequest(string $requestUri): Request
     {
         return new Request([], [], [], [], [], ['REQUEST_URI' => $requestUri]);
     }
 
-    /**
-     * @param string|null $datagridName
-     * @return ButtonSearchContext
-     */
-    private function getSearchButtonContext($datagridName): ButtonSearchContext
+    private function getSearchButtonContext(?string $datagridName): ButtonSearchContext
     {
         $btnContext = new ButtonSearchContext();
         $btnContext->setDatagrid($datagridName);

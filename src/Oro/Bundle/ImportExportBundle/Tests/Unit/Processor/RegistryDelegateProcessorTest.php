@@ -14,77 +14,76 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Processor\RegistryDelegateProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\StepExecutionAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\Mocks\ClassWithCloseMethod;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 
 class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject */
-    protected $processorRegistry;
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $processorRegistry;
 
-    /** @var MockObject */
-    protected $contextRegistry;
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
 
     /** @var string */
-    protected $delegateType = 'import';
+    private $delegateType = 'import';
 
     /** @var RegistryDelegateProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
 
-        $this->processor = new class(
+        $this->processor = new RegistryDelegateProcessor(
             $this->processorRegistry,
             $this->delegateType,
             $this->contextRegistry
-        ) extends RegistryDelegateProcessor {
-            public function xgetStepExecution(): StepExecution
-            {
-                return $this->stepExecution;
-            }
-        };
+        );
     }
 
     public function testSetStepExecution()
     {
-        /** @var StepExecution|MockObject $stepExecution */
-        $stepExecution = $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $this->processor->setStepExecution($stepExecution);
 
-        static::assertEquals($stepExecution, $this->processor->xgetStepExecution());
+        self::assertEquals($stepExecution, ReflectionUtil::getPropertyValue($this->processor, 'stepExecution'));
     }
 
     public function testProcessContextAwareProcessor()
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
-        $stepExecution = $this->getMockStepExecution();
+        $stepExecution = $this->createMock(StepExecution::class);
         $item = $this->createMock(\stdClass::class);
 
         $delegateProcessor = $this->createMock(ContextAwareProcessor::class);
 
-        $this->processorRegistry->expects(static::once())
+        $this->processorRegistry->expects(self::once())
             ->method('getProcessor')
             ->with($this->delegateType, $processorAlias)
             ->willReturn($delegateProcessor);
 
         $context = $this->createMock(ContextInterface::class);
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
-        $context->method('getOption')
+        $context->expects(self::any())
+            ->method('getOption')
             ->willReturnMap([
                 ['entityName', null, $entityName],
                 ['processorAlias', null, $processorAlias],
             ]);
 
-        $delegateProcessor->expects(static::once())->method('setImportExportContext')->with($context);
-        $delegateProcessor->expects(static::once())->method('process')->with($item);
+        $delegateProcessor->expects(self::once())
+            ->method('setImportExportContext')
+            ->with($context);
+        $delegateProcessor->expects(self::once())
+            ->method('process')
+            ->with($item);
 
         $this->processor->setStepExecution($stepExecution);
         $this->processor->process($item);
@@ -94,30 +93,35 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
-        $stepExecution = $this->getMockStepExecution();
+        $stepExecution = $this->createMock(StepExecution::class);
         $item = $this->createMock(\stdClass::class);
 
         $delegateProcessor = $this->createMock(StepExecutionAwareProcessor::class);
 
         $context = $this->createMock(ContextInterface::class);
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
-        $context->method('getOption')
+        $context->expects(self::any())
+            ->method('getOption')
             ->willReturnMap([
                 ['entityName', null, $entityName],
                 ['processorAlias', null, $processorAlias],
             ]);
 
-        $this->processorRegistry->expects(static::once())
+        $this->processorRegistry->expects(self::once())
             ->method('getProcessor')
             ->with($this->delegateType, $processorAlias)
             ->willReturn($delegateProcessor);
 
-        $delegateProcessor->expects(static::once())->method('setStepExecution')->with($stepExecution);
-        $delegateProcessor->expects(static::once())->method('process')->with($item);
+        $delegateProcessor->expects(self::once())
+            ->method('setStepExecution')
+            ->with($stepExecution);
+        $delegateProcessor->expects(self::once())
+            ->method('process')
+            ->with($item);
 
         $this->processor->setStepExecution($stepExecution);
         $this->processor->process($item);
@@ -127,34 +131,36 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
-        $stepExecution = $this->getMockStepExecution();
+        $stepExecution = $this->createMock(StepExecution::class);
         $item = $this->createMock(\stdClass::class);
 
-        $delegateProcessor = $this
-            ->getMockBuilder(ProcessorInterface::class)
+        $delegateProcessor = $this->getMockBuilder(ProcessorInterface::class)
             ->onlyMethods(['process'])
             ->addMethods(['setImportExportContext'])
             ->getMock();
 
-        $this->processorRegistry->expects(static::once())
+        $this->processorRegistry->expects(self::once())
             ->method('getProcessor')
             ->with($this->delegateType, $processorAlias)
             ->willReturn($delegateProcessor);
 
         $context = $this->createMock(ContextInterface::class);
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
-        $context->method('getOption')
+        $context->expects(self::any())
+            ->method('getOption')
             ->willReturnMap([
                 ['entityName', null, $entityName],
                 ['processorAlias', null, $processorAlias],
             ]);
 
-        $delegateProcessor->expects(static::never())->method('setImportExportContext');
-        $delegateProcessor->expects(static::once())->method('process')->with($item);
+        $delegateProcessor->expects(self::never())
+            ->method('setImportExportContext');
+        $delegateProcessor->expects(self::once())
+            ->method('process')->with($item);
 
         $this->processor->setStepExecution($stepExecution);
         $this->processor->process($item);
@@ -167,14 +173,15 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
 
         $context = $this->createMock(ContextInterface::class);
 
-        $stepExecution = $this->getMockStepExecution();
+        $stepExecution = $this->createMock(StepExecution::class);
 
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
-        $context->method('getOption')
+        $context->expects(self::any())
+            ->method('getOption')
             ->willReturnMap([
                 ['processorAlias', null, null],
                 ['entityName', null, null],
@@ -196,23 +203,25 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
-        $stepExecution = $this->getMockStepExecution();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $delegateProcessor = $this->createMock(ClosableInterface::class);
-        $delegateProcessor->expects(static::once())->method('close');
+        $delegateProcessor->expects(self::once())
+            ->method('close');
 
-        $this->processorRegistry->expects(static::once())
+        $this->processorRegistry->expects(self::once())
             ->method('getProcessor')
             ->with($this->delegateType, $processorAlias)
             ->willReturn($delegateProcessor);
 
         $context = $this->createMock(ContextInterface::class);
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
-        $context->method('getOption')
+        $context->expects(self::any())
+            ->method('getOption')
             ->willReturnMap([
                 ['entityName', null, $entityName],
                 ['processorAlias', null, $processorAlias],
@@ -226,22 +235,23 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
-        $stepExecution = $this->getMockStepExecution();
+        $stepExecution = $this->createMock(StepExecution::class);
 
         $delegateProcessor = $this->createMock(ClassWithCloseMethod::class);
 
-        $this->processorRegistry->expects(static::once())
+        $this->processorRegistry->expects(self::once())
             ->method('getProcessor')
             ->with($this->delegateType, $processorAlias)
             ->willReturn($delegateProcessor);
 
         $context = $this->createMock(ContextInterface::class);
-        $this->contextRegistry->expects(static::once())
+        $this->contextRegistry->expects(self::once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
 
-        $context->method('getOption')
+        $context->expects(self::any())
+            ->method('getOption')
             ->willReturnMap([
                 ['entityName', null, $entityName],
                 ['processorAlias', null, $processorAlias],
@@ -249,13 +259,5 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->setStepExecution($stepExecution);
         $this->processor->close();
-    }
-
-    /**
-     * @return MockObject|StepExecution
-     */
-    protected function getMockStepExecution()
-    {
-        return $this->getMockBuilder(StepExecution::class)->disableOriginalConstructor()->getMock();
     }
 }

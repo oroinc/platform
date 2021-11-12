@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -15,21 +15,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorRegistry */
-    protected $registry;
+    private $registry;
 
     protected function setUp(): void
     {
-        $this->registry = new class() extends ProcessorRegistry {
-            public function xgetProcessors(): array
-            {
-                return $this->processors;
-            }
-
-            public function xgetProcessorsByEntity(): array
-            {
-                return $this->processorsByEntity;
-            }
-        };
+        $this->registry = new ProcessorRegistry();
     }
 
     public function testRegisterProcessor()
@@ -37,33 +27,31 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var MockObject|ProcessorInterface $importProcessor */
         $importProcessor = $this->createMock(ProcessorInterface::class);
 
-        /** @var MockObject|EntityNameAwareProcessor $exportProcessor */
         $exportProcessor = $this->createMock(EntityNameAwareProcessor::class);
-        $exportProcessor->expects(static::once())->method('setEntityName')->with($entityName);
+        $exportProcessor->expects(self::once())
+            ->method('setEntityName')
+            ->with($entityName);
 
         $this->registry->registerProcessor($importProcessor, ProcessorRegistry::TYPE_IMPORT, $entityName, $alias);
         $this->registry->registerProcessor($exportProcessor, ProcessorRegistry::TYPE_EXPORT, $entityName, $alias);
-        static::assertEquals(
+        self::assertEquals(
             [
                 ProcessorRegistry::TYPE_IMPORT => [$alias => $importProcessor],
                 ProcessorRegistry::TYPE_EXPORT => [$alias => $exportProcessor],
             ],
-            $this->registry->xgetProcessors()
+            ReflectionUtil::getPropertyValue($this->registry, 'processors')
         );
-        static::assertEquals(
+        self::assertEquals(
             [
                 $entityName => [
                     ProcessorRegistry::TYPE_IMPORT => [$alias => $importProcessor],
                     ProcessorRegistry::TYPE_EXPORT => [$alias => $exportProcessor]
                 ]
             ],
-            $this->registry->xgetProcessorsByEntity()
+            ReflectionUtil::getPropertyValue($this->registry, 'processorsByEntity')
         );
-
-        return $this->registry;
     }
 
     public function testRegisterProcessorFails()
@@ -75,7 +63,6 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var MockObject|ProcessorInterface $processor */
         $processor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
@@ -88,29 +75,27 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $fooEntityName = 'foo_entity_name';
         $fooAlias = 'foo_processor_alias';
 
-        /** @var MockObject|ProcessorInterface $fooProcessor */
         $fooProcessor = $this->createMock(ProcessorInterface::class);
 
         $barType = ProcessorRegistry::TYPE_EXPORT;
         $barEntityName = 'bar_entity_name';
         $barAlias = 'bar_processor_alias';
 
-        /** @var MockObject|ProcessorInterface $barProcessor */
         $barProcessor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($fooProcessor, $fooType, $fooEntityName, $fooAlias);
         $this->registry->registerProcessor($barProcessor, $barType, $barEntityName, $barAlias);
         $this->registry->unregisterProcessor($fooType, $fooEntityName, $fooAlias);
-        static::assertEquals(
+        self::assertEquals(
             [$fooType => [], $barType => [$barAlias => $barProcessor]],
-            $this->registry->xgetProcessors()
+            ReflectionUtil::getPropertyValue($this->registry, 'processors')
         );
-        static::assertEquals(
+        self::assertEquals(
             [
                 $fooEntityName => [$fooType => []],
                 $barEntityName => [$barType => [$barAlias => $barProcessor]],
             ],
-            $this->registry->xgetProcessorsByEntity()
+            ReflectionUtil::getPropertyValue($this->registry, 'processorsByEntity')
         );
     }
 
@@ -120,12 +105,11 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var MockObject|ProcessorInterface $processor */
         $processor = $this->createMock(ProcessorInterface::class);
 
-        static::assertFalse($this->registry->hasProcessor($type, $alias));
+        self::assertFalse($this->registry->hasProcessor($type, $alias));
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
-        static::assertTrue($this->registry->hasProcessor($type, $alias));
+        self::assertTrue($this->registry->hasProcessor($type, $alias));
     }
 
     public function testGetProcessor()
@@ -134,11 +118,10 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $alias = 'processor_alias';
 
-        /** @var MockObject|ProcessorInterface $processor */
         $processor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
-        static::assertSame($processor, $this->registry->getProcessor($type, $alias));
+        self::assertSame($processor, $this->registry->getProcessor($type, $alias));
     }
 
     public function testGetProcessorFails()
@@ -155,17 +138,15 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entity_name';
         $fooAlias = 'foo_alias';
 
-        /** @var MockObject|ProcessorInterface $fooProcessor */
         $fooProcessor = $this->createMock(ProcessorInterface::class);
         $barAlias = 'bar_alias';
 
-        /** @var MockObject|ProcessorInterface $barProcessor */
         $barProcessor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($fooProcessor, $type, $entityName, $fooAlias);
         $this->registry->registerProcessor($barProcessor, $type, $entityName, $barAlias);
 
-        static::assertEquals(
+        self::assertEquals(
             [$fooAlias => $fooProcessor, $barAlias => $barProcessor],
             $this->registry->getProcessorsByEntity($type, $entityName)
         );
@@ -173,7 +154,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProcessorsByEntityUnknown()
     {
-        static::assertEquals(
+        self::assertEquals(
             [],
             $this->registry->getProcessorsByEntity('unknown', 'unknown')
         );
@@ -181,7 +162,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProcessorAliasesByEntityUnknown()
     {
-        static::assertEquals(
+        self::assertEquals(
             [],
             $this->registry->getProcessorAliasesByEntity('unknown', 'unknown')
         );
@@ -192,16 +173,14 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $fooAlias = 'foo_alias';
-        /** @var MockObject|ProcessorInterface $fooProcessor */
         $fooProcessor = $this->createMock(ProcessorInterface::class);
         $barAlias = 'bar_alias';
-        /** @var MockObject|ProcessorInterface $barProcessor */
         $barProcessor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($fooProcessor, $type, $entityName, $fooAlias);
         $this->registry->registerProcessor($barProcessor, $type, $entityName, $barAlias);
 
-        static::assertEquals(
+        self::assertEquals(
             [$fooAlias, $barAlias],
             $this->registry->getProcessorAliasesByEntity($type, $entityName)
         );
@@ -212,12 +191,11 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $alias = 'foo_alias';
-        /** @var MockObject|ProcessorInterface $processor */
         $processor = $this->createMock(ProcessorInterface::class);
 
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
 
-        static::assertEquals($entityName, $this->registry->getProcessorEntityName($type, $alias));
+        self::assertEquals($entityName, $this->registry->getProcessorEntityName($type, $alias));
     }
 
     public function testGetProcessorEntityNameFails()
@@ -231,30 +209,23 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $processors
-     * @param string $type
-     * @param array $expected
-     *
      * @dataProvider processorsByTypeDataProvider
      */
-    public function testGetProcessorsByType(array $processors, $type, array $expected)
+    public function testGetProcessorsByType(array $processors, string $type, array $expected)
     {
         foreach ($processors as $processorType => $processorsByType) {
             foreach ($processorsByType as $processorName => $processor) {
-                $this->registry->registerProcessor($processor, $processorType, '\stdClass', $processorName);
+                $this->registry->registerProcessor($processor, $processorType, \stdClass::class, $processorName);
             }
         }
 
-        static::assertEquals(
+        self::assertEquals(
             $expected,
             $this->registry->getProcessorsByType($type)
         );
     }
 
-    /**
-     * @return array
-     */
-    public function processorsByTypeDataProvider()
+    public function processorsByTypeDataProvider(): array
     {
         $processor = $this->createMock(ProcessorInterface::class);
 

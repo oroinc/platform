@@ -86,9 +86,9 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function findDataProvider(): array
     {
-        $operation1 = $this->createOperationMock('operation1', true);
-        $operationSubstitution = $this->createOperationMock('operation_substitution', true, true);
-        $operationNotAvailable = $this->createOperationMock('operation_not_available', false);
+        $operation1 = $this->createOperation('operation1', true);
+        $operationSubstitution = $this->createOperation('operation_substitution', true, true);
+        $operationNotAvailable = $this->createOperation('operation_not_available', false);
 
         $buttonSearchContext = $this->createButtonSearchContext();
 
@@ -154,16 +154,11 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
                 ['button' => 'resolved']
             );
 
-        if ($button instanceof OperationButton) {
-            $this->contextHelper->expects($this->once())
-                ->method('getActionData')
-                ->willReturn(new ActionData());
-        } else {
-            $this->contextHelper->expects($this->never())
-                ->method('getActionData');
-        }
-        $this->assertEquals($expected, $this->extension->isAvailable($button, $this->createButtonSearchContext()));
+        $this->contextHelper->expects($this->once())
+            ->method('getActionData')
+            ->willReturn(new ActionData());
 
+        $this->assertEquals($expected, $this->extension->isAvailable($button, $this->createButtonSearchContext()));
         $this->assertEquals(['frontend' => 'resolved'], $definition->getFrontendOptions());
         $this->assertEquals(['button' => 'resolved'], $definition->getButtonOptions());
     }
@@ -250,10 +245,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->extension->supports($this->createMock(ButtonInterface::class)));
     }
 
-    /**
-     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createOperationMock(string $name, bool $isAvailable, bool $withForm = false)
+    private function createOperation(string $name, bool $isAvailable, bool $withForm = false): Operation
     {
         $operation = $this->createMock(Operation::class);
         $definition = new OperationDefinition();
@@ -286,7 +278,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 
         return new OperationButton(
             $name,
-            $this->createOperationMock($name, $isOperationAvailable),
+            $this->createOperation($name, $isOperationAvailable),
             $buttonContext,
             $data
         );

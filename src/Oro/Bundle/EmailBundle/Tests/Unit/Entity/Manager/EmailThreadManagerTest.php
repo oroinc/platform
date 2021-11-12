@@ -73,9 +73,9 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
             $threadIds
         );
 
-        $this->emailThreadProvider->expects($this->any())
+        $this->emailThreadProvider->expects($this->exactly(count($consecutiveThreads)))
             ->method('getEmailThread')
-            ->will(call_user_func_array([$this, 'onConsecutiveCalls'], $consecutiveThreads));
+            ->willReturnOnConsecutiveCalls(...$consecutiveThreads);
         $this->emailThreadProvider->expects($this->any())
             ->method('getEmailReferences')
             ->willReturn($emailReferences);
@@ -143,7 +143,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->emailThreadProvider->expects($this->any())
             ->method('getThreadEmails')
-            ->will(call_user_func_array([$this, 'onConsecutiveCalls'], $consecutiveThreadEmails));
+            ->willReturnOnConsecutiveCalls(...$consecutiveThreadEmails);
 
         $this->emailThreadManager->updateHeads($updatedEmails);
         $this->assertEquals($expectedEmails, $updatedEmails);

@@ -7,7 +7,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransitionLabelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     protected function setUp(): void

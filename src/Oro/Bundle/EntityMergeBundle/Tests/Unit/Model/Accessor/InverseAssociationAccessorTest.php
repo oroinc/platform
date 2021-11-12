@@ -93,9 +93,9 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue($entity, FieldMetadata $metadata, $expectedValue)
+    public function testGetValue(object $entity, FieldMetadata $metadata, mixed $expectedValue)
     {
-        $this->assertEquals($expectedValue, $this->accessor->getValue($entity, $metadata));
+        $this->assertSame($expectedValue, $this->accessor->getValue($entity, $metadata));
     }
 
     public function getValueDataProvider(): array
@@ -112,11 +112,11 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue($entity, FieldMetadata $metadata, $values)
+    public function testSetValue(?object $entity, FieldMetadata $metadata, ArrayCollection $values)
     {
         $this->accessor->setValue($entity, $metadata, $values);
         foreach ($values as $value) {
-            $this->assertEquals($entity, $value->getEntityStub());
+            $this->assertSame($entity, $value->getEntityStub());
         }
     }
 

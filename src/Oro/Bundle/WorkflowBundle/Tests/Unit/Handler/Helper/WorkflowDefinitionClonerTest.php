@@ -46,7 +46,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         $this->assertObjectsDefinitions($definition, $sourceDefinition);
     }
 
-    protected function assertSameMainFields(WorkflowDefinition $definition1, WorkflowDefinition $definition2)
+    private function assertSameMainFields(WorkflowDefinition $definition1, WorkflowDefinition $definition2)
     {
         $this->assertSame($definition1->getName(), $definition2->getName());
         $this->assertSame($definition1->getLabel(), $definition2->getLabel());
@@ -66,7 +66,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
      * @param WorkflowDefinition $definition2
      * @param bool               $isCopy
      */
-    protected function assertObjectsDefinitions(
+    private function assertObjectsDefinitions(
         WorkflowDefinition $definition1,
         WorkflowDefinition $definition2,
         $isCopy = false
@@ -102,7 +102,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return WorkflowDefinition
      */
-    protected function createDefinition()
+    private function createDefinition()
     {
         $step1 = new WorkflowStep();
         $step1->setName('step1');

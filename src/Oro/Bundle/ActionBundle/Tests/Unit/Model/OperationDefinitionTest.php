@@ -10,16 +10,11 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var OperationDefinition */
-    protected $definition;
+    private $definition;
 
     protected function setUp(): void
     {
         $this->definition = new OperationDefinition();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->definition);
     }
 
     public function testSetAndGetActions()
@@ -56,7 +51,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
 
     public function testGettersAndSetters()
     {
-        static::assertPropertyAccessors(
+        self::assertPropertyAccessors(
             $this->definition,
             [
                 ['name', 'test'],

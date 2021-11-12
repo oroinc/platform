@@ -12,13 +12,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GridEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var GridEntityNameProvider */
@@ -98,7 +98,10 @@ class GridEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
     }
 
-    private function assertResultCall($result)
+    /**
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function assertResultCall(array $result)
     {
         $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())

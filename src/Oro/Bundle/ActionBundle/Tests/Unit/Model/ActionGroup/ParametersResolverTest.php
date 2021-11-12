@@ -6,19 +6,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
+use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Parameter;
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ParametersResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ParametersResolver */
-    protected $resolver;
-
-    /** @var array */
-    private static $typeAliases = [
+    private static array $typeAliases = [
         'boolean' => 'bool',
         'integer' => 'int',
         'double' => 'float',
     ];
+
+    /** @var ParametersResolver */
+    private $resolver;
 
     protected function setUp(): void
     {
@@ -30,22 +31,17 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
      */
     public function testResolveOk(ActionData $data, array $parameters, ActionData $expected)
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroup $mockActionGroup */
-        $mockActionGroup = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockActionGroup->expects($this->once())->method('getParameters')->willReturn($parameters);
+        $mockActionGroup = $this->createMock(ActionGroup::class);
+        $mockActionGroup->expects($this->once())
+            ->method('getParameters')
+            ->willReturn($parameters);
 
         $this->resolver->resolve($data, $mockActionGroup);
 
         $this->assertEquals($data, $expected);
     }
 
-    /**
-     * @return array
-     */
-    public function resolveDataProvider()
+    public function resolveDataProvider(): array
     {
         $stringRequiredParam = new Parameter('param1');
         $stringRequiredParam->setType('string');
@@ -66,7 +62,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
             ],
             'typed class param' => [
                 new ActionData(['param2' => $stringRequiredParam]),
-                [$this->requiredTypedParameter('param2', 'Oro\Bundle\ActionBundle\Model\Parameter')],
+                [$this->requiredTypedParameter('param2', Parameter::class)],
                 new ActionData(['param2' => $stringRequiredParam])
             ],
             'typed object param' => [
@@ -87,12 +83,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $type
-     * @return Parameter
-     */
-    private function requiredTypedParameter($name, $type)
+    private function requiredTypedParameter(string $name, string $type): Parameter
     {
         $parameter = new Parameter($name);
         $parameter->setType($type);
@@ -109,17 +100,13 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         array $exception,
         array $expectedErrors
     ) {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroup $mockActionGroup */
-        $mockActionGroup = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockActionGroup = $this->createMock(ActionGroup::class);
 
         $mockActionGroup->expects($this->once())
             ->method('getParameters')
             ->willReturn($parameters);
 
-        $mockDefinition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupDefinition')
-            ->getMock();
+        $mockDefinition = $this->createMock(ActionGroupDefinition::class);
 
         $mockActionGroup->expects($this->once())
             ->method('getDefinition')
@@ -129,7 +116,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn('testActionGroup');
 
-        list($exceptionType, $exceptionMessage) = $exception;
+        [$exceptionType, $exceptionMessage] = $exception;
 
         $errors = new ArrayCollection([]);
 
@@ -143,10 +130,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedErrors, $errors->getValues());
     }
 
-    /**
-     * @return array
-     */
-    public function resolveViolationsTypeProvider()
+    public function resolveViolationsTypeProvider(): array
     {
         return [
             'bool' => $this->violationTypeProviderArgs(
@@ -188,9 +172,9 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
             'complex object' => $this->violationTypeProviderArgs(
                 'complex object comp',
                 new ActionData(),
-                'Oro\Bundle\ActionBundle\Model\Parameter',
-                'Oro\Bundle\ActionBundle\Model\ActionData',
-                'Oro\Bundle\ActionBundle\Model\ActionData'
+                Parameter::class,
+                ActionData::class,
+                ActionData::class
             ),
             'float' => $this->violationTypeProviderArgs(
                 'float',
@@ -209,23 +193,14 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $paramName
-     * @param mixed $value
-     * @param string $type
-     * @param string $gotType
-     * @param string $gotValue
-     * @param string $customMessage
-     * @return array
-     */
     private function violationTypeProviderArgs(
-        $paramName,
-        $value,
-        $type,
-        $gotType,
-        $gotValue,
-        $customMessage = null
-    ) {
+        string $paramName,
+        mixed $value,
+        string $type,
+        string $gotType,
+        string $gotValue,
+        string $customMessage = null
+    ): array {
         $typedParam = new Parameter($paramName);
         $typedParam->setType($type);
 
@@ -239,7 +214,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
             'data' => new ActionData([$paramName => $value]),
             'paramDefinitions' => [$typedParam],
             'exception' => [
-                'Oro\Component\Action\Exception\InvalidParameterException',
+                InvalidParameterException::class,
                 'Trying to execute ActionGroup "testActionGroup" with invalid or missing parameter(s): ' .
                 sprintf('"%s"', $paramName)
             ],

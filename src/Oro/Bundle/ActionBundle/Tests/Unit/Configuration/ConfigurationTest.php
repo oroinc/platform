@@ -9,12 +9,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $configs
-     *
-     * @return array
-     */
-    private function processConfiguration(array $configs)
+    private function processConfiguration(array $configs): array
     {
         $processor = new Processor();
 
@@ -62,10 +57,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processValidConfigurationForOperationsProvider()
+    public function processValidConfigurationForOperationsProvider(): array
     {
         return [
             'empty configuration' => [
@@ -293,10 +287,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function processInvalidConfigurationForOperationsProvider()
+    public function processInvalidConfigurationForOperationsProvider(): array
     {
         return array_merge(
             $this->invalidConfigurationForOperationsProvider(),
@@ -308,10 +299,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function invalidConfigurationForOperationsProvider()
+    private function invalidConfigurationForOperationsProvider(): array
     {
         return [
             'incorrect root' => [
@@ -432,10 +422,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function invalidAttributeForOperationsProvider()
+    private function invalidAttributeForOperationsProvider(): array
     {
         return [
             'incorrect operation[attribute]' => [
@@ -496,10 +483,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function invalidFormOptionsForOperationsProvider()
+    private function invalidFormOptionsForOperationsProvider(): array
     {
         return [
             'incorrect operation[form_options]' => [
@@ -554,11 +538,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function invalidAttributesForOperationsProvider()
+    private function invalidAttributesForOperationsProvider(): array
     {
         return [
             'incorrect operation[attributes]' => [
@@ -718,10 +700,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function invalidDatagridOptionsForOperationsProvider()
+    private function invalidDatagridOptionsForOperationsProvider(): array
     {
         return [
             'incorrect operation[datagrid_options]' => [
@@ -752,10 +731,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function processValidConfigurationForActionGroupsProvider()
+    public function processValidConfigurationForActionGroupsProvider(): array
     {
         return [
             'empty configuration' => [
@@ -817,10 +793,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function processInvalidConfigurationForActionGroupsProvider()
+    public function processInvalidConfigurationForActionGroupsProvider(): array
     {
         return [
             'incorrect root' => [

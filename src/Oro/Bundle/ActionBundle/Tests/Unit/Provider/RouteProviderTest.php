@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Provider\RouteProvider;
 class RouteProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RouteProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {
@@ -17,11 +17,6 @@ class RouteProviderTest extends \PHPUnit\Framework\TestCase
             'oro_action_operation_execute',
             'oro_action_widget_buttons'
         );
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->provider);
     }
 
     public function testGetWidgetRoute()

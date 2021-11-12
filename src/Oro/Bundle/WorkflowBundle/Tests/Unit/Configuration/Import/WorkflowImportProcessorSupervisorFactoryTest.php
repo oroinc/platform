@@ -88,18 +88,15 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
         self::assertInstanceOf(WorkflowImportProcessorSupervisor::class, $processor);
 
         $finderMock = $this->createMock(Finder::class);
-        $this->finderBuilder
-            ->expects(self::once())
+        $this->finderBuilder->expects(self::once())
             ->method('create')
             ->willReturn($finderMock);
 
-        $finderMock
-            ->expects(self::once())
+        $finderMock->expects(self::once())
             ->method('getIterator')
             ->willReturn(new ArrayCollection([$file1]));
 
-        $this->reader
-            ->expects(self::once())
+        $this->reader->expects(self::once())
             ->method('read')
             ->with($file1)
             ->willReturnOnConsecutiveCalls($file1Content);

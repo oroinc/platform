@@ -9,70 +9,54 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $containerBuilder;
-
-    /** @var OroDistributionExtension */
-    protected $extension;
+    private OroDistributionExtension $extension;
 
     protected function setUp(): void
     {
-        $this->containerBuilder = $this->createMock(ContainerBuilder::class);
-
         $this->extension = new OroDistributionExtension();
     }
 
     /**
      * @dataProvider loadDataProvider
      */
-    public function testLoad(array $kernelBundles, array $expectedParameters)
+    public function testLoad(array $kernelBundles, array $expectedParameters): void
     {
-        $this->containerBuilder->expects($this->any())
-            ->method('getParameter')
-            ->willReturnMap([
-                ['kernel.bundles', $kernelBundles],
-            ]);
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->setParameter('kernel.bundles', $kernelBundles);
+        $containerBuilder->setParameter('twig.form.resources', []);
+        $this->extension->load([], $containerBuilder);
 
-        $parameters = [];
-
-        $this->containerBuilder->expects($this->any())
-            ->method('setParameter')
-            ->willReturnCallback(
-                function ($name, $value) use (&$parameters) {
-                    $parameters[$name] = $value;
-                }
-            );
-
-        $this->extension->load([], $this->containerBuilder);
-
-        $this->assertEquals($expectedParameters, $parameters);
+        self::assertEquals($expectedParameters, $containerBuilder->getParameterBag()->all());
     }
 
     public function loadDataProvider(): array
     {
         $parameters = [
-            'oro_distribution.composer_json' => '%kernel.project_dir%/composer.json',
             'twig.form.resources' => [],
+            'oro_distribution.composer_json' => '%kernel.project_dir%/composer.json',
+            'container.dumper.inline_factories' => true,
         ];
 
         return [
             'with OroTranslationBundle' => [
-                'kernelBundles' => [
-                    'OroTranslationBundle' => OroTranslationBundle::class
-                ],
+                'kernelBundles' => ['OroTranslationBundle' => OroTranslationBundle::class],
                 'expectedParameters' => array_merge(
                     $parameters,
                     [
+                        'kernel.bundles' => ['OroTranslationBundle' => OroTranslationBundle::class],
                         'twig.form.resources' => [
-                            '@OroTranslation/Form/fields.html.twig'
-                        ]
+                            '@OroTranslation/Form/fields.html.twig',
+                        ],
                     ]
-                )
+                ),
             ],
             'without OroTranslationBundle' => [
                 'kernelBundles' => [],
-                'expectedParameters' => array_merge($parameters, ['translator.class' => Translator::class])
-            ]
+                'expectedParameters' => array_merge(
+                    $parameters,
+                    ['kernel.bundles' => [], 'translator.class' => Translator::class]
+                ),
+            ],
         ];
     }
 }

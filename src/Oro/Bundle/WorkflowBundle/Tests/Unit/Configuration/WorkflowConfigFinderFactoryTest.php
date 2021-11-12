@@ -16,7 +16,6 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        /** @var ConfigFinderFactory|\PHPUnit\Framework\MockObject\MockObject $finderFactory */
         $this->finderFactory = $this->createMock(ConfigFinderFactory::class);
 
         $this->workflowConfigFinderBuilder = new WorkflowConfigFinderBuilder($this->finderFactory);
@@ -49,7 +48,8 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
         $finder1 = $this->createMock(Finder::class);
         $finder2 = $this->createMock(Finder::class);
 
-        $this->finderFactory->expects($this->exactly(2))->method('create')
+        $this->finderFactory->expects($this->exactly(2))
+            ->method('create')
             ->withConsecutive(['subDir1', 'fileName1'], ['subDir2', 'fileName2'])
             ->willReturnOnConsecutiveCalls($finder1, $finder2);
 

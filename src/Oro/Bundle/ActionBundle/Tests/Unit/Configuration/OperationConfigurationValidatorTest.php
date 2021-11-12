@@ -4,27 +4,29 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Twig\Loader\LoaderInterface;
 
 class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $controllerClassProvider;
+    private $controllerClassProvider;
 
     /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $twigLoader;
+    private $twigLoader;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var OperationConfigurationValidator */
-    protected $validator;
+    private $validator;
 
     protected function setUp(): void
     {
@@ -36,10 +38,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
         $this->createValidator();
     }
 
-    /**
-     * @param bool $debug
-     */
-    protected function createValidator($debug = false)
+    private function createValidator(bool $debug = false): void
     {
         $this->validator = new OperationConfigurationValidator(
             $this->controllerClassProvider,
@@ -73,7 +72,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->twigLoader->expects($this->any())
             ->method('exists')
-            ->will($this->returnValueMap($inputData['templates']));
+            ->willReturnMap($inputData['templates']);
 
         $this->logger->expects($expectedData['expectsLog'])
             ->method('warning')
@@ -87,13 +86,9 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $config
-     * @param string $exceptionName
-     * @param string $exceptionMessage
-     *
      * @dataProvider validateWithExceptionProvider
      */
-    public function testValidateWithException(array $config, $exceptionName, $exceptionMessage)
+    public function testValidateWithException(array $config, string $exceptionName, string $exceptionMessage)
     {
         $this->twigLoader->expects($this->any())
             ->method('exists')
@@ -105,10 +100,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($config);
     }
 
-    /**
-     * @return array
-     */
-    public function validateWithExceptionProvider()
+    public function validateWithExceptionProvider(): array
     {
         return [
             'unknown button template' => [
@@ -121,7 +113,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action1.button_options.template: Unable to find template "unknown_template"',
             ],
             'unknown frontend template' => [
@@ -134,7 +126,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action1.frontend_options.template: Unable to find template "unknown_template"',
             ],
             'unknown attribute in attribute_fields' => [
@@ -154,7 +146,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action2.form_options.attribute_fields: Unknown attribute "attribute2".',
             ],
             'unknown attribute in attribute_default_values' => [
@@ -176,18 +168,16 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action2.form_options.attribute_default_values: Unknown attribute "attribute3".',
             ],
         ];
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function validateProvider()
+    public function validateProvider(): array
     {
         $routes = [
             'route1' => [\stdClass::class, null]
@@ -296,7 +286,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                     'templates' => $templates,
                     'config' => [
                         'valid_config_action' => array_merge($config, [
-                            'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                            'entities' => [TestEntity1::class],
                             'routes' => ['route1'],
                             'button_options' => [
                                 'template' => 'Template1'

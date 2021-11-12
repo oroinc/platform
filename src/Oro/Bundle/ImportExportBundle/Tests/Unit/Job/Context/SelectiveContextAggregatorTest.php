@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator;
 
 class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
     /** @var SelectiveContextAggregator */

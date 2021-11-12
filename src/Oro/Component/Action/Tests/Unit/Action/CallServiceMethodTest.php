@@ -8,18 +8,15 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\Action\Tests\Unit\Action\Stub\TestService;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
-
-    /** @var MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
 
     /** @var CallServiceMethod */
     private $action;
@@ -27,20 +24,9 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->action = new class(new ContextAccessor(), $this->container) extends CallServiceMethod {
-            public function xgetOptions(): array
-            {
-                return $this->options;
-            }
-        };
-        $this->action->setDispatcher($this->eventDispatcher);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->action, $this->eventDispatcher, $this->container);
+        $this->action = new CallServiceMethod(new ContextAccessor(), $this->container);
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testInitialize()
@@ -52,8 +38,8 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
             'attribute' => 'test'
         ];
 
-        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
-        static::assertEquals($options, $this->action->xgetOptions());
+        self::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     public function testInitializeNoServiceException()
@@ -85,7 +71,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
             'method' => 'testMethod',
         ];
 
-        $this->container->expects(static::once())
+        $this->container->expects(self::once())
             ->method('has')
             ->with($service)
             ->willReturn(false);
@@ -128,7 +114,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(
+        self::assertEquals(
             ['param' => 'value', 'test' => TestService::TEST_METHOD_RESULT . 'value'],
             $context->getValues()
         );
@@ -150,7 +136,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(['param' => 'value'], $context->getValues());
+        self::assertEquals(['param' => 'value'], $context->getValues());
     }
 
     public function testExecuteActionPropertyPathService()
@@ -169,22 +155,19 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
         $this->action->execute($context);
 
-        static::assertEquals(
+        self::assertEquals(
             ['param' => 'value', 'service' => $service],
             $context->getValues()
         );
     }
 
-    /**
-     * @param string $serviceName
-     */
-    private function setContainerServiceExpectations($serviceName)
+    private function setContainerServiceExpectations(string $serviceName): void
     {
-        $this->container->expects(static::once())
+        $this->container->expects(self::once())
             ->method('has')
             ->with($serviceName)
             ->willReturn(true);
-        $this->container->expects(static::once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with($serviceName)
             ->willReturn(new TestService());

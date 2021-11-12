@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TemplateEntityRegistry */
-    protected $entityRegistry;
+    private $entityRegistry;
 
     protected function setUp(): void
     {
@@ -45,7 +48,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(
             $this->entityRegistry->hasEntity('Test\Entity', 'test3')
         );
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The entity "Test\Entity" with key "test3" does not exist.');
         $this->entityRegistry->getEntity('Test\Entity', 'test3');
     }
@@ -57,7 +60,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity1);
 
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The entity "Test\Entity" with key "test1" is already exist.');
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity2);
     }
@@ -69,16 +72,10 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
-        $repository1 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
-        $repository2 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
+        $repository1 = $this->createMock(TemplateEntityRepositoryInterface::class);
+        $repository2 = $this->createMock(TemplateEntityRepositoryInterface::class);
 
-        $templateManager = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $templateManager = $this->createMock(TemplateManager::class);
 
         $repository1->expects($this->once())
             ->method('fillEntityData')
@@ -113,15 +110,13 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
         $repository1 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
         $repository2 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
+            TemplateEntityRepositoryInterface::class
         );
 
-        $templateManager = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $templateManager = $this->createMock(TemplateManager::class);
 
         $repository1->expects($this->exactly(2))
             ->method('fillEntityData')

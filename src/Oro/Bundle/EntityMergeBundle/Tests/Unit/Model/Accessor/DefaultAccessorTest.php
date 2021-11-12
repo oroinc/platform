@@ -24,9 +24,9 @@ class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue($entity, FieldMetadata $metadata, $expectedValue)
+    public function testGetValue(object $entity, FieldMetadata $metadata, mixed $expectedValue)
     {
-        $this->assertEquals($expectedValue, $this->accessor->getValue($entity, $metadata));
+        $this->assertSame($expectedValue, $this->accessor->getValue($entity, $metadata));
     }
 
     public function getValueDataProvider(): array
@@ -53,7 +53,7 @@ class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue($entity, FieldMetadata $metadata, $value, $expectedEntity)
+    public function testSetValue(object $entity, FieldMetadata $metadata, mixed $value, object $expectedEntity)
     {
         $this->accessor->setValue($entity, $metadata, $value);
         $this->assertEquals($expectedEntity, $entity);

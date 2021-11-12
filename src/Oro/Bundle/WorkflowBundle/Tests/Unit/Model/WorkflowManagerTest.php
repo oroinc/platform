@@ -84,7 +84,7 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getWorkflowDataProvider
      */
-    public function testGetWorkflow($workflowIdentifier): void
+    public function testGetWorkflow(string|Workflow|WorkflowItem $workflowIdentifier): void
     {
         $expectedWorkflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME);
 
@@ -928,10 +928,8 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getWorkflowItemDataProvider
-     *
-     * @param int|string $id
      */
-    public function testGetWorkflowItem($id): void
+    public function testGetWorkflowItem(int|string $id): void
     {
         $entity = new EntityStub($id);
         $workflowName = 'test_workflow';
@@ -987,12 +985,9 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $entityId
-     * @param WorkflowItem[] $workflowItems
-     *
      * @dataProvider entityDataProvider
      */
-    public function testGetWorkflowItemsByEntity($entityId, array $workflowItems = []): void
+    public function testGetWorkflowItemsByEntity(mixed $entityId, array $workflowItems = []): void
     {
         $entity = new EntityStub($entityId);
         $this->prepareGetWorkflowItemsByEntity($entity, $workflowItems);

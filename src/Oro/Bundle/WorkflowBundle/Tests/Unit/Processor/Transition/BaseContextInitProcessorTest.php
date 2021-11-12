@@ -22,10 +22,10 @@ use Symfony\Component\HttpFoundation\Request;
 class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var BaseContextInitProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
@@ -53,12 +53,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         } else {
             $messagePattern = '%s::getTransitionName(): Return value must be of type %s, null returned';
         }
-        $this->expectExceptionMessage(
-            sprintf(
-                $messagePattern,
-                TransitionContext::class
-            )
-        );
+        $this->expectExceptionMessage(sprintf($messagePattern, TransitionContext::class));
 
         $this->processor->process(new TransitionContext());
     }
@@ -71,12 +66,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         } else {
             $messagePattern = '%s::getWorkflowName(): Return value must be of type %s, null returned';
         }
-        $this->expectExceptionMessage(
-            sprintf(
-                $messagePattern,
-                TransitionContext::class
-            )
-        );
+        $this->expectExceptionMessage(sprintf($messagePattern, TransitionContext::class));
 
         $context = new TransitionContext();
         $context->setTransitionName('some_transition');
@@ -112,10 +102,14 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $exception = InvalidTransitionException::unknownTransition('unknown_transition');
 
         $transitionManager = $this->createMock(TransitionManager::class);
-        $transitionManager->expects($this->once())->method('extractTransition')->willThrowException($exception);
+        $transitionManager->expects($this->once())
+            ->method('extractTransition')
+            ->willThrowException($exception);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->once())->method('getTransitionManager')->willReturn($transitionManager);
+        $workflow->expects($this->once())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
@@ -130,7 +124,6 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testStartContextInit()
     {
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $context = new TransitionContext();
@@ -142,10 +135,14 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 
         /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
-        list($workflow, $transition) = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
+        [$workflow, $transition] = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
 
-        $transition->expects($this->once())->method('isEmptyInitOptions')->willReturn(false);
-        $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(true);
+        $transition->expects($this->once())
+            ->method('isEmptyInitOptions')
+            ->willReturn(false);
+        $transition->expects($this->once())
+            ->method('hasFormConfiguration')
+            ->willReturn(true);
 
         $this->processor->process($context);
 
@@ -164,9 +161,10 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $workflowName
      * @param string $transitionName
+     *
      * @return array [<Workflow>, <Transition>]
      */
-    protected function extractWorkflowAndTransition(string $workflowName, string $transitionName): array
+    private function extractWorkflowAndTransition(string $workflowName, string $transitionName): array
     {
         $transition = $this->createMock(Transition::class);
         $transitionManager = $this->createMock(TransitionManager::class);
@@ -176,7 +174,9 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($transition);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->once())->method('getTransitionManager')->willReturn($transitionManager);
+        $workflow->expects($this->once())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
 
         $this->workflowManager->expects($this->once())
             ->method('getWorkflow')
@@ -188,20 +188,23 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRegularContextInitAttributes()
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->once())->method('getWorkflowName')->willReturn('the_workflow');
+        $workflowItem->expects($this->once())
+            ->method('getWorkflowName')
+            ->willReturn('the_workflow');
 
         /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
-        list($workflow, $transition) = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
+        [$workflow, $transition] = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
 
-        $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(true);
-        $transition->expects($this->never())->method('isEmptyInitOptions');
+        $transition->expects($this->once())
+            ->method('hasFormConfiguration')
+            ->willReturn(true);
+        $transition->expects($this->never())
+            ->method('isEmptyInitOptions');
 
         $context = new TransitionContext();
 
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $context->setRequest($request);

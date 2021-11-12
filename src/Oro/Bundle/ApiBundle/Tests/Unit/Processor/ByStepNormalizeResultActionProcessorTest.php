@@ -24,14 +24,11 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
 {
     private const TEST_ACTION = 'test';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
+    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorRegistry;
 
     /** @var ProcessorBagConfigBuilder */
     private $processorBagConfigBuilder;
-
-    /** @var ProcessorBag */
-    private $processorBag;
 
     /** @var ByStepNormalizeResultActionProcessor */
     private $processor;
@@ -40,13 +37,12 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
         $this->processorBagConfigBuilder->addGroup('group1', self::TEST_ACTION, -1);
         $this->processorBagConfigBuilder->addGroup('group2', self::TEST_ACTION, -2);
         $this->processorBagConfigBuilder->addGroup(ApiActionGroup::NORMALIZE_RESULT, self::TEST_ACTION, -3);
 
         $this->processor = new ByStepNormalizeResultActionProcessor(
-            $this->processorBag,
+            new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry),
             self::TEST_ACTION
         );
     }
@@ -70,9 +66,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessors(array $processors)
+    private function addProcessors(array $processors): array
     {
         $createdProcessors = [];
         $processorRegistryMap = [];
@@ -94,7 +90,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         return $createdProcessors;
     }
 
-    public function loggerProvider()
+    public function loggerProvider(): array
     {
         return [
             [false],
@@ -1316,7 +1312,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->will(new \PHPUnit\Framework\MockObject\Stub\Exception($internalPhpError));
+            ->willThrowException($internalPhpError);
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())

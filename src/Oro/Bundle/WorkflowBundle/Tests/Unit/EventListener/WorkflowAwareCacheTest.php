@@ -19,14 +19,13 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
     private $repository;
 
     /** @var WorkflowAwareCache */
-    protected $workflowAwareCache;
+    private $workflowAwareCache;
 
     protected function setUp(): void
     {
         $this->cache = $this->createMock(Cache::class);
         $this->repository = $this->createMock(WorkflowDefinitionRepository::class);
 
-        /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper */
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
@@ -40,12 +39,10 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
     {
         $this->repository->expects($this->exactly(2))
             ->method('getAllRelatedEntityClasses')
-            ->willReturnMap(
-                [
-                    [true, [User::class]],
-                    [false, [\stdClass::class, User::class]],
-                ]
-            );
+            ->willReturnMap([
+                [true, [User::class]],
+                [false, [\stdClass::class, User::class]],
+            ]);
 
         $this->cache->expects($this->exactly(2))
             ->method('save')

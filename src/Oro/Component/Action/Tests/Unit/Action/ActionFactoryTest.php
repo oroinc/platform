@@ -18,7 +18,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
     private function getActionFactory(array $arguments = []): ActionFactory
     {
         $defaultArguments = [
-            'container' => $this->getMockForAbstractClass(ContainerInterface::class),
+            'container' => $this->createMock(ContainerInterface::class),
             'types'     => self::ALLOWED_TYPES
         ];
         $arguments = array_merge($defaultArguments, $arguments);
@@ -65,7 +65,6 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
 
         $condition = null;
         if ($isCondition) {
-            /** @var ExpressionInterface $condition */
             $condition = $this->createMock(ExpressionInterface::class);
             $action->expects($this->once())
                 ->method('setCondition')

@@ -20,10 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var WorkflowTransitionSelectType */

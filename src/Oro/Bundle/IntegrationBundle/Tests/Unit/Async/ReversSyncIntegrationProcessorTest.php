@@ -71,8 +71,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Invalid message: integration_id and connector should not be empty')
-        ;
+            ->with('Invalid message: integration_id and connector should not be empty');
         $processor = new ReversSyncIntegrationProcessor(
             $this->createDoctrineHelperStub(),
             $this->createReversSyncProcessorMock(),
@@ -122,8 +121,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with(
                 'Invalid message: integration_id and connector should not be empty'
-            )
-        ;
+            );
         $processor = new ReversSyncIntegrationProcessor(
             $this->createDoctrineHelperStub(),
             $this->createReversSyncProcessorMock(),
@@ -149,15 +147,13 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Integration should exist and be enabled')
-        ;
+            ->with('Integration should exist and be enabled');
         $entityManagerMock = $this->createEntityManagerStub();
         $entityManagerMock
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn(null)
-        ;
+            ->willReturn(null);
 
         $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
 
@@ -186,8 +182,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Integration should exist and be enabled')
-        ;
+            ->with('Integration should exist and be enabled');
         $integration = new Integration();
         $integration->setEnabled(false);
 
@@ -197,7 +192,6 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
-        ;
 
         $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
 
@@ -232,7 +226,6 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
-        ;
 
         $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
 
@@ -280,7 +273,6 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
-        ;
 
         $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
 
@@ -327,8 +319,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
-            ->willReturn($integration)
-        ;
+            ->willReturn($integration);
 
         $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
 
@@ -375,8 +366,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $reverseSyncProcessor
             ->expects($this->any())
             ->method('getLoggerStrategy')
-            ->willReturn(new LoggerStrategy())
-        ;
+            ->willReturn(new LoggerStrategy());
 
         return $reverseSyncProcessor;
     }

@@ -8,27 +8,16 @@ use Psr\Log\LoggerInterface;
 
 class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connector;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->connector = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->getMockBuilder(LoggerInterface::class)
-            ->getMock();
+        $this->connector = $this->createMock(Connection::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     /**

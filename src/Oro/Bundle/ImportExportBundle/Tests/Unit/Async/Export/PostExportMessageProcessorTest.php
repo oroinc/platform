@@ -9,7 +9,6 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
@@ -18,66 +17,51 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const USER_ID = 132;
 
-    /**
-     * @var PostExportMessageProcessor
-     */
-    private $postExportMessageProcessor;
-
-    /**
-     * @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettings;
 
-    /**
-     * @var ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject */
     private $importExportResultSummarizer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|JobRepository
-     */
+    /** @var JobRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRepository;
 
-    /**
-     * @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $jobManager;
 
-    /**
-     * @var MessageProducer|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var MessageProducer|\PHPUnit\Framework\MockObject\MockObject */
     private $messageProducer;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var ExportHandler|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ExportHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $exportHandler;
+
+    /** @var PostExportMessageProcessor */
+    private $postExportMessageProcessor;
 
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
-
         $this->exportHandler = $this->createMock(ExportHandler::class);
         $this->messageProducer = $this->createMock(MessageProducer::class);
         $this->jobRepository = $this->createMock(JobRepository::class);
         $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->importExportResultSummarizer = $this->createMock(ImportExportResultSummarizer::class);
         $this->notificationSettings = $this->createMock(NotificationSettings::class);
+
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->with(JobEntity::class)
+            ->with(Job::class)
             ->willReturn($this->jobRepository);
 
         $this->postExportMessageProcessor = new PostExportMessageProcessor(
@@ -93,9 +77,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessExceptionsAreHandledDuringMerge()
     {
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
             'jobId' => '1',
@@ -106,47 +88,42 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'notificationTemplate' => 'resultTemplate',
             'entity' => 'Acme',
         ];
-        $message
-            ->expects(self::once())
+        $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(json_encode($messageBody));
+            ->willReturn(JSON::encode($messageBody));
 
         $job = new Job();
         $childJob = new Job();
         $childJob->setRootJob($job);
         $job->setChildJobs([$childJob]);
 
-        $this->jobRepository
-            ->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->willReturn($childJob);
 
-        $this->importExportResultSummarizer
-            ->expects(self::any())
+        $this->importExportResultSummarizer->expects(self::any())
             ->method('processSummaryExportResultForNotification')
             ->willReturn([]);
 
-        $this->exportHandler
-            ->expects(self::once())
+        $this->exportHandler->expects(self::once())
             ->method('exportResultFileMerge')
             ->willReturn('acme_filename');
 
         $exceptionMessage = 'Exception message';
         $exception = new RuntimeException($exceptionMessage);
-        $this->exportHandler
-            ->expects(self::once())
+        $this->exportHandler->expects(self::once())
             ->method('exportResultFileMerge')
             ->willThrowException($exception);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('critical')
             ->with(
                 sprintf('Error occurred during export merge: %s', $exceptionMessage),
                 ['exception' => $exception]
             );
 
-        $this->messageProducer->expects($this->never())->method('send');
+        $this->messageProducer->expects($this->never())
+            ->method('send');
 
         $result = $this->postExportMessageProcessor->process($message, $session);
 
@@ -155,9 +132,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
             'jobId' => '1',
@@ -168,28 +143,24 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'notificationTemplate' => 'resultTemplate',
             'entity' => 'Acme',
         ];
-        $message
-            ->expects(self::once())
+        $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(json_encode($messageBody));
+            ->willReturn(JSON::encode($messageBody));
 
         $job = new Job();
         $childJob = new Job();
         $childJob->setRootJob($job);
         $job->setChildJobs([$childJob]);
 
-        $this->jobRepository
-            ->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->willReturn($childJob);
 
-        $this->importExportResultSummarizer
-            ->expects(self::any())
+        $this->importExportResultSummarizer->expects(self::any())
             ->method('processSummaryExportResultForNotification')
             ->willReturn([]);
 
-        $this->exportHandler
-            ->expects(self::once())
+        $this->exportHandler->expects(self::once())
             ->method('exportResultFileMerge')
             ->willReturn('acme_filename');
 
@@ -220,9 +191,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenRecipientUserIdGiven()
     {
         $jobId = 123;
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $session = $this->createMock(SessionInterface::class);
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject */
         $message = $this->createMock(MessageInterface::class);
         $messageBody = [
             'jobId' => $jobId,
@@ -233,12 +202,10 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'recipientUserId' => self::USER_ID,
             'entity' => 'Acme',
         ];
-        $message
-            ->expects(self::once())
+        $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(json_encode($messageBody));
+            ->willReturn(JSON::encode($messageBody));
 
-        /** @var Job|\PHPUnit\Framework\MockObject\MockObject */
         $job = $this->createMock(Job::class);
         $job->expects($this->any())
             ->method('getId')
@@ -248,8 +215,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn(['file' => 'file.csv']);
 
-        $this->jobRepository
-            ->expects(self::once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->willReturn($job);
 
@@ -262,20 +228,17 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
 
         $fileName = 'filename.csv';
-        $this->exportHandler
-            ->expects(self::once())
+        $this->exportHandler->expects(self::once())
             ->method('exportResultFileMerge')
             ->willReturn($fileName);
 
         $summary = ['template' => 'params'];
-        $this->importExportResultSummarizer
-            ->expects(self::once())
+        $this->importExportResultSummarizer->expects(self::once())
             ->method('processSummaryExportResultForNotification')
             ->with($job, $fileName)
             ->willReturn($summary);
 
-        $this->messageProducer
-            ->expects($this->exactly(2))
+        $this->messageProducer->expects($this->exactly(2))
             ->method('send')
             ->withConsecutive(
                 [

@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Condition\CurrentStepNameIsEqual;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
+use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -15,18 +16,15 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const STEP_NAME = 'TestStep';
-    const WORKFLOW_NAME = 'TestWorkflow';
-
-    /** @var CurrentStepNameIsEqual */
-    protected $condition;
+    private const STEP_NAME = 'TestStep';
+    private const WORKFLOW_NAME = 'TestWorkflow';
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var CurrentStepNameIsEqual */
+    private $condition;
+
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
@@ -45,7 +43,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Missing "step_name" option');
 
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Condition\AbstractCondition',
+            AbstractCondition::class,
             $this->condition->initialize([])
         );
     }
@@ -53,7 +51,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
     public function testInitialize()
     {
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Condition\AbstractCondition',
+            AbstractCondition::class,
             $this->condition->initialize([
                 'main_entity' => new \stdClass(),
                 'step_name' => self::STEP_NAME,
@@ -64,11 +62,8 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateProvider
-     *
-     * @param string $stepName
-     * @param bool $expected
      */
-    public function testEvaluate($stepName, $expected)
+    public function testEvaluate(string $stepName, bool $expected)
     {
         $context = $this->createMock(TransitionContext::class);
         $user = $this->getEntity(User::class);
@@ -93,10 +88,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->condition->evaluate($context));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateProvider()
+    public function evaluateProvider(): array
     {
         return [
             'step_name_is_not_equal' => [

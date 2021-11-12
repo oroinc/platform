@@ -6,19 +6,12 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration;
 
 class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessDefinitionConfiguration
-     */
-    protected $configuration;
+    /** @var ProcessDefinitionConfiguration */
+    private $configuration;
 
     protected function setUp(): void
     {
         $this->configuration = new ProcessDefinitionConfiguration();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->configuration);
     }
 
     /**
@@ -29,10 +22,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
 
-    /**
-     * @return array
-     */
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             'minimum data' => [
