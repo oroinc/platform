@@ -1,5 +1,8 @@
 parameters:
-    oro_distribution.composer_json:                           '%kernel.project_dir%/composer.json'
+    oro_distribution.composer_json: '%kernel.project_dir%/composer.json'
+
+    # Makes the service container compile into a single file instead of multiple small files. Improves memory usage.
+    container.dumper.inline_factories: true
 
 services:
     oro_distribution.routing_loader:
