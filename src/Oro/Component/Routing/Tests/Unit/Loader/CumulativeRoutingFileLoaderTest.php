@@ -41,13 +41,13 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->loader->setResolver($this->loaderResolver);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
-        $this->assertTrue($this->loader->supports(null, 'auto'));
-        $this->assertFalse($this->loader->supports(null, 'another'));
+        self::assertTrue($this->loader->supports(null, 'auto'));
+        self::assertFalse($this->loader->supports(null, 'another'));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $rootDir = str_replace('\\', '/', realpath(__DIR__ . '/../Fixtures/Bundles'));
 
@@ -62,23 +62,23 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
             'bundle3' => $this->createMock(BundleInterface::class)
         ];
 
-        $bundles['bundle1']->expects($this->any())
+        $bundles['bundle1']->expects(self::any())
             ->method('getPath')
             ->willReturn($rootDir . '/Bundle1');
-        $bundles['bundle2']->expects($this->any())
+        $bundles['bundle2']->expects(self::any())
             ->method('getPath')
             ->willReturn($rootDir . '/Bundle2');
-        $bundles['bundle3']->expects($this->any())
+        $bundles['bundle3']->expects(self::any())
             ->method('getPath')
             ->willReturn($rootDir . '/Bundle3');
 
-        $this->kernel->expects($this->once())
+        $this->kernel->expects(self::once())
             ->method('getBundles')
             ->willReturn($bundles);
 
         $yamlLoader = $this->createMock(LoaderInterface::class);
 
-        $this->loaderResolver->expects($this->exactly(2))
+        $this->loaderResolver->expects(self::exactly(2))
             ->method('resolve')
             ->willReturnCallback(
                 function ($resource) use ($rootDir, $yamlLoader) {
@@ -94,7 +94,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $yamlLoader->expects($this->exactly(2))
+        $yamlLoader->expects(self::exactly(2))
             ->method('load')
             ->willReturnCallback(
                 function ($resource) use ($rootDir, $loadedRoutes) {
@@ -110,22 +110,22 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->routeOptionsResolver->expects($this->exactly(2))
+        $this->routeOptionsResolver->expects(self::exactly(2))
             ->method('resolve')
             ->withConsecutive(
                 [
-                    $this->identicalTo($loadedRoutes->get('route1')),
+                    $this->identicalTo($loadedRoutes->get('route2')),
                     $this->isInstanceOf(RouteCollectionAccessor::class)
                 ],
                 [
-                    $this->identicalTo($loadedRoutes->get('route2')),
+                    $this->identicalTo($loadedRoutes->get('route1')),
                     $this->isInstanceOf(RouteCollectionAccessor::class)
                 ]
             );
 
         $routes = $this->loader->load(null, 'auto');
 
-        $this->assertEquals(
+        self::assertEquals(
             ['route2', 'route1'],
             array_keys($routes->all())
         );

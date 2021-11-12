@@ -5,8 +5,10 @@ route2:
     path: /root2
     options:
         expose: true
+        priority: 10
 
 route3:
     path: /root3
     options:
         expose: false
+        priority: -10

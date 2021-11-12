@@ -5,8 +5,8 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Routing;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver;
+use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Route;
 
@@ -21,7 +21,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var SortableRouteCollection */
+    /** @var EnhancedRouteCollection */
     private $routeCollection;
 
     /** @var RouteCollectionAccessor */
@@ -42,7 +42,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
             $this->logger
         );
 
-        $this->routeCollection = new SortableRouteCollection();
+        $this->routeCollection = new EnhancedRouteCollection();
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 
@@ -107,7 +107,6 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
             $route->getRequirements()
         );
 
-        $this->routeCollection->sortByPriority();
         $this->assertEquals(
             [
                 'first_route',

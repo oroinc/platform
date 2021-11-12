@@ -42,15 +42,15 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
         unset($this->kernel, $this->routeOptionsResolver, $this->eventDispatcher);
     }
 
-    public function testSupportsFailed()
+    public function testSupportsFailed(): void
     {
-        $this->assertFalse($this->getLoader()->supports(null, 'not_supported'));
+        self::assertFalse($this->getLoader()->supports(null, 'not_supported'));
     }
 
     /**
      * @dataProvider loadDataProvider
      */
-    public function testLoad(array $expected)
+    public function testLoad(array $expected): void
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
         $bundle = $this->createMock(BundleInterface::class);
@@ -61,7 +61,7 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
             $this->callback(
                 function (RouteCollectionEvent $event) use ($expected) {
-                    $this->assertEquals($expected, $event->getCollection()->all());
+                    self::assertEquals($expected, $event->getCollection()->all());
 
                     return true;
                 }
@@ -69,20 +69,25 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
             $this->isType('string')
         );
 
-        $this->assertEquals($expected, $this->getLoader()->load('file', 'type')->all());
+        $routes = $this->getLoader()->load('file', 'type')->all();
+        self::assertEquals($expected, $routes);
+        self::assertSame(array_keys($expected), array_keys($routes));
     }
 
-    public function testDispatchEventWithoutEventDispatcher()
+    public function testDispatchEventWithoutEventDispatcher(): void
     {
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([]);
         $this->eventDispatcher->expects($this->never())->method('dispatch');
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->getLoaderWithoutEventDispatcher()->load('file', 'type')->all()
         );
     }
 
-    public function testLoadWithEmptyCache()
+    /**
+     * @dataProvider loadDataProvider
+     */
+    public function testLoadWithEmptyCache(array $expected): void
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
         $bundle = $this->createMock(BundleInterface::class);
@@ -102,10 +107,13 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
 
         $loader = $this->getLoader();
         $loader->setCache($cache);
-        $loader->load('file', 'type')->all();
+        $routes = $loader->load('file', 'type')->all();
+
+        self::assertEquals($expected, $routes);
+        self::assertSame(array_keys($expected), array_keys($routes));
     }
 
-    public function testLoadWithCachedData()
+    public function testLoadWithCachedData(): void
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
         $bundle = $this->createMock(BundleInterface::class);
@@ -127,15 +135,9 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
         $loader->load('file', 'type')->all();
     }
 
-    /**
-     * @return AbstractLoader
-     */
-    abstract public function getLoader();
+    abstract public function getLoader(): AbstractLoader;
 
-    /**
-     * @return AbstractLoader
-     */
-    abstract public function getLoaderWithoutEventDispatcher();
+    abstract public function getLoaderWithoutEventDispatcher(): AbstractLoader;
 
     abstract public function loadDataProvider(): array;
 }
