@@ -99,7 +99,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $businessUnit = new BusinessUnit();
         $user  = new User();
 
-        $businessUnit->setUsers(new ArrayCollection(array($user)));
+        $businessUnit->setUsers(new ArrayCollection([$user]));
 
         $this->assertContains($user, $businessUnit->getUsers());
 

@@ -14,7 +14,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
     private const TEST_TYPE = 'test_format_type';
     private const TEST_FORMAT = 'MMM, d y t';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DateTimeFormatConverterRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $converterRegistry;
 
     /** @var DateFormatExtension */
@@ -104,10 +104,10 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDateTimeFormatterList()
     {
-        $formatConverters = array(
+        $formatConverters = [
             'first'  => $this->createMock(DateTimeFormatConverterInterface::class),
             'second' => $this->createMock(DateTimeFormatConverterInterface::class),
-        );
+        ];
         $this->converterRegistry->expects($this->once())
             ->method('getFormatConverters')
             ->willReturn($formatConverters);

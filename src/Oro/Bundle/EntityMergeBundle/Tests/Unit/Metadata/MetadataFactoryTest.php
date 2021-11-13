@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -9,10 +10,8 @@ use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 
 class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MetadataFactory
-     */
-    protected $factory;
+    /** @var MetadataFactory */
+    private $factory;
 
     protected function setUp(): void
     {
@@ -21,7 +20,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateEntityMetadata()
     {
-        $options = array('foo' => 'bar');
+        $options = ['foo' => 'bar'];
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
 
         $metadata = $this->factory->createEntityMetadata($options, $doctrineMetadata);
@@ -32,8 +31,8 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateEntityMetadataFromArray()
     {
-        $options = array('foo' => 'bar');
-        $doctrineMetadata = array('doctrineOption' => 'test');
+        $options = ['foo' => 'bar'];
+        $doctrineMetadata = ['doctrineOption' => 'test'];
 
         $metadata = $this->factory->createEntityMetadata($options, $doctrineMetadata);
         $this->assertInstanceOf(EntityMetadata::class, $metadata);
@@ -43,17 +42,15 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    //@codingStandardsIgnoreStart
-    //@codingStandardsIgnoreEnd
     public function testCreateEntityMetadataFails()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf(
             '$doctrineMetadata must be an array of "%s", but "stdClass" given.',
-            \Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata::class
+            DoctrineMetadata::class
         ));
 
-        $options = array('foo' => 'bar');
+        $options = ['foo' => 'bar'];
         $doctrineMetadata = new \stdClass();
 
         $this->factory->createEntityMetadata($options, $doctrineMetadata);
@@ -61,7 +58,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFieldMetadata()
     {
-        $options = array('foo' => 'bar');
+        $options = ['foo' => 'bar'];
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
 
         $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
@@ -72,8 +69,8 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFieldMetadataFromArray()
     {
-        $options = array('foo' => 'bar');
-        $doctrineMetadata = array('doctrineOption' => 'test');
+        $options = ['foo' => 'bar'];
+        $doctrineMetadata = ['doctrineOption' => 'test'];
 
         $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
         $this->assertInstanceOf(FieldMetadata::class, $metadata);
@@ -83,17 +80,15 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    //@codingStandardsIgnoreStart
-    //@codingStandardsIgnoreEnd
     public function testCreateFieldMetadataFails()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf(
             '$doctrineMetadata must be an array of "%s", but "stdClass" given.',
-            \Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata::class
+            DoctrineMetadata::class
         ));
 
-        $options = array('foo' => 'bar');
+        $options = ['foo' => 'bar'];
         $doctrineMetadata = new \stdClass();
 
         $this->factory->createFieldMetadata($options, $doctrineMetadata);
@@ -101,7 +96,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateDoctrineMetadata()
     {
-        $options = array('foo' => 'bar');
+        $options = ['foo' => 'bar'];
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
 
         $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);

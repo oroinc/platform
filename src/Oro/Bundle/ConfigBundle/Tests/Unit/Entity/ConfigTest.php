@@ -33,7 +33,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $object->setScopedEntity($entity);
 
         $this->assertEquals($entity, $object->getScopedEntity());
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $object->getValues());
+        $this->assertInstanceOf(ArrayCollection::class, $object->getValues());
     }
 
     public function testRecordId()

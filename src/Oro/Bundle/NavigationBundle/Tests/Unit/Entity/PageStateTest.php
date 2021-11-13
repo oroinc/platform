@@ -22,7 +22,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
 
     public function testDateTime()
     {
-        $item     = new PageState();
+        $item = new PageState();
         $dateTime = new \DateTime();
 
         $item->setUpdatedAt($dateTime);
@@ -34,7 +34,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
 
     public function testPageId()
     {
-        $item   = new PageState();
+        $item = new PageState();
         $pageId = 'SomeId';
 
         $item->setPageId($pageId);
@@ -46,9 +46,9 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
     public function testData()
     {
         $item = new PageState();
-        $data = array(
-            array('key' => 'val', 'key2' => 'val2'),
-        );
+        $data = [
+            ['key' => 'val', 'key2' => 'val2'],
+        ];
 
         $item->setData($data);
 

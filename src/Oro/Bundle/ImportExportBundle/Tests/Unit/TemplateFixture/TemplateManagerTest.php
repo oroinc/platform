@@ -43,9 +43,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testHasEntityFixture()
     {
-        $repository = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
+        $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
             ->method('getEntityClass')
             ->willReturn('Test\Entity1');
@@ -71,9 +69,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityRepository()
     {
-        $repository = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
+        $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
             ->method('getEntityClass')
             ->willReturn('Test\Entity1');
@@ -110,9 +106,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityFixture()
     {
-        $repository = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
+        $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
             ->method('getEntityClass')
             ->willReturn('Test\Entity1');
@@ -144,9 +138,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testFrozenTemplateManager()
     {
-        $repository = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
+        $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
             ->method('getEntityClass')
             ->willReturn('Test\Entity1');
@@ -158,9 +150,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
             $this->templateManager->getEntityRepository('Test\Entity1')
         );
 
-        $anotherRepository = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
+        $anotherRepository = $this->createMock(TemplateEntityRepositoryInterface::class);
 
         $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
         $this->expectExceptionMessage(

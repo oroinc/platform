@@ -8,28 +8,28 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
 {
     public function testAll()
     {
-        $data = array('foo' => 'bar');
+        $data = ['foo' => 'bar'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
 
         $this->assertEquals($data, $parameters->all());
     }
 
     public function testKeys()
     {
-        $data = array('foo' => 'bar');
+        $data = ['foo' => 'bar'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
 
-        $this->assertEquals(array('foo'), $parameters->keys());
+        $this->assertEquals(['foo'], $parameters->keys());
     }
 
     public function testReplace()
     {
-        $data = array('foo' => 'bar');
-        $replaceData = array('bar' => 'baz');
+        $data = ['foo' => 'bar'];
+        $replaceData = ['bar' => 'baz'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
         $parameters->replace($replaceData);
 
         $this->assertEquals($replaceData, $parameters->all());
@@ -37,11 +37,11 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
 
     public function testAdd()
     {
-        $data = array('one' => array('one' => 'origin', 'two' => 'origin'), 'two' => 'origin');
-        $addData = array('one' => array('one' => 'new'), 'two' => 'new');
-        $expectedData = array('one' => array('one' => 'new', 'two' => 'origin'), 'two' => 'new');
+        $data = ['one' => ['one' => 'origin', 'two' => 'origin'], 'two' => 'origin'];
+        $addData = ['one' => ['one' => 'new'], 'two' => 'new'];
+        $expectedData = ['one' => ['one' => 'new', 'two' => 'origin'], 'two' => 'new'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
         $parameters->add($addData);
 
         $this->assertEquals($expectedData, $parameters->all());
@@ -49,9 +49,9 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
 
     public function testGet()
     {
-        $data = array('foo' => 'bar');
+        $data = ['foo' => 'bar'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
 
         $this->assertEquals($data['foo'], $parameters->get('foo'));
         $this->assertEquals('baz', $parameters->get('bar', 'baz'));
@@ -59,22 +59,22 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
 
     public function testSet()
     {
-        $data = array();
+        $data = [];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
         $parameters->set('foo', 'bar');
 
-        $this->assertEquals(array('foo' => 'bar'), $parameters->all());
+        $this->assertEquals(['foo' => 'bar'], $parameters->all());
     }
 
     public function testMergeKey()
     {
-        $data = array('one' => array('one' => 'origin', 'two' => 'origin'), 'two' => 'origin');
+        $data = ['one' => ['one' => 'origin', 'two' => 'origin'], 'two' => 'origin'];
         $mergeKey = 'one';
-        $mergeKeyData = array('one' => 'new');
-        $expectedData = array('one' => array('one' => 'new', 'two' => 'origin'), 'two' => 'origin');
+        $mergeKeyData = ['one' => 'new'];
+        $expectedData = ['one' => ['one' => 'new', 'two' => 'origin'], 'two' => 'origin'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
         $parameters->mergeKey($mergeKey, $mergeKeyData);
 
         $this->assertEquals($expectedData, $parameters->all());
@@ -82,9 +82,9 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
 
     public function testHas()
     {
-        $data = array('foo' => 'bar');
+        $data = ['foo' => 'bar'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
 
         $this->assertTrue($parameters->has('foo'));
         $this->assertFalse($parameters->has('bar'));
@@ -92,17 +92,12 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
 
     public function testRemove()
     {
-        $data = array('foo' => 'bar');
+        $data = ['foo' => 'bar'];
 
-        $parameters = $this->createParameterBag($data);
+        $parameters = new ParameterBag($data);
 
         $parameters->remove('foo');
 
         $this->assertFalse($parameters->has('foo'));
-    }
-
-    protected function createParameterBag(array $params)
-    {
-        return new ParameterBag($params);
     }
 }

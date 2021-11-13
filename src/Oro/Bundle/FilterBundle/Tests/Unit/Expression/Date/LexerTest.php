@@ -4,6 +4,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
+use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -99,17 +100,17 @@ class LexerTest extends \PHPUnit\Framework\TestCase
             'should check syntax errors'                                  => [
                 '((1+3)',
                 [],
-                'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
+                SyntaxException::class
             ],
             'should check errors'                                         => [
                 '1+3)',
                 [],
-                'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
+                SyntaxException::class
             ],
             'should not parse all string'                                 => [
                 'some string',
                 [],
-                'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
+                SyntaxException::class
             ]
         ];
     }

@@ -16,13 +16,11 @@ class TestEntityType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'data_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\TestEntity',
-                'test_option' => 'default_value',
-                'validation_groups' => array('Default'),
-            )
-        );
+        $resolver->setDefaults([
+            'data_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\TestEntity',
+            'test_option' => 'default_value',
+            'validation_groups' => ['Default'],
+        ]);
     }
 
     /**

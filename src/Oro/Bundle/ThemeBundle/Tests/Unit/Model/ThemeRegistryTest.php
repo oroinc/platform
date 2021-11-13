@@ -48,7 +48,7 @@ class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($barTheme, $this->themeRegistry->getTheme('bar'));
 
         self::assertEquals(
-            array('foo' => $fooTheme, 'bar' => $barTheme),
+            ['foo' => $fooTheme, 'bar' => $barTheme],
             $this->themeRegistry->getAllThemes()
         );
     }

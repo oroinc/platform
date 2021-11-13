@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class EntityCreateSelectFormExtension extends AbstractExtension
 {
-    protected $registry;
+    private ManagerRegistry $registry;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -19,10 +19,10 @@ class EntityCreateSelectFormExtension extends AbstractExtension
 
     protected function loadTypes()
     {
-        return array(
+        return [
             new TextType(),
             new TestEntityType(),
             new EntityIdentifierType($this->registry),
-        );
+        ];
     }
 }

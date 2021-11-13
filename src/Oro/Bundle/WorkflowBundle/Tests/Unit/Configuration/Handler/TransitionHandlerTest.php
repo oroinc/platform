@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -107,7 +108,7 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
                             'acl_message' => null,
                             'transition_definition' => 'test_transition_definition',
                             'frontend_options' => ['class' => 'btn-primary'],
-                            'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                            'form_type' => WorkflowTransitionType::class,
                             'display_type' => 'dialog',
                             'label' => 'Test Transition',
                             'form_options' => [
@@ -140,7 +141,7 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
                             'acl_message' => null,
                             'transition_definition' => 'test_transition_definition',
                             'frontend_options' => ['class' => 'btn-primary'],
-                            'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                            'form_type' => WorkflowTransitionType::class,
                             'display_type' => 'dialog',
                             'form_options' => [
                                 'attribute_fields' => [

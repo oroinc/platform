@@ -60,10 +60,10 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
         return [
             'allowed when processes has no exclude definitions' => [
                 'before_events' => [
-                    $this->createProcessHandleEvent($foo = $this->getMockProcessTrigger('foo')),
+                    $this->getProcessHandleEvent($foo = $this->getProcessTrigger('foo')),
                 ],
                 'after_events' => [
-                    $this->createProcessHandleEvent($foo),
+                    $this->getProcessHandleEvent($foo),
                 ],
                 'expects' => [
                     [
@@ -75,10 +75,10 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
             ],
             'allowed when exclude definition not match' => [
                 'before_events' => [
-                    $this->createProcessHandleEvent($foo = $this->getMockProcessTrigger('foo', ['bar'])),
+                    $this->getProcessHandleEvent($foo = $this->getProcessTrigger('foo', ['bar'])),
                 ],
                 'after_events' => [
-                    $this->createProcessHandleEvent($foo),
+                    $this->getProcessHandleEvent($foo),
                 ],
                 'expects' => [
                     [
@@ -90,10 +90,10 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
             ],
             'not allowed when self excluded' => [
                 'before_events' => [
-                    $this->createProcessHandleEvent($foo = $this->getMockProcessTrigger('foo', ['foo'])),
+                    $this->getProcessHandleEvent($foo = $this->getProcessTrigger('foo', ['foo'])),
                 ],
                 'after_events' => [
-                    $this->createProcessHandleEvent($foo),
+                    $this->getProcessHandleEvent($foo),
                 ],
                 'expects' => [
                     [
@@ -105,12 +105,12 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
             ],
             'not allowed when excluded by other process' => [
                 'before_events' => [
-                    $this->createProcessHandleEvent($foo = $this->getMockProcessTrigger('foo', ['bar'])),
-                    $this->createProcessHandleEvent($bar = $this->getMockProcessTrigger('bar')),
+                    $this->getProcessHandleEvent($foo = $this->getProcessTrigger('foo', ['bar'])),
+                    $this->getProcessHandleEvent($bar = $this->getProcessTrigger('bar')),
                 ],
                 'after_events' => [
-                    $this->createProcessHandleEvent($foo),
-                    $this->createProcessHandleEvent($bar),
+                    $this->getProcessHandleEvent($foo),
+                    $this->getProcessHandleEvent($bar),
                 ],
                 'expects' => [
                     [
@@ -128,21 +128,12 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
         ];
     }
 
-    /**
-     * @param ProcessTrigger $processTrigger
-     * @return ProcessHandleEvent
-     */
-    private function createProcessHandleEvent(ProcessTrigger $processTrigger)
+    private function getProcessHandleEvent(ProcessTrigger $processTrigger): ProcessHandleEvent
     {
         return new ProcessHandleEvent($processTrigger, $this->createMock(ProcessData::class));
     }
 
-    /**
-     * @param string $processDefinitionName
-     * @param array $excludeDefinitions
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockProcessTrigger($processDefinitionName, array $excludeDefinitions = array())
+    private function getProcessTrigger(string $processDefinitionName, array $excludeDefinitions = []): ProcessTrigger
     {
         $processDefinition = $this->createMock(ProcessDefinition::class);
         $processDefinition->expects($this->any())

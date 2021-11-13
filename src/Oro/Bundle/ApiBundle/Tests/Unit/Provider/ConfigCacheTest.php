@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFile;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
 use Oro\Component\Testing\TempDirExtension;
 
@@ -44,7 +46,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedConfig = [
             'entities'  => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+                User::class => [
                     'fields' => [
                         'groups' => [
                             'exclude' => true
@@ -82,7 +84,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedConfig = [
             'entities'  => [
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+                User::class => [
                     'fields' => [
                         'groups' => [
                             'exclude' => true
@@ -172,7 +174,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedAliases = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+            User::class => [
                 'alias'        => 'user',
                 'plural_alias' => 'users'
             ]
@@ -204,7 +206,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedAliases = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' => [
+            User::class => [
                 'alias'        => 'user',
                 'plural_alias' => 'users'
             ]
@@ -261,7 +263,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExcludedEntities = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User'
+            User::class
         ];
 
         $cache = $this->createMock(ConfigCacheFile::class);
@@ -290,7 +292,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExcludedEntities = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User'
+            User::class
         ];
 
         $cache = $this->createMock(ConfigCacheFile::class);
@@ -344,8 +346,8 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedSubstitutions = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' =>
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile'
+            User::class =>
+                UserProfile::class
         ];
 
         $cache = $this->createMock(ConfigCacheFile::class);
@@ -374,8 +376,8 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedSubstitutions = [
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User' =>
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile'
+            User::class =>
+                UserProfile::class
         ];
 
         $cache = $this->createMock(ConfigCacheFile::class);
@@ -430,7 +432,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'name'
             ]
         ];
@@ -462,7 +464,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'name'
             ]
         ];
@@ -519,7 +521,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedInclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'category'
             ]
         ];
@@ -551,7 +553,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedInclusions = [
             [
-                'entity' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User',
+                'entity' => User::class,
                 'field'  => 'category'
             ]
         ];

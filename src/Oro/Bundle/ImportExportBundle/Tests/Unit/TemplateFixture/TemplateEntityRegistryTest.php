@@ -109,12 +109,8 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
-        $repository1 = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
-        $repository2 = $this->createMock(
-            TemplateEntityRepositoryInterface::class
-        );
+        $repository1 = $this->createMock(TemplateEntityRepositoryInterface::class);
+        $repository2 = $this->createMock(TemplateEntityRepositoryInterface::class);
 
         $templateManager = $this->createMock(TemplateManager::class);
 

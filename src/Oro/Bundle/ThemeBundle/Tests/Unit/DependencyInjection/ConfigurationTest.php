@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
@@ -12,13 +13,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $configuration = new Configuration();
         $builder = $configuration->getConfigTreeBuilder();
 
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
+        $this->assertInstanceOf(TreeBuilder::class, $builder);
     }
 
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration($configs, $expected)
+    public function testProcessConfiguration(array $configs, array $expected)
     {
         $configuration = new Configuration();
         $processor = new Processor();
@@ -49,7 +50,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'empty' => [

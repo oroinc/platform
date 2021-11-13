@@ -25,7 +25,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testGroup()
     {
-        $name  = 'Users';
+        $name = 'Users';
 
         $this->assertEmpty($this->group->getId());
         $this->assertEmpty($this->group->getName());
@@ -37,11 +37,11 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRoleLabelsAsString()
     {
-        $roleFoo  = new Role('ROLE_FOO');
+        $roleFoo = new Role('ROLE_FOO');
         $roleFoo->setLabel('Role foo');
         $this->group->addRole($roleFoo);
 
-        $roleBar  = new Role('ROLE_BAR');
+        $roleBar = new Role('ROLE_BAR');
         $roleBar->setLabel('Role bar');
         $this->group->addRole($roleBar);
 
@@ -107,7 +107,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testSetRolesWithArrayArgument()
     {
-        $roles = array(new Role(self::TEST_ROLE));
+        $roles = [new Role(self::TEST_ROLE)];
         $this->assertCount(0, $this->group->getRoles());
         $this->group->setRoles($roles);
         $this->assertEquals($roles, $this->group->getRoles()->toArray());
@@ -115,7 +115,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testSetRolesWithCollectionArgument()
     {
-        $roles = new ArrayCollection(array(new Role(self::TEST_ROLE)));
+        $roles = new ArrayCollection([new Role(self::TEST_ROLE)]);
         $this->assertCount(0, $this->group->getRoles());
         $this->group->setRoles($roles);
         $this->assertEquals($roles->toArray(), $this->group->getRoles()->toArray());
@@ -145,8 +145,8 @@ class GroupTest extends \PHPUnit\Framework\TestCase
 
     public function testOrganization()
     {
-        $entity         = new Group();
-        $organization   = new Organization();
+        $entity = new Group();
+        $organization = new Organization();
 
         $this->assertNull($entity->getOrganization());
         $entity->setOrganization($organization);

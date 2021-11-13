@@ -35,7 +35,7 @@ class TestEmailOwner implements EmailOwnerInterface
 
     public function getClass()
     {
-        return 'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner';
+        return self::class;
     }
 
     public function getEmailFields()

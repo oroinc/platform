@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,10 +14,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         $configuration = new Configuration();
 
-        $this->assertInstanceOf(
-            'Symfony\Component\Config\Definition\Builder\TreeBuilder',
-            $configuration->getConfigTreeBuilder()
-        );
+        $this->assertInstanceOf(TreeBuilder::class, $configuration->getConfigTreeBuilder());
     }
 
     public function testGetConfigKeyByName()

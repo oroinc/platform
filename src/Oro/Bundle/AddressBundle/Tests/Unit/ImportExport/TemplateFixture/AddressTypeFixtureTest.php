@@ -21,7 +21,7 @@ class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityClass()
     {
-        $this->assertEquals('Oro\Bundle\AddressBundle\Entity\AddressType', $this->fixture->getEntityClass());
+        $this->assertEquals(AddressType::class, $this->fixture->getEntityClass());
     }
 
     public function testCreateEntity()

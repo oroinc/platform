@@ -17,13 +17,13 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
+
+    /** @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $paramsProvider;
 
     /** @var ReminderExtension */
@@ -34,6 +34,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->paramsProvider = $this->createMock(MessageParamsProvider::class);
+
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
             ->method('getManagerForClass')
@@ -83,19 +84,19 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRequestedRemindersReturnCorrectData()
     {
-        $reminder  = $this->createMock(Reminder::class);
+        $reminder = $this->createMock(Reminder::class);
         $reminder1 = $this->createMock(Reminder::class);
         $reminder2 = $this->createMock(Reminder::class);
 
-        $expectedReminder      = new \stdClass();
-        $expectedReminder->id  = 42;
-        $expectedReminder1     = new \stdClass();
+        $expectedReminder = new \stdClass();
+        $expectedReminder->id = 42;
+        $expectedReminder1 = new \stdClass();
         $expectedReminder1->id = 12;
-        $expectedReminder2     = new \stdClass();
+        $expectedReminder2 = new \stdClass();
         $expectedReminder2->id = 22;
-        $expectedReminders     = array($expectedReminder, $expectedReminder1, $expectedReminder2);
+        $expectedReminders = [$expectedReminder, $expectedReminder1, $expectedReminder2];
 
-        $reminders = array($reminder, $reminder1, $reminder2);
+        $reminders = [$reminder, $reminder1, $reminder2];
         $token = $this->createMock(TokenInterface::class);
         $user = $this->createMock(User::class);
         $token->expects($this->once())

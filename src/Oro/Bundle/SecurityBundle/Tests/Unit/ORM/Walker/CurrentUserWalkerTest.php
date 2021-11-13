@@ -34,7 +34,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
 
         $this->assertEquals(
@@ -52,7 +52,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -76,7 +76,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -100,7 +100,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -125,7 +125,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,

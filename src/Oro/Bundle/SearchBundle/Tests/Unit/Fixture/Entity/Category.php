@@ -33,7 +33,7 @@ class Category
      */
     private $products;
 
-    public $parent = array();
+    public $parent = [];
 
     /**
      * Get id

@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Metadata\Cache\DoctrineCacheAdapter;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\JmsSerializerPass;
+use Oro\Bundle\PlatformBundle\Twig\SerializerExtension;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -55,10 +57,7 @@ class JmsSerializerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($container);
 
-        self::assertEquals(
-            'Oro\Bundle\PlatformBundle\Twig\SerializerExtension',
-            $serializerTwigExtension->getClass()
-        );
+        self::assertEquals(SerializerExtension::class, $serializerTwigExtension->getClass());
         self::assertEquals(
             [new Reference('oro_platform.twig.service_locator')],
             $serializerTwigExtension->getArguments()
@@ -72,7 +71,7 @@ class JmsSerializerPassTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition('oro_platform.jms_serializer.cache')
         );
 
-        $jmsSerializerCacheAdapterDef = (new Definition('Metadata\Cache\DoctrineCacheAdapter'))
+        $jmsSerializerCacheAdapterDef = (new Definition(DoctrineCacheAdapter::class))
             ->setPublic(false)
             ->setArguments([
                 'jms_serializer_cache',

@@ -9,9 +9,9 @@ class StatusTypeTest extends FormIntegrationTestCase
 {
     public function testBindValidData()
     {
-        $formData = array(
+        $formData = [
             'status' => 'test status',
-        );
+        ];
 
         $form = $this->factory->create(StatusType::class);
 

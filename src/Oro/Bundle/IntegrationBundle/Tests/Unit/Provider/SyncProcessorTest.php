@@ -23,22 +23,22 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var Integration|\PHPUnit\Framework\MockObject\MockObject */
     private $integration;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $processorRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Executor|\PHPUnit\Framework\MockObject\MockObject */
     private $jobExecutor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerStrategy|\PHPUnit\Framework\MockObject\MockObject */
     private $log;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
     protected function setUp(): void
@@ -55,7 +55,7 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess($data, $expected)
+    public function testProcess(array $data, array $expected)
     {
         $this->integration->expects($this->once())
             ->method('getConnectors')
@@ -81,10 +81,10 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);
-        $mocker = $this->jobExecutor->expects($this->exactly(count($expected)))
-            ->method('executeJob');
-        call_user_func_array([$mocker, 'withConsecutive'], $expected);
-        $mocker->willReturn($jobResult);
+        $this->jobExecutor->expects($this->exactly(count($expected)))
+            ->method('executeJob')
+            ->withConsecutive(...$expected)
+            ->willReturn($jobResult);
 
         $processor = $this->getSyncProcessor();
         $processor->process($this->integration, $data['connector'], $data['parameters']);
