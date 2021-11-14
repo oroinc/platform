@@ -119,7 +119,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit\Framework\TestCase
         $definition = (new ProcessDefinition())
             ->setName('name')
             ->setLabel('label')
-            ->setRelatedEntity('\StdClass');
+            ->setRelatedEntity(\stdClass::class);
 
         $processTrigger = new ProcessTrigger();
         ReflectionUtil::setId($processTrigger, $id);

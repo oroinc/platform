@@ -7,11 +7,8 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ScalarFieldDenormalizer */
-    protected $denormalizer;
+    private $denormalizer;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->denormalizer = new ScalarFieldDenormalizer();
@@ -19,15 +16,14 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDenormalizationProvider
-     *
-     * @param bool   $isSupported
-     * @param mixed  $data
-     * @param string $type
-     * @param array  $context
-     * @param string $format
      */
-    public function testSupportsDenormalization(bool $isSupported, $data, $type, array $context = [], $format = null)
-    {
+    public function testSupportsDenormalization(
+        bool $isSupported,
+        mixed $data,
+        string $type,
+        array $context = [],
+        string $format = null
+    ) {
         $this->assertEquals(
             $isSupported,
             $this->denormalizer->supportsDenormalization($data, $type, $format, $context)
@@ -46,16 +42,16 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'field' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'Object value is not supported' => [
                 'isSupported' => false,
-                'data' => new \StdClass(),
+                'data' => new \stdClass(),
                 'type' => 'integer',
                 'context' => [
                     'field' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'Array value is not supported' => [
@@ -64,7 +60,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'field' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to integer is supported' => [
@@ -73,7 +69,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to smallint is supported' => [
@@ -82,7 +78,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'smallint',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to bigint is supported' => [
@@ -91,7 +87,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'bigint',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to float is supported' => [
@@ -100,7 +96,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'float',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to decimal is supported' => [
@@ -109,7 +105,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to money is supported' => [
@@ -118,7 +114,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'money',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to percent is supported' => [
@@ -127,7 +123,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'percent',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String to boolean is supported' => [
@@ -136,7 +132,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
         ];
@@ -144,7 +140,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSupportsDenormalizationOnIgnoredField()
     {
-        $this->denormalizer->addFieldToIgnore('\StdClass', 'test');
+        $this->denormalizer->addFieldToIgnore(\stdClass::class, 'test');
 
         $this->assertEquals(
             false,
@@ -154,7 +150,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 null,
                 [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ]
             )
         );
@@ -162,15 +158,14 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider denormalizeProvider
-     *
-     * @param mixed  $expectedValue
-     * @param mixed  $data
-     * @param string $type
-     * @param array  $context
-     * @param string $format
      */
-    public function testDenormalize($expectedValue, $data, $type, array $context = [], $format = null)
-    {
+    public function testDenormalize(
+        mixed $expectedValue,
+        mixed $data,
+        string $type,
+        array $context = [],
+        string $format = null
+    ) {
         $this->assertEquals(
             $expectedValue,
             $this->denormalizer->denormalize($data, $type, $format, $context)
@@ -195,7 +190,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -205,7 +200,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -215,7 +210,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -225,7 +220,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -235,7 +230,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -245,7 +240,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -255,7 +250,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass'
+                    'className' => \stdClass::class
                 ],
             ],
             'String with invalid string value to int' => [
@@ -264,7 +259,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -274,7 +269,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'integer',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -284,7 +279,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -294,7 +289,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -304,7 +299,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -314,7 +309,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true
                 ],
             ],
@@ -324,7 +319,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                 ],
             ],
             'String with invalid string value to decimal' => [
@@ -333,7 +328,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'decimal',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -343,7 +338,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -353,7 +348,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -363,7 +358,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -373,7 +368,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -383,7 +378,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -393,7 +388,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -403,7 +398,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -413,7 +408,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -423,7 +418,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -433,7 +428,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
@@ -443,7 +438,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
-                    'className' => '\StdClass',
+                    'className' => \stdClass::class,
                     'skip_invalid_value' => true,
                 ],
             ],
