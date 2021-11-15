@@ -37,10 +37,8 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
     {
         $context = $this->createMock(ContextInterface::class);
 
-        $provider1 = $this
-            ->createMock(PathProviderInterface::class);
-        $provider2 = $this
-            ->createMock(StubContextAwarePathProvider::class);
+        $provider1 = $this->createMock(PathProviderInterface::class);
+        $provider2 = $this->createMock(StubContextAwarePathProvider::class);
         $provider2->expects($this->once())
             ->method('setContext')
             ->with($this->identicalTo($context));
