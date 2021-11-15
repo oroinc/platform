@@ -10,8 +10,8 @@ class TestFormExtension extends AbstractExtension
 {
     protected function loadTypes()
     {
-        return array(
+        return [
             new Select2Type(HiddenType::class, 'oro_select2_hidden')
-        );
+        ];
     }
 }

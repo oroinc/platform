@@ -94,9 +94,6 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
         $this->assertEquals($enabledLocalizations, $childForm->getConfig()->getOption('enabled_localizations', []));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildFormDataProvider(): array
     {
         return [
@@ -122,7 +119,7 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     protected function getExtensions(): array
     {

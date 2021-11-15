@@ -15,17 +15,17 @@ class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
         $expected = [
             'expression' => '!true === false',
             'node' => [
-                'Symfony\Component\ExpressionLanguage\Node\BinaryNode' => [
+                BinaryNode::class => [
                     'attributes' => [
                         'operator' => '==='
                     ],
                     'nodes' => [
                         'left' => [
-                            'Symfony\Component\ExpressionLanguage\Node\UnaryNode' => [
+                            UnaryNode::class => [
                                 'attributes' => ['operator' => '!'],
                                 'nodes' => [
                                     'node' => [
-                                        'Symfony\Component\ExpressionLanguage\Node\ConstantNode' => [
+                                        ConstantNode::class => [
                                             'attributes' => ['value' => true],
                                         ]
                                     ]
@@ -33,7 +33,7 @@ class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
                             ]
                         ],
                         'right' => [
-                            'Symfony\Component\ExpressionLanguage\Node\ConstantNode' => [
+                            ConstantNode::class => [
                                 'attributes' => ['value' => false],
                             ]
                         ]

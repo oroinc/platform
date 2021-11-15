@@ -9,10 +9,8 @@ class ImportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new ImportData();
 
@@ -21,11 +19,11 @@ class ImportDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            array('file', 'test'),
-            array('processorAlias', 'test')
-        );
+        return [
+            ['file', 'test'],
+            ['processorAlias', 'test']
+        ];
     }
 }

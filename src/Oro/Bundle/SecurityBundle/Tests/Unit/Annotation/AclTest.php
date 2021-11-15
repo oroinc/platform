@@ -9,7 +9,7 @@ class AclTest extends \PHPUnit\Framework\TestCase
     public function testAnnotation()
     {
         $annotation = new Acl(
-            array(
+            [
                 'id' => 'test_acl',
                 'type' => 'SomeType',
                 'class' => \stdClass::class,
@@ -19,7 +19,7 @@ class AclTest extends \PHPUnit\Framework\TestCase
                 'description' => 'SomeDescription',
                 'category' => 'SomeCategory',
                 'ignore_class_acl' => true
-            )
+            ]
         );
         $this->assertEquals('test_acl', $annotation->getId());
         $this->assertEquals('SomeType', $annotation->getType());
@@ -35,30 +35,30 @@ class AclTest extends \PHPUnit\Framework\TestCase
     public function testAnnotationWithEmptyId()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $annotation = new Acl(array('id' => ''));
+        new Acl(['id' => '']);
     }
 
     public function testAnnotationWithInvalidId()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $annotation = new Acl(array('id' => 'test acl'));
+        new Acl(['id' => 'test acl']);
     }
 
     public function testAnnotationWithMissingId()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $annotation = new Acl(array());
+        new Acl([]);
     }
 
     public function testAnnotationWithEmptyType()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $annotation = new Acl(array('id' => 'test', 'type' => ''));
+        new Acl(['id' => 'test', 'type' => '']);
     }
 
     public function testAnnotationWithMissingType()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $annotation = new Acl(array('id' => 'test'));
+        new Acl(['id' => 'test']);
     }
 }

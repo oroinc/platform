@@ -9,10 +9,10 @@ class CsrfProtectionTest extends \PHPUnit\Framework\TestCase
     public function testAnnotation()
     {
         $annotation = new CsrfProtection(
-            array(
+            [
                 'enabled' => true,
                 'useRequest' => true
-            )
+            ]
         );
         $this->assertTrue($annotation->isEnabled());
         $this->assertTrue($annotation->isUseRequest());

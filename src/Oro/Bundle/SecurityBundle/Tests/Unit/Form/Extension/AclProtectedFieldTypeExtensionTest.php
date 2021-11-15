@@ -22,11 +22,14 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {
-    private FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject $fieldAclHelper;
+    /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldAclHelper;
 
-    private TestLogger $logger;
+    /** @var TestLogger */
+    private $logger;
 
-    private AclProtectedFieldTypeExtension $extension;
+    /** @var AclProtectedFieldTypeExtension */
+    private $extension;
 
     protected function setUp(): void
     {
@@ -187,7 +190,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
         $builder->setPropertyPath(new PropertyPath('zip'));
-        $builder->setAttribute('error_mapping', array());
+        $builder->setAttribute('error_mapping', []);
         $builder->setErrorBubbling(false);
         $builder->setMapped(true);
         $form->add($builder->getForm());
@@ -285,7 +288,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     /**
      * @return array [dispatcher, builder]
      */
-    private function getFormBuilderWithEventDispatcher($dataClass = null, $formName = null): array
+    private function getFormBuilderWithEventDispatcher(string $dataClass = null, string $formName = null): array
     {
         $dispatcher = new EventDispatcher();
         $formFactory = $this->createMock(FormFactoryInterface::class);

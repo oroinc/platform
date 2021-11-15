@@ -58,8 +58,8 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testEvents()
     {
-        $attributeNames = array('test');
-        $values = array('test' => 'value');
+        $attributeNames = ['test'];
+        $values = ['test' => 'value'];
 
         $data = $this->createMock(WorkflowData::class);
         $data->expects($this->once())

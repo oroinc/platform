@@ -208,7 +208,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $transitionRecord->setTransitionName('test_transition');
 
         $this->assertEquals($this->workflowItem, $this->workflowItem->addTransitionRecord($transitionRecord));
-        $this->assertEquals(array($transitionRecord), $this->workflowItem->getTransitionRecords()->getValues());
+        $this->assertEquals([$transitionRecord], $this->workflowItem->getTransitionRecords()->getValues());
         $this->assertEquals($this->workflowItem, $transitionRecord->getWorkflowItem());
     }
 
@@ -267,24 +267,24 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->workflowItem->getAclIdentities()->toArray());
 
         // adding
-        $this->workflowItem->setAclIdentities(array($firstAclIdentity));
+        $this->workflowItem->setAclIdentities([$firstAclIdentity]);
         $this->assertCount(1, $this->workflowItem->getAclIdentities());
         $this->assertEquals($firstAclIdentity, $this->workflowItem->getAclIdentities()->first());
 
         // merging
-        $this->workflowItem->setAclIdentities(array($alternativeFirstAclIdentity, $secondAclIdentity));
+        $this->workflowItem->setAclIdentities([$alternativeFirstAclIdentity, $secondAclIdentity]);
         $this->assertCount(2, $this->workflowItem->getAclIdentities());
         $aclIdentities = array_values($this->workflowItem->getAclIdentities()->toArray());
         $this->assertEquals($firstAclIdentity, $aclIdentities[0]);
         $this->assertEquals($secondAclIdentity, $aclIdentities[1]);
 
         // removing
-        $this->workflowItem->setAclIdentities(array($secondAclIdentity));
+        $this->workflowItem->setAclIdentities([$secondAclIdentity]);
         $this->assertCount(1, $this->workflowItem->getAclIdentities());
         $this->assertEquals($secondAclIdentity, $this->workflowItem->getAclIdentities()->first());
 
         // resetting
-        $this->workflowItem->setAclIdentities(array());
+        $this->workflowItem->setAclIdentities([]);
         $this->assertEmpty($this->workflowItem->getAclIdentities()->toArray());
     }
 

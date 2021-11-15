@@ -11,10 +11,10 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Calendar|\PHPUnit\Framework\MockObject\MockObject */
     private $calendar;
 
     /** @var CalendarExtension */
@@ -36,7 +36,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $width = Calendar::WIDTH_NARROW;
         $locale = 'en_US';
-        $expectedResult = array('expected_result');
+        $expectedResult = ['expected_result'];
 
         $this->calendar->expects($this->once())
             ->method('getMonthNames')
@@ -58,7 +58,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $width = Calendar::WIDTH_ABBREVIATED;
         $locale = 'en_US';
-        $expectedResult = array('expected_result');
+        $expectedResult = ['expected_result'];
 
         $this->calendar->expects($this->once())
             ->method('getDayOfWeekNames')

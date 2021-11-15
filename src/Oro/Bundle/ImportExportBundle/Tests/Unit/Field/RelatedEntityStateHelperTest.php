@@ -13,6 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -99,7 +100,7 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelper->expects($this->any())
             ->method('getObjectValue')
             ->willReturnCallback(function ($object, $field) {
-                return $this->getPropertyAccessor()->getValue($object, $field);
+                return PropertyAccess::createPropertyAccessor()->getValue($object, $field);
             });
 
         $this->doctrineHelper->expects($this->once())
@@ -131,7 +132,7 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelper->expects($this->any())
             ->method('getObjectValue')
             ->willReturnCallback(function ($object, $field) {
-                return $this->getPropertyAccessor()->getValue($object, $field);
+                return PropertyAccess::createPropertyAccessor()->getValue($object, $field);
             });
 
         $this->helper->rememberCollectionRelation($organization, 'businessUnits', $businessUnit);

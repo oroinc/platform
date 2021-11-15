@@ -6,10 +6,8 @@ use Oro\Bundle\ImportExportBundle\Serializer\Encoder\DummyEncoder;
 
 class DummyEncoderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DummyEncoder
-     */
-    protected $encoder;
+    /** @var DummyEncoder */
+    private $encoder;
 
     protected function setUp(): void
     {
@@ -18,13 +16,13 @@ class DummyEncoderTest extends \PHPUnit\Framework\TestCase
 
     public function testEncode()
     {
-        $data = array('any_data' => new \stdClass());
+        $data = ['any_data' => new \stdClass()];
         $this->assertSame($data, $this->encoder->encode($data, ''));
     }
 
     public function testDecode()
     {
-        $data = array('any_data' => new \stdClass());
+        $data = ['any_data' => new \stdClass()];
         $this->assertSame($data, $this->encoder->decode($data, ''));
     }
 

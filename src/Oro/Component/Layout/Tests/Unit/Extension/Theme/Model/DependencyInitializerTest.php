@@ -30,9 +30,7 @@ class DependencyInitializerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoKnownDependenciesShouldNotDoAnything()
     {
-        $object = $this->createMock(
-            LayoutUpdateWithDependency::class
-        );
+        $object = $this->createMock(LayoutUpdateWithDependency::class);
         $object->expects($this->never())
             ->method('setContainer');
 

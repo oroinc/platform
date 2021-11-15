@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -46,12 +47,9 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param \DateTime $date
-     *
      * @dataProvider isUpdatedAtSetDataProvider
      */
-    public function testIsUpdatedAtSet($expected, \DateTime $date = null): void
+    public function testIsUpdatedAtSet(bool $expected, \DateTime $date = null): void
     {
         $entity = new Localization();
         $entity->setUpdatedAt($date);
@@ -78,9 +76,9 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     public function testConstruct(): void
     {
         $entity = new Localization();
-        self::assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChildLocalizations());
+        self::assertInstanceOf(Collection::class, $entity->getChildLocalizations());
         self::assertEmpty($entity->getChildLocalizations()->toArray());
-        self::assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getTitles());
+        self::assertInstanceOf(Collection::class, $entity->getTitles());
         self::assertEmpty($entity->getTitles()->toArray());
     }
 
@@ -181,7 +179,7 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     {
         $parentLocalizationId = 42;
         $parentLocalization = $this->getEntity(
-            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            \Oro\Bundle\LocaleBundle\Entity\Localization::class,
             ['id' => $parentLocalizationId]
         );
         $localization = new Localization();

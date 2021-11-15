@@ -22,13 +22,13 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        $expectedOptions = array(
+        $expectedOptions = [
             'widget'         => 'single_text',
             'with_minutes'   => true,
             'with_seconds'   => true,
             'model_timezone' => 'UTC',
             'view_timezone'  => 'UTC',
-        );
+        ];
 
         $form = $this->factory->create(OroTimeIntervalType::class);
 

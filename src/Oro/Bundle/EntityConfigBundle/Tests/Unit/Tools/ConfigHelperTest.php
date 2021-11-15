@@ -2,14 +2,20 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Tools;
 
+use Gedmo\Translatable\Entity\Translation;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isConfigModelEntityProvider
      */
-    public function testIsConfigModelEntity($className, $expected)
+    public function testIsConfigModelEntity(string $className, bool $expected)
     {
         $result = ConfigHelper::isConfigModelEntity($className);
         $this->assertEquals($expected, $result);
@@ -18,8 +24,13 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTranslationKeyProvider
      */
-    public function testGetTranslationKey($expected, $scope, $propertyName, $className, $fieldName)
-    {
+    public function testGetTranslationKey(
+        string $expected,
+        string $scope,
+        string $propertyName,
+        string $className,
+        ?string $fieldName
+    ) {
         $result = ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);
     }
@@ -27,25 +38,28 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getModuleAndEntityNamesProvider
      */
-    public function testGetModuleAndEntityNames($className, $expectedModuleName, $expectedEntityName)
-    {
-        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
+    public function testGetModuleAndEntityNames(
+        ?string $className,
+        string $expectedModuleName,
+        string $expectedEntityName
+    ) {
+        [$moduleName, $entityName] = ConfigHelper::getModuleAndEntityNames($className);
         $this->assertEquals($expectedModuleName, $moduleName);
         $this->assertEquals($expectedEntityName, $entityName);
     }
 
-    public function isConfigModelEntityProvider()
+    public function isConfigModelEntityProvider(): array
     {
         return [
-            ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModel', true],
-            ['Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel', true],
-            ['Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true],
-            ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue', true],
+            [ConfigModel::class, true],
+            [EntityConfigModel::class, true],
+            [FieldConfigModel::class, true],
+            [ConfigModelIndexValue::class, true],
             ['Test\Other', false],
         ];
     }
 
-    public function getTranslationKeyProvider()
+    public function getTranslationKeyProvider(): array
     {
         return [
             [
@@ -107,7 +121,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getModuleAndEntityNamesProvider()
+    public function getModuleAndEntityNamesProvider(): array
     {
         return [
             ['Oro\SomeBundle\SomeClass', 'OroSomeBundle', 'SomeClass'],
@@ -117,8 +131,8 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             ['Acme\Bundles\SomeBundle\Entity\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
             ['Acme\Bundle\SomeBundle\Entities\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
             ['Acme\Bundles\SomeBundle\Entities\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
-            ['Gedmo\Translatable\Entity\Translation', 'GedmoTranslatable', 'Translation'],
-            ['Oro\Bundle\UserBundle\Entity\User', 'OroUserBundle', 'User'],
+            [Translation::class, 'GedmoTranslatable', 'Translation'],
+            [User::class, 'OroUserBundle', 'User'],
             ['Extend\Entity\SomeClass', 'System', 'SomeClass'],
             ['Acme\Entity\SomeClass', 'System', 'SomeClass'],
             ['Acme\Entities\SomeClass', 'System', 'SomeClass'],

@@ -45,7 +45,7 @@ class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($context->isExecutionInterrupted());
 
-        $objectLimit = spl_object_id(new \StdClass()) + 100;
+        $objectLimit = spl_object_id(new \stdClass()) + 100;
 
         /** GC reduces $objectLimit during runtime, so number of created objects should be way greater that limit */
         $amountOfObjectsToCreate = 100;
@@ -53,7 +53,7 @@ class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
         $collection = new \ArrayObject();
 
         for ($i = 0; $i < $objectLimit * $amountOfObjectsToCreate; $i++) {
-            $object = new \StdClass();
+            $object = new \stdClass();
             $collection->append($object);
         }
 

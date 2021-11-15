@@ -23,7 +23,7 @@ class Taggable implements OROTag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getTags()
     {
@@ -31,7 +31,7 @@ class Taggable implements OROTag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function setTags($tags)
     {
@@ -41,7 +41,7 @@ class Taggable implements OROTag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getTaggableId()
     {

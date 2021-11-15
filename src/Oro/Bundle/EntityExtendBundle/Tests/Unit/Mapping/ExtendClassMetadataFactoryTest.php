@@ -32,7 +32,7 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
         $cacheSalt = '$CLASSMETADATA';
         $this->assertTrue(
-            $this->cmf->getCacheDriver()->contains('Oro\Bundle\UserBundle\Entity\User' . $cacheSalt)
+            $this->cmf->getCacheDriver()->contains(User::class . $cacheSalt)
         );
     }
 

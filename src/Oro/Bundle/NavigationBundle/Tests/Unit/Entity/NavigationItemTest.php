@@ -14,13 +14,13 @@ class NavigationItemTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setEmail('some@email.com');
 
-        $values = array(
+        $values = [
             'title' => 'Some Title',
             'url' => 'Some Url',
             'position' => 'Some position',
             'user' => $user,
             'organization' => $organization
-        );
+        ];
 
         $item = new NavigationItem($values);
         $item->setType('test');

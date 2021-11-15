@@ -13,7 +13,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $formatter;
 
     /** @var NumberExtension */
@@ -97,13 +97,13 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $value = 1234.5;
         $style = 'decimal';
-        $attributes = array('grouping_size' => 3);
-        $textAttributes = array('grouping_separator_symbol' => ',');
-        $symbols = array('symbols' => '$');
+        $attributes = ['grouping_size' => 3];
+        $textAttributes = ['grouping_separator_symbol' => ','];
+        $symbols = ['symbols' => '$'];
         $locale = 'fr_CA';
-        $options = array(
+        $options = [
             'attributes' => $attributes, 'textAttributes' => $textAttributes, 'symbols' => $symbols, 'locale' => $locale
-        );
+        ];
         $expectedResult = '1,234.45';
 
         $this->formatter->expects($this->once())
@@ -121,17 +121,17 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $value = 1234.5;
         $currency = 'USD';
-        $attributes = array('grouping_size' => 3);
-        $textAttributes = array('grouping_separator_symbol' => ',');
-        $symbols = array('symbols' => '$');
+        $attributes = ['grouping_size' => 3];
+        $textAttributes = ['grouping_separator_symbol' => ','];
+        $symbols = ['symbols' => '$'];
         $locale = 'en_US';
-        $options = array(
+        $options = [
             'currency' => $currency,
             'attributes' => $attributes,
             'textAttributes' => $textAttributes,
             'symbols' => $symbols,
             'locale' => $locale
-        );
+        ];
         $expectedResult = '$1,234.45';
 
         $this->formatter->expects($this->once())
@@ -148,16 +148,16 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     public function testFormatDecimal()
     {
         $value = 1234.5;
-        $attributes = array('grouping_size' => 3);
-        $textAttributes = array('grouping_separator_symbol' => ',');
-        $symbols = array('symbols' => '$');
+        $attributes = ['grouping_size' => 3];
+        $textAttributes = ['grouping_separator_symbol' => ','];
+        $symbols = ['symbols' => '$'];
         $locale = 'en_US';
-        $options = array(
+        $options = [
             'attributes' => $attributes,
             'textAttributes' => $textAttributes,
             'symbols' => $symbols,
             'locale' => $locale
-        );
+        ];
         $expectedResult = '1,234.45';
 
         $this->formatter->expects($this->once())
@@ -174,16 +174,16 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     public function testFormatPercent()
     {
         $value = 99;
-        $attributes = array('grouping_size' => 3);
-        $textAttributes = array('grouping_separator_symbol' => ',');
-        $symbols = array('symbols' => '$');
+        $attributes = ['grouping_size' => 3];
+        $textAttributes = ['grouping_separator_symbol' => ','];
+        $symbols = ['symbols' => '$'];
         $locale = 'en_US';
-        $options = array(
+        $options = [
             'attributes' => $attributes,
             'textAttributes' => $textAttributes,
             'symbols' => $symbols,
             'locale' => $locale
-        );
+        ];
         $expectedResult = '99%';
 
         $this->formatter->expects($this->once())
@@ -200,16 +200,16 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     public function testFormatSpellout()
     {
         $value = 1;
-        $attributes = array('foo' => 1);
-        $textAttributes = array('bar' => 'baz');
-        $symbols = array('symbols' => '$');
+        $attributes = ['foo' => 1];
+        $textAttributes = ['bar' => 'baz'];
+        $symbols = ['symbols' => '$'];
         $locale = 'en_US';
-        $options = array(
+        $options = [
             'attributes' => $attributes,
             'textAttributes' => $textAttributes,
             'symbols' => $symbols,
             'locale' => $locale
-        );
+        ];
         $expectedResult = 'one';
 
         $this->formatter->expects($this->once())
@@ -226,16 +226,16 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     public function testFormatDuration()
     {
         $value = 1;
-        $attributes = array('foo' => 1);
-        $textAttributes = array('bar' => 'baz');
-        $symbols = array('symbols' => '$');
+        $attributes = ['foo' => 1];
+        $textAttributes = ['bar' => 'baz'];
+        $symbols = ['symbols' => '$'];
         $locale = 'en_US';
-        $options = array(
+        $options = [
             'attributes' => $attributes,
             'textAttributes' => $textAttributes,
             'symbols' => $symbols,
             'locale' => $locale
-        );
+        ];
         $expectedResult = '1 sec';
 
         $this->formatter->expects($this->once())
@@ -252,16 +252,16 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     public function testFormatOrdinal()
     {
         $value = 1;
-        $attributes = array('foo' => 1);
-        $textAttributes = array('bar' => 'baz');
-        $symbols = array('symbols' => '$');
+        $attributes = ['foo' => 1];
+        $textAttributes = ['bar' => 'baz'];
+        $symbols = ['symbols' => '$'];
         $locale = 'en_US';
-        $options = array(
+        $options = [
             'attributes' => $attributes,
             'textAttributes' => $textAttributes,
             'symbols' => $symbols,
             'locale' => $locale
-        );
+        ];
         $expectedResult = '1st';
 
         $this->formatter->expects($this->once())

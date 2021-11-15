@@ -9,9 +9,9 @@ class EmailTypeTest extends FormIntegrationTestCase
 {
     public function testBindValidData()
     {
-        $formData = array(
+        $formData = [
             'email' => 'test@example.com',
-        );
+        ];
 
         $form = $this->factory->create(EmailType::class);
 

@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\CollectionValidator;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -318,10 +319,7 @@ class EnumValueTypeTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @return RecursiveValidator
-     */
-    private function getValidator()
+    private function getValidator(): RecursiveValidator
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
@@ -337,7 +335,7 @@ class EnumValueTypeTest extends TypeTestCase
         );
     }
 
-    private function loadMetadata(ClassMetadata $meta)
+    private function loadMetadata(ClassMetadata $meta): void
     {
         $configFile = $this->getConfigFile($meta->name);
         if ($configFile) {
@@ -346,10 +344,7 @@ class EnumValueTypeTest extends TypeTestCase
         }
     }
 
-    /**
-     * @return ConstraintValidatorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getConstraintValidatorFactory()
+    private function getConstraintValidatorFactory(): ConstraintValidatorFactoryInterface
     {
         $factory = $this->createMock(ConstraintValidatorFactoryInterface::class);
         $factory->expects($this->any())
@@ -357,9 +352,7 @@ class EnumValueTypeTest extends TypeTestCase
             ->willReturnCallback(function (Constraint $constraint) {
                 $className = $constraint->validatedBy();
 
-                if (!isset($this->validators[$className])
-                    || $className === 'Symfony\Component\Validator\Constraints\CollectionValidator'
-                ) {
+                if (!isset($this->validators[$className]) || CollectionValidator::class === $className) {
                     $this->validators[$className] = new $className();
                 }
 
@@ -394,11 +387,11 @@ class EnumValueTypeTest extends TypeTestCase
         return $path;
     }
 
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getConfigProvider(bool $hasConfig = false, string $enumCode = '', array $immutableCodes = [])
-    {
+    private function getConfigProvider(
+        bool $hasConfig = false,
+        string $enumCode = '',
+        array $immutableCodes = []
+    ): ConfigProvider {
         $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->any())
             ->method('hasConfigById')
@@ -425,10 +418,7 @@ class EnumValueTypeTest extends TypeTestCase
         return $configProvider;
     }
 
-    /**
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getConfiguredForm()
+    private function getConfiguredForm(): FormInterface
     {
         $configId = new FieldConfigId('enum', 'Test\Entity', 'status', 'enum');
         $formConfig = $this->createMock(FormConfigInterface::class);

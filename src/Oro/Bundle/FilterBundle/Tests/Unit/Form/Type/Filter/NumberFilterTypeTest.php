@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
     /** @var NumberFilterType */
-    protected $type;
+    private $type;
 
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
@@ -36,7 +36,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
             new IntlNumberFormatterFactory($this->localeSettings)
         );
         $this->type = new NumberFilterType($translator, $this->numberFormatter);
-        $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new CustomFormExtension([new FilterType($translator)]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
@@ -92,7 +92,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         array $bindData,
         array $formData,
         array $viewData,
-        array $customOptions = array()
+        array $customOptions = []
     ) {
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
@@ -113,170 +113,170 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'not formatted number' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
-                'formData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.6789'),
+        return [
+            'not formatted number' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.6789'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-                'customOptions' => array(
-                    'field_options' => array('grouping' => true, 'scale' => 2)
-                ),
-            ),
-            'formatted number' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'),
-                'formData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'),
+                ],
+                'customOptions' => [
+                    'field_options' => ['grouping' => true, 'scale' => 2]
+                ],
+            ],
+            'formatted number' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-                'customOptions' => array(
-                    'field_options' => array('grouping' => true, 'scale' => 2)
-                ),
-            ),
-            'integer' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'),
-                'formData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'),
-                    'formatter_options' => array(
+                ],
+                'customOptions' => [
+                    'field_options' => ['grouping' => true, 'scale' => 2]
+                ],
+            ],
+            'integer' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
+                    'formatter_options' => [
                         'decimals' => 0,
                         'grouping' => false,
                         'orderSeparator' => '',
                         'decimalSeparator' => '.',
-                    ),
+                    ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'field_type' => IntegerType::class,
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-            ),
-            'integer IN' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'),
-                'formData' => array('type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'),
-                    'formatter_options' => array(
+                ],
+            ],
+            'integer IN' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
+                'formData' => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
+                    'formatter_options' => [
                         'decimals' => 0,
                         'grouping' => false,
                         'orderSeparator' => '',
                         'decimalSeparator' => '.',
-                    ),
+                    ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'field_type' => IntegerType::class,
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-            ),
-            'integer NOT IN' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'),
-                'formData' => array('type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'),
-                    'formatter_options' => array(
+                ],
+            ],
+            'integer NOT IN' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
+                'formData' => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
+                    'formatter_options' => [
                         'decimals' => 0,
                         'grouping' => false,
                         'orderSeparator' => '',
                         'decimalSeparator' => '.',
-                    ),
+                    ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'field_type' => IntegerType::class,
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-            ),
-            'percent_float' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'),
-                'formData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'),
-                    'formatter_options' => array(
+                ],
+            ],
+            'percent_float' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
+                    'formatter_options' => [
                         'grouping' => true,
                         'orderSeparator' => ',',
                         'decimalSeparator' => '.',
                         'percent' => true
-                    ),
+                    ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::PERCENT
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'data_type' => NumberFilterType::PERCENT
-                ),
-            ),
-            'percent_int' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'),
-                'formData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'),
-                    'formatter_options' => array(
+                ],
+            ],
+            'percent_int' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
+                    'formatter_options' => [
                         'grouping' => true,
                         'orderSeparator' => ',',
                         'decimalSeparator' => '.',
                         'percent' => true
-                    ),
+                    ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::PERCENT
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'data_type' => NumberFilterType::PERCENT
-                ),
-            ),
-            'money' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
-                'formData' => array(
+                ],
+            ],
+            'money' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
+                'formData' => [
                     'type' => NumberFilterType::TYPE_EQUAL,
                     'value' => 12345.68
-                ),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'),
-                    'formatter_options' => array(
+                ],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'],
+                    'formatter_options' => [
                         'grouping' => true,
                         'orderSeparator' => ' ',
                         'decimalSeparator' => '.',
-                    ),
+                    ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_DECIMAL
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'field_type' => MoneyType::class,
                     'data_type' => NumberFilterType::DATA_DECIMAL,
-                    'formatter_options' => array(
+                    'formatter_options' => [
                         'orderSeparator' => ' '
-                    )
-                ),
-            ),
-            'invalid format' => array(
-                'bindData' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'),
-                'formData' => array('type' => NumberFilterType::TYPE_EQUAL),
-                'viewData' => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'),
+                    ]
+                ],
+            ],
+            'invalid format' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
-                ),
-                'customOptions' => array(
+                ],
+                'customOptions' => [
                     'field_type' => MoneyType::class
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -306,7 +306,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataWithAnotherLocaleProvider()
     {
-        return array(
+        return [
             'not formatted number' => [
                 'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345,67890'],
                 'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789],
@@ -495,6 +495,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'field_type' => MoneyType::class
                 ],
             ],
-        );
+        ];
     }
 }

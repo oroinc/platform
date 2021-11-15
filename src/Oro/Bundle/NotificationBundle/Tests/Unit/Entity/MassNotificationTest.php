@@ -6,10 +6,8 @@ use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 
 class MassNotificationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MassNotification
-     */
-    protected $massNotification;
+    /** @var MassNotification */
+    private $massNotification;
 
     protected function setUp(): void
     {
@@ -19,27 +17,19 @@ class MassNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->massNotification->getId());
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->massNotification);
-    }
-
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testGetSet($property, $value, $expected)
+    public function testGetSet(string $property, mixed $value, mixed $expected)
     {
-        call_user_func_array(array($this->massNotification, 'set' . ucfirst($property)), array($value));
+        call_user_func([$this->massNotification, 'set' . ucfirst($property)], $value);
         $this->assertEquals(
             $expected,
-            call_user_func_array(array($this->massNotification, 'get' . ucfirst($property)), array())
+            call_user_func_array([$this->massNotification, 'get' . ucfirst($property)], [])
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
         $date = new \DateTime('now');
         return [
