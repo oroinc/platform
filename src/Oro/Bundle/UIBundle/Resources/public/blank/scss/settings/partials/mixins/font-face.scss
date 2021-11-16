@@ -1,7 +1,15 @@
 /* @theme: blank; */
 
 // Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'), swap);
-@mixin font-face($font-family, $file-path, $font-weight, $font-style, $font-formats, $font-display: swap) {
+@mixin font-face(
+    $font-family,
+    $file-path,
+    $font-weight,
+    $font-style,
+    $font-formats,
+    $font-display: swap,
+    $font-unicode-range: null
+) {
     @font-face {
         font-family: $font-family;
         @if ($font-formats) {
@@ -50,6 +58,7 @@
         font-weight: $font-weight;
         font-style: $font-style;
         font-display: $font-display;
+        unicode-range: $font-unicode-range;
     }
 }
 
@@ -82,10 +91,26 @@
 //     )
 // );
 // Use: @include use-font-face($fonts);
-@mixin include-font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats) {
+@mixin include-font-face(
+    $font-family,
+    $file-path,
+    $font-weigh,
+    $font-style,
+    $font-formats,
+    $font-display,
+    $font-unicode-range
+) {
     @if ($font-family and $file-path) {
         // Calling mixin font-face(family, path, $weigh, style);
-        @include font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats);
+        @include font-face(
+            $font-family,
+            $file-path,
+            $font-weigh,
+            $font-style,
+            $font-formats,
+            $font-display,
+            $font-unicode-range
+        );
     } @else {
         @warn 'Absent family or path keys in a list.';
     }
@@ -149,6 +174,8 @@
 
                 @if (type-of($font-variants) == 'map') {
                     $file-path: map_get($font-variants, 'path');
+                    $font-display: swap;
+                    $font-unicode-range: null;
 
                     // Sections 'variants' and 'style' not required.
                     // Update only if They are defined in iterate  section.
@@ -159,12 +186,30 @@
                         $font-style: map_get($font-variants, 'style');
                     }
 
-                    @include include-font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats);
+                    @if (map_has_key($font-variants, 'unicode-range')) {
+                        $font-unicode-range: map_get($font-variants, 'unicode-range');
+                    }
+
+                    @if (map_has_key($font-variants, 'display')) {
+                        $font-display: map_get($font-variants, 'display');
+                    }
+
+                    @include include-font-face(
+                        $font-family,
+                        $file-path,
+                        $font-weigh,
+                        $font-style,
+                        $font-formats,
+                        $font-display,
+                        $font-unicode-range
+                    );
                 }
 
                 @if (type-of($font-variants) == 'list') {
                     @each $font-variant in $font-variants {
                         $file-path: map_get($font-variant, 'path');
+                        $font-display: swap;
+                        $font-unicode-range: null;
 
                         // Sections 'variants' and 'style' not required.
                         // Update only if They are defined in iterate  section.
@@ -175,7 +220,23 @@
                             $font-style: map_get($font-variant, 'style');
                         }
 
-                        @include include-font-face($font-family, $file-path, $font-weigh, $font-style, $font-formats);
+                        @if (map_has_key($font-variant, 'unicode-range')) {
+                            $font-unicode-range: map_get($font-variant, 'unicode-range');
+                        }
+
+                        @if (map_has_key($font-variant, 'display')) {
+                            $font-display: map_get($font-variant, 'display');
+                        }
+
+                        @include include-font-face(
+                            $font-family,
+                            $file-path,
+                            $font-weigh,
+                            $font-style,
+                            $font-formats,
+                            $font-display,
+                            $font-unicode-range
+                        );
                     }
                 }
             } @else {

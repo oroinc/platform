@@ -2,6 +2,7 @@ styles:
     inputs:
         - '~overlayscrollbars/css/OverlayScrollbars.css'
         - 'bundles/oroui/blank/scss/settings/global-settings.scss'
+        - 'bundles/oroui/blank/scss/settings/partials/font-awesome/font-awesome.scss'
         - 'bundles/oroui/blank/scss/variables/base-config.scss'
         - 'bundles/oroui/blank/scss/variables/scrollbar-config.scss'
         - 'bundles/oroui/blank/scss/variables/animation-config.scss'
@@ -37,5 +38,6 @@ styles:
 stylebook_styles:
     inputs:
         - 'bundles/oroui/blank/scss/settings/global-settings.scss'
+        - 'bundles/oroui/blank/scss/settings/partials/font-awesome/font-awesome.scss'
         - 'bundles/oroui/blank/scss/variables/page-main-config.scss'
         - 'bundles/oroui/blank/scss/variables/page-container-config.scss'
