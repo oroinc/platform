@@ -30,7 +30,7 @@
 {% block oro_cron_schedule_intervals_collection_widget %}
     {% import _self as cronFormFields %}
 
-    {% spaceless %}
+    {% apply spaceless %}
         {% if prototype is defined %}
             {% set prototype_html = cronFormFields.schedule_interval_prototype(form) %}
         {% endif %}
@@ -71,5 +71,5 @@
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
             {{ cronFormFields.oro_collection_validate_primary_js(_context) }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}

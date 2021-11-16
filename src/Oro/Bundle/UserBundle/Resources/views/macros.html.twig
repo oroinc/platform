@@ -20,7 +20,7 @@
 {% endmacro %}
 
 {%- macro user_business_unit_name(user, addBrackets = true) -%}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set businessUnit = oro_get_entity_owner(user) %}
         {% if businessUnit is not null %}
             {% if is_granted('VIEW', businessUnit) %}
@@ -35,7 +35,7 @@
                 {{ buView }}
             {% endif %}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
 
 {% macro render_user_name(user) %}

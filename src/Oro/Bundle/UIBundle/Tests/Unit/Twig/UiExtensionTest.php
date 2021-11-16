@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 use Twig\Template;
+use Twig\TemplateWrapper;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -108,13 +109,21 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $template = $this->createMock(Template::class);
 
         $this->environment->expects(self::once())
-            ->method('loadTemplate')
+            ->method('load')
             ->with($testTemplate)
-            ->willReturn($template);
+            ->willReturn(new TemplateWrapper($this->environment, $template));
+
+        $this->environment->expects(self::once())
+            ->method('mergeGlobals')
+            ->with(['key' => 'value', 'extraKey' => 'value'])
+            ->willReturn(['key' => 'value', 'extraKey' => 'value']);
+
         $template->expects(self::once())
-            ->method('renderBlock')
+            ->method('displayBlock')
             ->with('block', ['key' => 'value', 'extraKey' => 'value'])
-            ->willReturn($expected);
+            ->willReturnCallback(function () use ($expected) {
+                echo $expected;
+            });
 
         self::assertEquals(
             $expected,
@@ -696,7 +705,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                         [
                             'title' => '',
                             'useSpan' => false,
-                            'data' => ['some_field_name' => null]
+                            'data' => ['some_field_name' => '']
                         ]
                     ]
                 ]

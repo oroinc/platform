@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block _oro_digital_asset_sourceFile_file_errors %}
-    {%- spaceless -%}
+    {%- apply spaceless -%}
         {% if errors|length > 0 %}
             {% set combinedError = '' %}
             {% set newErrors = [] %}
@@ -30,11 +30,11 @@
             {% set combinedError = newErrors|join('; ') %}
             <span class="validation-failed"><span><span>{{ combinedError|oro_html_sanitize }}</span></span></span>
         {% endif %}
-    {%- endspaceless -%}
+    {%- endapply -%}
 {% endblock %}
 
 {% block oro_file_with_digital_asset_widget %}
-    {%- spaceless -%}
+    {%- apply spaceless -%}
         {% import '@OroUI/macros.html.twig' as UI %}
 
         <div class="digital-asset-item fields-row"
@@ -104,5 +104,5 @@
 
         {{ form_errors(form.file) }}
         {{ form_errors(form.digitalAsset) }}
-    {%- endspaceless -%}
+    {%- endapply -%}
 {% endblock %}

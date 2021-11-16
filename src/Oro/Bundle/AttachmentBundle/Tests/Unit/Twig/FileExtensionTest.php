@@ -9,7 +9,6 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\ParentEntity;
 use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -201,8 +200,17 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
 
         $environment = $this->createMock(Environment::class);
         $environment->expects(self::once())
-            ->method('loadTemplate')
-            ->willReturn(new TestTemplate(new Environment($this->getLoader())));
+            ->method('render')
+            ->with(
+                '@OroAttachment/Twig/file.html.twig',
+                [
+                    'iconClass' => '',
+                    'url' => '',
+                    'fileName' => null,
+                    'additional' => null,
+                    'title' => '',
+                ]
+            );
 
         $this->attachmentManager->expects(self::once())
             ->method('getAttachmentIconClass')
@@ -234,10 +242,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->file->setFilename('test.doc');
 
-        $environment = $this->createMock(Environment::class);
-        $environment->expects(self::once())
-            ->method('loadTemplate')
-            ->willReturn(new TestTemplate(new Environment($this->getLoader())));
+        $environment = $this->createTwigEnvironmentForImagesTemplate();
 
         $this->attachmentManager->expects(self::once())
             ->method('getResizedImageUrl')
@@ -264,10 +269,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($attachmentId)
             ->willReturn($this->file);
 
-        $environment = $this->createMock(Environment::class);
-        $environment->expects(self::once())
-            ->method('loadTemplate')
-            ->willReturn(new TestTemplate(new Environment($this->getLoader())));
+        $environment = $this->createTwigEnvironmentForImagesTemplate();
 
         $this->attachmentManager->expects(self::once())
             ->method('getResizedImageUrl')
@@ -288,10 +290,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $config = $this->createMock(Config::class);
         $size = 120;
 
-        $environment = $this->createMock(Environment::class);
-        $environment->expects(self::once())
-            ->method('loadTemplate')
-            ->willReturn(new TestTemplate(new Environment($this->getLoader())));
+        $environment = $this->createTwigEnvironmentForImagesTemplate();
 
         $this->configManager->expects(self::once())
             ->method('getFieldConfig')
@@ -314,6 +313,27 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_image_view',
             [$environment, $this->file]
         );
+    }
+
+    /**
+     * @return mixed|\PHPUnit\Framework\MockObject\MockObject|Environment
+     */
+    private function createTwigEnvironmentForImagesTemplate(): mixed
+    {
+        $environment = $this->createMock(Environment::class);
+        $environment->expects(self::once())
+            ->method('render')
+            ->with(
+                '@OroAttachment/Twig/image.html.twig',
+                [
+                    'url' => '',
+                    'fileName' => null,
+                    'title' => '',
+                    'imagePath' => ''
+                ]
+            );
+
+        return $environment;
     }
 
     public function testGetTypeIsImage(): void

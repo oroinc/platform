@@ -165,9 +165,8 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
     {
         $breadcrumbs = $this->getBreadcrumbManager()->getBreadcrumbs($menuName, $useDecorators);
         if ($breadcrumbs) {
-            $template = $environment->loadTemplate(self::BREADCRUMBS_TEMPLATE);
-
-            return $template->render(
+            return $environment->render(
+                self::BREADCRUMBS_TEMPLATE,
                 [
                     'breadcrumbs' => $breadcrumbs,
                     'useDecorators' => $useDecorators

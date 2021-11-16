@@ -12,7 +12,6 @@ use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Environment;
-use Twig\Template;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -57,20 +56,15 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $environment = $this->createMock(Environment::class);
 
-        $template = $this->createMock(Template::class);
-
         $this->breadcrumbManager->expects($this->once())
             ->method('getBreadcrumbs')
             ->willReturn(['test-breadcrumb']);
 
-        $environment->expects($this->once())
-            ->method('loadTemplate')
-            ->willReturn($template);
-
         $result = 'test';
-        $template->expects($this->once())
+        $environment->expects($this->once())
             ->method('render')
             ->with(
+                '@OroNavigation/Menu/breadcrumbs.html.twig',
                 [
                     'breadcrumbs' => [
                         'test-breadcrumb'

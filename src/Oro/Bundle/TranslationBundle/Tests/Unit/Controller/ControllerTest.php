@@ -75,13 +75,14 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderRenderJsTranslationContent
+     * @throws \JsonException
      */
     public function testRenderJsTranslationContent(array $params, array $expected): void
     {
         $this->twig->expects(self::any())
             ->method('render')
             ->willReturnCallback(function (string $name, array $context) {
-                return $context['json'];
+                return json_encode($context['json'], JSON_THROW_ON_ERROR);
             });
 
         $this->translator
@@ -99,7 +100,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         );
         $result = call_user_func_array([$controller, 'renderJsTranslationContent'], $params);
 
-        self::assertEquals($expected, $result);
+        self::assertEquals(json_encode($expected, JSON_THROW_ON_ERROR), $result);
     }
 
     public function dataProviderRenderJsTranslationContent(): array

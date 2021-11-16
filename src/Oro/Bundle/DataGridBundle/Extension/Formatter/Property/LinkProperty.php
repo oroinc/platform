@@ -43,13 +43,12 @@ class LinkProperty extends UrlProperty
         } catch (InvalidParameterException $e) {
         }
 
-        return $this->twig
-            ->loadTemplate(self::TEMPLATE)
-            ->render(
-                [
-                    'url'   => $link,
-                    'label' => $label
-                ]
-            );
+        return $this->twig->render(
+            self::TEMPLATE,
+            [
+                'url' => $link,
+                'label' => $label
+            ]
+        );
     }
 }

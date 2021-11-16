@@ -34,7 +34,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->node->expects($this->once())
             ->method('getIterator')
-            ->willReturn([]);
+            ->willReturn(new \ArrayIterator([]));
 
         $this->titleNode->compile($this->compiler);
     }
@@ -45,7 +45,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->node->expects($this->once())
             ->method('getIterator')
-            ->willReturn([$expr]);
+            ->willReturn(new \ArrayIterator([$expr]));
 
         $this->compiler->expects($this->exactly(2))
             ->method('raw')

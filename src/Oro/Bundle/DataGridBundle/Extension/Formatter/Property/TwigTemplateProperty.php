@@ -24,9 +24,6 @@ class TwigTemplateProperty extends AbstractProperty
     /**  @var array */
     protected $reservedKeys = ['record', 'value'];
 
-    /** @var array */
-    protected $templates = [];
-
     public function __construct(Environment $environment)
     {
         $this->environment = $environment;
@@ -62,21 +59,6 @@ class TwigTemplateProperty extends AbstractProperty
             ]
         );
 
-        return $this->getTemplate()->render($context);
-    }
-
-    /**
-     * Load twig template
-     *
-     * @return Template
-     */
-    protected function getTemplate()
-    {
-        $templateName = $this->get(self::TEMPLATE_KEY);
-        if (!isset($this->templates[$templateName])) {
-            $this->templates[$templateName] = $this->environment->loadTemplate($templateName);
-        }
-
-        return $this->templates[$templateName];
+        return $this->environment->render($this->get(self::TEMPLATE_KEY), $context);
     }
 }

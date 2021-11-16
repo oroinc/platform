@@ -5,9 +5,9 @@
 {% set organizations = get_enabled_organizations() %}
 
 {% set organization_name %}
-{% spaceless %}
+{% apply spaceless %}
     {% placeholder organization_name %}
-{% endspaceless %}
+{% endapply %}
 {% endset %}
 
 {% if isDesktopVersion() %}

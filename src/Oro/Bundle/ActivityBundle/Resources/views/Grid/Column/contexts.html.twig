@@ -1,5 +1,5 @@
 {% for item in value %}
-    {% spaceless %}
+    {% apply spaceless %}
         <span class="cell-context-item">
             <span class="context-icon {{ item.icon }}" aria-hidden="true"></span>
             {% if item.link %}
@@ -8,5 +8,5 @@
                 <span class="context-label" title="{{ item.title }}">{{ item.title }}</span>
             {% endif %}
         </span>
-    {% endspaceless %}
+    {% endapply %}
 {% endfor %}

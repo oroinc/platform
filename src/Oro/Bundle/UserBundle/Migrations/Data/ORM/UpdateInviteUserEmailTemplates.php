@@ -16,7 +16,7 @@ class UpdateInviteUserEmailTemplates extends AbstractHashEmailMigration implemen
     protected function getEmailHashesToUpdate(): array
     {
         return [
-            'invite_user' => ['c8828699f6113dcb0ea7abb493a9cc9e']
+            'invite_user' => ['c6c227715b6ffbfac9ad5bda0fcf933b']
         ];
     }
 

@@ -27,19 +27,23 @@ class {{ className }} implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
-{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
+{% for table in schema.tables %}
+{% if allowedTables is empty or allowedTables[table.name] is defined %}
         $this->{{ 'create' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'Table' }}($schema);
+{% endif %}
 {% endfor %}
 
         /** Foreign keys generation **/
-{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
-{% if table.ForeignKeys is not empty %}
+{% for table in schema.tables %}
+{% if (allowedTables is empty or allowedTables[table.name] is defined) and if table.ForeignKeys is not empty %}
         $this->{{ 'add' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'ForeignKeys' }}($schema);
 {% endif %}
 {% endfor %}
     }
-{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
+{% for table in schema.tables %}
+{% if allowedTables is empty or allowedTables[table.name] is defined %}
 {% set methodName = 'create' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'Table' %}
+{% endif %}
 
     /**
      * Create {{ table.name }} table
@@ -64,7 +68,8 @@ class {{ className }} implements Installation
 {% endfor %}
     }
 {% endfor %}
-{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined -%}
+{% for table in schema.tables -%}
+{% if allowedTables is empty or allowedTables[table.name] is defined %}
 {% set methodName = 'add' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'ForeignKeys' %}
 {% if table.ForeignKeys is not empty %}
 
@@ -86,11 +91,12 @@ class {{ className }} implements Installation
 {% endfor %}
     }
 {% endif -%}
+{% endif %}
 {% endfor -%}
-}{% spaceless %}
+}{% apply spaceless %}
 
 {% macro dumpColumnOptions(column, columnExtendedOptions) %}
-{% spaceless %}
+{% apply spaceless %}
 {%- import _self as macros -%}
 {% set options = oro_migration_get_schema_column_options(column) %}
 {% set items = [] %}
@@ -105,11 +111,11 @@ class {{ className }} implements Installation
 {% if options.comment is defined %}{% set items = items|merge(["'comment' => " ~ macros.dumpString(options.comment)]) %}{% endif -%}
 {% if columnExtendedOptions is not empty %}{% set items = items|merge(["'oro_options' => " ~ macros.dumpOptionsArray(columnExtendedOptions)]) %}{% endif -%}
 [{{ items|join(', ')|raw }}]
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {% macro dumpOptionsArray(arrayValues) %}
-{% spaceless %}
+{% apply spaceless %}
 {%- import _self as macros -%}
 {% set items = [] %}
 {% for valueName, value in arrayValues %}
@@ -126,42 +132,42 @@ class {{ className }} implements Installation
     {% endif %}
 {% endfor %}
 [{{ items|join(', ')|raw }}]
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {% macro dumpArray(arrayValues) %}
-{% spaceless %}
+{% apply spaceless %}
 [{% for value in arrayValues %}{% if not loop.first %}, {% endif %}'{{ value }}'{% endfor %}]
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {% macro dumpBoolean(value) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if value %}
         true
     {% else %}
         false
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {% macro dumpString(value) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if value is not null %}
         '{{ value }}'
     {% else %}
         null
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {% macro dumpInteger(value) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if value is not null %}
         {{ value }}
     {% else %}
         null
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
-{% endspaceless %}
+{% endapply %}

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures;
 
+use Twig\Source;
 use Twig\Template;
 
 class TestTemplate extends Template
@@ -28,5 +29,13 @@ class TestTemplate extends Template
     public function getDebugInfo()
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSourceContext()
+    {
+        return new Source('test', 'test');
     }
 }

@@ -56,7 +56,7 @@ class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
         ];
     }
 
-    public function getGlobals()
+    public function getGlobals(): array
     {
         return [
             'foo_global' => 'foo_global',

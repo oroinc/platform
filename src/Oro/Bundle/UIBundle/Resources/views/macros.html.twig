@@ -322,7 +322,7 @@
         {% endset %}
     {% else %}
     {% endif %}
-    {% spaceless %}
+    {% apply spaceless %}
     <a href="{{ parameters.path }}"
         {% if (parameters.id is defined) %}
             id="{{ parameters.id }}"
@@ -337,7 +337,7 @@
         {% if parameters.title is defined and parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
     </a>
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -432,7 +432,7 @@
             groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
-        {% spaceless %}
+        {% apply spaceless %}
             <div class="pull-right pinned-dropdown"
                  {{ UIMacro.renderAttributes(parameters.dataAttributes|default({})|merge({
                      'page-component-module': 'oroui/js/app/components/jquery-widget-component',
@@ -440,7 +440,7 @@
                  })) }}>
                 {{ parameters.html|raw }}
             </div>
-        {% endspaceless %}
+        {% endapply %}
     {% else %}
         {{ parameters.html|raw }}
     {% endif %}
@@ -667,7 +667,7 @@
     {% set parameters = parameters|merge({
         class: parameters.class|default('') ~ (parameters.aCss is defined ? ' ' ~ parameters.aCss : '')
     })%}
-    {% spaceless %}
+    {% apply spaceless %}
         <a href="#"
             {%- if (parameters.dataUrlRaw is defined) -%}
                 data-url="{{ parameters.dataUrlRaw|raw }}"
@@ -678,7 +678,7 @@
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -774,7 +774,7 @@
 #}
 {% macro clientControlIcon(parameters) %}
     {% import _self as UIMacro %}
-    {% spaceless %}
+    {% apply spaceless %}
     {%- set labelInIcon = parameters.labelInIcon is defined ? parameters.labelInIcon : true -%}
     {%- if (parameters.iCss is defined) -%}
         <span class="{{ parameters.iCss }}" aria-hidden="true">
@@ -783,7 +783,7 @@
             {%- endif -%}
         </span>
     {%- endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -809,7 +809,7 @@
     {% set parameters = parameters|merge({
         class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
     })%}
-    {% spaceless %}
+    {% apply spaceless %}
         <button {{- UIMacro.clientControlAttrs(parameters) -}}
             {% if (parameters.title is defined) %}
                 title="{{ parameters.title }}"
@@ -817,7 +817,7 @@
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -899,7 +899,7 @@
         <div class="pull-left btn-group icons-holder">
             {{ UIMacro.clientLink(parameters|merge({class: 'btn icons-holder-text', role: 'button'})) }}
         </div>
-    {#{% endspaceless %}#}
+    {#{% endapply %}#}
 {% endmacro %}
 
 {#
@@ -1285,10 +1285,10 @@
         excludes - names of attributes which should not be rendered even if they exist in attr parameter
 #}
 {% macro attributes(attr, excludes) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set attr = attr|default({}) %}
         {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue is iterable ? attrvalue|json_encode : attrvalue }}" {% endif %}{% endif %}{% endfor %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -1300,7 +1300,7 @@
 {%- macro entityOwnerLink(entity, renderLabel = true) -%}
     {% import _self as UIMacro %}
 
-    {% spaceless %}
+    {% apply spaceless %}
         {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
             {%- if ownerType %}
@@ -1334,11 +1334,11 @@
                 {% endif %}
             {% endif -%}
         {% endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
 
 {%- macro renderUrl(url, text, class, title, attributes) -%}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if text is empty %}
             {% set text = url %}
         {% endif %}
@@ -1356,7 +1356,7 @@
             {% endfor %}
             >{{ text }}</a>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
 
 {%- macro renderUrlWithActions(parameters, entity) -%}
@@ -1591,12 +1591,12 @@
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
     {% endif %}
-    {% spaceless %}
+    {% apply spaceless %}
     <tr data-content="{{ name }}" data-validation-optional-group {{ widgetContainerAttributes }}
             class="{{ options.collection_class|default('') }}">
         {{ form_widget(form) }}
     </tr>
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {% macro render_birthday(birthday) %}

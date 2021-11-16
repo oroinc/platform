@@ -58,8 +58,8 @@
 {%- macro renderCollection(objectClass, fieldKey, fieldValue, allowedDiffTypes) -%}
     {% import _self as AuditMacro %}
 
-    {%- for diffType, diffValues in fieldValue.collectionDiffs if diffValues is not empty -%}
-        {%- if diffType in allowedDiffTypes -%}
+    {%- for diffType, diffValues in fieldValue.collectionDiffs -%}
+        {%- if diffValues is not empty and diffType in allowedDiffTypes -%}
             <dl class="audit-list">
                 {%- for diffValue in diffValues -%}
                     {%- set record = oro_entity_config_value(diffValue.entity_class, 'label') -%}

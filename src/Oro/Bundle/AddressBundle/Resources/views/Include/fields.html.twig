@@ -67,11 +67,13 @@
             </label>
         </div>
         {{ form_errors(form.email) }}
-        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-            <div class="collection-element-other clearfix">
-                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
-            </div>
-            {{ form_errors(child) }}
+        {% for child in form.children %}
+            {% if child.vars.extra_field is defined and child.vars.extra_field %}
+                <div class="collection-element-other clearfix">
+                    {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+                </div>
+                {{ form_errors(child) }}
+            {% endif %}
         {% endfor %}
     </div>
     {{ form_rest(form) }}
@@ -85,11 +87,13 @@
             </label>
         </div>
         {{ form_errors(form.phone) }}
-        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-            <div class="collection-element-other clearfix">
-                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
-            </div>
-            {{ form_errors(child) }}
+        {% for child in form.children %}
+            {% if child.vars.extra_field is defined and child.vars.extra_field %}
+                <div class="collection-element-other clearfix">
+                    {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+                </div>
+                {{ form_errors(child) }}
+            {% endif %}
         {% endfor %}
     </div>
     {{ form_rest(form) }}

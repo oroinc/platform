@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LayoutBundle\Twig;
 
 use Doctrine\Inflector\Inflector;
-use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
@@ -13,9 +12,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Twig\Environment;
 use Twig\Extension\AbstractExtension;
-use Twig\Extension\InitRuntimeInterface;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
@@ -44,16 +41,8 @@ use Twig\TwigTest;
  * Provides a Twig tag for setting block theme:
  *   - block_theme
  */
-class LayoutExtension extends AbstractExtension implements InitRuntimeInterface, ServiceSubscriberInterface
+class LayoutExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /**
-     * This property is public so that it can be accessed directly from compiled
-     * templates without having to call a getter, which slightly decreases performance.
-     *
-     * @var TwigRendererInterface
-     */
-    public $renderer;
-
     private ContainerInterface $container;
     private Inflector $inflector;
     private ?TextHelper $textHelper = null;
@@ -62,15 +51,6 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
     {
         $this->container = $container;
         $this->inflector = $inflector;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRuntime(Environment $environment)
-    {
-        $this->renderer = $this->container->get('oro_layout.twig.renderer');
-        $this->renderer->setEnvironment($environment);
     }
 
     /**
@@ -297,7 +277,6 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
     public static function getSubscribedServices()
     {
         return [
-            'oro_layout.twig.renderer' => TwigRenderer::class,
             'oro_layout.text.helper' => TextHelper::class,
         ];
     }

@@ -171,7 +171,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
                     ['group' => $group1, 'attributes' => []]
                 ],
                 'scrollData' => [],
-                'templateHtml' => false,
+                'templateHtml' => '',
                 'expectedData' => [],
             ],
             'empty group gets deleted' => [
@@ -183,7 +183,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
                         'group1' => []
                     ]
                 ],
-                'templateHtml' => false,
+                'templateHtml' => '',
                 'expectedData' => [
                     ScrollData::DATA_BLOCKS => [
                     ]
@@ -255,7 +255,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                'templateHtml' => false,
+                'templateHtml' => '',
                 'expectedData' => [
                     ScrollData::DATA_BLOCKS => [
                         'existingGroup' => [

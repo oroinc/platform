@@ -59,7 +59,7 @@
 {% block unique_collection_widget %}
     {% import _self as configEntityGridUnique %}
 
-    {% spaceless %}
+    {% apply spaceless %}
         <div class="row-oro">
             <div class="oro-item-collection collection-fields-list" id="entity_extend_unique_key_collection" data-prototype="{{ configEntityGridUnique.unique_collection_prototype(form.keys)|escape }}">
                 {% for field in form.keys.children %}
@@ -70,7 +70,7 @@
                 <a class="btn add-list-item pull-left" href="#">{{ 'Add'|trans }}</a>
             </div>
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock unique_collection_widget %}
 
 {% block content_data %}

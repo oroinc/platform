@@ -16,9 +16,9 @@ class UpdateEmailTemplates extends AbstractHashEmailMigration implements Version
     protected function getEmailHashesToUpdate(): array
     {
         return [
-            'user_change_password' => ['7d943b26d0b0b680666b8e53d09bab18'],
-            'force_reset_password' => ['8c6982893916d448afe4b083f9a27390'],
-            'user_reset_password'  => ['0c6cc530f1f90186450878a3176f3c20']
+            'user_change_password' => ['55cf4f5b78600eabeb3d14ea0d4aa5ae'],
+            'force_reset_password' => ['94bf65b402a50c53b3bef0f88c2cf121'],
+            'user_reset_password'  => ['1e707aadaa5524244233001c2850c6f8']
         ];
     }
 

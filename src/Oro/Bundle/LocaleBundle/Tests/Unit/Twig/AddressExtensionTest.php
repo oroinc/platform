@@ -8,6 +8,7 @@ use Oro\Bundle\LocaleBundle\Twig\AddressExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Environment;
 use Twig\Template;
+use Twig\TemplateWrapper;
 
 class AddressExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -77,25 +78,30 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
         $environment = $this->createMock(Environment::class);
         $template = $this->createMock(Template::class);
         $environment->expects($this->once())
-            ->method('loadTemplate')
+            ->method('load')
             ->with('@OroLocale/Twig/address.html.twig')
-            ->willReturn($template);
+            ->willReturn(new TemplateWrapper($environment, $template));
+
+        $environment->expects(self::any())
+            ->method('mergeGlobals')
+            ->willReturnCallback(function ($context) {
+                return $context;
+            });
 
         $template->expects($this->any())
             ->method('hasBlock')
-            ->willReturnMap([
-                ['address_part', [], [], true],
-                ['address_part_phone', [], [], true],
-            ]);
+            ->willReturnCallback(function (string $blockName) {
+                return $blockName === 'address_part' || $blockName === 'address_part_phone';
+            });
 
-        $template->expects($this->any())
-            ->method('renderBlock')
-            ->willReturnCallback(
-                static fn (string $blockName, array $context) => implode(
+        $template->expects(self::any())
+            ->method('displayBlock')
+            ->willReturnCallback(function (string $blockName, array $context) {
+                echo  implode(
                     '_',
                     [$blockName, implode('_', [...array_keys($context), ...array_values($context)])]
-                )
-            );
+                );
+            });
 
         $this->assertEquals(
             $expectedResult,

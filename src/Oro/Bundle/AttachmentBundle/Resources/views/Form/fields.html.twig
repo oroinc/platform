@@ -1,5 +1,5 @@
 {% block oro_file_widget %}
-    {% spaceless %}
+    {% apply spaceless %}
         <div class="control-group control-group--column">
             <div class="controls">
                 {{ form_widget(form.file) }}
@@ -43,11 +43,11 @@
                 {% endif %}
             {% endif %}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_image_widget %}
-    {% spaceless %}
+    {% apply spaceless %}
         <div class="control-group control-group--column">
             {% if form.vars.name == 'attachment' %}
                 <div class="controls">
@@ -110,7 +110,7 @@
                 {% endif %}
             {% endif %}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% macro oro_attachment_multi_file_item_prototype(widget, attributes) %}
@@ -146,7 +146,7 @@
 {% block oro_attachment_multi_file_widget %}
     {% import '@OroUI/macros.html.twig' as UI %}
     {% import _self as fields %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if prototype is defined %}
             {% set prototype_html = fields.oro_attachment_multi_file_item_prototype(form) %}
         {% endif %}
@@ -193,7 +193,7 @@
                 {% endif %}
             </div>
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_attachment_multi_file_row %}
