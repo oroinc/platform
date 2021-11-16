@@ -12,9 +12,9 @@
         }) }}>
         <header class="main-menu__header">
             {% set organization_name %}
-                {% spaceless %}
+                {% apply spaceless %}
                     {% placeholder organization_name %}
-                {% endspaceless %}
+                {% endapply %}
             {% endset %}
             {{ UI.app_logo(organization_name) }}
         </header>

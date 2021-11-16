@@ -17,7 +17,7 @@
 {%- endblock form_row -%}
 
 {%- block form_label -%}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if label is not same as(false) %}
             {% if not compound %}
                 {% set label_attr = label_attr|merge({'for': id}) %}
@@ -45,7 +45,7 @@
             <em aria-hidden="true">{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
             </label>
         {%- endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {%- endblock form_label -%}
 
 {%- block form_errors -%}

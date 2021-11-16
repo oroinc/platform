@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
-use Twig\Template;
 use Twig\TwigFunction;
 
 /**
@@ -91,18 +90,18 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * Renders "oro_form_js_validation" block with init script for JS validation of form.
      *
-     * @param Environment       $environment
-     * @param FormView          $view
-     * @param array             $options
+     * @param Environment $environment
+     * @param FormView $view
+     * @param array $options
      *
      * @return string
+     * @throws \Throwable
      */
     public function renderFormJsValidationBlock(Environment $environment, FormView $view, $options = [])
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        /** @var Template $template */
-        $template = $environment->loadTemplate($this->templateName);
+        $template = $environment->load($this->templateName);
         if (!$template->hasBlock(self::BLOCK_NAME, [])) {
             throw new \RuntimeException(
                 sprintf('Block "%s" is not found in template "%s".', self::BLOCK_NAME, $this->templateName)

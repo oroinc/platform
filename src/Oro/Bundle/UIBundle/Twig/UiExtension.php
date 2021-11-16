@@ -21,7 +21,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\AbstractExtension;
-use Twig\Template;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
@@ -184,20 +183,20 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * @param TwigEnvironment   $env
-     * @param array             $context
-     * @param string            $template
-     * @param string            $block
-     * @param array             $extraContext
+     * @param TwigEnvironment $env
+     * @param array $context
+     * @param string $template
+     * @param string $block
+     * @param array $extraContext
      *
      * @return string
+     * @throws \Throwable
      */
-    public function renderBlock(TwigEnvironment $env, $context, $template, $block, $extraContext = [])
+    public function renderBlock(TwigEnvironment $env, $context, $template, $block, $extraContext = []): string
     {
-        /** @var Template $template */
-        $template = $env->loadTemplate($template);
+        $templateWrapper = $env->load($template);
 
-        return $template->renderBlock($block, array_merge($context, $extraContext));
+        return $templateWrapper->renderBlock($block, array_merge($context, $extraContext));
     }
 
     /**

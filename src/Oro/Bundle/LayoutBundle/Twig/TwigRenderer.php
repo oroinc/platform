@@ -72,6 +72,8 @@ class TwigRenderer extends Renderer implements TwigRendererInterface
     public function setEnvironment(Environment $environment)
     {
         $this->engine->setEnvironment($environment);
+
+        return $this;
     }
 
     /**

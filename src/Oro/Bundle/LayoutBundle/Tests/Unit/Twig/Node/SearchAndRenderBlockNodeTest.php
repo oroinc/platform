@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
-use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
+use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Twig\Compiler;
 use Twig\Environment;
@@ -20,12 +20,12 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const RENDER_CALL = '$this->env->getExtension("' . LayoutExtension::class . '")->renderer->searchAndRenderBlock';
+    const RENDER_CALL = '$this->env->getRuntime("' . TwigRenderer::class . '")->searchAndRenderBlock';
 
     /**
      * block_widget(block)
      */
-    public function testCompileWidget()
+    public function testCompileWidget(): void
     {
         $arguments = new Node(
             [

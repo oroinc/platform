@@ -88,8 +88,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig = new Environment(new ArrayLoader(['test' => '{{foo}}']));
         $twig->getGlobals();
         $twig->addGlobal('foo', 'bar');
-        $template = $twig->loadTemplate('test');
-        $this->assertEquals('bar', $template->render([]));
+        $this->assertEquals('bar', $twig->render('test', []));
     }
 
     public function testExtensionsAreNotInitializedWhenRenderingACompiledTemplate()
@@ -133,7 +132,6 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig = new Environment(new ArrayLoader());
         $twig->addExtension(new EnvironmentExtension());
 
-        $this->assertArrayHasKey('test', $twig->getTags());
         $this->assertArrayHasKey('foo_filter', $twig->getFilters());
         $this->assertArrayHasKey('foo_function', $twig->getFunctions());
         $this->assertArrayHasKey('foo_test', $twig->getTests());
@@ -177,7 +175,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         // Caching is disabled: generateKey returns false
         $cache->expects($this->once())
             ->method('generateKey')
-            ->willReturn(false);
+            ->willReturn('');
         $cache->expects($this->never())
             ->method('write');
 

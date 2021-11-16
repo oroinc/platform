@@ -11,11 +11,13 @@
         }) %}
     {% endfor %}
 
-    {% for child in block if child.vars.visible -%}
-        {% set childContent = block_widget(child) %}
-        {% if childContent|trim|length > 0 %}
-            {% set content = content ~ childContent %}
-            {% set visibleTabsOptions = visibleTabsOptions|merge([tabsOptionsById[child.vars.group]]) %}
+    {% for child in block -%}
+        {% if child.vars.visible %}
+            {% set childContent = block_widget(child) %}
+            {% if childContent|trim|length > 0 %}
+                {% set content = content ~ childContent %}
+                {% set visibleTabsOptions = visibleTabsOptions|merge([tabsOptionsById[child.vars.group]]) %}
+            {% endif %}
         {% endif %}
     {%- endfor %}
 

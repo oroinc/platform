@@ -201,7 +201,8 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
+        return $environment->render(
+            self::FILES_TEMPLATE,
             [
                 'iconClass' => $this->getAttachmentManager()->getAttachmentIconClass($file),
                 'url' => $url,
@@ -241,7 +242,8 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             $height = $config->get('height');
         }
 
-        return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
+        return $environment->render(
+            self::IMAGES_TEMPLATE,
             [
                 'imagePath' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height),
                 'url' => $this->getAttachmentManager()->getFileUrl(

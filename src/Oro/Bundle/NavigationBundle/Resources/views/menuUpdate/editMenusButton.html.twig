@@ -1,9 +1,9 @@
 {% if app.request.attributes.get('_route') == 'oro_user_profile_view' %}
     <div class="pull-left btn-group icons-holder">
-        {% spaceless %}
+        {% apply spaceless %}
             <a href="{{ path('oro_navigation_user_menu_index') }}" class="btn icons-holder-text">
                 <i class="fa-cog"></i>{{ 'oro.navigation.menuupdate.edit_menus'|trans }}
             </a>
-        {% endspaceless %}
+        {% endapply %}
     </div>
 {% endif %}

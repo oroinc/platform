@@ -1,5 +1,5 @@
 {% block _email_configuration_oro_email___smtp_settings_password_row %}
-    {% spaceless %}
+    {% apply spaceless %}
         {{ form_row(form) }}
 
         {% if form.parent.parent is not null %}
@@ -35,7 +35,7 @@
                 <div class="check-connection-messages check-smtp-connection-messages"></div>
             </div>
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
@@ -159,20 +159,20 @@
             module: 'oroui/js/app/components/tabs-component'
         }) }}>
             <ul class="nav nav-tabs" role="tablist">
-                {% spaceless %}
+                {% apply spaceless %}
                     {% for templateLocalization in form %}
                         {{ emailFormFealds.renderTabNavItem(templateLocalization, loop.first, tabId ~ '-' ~ loop.index) }}
                     {% endfor %}
-                {% endspaceless %}
+                {% endapply %}
             </ul>
         </div>
         <div class="oro-tabs__content">
             <div class="tab-content">
-                {% spaceless %}
+                {% apply spaceless %}
                     {% for templateLocalization in form %}
                         {{ emailFormFealds.renderTab(templateLocalization, loop.first, tabContentId ~ '-' ~ loop.index) }}
                     {% endfor %}
-                {% endspaceless %}
+                {% endapply %}
             </div>
         </div>
     </div>
@@ -202,8 +202,10 @@
             {{ "oro.email.imap.folder.checkAll"|trans }}
         </label>
         <div class="folder-list">
-            {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
-                {{ emailFormFealds.renderFolder(key, folder, form.vars.full_name) }}
+            {% for key, folder in form.vars.value %}
+                {% if folder.parentFolder is null and folder.outdatedAt is null %}
+                    {{ emailFormFealds.renderFolder(key, folder, form.vars.full_name) }}
+                {% endif %}
             {% endfor %}
         </div>
         <input name="{{ full_name }}" type="hidden">

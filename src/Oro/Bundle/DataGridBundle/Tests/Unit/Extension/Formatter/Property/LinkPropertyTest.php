@@ -7,7 +7,6 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\UIBundle\Twig\Environment;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Template;
 
 class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,22 +36,15 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 
         $record = new ResultRecord($data);
 
-        $template = $this->createMock(Template::class);
-
-        $this->twig->expects($this->once())
-            ->method('loadTemplate')
-            ->with(LinkProperty::TEMPLATE)
-            ->willReturn($template);
-
         if (!empty($data[LinkProperty::ROUTE_KEY])) {
             $this->router->expects($this->once())
                 ->method('generate')
                 ->willReturn($data[LinkProperty::ROUTE_KEY]);
         }
 
-        $template->expects($this->once())
+        $this->twig->expects($this->once())
             ->method('render')
-            ->with($expected);
+            ->with(LinkProperty::TEMPLATE, $expected);
 
         $this->property->getRawValue($record);
     }

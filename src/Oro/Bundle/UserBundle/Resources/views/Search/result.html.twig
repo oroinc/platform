@@ -11,8 +11,8 @@
 {% set recordUrl = indexer_item.recordUrl %}
 {% set image = entity ? entity.avatar : null %}
 
-{% if entity %}
-    {% block additional_info %}
+{% block additional_info %}
+    {% if entity %}
         <span class="page-title__status">
             {% if entity.enabled %}
                 {{ UI.badge('Active'|trans, 'enabled') }}
@@ -20,8 +20,10 @@
                 {{ UI.badge('Inactive'|trans, 'disabled') }}
             {% endif %}
         </span>
-    {% endblock %}
-{% endif %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
 
 {% set title = entity ? entity|oro_format_name : indexer_item.recordTitle %}
 {% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}

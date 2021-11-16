@@ -6,7 +6,7 @@
 <div id="bookmark-buttons">
     <div class="navigation clearfix">
         <div class="top-action-box">
-            {% spaceless %}
+            {% apply spaceless %}
             <button class="btn btn-icon btn-light-custom favorite-button{% if contentProviderContent['favoriteButton'] == false %} hide{% endif %}"
                     data-title="{{ oro_title_render_serialized() }}"
                     data-title-rendered="{{ oro_title_render() }}"
@@ -55,7 +55,7 @@
                         <span class="fa-thumb-tack"></span>
                         {{- 'oro.navigation.pins.button'|trans -}}
             </button>
-            {% endspaceless %}
+            {% endapply %}
         </div>
     </div>
 </div>

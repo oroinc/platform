@@ -1,5 +1,5 @@
 {% macro getJobStatusClass(job) %}
-{% spaceless %}
+{% apply spaceless %}
     {% set status = job.status %}
 
     {% if status is constant('STATUS_RUNNING', job) %}
@@ -17,5 +17,5 @@
     {% endif %}
 
     {{ class }}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}

@@ -7,7 +7,6 @@ use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty;
 use Oro\Bundle\UIBundle\Twig\Environment;
-use Twig\Template;
 
 class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
 {
@@ -39,16 +38,9 @@ class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
 
         $record = new ResultRecord($data);
 
-        $template = $this->createMock(Template::class);
-
-        $this->twig->expects($this->once())
-            ->method('loadTemplate')
-            ->with(self::TEMPLATE)
-            ->willReturn($template);
-
-        $template->expects($this->exactly(2))
+        $this->twig->expects($this->exactly(2))
             ->method('render')
-            ->with(['record' => $record] + $expected);
+            ->with(self::TEMPLATE, ['record' => $record] + $expected);
 
         $this->property->getRawValue($record);
 

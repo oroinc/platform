@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2fb1853e4cb33c765596c7a21e544761",
+    "content-hash": "2e8cf46f61643402eba966ce5086b1f0",
     "packages": [
         {
             "name": "ass/xmlsecurity",
@@ -4339,16 +4339,16 @@
         },
         {
             "name": "laminas/laminas-stdlib",
-            "version": "3.6.0",
+            "version": "3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-stdlib.git",
-                "reference": "c53d8537f108fac3fae652677a19735db730ba46"
+                "reference": "db581851a092246ad99e12d4fddf105184924c71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-stdlib/zipball/c53d8537f108fac3fae652677a19735db730ba46",
-                "reference": "c53d8537f108fac3fae652677a19735db730ba46",
+                "url": "https://api.github.com/repos/laminas/laminas-stdlib/zipball/db581851a092246ad99e12d4fddf105184924c71",
+                "reference": "db581851a092246ad99e12d4fddf105184924c71",
                 "shasum": ""
             },
             "require": {
@@ -4394,7 +4394,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2021-09-02T16:11:32+00:00"
+            "time": "2021-11-10T11:33:52+00:00"
         },
         {
             "name": "laminas/laminas-validator",
@@ -5219,12 +5219,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/oroinc/NelmioApiDocBundle.git",
-                "reference": "e23e71dac4bfdceffebe9457d69e0ea4fda755f1"
+                "reference": "a8e9439f130edf9c45398d5772b6f6061c1efdcb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oroinc/NelmioApiDocBundle/zipball/e23e71dac4bfdceffebe9457d69e0ea4fda755f1",
-                "reference": "e23e71dac4bfdceffebe9457d69e0ea4fda755f1",
+                "url": "https://api.github.com/repos/oroinc/NelmioApiDocBundle/zipball/a8e9439f130edf9c45398d5772b6f6061c1efdcb",
+                "reference": "a8e9439f130edf9c45398d5772b6f6061c1efdcb",
                 "shasum": ""
             },
             "require": {
@@ -5300,7 +5300,7 @@
             "support": {
                 "source": "https://github.com/oroinc/NelmioApiDocBundle/tree/2.x"
             },
-            "time": "2021-08-18T15:35:03+00:00"
+            "time": "2021-11-12T15:00:29+00:00"
         },
         {
             "name": "oro/doctrine-extensions",
@@ -13494,16 +13494,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v2.14.5",
+            "version": "v3.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "c9dd15b3a80725bc4919730fae462bddcc960820"
+                "reference": "a27fa056df8a6384316288ca8b0fa3a35fdeb569"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/c9dd15b3a80725bc4919730fae462bddcc960820",
-                "reference": "c9dd15b3a80725bc4919730fae462bddcc960820",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/a27fa056df8a6384316288ca8b0fa3a35fdeb569",
+                "reference": "a27fa056df8a6384316288ca8b0fa3a35fdeb569",
                 "shasum": ""
             },
             "require": {
@@ -13513,18 +13513,15 @@
             },
             "require-dev": {
                 "psr/container": "^1.0",
-                "symfony/phpunit-bridge": "^4.4.9|^5.0.9"
+                "symfony/phpunit-bridge": "^4.4.9|^5.0.9|^6.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.14-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Twig_": "lib/"
-                },
                 "psr-4": {
                     "Twig\\": "src/"
                 }
@@ -13557,7 +13554,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v2.14.5"
+                "source": "https://github.com/twigphp/Twig/tree/v3.3.3"
             },
             "funding": [
                 {
@@ -13569,7 +13566,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-12T08:02:35+00:00"
+            "time": "2021-09-17T08:44:23+00:00"
         },
         {
             "name": "ua-parser/uap-php",
@@ -15964,16 +15961,16 @@
         },
         {
             "name": "sebastian/exporter",
-            "version": "4.0.3",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "d89cc98761b8cb5a1a235a6b703ae50d34080e65"
+                "reference": "65e8b7db476c5dd267e65eea9cab77584d3cfff9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/d89cc98761b8cb5a1a235a6b703ae50d34080e65",
-                "reference": "d89cc98761b8cb5a1a235a6b703ae50d34080e65",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/65e8b7db476c5dd267e65eea9cab77584d3cfff9",
+                "reference": "65e8b7db476c5dd267e65eea9cab77584d3cfff9",
                 "shasum": ""
             },
             "require": {
@@ -16022,14 +16019,14 @@
                 }
             ],
             "description": "Provides the functionality to export PHP variables for visualization",
-            "homepage": "http://www.github.com/sebastianbergmann/exporter",
+            "homepage": "https://www.github.com/sebastianbergmann/exporter",
             "keywords": [
                 "export",
                 "exporter"
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
-                "source": "https://github.com/sebastianbergmann/exporter/tree/4.0.3"
+                "source": "https://github.com/sebastianbergmann/exporter/tree/4.0.4"
             },
             "funding": [
                 {
@@ -16037,7 +16034,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-09-28T05:24:23+00:00"
+            "time": "2021-11-11T14:18:36+00:00"
         },
         {
             "name": "sebastian/global-state",

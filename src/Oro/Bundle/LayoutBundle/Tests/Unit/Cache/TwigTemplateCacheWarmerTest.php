@@ -6,6 +6,7 @@ use Oro\Bundle\LayoutBundle\Cache\TwigTemplateCacheWarmer;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Twig\Environment;
 use Twig\Error\Error;
+use Twig\Template;
 
 class TwigTemplateCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,6 +22,7 @@ class TwigTemplateCacheWarmerTest extends \PHPUnit\Framework\TestCase
     public function testWarmUp(): void
     {
         $twig = $this->createMock(Environment::class);
+        $template = $this->createMock(Template::class);
         $iterator = [
             'template.html.twig',
             'invalid_template.html.twig',
@@ -48,10 +50,11 @@ class TwigTemplateCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 ['@Acme/layouts/theme/template.html.twig'],
                 ['@Acme/layouts/theme/another.jpg']
             )
-            ->willReturnCallback(function (string $template) {
-                if ('invalid_template.html.twig' === $template) {
+            ->willReturnCallback(function (string $templateName) use ($twig, $template) {
+                if ('invalid_template.html.twig' === $templateName) {
                     throw new Error('some error');
                 }
+                return new \Twig\TemplateWrapper($twig, $template);
             });
 
         $cacheWarmer = $this->getCacheWarmer($twig, $iterator);

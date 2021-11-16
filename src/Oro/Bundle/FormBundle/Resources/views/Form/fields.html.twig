@@ -49,23 +49,23 @@
 {% endblock %}
 
 {% block form_javascript %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% for child in form %}
             {{ form_javascript(child) }}
         {% endfor %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock form_javascript %}
 
 {% block form_stylesheet %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% for child in form %}
             {{ form_stylesheet(child) }}
         {% endfor %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock form_stylesheet %}
 
 {% block form_row_collection %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% from '@OroUI/macros.html.twig' import collection_prototype  %}
         <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}{% if group_attr.class is defined %} {{ group_attr.class }}{% endif %}"{% if group_attr is defined %}{{ block('group_attributes') }}{% endif %}>
             {% if hint|default() and hint_position|default() == 'above' %}
@@ -92,7 +92,7 @@
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock form_row_collection %}
 
 {% block oro_ticker_symbol_widget %}
@@ -191,7 +191,7 @@
 {% endblock %}
 
 {% block form_label %}
-    {% spaceless %}
+    {% apply spaceless %}
     {% if label is not same as(false) %}
         {% if not compound %}
             {% set label_attr = label_attr|merge({'for': id}) %}
@@ -233,7 +233,7 @@
              <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {%- endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock form_label %}
 
 {% block oro_money_row %}
@@ -405,7 +405,7 @@
 
 {% block oro_collection_widget %}
     {% import _self as formFields %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if prototype is defined %}
             {% set prototype_html = formFields.oro_collection_item_prototype(form) %}
         {% endif %}
@@ -432,7 +432,7 @@
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
             {{ formFields.oro_collection_validate_primary_js(_context) }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% macro oro_collection_validate_primary_js(context) %}
@@ -462,7 +462,7 @@
     {% set currentMode = form.mode.vars.value|default('create') %}
     {% set viewsContainerId = form.vars.id ~ '-container' %}
 
-    {% spaceless %}
+    {% apply spaceless %}
         <div class="control-group create-select-entity {{ currentMode }}
             {% if attr.class is defined %} {{ attr.class }}{% endif %}"
             id="{{ viewsContainerId }}"
@@ -477,7 +477,7 @@
                 {{ form_errors(form) }}
             </div>
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_autocomplete_widget %}
@@ -683,13 +683,13 @@
 {% endblock %}
 
 {% block oro_download_links_type_widget %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% for fileName, route in files %}
             <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
                 {{ fileName }}
             </a>
         {% endfor %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_simple_color_picker_row %}

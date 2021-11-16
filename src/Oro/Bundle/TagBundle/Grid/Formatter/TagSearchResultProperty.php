@@ -41,16 +41,17 @@ class TagSearchResultProperty extends SearchResultProperty
         $entityClass = ClassUtils::getRealClass($entity);
         if ($this->mappingProvider->isClassSupported($entityClass)) {
             return parent::getValue($record);
-        } else {
-            $this->params[self::TEMPLATE_KEY] = $this->defaultTemplate;
-
-            return $this->getTemplate()->render(
-                [
-                    'entityType'   => $this->entityConfigProvider->getConfig($entityClass)->get('label'),
-                    'entity'       => $entity,
-                    'indexer_item' => $record->getValue('indexer_item')
-                ]
-            );
         }
+
+        $this->params[self::TEMPLATE_KEY] = $this->defaultTemplate;
+
+        return $this->environment->render(
+            $this->get(self::TEMPLATE_KEY),
+            [
+                'entityType'   => $this->entityConfigProvider->getConfig($entityClass)->get('label'),
+                'entity'       => $entity,
+                'indexer_item' => $record->getValue('indexer_item')
+            ]
+        );
     }
 }

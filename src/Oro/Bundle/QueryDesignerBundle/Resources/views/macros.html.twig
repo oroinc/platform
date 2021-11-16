@@ -110,7 +110,7 @@
             {% endif %}
             {% if ('action' in showItems) %}
             <td class="action-cell">
-                {% spaceless %}
+                {% apply spaceless %}
                 <a href="#" class="btn btn-icon btn-lighter action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
                         data-collection-action="edit">
@@ -122,7 +122,7 @@
                     <span class="fa-trash-o" aria-hidden="true"></span></a>
                 <span class="btn btn-icon btn-lighter" title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
                     <span class="fa-arrows-v handle" aria-hidden="true"></span></span>
-                {% endspaceless %}
+                {% endapply %}
             </td>
             {% endif %}
         </tr>
@@ -134,7 +134,7 @@
         <tr data-cid="<%= cid %>">
             <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             <td class="action-cell">
-                {% spaceless %}
+                {% apply spaceless %}
                 <a href="#" class="btn btn-icon btn-lighter action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
                         data-collection-action="edit">
@@ -146,7 +146,7 @@
                     <span class="fa-trash-o" aria-hidden="true"></span></a>
                 <span class="btn btn-icon btn-lighter" title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
                     <span class="fa-arrows-v handle" aria-hidden="true"></span></span>
-                {% endspaceless %}
+                {% endapply %}
             </td>
         </tr>
     </script>
@@ -200,7 +200,7 @@
             {% endif %}
             {% if ('action' in showItems) %}
             <div class="submit-cancel-buttons">
-                {% spaceless %}
+                {% apply spaceless %}
                 {{ UI.clientButton({
                     'aCss': 'no-hash cancel-button column-form-button',
                     'label' : 'oro.query_designer.form.action.cancel'|trans
@@ -215,7 +215,7 @@
                     'aCss': 'no-hash btn-primary add-button column-form-button',
                     'label' : 'oro.query_designer.form.action.add'|trans
                 }) }}
-                {% endspaceless %}
+                {% endapply %}
             </div>
             {% endif %}
         </div>
@@ -237,7 +237,7 @@
                 }
             }) }}
             <div class="submit-cancel-buttons">
-                {% spaceless %}
+                {% apply spaceless %}
                 {{ UI.clientButton({
                     'aCss': 'no-hash cancel-button',
                     'label' : 'oro.query_designer.form.action.cancel'|trans
@@ -252,7 +252,7 @@
                     'aCss': 'no-hash btn-primary add-button',
                     'label' : 'oro.query_designer.form.action.add'|trans
                 }) }}
-                {% endspaceless %}
+                {% endapply %}
             </div>
         </div>
     </div>
@@ -278,7 +278,7 @@
 {% endmacro %}
 
 {% macro query_designer_column_chain_template(id) %}
-    {% spaceless %}
+    {% apply spaceless %}
     <script type="text/html" id="{{ id }}">
         <span class="entity-field-path">
         <% _.each(obj, function (item, index, list) { %>
@@ -294,5 +294,5 @@
         <% }) %>
         </span>
     </script>
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}

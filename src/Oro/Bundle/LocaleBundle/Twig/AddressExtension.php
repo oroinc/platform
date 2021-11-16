@@ -70,6 +70,7 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
     /**
      * Formats address using twig template.
      * Wraps each address part into a tag.
+     * @throws \Throwable
      */
     public function formatAddressHtml(
         Environment $environment,
@@ -82,7 +83,7 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
         $addressFormat = $addressFormatter->getAddressFormat($country);
         $parts = $addressFormatter->getAddressParts($address, $addressFormat, $country);
 
-        $template = $environment->loadTemplate(self::ADDRESS_TEMPLATE);
+        $template = $environment->load(self::ADDRESS_TEMPLATE);
         foreach ($parts as $partKey => $partValue) {
             $partName = strtolower(trim($partKey, '%'));
             $partBlockName = 'address_part_' . $partName;

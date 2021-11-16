@@ -102,22 +102,22 @@
             module: 'oroui/js/app/components/tabs-component'
         }) }}>
             <ul class="nav nav-tabs" role="tablist">
-                {% spaceless %}
+                {% apply spaceless %}
                     {{ fields.renderTabNavItem(form.default, true, tabId ~ '-' ~ 0) }}
                     {% for localization in form.localizations %}
                         {{ fields.renderTabNavItem(localization, false, tabId ~ '-' ~ loop.index) }}
                     {% endfor %}
-                {% endspaceless %}
+                {% endapply %}
             </ul>
         </div>
         <div class="oro-tabs__content">
             <div class="tab-content">
-                {% spaceless %}
+                {% apply spaceless %}
                     {{ fields.renderTab(form.default, true, tabId ~ '-' ~ 0) }}
                     {% for localization in form.localizations %}
                         {{ fields.renderTab(localization, false, tabId ~ '-' ~ loop.index) }}
                     {% endfor %}
-                {% endspaceless %}
+                {% endapply %}
             </div>
         </div>
     </div>

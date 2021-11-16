@@ -8,12 +8,12 @@ use Twig\NodeVisitor\NodeVisitorInterface;
 
 class EnvironmentNodeVisitor implements NodeVisitorInterface
 {
-    public function enterNode(Node $node, Environment $env)
+    public function enterNode(Node $node, Environment $env): Node
     {
         return $node;
     }
 
-    public function leaveNode(Node $node, Environment $env)
+    public function leaveNode(Node $node, Environment $env): Node
     {
         return $node;
     }

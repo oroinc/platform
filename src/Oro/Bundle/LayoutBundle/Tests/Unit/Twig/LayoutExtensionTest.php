@@ -10,7 +10,6 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Form\FormView;
-use Twig\Environment;
 
 class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,18 +35,6 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $this->extension = new LayoutExtension($container, (new InflectorFactory())->build());
-    }
-
-    public function testInitRuntime()
-    {
-        $environment = $this->createMock(Environment::class);
-
-        $this->renderer->expects($this->once())
-            ->method('setEnvironment')
-            ->with($this->identicalTo($environment));
-
-        $this->extension->initRuntime($environment);
-        self::assertSame($this->renderer, $this->extension->renderer);
     }
 
     public function testGetTokenParsers()

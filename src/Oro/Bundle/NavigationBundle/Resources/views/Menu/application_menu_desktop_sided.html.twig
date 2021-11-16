@@ -41,11 +41,13 @@
     {% if item.level == 1 %}
         {% set hasValidChildren = false %}
 
-        {% for sub_item in item if not hasValidChildren %}
-            {%- set showNonAuthorized = sub_item.extras.show_non_authorized is defined and sub_item.extras.show_non_authorized -%}
-            {%- set displayable = sub_item.extras.isAllowed or showNonAuthorized -%}
-            {% if sub_item.displayed and displayable and not sub_item.getExtra('divider') %}
-                {% set hasValidChildren = true %}
+        {% for sub_item in item %}
+            {% if not hasValidChildren %}
+                {%- set showNonAuthorized = sub_item.extras.show_non_authorized is defined and sub_item.extras.show_non_authorized -%}
+                {%- set displayable = sub_item.extras.isAllowed or showNonAuthorized -%}
+                {% if sub_item.displayed and displayable and not sub_item.getExtra('divider') %}
+                    {% set hasValidChildren = true %}
+                {% endif %}
             {% endif %}
         {% endfor %}
 

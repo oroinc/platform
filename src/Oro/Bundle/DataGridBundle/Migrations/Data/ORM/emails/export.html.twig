@@ -2,7 +2,7 @@
 @subject = Grid export result for job {{ jobName }}
 @isSystem = 1
 @isEditable = 1
-{% spaceless %}
+{% apply spaceless %}
 <style>
     @media (max-width: 480pt) {
         .wrapper{
@@ -24,4 +24,4 @@
         </p>
     {% endif %}
 </div>
-{% endspaceless %}
+{% endapply %}

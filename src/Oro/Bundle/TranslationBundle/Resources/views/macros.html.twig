@@ -26,8 +26,10 @@ Example:
             {% set locale = translationsFields.vars.name %}
 
             <div class="oro_translationsFields-{{ locale }} tab-pane {% if app.request.locale == locale %}active{% endif %}">
-            {% for translationsField in translationsFields if translationsField.vars.name in fieldsNames %}
-                {{ form_widget(translationsField) }}
+            {% for translationsField in translationsFields %}
+                {% if translationsField.vars.name in fieldsNames %}
+                    {{ form_widget(translationsField) }}
+                {% endif %}
             {% endfor %}
             </div>
         {% endfor %}
@@ -59,8 +61,10 @@ Example:
                 {% set locale = translationsFields.vars.name %}
 
                 <div class="oro_translationsFields-{{ locale }} tab-pane {% if app.request.locale == locale %}active{% endif %}">
-                {% for translationsField in translationsFields if translationsField.vars.name in fieldsNames %}
-                    {{ form_widget(translationsField) }}
+                {% for translationsField in translationsFields %}
+                    {% if translationsField.vars.name in fieldsNames %}
+                        {{ form_widget(translationsField) }}
+                    {% endif %}
                 {% endfor %}
                 </div>
             {% endfor %}

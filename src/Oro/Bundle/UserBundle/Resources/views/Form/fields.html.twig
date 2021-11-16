@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block _user_settings_oro_user___case_insensitive_email_addresses_enabled_value_errors %}
-    {%- spaceless -%}
+    {%- apply spaceless -%}
         {% if errors|length > 0 %}
             {% set combinedError = '' %}
             {% for error in errors %}
@@ -68,7 +68,7 @@
             {% endfor %}
             <span class="validation-failed"><span><span>{{ combinedError|raw }}</span></span></span>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block oro_user_emailsettings_widget %}

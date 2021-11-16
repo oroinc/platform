@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig\Node;
 
-use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
+use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
 use Twig\Compiler;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -23,7 +23,10 @@ class SearchAndRenderBlockNode extends FunctionExpression
     {
         $compiler->addDebugInfo($this);
         $compiler->raw(
-            sprintf('$this->env->getExtension("%s")->renderer->searchAndRenderBlock(', LayoutExtension::class)
+            sprintf(
+                '$this->env->getRuntime("%s")->searchAndRenderBlock(',
+                TwigRenderer::class
+            )
         );
 
         $name            = $this->getAttribute('name');

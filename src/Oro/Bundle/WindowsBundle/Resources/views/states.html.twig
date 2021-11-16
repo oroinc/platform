@@ -10,11 +10,13 @@
         loadModules(['jquery', 'oro/dialog-widget', 'orowindows/js/dialog/state/model'],
         function($, DialogWidget, StateModel) {
             $(function(){
-                {% for windowState in windowStates if windowState.renderedSuccessfully %}
-                new DialogWidget({
-                    autoRender: true,
-                    model: new StateModel({{ {'data': windowState.data, 'id': windowState.id}|json_encode|raw }})
-                });
+                {% for windowState in windowStates %}
+                    {% if windowState.renderedSuccessfully %}
+                        new DialogWidget({
+                            autoRender: true,
+                            model: new StateModel({{ {'data': windowState.data, 'id': windowState.id}|json_encode|raw }})
+                        });
+                    {% endif %}
                 {% endfor %}
             });
         });

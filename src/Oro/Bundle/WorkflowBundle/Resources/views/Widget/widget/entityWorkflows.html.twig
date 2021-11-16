@@ -39,31 +39,33 @@
                                         {% set manyVariantsFound = false %}
                                         {% set manyVariantsRendered = false %}
 
-                                        {% for step in steps if not manyVariantsRendered %}
-                                            {% set final = step.final %}
-                                            {% if isOrdered %}
-                                                {% set active = step.active %}
+                                        {% for step in steps %}
+                                            {% if not manyVariantsRendered %}
+                                                {% set final = step.final %}
+                                                {% if isOrdered %}
+                                                    {% set active = step.active %}
 
-                                                {% if activeRendered and manyVariantsFound %}
-                                                    {% set manyVariantsRendered = true %}
-                                                    {% set step = step|merge({label: '...'}) %}
+                                                    {% if activeRendered and manyVariantsFound %}
+                                                        {% set manyVariantsRendered = true %}
+                                                        {% set step = step|merge({label: '...'}) %}
+                                                    {% endif %}
+
+                                                    {% if active and not activeRendered %}
+                                                        {% set activeRendered = true %}
+                                                    {% endif %}
+
+                                                    {% if step.possibleStepsCount > 1 and activeRendered %}
+                                                        {% set manyVariantsFound = true %}
+                                                    {% endif %}
+
+                                                    <li class="workflow-steps-item workflow-ordered-steps{% if active %} active{% endif %}{% if final %} workflow-step-final{% endif %}" title="{{ step.label|trans({},'workflows') }}">
+                                                        <span class="workflow-step-name">{{ step.label|trans({},'workflows') }}</span>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="workflow-steps-item workflow-unordered-steps">
+                                                        <span class="workflow-unordered-step-name{% if final %} workflow-step-final-name{% endif %}">{{ step.label|trans({},'workflows') }}</span>
+                                                    </li>
                                                 {% endif %}
-
-                                                {% if active and not activeRendered %}
-                                                    {% set activeRendered = true %}
-                                                {% endif %}
-
-                                                {% if step.possibleStepsCount > 1 and activeRendered %}
-                                                    {% set manyVariantsFound = true %}
-                                                {% endif %}
-
-                                                <li class="workflow-steps-item workflow-ordered-steps{% if active %} active{% endif %}{% if final %} workflow-step-final{% endif %}" title="{{ step.label|trans({},'workflows') }}">
-                                                    <span class="workflow-step-name">{{ step.label|trans({},'workflows') }}</span>
-                                                </li>
-                                            {% else %}
-                                                <li class="workflow-steps-item workflow-unordered-steps">
-                                                    <span class="workflow-unordered-step-name{% if final %} workflow-step-final-name{% endif %}">{{ step.label|trans({},'workflows') }}</span>
-                                                </li>
                                             {% endif %}
                                         {% endfor %}
                                     </ul>

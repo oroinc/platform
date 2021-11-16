@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox\Stub;
 
 use Twig\Environment;
+use Twig\Source;
 use Twig\Template;
 
 class TestTemplateStub extends Template
@@ -48,5 +49,13 @@ class TestTemplateStub extends Template
     public function getDebugInfo()
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSourceContext()
+    {
+        return new Source('stub', 'stub');
     }
 }
