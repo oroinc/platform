@@ -11,6 +11,7 @@ use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +34,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
         $this->helper = $this->createMock(VersionHelper::class);
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheInterface::class);
     }
 
     private function getHelpLinkProvider(array $defaultConfig = [], array $config = []): HelpLinkProvider
@@ -59,11 +60,9 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $routeName = 'test_route';
 
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with($routeName)
             ->willReturn($expectedLink);
-        $this->cache->expects(self::never())
-            ->method('save');
 
         $request = new Request();
         $request->attributes->add(['_route' => $routeName]);
@@ -80,9 +79,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $expectedLink = 'http://example.com/';
 
         $this->cache->expects(self::never())
-            ->method('fetch');
-        $this->cache->expects(self::never())
-            ->method('save');
+            ->method('get');
 
         $helpLinkProvider = $this->getHelpLinkProvider(
             ['link' => 'http://example.com/']
@@ -95,9 +92,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $expectedLink = 'http://example.com/';
 
         $this->cache->expects(self::never())
-            ->method('fetch');
-        $this->cache->expects(self::never())
-            ->method('save');
+            ->method('get');
 
         $helpLinkProvider = $this->getHelpLinkProvider(
             ['link' => 'http://example.com/']
@@ -130,12 +125,9 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 
         if (isset($requestAttributes['_route'])) {
             $this->cache->expects(self::once())
-                ->method('fetch')
+                ->method('get')
                 ->with($requestAttributes['_route'])
-                ->willReturn(false);
-            $this->cache->expects(self::once())
-                ->method('save')
-                ->with($requestAttributes['_route'], $expectedLink);
+                ->willReturn($expectedLink);
         }
 
         $defaultConfig = [];

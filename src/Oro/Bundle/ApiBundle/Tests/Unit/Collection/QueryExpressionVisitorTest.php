@@ -682,12 +682,8 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' LEFT JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1'
             . ' FROM user_to_group_table u2_'
-            . ' INNER JOIN group_table g3_ ON u2_.user_group_id = g3_.id'
-            . ' WHERE u2_.user_id = u1_.id AND g3_.id IN (g0_.id)))'
-            . ' WHERE EXISTS ('
-            . 'SELECT u4_.id'
-            . ' FROM user_table u4_'
-            . ' WHERE u4_.id = u1_.id)';
+            . ' WHERE u2_.user_id = u1_.id AND u2_.user_group_id IN (g0_.id)))'
+            . ' WHERE EXISTS (SELECT u3_.id FROM user_table u3_ WHERE u3_.id = u1_.id)';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
@@ -760,12 +756,8 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' LEFT JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1'
             . ' FROM user_to_group_table u2_'
-            . ' INNER JOIN group_table g3_ ON u2_.user_group_id = g3_.id'
-            . ' WHERE u2_.user_id = u1_.id AND g3_.id IN (u0_.id)))'
-            . ' WHERE EXISTS ('
-            . 'SELECT u4_.id'
-            . ' FROM user_table u4_'
-            . ' WHERE u4_.id = u1_.id)';
+            . ' WHERE u2_.user_id = u1_.id AND u2_.user_group_id IN (u0_.id)))'
+            . ' WHERE EXISTS (SELECT u3_.id FROM user_table u3_ WHERE u3_.id = u1_.id)';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
@@ -839,8 +831,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' FROM group_table g1_'
             . ' WHERE EXISTS ('
             . 'SELECT 1 FROM user_to_group_table u2_'
-            . ' INNER JOIN group_table g3_ ON u2_.user_group_id = g3_.id'
-            . ' WHERE u2_.user_id = u0_.id AND g3_.id IN (g1_.id)))';
+            . ' WHERE u2_.user_id = u0_.id AND u2_.user_group_id IN (g1_.id)))';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 

@@ -99,7 +99,7 @@ services:
         arguments:
             - '@oro_email.form.email'
             - '@request_stack'
-            - '@oro_email.mailer.processor'
+            - '@oro_email.sender.email_model_sender'
             - '@logger'
 
     Oro\Bundle\EmailBundle\Form\Handler\EmailHandler:

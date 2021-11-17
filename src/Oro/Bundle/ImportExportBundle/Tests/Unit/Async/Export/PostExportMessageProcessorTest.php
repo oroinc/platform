@@ -84,8 +84,8 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'jobName' => 'job-name',
             'exportType' => 'type',
             'outputFormat' => 'csv',
-            'email' => 'test@example.com',
             'notificationTemplate' => 'resultTemplate',
+            'recipientUserId' => self::USER_ID,
             'entity' => 'Acme',
         ];
         $message->expects(self::once())
@@ -122,7 +122,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ['exception' => $exception]
             );
 
-        $this->messageProducer->expects($this->never())
+        $this->messageProducer->expects(self::never())
             ->method('send');
 
         $result = $this->postExportMessageProcessor->process($message, $session);
@@ -132,64 +132,6 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $message = $this->createMock(MessageInterface::class);
-        $messageBody = [
-            'jobId' => '1',
-            'jobName' => 'job-name',
-            'exportType' => 'type',
-            'outputFormat' => 'csv',
-            'email' => 'test@example.com',
-            'notificationTemplate' => 'resultTemplate',
-            'entity' => 'Acme',
-        ];
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn(JSON::encode($messageBody));
-
-        $job = new Job();
-        $childJob = new Job();
-        $childJob->setRootJob($job);
-        $job->setChildJobs([$childJob]);
-
-        $this->jobRepository->expects(self::once())
-            ->method('findJobById')
-            ->willReturn($childJob);
-
-        $this->importExportResultSummarizer->expects(self::any())
-            ->method('processSummaryExportResultForNotification')
-            ->willReturn([]);
-
-        $this->exportHandler->expects(self::once())
-            ->method('exportResultFileMerge')
-            ->willReturn('acme_filename');
-
-        $this->messageProducer->expects($this->exactly(2))
-            ->method('send')
-            ->withConsecutive(
-                [
-                    NotificationTopics::SEND_NOTIFICATION_EMAIL,
-                    [
-                        'sender' => [],
-                        'toEmail' => 'test@example.com',
-                        'body' => [],
-                        'contentType' => 'text/html',
-                        'template' => 'resultTemplate',
-                    ]
-                ],
-                [
-                    Topics::SAVE_IMPORT_EXPORT_RESULT,
-                    ['jobId' => $job->getId(), 'type' => 'type', 'entity' => 'Acme']
-                ]
-            );
-
-        $result = $this->postExportMessageProcessor->process($message, $session);
-
-        self::assertSame(MessageProcessorInterface::ACK, $result);
-    }
-
-    public function testProcessWhenRecipientUserIdGiven()
-    {
         $jobId = 123;
         $session = $this->createMock(SessionInterface::class);
         $message = $this->createMock(MessageInterface::class);
@@ -198,7 +140,6 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'jobName' => 'job-name',
             'exportType' => 'type',
             'outputFormat' => 'csv',
-            'email' => 'test@example.com',
             'recipientUserId' => self::USER_ID,
             'entity' => 'Acme',
         ];
@@ -242,7 +183,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->withConsecutive(
                 [
-                    NotificationTopics::SEND_NOTIFICATION_EMAIL,
+                    NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE,
                     self::callback(function ($message) {
                         return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
                     })

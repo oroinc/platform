@@ -1,0 +1,69 @@
+services:
+    oro_email.mailer:
+        decorates: mailer.mailer
+        class: Oro\Bundle\EmailBundle\Mailer\Mailer
+        arguments:
+            - '@mailer.transports'
+
+    oro_email.mailer.transports.lazy:
+        decorates: mailer.transports
+        decoration_priority: 64 # Should be higher than oro_email.mailer.transports
+        class: Oro\Bundle\EmailBundle\Mailer\Transport\LazyTransports
+        arguments:
+            - '@mailer.transport_factory'
+            - !abstract '$transportsDsns defined in LazyTransportsPass'
+
+    oro_email.mailer.transports:
+        decorates: mailer.transports
+        decoration_priority: 32 # Should be lower than oro_email.mailer.transports.lazy
+        class: Oro\Bundle\EmailBundle\Mailer\Transport\Transport
+        arguments:
+            - '@.inner'
+            - '@event_dispatcher'
+        calls:
+            - [setLogger, ['@logger']]
+
+    Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker:
+        alias: 'oro_email.mailer.checker.smtp_settings'
+
+    oro_email.mailer.checker.smtp_settings:
+        class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
+        arguments:
+            - '@oro_email.mailer.dsn_from_smtp_settings_factory'
+            - '@oro_email.mailer.checker.smtp_connection_checker'
+
+    oro_email.mailer.checker.smtp_connection_checker:
+        class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpConnectionChecker
+        tags:
+            - { name: oro_email.mailer.connection_checker }
+
+    oro_email.mailer.checker.system_config_connection_checker:
+        class: Oro\Bundle\EmailBundle\Mailer\Checker\SystemConfigConnectionChecker
+        arguments:
+            - '@oro_email.mailer.checker.connection_checkers'
+            - '@oro_email.mailer.transport.system_config_real_dsn_provider'
+        tags:
+            - { name: oro_email.mailer.connection_checker }
+
+    oro_email.mailer.checker.connection_checkers:
+        class: Oro\Bundle\EmailBundle\Mailer\Checker\ConnectionCheckers
+        arguments:
+            - !tagged_iterator oro_email.mailer.connection_checker
+
+    oro_email.mailer.transport.system_config:
+        class: Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportFactory
+        arguments:
+            - '@mailer.transport_factory'
+            - '@oro_email.mailer.transport.system_config_real_dsn_provider'
+            - '@?request_stack'
+        tags:
+            - { name: mailer.transport_factory }
+
+    oro_email.mailer.transport.system_config_real_dsn_provider:
+        class: Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider
+        arguments:
+            - '@oro_email.provider.smtp_settings'
+            - '@oro_email.mailer.dsn_from_smtp_settings_factory'
+
+    oro_email.mailer.dsn_from_smtp_settings_factory:
+        class: Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory

@@ -5,89 +5,164 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
-use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
+use Symfony\Component\Mime\Email as SymfonyEmail;
+use Symfony\Component\Mime\RawMessage;
 
 class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
-    /** @var MassNotificationListener */
-    private $listener;
+    private MassNotificationListener $listener;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(MassNotification::class)
-            ->willReturn($this->em);
+            ->willReturn($this->entityManager);
 
         $this->listener = new MassNotificationListener($doctrine);
     }
 
-    public function testLogMassNotification()
+    public function testLogMassNotificationWhenTypeNotMass(): void
     {
-        $date = new \DateTime('now');
-        $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
-        $message->expects(self::once())
-            ->method('getTo')
-            ->willReturn(['to@test.com' => 'test']);
-        $message->expects(self::once())
-            ->method('getFrom')
-            ->willReturn(['from@test.com' => 'test']);
-        $message->expects(self::once())
-            ->method('getDate')
-            ->willReturn($date);
-        $message->expects(self::once())
-            ->method('getSubject')
-            ->willReturn('test subject');
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn('test body');
+        $event = new NotificationSentEvent(new SymfonyEmail(), 1, 'sample_type');
 
-        $spoolItem = new SpoolItem();
-        $spoolItem->setMessage($message);
-        $spoolItem->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE);
-
-        $event = new NotificationSentEvent($spoolItem, 1);
-
-        $this->em->expects(self::once())
-            ->method('persist')
-            ->willReturnCallback(function (MassNotification $logEntity) use ($date) {
-                self::assertEquals('test <to@test.com>', $logEntity->getEmail());
-                self::assertEquals('test <from@test.com>', $logEntity->getSender());
-                self::assertEquals('test subject', $logEntity->getSubject());
-                self::assertEquals('test body', $logEntity->getBody());
-                self::assertGreaterThanOrEqual($date, $logEntity->getScheduledAt());
-                self::assertEquals(MassNotification::STATUS_SUCCESS, $logEntity->getStatus());
-
-                return true;
-            });
-        $this->em->expects(self::once())
-            ->method('flush')
-            ->with(self::isInstanceOf(MassNotification::class));
+        $this->entityManager
+            ->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->logMassNotification($event);
     }
 
-    public function testNoLoggingDone()
+    public function testLogMassNotificationWhenTypeNotEmail(): void
     {
-        $spoolItem = new SpoolItem();
-        $spoolItem->setLogType('non existing type');
+        $event = new NotificationSentEvent(
+            new RawMessage('sample body'),
+            1,
+            MassNotificationSender::NOTIFICATION_LOG_TYPE
+        );
 
-        $event = new NotificationSentEvent($spoolItem, 1);
-
-        $this->em->expects(self::never())
-            ->method('persist');
-        $this->em->expects(self::never())
-            ->method('persist');
+        $this->entityManager
+            ->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->logMassNotification($event);
+    }
+
+    /**
+     * @dataProvider logMassNotificationDataProvider
+     *
+     * @param SymfonyEmail $symfonyEmail
+     * @param int $sentCount
+     * @param MassNotification $massNotification
+     */
+    public function testLogMassNotification(
+        SymfonyEmail $symfonyEmail,
+        int $sentCount,
+        MassNotification $massNotification
+    ): void {
+        $event = new NotificationSentEvent($symfonyEmail, $sentCount, MassNotificationSender::NOTIFICATION_LOG_TYPE);
+
+        $this->entityManager
+            ->expects(self::once())
+            ->method('persist')
+            ->willReturnCallback(static function (MassNotification $entity) use ($massNotification) {
+                self::assertEquals($massNotification->getSender(), $entity->getSender());
+                self::assertEquals($massNotification->getEmail(), $entity->getEmail());
+                self::assertEquals($massNotification->getSubject(), $entity->getSubject());
+                self::assertEquals($massNotification->getStatus(), $entity->getStatus());
+                self::assertEquals($massNotification->getBody(), $entity->getBody());
+                self::assertInstanceOf(\DateTimeInterface::class, $entity->getProcessedAt());
+                self::assertInstanceOf(\DateTimeInterface::class, $entity->getScheduledAt());
+            });
+
+        $this->entityManager
+            ->expects(self::once())
+            ->method('flush');
+
+        $this->listener->logMassNotification($event);
+    }
+
+    public function logMassNotificationDataProvider(): array
+    {
+        return [
+            'status is not success when sentCount is 0' => [
+                'symfonyEmail' => (new SymfonyEmail()),
+                'sentCount' => 0,
+                'massNotification' => (new MassNotification()),
+            ],
+            'status is success when sentCount > 0' => [
+                'symfonyEmail' => (new SymfonyEmail()),
+                'sentCount' => 1,
+                'massNotification' => (new MassNotification())
+                    ->setStatus(MassNotification::STATUS_SUCCESS),
+            ],
+            'sender is taken from email' => [
+                'symfonyEmail' => (new SymfonyEmail())
+                    ->from('From1Name <from1@example.com>', 'from2@example.com'),
+                'sentCount' => 1,
+                'massNotification' => (new MassNotification())
+                    ->setStatus(MassNotification::STATUS_SUCCESS)
+                    ->setSender('From1Name <from1@example.com>'),
+            ],
+            'recipient is taken from email' => [
+                'symfonyEmail' => (new SymfonyEmail())
+                    ->from('From1Name <from1@example.com>', 'from2@example.com')
+                    ->to('To1Name <to1@example.com>', 'to1@example.com'),
+                'sentCount' => 1,
+                'massNotification' => (new MassNotification())
+                    ->setStatus(MassNotification::STATUS_SUCCESS)
+                    ->setSender('From1Name <from1@example.com>')
+                    ->setEmail('To1Name <to1@example.com>'),
+            ],
+            'subject is taken from email' => [
+                'symfonyEmail' => (new SymfonyEmail())
+                    ->from('From1Name <from1@example.com>', 'from2@example.com')
+                    ->to('To1Name <to1@example.com>', 'to1@example.com')
+                    ->subject('Sample subject'),
+                'sentCount' => 1,
+                'massNotification' => (new MassNotification())
+                    ->setStatus(MassNotification::STATUS_SUCCESS)
+                    ->setSender('From1Name <from1@example.com>')
+                    ->setEmail('To1Name <to1@example.com>')
+                    ->setSubject('Sample subject'),
+            ],
+            'html body is taken from email' => [
+                'symfonyEmail' => (new SymfonyEmail())
+                    ->from('From1Name <from1@example.com>', 'from2@example.com')
+                    ->to('To1Name <to1@example.com>', 'to1@example.com')
+                    ->subject('Sample subject')
+                    ->text('Sample text body')
+                    ->html('Sample html body'),
+                'sentCount' => 1,
+                'massNotification' => (new MassNotification())
+                    ->setStatus(MassNotification::STATUS_SUCCESS)
+                    ->setSender('From1Name <from1@example.com>')
+                    ->setEmail('To1Name <to1@example.com>')
+                    ->setSubject('Sample subject')
+                    ->setBody('Sample html body'),
+            ],
+            'text body is taken from email from html is absent' => [
+                'symfonyEmail' => (new SymfonyEmail())
+                    ->from('From1Name <from1@example.com>', 'from2@example.com')
+                    ->to('To1Name <to1@example.com>', 'to1@example.com')
+                    ->subject('Sample subject')
+                    ->text('Sample text body'),
+                'sentCount' => 1,
+                'massNotification' => (new MassNotification())
+                    ->setStatus(MassNotification::STATUS_SUCCESS)
+                    ->setSender('From1Name <from1@example.com>')
+                    ->setEmail('To1Name <to1@example.com>')
+                    ->setSubject('Sample subject')
+                    ->setBody('Sample text body'),
+            ],
+        ];
     }
 }

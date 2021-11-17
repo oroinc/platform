@@ -3,11 +3,11 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\NativeMailerHandler;
 use Oro\Bundle\LoggerBundle\Monolog\DisableHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Monolog\Handler\SwiftMailerHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -78,12 +78,12 @@ class DisableHandlerWrapperTest extends TestCase
             new Request(),
             new Response()
         );
-        $mailerHandler = $this->createMock(SwiftMailerHandler::class);
+        $mailerHandler = $this->createMock(NativeMailerHandler::class);
         $mailerHandler->expects(self::once())
-            ->method('onKernelTerminate')
+            ->method('addHeader')
             ->with($event);
 
         $wrapper = new DisableHandlerWrapper($this->config, $mailerHandler);
-        $wrapper->onKernelTerminate($event);
+        $wrapper->addHeader($event);
     }
 }

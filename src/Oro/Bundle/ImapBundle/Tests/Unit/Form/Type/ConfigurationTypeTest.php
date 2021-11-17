@@ -7,8 +7,6 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
-use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration;
-use Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -18,8 +16,10 @@ use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
+use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
 use Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator;
+use Oro\Bundle\ImapBundle\Validator\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
@@ -38,23 +38,17 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     private const OAUTH_ACCOUNT_TYPE = 'oauth1';
 
-    /** @var SymmetricCrypterInterface */
-    private $encryptor;
+    private SymmetricCrypterInterface $encryptor;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
+    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private Translator|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
 
-    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $imapSettingsChecker;
+    private ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject $imapSettingsChecker;
 
-    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $smtpSettingsChecker;
+    private SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject $smtpSettingsChecker;
 
     protected function setUp(): void
     {
@@ -67,13 +61,13 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $organization = $this->createMock(Organization::class);
         $user = $this->createMock(User::class);
-        $user->expects($this->any())
+        $user->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
 
@@ -118,16 +112,16 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $emailFolders = new EmailFolders();
         $imapConnectionConfiguration = new ImapConnectionConfiguration();
         $smtpConnectionConfiguration = new SmtpConnectionConfiguration();
-        $this->imapSettingsChecker->expects($this->any())
+        $this->imapSettingsChecker->expects(self::any())
             ->method('checkConnection')
             ->willReturn(true);
         $smtpSettingsFactory = $this->createMock(SmtpSettingsFactory::class);
-        $smtpSettingsFactory->expects($this->any())
-            ->method('create')
+        $smtpSettingsFactory->expects(self::any())
+            ->method('createFromUserEmailOrigin')
             ->willReturn(new SmtpSettings());
-        $this->smtpSettingsChecker->expects($this->any())
+        $this->smtpSettingsChecker->expects(self::any())
             ->method('checkConnection')
-            ->willReturn('');
+            ->willReturn(true);
 
         return [
             $valid->validatedBy() => $this->createMock(ConstraintValidatorInterface::class),
@@ -142,7 +136,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    public function testBindValidDataShouldBindCorrectDataExceptPassword()
+    public function testBindValidDataShouldBindCorrectDataExceptPassword(): void
     {
         $formData =
         [
@@ -184,7 +178,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         self::assertEquals(self::TEST_PASSWORD, $this->encryptor->decryptData($entity->getPassword()));
     }
 
-    public function testBindValidDataShouldNotCreateEmptyEntity()
+    public function testBindValidDataShouldNotCreateEmptyEntity(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
@@ -205,8 +199,11 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider setFolderDataProvider
      */
-    public function testBindValidFolderData(string|array|null $foldersForm, ?array $folders, int $expectedFoldersCount)
-    {
+    public function testBindValidFolderData(
+        string|array|null $foldersForm,
+        ?array $folders,
+        int $expectedFoldersCount
+    ): void {
         $formData = [
             'imapHost' => 'someHost',
             'imapPort' => '123',
@@ -271,7 +268,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /**
      * If submitted empty password, it should be populated from old entity
      */
-    public function testBindEmptyPassword()
+    public function testBindEmptyPassword(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
@@ -300,7 +297,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      * In case when user or host field was changed new configuration should be created
      * and old one will be not active.
      */
-    public function testCreatingNewConfiguration()
+    public function testCreatingNewConfiguration(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
@@ -334,7 +331,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      * In case when user or host field was changed new configuration should NOT be created if imap and smtp
      * are inactive.
      */
-    public function testNotCreatingNewConfigurationWhenImapInactive()
+    public function testNotCreatingNewConfigurationWhenImapInactive(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
@@ -364,10 +361,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * Case when user submit empty form but have configuration
-     * configuration should be not active and relation should be broken
+     * Case when user submit empty form but have configuration.
+     * Configuration should be not active and relation should be broken
      */
-    public function testSubmitEmptyForm()
+    public function testSubmitEmptyForm(): void
     {
         $form = $this->factory->create(ConfigurationType::class);
 
@@ -397,7 +394,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider submitDataProvider
      */
-    public function testSubmit(array $submitData, bool $expectedValid)
+    public function testSubmit(array $submitData, bool $expectedValid): void
     {
         $form = $this->factory->create(ConfigurationType::class);
         $form->submit($submitData);
@@ -430,26 +427,26 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         ];
 
         return [
-            'use imap disabled, use stmp disabled' => [
+            'use imap disabled, use smtp disabled' => [
                 'submitData' => array_merge($config, ['useImap' => false, 'useSmtp' => false]),
                 'expectedValid' => true,
             ],
-            'use imap disabled, use stmp enabled' => [
+            'use imap disabled, use smtp enabled' => [
                 'submitData' => array_merge($config, ['useImap' => false, 'useSmtp' => true]),
                 'expectedValid' => true,
             ],
-            'use imap enabled, use stmp enabled' => [
+            'use imap enabled, use smtp enabled' => [
                 'submitData' => array_merge($config, ['useImap' => true, 'useSmtp' => true]),
                 'expectedValid' => false,
             ],
-            'use imap enabled, use stmp disabled' => [
+            'use imap enabled, use smtp disabled' => [
                 'submitData' => array_merge($config, ['useImap' => true, 'useSmtp' => false]),
                 'expectedValid' => false,
             ]
         ];
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $type = new ConfigurationType(
             $this->encryptor,

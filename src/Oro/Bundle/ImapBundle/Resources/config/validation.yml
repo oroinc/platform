@@ -1,6 +1,6 @@
 Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
     constraints:
-        - Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration: { groups: [SmtpConnection] }
+        - Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration: { groups: [SmtpConnection] }
         - Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration: { groups: [ImapConnection] }
     properties:
         imapHost:

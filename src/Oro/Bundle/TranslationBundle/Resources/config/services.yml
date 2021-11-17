@@ -94,8 +94,8 @@ services:
             - [setNamespace, [ 'oro_trans' ] ]
 
     oro_translation.resource.cache:
+        parent: oro_cache.array_cache
         public: false
-        class: Doctrine\Common\Cache\ArrayCache
 
     oro_translation.cache.translation_cache_warmer:
         class: Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer

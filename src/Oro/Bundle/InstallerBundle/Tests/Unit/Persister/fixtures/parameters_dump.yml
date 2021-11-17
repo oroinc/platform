@@ -6,12 +6,7 @@ parameters:
     database_user: oro_db_user
     database_password: oro_db_pass
     database_driver_options: { 9223372036854775807: const_as_key, const_as_value: 9223372036854775807}
-    mailer_transport: null
-    mailer_host: null
-    mailer_port: null
-    mailer_encryption: null
-    mailer_user: null
-    mailer_password: null
+    mailer_dsn: null://null
     websocket_bind_address: 0.0.0.0
     websocket_bind_port: 8080
     websocket_frontend_host: null

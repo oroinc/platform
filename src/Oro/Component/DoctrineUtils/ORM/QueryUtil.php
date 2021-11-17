@@ -158,9 +158,7 @@ class QueryUtil
         // we have to call the private _parse() method to be able to use the query cache
         // and as result avoid unneeded query parsing when the parse result is already cached
         $parseClosure = \Closure::bind(
-            function ($query) {
-                return $query->_parse();
-            },
+            fn (Query $query) => $query->parse(),
             null,
             $query
         );

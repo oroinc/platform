@@ -70,11 +70,12 @@ For example, you can build a backend module to activate maintenance mode.
 In your controller:
 
     $driver = $this->get('oro_maintenance.driver.factory')->getDriver();
-    $message = "";
     if ($action === 'lock') {
-        $message = $driver->getMessageLock($driver->lock());
+        $isLocked = $driver->lock();
+        $message = $isLocked ? 'Maintenance mode on' : 'Failed to turn on maintenance mode';
     } else {
-        $message = $driver->getMessageUnlock($driver->unlock());
+        $isUnlocked = $driver->unlock();
+        $message = $isUnlocked ? 'Maintenance mode off' : 'Failed to turn off maintenance mode';
     }
 
     $this->get('request_stack')->getSession()->setFlash('maintenance', $message);

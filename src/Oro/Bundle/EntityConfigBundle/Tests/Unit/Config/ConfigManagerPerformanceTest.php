@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\UnitOfWork;
@@ -21,6 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -34,6 +34,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
 {
+    use CacheTrait;
+
     private const ENABLE_TESTS = false;
     private const ENABLE_ASSERTS = true;
     private const SHOW_DURATIONS = true;
@@ -428,7 +430,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
             $this->createMock(MetadataFactory::class),
             new ConfigModelManager($doctrine, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
-            new ConfigCache(new ArrayCache(), new ArrayCache(), ['test' => 'test'])
+            new ConfigCache($this->getArrayCache(), $this->getArrayCache(), ['test' => 'test'])
         );
     }
 

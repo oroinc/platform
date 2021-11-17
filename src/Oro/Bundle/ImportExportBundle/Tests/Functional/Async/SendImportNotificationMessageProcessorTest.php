@@ -94,10 +94,9 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                 ],
             ],
             [
-                'sender' => From::emailAddress($this->emailNotificationSenderEmail, $this->emailNotificationSenderName)
-                    ->toArray(),
-                'toEmail' => 'admin@example.com',
-                'body' => [
+                'from' => From::emailAddress($this->emailNotificationSenderEmail, $this->emailNotificationSenderName)
+                    ->toString(),
+                'templateParams' => [
                     'data' => [
                         'hasError' => false,
                         'successParts' => 2,
@@ -159,10 +158,9 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                 ],
             ],
             [
-                'sender' => From::emailAddress($this->emailNotificationSenderEmail, $this->emailNotificationSenderName)
-                    ->toArray(),
-                'toEmail' => 'admin@example.com',
-                'body' => [
+                'from' => From::emailAddress($this->emailNotificationSenderEmail, $this->emailNotificationSenderName)
+                    ->toString(),
+                'templateParams' => [
                     'data' => [
                         'hasError' => true,
                         'successParts' => 2,
@@ -230,9 +228,9 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
 
         $url = self::getConfigManager('user')->get('oro_ui.application_url') .
             $this->getRouter()->generate('oro_importexport_job_error_log', ['jobId' => $rootJob->getId()]);
-        $notificationExpectedMessage['body']['data']['downloadLogUrl'] = $url;
+        $notificationExpectedMessage['templateParams']['data']['downloadLogUrl'] = $url;
 
-        $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL, $notificationExpectedMessage);
+        $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $notificationExpectedMessage);
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 

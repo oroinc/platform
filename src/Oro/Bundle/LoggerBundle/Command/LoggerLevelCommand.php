@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -14,6 +13,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Temporarily changes the configured logging level.
@@ -25,7 +25,7 @@ class LoggerLevelCommand extends Command
 
     private ConfigManager $globalConfigManager;
     private ConfigManager $userConfigManager;
-    private CacheProvider $cache;
+    private CacheInterface $cache;
     private UserManager $userManager;
 
     protected static array $loggingLevels = [
@@ -42,7 +42,7 @@ class LoggerLevelCommand extends Command
     public function __construct(
         ConfigManager $globalConfigManager,
         ConfigManager $userConfigManager,
-        CacheProvider $cache,
+        CacheInterface $cache,
         UserManager $userManager
     ) {
         parent::__construct();
@@ -103,9 +103,7 @@ HELP
 
         $configManager->flush();
 
-        if ($this->cache->contains(Configuration::LOGS_LEVEL_KEY)) {
-            $this->cache->delete(Configuration::LOGS_LEVEL_KEY);
-        }
+        $this->cache->delete(Configuration::LOGS_LEVEL_KEY);
 
         if ($user) {
             $message = sprintf(

@@ -1,0 +1,16 @@
+services:
+    oro_email.mailer.transport.user_email_origin:
+        class: Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransportFactory
+        arguments:
+            - '@mailer.transport_factory'
+            - '@doctrine'
+            - '@oro_email.mailer.dsn_from_user_email_origin_factory'
+            - '@?request_stack'
+        tags:
+            - { name: mailer.transport_factory }
+
+    oro_email.mailer.dsn_from_user_email_origin_factory:
+        class: Oro\Bundle\ImapBundle\Mailer\Transport\DsnFromUserEmailOriginFactory
+        arguments:
+            - '@oro_security.encoder.default'
+            - '@oro_imap.oauth_manager_registry'

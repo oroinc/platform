@@ -75,9 +75,9 @@ class EmailController extends AbstractController
         $smtpSettings = SmtpSettingsFactory::createFromRequest($request);
         $smtpSettingsChecker = $this->get(SmtpSettingsChecker::class);
 
-        return new JsonResponse(
-            $smtpSettingsChecker->checkConnection($smtpSettings)
-        );
+        $smtpSettingsChecker->checkConnection($smtpSettings, $error);
+
+        return new JsonResponse($error ?? '');
     }
 
     /**
@@ -94,9 +94,9 @@ class EmailController extends AbstractController
         $smtpSettings = $settingsProvider->getSmtpSettings($scopeIdentifier);
         $smtpSettingsChecker = $this->get(SmtpSettingsChecker::class);
 
-        return new JsonResponse(
-            $smtpSettingsChecker->checkConnection($smtpSettings)
-        );
+        $smtpSettingsChecker->checkConnection($smtpSettings, $error);
+
+        return new JsonResponse($error ?? '');
     }
 
     /**

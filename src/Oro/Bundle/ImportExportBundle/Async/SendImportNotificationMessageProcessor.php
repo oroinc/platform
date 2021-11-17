@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -50,11 +48,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      */
     private $doctrine;
 
-    /**
-     * @var int
-     */
-    private $recipientUserId;
-
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,
@@ -82,7 +75,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
 
-        if (! ($job = $this->getJobRepository()->findJobById((int)$body['rootImportJobId']))) {
+        if (! ($job = $this->doctrine->getRepository(Job::class)->findJobById((int)$body['rootImportJobId']))) {
             $this->logger->critical('Job not found');
 
             return self::REJECT;
@@ -96,7 +89,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
 
             return self::REJECT;
         }
-        $this->recipientUserId = $user->getId();
 
         switch ($body['process']) {
             case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
@@ -109,41 +101,26 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
                 throw new NotSupportedException(
                     sprintf('Not found template for "%s" process of Import', $body['process'])
                 );
-                break;
         }
 
-        $data = $this->importJobSummaryResultService
-            ->getSummaryResultForNotification($job, $body['originFileName']);
+        $summary = $this->importJobSummaryResultService->getSummaryResultForNotification($job, $body['originFileName']);
 
-        $this->sendNotification($user->getEmail(), $template, $data);
+        $this->sendNotification($user->getId(), $template, $summary);
 
         return self::ACK;
     }
 
-    /**
-     * @param string $toEmail
-     * @param string $template
-     * @param array $body
-     */
-    protected function sendNotification($toEmail, $template, array $body)
+    private function sendNotification(int $userId, string $template, array $templateParams): void
     {
-        $sender = $this->notificationSettings->getSender();
         $message = [
-            'sender' => $sender->toArray(),
-            'toEmail' => $toEmail,
-            'body' => $body,
+            'from' => $this->notificationSettings->getSender()->toString(),
+            'recipientUserId' => $userId,
             'contentType' => 'text/html',
             'template' => $template,
+            'templateParams' => $templateParams,
         ];
 
-        if ($this->recipientUserId) {
-            $message['recipientUserId'] = $this->recipientUserId;
-        }
-
-        $this->producer->send(
-            NotificationTopics::SEND_NOTIFICATION_EMAIL,
-            $message
-        );
+        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $message);
 
         $this->logger->info('Sent notification message.');
     }
@@ -154,13 +131,5 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     public static function getSubscribedTopics()
     {
         return [Topics::SEND_IMPORT_NOTIFICATION];
-    }
-
-    /**
-     * @return JobRepository|EntityRepository
-     */
-    private function getJobRepository(): JobRepository
-    {
-        return $this->doctrine->getManagerForClass(Job::class)->getRepository(Job::class);
     }
 }

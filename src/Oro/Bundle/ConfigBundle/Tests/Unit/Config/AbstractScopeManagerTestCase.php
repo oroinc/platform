@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,6 +11,7 @@ use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    use EntityTrait, CacheTrait;
 
     /** @var AbstractScopeManager */
     protected $manager;
@@ -58,7 +58,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->with(Config::class)
             ->willReturn($this->em);
 
-        $this->cache = new ArrayCache();
+        $this->cache = $this->getArrayCache();
 
         $this->dispatcher = $this->createMock(EventDispatcher::class);
         $this->configBag = $this->createMock(ConfigBag::class);

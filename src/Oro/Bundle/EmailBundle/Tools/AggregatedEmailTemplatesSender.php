@@ -2,64 +2,61 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
-use Doctrine\ORM\EntityNotFoundException;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
+use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
- * Sends emails based on passed aggregated templates.
+ * Sends localized emails to specified recipients using specified email template.
+ * Creates {@see EmailUser} entities.
  */
 class AggregatedEmailTemplatesSender implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /** @var LocalizedTemplateProvider */
-    private $localizedTemplateProvider;
+    private LocalizedTemplateProvider $localizedTemplateProvider;
 
-    /** @var EmailOriginHelper */
-    private $emailOriginHelper;
+    private EmailOriginHelper $emailOriginHelper;
 
-    /** @var Processor */
-    private $emailProcessor;
+    private EmailModelSender $emailModelSender;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizedTemplateProvider $localizedTemplateProvider,
         EmailOriginHelper $emailOriginHelper,
-        Processor $emailProcessor
+        EmailModelSender $emailModelSender
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->localizedTemplateProvider = $localizedTemplateProvider;
         $this->emailOriginHelper = $emailOriginHelper;
-        $this->emailProcessor = $emailProcessor;
+        $this->emailModelSender = $emailModelSender;
     }
 
     /**
      * @param object $entity
      * @param EmailHolderInterface[] $recipients
-     * @param string $from
+     * @param From $from
      * @param string $templateName
      * @param array $templateParams
      * @return EmailUser[]
      *
-     * @throws EntityNotFoundException if the specified email template cannot be found
+     * @throws \Doctrine\ORM\EntityNotFoundException If the specified email template cannot be found
      * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
      */
     public function send(
         object $entity,
         array $recipients,
-        string $from,
+        From $from,
         string $templateName,
         array $templateParams = []
     ): array {
@@ -74,7 +71,7 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
             $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
 
             $emailModel = new Email();
-            $emailModel->setFrom($from);
+            $emailModel->setFrom($from->toString());
             $emailModel->setTo($localizedTemplateDTO->getEmails());
             $emailModel->setSubject($emailTemplate->getSubject());
             $emailModel->setBody($emailTemplate->getContent());
@@ -86,9 +83,18 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
                     $emailModel->getOrganization()
                 );
 
-                $emailUsers[] = $this->emailProcessor->process($emailModel, $emailOrigin);
-            } catch (\Swift_SwiftException $exception) {
-                $this->logger->error('Workflow send email template action.', ['exception' => $exception]);
+                $emailUsers[] = $this->emailModelSender->send($emailModel, $emailOrigin);
+            } catch (\RuntimeException $exception) {
+                $this->logger->error(
+                    sprintf(
+                        'Failed to send an email to %s using "%s" email template for "%s" entity: %s',
+                        implode(', ', (array)$emailModel->getTo()),
+                        $templateName,
+                        get_debug_type($entity),
+                        $exception->getMessage()
+                    ),
+                    ['exception' => $exception]
+                );
             }
         }
 

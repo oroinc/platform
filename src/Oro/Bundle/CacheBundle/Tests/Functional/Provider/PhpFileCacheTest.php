@@ -17,19 +17,17 @@ class PhpFileCacheTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->provider = new PhpFileCache($this->getTempDir('oro_cache'));
+        $this->provider = new PhpFileCache('test_namespace', 0, $this->getTempDir('oro_cache'));
     }
 
     public function testObjectNotImplementsSetState()
     {
         $cacheData = new \stdClass();
-        $cacheId = 'test';
-
-        $this->provider->save($cacheId, $cacheData);
-
-        $fetchedData = $this->provider->fetch($cacheId);
-
-        $this->assertTrue($this->provider->contains($cacheId));
+        $cacheId = 'test1';
+        $fetchedData = $this->provider->get($cacheId, function ($item) {
+            $item->set(new \stdClass());
+            return $item->get();
+        });
         $this->assertEquals($cacheData, $fetchedData);
     }
 
@@ -37,13 +35,11 @@ class PhpFileCacheTest extends \PHPUnit\Framework\TestCase
     {
         $data = [1,2,3];
         $cacheData = new SetStateClassStub($data);
-        $cacheId = 'test';
-
-        $this->provider->save($cacheId, $cacheData, 100);
-
-        $fetchedData = $this->provider->fetch($cacheId);
-
-        $this->assertTrue($this->provider->contains($cacheId));
+        $cacheId = 'test2';
+        $fetchedData = $this->provider->get($cacheId, function ($item) use ($cacheData) {
+            $item->set($cacheData);
+            return $item->get();
+        });
         $this->assertEquals($cacheData, $fetchedData);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\MaintenanceBundle\Drivers;
 
-use Symfony\Contracts\Translation\TranslatorInterface;
-
 /**
  * Abstract class for drivers
  *
@@ -13,56 +11,26 @@ abstract class AbstractDriver
 {
     protected array $options;
 
-    protected TranslatorInterface $translator;
-
     public function __construct(array $options = [])
     {
         $this->options = $options;
     }
 
-    public function setTranslator(TranslatorInterface $translator): self
-    {
-        $this->translator = $translator;
-
-        return $this;
-    }
-
     /**
-     * Test if object exists
+     * Test if lock exists
      */
     abstract public function isExists(): bool;
 
     /**
-     * Result of creation of lock
+     * Result of locking
      */
     abstract protected function createLock(): bool;
 
     /**
-     * Result of create unlock
+     * Result of unlocking
      */
     abstract protected function createUnlock(): bool;
 
-    /**
-     * The feedback message
-     *
-     * @param bool $resultTest The result of lock
-     *
-     * @return string
-     */
-    abstract public function getMessageLock(bool $resultTest): string;
-
-    /**
-     * The feedback message
-     *
-     * @param bool $resultTest The result of unlock
-     *
-     * @return string
-     */
-    abstract public function getMessageUnlock(bool $resultTest): string;
-
-    /**
-     * The response of lock
-     */
     public function lock(): bool
     {
         if (!$this->isExists()) {
@@ -72,9 +40,6 @@ abstract class AbstractDriver
         return false;
     }
 
-    /**
-     * The response of unlock
-     */
     public function unlock(): bool
     {
         if ($this->isExists()) {

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 
-use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
@@ -15,7 +15,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -74,18 +73,10 @@ class SegmentManagerTest extends WebTestCase
         $this->getSegmentQueryConverterCache()->deleteAll();
     }
 
-    private function clearSegmentQueryConverterCacheStats(): void
-    {
-        $cache = $this->getSegmentQueryConverterCache();
-        // unfortunately the reflection is only way to reset the cache stats
-        ReflectionUtil::setPropertyValue($cache, 'hitsCount', 0);
-        ReflectionUtil::setPropertyValue($cache, 'missesCount', 0);
-    }
-
-    private function getSegmentQueryConverterCache(): ArrayCache
+    private function getSegmentQueryConverterCache(): Cache
     {
         $cache = self::getContainer()->get('oro_segment.query.segment_query_cache');
-        self::assertInstanceOf(ArrayCache::class, $cache, 'These tests can work only with ArrayCache.');
+        self::assertInstanceOf(Cache::class, $cache, 'These tests can work only with ArrayCache.');
 
         return $cache;
     }
@@ -112,36 +103,32 @@ class SegmentManagerTest extends WebTestCase
         return $this->getReference($reference);
     }
 
+    private function isSegmentCached(Segment $segment): bool
+    {
+        $cacheKey = 'segment_query_' . $segment->getId();
+        return $this->getSegmentQueryConverterCache()->contains($cacheKey);
+    }
+
     private function assertGetSegmentQueryBuilder(
         Segment $segment,
         string $expectedSql = null,
         array $firstTryCacheStats = null,
         array $secondTryCacheStats = null
     ): void {
-        $this->clearSegmentQueryConverterCacheStats();
+        $this->clearSegmentQueryConverterCache();
+        if ($firstTryCacheStats) {
+            self::assertFalse($this->isSegmentCached($segment));
+        }
         $qb = $this->manager->getSegmentQueryBuilder($segment);
         $sql = $qb->getQuery()->getSQL();
         if ($expectedSql) {
             self::assertEquals($expectedSql, $sql, 'SQL - First Try');
         }
-        if ($firstTryCacheStats) {
-            self::assertEquals(
-                $firstTryCacheStats,
-                array_intersect_key($this->getSegmentQueryConverterCache()->getStats(), $firstTryCacheStats),
-                'Cache Stats - First Try'
-            );
-        }
-
         // do get the segment query builder one more time to ensure that it returns the same query
-        $this->clearSegmentQueryConverterCacheStats();
         $qb = $this->manager->getSegmentQueryBuilder($segment);
         self::assertEquals($sql, $qb->getQuery()->getSQL(), 'SQL - Second Try');
         if ($secondTryCacheStats) {
-            self::assertEquals(
-                $secondTryCacheStats,
-                array_intersect_key($this->getSegmentQueryConverterCache()->getStats(), $secondTryCacheStats),
-                'Cache Stats - Second Try'
-            );
+            self::assertTrue($this->isSegmentCached($segment));
         }
     }
 

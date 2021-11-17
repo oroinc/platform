@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
-use Oro\Bundle\CacheBundle\Provider\ArrayCache;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -13,6 +13,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class DatagridTest extends \PHPUnit\Framework\TestCase
 {
@@ -105,7 +106,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
             ->willReturnOnConsecutiveCalls($rows1, $rows2);
 
         $cacheCallCounter = 0;
-        $cache = new ArrayCache();
+        $cache = DoctrineProvider::wrap(new ArrayAdapter(0, false));
         $this->memoryCacheProvider->expects($this->exactly(3))
             ->method('get')
             ->willReturnCallback(function ($arguments, $callback) use (&$cacheCallCounter, $cache) {

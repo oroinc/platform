@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
+    use CacheTrait;
+
     /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerLoader;
 
@@ -23,7 +25,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $this->cachingLoader = new CachingTranslationLoader(
             $this->innerLoader,
-            new ArrayCache()
+            $this->getArrayCache()
         );
     }
 

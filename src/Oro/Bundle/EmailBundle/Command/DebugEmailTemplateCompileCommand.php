@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\EmailBundle\Command;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Console\Command\Command;
@@ -12,11 +11,13 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Render an email template, use the command below.
- * Optionally, it can send a compiled email to the recipient's email address.
+ * Renders an email template.
+ * Optionally, sends a compiled email to the email address specified in the "recipient" option.
  */
 class DebugEmailTemplateCompileCommand extends Command
 {
@@ -28,31 +29,31 @@ class DebugEmailTemplateCompileCommand extends Command
     /**
      * @var string
      */
-    protected static $defaultDescription = 'render an email template, use the command below.'
-    . ' Optionally, it can send a compiled email to the recipient\'s email address.';
+    protected static $defaultDescription = 'Renders an email template.'
+    . ' Optionally, sends a compiled email to the email address specified in the "recipient" option.';
 
     private DoctrineHelper $doctrineHelper;
 
     private EmailRenderer $emailRenderer;
 
-    private Processor $emailProcessor;
+    private MailerInterface $mailer;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EmailRenderer $emailRenderer,
-        Processor $emailProcessor
+        MailerInterface $mailer
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->emailRenderer = $emailRenderer;
-        $this->emailProcessor = $emailProcessor;
+        $this->mailer = $mailer;
 
         parent::__construct();
     }
 
     /**
-     * {@internal doc}
+     * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument(
@@ -84,7 +85,7 @@ class DebugEmailTemplateCompileCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $templateName = $input->getArgument('template');
 
@@ -112,20 +113,23 @@ class DebugEmailTemplateCompileCommand extends Command
             $output->writeln('BODY:');
             $output->writeln($body);
         } else {
-            $emailMessage = new \Swift_Message(
-                $subject,
-                $body,
-                $template->getType() === 'html' ? 'text/html' : null
-            );
+            $emailMessage = (new Email())
+                ->subject($subject);
 
-            $emailMessage->setFrom($input->getOption('recipient'));
-            $emailMessage->setTo($input->getOption('recipient'));
+            if ($template->getType() === 'html') {
+                $emailMessage->html($body);
+            } else {
+                $emailMessage->text($body);
+            }
+
+            $emailMessage->from($input->getOption('recipient'));
+            $emailMessage->to($input->getOption('recipient'));
 
             try {
-                $this->emailProcessor->processSend($emailMessage, null);
-                $output->writeln(sprintf('Message successfully send to "%s"', $input->getOption('recipient')));
-            } catch (\Swift_SwiftException $e) {
-                $output->writeln(sprintf('Message not sent due error "%s"', $e->getMessage()));
+                $this->mailer->send($emailMessage);
+                $output->writeln(sprintf('Message was successfully sent to "%s"', $input->getOption('recipient')));
+            } catch (\RuntimeException $e) {
+                $output->writeln(sprintf('Message was not sent due to error: "%s"', $e->getMessage()));
             }
         }
 

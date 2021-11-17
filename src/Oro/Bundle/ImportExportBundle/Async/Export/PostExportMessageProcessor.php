@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
@@ -16,7 +15,6 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
-use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -62,11 +60,6 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     private $notificationSettings;
 
-    /**
-     * @var int
-     */
-    private $recipientUserId;
-
     public function __construct(
         ExportHandler $exportHandler,
         MessageProducerInterface $producer,
@@ -97,10 +90,12 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             $body['jobName'],
             $body['exportType'],
             $body['outputFormat'],
-            $body['email'],
+            $body['recipientUserId'],
             $body['entity']
         )) {
             $this->logger->critical('Invalid message');
+
+            return self::REJECT;
         }
 
         if (!($job = $this->getJobRepository()->findJobById((int)$body['jobId']))) {
@@ -139,8 +134,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
 
             $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
-            $this->recipientUserId = $body['recipientUserId'] ?? null;
-            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
+            $this->sendEmailNotification($body['recipientUserId'], $summary, $body['notificationTemplate'] ?? '');
 
             $this->producer->send(
                 Topics::SAVE_IMPORT_EXPORT_RESULT,
@@ -163,39 +157,21 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         return [Topics::POST_EXPORT];
     }
 
-    /**
-     * @param string $toEmail
-     * @param array $summary
-     * @param string $notificationTemplate
-     *
-     * @throws Exception
-     */
-    protected function sendEmailNotification($toEmail, array $summary, $notificationTemplate = null)
+    private function sendEmailNotification(int $recipientUserId, array $summary, string $templateName = ''): void
     {
-        $sender = $this->notificationSettings->getSender();
         $message = [
-            'sender' => $sender->toArray(),
-            'toEmail' => $toEmail,
-            'body' => $summary,
+            'from' => $this->notificationSettings->getSender()->toString(),
+            'recipientUserId' => $recipientUserId,
             'contentType' => 'text/html',
-            'template' => $notificationTemplate ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'template' => $templateName ?: ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'templateParams' => $summary,
         ];
 
-        if ($this->recipientUserId) {
-            $message['recipientUserId'] = $this->recipientUserId;
-        }
-
-        $this->producer->send(
-            NotificationTopics::SEND_NOTIFICATION_EMAIL,
-            $message
-        );
+        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $message);
 
         $this->logger->info('Sent notification email.');
     }
 
-    /**
-     * @return JobRepository|EntityRepository
-     */
     private function getJobRepository(): JobRepository
     {
         return $this->doctrineHelper->getEntityRepository(Job::class);

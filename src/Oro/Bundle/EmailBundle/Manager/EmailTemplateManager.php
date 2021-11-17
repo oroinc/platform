@@ -2,51 +2,55 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInSymfonyEmailHandler;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Model\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email as SymfonyEmail;
 
 /**
  * Responsible for sending email templates in preferred recipient's language when recipient entities given or in
  * a specific language to a set of email addresses.
  */
-class EmailTemplateManager
+class EmailTemplateManager implements LoggerAwareInterface
 {
-    /** @var \Swift_Mailer */
-    private $mailer;
+    use LoggerAwareTrait;
 
-    /** @var Processor */
-    private $mailerProcessor;
+    private MailerInterface $mailer;
 
-    /** @var LocalizedTemplateProvider */
-    private $localizedTemplateProvider;
+    private EmbeddedImagesInSymfonyEmailHandler $embeddedImagesHandler;
+
+    private LocalizedTemplateProvider $localizedTemplateProvider;
 
     public function __construct(
-        \Swift_Mailer $mailer,
-        Processor $mailerProcessor,
+        MailerInterface $mailer,
+        EmbeddedImagesInSymfonyEmailHandler $embeddedImagesInSymfonyEmailHandler,
         LocalizedTemplateProvider $localizedTemplateProvider
     ) {
         $this->mailer = $mailer;
-        $this->mailerProcessor = $mailerProcessor;
+        $this->embeddedImagesHandler = $embeddedImagesInSymfonyEmailHandler;
         $this->localizedTemplateProvider = $localizedTemplateProvider;
+        $this->logger = new NullLogger();
     }
 
     /**
-     * @param From $sender
-     * @param iterable|EmailHolderInterface[] $recipients
+     * @param From $from
+     * @param iterable<EmailHolderInterface> $recipients
      * @param EmailTemplateCriteria $criteria
      * @param array $templateParams
-     * @param null|array $failedRecipients
      * @return int
      */
     public function sendTemplateEmail(
-        From $sender,
+        From $from,
         iterable $recipients,
         EmailTemplateCriteria $criteria,
-        array $templateParams = [],
-        &$failedRecipients = null
+        array $templateParams = []
     ): int {
         $sent = 0;
         $templateCollection = $this->localizedTemplateProvider->getAggregated($recipients, $criteria, $templateParams);
@@ -54,20 +58,36 @@ class EmailTemplateManager
         foreach ($templateCollection as $localizedTemplateDTO) {
             $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
 
-            $message = new \Swift_Message();
-            $message->setSubject($emailTemplate->getSubject());
-            $message->setBody($emailTemplate->getContent());
-            $message->setContentType($emailTemplate->getType());
+            $symfonyEmail = (new SymfonyEmail())
+                ->from($from->toString())
+                ->subject($emailTemplate->getSubject());
 
-            $sender->populate($message);
+            if ($emailTemplate->getType() === EmailTemplate::CONTENT_TYPE_HTML) {
+                $symfonyEmail->html($emailTemplate->getContent());
 
-            $this->mailerProcessor->processEmbeddedImages($message);
+                $this->embeddedImagesHandler->handleEmbeddedImages($symfonyEmail);
+            } else {
+                $symfonyEmail->text($emailTemplate->getContent());
+            }
 
             foreach ($localizedTemplateDTO->getRecipients() as $recipient) {
-                $messageToSend = clone $message;
-                $messageToSend->setTo($recipient->getEmail());
+                $messageToSend = clone $symfonyEmail;
+                $messageToSend->to($recipient->getEmail());
 
-                $sent += $this->mailer->send($messageToSend, $failedRecipients);
+                try {
+                    $this->mailer->send($messageToSend);
+                    $sent++;
+                } catch (\RuntimeException $exception) {
+                    $this->logger->error(
+                        sprintf(
+                            'Failed to send an email to "%s" using "%s" email template: %s',
+                            $recipient->getEmail(),
+                            $criteria->getName(),
+                            $exception->getMessage()
+                        ),
+                        ['exception' => $exception, 'criteria' => $criteria]
+                    );
+                }
             }
         }
 

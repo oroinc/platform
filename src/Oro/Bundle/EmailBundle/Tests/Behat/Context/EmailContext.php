@@ -15,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTra
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Assets email messages received from Oro application over SMTP
+ * Asserts email messages received from Oro application over SMTP
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -395,7 +395,11 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         }
 
         throw new \LogicException(
-            sprintf('Email field %s not found. Available fields are ', $fieldName, implode(', ', array_keys($message)))
+            sprintf(
+                'Email field %s not found. Available fields are %s',
+                $fieldName,
+                implode(', ', array_keys($message))
+            )
         );
     }
 
@@ -456,13 +460,11 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         /** @var EmailTemplateManager $emailTemplateManager */
         $emailTemplateManager = $this->getAppContainer()->get('oro_email.manager.template_email');
 
-        $failedRecipients = [];
         $emailTemplateManager->sendTemplateEmail(
             From::emailAddress('no-reply@example.com'),
             [$recipient],
             new EmailTemplateCriteria($templateName),
-            [],
-            $failedRecipients
+            []
         );
 
         // Doctrine is caching email templates and after change template data not perform that changes in behat thread

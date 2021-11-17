@@ -10,13 +10,12 @@ use Symfony\Component\Validator\Constraint;
  */
 class SmtpConnectionConfiguration extends Constraint
 {
-    /** @var string */
-    public $message = 'oro.email.validator.configuration.connection.smtp';
+    public string $message = 'oro.email.validator.configuration.connection.smtp';
 
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return SmtpConnectionConfigurationValidator::class;
     }
@@ -24,7 +23,7 @@ class SmtpConnectionConfiguration extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }

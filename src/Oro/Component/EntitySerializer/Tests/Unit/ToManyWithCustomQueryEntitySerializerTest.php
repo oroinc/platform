@@ -39,8 +39,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             . ' FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u1_.id AND g3_.id IN (g0_.id)) AND u1_.category_name = ?)'
+            . ' WHERE r2_.user_id = u1_.id AND r2_.user_group_id IN (g0_.id)) AND u1_.category_name = ?)'
             . ' WHERE g0_.id IN (?, ?)',
             [
                 [
@@ -137,15 +136,13 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             . '(SELECT g0_.id AS id_0, u1_.id AS id_1 FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u1_.id AND g3_.id IN (g0_.id)) AND u1_.category_name = 1)'
+            . ' WHERE r2_.user_id = u1_.id AND r2_.user_group_id IN (g0_.id)) AND u1_.category_name = 1)'
             . ' WHERE g0_.id = 123 LIMIT 5) '
             . 'UNION ALL '
             . '(SELECT g0_.id AS id_0, u1_.id AS id_1 FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u1_.id AND g3_.id IN (g0_.id)) AND u1_.category_name = 1)'
+            . ' WHERE r2_.user_id = u1_.id AND r2_.user_group_id IN (g0_.id)) AND u1_.category_name = 1)'
             . ' WHERE g0_.id = 456 LIMIT 5)'
             . ') entity',
             [
@@ -241,8 +238,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             . ' FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u1_.id AND g3_.id IN (g0_.id)) AND u1_.category_name = ?)'
+            . ' WHERE r2_.user_id = u1_.id AND r2_.user_group_id IN (g0_.id)) AND u1_.category_name = ?)'
             . ' WHERE g0_.id IN (?, ?)',
             [
                 [
@@ -342,15 +338,13 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             . '(SELECT g0_.id AS id_0, u1_.id AS id_1 FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u1_.id AND g3_.id IN (g0_.id)) AND u1_.category_name = 1)'
+            . ' WHERE r2_.user_id = u1_.id AND r2_.user_group_id IN (g0_.id)) AND u1_.category_name = 1)'
             . ' WHERE g0_.id = 123 LIMIT 5) '
             . 'UNION ALL '
             . '(SELECT g0_.id AS id_0, u1_.id AS id_1 FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u1_.id AND g3_.id IN (g0_.id)) AND u1_.category_name = 1)'
+            . ' WHERE r2_.user_id = u1_.id AND r2_.user_group_id IN (g0_.id)) AND u1_.category_name = 1)'
             . ' WHERE g0_.id = 456 LIMIT 5)'
             . ') entity',
             [

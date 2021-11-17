@@ -12,7 +12,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -236,7 +236,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->dependentJob->saveDependentJob($context);
     }
 
-    protected function sendErrorNotification(array $body, string $error): void
+    private function sendErrorNotification(array $body, string $error): void
     {
         $errorMessage = sprintf(
             'An error occurred while reading file %s: "%s"',
@@ -259,19 +259,19 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             return;
         }
 
-        $sender = $this->notificationSettings->getSender();
-        $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [
-            'sender' => $sender->toArray(),
-            'toEmail' => $user->getEmail(),
-            'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
+        $message = [
+            'from' => $this->notificationSettings->getSender()->toString(),
             'recipientUserId' => $user->getId(),
-            'body' => [
+            'contentType' => 'text/html',
+            'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
+            'templateParams' => [
                 'originFileName' => $body['originFileName'],
-                'error' =>  'The import file could not be imported due to a fatal error. ' .
+                'error' => 'The import file could not be imported due to a fatal error. ' .
                     'Please check its integrity and try again!',
             ],
-            'contentType' => 'text/html',
-        ]);
+        ];
+
+        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $message);
     }
 
     /**

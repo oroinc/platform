@@ -1,5 +1,82 @@
 
+## 5.0.0-rc
+
+### Added
+
+#### EmailBundle
+* Added `Oro\Bundle\EmailBundle\Mailer\Mailer` to send `Symfony\Component\Mime\Email` message.
+* Added `Oro\Bundle\EmailBundle\Sender\EmailModelSender` to send `Oro\Bundle\EmailBundle\Form\Model\Email` model.
+* Added `Oro\Bundle\EmailBundle\Mailer\Transport\Transport` decorator that dispatches `Oro\Bundle\EmailBundle\Event\BeforeMessageEvent`
+  and adds extra logging for mailer transports;
+* Added `Oro\Bundle\EmailBundle\Mailer\Transport\LazyTransports` decorator that defers transports instantiation until 
+  method `send()`  is called.
+* Added `Oro\Bundle\EmailBundle\Event\BeforeMessageEvent` event that is dispatched by `Oro\Bundle\EmailBundle\Mailer\Transport\Transport`
+  to allow altering email message and envelope.
+* Added `Oro\Bundle\EmailBundle\Mailer\Envelope\EmailOriginAwareEnvelope` that adds ability to specify `Oro\Bundle\EmailBundle\Entity\EmailOrigin`
+  in the email message envelope.
+* Added `Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportFactory` for `oro://system-config` mailer transport.
+* Added `Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider` for resolving real DSN that lies behind
+  `oro://system-config` DSN.
+* Added `Oro\Bundle\EmailBundle\Mailer\Checker\ConnectionCheckers` that allows to check if the mailer transport connection 
+  specified in the DSN is valid.
+* Added `Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesExtractor`, `Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInEmailModelHandler`,
+  `Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInSymfonyEmailHandler` for extracting and handling embedded images in
+  `Oro\Bundle\EmailBundle\Form\Model\Email` and `Symfony\Component\Mime\Email` models.
+
+#### ImapBundle
+* Added `Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransportFactory` for `oro://user-email-origin` mailer transport.
+* Added `Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransport` to send email messages using SMTP settings 
+  taken from `Oro\Bundle\ImapBundle\Entity\UserEmailOrigin`
+* Added `Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration` and `Oro\Bundle\ImapBundle\Validator\SmtpConnectionConfigurationValidator`
+  for validating SMTP settings taken from `Oro\Bundle\ImapBundle\Entity\UserEmailOrigin`.
+* Added `Oro\Bundle\ImapBundle\EventListener\SetUserEmailOriginTransportListener` for adding `X-Transport` and 
+  `X-User-Email-Origin-Id` headers to email message required to use `oro://user-email-origin` mailer transport.
+
+#### LoggerBundle
+* Added `Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper` monolog handler wrapper to prevent error log
+  notification from being sent when there are no recipients configured.
+
+#### NotificationBundle
+* Added `Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor` for processing MQ messages for sending 
+  email notification messages in a message queue.
+* Added `Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL_TEMPLATE` MQ topic and 
+  `Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor` processor for processing MQ messages 
+  for sending templated email notification messages in a message queue.
+* Added `Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer` for sending mass notification email messages.
+
 ### Changed
+
+### EmailBundle
+* EmailBundle uses Symfony Mailer instead of SwiftMailer from now on.
+* Changed mailer configuration: `mailer_dsn` parameter is used instead of `mailer_transport`, `mailer_host`, `mailer_port`,
+  `mailer_encryption`, `mailer_user`, `mailer_password`.
+
+### Removed
+
+#### EmailBundle
+* Removed `Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender`.
+* Removed `Oro\Bundle\EmailBundle\Event\SendEmailTransport`, use `X-Transport` email message header for configuring 
+  mailer transport. See `Oro\Bundle\ImapBundle\EventListener\SetUserEmailOriginTransportListener`.
+* Removed `Oro\Bundle\EmailBundle\Mailer\DirectMailer`, use `Oro\Bundle\EmailBundle\Mailer\Mailer` instead.
+* Removed `Oro\Bundle\EmailBundle\Mailer\Processor`, use `Oro\Bundle\EmailBundle\Sender\EmailModelSender` instead.
+* Removed unused `Oro\Bundle\EmailBundle\Util\MailerWrapper`.
+* Removed `Oro\Bundle\EmailBundle\Model\DTO\EmailAddressDTO`, use `\Oro\Bundle\EmailBundle\Model\Recipient` instead.
+
+#### ImapBundle
+* Removed `Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener` in favor 
+  of `Oro\Bundle\ImapBundle\EventListener\SetUserEmailOriginTransportListener`.
+
+#### LoggerBundle
+* Removed `Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin` in favor of `Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper`.
+* Removed `Oro\Bundle\LoggerBundle\Mailer\MessageFactory` in favor of `Oro\Bundle\LoggerBundle\Monolog\EmailFactory\ErrorLogNotificationEmailFactory`.
+
+#### NotificationBundle
+* Removed `Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor`. Use `Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor`
+  and `Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor` instead.
+* Removed `Oro\Bundle\NotificationBundle\Async\SendMassEmailMessageProcessor` in favor of `Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor`.
+* Removed `Oro\Bundle\NotificationBundle\Mailer\MassEmailDirectMailer`. Use `Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer` instead.
+* Removed unused `\Oro\Bundle\NotificationBundle\Entity\SpoolItem` entity, `\Oro\Bundle\NotificationBundle\Entity\Repository\SpoolItemRepository`.
+* Removed unused `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool`. 
 
 #### UIBundle
 

@@ -4,7 +4,6 @@ bundles:
     - { name: Symfony\Bundle\AclBundle\AclBundle, priority: -250 }
     - { name: Symfony\Bundle\TwigBundle\TwigBundle, priority: -245 }
     - { name: Symfony\Bundle\MonologBundle\MonologBundle, priority: -240 }
-    - { name: Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle, priority: -235 }
     - { name: Doctrine\Bundle\DoctrineBundle\DoctrineBundle, priority: -225 }
     - { name: Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle, priority: -220 }
     - { name: Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle, priority: -215 }

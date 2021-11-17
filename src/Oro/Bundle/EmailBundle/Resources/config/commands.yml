@@ -31,7 +31,7 @@ services:
         arguments:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
             - '@Oro\Bundle\EmailBundle\Provider\EmailRenderer'
-            - '@Oro\Bundle\EmailBundle\Mailer\Processor'
+            - '@Symfony\Component\Mailer\MailerInterface'
         tags:
             - { name: console.command }
 

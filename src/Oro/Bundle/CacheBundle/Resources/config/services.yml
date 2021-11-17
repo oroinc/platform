@@ -1,4 +1,20 @@
+parameters:
+    oro_cache.array_cache_lifetime: 0
+    oro_cache.array_cache_store_serialized: false
+
+    oro_cache.data_adapter_namespace: ''
+    oro_cache.data_adapter_lifetime: 0
+    oro_cache.data_adapter_directory: '%kernel.cache_dir%/oro_data'
+
 services:
+    oro_cache.data.adapter:
+        public: false
+        class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+        arguments:
+            - '%oro_cache.data_adapter_namespace%'
+            - '%oro_cache.data_adapter_lifetime%'
+            - '%oro_cache.data_adapter_directory%'
+
     oro_cache.oro_data_cache_manager:
         class: Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
         public: true
@@ -112,7 +128,7 @@ services:
         class: Symfony\Component\Cache\Adapter\ArrayAdapter
         shared: false
         arguments:
-            - 0 # $defaultLifetime
+            - '%oro_cache.data_adapter_lifetime%' # $defaultLifetime
             - false # $storeSerialized
 
     oro.cache.provider.memory_cache:
@@ -121,3 +137,13 @@ services:
         arguments:
             - '@oro.cache.generator.universal_cache_key'
             - '@oro.cache.provider.memory_cache.cache'
+
+    oro_cache.array_cache:
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
+        factory: ['Doctrine\Common\Cache\Psr6\DoctrineProvider', 'wrap']
+        arguments:
+            - !service
+                class: Symfony\Component\Cache\Adapter\ArrayAdapter
+                arguments:
+                    - '%oro_cache.array_cache_lifetime%'
+                    - '%oro_cache.array_cache_store_serialized%'

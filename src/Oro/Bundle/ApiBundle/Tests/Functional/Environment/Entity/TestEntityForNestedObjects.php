@@ -94,7 +94,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     /**
      * @var Collection
      *
-     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier", cascade="ALL")
+     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier", cascade={"all"})
      * @ORM\JoinTable(name="test_api_nested_objects_links",
      *      joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="link_id", referencedColumnName="id")}

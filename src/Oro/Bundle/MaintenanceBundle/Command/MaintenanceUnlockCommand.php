@@ -61,16 +61,14 @@ HELP
 
         $driver = $this->driverFactory->getDriver();
 
-        $unlockStatus = $driver->unlock();
-        $message = $driver->getMessageUnlock($unlockStatus);
-        if ($unlockStatus === true) {
+        if ($driver->unlock() === true) {
             $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
-            $io->success($message);
+            $io->success('Maintenance mode is turned off.');
 
             return 0;
         }
 
-        $io->error($message);
+        $io->error('Failed to turn off maintenance mode.');
 
         return 1;
     }

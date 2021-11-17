@@ -2,67 +2,69 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\Form\Type;
 
-use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\Mime\Email as SymfonyEmail;
+use Symfony\Component\Mime\RawMessage;
 
 class UserTypeTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
-    const NAME_PREFIX = 'NamePrefix';
-    const MIDDLE_NAME = 'MiddleName';
-    const NAME_SUFFIX = 'NameSuffix';
-    const FIRST_NAME = 'John';
-    const LAST_NAME = 'Doe';
+    private const NAME_PREFIX = 'NamePrefix';
+    private const MIDDLE_NAME = 'MiddleName';
+    private const NAME_SUFFIX = 'NameSuffix';
+    private const FIRST_NAME = 'John';
+    private const LAST_NAME = 'Doe';
 
     protected function setUp(): void
     {
         $this->initClient(
             [],
-            $this->generateBasicAuthHeader(LoadUserData::SIMPLE_USER, LoadUserData::SIMPLE_USER_PASSWORD)
+            self::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, LoadUserData::SIMPLE_USER_PASSWORD)
         );
         $this->client->useHashNavigation(true);
-        $this->loadFixtures([
-            LoadUserData::class
-        ]);
+        $this->loadFixtures(
+            [
+                LoadUserData::class,
+            ]
+        );
     }
 
     /**
      * @return array
      */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         return [
             'empty password and send password' => [
                 'username' => 'test1',
                 'email' => 'first@example.com',
                 'plainPassword' => '',
-                'sendPassword' => true
+                'sendPassword' => true,
             ],
             'with password and send password' => [
                 'username' => 'test2',
                 'email' => 'second@example.com',
                 'plainPassword' => 'Qwerty!123%$',
-                'sendPassword' => true
+                'sendPassword' => true,
             ],
             'empty password and not send password' => [
                 'username' => 'test3',
                 'email' => 'third@example.com',
                 'plainPassword' => '',
-                'sendPassword' => false
+                'sendPassword' => false,
             ],
             'with password and not send password' => [
                 'username' => 'test4',
                 'email' => 'fourth@example.com',
                 'plainPassword' => 'Qwerty!123%$',
-                'sendPassword' => false
+                'sendPassword' => false,
             ],
         ];
     }
@@ -75,20 +77,20 @@ class UserTypeTest extends WebTestCase
      * @param string $plainPassword
      * @param bool $sendPassword
      */
-    public function testCreate($username, $email, $plainPassword, $sendPassword)
+    public function testCreate(string $username, string $email, string $plainPassword, bool $sendPassword): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
 
         $configManager = self::getConfigManager('global');
         $configManager->set('oro_user.send_password_in_invitation_email', $sendPassword);
         $configManager->flush();
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_create'));
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         /** @var Role $role */
         $role = $this->getUserRoleRepository()->findOneBy([]);
-        $this->assertNotNull($role);
+        self::assertNotNull($role);
 
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[enabled]'] = true;
@@ -108,27 +110,24 @@ class UserTypeTest extends WebTestCase
 
         $this->client->submit($form);
 
-        /** @var \Swift_Plugins_MessageLogger $emailLogging */
-        $emailLogger = $this->getContainer()->get('swiftmailer.plugin.messagelogger');
-        $emailMessages = $emailLogger->getMessages();
+        $emailMessages = self::getMailerMessages();
 
-        $this->assertCount(1, $emailMessages);
+        self::assertCount(1, $emailMessages);
         $this->assertMessage(array_shift($emailMessages), $email, $plainPassword);
 
         $crawler = $this->client->followRedirect();
         $result = $this->client->getResponse();
 
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         static::assertStringContainsString('User saved', $crawler->html());
     }
 
-    public function testUserChangeUsernameToAnotherUserUsername()
+    public function testUserChangeUsernameToAnotherUserUsername(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
 
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form['oro_user_user_form[username]'] = 'admin';
@@ -137,75 +136,53 @@ class UserTypeTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         static::assertStringContainsString('This value is already used', $crawler->html());
         static::assertStringNotContainsString('User saved', $crawler->html());
 
         /** @var User $expectedUser */
         $expectedUser = $this->getReference(LoadUserData::SIMPLE_USER);
-        $actualUsername = $this->getContainer()->get('security.token_storage')->getToken()->getUsername();
+        $actualUsername = self::getContainer()->get('security.token_storage')->getToken()->getUsername();
 
-        $this->assertEquals($expectedUser->getUsername(), $actualUsername);
+        self::assertEquals($expectedUser->getUsername(), $actualUsername);
     }
 
-    /**
-     * @param \Swift_Message $message
-     * @param string $email
-     * @param string $plainPassword
-     */
-    protected function assertMessage(\Swift_Message $message, $email, $plainPassword)
+    protected function assertMessage(RawMessage $symfonyEmail, string $email, string $plainPassword): void
     {
+        self::assertInstanceOf(SymfonyEmail::class, $symfonyEmail);
+
         /** @var \Oro\Bundle\CustomerBundle\Entity\CustomerUser $user */
         $user = $this->getUserRepository()->findOneBy(['email' => $email]);
 
-        $this->assertNotNull($user);
-        $this->assertEquals($email, key($message->getTo()));
+        self::assertNotNull($user);
+        self::assertEmailAddressContains($symfonyEmail, 'to', $email);
 
         $configManager = self::getConfigManager(null);
-
-        $this->assertEquals(
-            $configManager->get('oro_notification.email_notification_sender_email'),
-            key($message->getFrom())
+        self::assertEmailAddressContains(
+            $symfonyEmail,
+            'from',
+            $configManager->get('oro_notification.email_notification_sender_email')
         );
 
-        static::assertStringContainsString('Invite user', $message->getSubject());
+        static::assertStringContainsString('Invite user', $symfonyEmail->getSubject());
 
         if ($configManager->get('oro_user.send_password_in_invitation_email')) {
-            static::assertStringContainsString('Password:', $message->getBody());
-            static::assertStringContainsString($plainPassword, $message->getBody());
+            static::assertStringContainsString('Password:', $symfonyEmail->getHtmlBody());
+            static::assertStringContainsString($plainPassword, $symfonyEmail->getHtmlBody());
         } else {
-            $this->assertNotNull($user->getConfirmationToken());
-            static::assertStringContainsString($user->getConfirmationToken(), $message->getBody());
-            static::assertStringNotContainsString('Password:', $message->getBody());
+            self::assertNotNull($user->getConfirmationToken());
+            static::assertStringContainsString($user->getConfirmationToken(), $symfonyEmail->getHtmlBody());
+            static::assertStringNotContainsString('Password:', $symfonyEmail->getHtmlBody());
         }
     }
 
-    /**
-     * @return ObjectRepository|RoleRepository
-     */
-    protected function getUserRepository()
+    protected function getUserRepository(): UserRepository
     {
-        $class = User::class;
-
-        return $this->getManager($class)->getRepository($class);
+        return self::getContainer()->get('doctrine')->getRepository(User::class);
     }
 
-    /**
-     * @return ObjectRepository|RoleRepository
-     */
-    protected function getUserRoleRepository()
+    protected function getUserRoleRepository(): RoleRepository
     {
-        $class = Role::class;
-
-        return $this->getManager($class)->getRepository($class);
-    }
-
-    /**
-     * @param string $class
-     * @return ObjectManager
-     */
-    protected function getManager($class)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($class);
+        return self::getContainer()->get('doctrine')->getRepository(Role::class);
     }
 }

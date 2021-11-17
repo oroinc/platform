@@ -9,12 +9,7 @@ parameters:
     database_driver_options:
         !php/const PHP_INT_MAX: const_as_key
         const_as_value: !php/const PHP_INT_MAX
-    mailer_transport: null
-    mailer_host: null
-    mailer_port: null
-    mailer_encryption: null
-    mailer_user: null
-    mailer_password: null
+    mailer_dsn: null://null
     websocket_bind_address: 0.0.0.0
     websocket_bind_port: 8080
     websocket_frontend_host: null

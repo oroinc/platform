@@ -2,7 +2,6 @@ services:
     oro_maintenance.driver.factory:
         class: Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory
         arguments:
-            - '@translator'
             - '%oro_maintenance.driver%'
 
     oro_maintenance.maintenance_listener:

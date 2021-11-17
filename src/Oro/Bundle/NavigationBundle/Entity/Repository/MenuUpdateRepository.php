@@ -3,14 +3,15 @@
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * Repository for MenuUpdate ORM Entity.
@@ -150,7 +151,7 @@ class MenuUpdateRepository extends ServiceEntityRepository
     private function getQueryResultCache()
     {
         if (!$this->queryResultCache) {
-            $this->queryResultCache = new ArrayCache();
+            $this->queryResultCache = DoctrineProvider::wrap(new ArrayAdapter(0, false));
         }
 
         return $this->queryResultCache;

@@ -151,15 +151,11 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $notObject = 'not_object';
         $notUserObject = new \stdClass();
         $userWithoutRequiredMethods = $this->createMock(UserInterface::class);
-        $userWithoutGetEmailMethod = $this->getMockBuilder(UserInterface::class)
-            ->onlyMethods(array_diff(get_class_methods(UserInterface::class), ['getEmail']))
-            ->getMock();
 
         return [
             [$notObject],
             [$notUserObject],
-            [$userWithoutRequiredMethods],
-            [$userWithoutGetEmailMethod],
+            [$userWithoutRequiredMethods]
         ];
     }
 
@@ -244,8 +240,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $user->expects(self::once())
             ->method('getId')
             ->willReturn(self::USER_ID);
-        $user->expects(self::once())
-            ->method('getEmail');
 
         $token = $this->createMock(TokenInterface::class);
         $token->expects(self::any())
@@ -317,15 +311,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(self::USER_ID);
 
-        $user->expects(self::once())
-            ->method('getEmail');
-
         $token = $this->createMock(TokenInterface::class);
-        $token->expects(self::exactly(2))
+        $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage->expects(self::exactly(2))
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 

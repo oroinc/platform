@@ -3,76 +3,84 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Checker;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Oro\Bundle\EmailBundle\Mailer\Checker\ConnectionCheckerInterface;
+use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpConnectionChecker;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject */
-    private $mailerTransport;
+    private DsnFromSmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject $dsnFromSmtpSettingsFactory;
 
-    /** @var DirectMailer|\PHPUnit\Framework\MockObject\MockObject */
-    private $directMailer;
+    private ConnectionCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $connectionChecker;
 
-    /** @var SmtpSettingsChecker */
-    private $smtpSettingsChecker;
+    private SmtpSettingsChecker $smtpSettingsChecker;
 
     protected function setUp(): void
     {
-        $this->mailerTransport = $this->createMock(\Swift_Transport_EsmtpTransport::class);
-        $this->directMailer = $this->createMock(DirectMailer::class);
-
-        $this->smtpSettingsChecker = new SmtpSettingsChecker($this->directMailer);
-    }
-
-    public function testCheckConnectionWithNotEligibleSmtpSettings()
-    {
-        $this->directMailer->expects($this->never())
-            ->method($this->anything());
-
-        $this->mailerTransport->expects($this->never())
-            ->method($this->anything());
-
-        $this->assertNotEmpty(
-            'Not eligible SmtpSettings are given',
-            $this->smtpSettingsChecker->checkConnection(new SmtpSettings())
+        $this->dsnFromSmtpSettingsFactory = $this->createMock(DsnFromSmtpSettingsFactory::class);
+        $this->connectionChecker = $this->createMock(SmtpConnectionChecker::class);
+        $this->smtpSettingsChecker = new SmtpSettingsChecker(
+            $this->dsnFromSmtpSettingsFactory,
+            $this->connectionChecker
         );
     }
 
-    public function testCheckConnectionWithNoError()
+    public function testCheckConnectionWithNotEligibleSmtpSettings(): void
     {
-        $smtpSettings = new SmtpSettings('smtp.host', 25, 'ssl');
-        $this->directMailer->expects($this->once())
-            ->method('afterPrepareSmtpTransport')
-            ->with($smtpSettings);
+        $this->connectionChecker->expects(self::never())
+            ->method(self::anything());
 
-        $this->directMailer->expects($this->once())
-            ->method('getTransport')
-            ->willReturn($this->mailerTransport);
+        $result = $this->smtpSettingsChecker->checkConnection(new SmtpSettings(), $error);
 
-        $this->mailerTransport->expects($this->once())
-            ->method('start');
-
-        $this->assertEmpty($this->smtpSettingsChecker->checkConnection($smtpSettings));
+        self::assertFalse($result);
+        self::assertEquals('Not eligible SmtpSettings are given', $error);
     }
 
-    public function testCheckConnectionWithError()
+    public function testCheckConnectionWithNoError(): void
     {
-        $smtpSettings = new SmtpSettings('smtp.host', 25, 'ssl');
-        $this->directMailer->expects($this->once())
-            ->method('afterPrepareSmtpTransport')
-            ->with($smtpSettings);
+        $smtpSettings = new SmtpSettings('example.org', 25, 'ssl');
+        $dsn = Dsn::fromString('smtp://example.org:25');
 
-        $this->directMailer->expects($this->once())
-            ->method('getTransport')
-            ->willReturn($this->mailerTransport);
+        $this->dsnFromSmtpSettingsFactory->expects(self::once())
+            ->method('create')
+            ->with($smtpSettings)
+            ->willReturn($dsn);
 
-        $exception = new \Swift_TransportException('Test exception message');
+        $this->connectionChecker->expects(self::once())
+            ->method('checkConnection')
+            ->with($dsn)
+            ->willReturn(true);
 
-        $this->mailerTransport->expects($this->once())
-            ->method('start')
-            ->willThrowException($exception);
+        $result = $this->smtpSettingsChecker->checkConnection($smtpSettings, $error);
 
-        $this->assertSame($this->smtpSettingsChecker->checkConnection($smtpSettings), $exception->getMessage());
+        self::assertTrue($result);
+        self::assertEmpty($error);
+    }
+
+    public function testCheckConnectionWithError(): void
+    {
+        $smtpSettings = new SmtpSettings('example.org', 25, 'ssl');
+        $dsn = Dsn::fromString('smtp://example.org:25');
+
+        $this->dsnFromSmtpSettingsFactory->expects(self::once())
+            ->method('create')
+            ->with($smtpSettings)
+            ->willReturn($dsn);
+
+        $this->connectionChecker->expects(self::once())
+            ->method('checkConnection')
+            ->with($dsn)
+            ->willReturnCallback(static function (Dsn $dsn, string &$error = null) {
+                $error = 'Test exception message';
+
+                return false;
+            });
+
+        $result = $this->smtpSettingsChecker->checkConnection($smtpSettings, $error);
+
+        self::assertFalse($result);
+        self::assertEquals('Test exception message', $error);
     }
 }

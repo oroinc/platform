@@ -210,9 +210,9 @@ class EmailAttachment implements FileExtensionInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getEmbeddedContentId()
+    public function getEmbeddedContentId(): ?string
     {
         return $this->embeddedContentId;
     }

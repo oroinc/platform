@@ -2,40 +2,41 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 
 class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ArrayCache */
-    private $cache;
+    use CacheTrait;
+
+    /** @var Cache */
+    protected $cache;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    protected $doctrineHelper;
 
     /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $definitionRepository;
+    protected $definitionRepository;
+
+    /** @var WorkflowAwareCache */
+    protected $workflowAwareCache;
 
     /** @var \stdClass */
     private $entity;
 
-    /** @var WorkflowAwareCache */
-    private $workflowAwareCache;
-
     protected function setUp(): void
     {
-        $this->cache = new ArrayCache();
+        $this->cache = $this->getArrayCache();
         $this->entity = new \stdClass();
         $this->definitionRepository = $this->createMock(WorkflowDefinitionRepository::class);
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturn(get_class($this->entity));
+        $this->doctrineHelper->expects($this->any())->method('getEntityClass')->willReturn(get_class($this->entity));
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with(WorkflowDefinition::class)

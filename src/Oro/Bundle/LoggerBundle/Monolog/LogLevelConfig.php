@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\LoggerBundle\Monolog;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -20,7 +21,7 @@ class LogLevelConfig implements ResetInterface
 
     private bool $loading = false;
 
-    private CacheProvider $loggerCache;
+    private CacheInterface $loggerCache;
 
     private ?ConfigManager $configManager;
 
@@ -29,8 +30,8 @@ class LogLevelConfig implements ResetInterface
     private ?int $logLevel = null;
 
     public function __construct(
-        CacheProvider    $loggerCache,
-        ?ConfigManager   $configManager,
+        CacheInterface $loggerCache,
+        ?ConfigManager $configManager,
         ApplicationState $applicationState,
         $defaultLevel = Logger::ERROR
     ) {
@@ -51,42 +52,25 @@ class LogLevelConfig implements ResetInterface
             return $this->logLevel;
         }
 
-        $cacheValue = $this->loggerCache->fetch(self::CACHE_KEY);
-        $this->logLevel = $cacheValue === false ? null : $cacheValue;
-        if (null === $this->logLevel) {
-            $this->logLevel = $this->defaultLevel;
-            if (!$this->loading) {
-                $this->loading = true;
-                try {
-                    $this->logLevel = $this->loadLogLevel();
-                } finally {
-                    $this->loading = false;
+        $this->logLevel = $this->loggerCache->get(self::CACHE_KEY, function (ItemInterface $item) {
+            $logLevel = $this->defaultLevel;
+            $lifeTime = 0;
+            if ($this->configManager && $this->applicationState->isInstalled()) {
+                $curTimestamp = time();
+                $endTimestamp = $this->configManager
+                    ->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));
+                if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
+                    $logLevel = $this->configManager
+                        ->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
+                    $logLevel = Logger::toMonologLevel($logLevel);
+                    $lifeTime = $endTimestamp - $curTimestamp;
                 }
             }
-        }
+            $item->expiresAfter($lifeTime);
+            return $logLevel;
+        });
 
         return $this->logLevel;
-    }
-
-    private function loadLogLevel(): int
-    {
-        $logLevel = $this->defaultLevel;
-        $lifeTime = 0;
-        if ($this->configManager && $this->applicationState->isInstalled()) {
-            $curTimestamp = time();
-            $endTimestamp = $this->configManager
-                ->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));
-            if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
-                $logLevel = $this->configManager
-                    ->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
-                $logLevel = Logger::toMonologLevel($logLevel);
-                $lifeTime = $endTimestamp - $curTimestamp;
-            }
-        }
-
-        $this->loggerCache->save(self::CACHE_KEY, $logLevel, $lifeTime);
-
-        return $logLevel;
     }
 
     public function reset()

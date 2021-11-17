@@ -113,7 +113,6 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ImportExportTopics::POST_EXPORT,
                 [
                     'jobId' => 1,
-                    'email' => null,
                     'recipientUserId' => 1,
                     'jobName' => 'grid_name',
                     'exportType' => 'export',
@@ -136,8 +135,6 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $user->expects(self::any())
             ->method('getId')
             ->willReturn(1);
-        $user->expects(self::once())
-            ->method('getEmail');
 
         $token = $this->createMock(TokenInterface::class);
         $token->expects(self::any())

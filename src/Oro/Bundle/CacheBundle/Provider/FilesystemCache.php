@@ -2,19 +2,27 @@
 
 namespace Oro\Bundle\CacheBundle\Provider;
 
-use Doctrine\Common\Cache\FilesystemCache as BaseFilesystemCache;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
- * The aims of this class:
- * 1) Modify an algorithm is used to generate file names to avoid very long file names.
- *    We can do not use additional sha256 encoding used in the original FilesystemCache class
- *    because $id passed to getFilename is quite unique itself.
- * 2) Provide a way to synchronize a cache between different processes.
- * 3) Allow to change a file cache directory.
+ * This class extends Symfony FilesystemAdapter in order to be able changing and retrieve a file cache directory
  */
-class FilesystemCache extends BaseFilesystemCache implements SyncCacheInterface, DirectoryAwareFileCacheInterface
+class FilesystemCache extends FilesystemAdapter implements DirectoryAwareFileCacheInterface
 {
     use NamespaceVersionSyncTrait;
     use DirectoryAwareFileCacheTrait;
     use ShortFileNameGeneratorTrait;
+
+    public function __construct(
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        string $directory = null,
+        MarshallerInterface $marshaller = null
+    ) {
+        if ($directory) {
+            $this->setDirectory($directory . DIRECTORY_SEPARATOR . $namespace);
+        }
+        parent::__construct($namespace, $defaultLifetime, $directory, $marshaller);
+    }
 }

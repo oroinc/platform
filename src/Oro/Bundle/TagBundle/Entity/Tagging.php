@@ -53,7 +53,7 @@ class Tagging extends ExtendTagging
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Tag", inversedBy="tagging", cascade="ALL")
+     * @ORM\ManyToOne(targetEntity="Tag", inversedBy="tagging", cascade={"ALL"})
      * @ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="CASCADE")
      **/
     protected $tag;

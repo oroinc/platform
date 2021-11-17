@@ -3,6 +3,8 @@
 namespace Oro\Bundle\CacheBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * The cache provider that adds a memory cache provider before the main cache provider
@@ -14,7 +16,7 @@ use Doctrine\Common\Cache\CacheProvider;
  */
 class MemoryCacheChain extends CacheProvider
 {
-    /** @var ArrayCache|null */
+    /** @var CacheProvider|null */
     private $memoryCache;
 
     /** @var CacheProvider|null */
@@ -26,7 +28,7 @@ class MemoryCacheChain extends CacheProvider
     public function __construct(CacheProvider $cache = null)
     {
         if (PHP_SAPI !== 'cli') {
-            $this->memoryCache = new ArrayCache();
+            $this->memoryCache = DoctrineProvider::wrap(new ArrayAdapter(0, false));
             $this->caches[] = $this->memoryCache;
         }
         $this->cache = $cache;
