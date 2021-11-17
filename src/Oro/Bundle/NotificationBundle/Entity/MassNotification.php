@@ -64,14 +64,14 @@ class MassNotification
     protected $body;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
      */
     protected $scheduledAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
      */
@@ -169,18 +169,18 @@ class MassNotification
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
-    public function getScheduledAt()
+    public function getScheduledAt(): ?\DateTimeInterface
     {
         return $this->scheduledAt;
     }
 
     /**
-     * @param \DateTime $scheduledAt
+     * @param \DateTimeInterface $scheduledAt
      * @return MassNotification
      */
-    public function setScheduledAt($scheduledAt)
+    public function setScheduledAt(\DateTimeInterface $scheduledAt): self
     {
         $this->scheduledAt = $scheduledAt;
 
@@ -188,18 +188,18 @@ class MassNotification
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
-    public function getProcessedAt()
+    public function getProcessedAt(): ?\DateTimeInterface
     {
         return $this->processedAt;
     }
 
     /**
-     * @param \DateTime $processedAt
+     * @param \DateTimeInterface $processedAt
      * @return MassNotification
      */
-    public function setProcessedAt($processedAt)
+    public function setProcessedAt(\DateTimeInterface $processedAt): self
     {
         $this->processedAt = $processedAt;
 

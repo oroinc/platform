@@ -8,7 +8,6 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -40,19 +39,18 @@ class OroEmailBundle extends Bundle
         parent::build($container);
 
         $this->addDoctrineOrmMappingsPass($container);
+        $container->addCompilerPass(new Compiler\LazyTransportsPass());
         $container->addCompilerPass(new Compiler\EmailOwnerConfigurationPass());
         $container->addCompilerPass(new Compiler\EmailSynchronizerPass());
         $container->addCompilerPass(new Compiler\EmailTemplateVariablesPass());
         $container->addCompilerPass(new Compiler\TwigSandboxConfigurationPass());
         $container->addCompilerPass(new Compiler\EmailRecipientsProviderPass());
         $container->addCompilerPass(new Compiler\MailboxProcessPass());
-        $container->addCompilerPass(new Compiler\OverrideServiceSwiftMailer());
         $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
             'oro_email.emailtemplate.variable_processor',
             'oro_email.emailtemplate.variable_processor',
             'alias'
         ));
-        $container->addCompilerPass(new Compiler\SwiftMailerTransportPass(), PassConfig::TYPE_OPTIMIZE);
 
         $addTopicPass = AddTopicDescriptionPass::create()
             ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')

@@ -25,7 +25,7 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
 
         $commandTester = $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName());
 
-        $this->assertOutputContains($commandTester, 'Server is under maintenance');
+        $this->assertOutputContains($commandTester, 'Maintenance mode is turned on.');
         $this->assertResponseCode(503);
     }
 
@@ -36,7 +36,7 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
     {
         $commandTester = $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
 
-        $this->assertOutputContains($commandTester, 'Server is online');
+        $this->assertOutputContains($commandTester, 'Maintenance mode is turned off.');
         $this->assertResponseCode(200);
     }
 

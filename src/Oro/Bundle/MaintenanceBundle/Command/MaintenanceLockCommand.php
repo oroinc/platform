@@ -73,16 +73,14 @@ HELP
             }
         }
 
-        $lockStatus = $driver->lock();
-        $message = $driver->getMessageLock($lockStatus);
-        if ($lockStatus === true) {
+        if ($driver->lock() === true) {
             $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
-            $io->success($message);
+            $io->success('Maintenance mode is turned on.');
 
             return 0;
         }
 
-        $io->error($message);
+        $io->error('Failed to turn on maintenance mode.');
 
         return 1;
     }

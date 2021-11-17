@@ -63,18 +63,12 @@ class EmailNotificationSender
             : $this->notificationSettings->getSender();
 
         foreach ($notification->getRecipients() as $recipient) {
-            $email = $recipient->getEmail();
-            // added RFC 822 check to avoid consumer fail
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                continue;
-            }
-
             $messageParams = [
-                'sender'      => $sender->toArray(),
-                'toEmail'     => $email,
-                'subject'     => $template->getSubject(),
-                'body'        => $template->getContent(),
-                'contentType' => $template->getType()
+                'from' => $sender->toString(),
+                'toEmail' => $recipient->getEmail(),
+                'subject' => $template->getSubject(),
+                'body' => $template->getContent(),
+                'contentType' => $template->getType(),
             ];
 
             $this->producer->send($topic, $messageParams);

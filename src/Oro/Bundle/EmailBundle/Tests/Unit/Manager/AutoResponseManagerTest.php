@@ -13,9 +13,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -27,47 +27,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private Registry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
-    /** @var EmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailBuilder;
+    private EmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject $emailBuilder;
 
-    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailProcessor;
+    private EmailModelSender|\PHPUnit\Framework\MockObject\MockObject $emailModelSender;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private EmailRenderer|\PHPUnit\Framework\MockObject\MockObject $emailRenderer;
 
-    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    private $render;
+    private AutoResponseManager $autoResponseManager;
 
-    /** @var AutoResponseManager */
-    private $autoResponseManager;
-
-    /** @var array|null */
-    private $definitions;
+    private ?array $definitions = null;
 
     protected function setUp(): void
     {
         $this->registry = $this->createMock(Registry::class);
         $this->emailBuilder = $this->createMock(EmailModelBuilder::class);
-        $this->emailProcessor = $this->createMock(Processor::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->render = $this->createMock(EmailRenderer::class);
+        $this->emailModelSender = $this->createMock(EmailModelSender::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->emailRenderer = $this->createMock(EmailRenderer::class);
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(function ($id) {
-                return $id;
-            });
+            ->willReturnCallback(static fn (string $id) => $id . '_translated');
 
         $this->autoResponseManager = new AutoResponseManager(
             $this->registry,
             $this->emailBuilder,
-            $this->emailProcessor,
-            $this->render,
-            $this->logger,
+            $this->emailModelSender,
+            $this->emailRenderer,
+            $logger,
             $translator,
             'en'
         );
@@ -76,10 +65,10 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider definitionNamesProvider
      */
-    public function testCreateRuleExpr(string $definition)
+    public function testCreateRuleExpr(string $definition): void
     {
         $expr = $this->autoResponseManager->createRuleExpr($this->getAutoResponseRule($definition), new Email());
-        $this->assertEquals($this->getExpectedExpression($definition), $expr);
+        self::assertEquals($this->getExpectedExpression($definition), $expr);
     }
 
     public function definitionNamesProvider(): array
@@ -93,13 +82,13 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applicableEmailsProvider
      */
-    public function testGetApplicableRulesReturnsTheRule(string $definition, Email $email)
+    public function testGetApplicableRulesReturnsTheRule(string $definition, Email $email): void
     {
         $mailbox = new Mailbox();
         $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
 
         $rules = $this->autoResponseManager->getApplicableRules($mailbox, $email);
-        $this->assertEquals(1, $rules->count());
+        self::assertEquals(1, $rules->count());
     }
 
     public function applicableEmailsProvider(): array
@@ -110,13 +99,13 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider inapplicableEmailsProvider
      */
-    public function testGetApplicableRulesDoesNotReturnTheRule(string $definition, Email $email)
+    public function testGetApplicableRulesDoesNotReturnTheRule(string $definition, Email $email): void
     {
         $mailbox = new Mailbox();
         $mailbox->setAutoResponseRules(new ArrayCollection([$this->getAutoResponseRule($definition)]));
 
         $rules = $this->autoResponseManager->getApplicableRules($mailbox, $email);
-        $this->assertEquals(0, $rules->count());
+        self::assertEquals(0, $rules->count());
     }
 
     public function inapplicableEmailsProvider(): array
@@ -127,7 +116,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applicableEmailsProvider
      */
-    public function testSendAutoResponses(string $definition, Email $email)
+    public function testSendAutoResponses(string $definition, Email $email): void
     {
         $mailbox = new Mailbox();
         $origin = new UserEmailOrigin();
@@ -140,36 +129,38 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         $email->setFromEmailAddress($emailAddress);
 
         $repo = $this->createMock(MailboxRepository::class);
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getRepository')
             ->with(Mailbox::class)
             ->willReturn($repo);
 
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('findForEmail')
             ->with($email)
             ->willReturn([$mailbox]);
 
         $emailModel = new EmailModel();
-        $this->emailBuilder->expects($this->once())
+        $this->emailBuilder->expects(self::once())
             ->method('createReplyEmailModel')
             ->with($email)
             ->willReturn($emailModel);
 
-        $this->render->expects($this->exactly(2))
+        $this->emailRenderer->expects(self::exactly(2))
             ->method('renderTemplate')
-            ->willReturnMap([
-                ['SUBJECT EN', ['entity' => $email], 'RENDERED EN SUBJECT'],
-                ['CONTENT EN', ['entity' => $email], 'RENDERED EN CONTENT']
-            ]);
-        $this->emailProcessor->expects($this->once())
-            ->method('process')
+            ->willReturnMap(
+                [
+                    ['SUBJECT EN', ['entity' => $email], 'RENDERED EN SUBJECT'],
+                    ['CONTENT EN', ['entity' => $email], 'RENDERED EN CONTENT'],
+                ]
+            );
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
             ->with($emailModel, $origin);
 
         $this->autoResponseManager->sendAutoResponses($email);
 
-        $this->assertEquals('RENDERED EN SUBJECT', $emailModel->getSubject());
-        $this->assertEquals('RENDERED EN CONTENT', $emailModel->getBody());
+        self::assertEquals('RENDERED EN SUBJECT', $emailModel->getSubject());
+        self::assertEquals('RENDERED EN CONTENT', $emailModel->getBody());
     }
 
     private function getAutoResponseRule(string $definition = 'and'): AutoResponseRule
@@ -198,41 +189,41 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
         return $autoResponseRule;
     }
 
-    public function testCreateEmailEntity()
+    public function testCreateEmailEntity(): void
     {
         $expected = [
             'name' => 'email',
-            'label' => 'oro.email.entity_label',
+            'label' => 'oro.email.entity_label_translated',
             'fields' => [
                 [
-                    'label' => 'oro.email.subject.label',
+                    'label' => 'oro.email.subject.label_translated',
                     'name' => 'subject',
                     'type' => 'text',
                 ],
                 [
-                    'label' => 'oro.email.email_body.label',
+                    'label' => 'oro.email.email_body.label_translated',
                     'name' => 'emailBody.bodyContent',
                     'type' => 'text',
                 ],
                 [
-                    'label' => 'From',
+                    'label' => 'From_translated',
                     'name' => 'fromName',
                     'type' => 'text',
                 ],
                 [
-                    'label' => 'Cc',
+                    'label' => 'Cc_translated',
                     'name' => 'cc.__index__.name',
                     'type' => 'text',
                 ],
                 [
-                    'label' => 'Bcc',
+                    'label' => 'Bcc_translated',
                     'name' => 'bcc.__index__.name',
                     'type' => 'text',
                 ],
             ],
         ];
 
-        $this->assertEquals($expected, $this->autoResponseManager->createEmailEntity());
+        self::assertEquals($expected, $this->autoResponseManager->createEmailEntity());
     }
 
     private function getDefinition(string $name): string
@@ -251,7 +242,7 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 
         $results = [];
         foreach ($definitionNames as $definition) {
-            $results[] = array_map(function ($data) use ($definition) {
+            $results[] = array_map(static function ($data) use ($definition) {
                 $body = new EmailBody();
                 $body->setBodyContent($data['body']);
 
@@ -278,6 +269,6 @@ class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 
     private function getAutoResponseRuleDefinitionsPath(): string
     {
-        return __DIR__ . '/../Fixtures/autorResponseRuleDefinitions.yml';
+        return __DIR__ . '/../Fixtures/autoResponseRuleDefinitions.yml';
     }
 }

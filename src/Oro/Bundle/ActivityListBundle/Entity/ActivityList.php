@@ -124,7 +124,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     protected $relatedActivityId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(name="created_at", type="datetime")
      * @ConfigField(
@@ -138,7 +138,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     protected $createdAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(name="updated_at", type="datetime")
      * @ConfigField(
@@ -461,7 +461,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCreatedAt()
     {
@@ -469,10 +469,10 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTimeInterface|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(\DateTime $createdAt = null)
+    public function setCreatedAt(\DateTimeInterface $createdAt = null)
     {
         $this->createdAt = $createdAt;
 
@@ -480,7 +480,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getUpdatedAt()
     {
@@ -488,11 +488,11 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param \DateTimeInterface|null $updatedAt
      *
      * @return $this
      */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
+    public function setUpdatedAt(\DateTimeInterface $updatedAt = null)
     {
         $this->updatedAtSet = false;
         if ($updatedAt !== null) {

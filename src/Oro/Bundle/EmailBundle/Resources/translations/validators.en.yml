@@ -3,6 +3,6 @@
 "Recipient can not be empty": "Recipient can not be empty"
 oro.email:
     validator:
-      configuration:
-          connection:
-              smtp: Could not establish the SMTP connection
+        configuration:
+            connection:
+                smtp: Could not establish the SMTP connection

@@ -146,9 +146,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
 
         $user = $token->getUser();
 
-        if (! is_object($user) || ! $user instanceof UserInterface
-            || ! method_exists($user, 'getId') || ! method_exists($user, 'getEmail')
-        ) {
+        if (!is_object($user) || !$user instanceof UserInterface || !method_exists($user, 'getId')) {
             throw new \RuntimeException('Not supported user type');
         }
 
@@ -171,7 +169,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
 
         $context->addDependentJob(Topics::POST_EXPORT, [
             'jobId' => $rootJob->getId(),
-            'email' => $this->getUser()->getEmail(),
             'recipientUserId' => $this->getUser()->getId(),
             'jobName' => $body['jobName'],
             'exportType' => $body['exportType'],

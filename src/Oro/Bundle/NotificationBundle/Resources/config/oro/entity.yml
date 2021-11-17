@@ -3,6 +3,3 @@ oro_entity:
         Oro\Bundle\NotificationBundle\Entity\RecipientList:
             alias:        notificationrecipientlist
             plural_alias: notificationrecipientlist
-
-    entity_alias_exclusions:
-        - Oro\Bundle\NotificationBundle\Entity\SpoolItem

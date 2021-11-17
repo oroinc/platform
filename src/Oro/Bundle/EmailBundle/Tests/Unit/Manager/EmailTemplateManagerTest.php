@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInSymfonyEmailHandler;
 use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\DTO\LocalizedTemplateDTO;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate;
@@ -10,10 +10,16 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address as SymfonyAddress;
+use Symfony\Component\Mime\Email as SymfonyEmail;
 
 class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
 {
+    use LoggerAwareTraitTestTrait;
+
     private const EMAIL_SUBJECT = 'Subject';
     private const EMAIL_BODY = 'Body';
     private const EMAIL_SUBJECT_GERMAN = 'Subject German';
@@ -22,89 +28,74 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
     private const EMAIL_TEMPLATE_ENTITY_NAME = 'Template\Entity';
     private const TEMPLATE_PARAMS = ['param' => 'value'];
 
-    /** @var \Swift_Mailer|\PHPUnit\Framework\MockObject\MockObject */
-    private $mailer;
+    private MailerInterface|\PHPUnit\Framework\MockObject\MockObject $mailer;
 
-    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
+    private EmbeddedImagesInSymfonyEmailHandler|\PHPUnit\Framework\MockObject\MockObject $embeddedImagesHandler;
 
-    /** @var LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizedTemplateProvider;
+    private LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject $localizedTemplateProvider;
 
-    /** @var EmailTemplateManager */
-    private $manager;
+    private EmailTemplateManager $manager;
 
     protected function setUp(): void
     {
-        $this->mailer = $this->createMock(\Swift_Mailer::class);
-        $this->processor = $this->createMock(Processor::class);
+        $this->mailer = $this->createMock(MailerInterface::class);
+        $this->embeddedImagesHandler = $this->createMock(EmbeddedImagesInSymfonyEmailHandler::class);
         $this->localizedTemplateProvider = $this->createMock(LocalizedTemplateProvider::class);
 
         $this->manager = new EmailTemplateManager(
             $this->mailer,
-            $this->processor,
+            $this->embeddedImagesHandler,
             $this->localizedTemplateProvider
         );
+
+        $this->setUpLoggerMock($this->manager);
     }
 
     public function testSendTemplateEmailToOneRecipientWithTextMimeTypeAndSendFailed(): void
     {
-        $this->processor->expects($this->once())
-            ->method('processEmbeddedImages')
-            ->with($this->assertMessageCallback(
-                self::EMAIL_SUBJECT,
-                self::EMAIL_BODY,
-                EmailTemplate::CONTENT_TYPE_TEXT,
-                ['no-reply@mail.com' => null]
-            ));
-
         $emailTemplateModel = (new EmailTemplate())
             ->setSubject(self::EMAIL_SUBJECT)
             ->setContent(self::EMAIL_BODY)
             ->setType(EmailTemplate::CONTENT_TYPE_TEXT);
 
-        $this->mailer->expects($this->once())
+        $exception = new \RuntimeException('Sample exception');
+        $this->mailer->expects(self::once())
             ->method('send')
-            ->with($this->assertMessageCallback(
-                self::EMAIL_SUBJECT,
-                self::EMAIL_BODY,
-                EmailTemplate::CONTENT_TYPE_TEXT,
-                ['no-reply@mail.com' => null],
-                ['to@mail.com' => null]
-            ))
-            ->willReturnCallback(function ($message, &$failedRecipients) {
-                $failedRecipients = ['to@mail.com'];
-            });
+            ->with(
+                $this->assertMessageCallback(
+                    self::EMAIL_SUBJECT,
+                    '',
+                    self::EMAIL_BODY,
+                    ['no-reply@example.com'],
+                    ['to@example.com']
+                )
+            )
+            ->willThrowException($exception);
 
-        $recipient = new EmailAddressWithContext('to@mail.com');
-
+        $recipient = new EmailAddressWithContext('to@example.com');
         $emailTemplateCriteria = new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME, self::EMAIL_TEMPLATE_ENTITY_NAME);
 
-        $this->localizedTemplateProvider->expects($this->once())
+        $this->localizedTemplateProvider->expects(self::once())
             ->method('getAggregated')
-            ->with(
-                [$recipient],
-                $emailTemplateCriteria,
-                []
-            )
-            ->willReturn([
-                (new LocalizedTemplateDTO($emailTemplateModel))->addRecipient($recipient),
-            ]);
+            ->with([$recipient], $emailTemplateCriteria, [])
+            ->willReturn([(new LocalizedTemplateDTO($emailTemplateModel))->addRecipient($recipient)]);
 
-        $failedRecipients = [];
+        $this->loggerMock->expects(self::once())
+            ->method('error')
+            ->with(
+                'Failed to send an email to "to@example.com" using "template_name" email template: Sample exception',
+                ['exception' => $exception, 'criteria' => $emailTemplateCriteria]
+            );
 
         self::assertEquals(
             0,
             $this->manager->sendTemplateEmail(
-                From::emailAddress('no-reply@mail.com'),
+                From::emailAddress('no-reply@example.com'),
                 [$recipient],
                 new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME, self::EMAIL_TEMPLATE_ENTITY_NAME),
-                [],
-                $failedRecipients
+                []
             )
         );
-
-        self::assertEquals(['to@mail.com'], $failedRecipients);
     }
 
     public function testSendTemplateEmailWithSeveralRecipients(): void
@@ -119,76 +110,78 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
             ->setContent(self::EMAIL_BODY_GERMAN)
             ->setType(EmailTemplate::CONTENT_TYPE_TEXT);
 
-        $this->processor->expects($this->exactly(2))
-            ->method('processEmbeddedImages')
-            ->withConsecutive(
-                [$this->assertMessageCallback(
+        $this->embeddedImagesHandler->expects(self::once())
+            ->method('handleEmbeddedImages')
+            ->with(
+                $this->assertMessageCallback(
                     self::EMAIL_SUBJECT,
                     self::EMAIL_BODY,
-                    EmailTemplate::CONTENT_TYPE_HTML,
-                    ['no-reply@mail.com' => 'SenderName']
-                )],
-                [$this->assertMessageCallback(
-                    self::EMAIL_SUBJECT_GERMAN,
-                    self::EMAIL_BODY_GERMAN,
-                    EmailTemplate::CONTENT_TYPE_TEXT,
-                    ['no-reply@mail.com' => 'SenderName']
-                )]
+                    '',
+                    ['SenderName <no-reply@example.com>'],
+                    []
+                )
             );
 
-        $this->mailer->expects($this->exactly(3))
+        $this->mailer->expects(self::exactly(3))
             ->method('send')
             ->withConsecutive(
-                [$this->assertMessageCallback(
-                    self::EMAIL_SUBJECT,
-                    self::EMAIL_BODY,
-                    EmailTemplate::CONTENT_TYPE_HTML,
-                    ['no-reply@mail.com' => 'SenderName'],
-                    ['user1@mail.com' => null]
-                )],
-                [$this->assertMessageCallback(
-                    self::EMAIL_SUBJECT,
-                    self::EMAIL_BODY,
-                    EmailTemplate::CONTENT_TYPE_HTML,
-                    ['no-reply@mail.com' => 'SenderName'],
-                    ['other_user@mail.com' => null]
-                )],
-                [$this->assertMessageCallback(
-                    self::EMAIL_SUBJECT_GERMAN,
-                    self::EMAIL_BODY_GERMAN,
-                    EmailTemplate::CONTENT_TYPE_TEXT,
-                    ['no-reply@mail.com' => 'SenderName'],
-                    ['user2@mail.com' => null]
-                )]
-            )
-            ->willReturn(1);
+                [
+                    $this->assertMessageCallback(
+                        self::EMAIL_SUBJECT,
+                        self::EMAIL_BODY,
+                        '',
+                        ['SenderName <no-reply@example.com>'],
+                        ['user1@example.com']
+                    ),
+                ],
+                [
+                    $this->assertMessageCallback(
+                        self::EMAIL_SUBJECT,
+                        self::EMAIL_BODY,
+                        '',
+                        ['SenderName <no-reply@example.com>'],
+                        ['other_user@example.com']
+                    ),
+                ],
+                [
+                    $this->assertMessageCallback(
+                        self::EMAIL_SUBJECT_GERMAN,
+                        '',
+                        self::EMAIL_BODY_GERMAN,
+                        ['SenderName <no-reply@example.com>'],
+                        ['user2@example.com']
+                    ),
+                ]
+            );
 
-        $userRecipient1 = new EmailAddressWithContext('user1@mail.com');
-        $userRecipient2 = new EmailAddressWithContext('user2@mail.com');
-        $userRecipient3 = new EmailAddressWithContext('other_user@mail.com', new User());
+        $userRecipient1 = new EmailAddressWithContext('user1@example.com');
+        $userRecipient2 = new EmailAddressWithContext('user2@example.com');
+        $userRecipient3 = new EmailAddressWithContext('other_user@example.com', new User());
 
         $emailTemplateCriteria = new EmailTemplateCriteria(self::EMAIL_TEMPLATE_NAME, self::EMAIL_TEMPLATE_ENTITY_NAME);
 
-        $this->localizedTemplateProvider->expects($this->once())
+        $this->localizedTemplateProvider->expects(self::once())
             ->method('getAggregated')
             ->with(
                 [$userRecipient1, $userRecipient2, $userRecipient3],
                 $emailTemplateCriteria,
                 self::TEMPLATE_PARAMS
             )
-            ->willReturn([
-                (new LocalizedTemplateDTO($emailTemplate))
-                    ->addRecipient($userRecipient1)
-                    ->addRecipient($userRecipient3),
+            ->willReturn(
+                [
+                    (new LocalizedTemplateDTO($emailTemplate))
+                        ->addRecipient($userRecipient1)
+                        ->addRecipient($userRecipient3),
 
-                (new LocalizedTemplateDTO($germanEmailTemplate))
-                    ->addRecipient($userRecipient2),
-            ]);
+                    (new LocalizedTemplateDTO($germanEmailTemplate))
+                        ->addRecipient($userRecipient2),
+                ]
+            );
 
         self::assertEquals(
             3,
             $this->manager->sendTemplateEmail(
-                From::emailAddress('no-reply@mail.com', 'SenderName'),
+                From::emailAddress('no-reply@example.com', 'SenderName'),
                 [$userRecipient1, $userRecipient2, $userRecipient3],
                 $emailTemplateCriteria,
                 self::TEMPLATE_PARAMS
@@ -197,22 +190,22 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * We have to use callback instead of constructing \Swift_Message object, as it has auto generated inner fields
+     * We have to use callback instead of constructing object, as it has auto generated inner fields
      * which make it impossible to compare objects directly.
      */
     private function assertMessageCallback(
         string $subject,
-        string $body,
-        string $contentType,
+        string $htmlBody,
+        string $textBody,
         array $from,
-        array $to = null
+        array $to
     ): \PHPUnit\Framework\Constraint\Callback {
-        return $this->callback(function (\Swift_Message $message) use ($subject, $body, $contentType, $to, $from) {
+        return self::callback(function (SymfonyEmail $message) use ($subject, $htmlBody, $textBody, $to, $from) {
             $this->assertEquals($subject, $message->getSubject());
-            $this->assertEquals($body, $message->getBody());
-            $this->assertEquals($contentType, $message->getContentType());
-            $this->assertEquals($to, $message->getTo());
-            $this->assertEquals($from, $message->getFrom());
+            $this->assertEquals($htmlBody, $message->getHtmlBody());
+            $this->assertEquals($textBody, $message->getTextBody());
+            $this->assertEquals(SymfonyAddress::createArray($from), $message->getFrom());
+            $this->assertEquals(SymfonyAddress::createArray($to), $message->getTo());
 
             return true;
         });

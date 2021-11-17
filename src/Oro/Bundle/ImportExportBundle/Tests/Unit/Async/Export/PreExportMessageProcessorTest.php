@@ -118,7 +118,6 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ImportExportTopics::POST_EXPORT,
                 [
                     'jobId' => 1,
-                    'email' => null,
                     'recipientUserId' => 1,
                     'jobName' => 'test',
                     'exportType' => 'export',

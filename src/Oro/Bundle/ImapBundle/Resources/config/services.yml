@@ -231,14 +231,6 @@ services:
             - oro_email_mailbox
             - Oro\Bundle\EmailBundle\Form\Type\MailboxType
 
-    oro_imap.listener.send_email_transport_listener:
-        class: Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener
-        arguments:
-            - '@oro_security.encoder.default'
-            - '@oro_imap.oauth_manager_registry'
-        tags:
-            - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
-
     oro_imap.async.clear_inactive_mailbox_processor:
         class: Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor
         arguments:
@@ -335,9 +327,17 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
-    Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry:
-        alias: oro_imap.manager_registry.registry
+    oro_imap.validator.connection_configuration.smtp:
+        class: Oro\Bundle\ImapBundle\Validator\SmtpConnectionConfigurationValidator
+        arguments:
+            - '@oro_email.mailer.checker.smtp_settings'
+            - '@oro_email.smtp_settings_factory'
+        tags:
+            - { name: validator.constraint_validator }
 
-    oro_imap.manager_registry.registry:
-        public: true
-        class: Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry
+    oro_imap.listener.set_user_email_origin_transport:
+        class: Oro\Bundle\ImapBundle\EventListener\SetUserEmailOriginTransportListener
+        arguments:
+            - '%oro_imap.user_email_origin_transport%'
+        tags:
+            - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\BeforeMessageEvent, method: onBeforeMessage }

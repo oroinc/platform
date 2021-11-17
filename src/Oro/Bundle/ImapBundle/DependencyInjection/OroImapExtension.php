@@ -21,8 +21,11 @@ class OroImapExtension extends Extension
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
+        $container->setParameter('oro_imap.user_email_origin_transport', $config['user_email_origin_transport']);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('mailer.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
 

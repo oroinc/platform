@@ -1,9 +1,4 @@
 services:
-    oro_email.swiftmailer.mailer.abstract:
-        parent: swiftmailer.mailer.abstract
-        decorates: swiftmailer.mailer.abstract
-        class: Oro\Bundle\EmailBundle\Util\MailerWrapper
-
     oro_email.entity.cache.warmer:
         class: Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
         arguments:
@@ -268,7 +263,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_email.email.model.builder'
-            - '@oro_email.mailer.processor'
+            - '@oro_email.sender.email_model_sender'
             - '@oro_email.email_renderer'
             - '@logger'
             - '@translator'
@@ -291,12 +286,52 @@ services:
             - 'Oro\Bundle\EmailBundle\Entity\EmailOrigin'
             - '@doctrine.orm.entity_manager'
 
-    oro_email.direct_mailer:
-        class: Oro\Bundle\EmailBundle\Mailer\DirectMailer
-        public: true
+    oro_email.sender.email_model_sender:
+        class: Oro\Bundle\EmailBundle\Sender\EmailModelSender
         arguments:
             - '@mailer'
-            - '@service_container'
+            - '@oro_email.embedded_images.handler.email_model'
+            - '@oro_email.sender.email_factory'
+            - '@oro_email.builder.email_user_from_email_model_builder'
+            - '@event_dispatcher'
+
+    oro_email.builder.email_user_from_email_model_builder:
+        class: Oro\Bundle\EmailBundle\Builder\EmailUserFromEmailModelBuilder
+        shared: false
+        arguments:
+            - '@doctrine'
+            - '@oro_email.email.entity.builder'
+            - '@oro_email.tools.email_origin_helper'
+            - '@oro_email.provider.parent_message_id'
+            - '@oro_email.email.activity.manager'
+
+    oro_email.sender.email_factory:
+        class: Oro\Bundle\EmailBundle\Sender\EmailFactory
+        arguments:
+            - '@oro_email.provider.parent_message_id'
+            - '@oro_email.email.address.helper'
+
+    oro_email.embedded_images.extractor:
+        class: Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesExtractor
+        arguments:
+            - '@mime_types'
+
+    oro_email.embedded_images.handler.email_model:
+        class: Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInEmailModelHandler
+        arguments:
+            - '@oro_email.embedded_images.extractor'
+            - '@oro_email.email.entity.builder'
+            - '@oro_email.form.factory'
+
+    oro_email.embedded_images.handler.symfony_email:
+        class: Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInSymfonyEmailHandler
+        arguments:
+            - '@oro_email.embedded_images.extractor'
+
+    oro_email.provider.parent_message_id:
+        class: Oro\Bundle\EmailBundle\Provider\ParentMessageIdProvider
+        arguments:
+            - '@doctrine'
 
     oro_email.manager.emailtemplate.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -521,29 +556,14 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: email-string }
 
-    oro_email.mailer.processor:
-        class: Oro\Bundle\EmailBundle\Mailer\Processor
-        arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_email.direct_mailer'
-            - '@oro_email.email.address.helper'
-            - '@oro_email.email.entity.builder'
-            - '@oro_email.email.activity.manager'
-            - '@event_dispatcher'
-            - '@oro_security.encoder.default'
-            - '@oro_email.tools.email_origin_helper'
-            - '@mime_types'
-
-    Oro\Bundle\EmailBundle\Mailer\Processor:
-        alias: oro_email.mailer.processor
-
     oro_email.workflow.action.send_email:
         class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_email.mailer.processor'
+            - '@validator'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
+            - '@oro_email.sender.email_model_sender'
             - '@oro_email.tools.email_origin_helper'
         calls:
             - [setLogger, ['@logger']]
@@ -554,10 +574,9 @@ services:
         class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_email.mailer.processor'
+            - '@validator'
             - '@oro_email.email.address.helper'
             - '@oro_entity.entity_name_resolver'
-            - '@validator'
             - '@oro_email.sender.aggregated_email_templates'
         calls:
             - [setLogger, ['@logger']]
@@ -565,9 +584,12 @@ services:
             - { name: oro_action.action, alias: send_email_template }
 
     oro_email.workflow.action.schedule_send_email_template:
-        parent: oro_email.workflow.action.send_email_template
         class: Oro\Bundle\EmailBundle\Workflow\Action\ScheduleSendEmailTemplate
         arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@validator'
+            - '@oro_email.email.address.helper'
+            - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
             - '@oro_message_queue.client.message_producer'
         calls:
@@ -1169,29 +1191,15 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }
 
-    oro_email.logger.link:
-        tags:
-            - { name: oro_service_link, service: logger }
-
     oro_email.provider.smtp_settings:
         class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider
-        public: true
         arguments:
             - '@oro_config.manager'
-            - '@oro_config.scope.global'
             - '@oro_security.encoder.default'
+            - '@oro_distribution.handler.application_status'
 
     Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider:
         alias: oro_email.provider.smtp_settings
-
-    oro_email.mailer.checker.smtp_settings:
-        class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
-        public: true
-        arguments:
-            - '@oro_email.direct_mailer'
-
-    Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker:
-        alias: 'oro_email.mailer.checker.smtp_settings'
 
     oro_email.listener.datagrid.user_email_grid_listener:
         class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
@@ -1248,15 +1256,11 @@ services:
         class: Oro\Bundle\EmailBundle\Manager\EmailTemplateManager
         public: true
         arguments:
-            - '@oro_email.direct_mailer'
-            - '@oro_email.mailer.processor'
+            - '@mailer'
+            - '@oro_email.embedded_images.handler.symfony_email'
             - '@oro_email.provider.localized_template'
-
-    oro_email.async.template_email_message_sender:
-        class: 'Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender'
-        arguments:
-            - '@oro_email.manager.template_email'
-            - '@oro_entity.doctrine_helper'
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_email.entity_name_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\EmailEntityNameProvider'
@@ -1299,6 +1303,7 @@ services:
         arguments:
             - '@oro_email.mailer.checker.smtp_settings'
             - '@oro_email.smtp_settings_factory'
+            - '@oro_security.encoder.default'
         tags:
             - { name: validator.constraint_validator }
 
@@ -1313,15 +1318,15 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.provider.localized_template'
             - '@oro_email.tools.email_origin_helper'
-            - '@oro_email.mailer.processor'
+            - '@oro_email.sender.email_model_sender'
         calls:
             - [setLogger, ['@logger']]
 
     oro_email.async.send_email_template:
         class: 'Oro\Bundle\EmailBundle\Async\SendEmailTemplateProcessor'
         arguments:
+            - '@doctrine'
             - '@validator'
-            - '@oro_entity.doctrine_helper'
             - '@oro_email.sender.aggregated_email_templates'
         calls:
             - [setLogger, ['@logger']]

@@ -337,12 +337,11 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                NotificationTopics::SEND_NOTIFICATION_EMAIL,
+                NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE,
                 [
-                    'sender' => $expectedSender->toArray(),
-                    'toEmail' => 'useremail@example.com',
+                    'from' => $expectedSender->toString(),
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
-                    'body' => [
+                    'templateParams' => [
                         'originFileName' => 'test.csv',
                         'error' => 'The import file could not be imported due to a fatal error. ' .
                             'Please check its integrity and try again!',

@@ -1,6 +1,0 @@
-oro:
-    maintenance:
-        success_unlock: Server is online.
-        not_success_unlock: Impossible to do this action.
-        not_success_lock: Server is already under maintenance.
-        success_lock_file: Server is under maintenance.

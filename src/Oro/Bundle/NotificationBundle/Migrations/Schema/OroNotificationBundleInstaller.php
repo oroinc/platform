@@ -17,7 +17,7 @@ class OroNotificationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -27,7 +27,6 @@ class OroNotificationBundleInstaller implements Installation
     {
         /** Tables generation **/
         $this->createOroNotificationEmailNotifTable($schema);
-        $this->createOroNotificationEmailSpoolTable($schema);
         $this->createOroNotificationMassNotifTable($schema);
         $this->createOroNotificationRecipGroupTable($schema);
         $this->createOroNotificationRecipListTable($schema);
@@ -55,20 +54,6 @@ class OroNotificationBundleInstaller implements Installation
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['recipient_list_id'], 'UNIQ_A3D00FDF2B9E3E89');
         $table->addIndex(['template_id'], 'IDX_A3D00FDF5DA0FB8', []);
-    }
-
-    /**
-     * Create oro_notification_email_spool table
-     */
-    protected function createOroNotificationEmailSpoolTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_notification_email_spool');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('status', 'integer', []);
-        $table->addColumn('message', 'object', ['comment' => '(DC2Type:object)']);
-        $table->addColumn('log_type', 'string', ['notnull' => false, 'length' => 255]);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['status'], 'notification_spool_status_idx', []);
     }
 
     /**

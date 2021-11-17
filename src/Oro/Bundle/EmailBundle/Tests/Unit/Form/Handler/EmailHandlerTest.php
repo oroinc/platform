@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -19,7 +19,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 
     private Request $request;
 
-    private Processor|\PHPUnit\Framework\MockObject\MockObject $emailProcessor;
+    private EmailModelSender|\PHPUnit\Framework\MockObject\MockObject $emailModelSender;
 
     private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
@@ -35,14 +35,14 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
 
-        $this->emailProcessor = $this->createMock(Processor::class);
+        $this->emailModelSender = $this->createMock(EmailModelSender::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->model = new Email();
 
         $this->handler = new EmailHandler(
             $this->form,
             $requestStack,
-            $this->emailProcessor,
+            $this->emailModelSender,
             $this->logger
         );
     }
@@ -104,8 +104,8 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
                 ->willReturn($valid);
 
             if ($valid) {
-                $this->emailProcessor->expects(self::once())
-                    ->method('process')
+                $this->emailModelSender->expects(self::once())
+                    ->method('send')
                     ->with($this->model);
             }
         }
@@ -139,8 +139,8 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $exception = new \Exception('TEST');
-        $this->emailProcessor->expects(self::once())
-            ->method('process')
+        $this->emailModelSender->expects(self::once())
+            ->method('send')
             ->with($this->model)
             ->willReturnCallback(function () use ($exception) {
                 throw $exception;
@@ -148,10 +148,13 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->logger->expects(self::once())
             ->method('error')
-            ->with('Email sending failed.', ['exception' => $exception]);
+            ->with(
+                'Failed to send email model to to@example.com: TEST',
+                ['exception' => $exception, 'emailModel' => $this->model]
+            );
         $this->form->expects(self::once())
             ->method('addError')
-            ->with($this->isInstanceOf(FormError::class));
+            ->with(self::isInstanceOf(FormError::class));
 
         self::assertFalse($this->handler->process($this->model));
     }

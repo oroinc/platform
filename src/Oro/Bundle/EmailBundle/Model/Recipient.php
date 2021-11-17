@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
-class Recipient
+/**
+ * Model that stores recipient email address, name and optional related entity.
+ */
+class Recipient implements EmailHolderInterface
 {
     /** @var string */
     protected $email;
@@ -18,7 +21,7 @@ class Recipient
      * @param string $name
      * @param RecipientEntity|null $entity
      */
-    public function __construct($email, $name, RecipientEntity $entity = null)
+    public function __construct($email, $name = '', RecipientEntity $entity = null)
     {
         $this->email = $email;
         $this->name = trim($name);

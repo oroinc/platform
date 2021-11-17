@@ -2,43 +2,48 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\SendEmailTemplateProcessor;
 use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
+    use LoggerAwareTraitTestTrait;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
 
-    /** @var AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $sender;
+    private AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject $aggregatedEmailTemplatesSender;
 
-    /** @var SendEmailTemplateProcessor */
-    private $processor;
+    private SendEmailTemplateProcessor $processor;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->sender = $this->createMock(AggregatedEmailTemplatesSender::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->aggregatedEmailTemplatesSender = $this->createMock(AggregatedEmailTemplatesSender::class);
 
-        $this->processor = new SendEmailTemplateProcessor($this->validator, $this->doctrineHelper, $this->sender);
-        $this->processor->setLogger($this->logger);
+        $this->processor = new SendEmailTemplateProcessor(
+            $managerRegistry,
+            $this->validator,
+            $this->aggregatedEmailTemplatesSender
+        );
+        $this->setUpLoggerMock($this->processor);
+
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $managerRegistry
+            ->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
     }
 
     /**
@@ -46,11 +51,11 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testBodyException(array $body, string $expectedMessage): void
     {
-        $this->logger->expects($this->once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with($expectedMessage);
 
-        $this->validator->expects($this->any())
+        $this->validator->expects(self::any())
             ->method('validate')
             ->willReturnCallback(function ($value) {
                 $violationList = $this->createMock(ConstraintViolationList::class);
@@ -64,7 +69,7 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->setBody(json_encode($body, JSON_THROW_ON_ERROR));
 
-        $this->assertEquals(
+        self::assertEquals(
             MessageProcessorInterface::REJECT,
             $this->processor->process($message, $this->createMock(SessionInterface::class))
         );
@@ -74,51 +79,68 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'no from' => [
-                'body' => ['to' => 'test@test.com', 'templateName' => 'test', 'entity' => [\stdClass::class, 42]],
+                'body' => [
+                    'recipients' => ['test@example.com'],
+                    'templateName' => 'test',
+                    'entity' => [\stdClass::class, 42],
+                ],
                 'expectedMessage' => 'Parameter "from" must contain a valid email address, got "".',
             ],
-            'no to' => [
-                'body' => ['from' => 'test@test.com', 'templateName' => 'test', 'entity' => [\stdClass::class, 42]],
-                'expectedMessage' => 'Could not find required entity with class "stdClass" and id "42".',
+            'no recipients' => [
+                'body' => ['from' => 'test@example.com', 'templateName' => 'test', 'entity' => [\stdClass::class, 42]],
+                'expectedMessage' => 'Recipients list is empty',
             ],
             'no template' => [
-                'body' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'entity' => [\stdClass::class, 42]],
+                'body' => [
+                    'from' => 'test@example.com',
+                    'recipients' => ['test@example.com'],
+                    'entity' => [\stdClass::class, 42],
+                ],
                 'expectedMessage' => 'Parameter "templateName" must contain a valid template name.',
             ],
             'no entity' => [
-                'body' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'templateName' => 'test'],
-                'expectedMessage' => 'Could not find required entity with class "" and id "".',
+                'body' => [
+                    'from' => 'test@example.com',
+                    'recipients' => ['test@example.com'],
+                    'templateName' => 'test',
+                ],
+                'expectedMessage' => 'Parameter "entity" must be an array [string $entityClass, int $entityId],'
+                    . ' got "[]".',
             ],
         ];
     }
 
     public function testSendException(): void
     {
-        $this->sender->expects($this->once())
+        $this->aggregatedEmailTemplatesSender
+            ->expects(self::once())
             ->method('send')
             ->willThrowException(new EntityNotFoundException());
 
-        $this->validator->expects($this->any())
+        $this->validator->expects(self::any())
             ->method('validate')
             ->willReturn($this->createMock(ConstraintViolationList::class));
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntity')
+        $this->entityManager
+            ->expects(self::any())
+            ->method('find')
+            ->with(\stdClass::class, 42)
             ->willReturn(new \stdClass());
 
-        $this->logger->expects($this->once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with('Cannot send email template.', ['exception' => new EntityNotFoundException()]);
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'from' => 'test@test.com',
-            'to' => 'test@test.com',
+        $messageBody = [
+            'from' => 'test@example.com',
+            'recipients' => ['test@example.com'],
             'templateName' => 'test',
-            'entity' => [\stdClass::class, 42]
-        ], JSON_THROW_ON_ERROR));
+            'entity' => [\stdClass::class, 42],
+        ];
+        $message->setBody(json_encode($messageBody, JSON_THROW_ON_ERROR));
 
-        $this->assertEquals(
+        self::assertEquals(
             MessageProcessorInterface::REJECT,
             $this->processor->process($message, $this->createMock(SessionInterface::class))
         );
@@ -126,29 +148,32 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteWithMultipleRecipients(): void
     {
-        $this->sender->expects($this->once())
+        $this->aggregatedEmailTemplatesSender->expects(self::once())
             ->method('send');
 
-        $this->validator->expects($this->any())
+        $this->validator->expects(self::any())
             ->method('validate')
             ->willReturn($this->createMock(ConstraintViolationList::class));
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntity')
+        $this->entityManager
+            ->expects(self::any())
+            ->method('find')
+            ->with(\stdClass::class, 42)
             ->willReturn(new \stdClass());
 
-        $this->logger->expects($this->never())
-            ->method($this->anything());
+        $this->loggerMock->expects(self::never())
+            ->method(self::anything());
 
         $message = new Message();
-        $message->setBody(json_encode([
-            'from' => 'test@test.com',
-            'to' => 'test@test.com',
+        $messageBody = [
+            'from' => 'test@example.com',
+            'recipients' => ['test@example.com'],
             'templateName' => 'test',
-            'entity' => [\stdClass::class, 42]
-        ], JSON_THROW_ON_ERROR));
+            'entity' => [\stdClass::class, 42],
+        ];
+        $message->setBody(json_encode($messageBody, JSON_THROW_ON_ERROR));
 
-        $this->assertEquals(
+        self::assertEquals(
             MessageProcessorInterface::ACK,
             $this->processor->process($message, $this->createMock(SessionInterface::class))
         );

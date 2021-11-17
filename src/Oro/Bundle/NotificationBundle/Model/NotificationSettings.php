@@ -10,26 +10,11 @@ use Oro\Bundle\EmailBundle\Model\From;
  */
 class NotificationSettings
 {
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
+    private ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
-    }
-
-    /**
-     * @return string Sender Name <sender@example.org>
-     */
-    public function getSenderEmail(): string
-    {
-        return sprintf(
-            '%s <%s>',
-            $this->configManager->get('oro_notification.email_notification_sender_name'),
-            $this->configManager->get('oro_notification.email_notification_sender_email')
-        );
     }
 
     public function getSender(): From

@@ -13,9 +13,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\AutoResponseRuleCondition;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
@@ -40,8 +40,7 @@ class AutoResponseManager
     /** @var EmailModelBuilder */
     protected $emailBuilder;
 
-    /** @var Processor */
-    protected $emailProcessor;
+    protected EmailModelSender $emailModelSender;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -80,27 +79,18 @@ class AutoResponseManager
         FilterUtility::CONDITION_OR => '@or',
     ];
 
-    /**
-     * @param Registry $registry
-     * @param EmailModelBuilder $emailBuilder
-     * @param Processor $emailProcessor
-     * @param EmailRenderer $emailRender
-     * @param LoggerInterface $logger
-     * @param TranslatorInterface $translator
-     * @param string $defaultLocale
-     */
     public function __construct(
         Registry $registry,
         EmailModelBuilder $emailBuilder,
-        Processor $emailProcessor,
+        EmailModelSender $emailModelSender,
         EmailRenderer $emailRender,
         LoggerInterface $logger,
         TranslatorInterface $translator,
-        $defaultLocale
+        string $defaultLocale
     ) {
         $this->registry = $registry;
         $this->emailBuilder = $emailBuilder;
-        $this->emailProcessor = $emailProcessor;
+        $this->emailModelSender = $emailModelSender;
         $this->logger = $logger;
         $this->translator = $translator;
         $this->defaultLocale = $defaultLocale;
@@ -170,16 +160,19 @@ class AutoResponseManager
         }
     }
 
-    /**
-     * @param EmailModel $email
-     * @param EmailOrigin $origin
-     */
-    protected function sendEmailModel(EmailModel $email, EmailOrigin $origin = null)
+    protected function sendEmailModel(EmailModel $emailModel, EmailOrigin $origin = null)
     {
         try {
-            $this->emailProcessor->process($email, $origin);
-        } catch (\Exception $ex) {
-            $this->logger->error('Email sending failed.', ['exception' => $ex]);
+            $this->emailModelSender->send($emailModel, $origin);
+        } catch (\RuntimeException $exception) {
+            $this->logger->error(
+                sprintf(
+                    'Failed to send email model to %s: %s',
+                    implode(', ', $emailModel->getTo()),
+                    $exception->getMessage()
+                ),
+                ['exception' => $exception, 'emailModel' => $emailModel]
+            );
         }
     }
 

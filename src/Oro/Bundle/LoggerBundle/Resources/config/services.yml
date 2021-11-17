@@ -31,14 +31,19 @@ services:
             - '@oro_distribution.handler.application_status'
             - '%oro_logger.detailed_logs_default_level%'
 
-    oro_logger.message_factory:
-        class: Oro\Bundle\LoggerBundle\Mailer\MessageFactory
-        calls:
-            - ['setContainer', ['@service_container']]
+    oro_logger.monolog.email_factory.error_log_notification:
+        class: Oro\Bundle\LoggerBundle\Monolog\EmailFactory\ErrorLogNotificationEmailFactory
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_logger.provider.error_log_notification_recipients'
 
-    swiftmailer.plugin.no_recipient.abstract:
-        class: Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin
-        abstract: true
+    oro_logger.provider.error_log_notification_recipients:
+        class: Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider
+        arguments:
+            # Global config manager is used on purpose because 1) configuration which is fetched by this provider is
+            # present only in global config scope; 2) other config scopes might be not working at the moment of logging
+            # error (when this provider is intended to be used).
+            - '@oro_config.global'
 
     oro_logger.processor.log_message:
         class: Monolog\Processor\PsrLogMessageProcessor

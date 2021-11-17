@@ -3,44 +3,35 @@
 namespace Oro\Bundle\EmailBundle\Mailer\Checker;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
 
 /**
  * Checks that connection can be established with the given SmtpSettings.
  */
 class SmtpSettingsChecker
 {
-    /** @var DirectMailer */
-    protected $directMailer;
+    private DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory;
 
-    /**
-     * SmtpSettingsChecker constructor.
-     */
-    public function __construct(DirectMailer $directMailer)
-    {
-        $this->directMailer = $directMailer;
+    private ConnectionCheckerInterface $smtpConnectionChecker;
+
+    public function __construct(
+        DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory,
+        ConnectionCheckerInterface $smtpConnectionChecker
+    ) {
+        $this->dsnFromSmtpSettingsFactory = $dsnFromSmtpSettingsFactory;
+        $this->smtpConnectionChecker = $smtpConnectionChecker;
     }
 
-    /**
-     * @param SmtpSettings $smtpSettings
-     *
-     * @return string
-     */
-    public function checkConnection(SmtpSettings $smtpSettings)
+    public function checkConnection(SmtpSettings $smtpSettings, string &$error = null): bool
     {
         if (!$smtpSettings->isEligible()) {
-            return 'Not eligible SmtpSettings are given';
+            $error = 'Not eligible SmtpSettings are given';
+
+            return false;
         }
 
-        $error = '';
-        $this->directMailer->afterPrepareSmtpTransport($smtpSettings);
+        $dsn = $this->dsnFromSmtpSettingsFactory->create($smtpSettings);
 
-        try {
-            $this->directMailer->getTransport()->start();
-        } catch (\Swift_TransportException $e) {
-            $error = $e->getMessage();
-        }
-
-        return $error;
+        return $this->smtpConnectionChecker->checkConnection($dsn, $error);
     }
 }

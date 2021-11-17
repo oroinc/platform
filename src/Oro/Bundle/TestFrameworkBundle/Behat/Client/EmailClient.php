@@ -33,7 +33,7 @@ class EmailClient
             $messageDetails = $this->getJson($this->url.'/messages/'.$message['id'].'.json');
             $message = array_merge($message, $messageDetails);
             Decode::splitMessage($message['source'], $headers, $body);
-            if ($headers->get('contenttype')->getType() === 'multipart/related') {
+            if (str_starts_with($headers->get('contenttype')->getType(), 'multipart/')) {
                 $boundary = $headers->get('contenttype')->getParameter('boundary');
                 $mimeMessage = Message::createFromMessage($body, $boundary);
             } else {

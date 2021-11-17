@@ -47,24 +47,4 @@ class FileDriver extends AbstractDriver
     {
         return file_exists($this->filePath);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageLock(bool $resultTest): string
-    {
-        $key = $resultTest ? 'oro.maintenance.success_lock_file' : 'oro.maintenance.not_success_lock';
-
-        return $this->translator->trans($key);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageUnlock(bool $resultTest): string
-    {
-        $key = $resultTest ? 'oro.maintenance.success_unlock' : 'oro.maintenance.not_success_unlock';
-
-        return $this->translator->trans($key);
-    }
 }

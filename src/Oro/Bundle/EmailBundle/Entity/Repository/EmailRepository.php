@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -11,6 +13,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Entity repository for {@see Email} entity.
+ */
 class EmailRepository extends EntityRepository
 {
     /**
@@ -38,8 +43,26 @@ class EmailRepository extends EntityRepository
     }
 
     /**
+     * Finds messageId of the Email specified by id.
+     *
+     * @param int $id
+     * @return string|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findMessageIdByEmailId(int $id): ?string
+    {
+        $qb = $this->createQueryBuilder('e');
+
+        return $qb
+            ->select('e.messageId')
+            ->where($qb->expr()->eq('e.id', ':id'))
+            ->setParameter('id', $id, Types::INTEGER)
+            ->getQuery()
+            ->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR);
+    }
+
+    /**
      * Get $limit last emails
-     * todo: BAP-11456 Move method getNewEmails from EmailRepository to EmailUserRepository
      *
      * @param User         $user
      * @param Organization $organization

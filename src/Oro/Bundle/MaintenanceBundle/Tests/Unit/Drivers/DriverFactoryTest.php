@@ -4,20 +4,12 @@ namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\Drivers;
 
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\Drivers\FileDriver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
-    protected function setUp(): void
-    {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-    }
-
     private function getDriverFactory(array $options): DriverFactory
     {
-        return new DriverFactory($this->translator, $options);
+        return new DriverFactory($options);
     }
 
     /**

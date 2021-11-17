@@ -1,5 +1,5 @@
 services:
-  Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext:
-    public: true
-    arguments:
-      - '@Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient'
+    Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext:
+        public: true
+        arguments:
+            - '@Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient'

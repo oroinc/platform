@@ -15,6 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Topics as JobTopics;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -95,9 +96,16 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             $exportMessageData
         );
 
+        $rootJobStoppedData = $this->getOneSentMessageWithTopic(JobTopics::ROOT_JOB_STOPPED);
+        $this->assertMessageProcessorExecuted(
+            'oro_message_queue.job.dependent_job_processor',
+            $rootJobStoppedData
+        );
+
+        $postExportMessageData = $this->getOneSentMessageWithTopic(Topics::POST_EXPORT);
         $this->assertMessageProcessorExecuted(
             'oro_importexport.async.post_export',
-            array_merge($exportMessageData, ['email' => 'acme@example.com'])
+            array_merge($postExportMessageData)
         );
 
         $job = $this->findJob($jobId);

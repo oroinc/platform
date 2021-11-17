@@ -67,20 +67,20 @@ class EmailEntityBuilder
      * Create EmailUser entity object
      *
      * @param string               $subject             The email subject
-     * @param string $from                              The FROM email address,
+     * @param string               $from                The FROM email address,
      *                                                  for example: john@example.com or "John Smith" <john@example.c4m>
      * @param string|string[]|null $to                  The TO email address(es).
      *                                                  Example of email address see in description of $from parameter
-     * @param \DateTime            $sentAt              The date/time when email sent
-     * @param \DateTime            $receivedAt          The date/time when email received
-     * @param \DateTime            $internalDate        The date/time an email server returned in INTERNALDATE field
-     * @param integer $importance                       The email importance flag.
+     * @param \DateTimeInterface   $sentAt              The date/time when email sent
+     * @param \DateTimeInterface   $receivedAt          The date/time when email received
+     * @param \DateTimeInterface   $internalDate        The date/time an email server returned in INTERNALDATE field
+     * @param int                  $importance          The email importance flag.
      *                                                  Can be one of *_IMPORTANCE constants of Email class
      * @param string|string[]|null $cc                  The CC email address(es).
      *                                                  Example of email address see in description of $from parameter
      * @param string|string[]|null $bcc                 The BCC email address(es).
      *                                                  Example of email address see in description of $from parameter
-     * @param User|Mailbox|null $owner                  Owner of the email
+     * @param User|Mailbox|null    $owner               Owner of the email
      * @param OrganizationInterface|null $organization
      *
      * @return EmailUser
@@ -282,6 +282,24 @@ class EmailEntityBuilder
             ->setTextBody($this->getEmailBodyHelper()->getTrimmedClearText($content, !$isHtml));
 
         return $result;
+    }
+
+    /**
+     * Adds an attachment to EmailBody entity.
+     * If an attachment already belongs to another EmailBody entity, then adds a clone of it.
+     *
+     * @param EmailBody $emailBody
+     * @param EmailAttachment $emailAttachment
+     */
+    public function addEmailAttachmentEntity(EmailBody $emailBody, EmailAttachment $emailAttachment): void
+    {
+        if ($emailAttachment->getEmailBody() && $emailAttachment->getEmailBody()->getId() !== $emailBody->getId()) {
+            $emailAttachmentContent = clone $emailAttachment->getContent();
+            $emailAttachment = clone $emailAttachment;
+            $emailAttachment->setContent($emailAttachmentContent);
+        }
+
+        $emailBody->addAttachment($emailAttachment);
     }
 
     /**

@@ -1,6 +1,3 @@
-parameters:
-    swiftmailer.mailer.db_spool_mailer.spool.enabled: true
-
 services:
     oro_notification.entity_spool:
         class: Oro\Bundle\NotificationBundle\Doctrine\EntityPool
@@ -117,30 +114,6 @@ services:
         tags:
             - { name: notification.handler, alias: email_notification_handler }
 
-    oro_notification.mailer.spool_db:
-        class: Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool
-        arguments:
-            - '@doctrine'
-            - '@oro_notification.entity_spool'
-            - '@event_dispatcher'
-
-    oro_notification.mailer.transport.eventdispatcher:
-        parent: swiftmailer.transport.eventdispatcher.abstract
-
-    oro_notification.mailer.transport:
-        parent: swiftmailer.transport.spool.abstract
-        arguments:
-            - '@oro_notification.mailer.transport.eventdispatcher'
-            - '@oro_notification.mailer.spool_db'
-
-    swiftmailer.mailer.db_spool_mailer:
-        class: Oro\Bundle\EmailBundle\Util\MailerWrapper
-        arguments:
-            - '@oro_notification.mailer.transport'
-
-    swiftmailer.mailer.db_spool_mailer.transport.real:
-        alias: swiftmailer.transport.real
-
     oro_notification.grid_helper:
         class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper
         public: true
@@ -160,49 +133,43 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro.notification.event.notification_send_after, method: logMassNotification}
+            - { name: kernel.event_listener, event: Oro\Bundle\NotificationBundle\Event\NotificationSentEvent, method: logMassNotification}
 
-    oro_notification.mailer.mass_email_direct_mailer:
-        class: Oro\Bundle\NotificationBundle\Mailer\MassEmailDirectMailer
+    oro_notification.mailer.mass_notifications:
+        class: Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer
         arguments:
-            - '@oro_email.direct_mailer'
+            - '@mailer.transports'
             - '@event_dispatcher'
 
-    oro_notification.manager.template_email.mass:
-        class: Oro\Bundle\EmailBundle\Manager\EmailTemplateManager
+    oro_notification.async.send_email_notification_template_processor:
+        class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor
         arguments:
-            - '@oro_notification.mailer.mass_email_direct_mailer'
-            - '@oro_email.mailer.processor'
-            - '@oro_email.provider.localized_template'
-
-    oro_notification.async.template_email_message_sender.mass:
-        class: Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender
-        arguments:
-            - '@oro_notification.manager.template_email.mass'
-            - '@oro_entity.doctrine_helper'
-
-    oro_notification.async.send_email_processor:
-        class: Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor
-        arguments:
-            - '@oro_email.direct_mailer'
-            - '@oro_email.mailer.processor'
             - '@doctrine'
-            - '@oro_email.email_renderer'
-            - '@logger'
-            - '@oro_email.async.template_email_message_sender'
+            - '@oro_email.manager.template_email'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_notification_email_template }
+
+    oro_notification.async.send_email_notification_processor:
+        class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor
+        arguments:
+            - '@mailer'
+            - '@oro_email.embedded_images.handler.symfony_email'
+            - '@validator'
+        calls:
+            - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_notification_email }
 
-    oro_notification.async.send_mass_email_processor:
-        class: Oro\Bundle\NotificationBundle\Async\SendMassEmailMessageProcessor
+    oro_notification.async.send_mass_email_notification_processor:
+        class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor
         arguments:
-            - '@oro_email.direct_mailer'
-            - '@oro_email.mailer.processor'
-            - '@doctrine'
-            - '@oro_email.email_renderer'
-            - '@logger'
-            - '@event_dispatcher'
-            - '@oro_notification.async.template_email_message_sender.mass'
+            - '@oro_notification.mailer.mass_notifications'
+            - '@oro_email.embedded_images.handler.symfony_email'
+            - '@validator'
+        calls:
+            - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_mass_notification_email }
 

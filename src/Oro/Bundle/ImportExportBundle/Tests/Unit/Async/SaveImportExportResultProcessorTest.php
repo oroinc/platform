@@ -19,37 +19,30 @@ use Psr\Log\LoggerInterface;
 
 class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var JobRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
+    private JobRepository|\PHPUnit\Framework\MockObject\MockObject $jobRepository;
 
-    /** @var ImportExportResultManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $importExportResultManager;
+    private ImportExportResultManager|\PHPUnit\Framework\MockObject\MockObject $importExportResultManager;
 
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var SaveImportExportResultProcessor */
-    private $saveExportResultProcessor;
+    private SaveImportExportResultProcessor $saveExportResultProcessor;
 
     protected function setUp(): void
     {
         $this->jobRepository = $this->createMock(JobRepository::class);
-        $this->userManager = $this->createMock(UserManager::class);
+        $userManager = $this->createMock(UserManager::class);
         $this->importExportResultManager = $this->createMock(ImportExportResultManager::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper->expects($this->any())
+        $doctrineHelper->expects(self::any())
             ->method('getEntityRepository')
             ->with(JobEntity::class)
             ->willReturn($this->jobRepository);
 
         $this->saveExportResultProcessor = new SaveImportExportResultProcessor(
             $this->importExportResultManager,
-            $this->userManager,
+            $userManager,
             $doctrineHelper,
             $this->logger
         );
@@ -57,18 +50,18 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveExportProcessor(): void
     {
-        $this->assertInstanceOf(MessageProcessorInterface::class, $this->saveExportResultProcessor);
-        $this->assertInstanceOf(TopicSubscriberInterface::class, $this->saveExportResultProcessor);
+        self::assertInstanceOf(MessageProcessorInterface::class, $this->saveExportResultProcessor);
+        self::assertInstanceOf(TopicSubscriberInterface::class, $this->saveExportResultProcessor);
     }
 
     public function testProcessWithValidMessage(): void
     {
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('critical');
         $session = $this->createMock(SessionInterface::class);
         $message = $this->createMock(MessageInterface::class);
 
-        $message->expects($this->once())
+        $message->expects(self::once())
             ->method('getBody')
             ->willReturn(JSON::encode([
                 'jobId' => '1',
@@ -80,17 +73,17 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setId(1);
 
-        $this->importExportResultManager->expects($this->once())
+        $this->importExportResultManager->expects(self::once())
             ->method('saveResult')
             ->with(1, ProcessorRegistry::TYPE_EXPORT, 'Acme', null, null);
 
-        $this->jobRepository->expects($this->once())
+        $this->jobRepository->expects(self::once())
             ->method('findJobById')
             ->willReturn($job);
 
         $result = $this->saveExportResultProcessor->process($message, $session);
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     /**
@@ -98,29 +91,29 @@ class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessWithInvalidMessage(array $parameters, string $expectedError): void
     {
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('critical')
-            ->with($this->stringContains($expectedError));
+            ->with(self::stringContains($expectedError));
         $session = $this->createMock(SessionInterface::class);
         $message = $this->createMock(MessageInterface::class);
 
-        $message->expects($this->once())
+        $message->expects(self::once())
             ->method('getBody')
             ->willReturn(JSON::encode($parameters));
 
         $job = new Job();
         $job->setId(1);
 
-        $this->importExportResultManager->expects($this->never())
+        $this->importExportResultManager->expects(self::never())
             ->method('saveResult');
 
-        $this->jobRepository->expects($this->never())
+        $this->jobRepository->expects(self::never())
             ->method('findJobById')
             ->willReturn($job);
 
         $result = $this->saveExportResultProcessor->process($message, $session);
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function getProcessWithInvalidMessageDataProvider(): array

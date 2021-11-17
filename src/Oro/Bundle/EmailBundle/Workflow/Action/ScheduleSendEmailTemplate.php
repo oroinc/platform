@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -16,31 +14,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Workflow action that schedules send emails based on passed templates
  */
-class ScheduleSendEmailTemplate extends SendEmailTemplate
+class ScheduleSendEmailTemplate extends AbstractSendEmailTemplate
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /** @var MessageProducerInterface */
-    private $messageProducer;
+    private MessageProducerInterface $messageProducer;
 
     public function __construct(
         ContextAccessor $contextAccessor,
-        Processor $emailProcessor,
+        ValidatorInterface $validator,
         EmailAddressHelper $emailAddressHelper,
         EntityNameResolver $entityNameResolver,
-        ValidatorInterface $validator,
-        AggregatedEmailTemplatesSender $sender,
         DoctrineHelper $doctrineHelper,
         MessageProducerInterface $messageProducer
     ) {
         parent::__construct(
             $contextAccessor,
-            $emailProcessor,
-            $emailAddressHelper,
-            $entityNameResolver,
             $validator,
-            $sender
+            $emailAddressHelper,
+            $entityNameResolver
         );
 
         $this->doctrineHelper = $doctrineHelper;
@@ -65,11 +57,11 @@ class ScheduleSendEmailTemplate extends SendEmailTemplate
                     static function (EmailHolderInterface $holder) {
                         return $holder->getEmail();
                     },
-                    $this->getRecipientsFromContext($context)
+                    $this->getRecipients($context, $this->options),
                 ),
                 'entity' => [
                     $this->doctrineHelper->getEntityClass($entity),
-                    $this->doctrineHelper->getSingleEntityIdentifier($entity)
+                    $this->doctrineHelper->getSingleEntityIdentifier($entity),
                 ],
             ]
         );
