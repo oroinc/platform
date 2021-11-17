@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Mapping;
 
-use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Psr6\CacheAdapter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 
 class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use CacheTrait;
+
     /** @var AdditionalMetadataProvider */
     private $additionalMetadataProvider;
 
@@ -31,9 +35,10 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getManager')
             ->willReturn($em);
 
+        $cacheAdapter = CacheAdapter::wrap(new MemoryCacheChain($this->getArrayCache()));
         $this->additionalMetadataProvider = new AdditionalMetadataProvider(
             $registry,
-            new ArrayCache()
+            $cacheAdapter
         );
     }
 

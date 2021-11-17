@@ -3,9 +3,12 @@
 namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
+use Oro\Bundle\CacheBundle\Adapter\ChainAdapter;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Oro\Component\Config\Cache\ConfigCacheWarmer;
+use Symfony\Component\Cache\Adapter\ChainAdapter as SymfonyChainAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,6 +28,7 @@ class CacheConfigurationPass implements CompilerPassInterface
     public const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
     /** the base service for static configuration providers */
     public const STATIC_CONFIG_PROVIDER_SERVICE = 'oro.static_config_provider.abstract';
+    public const DATA_CACHE_POOL = 'oro.data.cache';
 
     /**
      * {@inheritdoc}
@@ -33,6 +37,7 @@ class CacheConfigurationPass implements CompilerPassInterface
     {
         $this->ensureAbstractDataCacheExists($container);
         $this->configureDataCacheManagerAndStaticConfigCache($container);
+        $this->configureClassForChainAdapter($container);
     }
 
     /**
@@ -109,12 +114,24 @@ class CacheConfigurationPass implements CompilerPassInterface
     private function getFilesystemCache(): Definition
     {
         $cacheDefinition = new Definition(
-            FilesystemCache::class,
-            ['%kernel.cache_dir%/oro_data']
+            FilesystemAdapter::class,
+            ['', 0, '%kernel.cache_dir%/oro_data']
         );
         $cacheDefinition->setAbstract(true);
+        $doctrineProviderDefinition = new Definition(DoctrineProvider::class, [$cacheDefinition]);
+        $doctrineProviderDefinition->setFactory([DoctrineProvider::class, 'wrap']);
 
-        return $cacheDefinition;
+        return $doctrineProviderDefinition;
+    }
+
+    private function configureClassForChainAdapter(ContainerBuilder $container): void
+    {
+        if ($container->hasDefinition(self::DATA_CACHE_POOL)) {
+            $adapter = $container->getDefinition(self::DATA_CACHE_POOL);
+            if (SymfonyChainAdapter::class === $adapter->getClass()) {
+                $adapter->setClass(ChainAdapter::class);
+            }
+        }
     }
 
     public static function getMemoryCacheChain(Definition $cacheProvider): Definition

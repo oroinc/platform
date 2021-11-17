@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
@@ -190,8 +190,8 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $items = ['name' => $alias];
         $menu = $this->createMock(ItemInterface::class);
 
-        $cache = $this->createMock(ArrayCache::class);
-        $cache->expects(self::once())
+        $cache = $this->createMock(CacheProvider::class);
+        $cache->expects(static::once())
             ->method('contains')
             ->with($alias)
             ->willReturn(true);

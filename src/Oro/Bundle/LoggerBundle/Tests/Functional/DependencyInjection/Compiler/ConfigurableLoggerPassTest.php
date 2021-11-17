@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Functional\DependencyInjection\Compiler;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ConfigurableLoggerPass;
@@ -15,6 +14,7 @@ use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -115,8 +115,8 @@ class ConfigurableLoggerPassTest extends WebTestCase
         /** @var ConfigManager $userConfigManager */
         $userConfigManager = $this->createMock(ConfigManager::class);
 
-        /** @var CacheProvider $cache */
-        $cache = $this->createMock(CacheProvider::class);
+        /** @var ArrayAdapter $cache */
+        $cache = $this->createMock(ArrayAdapter::class);
 
         /** @var UserManager $userManager */
         $userManager = $this->createMock(UserManager::class);

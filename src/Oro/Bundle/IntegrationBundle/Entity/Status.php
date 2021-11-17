@@ -34,7 +34,11 @@ class Status
     /**
      * @var Channel
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", cascade="ALL", inversedBy="statuses")
+     * @ORM\ManyToOne(
+     *     targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel",
+     *     cascade={"ALL"},
+     *     inversedBy="statuses"
+     * )
      * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
     protected $channel;

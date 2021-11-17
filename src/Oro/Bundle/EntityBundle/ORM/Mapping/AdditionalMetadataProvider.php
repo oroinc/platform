@@ -3,22 +3,24 @@
 namespace Oro\Bundle\EntityBundle\ORM\Mapping;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\Psr6\CacheAdapter;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * Doctrine helper methods.
+ */
 class AdditionalMetadataProvider
 {
-    /** @var ManagerRegistry */
-    protected $registry;
+    protected ManagerRegistry $registry;
+    protected Cache $cacheDriver;
 
-    /** @var Cache */
-    protected $cacheDriver;
-
-    public function __construct(ManagerRegistry $registry, Cache $cacheDriver)
+    public function __construct(ManagerRegistry $registry, CacheAdapter $cacheAdapter)
     {
         $this->registry = $registry;
-        $this->cacheDriver = $cacheDriver;
+        $this->cacheDriver = DoctrineProvider::wrap($cacheAdapter);
     }
 
     /**

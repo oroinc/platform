@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Manager;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -10,10 +9,11 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 
 class LocalizationManagerTest extends WebTestCase
 {
-    use ConfigManagerAwareTestTrait;
+    use ConfigManagerAwareTestTrait, CacheTrait;
 
     protected function setUp(): void
     {
@@ -67,7 +67,7 @@ class LocalizationManagerTest extends WebTestCase
         $conn = $em->getConnection();
         $sqlLogger = new QueryAnalyzer($conn->getDatabasePlatform());
         $conn->getConfiguration()->setSQLLogger($sqlLogger);
-        $cache = new ArrayCache();
+        $cache = $this->getArrayCache();
 
         $manager = new LocalizationManager(
             $doctrineHelper,
@@ -97,7 +97,6 @@ class LocalizationManagerTest extends WebTestCase
         ], $manager->getLocalizationData($this->getReference('es')->getId(), false));
 
         $this->assertCount(3, $sqlLogger->getExecutedQueries());
-        $this->assertEquals(2, $cache->getStats()['hits']);
     }
 
     /**

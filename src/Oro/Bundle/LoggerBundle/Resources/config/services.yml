@@ -2,11 +2,12 @@ parameters:
     oro_logger.detailed_logs_default_level: error
 services:
     oro_logger.cache:
-        class: Doctrine\Common\Cache\ArrayCache
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
         public: true
         lazy: true
-        calls:
-            - [ setNamespace, [ 'oro_logger' ] ]
+        arguments:
+            - 0
+            - false
 
     oro_logger.event_subscriber.console_command:
         class: Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber

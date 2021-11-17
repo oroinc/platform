@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
-use Doctrine\Common\Cache\VoidCache;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -26,6 +25,7 @@ use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -35,6 +35,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
+    use CacheTrait;
+
     /** @var FormFactoryInterface */
     private $formFactory;
 
@@ -228,7 +230,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 $this->getVirtualRelationProvider(),
                 new DoctrineHelper($doctrine),
                 new RestrictionBuilder($manager, $configManager, $filterExecutionContext),
-                new SegmentQueryConverterState(new VoidCache())
+                new SegmentQueryConverterState($this->getNullCache())
             ));
 
         return new DynamicSegmentQueryBuilder($segmentQueryConverterFactory, $doctrine);

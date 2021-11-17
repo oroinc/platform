@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\HelpBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The help link URL provider.
@@ -45,7 +45,7 @@ class HelpLinkProvider
     /** @var Help[]|null */
     private $helpAnnotation;
 
-    /** @var CacheProvider */
+    /** @var CacheInterface */
     private $cache;
 
     public function __construct(
@@ -54,7 +54,7 @@ class HelpLinkProvider
         RequestStack $requestStack,
         ControllerClassProvider $controllerClassProvider,
         VersionHelper $helper,
-        CacheProvider $cache
+        CacheInterface $cache
     ) {
         $this->defaultConfig = $defaultConfig;
         $this->configProvider = $configProvider;
@@ -73,19 +73,10 @@ class HelpLinkProvider
     {
         $this->ensureRequestSet();
 
-        $helpLink = false;
-        if ($this->requestRoute) {
-            $helpLink = $this->cache->fetch($this->requestRoute);
-        }
-        if (false === $helpLink) {
-            $helpLink = $this->constructedHelpLinkUrl();
-
-            if ($this->requestRoute) {
-                $this->cache->save($this->requestRoute, $helpLink);
-            }
-        }
-
-        return $helpLink;
+        return $this->requestRoute
+            ? $this->cache->get($this->requestRoute, function () {
+                return $this->constructedHelpLinkUrl();
+            }) : $this->constructedHelpLinkUrl();
     }
 
     /**

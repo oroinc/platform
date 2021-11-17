@@ -8,9 +8,9 @@ services:
             - '%kernel.debug%'
 
     oro_help.help_link.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_help_link' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_help_link' }
 
     oro_help.help_link_provider:
         class: Oro\Bundle\HelpBundle\Provider\HelpLinkProvider

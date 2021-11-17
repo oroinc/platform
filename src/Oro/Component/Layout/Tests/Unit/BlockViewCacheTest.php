@@ -3,10 +3,11 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Oro\Bundle\CacheBundle\Provider\ArrayCache;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -125,7 +126,10 @@ class BlockViewCacheTest extends LayoutTestCase
             });
         $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
 
-        $cache = new BlockViewCache(new ArrayCache(), $serializer);
+        $cache = new BlockViewCache(
+            DoctrineProvider::wrap(new ArrayAdapter(0, false)),
+            $serializer
+        );
         $context = new LayoutContext(['some data']);
         $firstBlockView = new BlockView();
         $firstBlockView->vars = ['attr' => 'first block view data'];

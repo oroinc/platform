@@ -2,16 +2,17 @@
 
 namespace Oro\Component\TestUtils\ORM;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\ChainCache;
+use Doctrine\Common\Cache\Psr6\CacheAdapter;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 use Oro\Component\Testing\TempDirExtension;
+use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
 use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 
 /**
  * The base class for ORM related test cases.
@@ -20,7 +21,7 @@ use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
  */
 abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
-    use TempDirExtension;
+    use TempDirExtension, CacheTrait;
 
     /** @var CacheProvider The metadata cache that is shared between all ORM tests */
     private $metadataCacheImpl;
@@ -58,8 +59,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     protected function getTestEntityManager($conn = null, $eventManager = null, $withSharedMetadata = true)
     {
         $config = new \Doctrine\ORM\Configuration();
-
-        $config->setMetadataCacheImpl($this->getMetadataCacheImpl($withSharedMetadata));
+        $config->setMetadataCache($this->getMetadataCacheImpl($withSharedMetadata));
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
         $config->setQueryCacheImpl($this->getQueryCacheImpl());
         $config->setProxyDir($this->getProxyDir());
@@ -246,29 +246,25 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
                 ->willReturnOnConsecutiveCalls(...$will);
         }
     }
-    /**
-     * @return CacheProvider
-     */
+
     private function getMetadataCacheImpl($withSharedMetadata)
     {
         if (!$withSharedMetadata) {
             // do not cache anything to avoid influence between tests
-            return new ChainCache();
+            return $this->getChainCache();
         }
 
         if ($this->metadataCacheImpl === null) {
-            $this->metadataCacheImpl = new ArrayCache();
+            $this->metadataCacheImpl = $this->getArrayCache();
         }
 
-        return $this->metadataCacheImpl;
+        return CacheAdapter::wrap($this->metadataCacheImpl);
     }
 
-    /**
-     * @return CacheProvider
-     */
+
     protected function getQueryCacheImpl()
     {
         // do not cache anything to avoid influence between tests
-        return new ChainCache();
+        return $this->getChainCache([new NullAdapter()]);
     }
 }

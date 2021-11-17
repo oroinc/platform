@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * Provide information about entity applicability for workflow.
@@ -42,7 +43,7 @@ class WorkflowEntityConnector
     public function __construct(ManagerRegistry $managerRegistry, Cache $cache = null)
     {
         $this->registry = $managerRegistry;
-        $this->cache = $cache ?: new ArrayCache();
+        $this->cache = $cache ?: DoctrineProvider::wrap(new ArrayAdapter(0, false));
     }
 
     /**
