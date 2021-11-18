@@ -92,6 +92,7 @@
 
     .form-actions.widget-actions {
         text-align: $dialog-actions-mobile-text-align;
+        padding: $dialog-actions-mobile-inner-offset;
 
         .pull-right {
             float: $dialog-actions-mobile-float;
