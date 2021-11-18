@@ -29,7 +29,7 @@ class AttributeController extends AbstractController
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_create")
-     * @Template
+     * @Template("@OroEntityConfig/Attribute/create.html.twig")
      *
      * @param Request $request
      * @param string $alias
@@ -94,7 +94,7 @@ class AttributeController extends AbstractController
 
     /**
      * @Route("/update/{id}", name="oro_attribute_update", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroEntityConfig/Attribute/update.html.twig")
      * @param FieldConfigModel $fieldConfigModel
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -167,7 +167,7 @@ class AttributeController extends AbstractController
 
     /**
      * @Route("/index/{alias}", name="oro_attribute_index")
-     * @Template
+     * @Template("@OroEntityConfig/Attribute/index.html.twig")
      * @param string $alias
      * @return array
      */
