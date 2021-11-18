@@ -6,13 +6,29 @@ use Oro\Component\ExpressionLanguage\Lexer;
 use Oro\Component\ExpressionLanguage\Node as CustomNode;
 use Oro\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\Node;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
-    public function testParseWithInvalidName()
+    public function testParseWhenMethodNotSupported(): void
     {
-        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
-        $this->expectExceptionMessage('Array calls on a method call is not allowed around position 11.');
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(
+            'Unsupported method: bar(), supported methods are all(), any(), sum()'
+            . ' around position 5 for expression `foo.bar(1)`.'
+        );
+
+        $lexer = new Lexer();
+        $parser = new Parser([]);
+        $parser->parse($lexer->tokenize('foo.bar(1)'));
+    }
+
+    public function testParseWhenArrayAccessAfterMethodCall(): void
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(
+            'Array calls on a method call is not allowed around position 11 for expression `foo.any(1)[3]`.'
+        );
 
         $lexer = new Lexer();
         $parser = new Parser([]);
@@ -24,10 +40,12 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      *
      * @param string $expression
      */
-    public function testParseOneArgumentRequired($expression)
+    public function testParseOneArgumentRequired(string $expression): void
     {
-        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
-        $this->expectExceptionMessage('Method should have exactly one argument around position 5.');
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(
+            sprintf('Method any() should have exactly one argument around position 5 for expression `%s`.', $expression)
+        );
 
         $lexer = new Lexer();
         $parser = new Parser([]);
@@ -37,7 +55,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function parseOneArgumentRequiredDataProvider()
+    public function parseOneArgumentRequiredDataProvider(): array
     {
         return [
             ['foo.any()'],
@@ -48,15 +66,15 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getParseData
      *
-     * @param Node\Node  $expectedNode
+     * @param Node\Node $expectedNode
      * @param string $expression
-     * @param array  $names
+     * @param array $names
      */
-    public function testParse($expectedNode, $expression, $names = [])
+    public function testParse(Node\Node $expectedNode, string $expression, array $names = []): void
     {
         $lexer = new Lexer();
         $parser = new Parser([]);
-        $this->assertEquals($expectedNode, $parser->parse($lexer->tokenize($expression), $names));
+        self::assertEquals($expectedNode, $parser->parse($lexer->tokenize($expression), $names));
     }
 
     /**
@@ -64,7 +82,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function getParseData()
+    public function getParseData(): array
     {
         return [
             [
@@ -109,51 +127,47 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                 '(3 - 3) * 2',
             ],
             [
-                new CustomNode\GetAttrNode(
+                new CustomNode\GetPropertyNode(
                     new Node\NameNode('foo'),
-                    new Node\ConstantNode('bar'),
-                    new Node\ArgumentsNode(),
-                    CustomNode\GetAttrNode::PROPERTY_CALL
+                    new Node\ConstantNode('bar', true),
+                    new Node\ArgumentsNode()
                 ),
                 'foo.bar',
                 ['foo'],
             ],
             [
-                new CustomNode\GetAttrNode(
+                new CustomNode\CollectionMethodAllNode(
                     new Node\NameNode('foo'),
-                    new Node\ConstantNode('all'),
-                    new Node\ConstantNode(true),
-                    CustomNode\GetAttrNode::ALL_CALL
+                    new Node\ConstantNode('all', true),
+                    $this->getArgumentsNode(new Node\ConstantNode(true))
                 ),
                 'foo.all(true)',
                 ['foo'],
             ],
             [
-                new CustomNode\GetAttrNode(
+                new CustomNode\CollectionMethodAnyNode(
                     new Node\NameNode('foo'),
-                    new Node\ConstantNode('any'),
-                    new Node\ConstantNode(true),
-                    CustomNode\GetAttrNode::ANY_CALL
+                    new Node\ConstantNode('any', true),
+                    $this->getArgumentsNode(new Node\ConstantNode(true))
                 ),
                 'foo.any(true)',
                 ['foo'],
             ],
             [
-                new CustomNode\GetAttrNode(
+                new CustomNode\CollectionMethodSumNode(
                     new Node\NameNode('foo'),
-                    new Node\ConstantNode('sum'),
-                    new Node\ConstantNode(true),
-                    CustomNode\GetAttrNode::SUM_CALL
+                    new Node\ConstantNode('sum', true),
+                    $this->getArgumentsNode(new Node\ConstantNode(true))
                 ),
                 'foo.sum(1)',
                 ['foo'],
             ],
             [
-                new CustomNode\GetAttrNode(
+                new Node\GetAttrNode(
                     new Node\NameNode('foo'),
                     new Node\ConstantNode(3),
                     new Node\ArgumentsNode(),
-                    CustomNode\GetAttrNode::ARRAY_CALL
+                    Node\GetAttrNode::ARRAY_CALL
                 ),
                 'foo[3]',
                 ['foo'],
@@ -171,16 +185,14 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                 '"foo" matches "/foo/"',
             ],
             [
-                $this->createGetAttrNode(
-                    $this->createGetAttrNode(
+                new CustomNode\CollectionMethodAllNode(
+                    new CustomNode\CollectionMethodAnyNode(
                         new Node\NameNode('foo'),
-                        'any',
-                        new Node\ConstantNode(true),
-                        CustomNode\GetAttrNode::ANY_CALL
+                        new Node\ConstantNode('any', true),
+                        $this->getArgumentsNode(new Node\ConstantNode(true))
                     ),
-                    'all',
-                    new Node\ConstantNode(true),
-                    CustomNode\GetAttrNode::ALL_CALL
+                    new Node\ConstantNode('all', true),
+                    $this->getArgumentsNode(new Node\ConstantNode(true))
                 ),
                 'foo.any(true).all(true)',
                 ['foo'],
@@ -193,62 +205,58 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testParseNestedCondition()
+    public function testParseNestedCondition(): void
     {
         $arrayNode = new Node\ArrayNode();
         $arrayNode->addElement(new Node\ConstantNode('bar'));
 
         $left = new CustomNode\BinaryNode(
             'in',
-            new CustomNode\GetAttrNode(
+            new CustomNode\GetPropertyNode(
                 new Node\NameNode('item'),
-                new Node\ConstantNode('foo'),
-                new Node\ArgumentsNode(),
-                CustomNode\GetAttrNode::PROPERTY_CALL
+                new Node\ConstantNode('foo', true),
+                new Node\ArgumentsNode()
             ),
             $arrayNode
         );
 
-        $allsArguments = new Node\ArgumentsNode();
-        $allsArguments->addElement(new CustomNode\BinaryNode(
-            '>',
-            new CustomNode\GetAttrNode(
-                new Node\NameNode('item'),
-                new Node\ConstantNode('index'),
-                new Node\ArgumentsNode(),
-                CustomNode\GetAttrNode::PROPERTY_CALL
-            ),
-            new Node\ConstantNode(10)
-        ));
+        $allArguments = new Node\ArgumentsNode();
+        $allArguments->addElement(
+            new CustomNode\BinaryNode(
+                '>',
+                new CustomNode\GetPropertyNode(
+                    new Node\NameNode('item'),
+                    new Node\ConstantNode('index', true),
+                    new Node\ArgumentsNode()
+                ),
+                new Node\ConstantNode(10)
+            )
+        );
 
         $arguments = new CustomNode\BinaryNode(
             '>',
-            new CustomNode\GetAttrNode(
+            new CustomNode\GetPropertyNode(
                 new Node\NameNode('value'),
-                new Node\ConstantNode('index'),
-                new Node\ArgumentsNode(),
-                CustomNode\GetAttrNode::PROPERTY_CALL
+                new Node\ConstantNode('index', true),
+                new Node\ArgumentsNode()
             ),
             new Node\ConstantNode(10)
         );
 
-        $right = new CustomNode\GetAttrNode(
-            new CustomNode\GetAttrNode(
+        $right = new CustomNode\CollectionMethodAllNode(
+            new CustomNode\GetPropertyNode(
                 new Node\NameNode('item'),
-                new Node\ConstantNode('values'),
-                new Node\ArgumentsNode(),
-                CustomNode\GetAttrNode::PROPERTY_CALL
+                new Node\ConstantNode('values', true),
+                new Node\ArgumentsNode()
             ),
-            new Node\ConstantNode('all'),
-            $arguments,
-            CustomNode\GetAttrNode::ALL_CALL
+            new Node\ConstantNode('all', true),
+            $this->getArgumentsNode($arguments)
         );
 
-        $node = new CustomNode\GetAttrNode(
+        $node = new CustomNode\CollectionMethodAnyNode(
             new Node\NameNode('items'),
-            new Node\ConstantNode('any'),
-            new CustomNode\BinaryNode('and', $left, $right),
-            CustomNode\GetAttrNode::ANY_CALL
+            new Node\ConstantNode('any', true),
+            $this->getArgumentsNode(new CustomNode\BinaryNode('and', $left, $right))
         );
 
         $expression = 'items.any(item.foo in ["bar"] and item.values.all(value.index > 10))';
@@ -256,19 +264,17 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
         $lexer = new Lexer();
         $parser = new Parser([]);
-        $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
+        self::assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
-    /**
-     * @param Node\Node $node
-     * @param mixed $item
-     * @param Node\Node $arguments
-     * @param int $type
-     * @return CustomNode\GetAttrNode
-     */
-    private function createGetAttrNode(Node\Node $node, $item, Node\Node $arguments, $type)
+    private function getArgumentsNode(...$args): Node\ArgumentsNode
     {
-        return new CustomNode\GetAttrNode($node, new Node\ConstantNode($item), $arguments, $type);
+        $arguments = new Node\ArgumentsNode();
+        foreach ($args as $arg) {
+            $arguments->addElement($arg);
+        }
+
+        return $arguments;
     }
 
     /**
@@ -277,7 +283,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      * @param string $expr
      * @param array $names
      */
-    public function testParseWithInvalidPostfixData($expr, array $names = [])
+    public function testParseWithInvalidPostfixData(string $expr, array $names = []): void
     {
         $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
         $lexer = new Lexer();
@@ -285,10 +291,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse($lexer->tokenize($expr), $names);
     }
 
-    /**
-     * @return array
-     */
-    public function getInvalidPostfixData()
+    public function getInvalidPostfixData(): array
     {
         return [
             [
