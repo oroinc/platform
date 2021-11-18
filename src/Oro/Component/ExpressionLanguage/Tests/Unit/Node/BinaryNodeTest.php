@@ -8,9 +8,6 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
 class BinaryNodeTest extends AbstractNodeTest
 {
-    /**
-     * {@inheritDoc}
-     */
     public function getEvaluateData(): array
     {
         $array = new ArrayNode();
@@ -57,9 +54,6 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getCompileData(): array
     {
         $array = new ArrayNode();
@@ -109,9 +103,6 @@ class BinaryNodeTest extends AbstractNodeTest
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getDumpData(): array
     {
         $array = new ArrayNode();

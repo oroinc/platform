@@ -9,15 +9,16 @@
 namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\Node\Node;
 
 abstract class AbstractNodeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getEvaluateData
      */
-    public function testEvaluate($expected, $node, $variables = [], $functions = [])
+    public function testEvaluate($expected, Node $node, $variables = [], $functions = []): void
     {
-        $this->assertSame($expected, $node->evaluate($functions, $variables));
+        self::assertSame($expected, $node->evaluate($functions, $variables));
     }
 
     abstract public function getEvaluateData(): array;
@@ -25,11 +26,11 @@ abstract class AbstractNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getCompileData
      */
-    public function testCompile($expected, $node, $functions = [])
+    public function testCompile($expected, Node $node, $functions = []): void
     {
         $compiler = new Compiler($functions);
         $node->compile($compiler);
-        $this->assertSame($expected, $compiler->getSource());
+        self::assertSame($expected, $compiler->getSource());
     }
 
     abstract public function getCompileData(): array;
@@ -37,9 +38,9 @@ abstract class AbstractNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDumpData
      */
-    public function testDump($expected, $node)
+    public function testDump($expected, Node $node): void
     {
-        $this->assertSame($expected, $node->dump());
+        self::assertSame($expected, $node->dump());
     }
 
     abstract public function getDumpData(): array;
