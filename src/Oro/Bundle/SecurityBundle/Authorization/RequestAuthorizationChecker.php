@@ -9,6 +9,9 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides a set of methods to simplify checking access in controllers.
+ */
 class RequestAuthorizationChecker
 {
     /** @var AuthorizationCheckerInterface */
@@ -63,12 +66,14 @@ class RequestAuthorizationChecker
     public function getRequestAcl(Request $request, $convertClassName = false)
     {
         $controller = $request->attributes->get('_controller');
-        if (false === strpos($controller, '::')) {
-            return null;
+        if (false !== strpos($controller, '::')) {
+            [$controllerClass, $controllerMethod] = explode('::', $controller);
+        } else {
+            $controllerClass = $controller;
+            $controllerMethod = '__invoke';
         }
 
-        $controllerData = explode('::', $controller);
-        $annotation = $this->getAnnotation($controllerData[0], $controllerData[1]);
+        $annotation = $this->getAnnotation($controllerClass, $controllerMethod);
         if ($convertClassName && null !== $annotation) {
             $entityClass = $annotation->getClass();
             if ($entityClass) {
