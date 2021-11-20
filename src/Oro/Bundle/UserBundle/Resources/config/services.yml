@@ -481,9 +481,9 @@ services:
             - '@oro_config.user'
 
     oro_user.validator.user_without_role:
-        class: Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator
+        class: Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRoleValidator
         tags:
-            - { name: validator.constraint_validator,  alias: oro_user.validator.user_without_role }
+            - { name: validator.constraint_validator }
 
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper

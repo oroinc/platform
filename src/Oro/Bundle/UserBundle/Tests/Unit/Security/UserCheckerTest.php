@@ -4,15 +4,22 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
 use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
 use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\UserBundle\Security\UserChecker;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UserCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -28,134 +35,178 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker = new UserChecker($this->tokenStorage);
     }
 
-    /**
-     * @dataProvider checkPreAuthProvider
-     */
-    public function testCheckPreAuth(UserInterface $user, int $getTokenCalls, ?string $token, bool $exceptionThrown)
+    private function getAuthStatus(string $id): AbstractEnumValue
     {
-        $this->tokenStorage->expects($this->exactly($getTokenCalls))
-            ->method('getToken')
-            ->willReturn($token);
+        $authStatus = $this->createMock(AbstractEnumValue::class);
+        $authStatus->expects(self::any())
+            ->method('getId')
+            ->willReturn($id);
 
-        if ($exceptionThrown) {
-            $this->expectException(PasswordChangedException::class);
-            $this->expectExceptionMessage('Invalid password.');
-        }
+        return $authStatus;
+    }
+
+    public function testCheckPostAuthForNotUser()
+    {
+        $user = $this->createMock(UserInterface::class);
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPostAuthForUser()
+    {
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+        $user->setOwner(new BusinessUnit());
+        $organization = new Organization();
+        $organization->setEnabled(true);
+        $user->addOrganization($organization);
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPostAuthForDisabledUser()
+    {
+        $this->expectException(DisabledException::class);
+
+        $user = new User();
+        $user->setEnabled(false);
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPostAuthForUserWithoutAuthStatus()
+    {
+        $user = new User();
+        $user->setOwner(new BusinessUnit());
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPostAuthForUserInDisabledOrganization()
+    {
+        $this->expectException(OrganizationException::class);
+
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+        $user->setOwner(new BusinessUnit());
+        $organization = new Organization();
+        $organization->setEnabled(false);
+        $user->addOrganization($organization);
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPostAuthForUserNotBelongsToAnyOrganization()
+    {
+        $this->expectException(OrganizationException::class);
+
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+        $user->setOwner(new BusinessUnit());
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPostAuthForUserWithoutOwner()
+    {
+        $this->expectException(EmptyOwnerException::class);
+
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+        $organization = new Organization();
+        $organization->setEnabled(true);
+        $user->addOrganization($organization);
+
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function testCheckPreAuthForNotUser()
+    {
+        $user = $this->createMock(UserInterface::class);
+
+        $this->tokenStorage->expects(self::never())
+            ->method('getToken');
 
         $this->userChecker->checkPreAuth($user);
     }
 
-    /**
-     * @dataProvider checkPostAuthProvider
-     */
-    public function testCheckPostAuth(UserInterface $user, bool $exceptionThrown)
+    public function testCheckPreAuthForUserWithNotChangedPassword()
     {
-        if ($exceptionThrown) {
-            $this->expectException(OrganizationException::class);
-            $this->expectExceptionMessage('');
-        }
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
 
-        $this->userChecker->checkPostAuth($user);
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+
+        $this->userChecker->checkPreAuth($user);
     }
 
-    public function checkPreAuthProvider(): array
+    public function testCheckPreAuthForUserWithPasswordChangedBeforeLastLogin()
     {
-        $data = [];
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+        $user->setPasswordChangedAt(new \DateTime());
+        $user->setLastLogin((new \DateTime())->modify('+1 minute'));
 
-        $user = $this->createMock(UserInterface::class);
-        $data[] = [
-            'user' => $user,
-            'getTokenCalls' => 0,
-            'token' => null,
-            'exceptionThrown' => false,
-        ];
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
 
-        $user1 = new User();
-        $user1->setOwner(new BusinessUnit());
-        $data[] = [
-            'user' => $user1,
-            'getTokenCalls' => 1,
-            'token' => null,
-            'exceptionThrown' => false,
-        ];
-
-        $user2 = new User();
-        $user2->setOwner(new BusinessUnit());
-        $user2->setPasswordChangedAt(new \DateTime());
-        $user2->setLastLogin((new \DateTime())->modify('+1 minute'));
-        $data[] = [
-            'user' => $user2,
-            'getTokenCalls' => 1,
-            'token' => 'not_null',
-            'exceptionThrown' => false,
-        ];
-
-        $user3 = new User();
-        $user3->setOwner(new BusinessUnit());
-        $passwordChangedAt = new \DateTime();
-        $lastLogin = clone $passwordChangedAt;
-        $user3->setPasswordRequestedAt($passwordChangedAt);
-        $user3->setLastLogin($lastLogin);
-        $data[] = [
-            'user' => $user3,
-            'getTokenCalls' => 1,
-            'token' => 'not_null',
-            'exceptionThrown' => false,
-        ];
-
-        $user4 = new User();
-        $user4->setOwner(new BusinessUnit());
-        $user4->setPasswordChangedAt(new \DateTime());
-        $user4->setLastLogin((new \DateTime())->modify('-1 minute'));
-        $data[] = [
-            'user' => $user4,
-            'getTokenCalls' => 1,
-            'token' => 'not_null',
-            'exceptionThrown' => true,
-        ];
-
-        return $data;
+        $this->userChecker->checkPreAuth($user);
     }
 
-    public function checkPostAuthProvider(): array
+
+    public function testCheckPreAuthForUserWithPasswordChangedAfterLastLogin()
     {
-        $data = [];
+        $this->expectException(PasswordChangedException::class);
 
-        $user = $this->createMock(UserInterface::class);
-        $data['invalid_user_class'] = [
-            'user' => $user,
-            'exceptionThrown' => false,
-        ];
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+        $user->setPasswordChangedAt(new \DateTime());
+        $user->setLastLogin((new \DateTime())->modify('-1 minute'));
 
-        $organization = new OrganizationStub();
-        $organization->setEnabled(true);
-        $user1 = new User();
-        $user1->setOwner($this->createMock(BusinessUnit::class));
-        $user1->addOrganization($organization);
-        $authStatus = $this->createMock(AbstractEnumValue::class);
-        $user1->setAuthStatus($authStatus);
-        $data['with_organization'] = [
-            'user' => $user1,
-            'exceptionThrown' => false,
-        ];
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
 
-        $user2 = new User();
-        $user2->setOwner($this->createMock(BusinessUnit::class));
-        $authStatus = $this->createMock(AbstractEnumValue::class);
-        $user2->setAuthStatus($authStatus);
-        $data['without_organization'] = [
-            'user' => $user2,
-            'exceptionThrown' => true,
-        ];
-
-        return $data;
+        $this->userChecker->checkPreAuth($user);
     }
 
-    public function testCheckPostAuthOnUserWithoutOwner()
+    public function testCheckPreAuthForUserWithoutAuthStatus()
     {
-        $this->expectException(EmptyOwnerException::class);
         $user = new User();
 
-        $this->userChecker->checkPostAuth($user);
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $this->userChecker->checkPreAuth($user);
+    }
+
+    public function testCheckPreAuthForUserWithActiveAuthStatus()
+    {
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
+
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $this->userChecker->checkPreAuth($user);
+    }
+
+    public function testCheckPreAuthForUserWithExpiredAuthStatus()
+    {
+        $this->expectException(CredentialsResetException::class);
+
+        $user = new User();
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_EXPIRED));
+
+        $this->tokenStorage->expects(self::once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $this->userChecker->checkPreAuth($user);
     }
 }

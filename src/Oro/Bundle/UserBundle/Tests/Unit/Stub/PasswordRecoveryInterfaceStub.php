@@ -29,22 +29,6 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     /**
      * {@inheritDoc}
      */
-    public function isAccountNonLocked(): bool
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isEnabled(): bool
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setUsername($username): self
     {
         $this->username = $username;
