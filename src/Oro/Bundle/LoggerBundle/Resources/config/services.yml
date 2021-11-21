@@ -60,9 +60,9 @@ services:
             - { name: oro_message_queue.consumption.extension, persistent: true }
 
     oro_logger.validator.email_recipients_list:
-        class: Oro\Bundle\LoggerBundle\Validator\EmailRecipientsListValidator
+        class: Oro\Bundle\LoggerBundle\Validator\Constraints\EmailRecipientsListValidator
         tags:
-            - { name: validator.constraint_validator, alias: oro_logger.validator.email_recipients_list }
+            - { name: validator.constraint_validator }
 
     oro_logger.deduplication_handler.cache.warmer:
         public: false

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Validator\Constraints;
 
-use Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -11,14 +10,6 @@ use Symfony\Component\Validator\Constraint;
 class SmtpConnectionConfiguration extends Constraint
 {
     public string $message = 'oro.email.validator.configuration.connection.smtp';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy(): string
-    {
-        return SmtpConnectionConfigurationValidator::class;
-    }
 
     /**
      * {@inheritdoc}

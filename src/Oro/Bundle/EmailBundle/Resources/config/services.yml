@@ -460,38 +460,38 @@ services:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
     oro_email.validator.email_template_syntax:
-        class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntaxValidator
         arguments:
             - '@oro_email.email_renderer'
             - '@oro_locale.manager.localization'
             - '@oro_entity_config.provider.entity'
             - '@translator'
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
+            - { name: validator.constraint_validator }
 
     oro_email.validator.email_address_validator:
-        class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddressValidator
         arguments:
             - '@oro_email.email.address.helper'
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.email_address_validator }
+            - { name: validator.constraint_validator }
 
     oro_email.validator.email_recipients:
-        class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipientsValidator
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
+            - { name: validator.constraint_validator }
 
     oro_email.validator.mailbox_origin:
-        class: Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOriginValidator
         arguments:
             - '@translator'
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.validator.mailbox_origin }
+            - { name: validator.constraint_validator }
 
     oro_email.validator.not_empty_email_template_translation_subject:
-        class: Oro\Bundle\EmailBundle\Validator\NotEmptyEmailTemplateTranslationSubjectValidator
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\NotEmptyEmailTemplateTranslationSubjectValidator
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.not_empty_email_template_translation_subject }
+            - { name: validator.constraint_validator }
 
     oro_email.datagrid_query_factory:
         class: Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
@@ -1299,7 +1299,7 @@ services:
              - '@doctrine.orm.entity_manager'
 
     oro_email.validator.connection_configuration.smtp:
-        class: 'Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator'
+        class: Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfigurationValidator
         arguments:
             - '@oro_email.mailer.checker.smtp_settings'
             - '@oro_email.smtp_settings_factory'

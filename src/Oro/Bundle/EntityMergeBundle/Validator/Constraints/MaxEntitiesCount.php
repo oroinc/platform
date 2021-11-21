@@ -4,20 +4,13 @@ namespace Oro\Bundle\EntityMergeBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * This constraint is used to check that the number of entities is less or equals to the max limit
+ * of entities to merge.
+ */
 class MaxEntitiesCount extends Constraint
 {
-    /**
-     * @var string
-     */
-    public $message = 'You can merge only {{ limit }} entities at once.';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return 'oro_entity_merge_max_entities_validator';
-    }
+    public string $message = 'You can merge only {{ limit }} entities at once.';
 
     /**
      * {@inheritdoc}

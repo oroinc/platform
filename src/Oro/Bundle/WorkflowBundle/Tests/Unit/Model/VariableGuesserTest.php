@@ -6,7 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
+use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFields;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,14 +18,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class VariableGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    private $guesser;
-
     /** @var Variable|\PHPUnit\Framework\MockObject\MockObject */
     private $variable;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $formConfigProvider;
+
+    /** @var VariableGuesser */
+    private $guesser;
 
     protected function setUp(): void
     {
@@ -61,14 +61,13 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
      * Test variable form guessing.
      *
      * @dataProvider guessVariableFormDataProvider
-     *
-     * @param TypeGuess $expected
-     * @param Variable  $variable
-     * @param array     $formMapping
-     * @param array     $formConfig
      */
-    public function testGuessVariableForm(TypeGuess $expected, Variable $variable, $formMapping = [], $formConfig = [])
-    {
+    public function testGuessVariableForm(
+        TypeGuess $expected,
+        Variable $variable,
+        array $formMapping = [],
+        array $formConfig = []
+    ) {
         foreach ($formMapping as $mapping) {
             $this->guesser->addFormTypeMapping(
                 $mapping['variableType'],
@@ -130,7 +129,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
                         'key' => 'value',
                         'constraints' => [
                             new NotBlank(),
-                            new UserAuthenticationFieldsConstraint(),
+                            new UserAuthenticationFields(),
                             new GreaterThan(10)
                         ],
                         'tooltip' => 'test_tooltip_translated'
@@ -142,7 +141,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
                     'form_options' => [
                         'constraints' => [
                             'NotBlank' => null,
-                            UserAuthenticationFieldsConstraint::class => null,
+                            UserAuthenticationFields::class => null,
                             'GreaterThan' => 10,
                         ],
                         'tooltip' => 'test_tooltip'
@@ -187,11 +186,8 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
      * Test guessing without options
      *
      * @dataProvider optionsDataProvider
-     * @param string $type
-     * @param string $property
-     * @param mixed $value
      */
-    public function testGuessWithoutOptions($type, $property, $value)
+    public function testGuessWithoutOptions(string $type, string $property, mixed $value)
     {
         $this->variable->expects($this->once())
             ->method('getType')
@@ -233,17 +229,13 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $type
-     * @param string $propertyPath
-     * @param array  $options
-     * @param string   $value
-     * @param string   $label
-     *
-     * @return Variable
-     */
-    private function createVariable($type, $propertyPath = null, array $options = [], $value = null, $label = null)
-    {
+    private function createVariable(
+        string $type,
+        string $propertyPath = null,
+        array $options = [],
+        string $value = null,
+        string $label = null
+    ): Variable {
         $variable = new Variable();
         $variable->setType($type)
             ->setPropertyPath($propertyPath)

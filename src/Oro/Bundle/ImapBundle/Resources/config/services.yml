@@ -259,9 +259,9 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_imap.validator.email_folders:
-        class: Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator
+        class: Oro\Bundle\ImapBundle\Validator\Constraints\EmailFoldersValidator
         tags:
-            - { name: validator.constraint_validator, alias: oro_imap.validator.email_folders }
+            - { name: validator.constraint_validator }
 
     oro_imap.origin_credentials.issue_manager:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager
@@ -321,14 +321,14 @@ services:
             - '@oro_security.encoder.default'
 
     oro_imap.validator.connection_configuration.imap:
-        class: Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator
+        class: Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfigurationValidator
         arguments:
             - '@oro_imap.manager.checker.imap_settings'
         tags:
             - { name: validator.constraint_validator }
 
     oro_imap.validator.connection_configuration.smtp:
-        class: Oro\Bundle\ImapBundle\Validator\SmtpConnectionConfigurationValidator
+        class: Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfigurationValidator
         arguments:
             - '@oro_email.mailer.checker.smtp_settings'
             - '@oro_email.smtp_settings_factory'

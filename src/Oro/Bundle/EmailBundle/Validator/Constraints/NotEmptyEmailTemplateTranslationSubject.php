@@ -12,14 +12,6 @@ class NotEmptyEmailTemplateTranslationSubject extends NotBlank
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
-    {
-        return 'oro_email.not_empty_email_template_translation_subject';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getTargets()
     {
         return self::CLASS_CONSTRAINT;
