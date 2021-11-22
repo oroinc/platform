@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MaxEntitiesCountValidatorTest extends ConstraintValidatorTestCase
@@ -16,51 +17,18 @@ class MaxEntitiesCountValidatorTest extends ConstraintValidatorTestCase
         return new MaxEntitiesCountValidator();
     }
 
-    /**
-     * @dataProvider invalidArgumentProvider
-     */
-    public function testInvalidArgument(mixed $value, string $expectedExceptionMessage)
+    public function testUnexpectedConstraint()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->expectException(UnexpectedTypeException::class);
 
-        $this->validator->validate($value, new MaxEntitiesCount());
+        $this->validator->validate($this->createMock(EntityData::class), $this->createMock(Constraint::class));
     }
 
-    public function invalidArgumentProvider(): array
+    public function testValueIsNotEntityData()
     {
-        return [
-            'bool'    => [
-                'value'                    => true,
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, boolean given'
-            ],
-            'string'  => [
-                'value'                    => 'string',
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, string given'
-            ],
-            'integer' => [
-                'value'                    => 5,
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, integer given'
-            ],
-            'null'    => [
-                'value'                    => null,
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, NULL given'
-            ],
-            'object'  => [
-                'value'                    => new \stdClass(),
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, stdClass given'
-            ],
-            'array'   => [
-                'value'                    => [],
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, array given'
-            ],
-        ];
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->validator->validate('test', new MaxEntitiesCount());
     }
 
     public function testValidateForValidValueAndDefaultMaxEntitiesCount()

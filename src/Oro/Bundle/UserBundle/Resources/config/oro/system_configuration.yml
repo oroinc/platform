@@ -75,7 +75,7 @@ system_configuration:
                 required: false
                 resettable: false
                 constraints:
-                    - Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionConstraint: ~
+                    - Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOption: ~
 
     tree:
         system_configuration:

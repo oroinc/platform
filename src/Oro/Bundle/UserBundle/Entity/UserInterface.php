@@ -45,28 +45,4 @@ interface UserInterface extends SymfonyUserInterface
      * @return Role[]
      */
     public function getUserRoles(): array;
-
-    /**
-     * Checks whether the user is locked.
-     *
-     * If this method returns false, the authentication system
-     * will throw a LockedException and prevent login.
-     *
-     * @return bool true if the user is not locked, false otherwise
-     *
-     * @see LockedException
-     */
-    public function isAccountNonLocked(): bool;
-
-    /**
-     * Checks whether the user is enabled.
-     *
-     * If this method returns false, the authentication system
-     * will throw a DisabledException and prevent login.
-     *
-     * @return bool true if the user is enabled, false otherwise
-     *
-     * @see DisabledException
-     */
-    public function isEnabled(): bool;
 }

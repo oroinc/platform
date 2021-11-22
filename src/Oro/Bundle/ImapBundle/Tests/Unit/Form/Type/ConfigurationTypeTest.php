@@ -15,11 +15,11 @@ use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
+use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFoldersValidator;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
+use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfigurationValidator;
 use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration;
-use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
-use Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator;
-use Oro\Bundle\ImapBundle\Validator\SmtpConnectionConfigurationValidator;
+use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
@@ -38,17 +38,23 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     private const OAUTH_ACCOUNT_TYPE = 'oauth1';
 
-    private SymmetricCrypterInterface $encryptor;
+    /** @var SymmetricCrypterInterface */
+    private $encryptor;
 
-    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    private Translator|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    private ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject $imapSettingsChecker;
+    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $imapSettingsChecker;
 
-    private SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject $smtpSettingsChecker;
+    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $smtpSettingsChecker;
 
     protected function setUp(): void
     {

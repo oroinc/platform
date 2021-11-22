@@ -9,15 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueUserEmail extends Constraint
 {
-    public $message = 'oro.user.message.user_email_exists';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return 'oro_user.validator.unique_user_email';
-    }
+    public string $message = 'oro.user.message.user_email_exists';
 
     /**
      * {@inheritdoc}

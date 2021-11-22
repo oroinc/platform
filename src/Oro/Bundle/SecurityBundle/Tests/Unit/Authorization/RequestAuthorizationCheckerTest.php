@@ -39,38 +39,81 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testGetRequestAcl()
     {
         $request = new Request();
-        $request->attributes->add(['_controller' => 'OroTestBundle::testAction']);
-        $acl = new Acl(['id' => 1, 'class' => 'OroTestBundle:Test', 'type' => 'entity']);
+        $request->attributes->add(['_controller' => 'testController::testAction']);
+        $acl = new Acl(['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity']);
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotation')
-            ->with('OroTestBundle', 'testAction')
+            ->with('testController', 'testAction')
             ->willReturn($acl);
         $this->entityClassResolver->expects($this->once())
             ->method('isEntity')
-            ->with('OroTestBundle:Test')
+            ->with('AcmeTestBundle:Test')
             ->willReturn(true);
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
-            ->with('OroTestBundle:Test')
-            ->willReturn('Oro\Bundle\TestBundle\Entity\Test');
+            ->with('AcmeTestBundle:Test')
+            ->willReturn('Acme\Bundle\TestBundle\Entity\Test');
 
         $returnAcl = $this->requestAuthorizationChecker->getRequestAcl($request, true);
         $this->assertNotNull($returnAcl);
-        $this->assertEquals('Oro\Bundle\TestBundle\Entity\Test', $acl->getClass());
+        $this->assertEquals('Acme\Bundle\TestBundle\Entity\Test', $acl->getClass());
     }
 
-    public function testGeWrongRequestAcl()
+    public function testGetRequestAclWhenAclNotFound()
     {
         $request = new Request();
-        $request->attributes->add(['_controller' => 'wrong controller']);
-        $this->annotationProvider->expects($this->never())
-            ->method('findAnnotation');
+        $request->attributes->add(['_controller' => 'testController::testAction']);
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotation')
+            ->with('testController', 'testAction')
+            ->willReturn(null);
         $this->entityClassResolver->expects($this->never())
             ->method('isEntity');
         $this->entityClassResolver->expects($this->never())
             ->method('getEntityClass');
 
-        $this->assertNull($this->requestAuthorizationChecker->getRequestAcl($request, true));
+        $returnAcl = $this->requestAuthorizationChecker->getRequestAcl($request, true);
+        $this->assertNull($returnAcl);
+    }
+
+    public function testGeRequestAclForInvokableController()
+    {
+        $request = new Request();
+        $request->attributes->add(['_controller' => 'testController']);
+        $acl = new Acl(['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity']);
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotation')
+            ->with('testController', '__invoke')
+            ->willReturn($acl);
+        $this->entityClassResolver->expects($this->once())
+            ->method('isEntity')
+            ->with('AcmeTestBundle:Test')
+            ->willReturn(true);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with('AcmeTestBundle:Test')
+            ->willReturn('Acme\Bundle\TestBundle\Entity\Test');
+
+        $returnAcl = $this->requestAuthorizationChecker->getRequestAcl($request, true);
+        $this->assertNotNull($returnAcl);
+        $this->assertEquals('Acme\Bundle\TestBundle\Entity\Test', $acl->getClass());
+    }
+
+    public function testGeRequestAclForInvokableControllerWhenAclNotFound()
+    {
+        $request = new Request();
+        $request->attributes->add(['_controller' => 'testController']);
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotation')
+            ->with('testController', '__invoke')
+            ->willReturn(null);
+        $this->entityClassResolver->expects($this->never())
+            ->method('isEntity');
+        $this->entityClassResolver->expects($this->never())
+            ->method('getEntityClass');
+
+        $returnAcl = $this->requestAuthorizationChecker->getRequestAcl($request, true);
+        $this->assertNull($returnAcl);
     }
 
     /**
@@ -82,18 +125,18 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $request->attributes->add(['_controller' => $requestController]);
         $acl = new Acl(
-            ['id' => 1, 'class' => 'OroTestBundle:Test', 'type' => 'entity', 'permission' => 'TEST_PERMISSION']
+            ['id' => 1, 'class' => 'AcmeTestBundle:Test', 'type' => 'entity', 'permission' => 'TEST_PERMISSION']
         );
         $this->annotationProvider->expects($this->any())
             ->method('findAnnotation')
             ->willReturn($acl);
         $this->entityClassResolver->expects($this->any())
             ->method('isEntity')
-            ->with('OroTestBundle:Test')
+            ->with('AcmeTestBundle:Test')
             ->willReturn(true);
         $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->with('OroTestBundle:Test')
+            ->with('AcmeTestBundle:Test')
             ->willReturn(\stdClass::class);
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
@@ -109,9 +152,10 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function isRequestObjectIsGrantedProvider(): array
     {
         return [
-            ['testBundle::testAction', true, 1],
-            ['testBundle::testAction', false, -1],
-            ['wrong_action', true, 0]
+            ['testController::testAction', true, 1],
+            ['testController::testAction', false, -1],
+            ['testController', true, 1],
+            ['testController', false, -1]
         ];
     }
 }

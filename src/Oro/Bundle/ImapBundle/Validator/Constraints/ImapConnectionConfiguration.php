@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Validator\Constraints;
 
-use Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -10,16 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class ImapConnectionConfiguration extends Constraint
 {
-    /** @var string */
-    public $message = 'oro.imap.validator.configuration.connection.imap';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return ImapConnectionConfigurationValidator::class;
-    }
+    public string $message = 'oro.imap.validator.configuration.connection.imap';
 
     /**
      * {@inheritdoc}

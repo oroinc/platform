@@ -446,34 +446,34 @@ services:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_UserBundle_Entity_User }
 
     oro_user.validator.user_authentication_fields:
-        class: Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator
+        class: Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsValidator
         arguments:
             - '@oro_user.manager'
         tags:
-            - { name: validator.constraint_validator, alias: oro_user.validator.user_authentication_fields }
+            - { name: validator.constraint_validator }
 
     oro_user.validator.password_complexity_validator:
-        class: Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator
+        class: Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexityValidator
         arguments:
             - '@oro_user.provider.password_complexity_config_provider'
         tags:
-            - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
+            - { name: validator.constraint_validator }
 
     oro_user.validator.email_case_insensitive_option:
-        class: Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator
+        class: Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionValidator
         arguments:
             - '@doctrine'
             - '@translator'
             - '@oro_datagrid.helper.route'
         tags:
-            - { name: validator.constraint_validator, alias: oro_user.validator.email_case_insensitive_option }
+            - { name: validator.constraint_validator }
 
     oro_user.validator.unique_user_email_validator:
-        class: Oro\Bundle\UserBundle\Validator\UniqueUserEmailValidator
+        class: Oro\Bundle\UserBundle\Validator\Constraints\UniqueUserEmailValidator
         arguments:
             - '@oro_user.manager'
         tags:
-            - { name: validator.constraint_validator, alias: oro_user.validator.unique_user_email }
+            - { name: validator.constraint_validator }
 
     oro_user.provider.password_complexity_config_provider:
         class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
@@ -481,9 +481,9 @@ services:
             - '@oro_config.user'
 
     oro_user.validator.user_without_role:
-        class: Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator
+        class: Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRoleValidator
         tags:
-            - { name: validator.constraint_validator,  alias: oro_user.validator.user_without_role }
+            - { name: validator.constraint_validator }
 
     oro_user.dashboard.owner_helper:
         class: Oro\Bundle\UserBundle\Dashboard\OwnerHelper

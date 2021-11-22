@@ -162,12 +162,10 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $user = $this->getUser();
 
         self::assertTrue($user->isEnabled());
-        self::assertTrue($user->isAccountNonLocked());
 
         $user->setEnabled(false);
 
         self::assertFalse($user->isEnabled());
-        self::assertFalse($user->isAccountNonLocked());
     }
 
     public function testSerializing(): void

@@ -26,22 +26,6 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritDoc}
      */
-    public function isAccountNonLocked(): bool
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isEnabled(): bool
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getLastLogin()
     {
         return $this->lastLogin;

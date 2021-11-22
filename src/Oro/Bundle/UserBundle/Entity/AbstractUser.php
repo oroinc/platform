@@ -277,14 +277,14 @@ abstract class AbstractUser implements
      */
     public function unserialize($serialized)
     {
-        list(
+        [
             $this->password,
             $this->salt,
             $this->username,
             $this->enabled,
             $this->confirmationToken,
             $this->id
-            ) = unserialize($serialized);
+            ] = unserialize($serialized);
     }
 
     /**
@@ -384,15 +384,7 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function isAccountNonLocked(): bool
-    {
-        return $this->isEnabled();
-    }
-
-    /**
-     * {@inheritDoc}
+     * Indicates whether the user is enabled.
      */
     public function isEnabled(): bool
     {
@@ -695,11 +687,7 @@ abstract class AbstractUser implements
             return false;
         }
 
-        if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
-            return false;
-        }
-
-        if ($this->isEnabled() !== $user->isEnabled()) {
+        if ($user instanceof AbstractUser && $this->isEnabled() !== $user->isEnabled()) {
             return false;
         }
 

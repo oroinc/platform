@@ -56,12 +56,14 @@ class RequestAuthorizationChecker
     public function getRequestAcl(Request $request, bool $convertClassName = false): ?AclAnnotation
     {
         $controller = $request->attributes->get('_controller');
-        if (!str_contains($controller, '::')) {
-            return null;
+        if (str_contains($controller, '::')) {
+            [$controllerClass, $controllerMethod] = explode('::', $controller);
+        } else {
+            $controllerClass = $controller;
+            $controllerMethod = '__invoke';
         }
 
-        $controllerData = explode('::', $controller);
-        $annotation = $this->annotationProvider->findAnnotation($controllerData[0], $controllerData[1]);
+        $annotation = $this->annotationProvider->findAnnotation($controllerClass, $controllerMethod);
         if ($convertClassName && null !== $annotation) {
             $entityClass = $annotation->getClass();
             if ($entityClass && $this->entityClassResolver->isEntity($entityClass)) {

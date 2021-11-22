@@ -4,9 +4,12 @@ namespace Oro\Bundle\EmailBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * This constraint is used to check that an email has at least one recipient.
+ */
 class EmailRecipients extends Constraint
 {
-    public $message = 'Recipient can not be empty';
+    public string $message = 'Recipient can not be empty';
 
     /**
      * {@inheritdoc}
@@ -14,13 +17,5 @@ class EmailRecipients extends Constraint
     public function getTargets()
     {
         return self::CLASS_CONSTRAINT;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return 'oro_email.email_recipients_validator';
     }
 }
