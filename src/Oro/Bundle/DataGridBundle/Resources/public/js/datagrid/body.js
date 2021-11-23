@@ -87,19 +87,15 @@ define(function(require) {
                     ariaRowsIndexShift: this.gridRowsCounter.getHeaderRowsCount()
                 };
                 this.columns.trigger('configureInitializeOptions', RowView, rowOptions);
-                return new RowView(rowOptions);
+
+                const row = new RowView(rowOptions);
+                this.attachListenerToSingleRow(row);
+
+                return row;
             } else {
                 throw new Error('The one of Body#row or Body#itemView properties ' +
                     'must be defined or the initItemView() must be overridden.');
             }
-        },
-
-        /**
-         * @inheritdoc
-         */
-        insertView: function(model, view, ...rest) {
-            Body.__super__.insertView.call(this, model, view, ...rest);
-            this.attachListenerToSingleRow(view);
         },
 
         /**
