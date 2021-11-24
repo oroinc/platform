@@ -209,19 +209,3 @@ datagrids:
             entity_pagination: false
         properties: { id: ~ }
         actions: ~
-
-    enabled-localizations-select-grid:
-        extends: oro-locale-localizations-grid
-        source:
-            type: orm
-            query:
-                where:
-                    and:
-                        - l.id IN (:ids)
-            bind_parameters:
-                -
-                    name: ids
-                    default: []
-        options:
-            entity_pagination: false
-        actions: ~

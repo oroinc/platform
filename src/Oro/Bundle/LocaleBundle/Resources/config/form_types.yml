@@ -129,8 +129,3 @@ services:
         public: true
         arguments:
             - '@oro_config.form.handler.config'
-
-    oro_locale.form.type.enabled_localization_select:
-        class: Oro\Bundle\LocaleBundle\Form\Type\EnabledLocalizationSelectType
-        tags:
-            - { name: form.type, alias: oro_locale_enabled_localization }
