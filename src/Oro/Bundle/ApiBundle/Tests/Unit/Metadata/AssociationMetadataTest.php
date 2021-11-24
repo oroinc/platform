@@ -176,6 +176,25 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testToArrayHiddenField()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setHidden();
+
+        self::assertEquals(
+            [
+                'name'             => 'testName',
+                'hidden'           => true,
+                'nullable'         => false,
+                'collapsed'        => false,
+                'association_type' => null,
+                'collection'       => false
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
     public function testToArrayWhenEmptyAcceptableTargetsAllowedAndAcceptableTargetClassNamesAreNotEmpty()
     {
         $associationMetadata = new AssociationMetadata();
@@ -294,6 +313,19 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $associationMetadata->setDirection(true, true);
         self::assertTrue($associationMetadata->isInput());
         self::assertTrue($associationMetadata->isOutput());
+    }
+
+    public function testHidden()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        self::assertFalse($associationMetadata->isHidden());
+        self::assertTrue($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+        $associationMetadata->setHidden();
+        self::assertTrue($associationMetadata->isHidden());
+        self::assertFalse($associationMetadata->isInput());
+        self::assertFalse($associationMetadata->isOutput());
     }
 
     public function testTargetClassName()
