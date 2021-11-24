@@ -29,10 +29,7 @@ class EnabledLocalizationSelectTypeTest extends FormIntegrationTestCase
         $this->formType->configureOptions($resolver);
         $resolved = $resolver->resolve();
 
-        self::assertEquals('oro_enabled_localization', $resolved['autocomplete_alias']);
         self::assertEquals(false, $resolved['create_enabled']);
-        self::assertEquals('enabled-localizations-select-grid', $resolved['grid_name']);
-        self::assertEquals(['component' => 'autocomplete-enabledlocalization'], $resolved['configs']);
     }
 
     public function testGetParent()

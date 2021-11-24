@@ -41,12 +41,7 @@ class EnabledLocalizationSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'autocomplete_alias' => 'oro_enabled_localization',
             'create_enabled' => false,
-            'grid_name' => 'enabled-localizations-select-grid',
-            'configs' => [
-                'component' => 'autocomplete-enabledlocalization',
-            ],
         ]);
     }
 }

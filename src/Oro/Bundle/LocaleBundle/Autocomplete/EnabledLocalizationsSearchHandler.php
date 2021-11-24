@@ -8,6 +8,7 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * The autocomplete handler to search enabled localizations by scope.
@@ -46,7 +47,10 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
         }
 
         $queryBuilder = $this->entityRepository->createQueryBuilder('l');
-        $queryBuilder->where($queryBuilder->expr()->in('l.' . $this->idFieldName, ':entityIds'));
+        $queryBuilder->where($queryBuilder->expr()->in(
+            QueryBuilderUtil::getField('l', $this->idFieldName),
+            ':entityIds'
+        ));
         $queryBuilder->setParameter('entityIds', $entityIds);
         $query = $this->aclHelper->apply($queryBuilder);
 

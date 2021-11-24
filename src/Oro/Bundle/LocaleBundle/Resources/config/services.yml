@@ -419,7 +419,6 @@ services:
         arguments:
             - '@oro_config.manager'
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.enabled-localizations-select-grid, method: onPreBuild }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.enabled-localizations-select-grid, method: onBuildAfter }
 
     oro_locale.autocomplete.enabled_localizations.search_handler:
