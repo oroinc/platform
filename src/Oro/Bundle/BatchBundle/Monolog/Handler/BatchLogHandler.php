@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\Monolog\Handler;
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Monolog\Utils;
 
 /**
  * Writes the log into a separate log file
@@ -23,6 +24,7 @@ class BatchLogHandler extends StreamHandler
         $this->useLocking = false;
         $this->bubble = true;
 
+        $this->setupStringChunkSize();
         $this->setLevel(Logger::DEBUG);
     }
 
@@ -74,5 +76,24 @@ class BatchLogHandler extends StreamHandler
     private function generateLogFilename(): string
     {
         return sprintf('batch_%s.log', sha1(uniqid(mt_rand(), true)));
+    }
+
+    /**
+     * Note: code taken from ancestor's contructor.
+     */
+    private function setupStringChunkSize(): void
+    {
+        if (($phpMemoryLimit = Utils::expandIniShorthandBytes(ini_get('memory_limit'))) !== false) {
+            if ($phpMemoryLimit > 0) {
+                // use max 10% of allowed memory for the chunk size, and at least 100KB
+                $this->streamChunkSize = min(static::MAX_CHUNK_SIZE, max((int) ($phpMemoryLimit / 10), 100 * 1024));
+            } else {
+                // memory is unlimited, set to the default 10MB
+                $this->streamChunkSize = static::DEFAULT_CHUNK_SIZE;
+            }
+        } else {
+            // no memory limit information, set to the default 10MB
+            $this->streamChunkSize = static::DEFAULT_CHUNK_SIZE;
+        }
     }
 }

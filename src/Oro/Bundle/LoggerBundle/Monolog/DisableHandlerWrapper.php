@@ -25,7 +25,7 @@ class DisableHandlerWrapper extends HandlerWrapper
     /**
      * {@inheritDoc}
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
         return !$this->logLevelConfig->isActive();
     }
@@ -33,13 +33,13 @@ class DisableHandlerWrapper extends HandlerWrapper
     /**
      * {@inheritdoc}
      */
-    public function handleBatch(array $records)
+    public function handleBatch(array $records): void
     {
         if ($this->logLevelConfig->isActive()) {
-            return null;
+            return;
         }
 
-        return parent::handleBatch($records);
+        parent::handleBatch($records);
     }
 
     /**

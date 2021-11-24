@@ -36,7 +36,7 @@ class ConsoleErrorHandler extends HandlerWrapper
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
         return $this->consumerState->isConsumptionStarted() && parent::isHandling($record);
     }
@@ -44,7 +44,7 @@ class ConsoleErrorHandler extends HandlerWrapper
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         return $this->consumerState->isConsumptionStarted() && parent::handle($record);
     }

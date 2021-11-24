@@ -304,6 +304,24 @@ JS;
     /**
      * {@inheritdoc}
      */
+    public function wait($timeout, $condition)
+    {
+        $script = "return $condition;";
+        $start = microtime(true);
+        $end = $start + $timeout / 1000.0;
+
+        do {
+            $result = $this->getWebDriverSession()
+                ->execute(array('script' => $script, 'args' => array()));
+            usleep(100000);
+        } while (microtime(true) < $end && !$result);
+
+        return (bool) $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function doubleClick($xpath)
     {
         // Original method doesn't work properly with chromedriver,

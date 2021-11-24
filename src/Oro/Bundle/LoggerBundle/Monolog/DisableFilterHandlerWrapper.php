@@ -31,18 +31,18 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
         $this->logLevelConfig = $config;
     }
 
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         $this->setMinLevel();
 
         return parent::handle($record);
     }
 
-    public function handleBatch(array $records)
+    public function handleBatch(array $records): void
     {
         $this->setMinLevel();
 
-        return parent::handleBatch($records);
+        parent::handleBatch($records);
     }
 
     /**

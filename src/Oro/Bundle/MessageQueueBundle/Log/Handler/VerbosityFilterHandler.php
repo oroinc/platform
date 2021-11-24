@@ -56,7 +56,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()
@@ -67,7 +67,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()

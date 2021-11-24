@@ -9,23 +9,20 @@ $finder = PhpCsFixer\Finder::create()
     ->notName('OroKernel.php');
 
 // https://github.com/mlocati/php-cs-fixer-configurator
-return PhpCsFixer\Config::create()
-    ->setRules(
-        [
-            // generic PSRs
-            '@PSR1' => true,
-            '@PSR2' => true,
-            'psr0' => true,
-            'psr4' => true,
+$config = new PhpCsFixer\Config();
+$config->setRules([
+        // generic PSRs
+        '@PSR1' => true,
+        '@PSR2' => true,
+        'psr_autoloading' => true,
 
-            // imports
-            'ordered_imports' => true,
-            'no_unused_imports' => true,
-            'no_extra_consecutive_blank_lines' => ['use'],
-            'php_unit_namespaced' => ['target' => '6.0'],
-            'php_unit_expectation' => true,
+        // imports
+        'ordered_imports' => true,
+        'no_unused_imports' => true,
+        'php_unit_namespaced' => ['target' => '6.0'],
+        'php_unit_expectation' => true,
 
-            // Symfony, but exclude Oro cases
+        // Symfony, but exclude Oro cases
 //            '@Symfony' => true,
 //            '@Symfony:risky' => true,
 //            'yoda_style' => false,
@@ -46,13 +43,14 @@ return PhpCsFixer\Config::create()
 //            'phpdoc_order' => true,
 //            'phpdoc_types_order' => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
 
-            // Otherwise anonymous classes cannot be used with any meaningful constructor arguments.
-            // It is temporary for now, until a decision is made by PSR-12 editors (see
-            // https://github.com/php-fig/fig-standards/pull/1206#issuecomment-628873709 ) and
-            // and a PR to php-cs-fixer will be proposed based on that decision to address it one way or the other.
-            'class_definition' => false,
-        ]
-    )
+        // Otherwise anonymous classes cannot be used with any meaningful constructor arguments.
+        // It is temporary for now, until a decision is made by PSR-12 editors (see
+        // https://github.com/php-fig/fig-standards/pull/1206#issuecomment-628873709 ) and
+        // and a PR to php-cs-fixer will be proposed based on that decision to address it one way or the other.
+        'class_definition' => false,
+    ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)
-    ->setCacheFile(__DIR__.DIRECTORY_SEPARATOR.'.php_cs.cache');
+    ->setCacheFile(__DIR__ . DIRECTORY_SEPARATOR . '.php-cs-fixer.cache');
+
+return $config;

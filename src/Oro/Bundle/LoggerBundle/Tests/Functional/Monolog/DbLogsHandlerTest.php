@@ -67,8 +67,8 @@ class DbLogsHandlerTest extends WebTestCase
                 'level' => 'warning',
                 'expected' => [
                     'message' => 'second error msg',
-                    'context' => ['aaa' => 'bbb', 'ccc' => '[object] (stdClass: {})'],
-                ]
+                    'context' => ['aaa' => 'bbb', 'ccc' => ['stdClass' => []]],
+                ],
             ],
             [
                 'message' => 'third error msg',
