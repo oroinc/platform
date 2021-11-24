@@ -77,7 +77,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param EmailOrigin $origin
      * @param \DateTime   $syncStartTime
      */
-    abstract public function process(EmailOrigin $origin, $syncStartTime);
+    abstract public function process(EmailOrigin $origin, $syncStartTime, EmailSyncNotificationBag $notificationBag);
 
     /**
      * @param EmailHeader           $email

@@ -133,6 +133,13 @@ class NotificationAlert extends ExtendNotificationAlert
      */
     private $organization;
 
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="additional_info", type="json", nullable=true)
+     */
+    private $additionalInfo = [];
+
     public function getId(): string
     {
         return $this->id;
@@ -254,6 +261,16 @@ class NotificationAlert extends ExtendNotificationAlert
     public function getOrganization(): OrganizationInterface
     {
         return $this->organization;
+    }
+
+    public function getAdditionalInfo(): array
+    {
+        return $this->additionalInfo ?: [];
+    }
+
+    public function setAdditionalInfo(array $additionalInfo): void
+    {
+        $this->additionalInfo = $additionalInfo;
     }
 
     /**

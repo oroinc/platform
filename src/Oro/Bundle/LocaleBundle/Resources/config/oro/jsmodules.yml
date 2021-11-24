@@ -2,14 +2,12 @@ aliases:
     moment$: moment/moment
     moment-timezone$: moment-timezone/builds/moment-timezone-with-data
     numeral$: numeral/numeral
-    oro/select2-autocomplete-enabledlocalization-component$: orolocale/js/app/components/select2-autocomplete-enabledlocalization-component
 app-modules:
     - orolocale/js/app/modules/locale-module
 configs:
     orolocale/js/locale-settings: {}
 dynamic-imports:
     commons:
-        - oro/select2-autocomplete-enabledlocalization-component
         - orolocale/js/app/views/localization-select-view
         - orolocale/js/app/views/localizations-select-view
     tinymce.min:

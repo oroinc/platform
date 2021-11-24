@@ -30,13 +30,13 @@ class ErrorLogNotificationHandlerWrapper extends HandlerWrapper
      *
      * {@inheritdoc}
      */
-    public function handle(array $record): void
+    public function handle(array $record): bool
     {
         if (!$this->getRecipientsEmailAddresses()) {
-            return;
+            return false;
         }
 
-        parent::handle($record);
+        return parent::handle($record);
     }
 
     /**

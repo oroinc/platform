@@ -4,4 +4,14 @@
     .thead-sizing {
         display: none;
     }
+
+    thead {
+        th {
+            box-shadow: 1px 0 $table-thead-th-background;
+
+            &:last-child {
+                box-shadow: none;
+            }
+        }
+    }
 }

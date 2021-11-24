@@ -36,7 +36,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public function isHandling(array $record)
+    public function isHandling(array $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()
@@ -46,7 +46,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()

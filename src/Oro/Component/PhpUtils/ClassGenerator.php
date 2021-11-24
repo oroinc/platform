@@ -50,6 +50,8 @@ final class ClassGenerator
 
     public function addUse(string $name, string $alias = null, string &$aliasOut = null): self
     {
+        $aliasOut = !empty($aliasOut) ? $aliasOut : PhpNamespace::NAME_NORMAL;
+
         if (null === $this->namespace) {
             throw new InvalidStateException('Cannot add imports to a non-namespaced class.');
         }

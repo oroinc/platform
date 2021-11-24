@@ -21,7 +21,7 @@ class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
         $this->config = $config;
     }
 
-    public function handle(array $record)
+    public function handle(array $record): bool
     {
         if (!$this->config->isActive()) {
             return parent::handle($record);

@@ -7,7 +7,3 @@ trusted_data:
     safe_methods:
         Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter:
             getFormattedNameDQL: true
-    properties:
-        Oro\Bundle\LocaleBundle\Autocomplete\EnabledLocalizationsSearchHandler:
-            searchEntities:
-                idFieldName: true

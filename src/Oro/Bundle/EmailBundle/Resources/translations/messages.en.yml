@@ -423,6 +423,19 @@ oro:
                 success: Email sync completed.
                 error: Email sync failed.
                 processing: Email sync has started. Please wait, the grid will be updated after it is complete...
+        sync_alert:
+            system_origin:
+                common: There was an issue when syncing one of the system mailboxes. Please check <a href="%settings_url%">system mailboxes</a>.
+                auth: There was an issue connecting to your email server when syncing one of the system mailboxes. Please check connection settings.
+                switch_folder: There was an issue switching the folder when syncing one of the system mailboxes. Please check synced folders.
+                sync: There was an issue synchronizing emails when syncing one of the system mailboxes.
+            auth:
+                full: There was an issue connecting to your email server during the sync. Please check <a href="%settings_url%">connection settings</a>.
+                short: There was an issue connecting to your email server during the sync. Please check connection settings.
+            switch_folder:
+                full: There was an issue when switching a folder during email synchronization. Please check the synced folders on the <a href="%settings_url%">connection settings</a> page.
+                short: There was an issue when switching a folder during email synchronization. Please check the synced folders.
+            sync: There was an issue with email synchronization. Please contact your administrator.
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

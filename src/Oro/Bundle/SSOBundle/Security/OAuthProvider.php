@@ -60,7 +60,7 @@ class OAuthProvider extends HWIOAuthProvider
     /**
      * {@inheritDoc}
      */
-    public function authenticate(TokenInterface $token)
+    public function authenticate(TokenInterface $token): ?TokenInterface
     {
         if (null === $this->tokenFactory) {
             throw new AuthenticationException('Token Factory is not set in OAuthProvider.');

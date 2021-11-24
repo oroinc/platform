@@ -15,6 +15,7 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 /**
  * The service to manage a notification alerts for a resource
  * for the user.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class NotificationAlertManager
 {
@@ -32,6 +33,7 @@ class NotificationAlertManager
     public const UPDATED_AT = 'updatedAt';
     public const RESOLVED = 'resolved';
     public const MESSAGE = 'message';
+    public const ADDITIONAL_INFO = 'additionalInfo';
 
     private string $sourceType;
     private string $resourceType;
@@ -66,6 +68,10 @@ class NotificationAlertManager
         return $this->sourceType;
     }
 
+    /**
+     * Saves the notification alert to the storage.
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function addNotificationAlert(NotificationAlertInterface $alert, \DateTime $syncAt = null): string
     {
         if ($alert->getSourceType() !== $this->getSourceType()) {
@@ -80,14 +86,20 @@ class NotificationAlertManager
             $alert->toArray(),
             [
                 self::SOURCE_TYPE   => $this->getSourceType(),
-                self::RESOURCE_TYPE => $this->getResourceType(),
-                self::USER          => $this->tokenAccessor->getUserId(),
-                self::ORGANIZATION  => $this->tokenAccessor->getOrganizationId()
+                self::RESOURCE_TYPE => $this->getResourceType()
             ]
         );
 
         if (empty($data[self::ID])) {
             $data[self::ID] = UUIDGenerator::v4();
+        }
+
+        if (empty($data[self::USER])) {
+            $data[self::USER] = $this->tokenAccessor->getUserId();
+        }
+
+        if (empty($data[self::ORGANIZATION])) {
+            $data[self::ORGANIZATION] = $this->tokenAccessor->getOrganizationId();
         }
 
         if (null !== $syncAt) {
@@ -130,24 +142,64 @@ class NotificationAlertManager
         ]);
     }
 
-    public function resolveNotificationAlertsByAlertTypeForCurrentUser(string $alertType): void
-    {
+    public function resolveNotificationAlertByItemIdForUserAndOrganization(
+        int  $itemId,
+        ?int $userId,
+        int  $organizationId
+    ): void {
         $this->doResolveNotificationAlert([
             self::SOURCE_TYPE   => $this->getSourceType(),
             self::RESOURCE_TYPE => $this->getResourceType(),
-            self::USER          => $this->tokenAccessor->getUserId(),
-            self::ORGANIZATION  => $this->tokenAccessor->getOrganizationId(),
+            self::USER          => $userId,
+            self::ORGANIZATION  => $organizationId,
+            self::ITEM_ID       => $itemId
+        ]);
+    }
+
+    public function resolveNotificationAlertsByAlertTypeForCurrentUser(string $alertType): void
+    {
+        $this->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+            $alertType,
+            $this->tokenAccessor->getUserId(),
+            $this->tokenAccessor->getOrganizationId()
+        );
+    }
+
+    public function resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+        string $alertType,
+        ?int   $userId,
+        int    $organizationId
+    ): void {
+        $this->doResolveNotificationAlert([
+            self::SOURCE_TYPE   => $this->getSourceType(),
+            self::RESOURCE_TYPE => $this->getResourceType(),
+            self::USER          => $userId,
+            self::ORGANIZATION  => $organizationId,
             self::ALERT_TYPE    => $alertType
         ]);
     }
 
     public function resolveNotificationAlertsByAlertTypeAndStepForCurrentUser(string $alertType, string $step): void
     {
+        $this->resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
+            $alertType,
+            $step,
+            $this->tokenAccessor->getUserId(),
+            $this->tokenAccessor->getOrganizationId()
+        );
+    }
+
+    public function resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
+        string $alertType,
+        string $step,
+        ?int   $userId,
+        int    $organizationId
+    ): void {
         $this->doResolveNotificationAlert([
             self::SOURCE_TYPE   => $this->getSourceType(),
             self::RESOURCE_TYPE => $this->getResourceType(),
-            self::USER          => $this->tokenAccessor->getUserId(),
-            self::ORGANIZATION  => $this->tokenAccessor->getOrganizationId(),
+            self::USER          => $userId,
+            self::ORGANIZATION  => $organizationId,
             self::ALERT_TYPE    => $alertType,
             self::STEP          => $step
         ]);
@@ -180,20 +232,64 @@ class NotificationAlertManager
         return (bool) $hasNotificationAlertsByType;
     }
 
+    /**
+     * @return array [alertType => notificationAlertCount, ...]
+     */
+    public function getNotificationAlertsCountGroupedByType(): array
+    {
+        return $this->getNotificationAlertsCountGroupedByTypeForUserAndOrganization(
+            $this->tokenAccessor->getUserId(),
+            $this->tokenAccessor->getOrganizationId()
+        );
+    }
+
+    /**
+     * @return array [alertType => notificationAlertCount, ...]
+     */
+    public function getNotificationAlertsCountGroupedByTypeForUserAndOrganization(
+        ?int   $userId,
+        int    $organizationId
+    ): array {
+        $result = [];
+        $notificationAlerts = $this->doGetNotificationAlertsCount([
+            self::SOURCE_TYPE   => $this->getSourceType(),
+            self::RESOURCE_TYPE => $this->getResourceType(),
+            self::USER          => $userId,
+            self::ORGANIZATION  => $organizationId,
+            self::RESOLVED      => false
+        ]);
+
+        foreach ($notificationAlerts as $notificationAlert) {
+            $count = (int) $notificationAlert['notification_alert_count'];
+            if ($count > 0) {
+                $result[$notificationAlert['alert_type']] = $count;
+            }
+        }
+
+        return $result;
+    }
+
     private function doCheckHasNotificationAlerts(array $fields): bool
     {
+        if (null === $fields[self::USER]) {
+            $userCondition = ' AND alert.user_id is null';
+            unset($fields[self::USER]);
+        } else {
+            $userCondition = ' AND alert.user_id = :user_id';
+        }
+
         [$data, $types] = $this->prepareDbalCriteria($fields);
         $em = $this->getEntityManager();
         try {
-            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount
-                FROM %s AS alert
-                WHERE
-                 alert.source_type = :source_type
-                 AND alert.resource_type = :resource_type
-                 AND alert.user_id = :user_id
-                 AND alert.organization_id = :organization_id
-                 AND alert.is_resolved = :is_resolved';
-            $sql = sprintf($sql, $this->getEntityMetadata($em)->getTableName());
+            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount'
+                . ' FROM %s AS alert'
+                . ' WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . $userCondition
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved';
+            $sql = sprintf($sql, $this->getTableName());
             $hasNotificationAlerts = $em->getConnection()->fetchOne($sql, $data, $types);
         } catch (\Exception $e) {
             throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
@@ -204,25 +300,69 @@ class NotificationAlertManager
 
     private function doCheckHasNotificationAlertsByType(array $fields): bool
     {
+        if (null === $fields[self::USER]) {
+            $userCondition = ' AND alert.user_id is null';
+            unset($fields[self::USER]);
+        } else {
+            $userCondition = ' AND alert.user_id = :user_id';
+        }
+
         [$data, $types] = $this->prepareDbalCriteria($fields);
         $em = $this->getEntityManager();
         try {
-            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount
-                FROM %s AS alert
-                WHERE
-                 alert.source_type = :source_type
-                 AND alert.resource_type = :resource_type
-                 AND alert.alert_type = :alert_type
-                 AND alert.user_id = :user_id
-                 AND alert.organization_id = :organization_id
-                 AND alert.is_resolved = :is_resolved';
-            $sql = sprintf($sql, $this->getEntityMetadata($em)->getTableName());
+            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount'
+                . ' FROM %s AS alert'
+                . ' WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . ' AND alert.alert_type = :alert_type'
+                . $userCondition
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved';
+            $sql = sprintf($sql, $this->getTableName());
             $hasNotificationAlertsByType = $em->getConnection()->fetchOne($sql, $data, $types);
         } catch (\Exception $e) {
             throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
         }
 
         return (bool) $hasNotificationAlertsByType;
+    }
+
+    /**
+     * @param array $fields
+     * @return array [[alertType, notificationAlertCount], ...]
+     */
+    private function doGetNotificationAlertsCount(array $fields): array
+    {
+        if (null === $fields[self::USER]) {
+            $userCondition = ' AND alert.user_id is null';
+            unset($fields[self::USER]);
+        } else {
+            $userCondition = ' AND alert.user_id = :user_id';
+        }
+
+        [$data, $types] = $this->prepareDbalCriteria($fields);
+        $em = $this->getEntityManager();
+        try {
+            $sql = 'SELECT alert.alert_type, COUNT(alert.id) as notification_alert_count'
+                . ' FROM %s AS alert'
+                . ' WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . $userCondition
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved'
+                . ' GROUP BY alert.alert_type';
+            $sql = sprintf($sql, $this->getTableName());
+
+            return $em->getConnection()->fetchAllAssociative($sql, $data, $types);
+        } catch (\Exception $e) {
+            throw new NotificationAlertFetchFailedException(
+                'Failed to fetch a notification alerts count.',
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     /**
@@ -286,7 +426,8 @@ class NotificationAlertManager
             $fields[self::ID],
             $fields[self::MESSAGE],
             $fields[self::CREATED_AT],
-            $fields[self::UPDATED_AT]
+            $fields[self::UPDATED_AT],
+            $fields[self::ADDITIONAL_INFO],
         );
         $fields[self::RESOLVED] = false;
 
@@ -307,7 +448,7 @@ class NotificationAlertManager
             throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
         }
 
-        return $similarNotificationAlertId ? : null;
+        return $similarNotificationAlertId ?: null;
     }
 
     private function doUpdateNotificationAlert(string $uuid, array $fields): void
@@ -331,7 +472,7 @@ class NotificationAlertManager
         }
     }
 
-    private function prepareDbalCriteria(array $fields): array
+    protected function prepareDbalCriteria(array $fields): array
     {
         $data = [];
         $types = [];
@@ -351,9 +492,14 @@ class NotificationAlertManager
         return [$data, $types];
     }
 
-    private function getEntityManager(): EntityManagerInterface
+    protected function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass(NotificationAlert::class);
+    }
+
+    protected function getTableName(): string
+    {
+        return $this->getEntityMetadata($this->getEntityManager())->getTableName();
     }
 
     private function getEntityMetadata(EntityManagerInterface $em): ClassMetadata

@@ -21,7 +21,7 @@ class BaseAclManager implements AclSidInterface
         if (is_string($identity)) {
             return new RoleSecurityIdentity($identity);
         } elseif ($identity instanceof Role) {
-            return new RoleSecurityIdentity($identity->getRole());
+            return new RoleSecurityIdentity((string)$identity->getRole());
         } elseif ($identity instanceof UserInterface) {
             return UserSecurityIdentity::fromAccount($identity);
         } elseif ($identity instanceof TokenInterface) {

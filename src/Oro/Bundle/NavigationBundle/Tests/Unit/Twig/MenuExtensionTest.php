@@ -11,6 +11,7 @@ use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\Assert;
 use Twig\Environment;
 
 /**
@@ -222,7 +223,8 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('render')
             ->willReturnCallback(function ($menu) use ($expected) {
                 $result = $this->collectResultItemsData($menu);
-                \PHPUnit\Framework\Assert::assertEquals($expected, $result);
+                Assert::assertEquals($expected, $result);
+                return '';
             });
 
         self::callTwigFunction($this->extension, 'oro_menu_render', [$menu]);

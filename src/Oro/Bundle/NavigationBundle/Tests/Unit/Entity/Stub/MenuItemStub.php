@@ -114,7 +114,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return $this->label ?: $this->getName();
     }
@@ -221,7 +221,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setChildrenAttribute($name, $value)
+    public function setChildrenAttribute($name, $value): self
     {
     }
 

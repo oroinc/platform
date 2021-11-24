@@ -19,7 +19,8 @@ class NotificationAlertTest extends \PHPUnit\Framework\TestCase
             'operation'       => ['operation', 'import'],
             'step'            => ['step','save'],
             'itemId'          => ['itemId', 140],
-            'externalId'      => ['externalId', 'testId']
+            'externalId'      => ['externalId', 'testId'],
+            'additionalInfo'  => ['additionalInfo', ['test' => 'value']]
         ];
 
         $entity = new NotificationAlert();

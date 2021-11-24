@@ -23,7 +23,7 @@ class DBLogsHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record)
+    protected function write(array $record): void
     {
         $formatted = $record['formatted'];
 
@@ -59,7 +59,7 @@ class DBLogsHandler extends AbstractProcessingHandler
      * @param \DateTime $dateTime
      * @return string
      */
-    protected function formatDateTime(\DateTime $dateTime)
+    protected function formatDateTime(\DateTimeInterface $dateTime)
     {
         if (!$this->dateTimeFormatString) {
             $this->dateTimeFormatString = $this->container

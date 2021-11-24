@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\ImapBundle\Async\Topics;
@@ -13,12 +14,14 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
+use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -26,6 +29,7 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
+    /** @var string */
     protected static $messageQueueTopic = Topics::SYNC_EMAILS;
 
     /** @var ImapEmailSynchronizationProcessorFactory */
@@ -49,9 +53,10 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        OAuthManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry,
+        NotificationAlertManager $notificationAlertManager
     ) {
-        parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
+        parent::__construct($doctrine, $knownEmailAddressCheckerFactory, $notificationAlertManager);
 
         $this->syncProcessorFactory = $syncProcessorFactory;
         $this->connectorFactory     = $connectorFactory;
@@ -105,13 +110,23 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
             ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
             : null;
+
+        try {
+            $accessToken = $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null;
+        } catch (RefreshOAuthAccessTokenFailureException $e) {
+            $notification = EmailSyncNotificationAlert::createForAuthFail($e->getMessage());
+            $this->notificationsBag->addNotification($notification);
+
+            throw $e;
+        }
+
         $config = new ImapConfig(
             $origin->getImapHost(),
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
+            $accessToken
         );
 
         return $this->syncProcessorFactory->create(

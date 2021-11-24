@@ -3,17 +3,21 @@
 namespace Oro\Bundle\ImapBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Laminas\Mail\Protocol\Exception\RuntimeException;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
+use Oro\Bundle\EmailBundle\Exception\SyncWithNotificationAlertException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
@@ -75,8 +79,28 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
         );
 
-        $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
-        $manager->selectFolder($folder->getFullName());
+        try {
+            $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
+            $manager->selectFolder($folder->getFullName());
+        } catch (UnselectableFolderException $e) {
+            throw new SyncWithNotificationAlertException(
+                EmailSyncNotificationAlert::createForSwitchFolderFail(
+                    sprintf('The folder "%s" cannot be selected.', $folder->getFullName()),
+                ),
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        } catch (RuntimeException $e) {
+            throw new SyncWithNotificationAlertException(
+                EmailSyncNotificationAlert::createForSwitchFolderFail(
+                    'Cannot connect to the IMAP server. Exception message:' . $e->getMessage()
+                ),
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
 
         $repo = $em->getRepository(ImapEmail::class);
         $query = $repo->createQueryBuilder('e')

@@ -30,6 +30,7 @@
 .grid-header-cell {
     background-color: $oro-datagrid-header-background;
     padding: $oro-datagrid-header-cell-inner-offset;
+    box-shadow: 1px 0 $oro-datagrid-header-background;
 
     white-space: nowrap;
 
@@ -55,6 +56,7 @@
     &:last-child {
         border-top-right-radius: $oro-datagrid-header-cell-radius;
         border-bottom-right-radius: $oro-datagrid-header-cell-radius;
+        box-shadow: none;
     }
 
     &:first-of-type {

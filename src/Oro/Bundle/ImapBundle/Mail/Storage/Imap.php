@@ -8,6 +8,7 @@ use Laminas\Mail\Headers;
 use Laminas\Mail\Storage\Exception as BaseException;
 use Laminas\Mail\Storage\Exception\InvalidArgumentException;
 use Laminas\Mail\Storage\Exception\RuntimeException;
+use Oro\Bundle\ImapBundle\Exception\ConnectionException;
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
 use Oro\Bundle\ImapBundle\Exception\InvalidMessageHeadersException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
@@ -125,8 +126,12 @@ class Imap extends \Laminas\Mail\Storage\Imap
         $port     = isset($params->port)     ? $params->port     : null;
         $ssl      = isset($params->ssl)      ? $params->ssl      : false;
 
-        $this->protocol = new ProtocolImap();
-        $this->protocol->connect($host, $port, $ssl);
+        try {
+            $this->protocol = new ProtocolImap();
+            $this->protocol->connect($host, $port, $ssl);
+        } catch (\Exception $e) {
+            throw new ConnectionException($e->getMessage(), $e->getCode(), $e);
+        }
 
         if ($params->accessToken === null) {
             $response = $this->protocol->login($params->user, $password);

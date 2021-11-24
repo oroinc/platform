@@ -53,6 +53,9 @@ abstract class PropertyMetadata extends ParameterBag implements ToArrayInterface
         } elseif ($this->isOutput() && !$this->isInput()) {
             $result['direction'] = 'output-only';
         }
+        if ($this->isHidden()) {
+            $result['hidden'] = true;
+        }
 
         return $result;
     }
@@ -155,6 +158,24 @@ abstract class PropertyMetadata extends ParameterBag implements ToArrayInterface
     {
         $this->setFlag($input, self::MASK_DIRECTION_INPUT);
         $this->setFlag($output, self::MASK_DIRECTION_OUTPUT);
+    }
+
+    /**
+     * Indicates whether the request data and response data cannot contain this property.
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return !$this->isOutput() && !$this->isInput();
+    }
+
+    /**
+     * Sets a flag indicates that the request data and response data cannot contain this property.
+     */
+    public function setHidden()
+    {
+        $this->setDirection(false, false);
     }
 
     /**
