@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates whether a query definition created by the query designer
- * groups all columns without aggregate function if there ia at least one column with aggregate function.
+ * groups all columns without aggregate function if there is at least one column with aggregate function.
  */
 class GroupingColumnsValidator extends ConstraintValidator
 {
