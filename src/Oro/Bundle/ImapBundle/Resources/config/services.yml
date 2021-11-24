@@ -49,6 +49,7 @@ services:
             - '@oro_imap.connector.factory'
             - '@oro_security.encoder.default'
             - '@oro_imap.oauth_manager_registry'
+            - '@oro_email.email_notification_alert_manager'
         calls:
             - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
             - [setLogger, ['@logger']]

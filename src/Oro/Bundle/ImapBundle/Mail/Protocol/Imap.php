@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Protocol;
 
-use Laminas\Mail\Storage\Exception as BaseException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 
@@ -84,9 +83,9 @@ class Imap extends \Laminas\Mail\Protocol\Imap
 
         if ($to === null && !is_array($from)) {
             if ($tokens[0] === 'OK' && $tokens[1] === 'FETCH' && $tokens[2] === 'completed.') {
-                throw new InvalidEmailFormatException('Invalid email format');
+                throw new InvalidEmailFormatException($data, 'Invalid email format');
             }
-            throw new BaseException\RuntimeException('the single id was not found in response');
+            throw new InvalidEmailFormatException($data, 'the single id was not found in response');
         }
 
         return $result;

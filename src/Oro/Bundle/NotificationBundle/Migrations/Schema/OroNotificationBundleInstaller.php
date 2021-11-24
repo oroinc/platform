@@ -146,6 +146,7 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('external_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_resolved', 'boolean', ['default' => false, 'notnull' => true]);
         $table->addColumn('message', 'text', ['notnull' => false]);
+        $table->addColumn('additional_info', 'json', ['notnull' => false, 'comment' => '(DC2Type:json)']);
         $table->addIndex(['organization_id'], 'idx_ea4c646532c8a3de', []);
         $table->addIndex(['user_id'], 'idx_ea4c6465a76ed395', []);
         $table->setPrimaryKey(['id']);

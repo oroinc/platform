@@ -16,6 +16,7 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -59,10 +60,10 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                     return null;
                 }
                 if ('integer' === $type) {
-                    return (int) $value;
+                    return (int)$value;
                 }
                 if ('boolean' === $type) {
-                    return (bool) $value;
+                    return (bool)$value;
                 }
                 if ('datetime' === $type) {
                     return $this->createDateTime($value);
@@ -100,6 +101,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                 ['externalId', 'text'],
                 ['message', 'text'],
                 ['resolved', 'boolean'],
+                ['additional_data', 'array']
             ]);
         $metadata->expects(self::any())
             ->method('getColumnName')
@@ -116,6 +118,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                 ['externalId', 'external_id'],
                 ['message', 'message'],
                 ['resolved', 'is_resolved'],
+                ['additional_data', 'additional_data']
             ]);
         $metadata->expects(self::any())
             ->method('getFieldName')
@@ -132,6 +135,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                 ['external_id', 'externalId'],
                 ['message', 'message'],
                 ['is_resolved', 'resolved'],
+                ['additionalData', 'additional_data'],
             ]);
         $metadata->expects(self::any())
             ->method('getSingleAssociationJoinColumnName')
@@ -362,14 +366,14 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                "SELECT COUNT(alert.id) as notificationAlertCount\n"
-                . "                FROM oro_notification_alert AS alert\n"
-                . "                WHERE\n"
-                . "                 alert.source_type = :source_type\n"
-                . "                 AND alert.resource_type = :resource_type\n"
-                . "                 AND alert.user_id = :user_id\n"
-                . "                 AND alert.organization_id = :organization_id\n"
-                . "                 AND alert.is_resolved = :is_resolved",
+                "SELECT COUNT(alert.id) as notificationAlertCount"
+                . " FROM oro_notification_alert AS alert"
+                . " WHERE"
+                . " alert.source_type = :source_type"
+                . " AND alert.resource_type = :resource_type"
+                . " AND alert.user_id = :user_id"
+                . " AND alert.organization_id = :organization_id"
+                . " AND alert.is_resolved = :is_resolved",
                 [
                     'source_type'     => 'test_integration',
                     'resource_type'   => 'test_resource',
@@ -426,17 +430,15 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                <<<EOS
-SELECT COUNT(alert.id) as notificationAlertCount
-                FROM oro_notification_alert AS alert
-                WHERE
-                 alert.source_type = :source_type
-                 AND alert.resource_type = :resource_type
-                 AND alert.alert_type = :alert_type
-                 AND alert.user_id = :user_id
-                 AND alert.organization_id = :organization_id
-                 AND alert.is_resolved = :is_resolved
-EOS,
+                'SELECT COUNT(alert.id) as notificationAlertCount'
+                . ' FROM oro_notification_alert AS alert'
+                . ' WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . ' AND alert.alert_type = :alert_type'
+                . ' AND alert.user_id = :user_id'
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved',
                 [
                     'source_type'     => 'test_integration',
                     'resource_type'   => 'test_resource',
@@ -691,6 +693,48 @@ EOS,
         }
     }
 
+    public function testResolveNotificationAlertByItemIdForUserAndOrganization(): void
+    {
+        $itemId = 32;
+        $userId = 13;
+        $organizationId = 2;
+
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUserId');
+        $this->tokenAccessor->expects(self::never())
+            ->method('getOrganizationId');
+
+        $this->connection->expects(self::once())
+            ->method('update')
+            ->with(
+                'oro_notification_alert',
+                self::isType('array'),
+                self::isType('array'),
+                [
+                    'source_type'     => 'text',
+                    'resource_type'   => 'text',
+                    'user_id'         => 'integer',
+                    'organization_id' => 'integer',
+                    'item_id'         => 'integer'
+                ]
+            )
+            ->willReturnCallback(
+                function (string $table, array $values, array $data) use ($itemId, $userId, $organizationId) {
+                    self::assertSame(self::SOURCE_TYPE, $data['source_type']);
+                    self::assertSame(self::RESOURCE_TYPE, $data['resource_type']);
+                    self::assertSame($userId, $data['user_id']);
+                    self::assertSame($organizationId, $data['organization_id']);
+                    self::assertSame($itemId, $data['item_id']);
+                }
+            );
+
+        $this->notificationAlertManager->resolveNotificationAlertByItemIdForUserAndOrganization(
+            $itemId,
+            $userId,
+            $organizationId
+        );
+    }
+
     public function testResolveNotificationAlertsByErrorTypeForCurrentUser(): void
     {
         $alertType = 'testError';
@@ -729,6 +773,48 @@ EOS,
             );
 
         $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser($alertType);
+    }
+
+    public function tesResolveNotificationAlertsByAlertTypeForUserAndOrganization(): void
+    {
+        $alertType = 'testError';
+        $userId = 48;
+        $organizationId = 3;
+
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUserId');
+        $this->tokenAccessor->expects(self::never())
+            ->method('getOrganizationId');
+
+        $this->connection->expects(self::once())
+            ->method('update')
+            ->with(
+                'oro_notification_alert',
+                self::isType('array'),
+                self::isType('array'),
+                [
+                    'source_type'     => 'text',
+                    'resource_type'   => 'text',
+                    'user_id'         => 'integer',
+                    'organization_id' => 'integer',
+                    'alert_type'      => 'text'
+                ]
+            )
+            ->willReturnCallback(
+                function (string $table, array $values, array $data) use ($alertType, $userId, $organizationId) {
+                    self::assertSame(self::SOURCE_TYPE, $data['source_type']);
+                    self::assertSame(self::RESOURCE_TYPE, $data['resource_type']);
+                    self::assertSame($userId, $data['user_id']);
+                    self::assertSame($organizationId, $data['organization_id']);
+                    self::assertSame($alertType, $data['alert_type']);
+                }
+            );
+
+        $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+            $alertType,
+            $userId,
+            $organizationId
+        );
     }
 
     public function testTryToResolveNotificationAlertsByErrorTypeForCurrentUserWhenExceptionWasThrown(): void
@@ -814,6 +900,52 @@ EOS,
         $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForCurrentUser($alertType, $step);
     }
 
+    public function testResolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(): void
+    {
+        $alertType = 'testError';
+        $step = 'testStep';
+        $userId = 22;
+        $organizationId = 13;
+
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUserId');
+        $this->tokenAccessor->expects(self::never())
+            ->method('getOrganizationId');
+
+        $this->connection->expects(self::once())
+            ->method('update')
+            ->with(
+                'oro_notification_alert',
+                self::isType('array'),
+                self::isType('array'),
+                [
+                    'source_type'     => 'text',
+                    'resource_type'   => 'text',
+                    'user_id'         => 'integer',
+                    'organization_id' => 'integer',
+                    'alert_type'      => 'text',
+                    'step'            => 'text'
+                ]
+            )
+            ->willReturnCallback(
+                function (string $table, array $values, array $data) use ($alertType, $step, $userId, $organizationId) {
+                    self::assertSame(self::SOURCE_TYPE, $data['source_type']);
+                    self::assertSame(self::RESOURCE_TYPE, $data['resource_type']);
+                    self::assertSame($userId, $data['user_id']);
+                    self::assertSame($organizationId, $data['organization_id']);
+                    self::assertSame($alertType, $data['alert_type']);
+                    self::assertSame($step, $data['step']);
+                }
+            );
+
+        $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
+            $alertType,
+            $step,
+            $userId,
+            $organizationId
+        );
+    }
+
     public function testTryToResolveNotificationAlertsByAlertTypeAndStepForCurrentUserWhenExceptionWasThrown(): void
     {
         $exception = new \Exception('Error during deletion.', 404);
@@ -853,6 +985,88 @@ EOS,
             self::assertSame($exception->getCode(), $e->getCode());
             self::assertEquals(
                 'Failed to resolve a notification alert.',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testGetNotificationAlertsCountGroupedByType(): void
+    {
+        $userId = 15;
+        $organizationId = 1;
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUserId')
+            ->willReturn($userId);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getOrganizationId')
+            ->willReturn($organizationId);
+
+        $this->connection->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                'SELECT alert.alert_type, COUNT(alert.id) as notification_alert_count'
+                . ' FROM oro_notification_alert AS alert'
+                . ' WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . ' AND alert.user_id = :user_id'
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved'
+                . ' GROUP BY alert.alert_type',
+                [
+                    'source_type'     => 'test_integration',
+                    'resource_type'   => 'test_resource',
+                    'user_id'         => 15,
+                    'organization_id' => 1,
+                    'is_resolved'     => false,
+                ],
+                [
+                    'source_type'     => 'text',
+                    'resource_type'   => 'text',
+                    'user_id'         => 'integer',
+                    'organization_id' => 'integer',
+                    'is_resolved'     => 'boolean',
+                ]
+            )
+            ->willReturn([
+                ['alert_type' => 'auth', 'notification_alert_count' => 1],
+                ['alert_type' => 'sync', 'notification_alert_count' => 2],
+                ['alert_type' => 'save', 'notification_alert_count' => 3],
+            ]);
+
+        self::assertEquals(
+            ['auth' => 1, 'sync' => 2, 'save' => 3],
+            $this->notificationAlertManager->getNotificationAlertsCountGroupedByType()
+        );
+    }
+
+    public function testGetNotificationAlertsCountGroupedByTypeWithException(): void
+    {
+        $exception = new \Exception('Error during fetch by error type.', 510);
+
+        $userId = 16;
+        $organizationId = 12;
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUserId')
+            ->willReturn($userId);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getOrganizationId')
+            ->willReturn($organizationId);
+
+        $this->connection->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->willThrowException($exception);
+
+        try {
+            $this->notificationAlertManager->getNotificationAlertsCountGroupedByType();
+            self::fail('An exception expected');
+        } catch (NotificationAlertFetchFailedException $e) {
+            self::assertSame($exception, $e->getPrevious());
+            self::assertSame($exception->getCode(), $e->getCode());
+            self::assertEquals(
+                'Failed to fetch a notification alerts count.',
                 $e->getMessage()
             );
         }

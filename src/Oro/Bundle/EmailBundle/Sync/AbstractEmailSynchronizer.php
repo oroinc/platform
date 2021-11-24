@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -48,6 +49,10 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /** @var KnownEmailAddressCheckerInterface */
     private $knownEmailAddressChecker;
 
+    private NotificationAlertManager $notificationAlertManager;
+
+    protected EmailSyncNotificationBag $notificationsBag;
+
     /** @var TokenInterface */
     private $currentToken;
 
@@ -62,19 +67,22 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      */
     protected function __construct(
         ManagerRegistry $doctrine,
-        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
+        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
+        NotificationAlertManager $notificationAlertManager
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+        $this->notificationAlertManager = $notificationAlertManager;
         $this->logger = new NullLogger();
+        $this->notificationsBag = new EmailSyncNotificationBag();
     }
 
-    public function setMessageProducer(MessageProducerInterface $producer)
+    public function setMessageProducer(MessageProducerInterface $producer): void
     {
         $this->producer = $producer;
     }
 
-    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
         $this->currentToken = $tokenStorage->getToken();
@@ -109,7 +117,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
+    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1): int
     {
         if (!$this->checkConfiguration()) {
             $this->logger->info('Exit because synchronization was not configured or disabled.');
@@ -146,6 +154,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             }
 
             $processedOrigins[$origin->getId()] = true;
+            $this->notificationsBag->emptyNotifications();
             try {
                 $this->doSyncOrigin($origin, new SynchronizationProcessorSettings());
             } catch (SyncFolderTimeoutException $ex) {
@@ -155,6 +164,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 break;
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
+            } finally {
+                $this->processNotificationAlerts($origin, $this->notificationsBag->getNotifications());
             }
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {
@@ -171,12 +182,12 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Performs a synchronization of emails for the given email origins.
      *
-     * @param int[] $originIds
-     * @param SynchronizationProcessorSettings $settings
+     * @param int[]                                 $originIds
+     * @param SynchronizationProcessorSettings|null $settings
      *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null)
+    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -188,6 +199,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
         $failedOriginIds = [];
         foreach ($originIds as $originId) {
+            $this->notificationsBag->emptyNotifications();
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
@@ -196,6 +208,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                     break;
                 } catch (\Exception $ex) {
                     $failedOriginIds[] = $origin->getId();
+                } finally {
+                    $this->processNotificationAlerts($origin, $this->notificationsBag->getNotifications());
+                    $this->notificationsBag->emptyNotifications();
                 }
             }
         }
@@ -299,7 +314,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             if ($settings) {
                 $processor->setSettings($settings);
             }
-            $processor->process($origin, $syncStartTime);
+            $processor->process($origin, $syncStartTime, $this->notificationsBag);
             $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
         } else {
             $this->logger->info('Skip because it is already in process.');
@@ -604,5 +619,63 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 )
             );
         }
+    }
+
+    private function processNotificationAlerts(EmailOrigin $origin, array $notificationAlerts): void
+    {
+        $userId = $origin->getOwner()?->getId();
+        $organizationId = $origin->getOrganization()->getId();
+        $originId = $origin->getId();
+
+        $authAlertsExist = false;
+        $collectionAlertsExist = false;
+        $failedFoldersExist = false;
+        /** @var $notificationAlert EmailSyncNotificationAlert */
+        foreach ($notificationAlerts as $notificationAlert) {
+            if (EmailSyncNotificationAlert::ALERT_TYPE_AUTH === $notificationAlert->getAlertType()) {
+                $authAlertsExist = true;
+            }
+            if (EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER === $notificationAlert->getAlertType()) {
+                $failedFoldersExist = true;
+            }
+            if (EmailSyncNotificationAlert::ALERT_TYPE_SYNC === $notificationAlert->getAlertType()
+                && EmailSyncNotificationAlert::STEP_GET_LIST === $notificationAlert->getStep()
+            ) {
+                $collectionAlertsExist = true;
+            }
+
+            $notificationAlert->setUserId($userId);
+            $notificationAlert->setOrganizationId($organizationId);
+            $notificationAlert->setEmailOriginId($originId);
+
+            $this->notificationAlertManager->addNotificationAlert($notificationAlert);
+        }
+
+        if (false === $authAlertsExist) {
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                EmailSyncNotificationAlert::ALERT_TYPE_AUTH,
+                $userId,
+                $organizationId
+            );
+
+            if (false === $collectionAlertsExist) {
+                $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
+                    EmailSyncNotificationAlert::ALERT_TYPE_SYNC,
+                    EmailSyncNotificationAlert::STEP_GET_LIST,
+                    $userId,
+                    $organizationId
+                );
+            }
+
+            if (false === $failedFoldersExist) {
+                $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                    EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER,
+                    $userId,
+                    $organizationId
+                );
+            }
+        }
+
+        $this->notificationsBag->emptyNotifications();
     }
 }

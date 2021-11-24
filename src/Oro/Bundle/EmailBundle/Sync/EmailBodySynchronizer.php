@@ -8,33 +8,31 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
+use Oro\Bundle\EmailBundle\Exception\SyncWithNotificationAlertException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Synchronizer that syncs the email body data.
+ */
 class EmailBodySynchronizer implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var EmailBodyLoaderSelector */
-    protected $selector;
+    protected EmailBodyLoaderSelector $selector;
+    protected EventDispatcherInterface $eventDispatcher;
+    protected ManagerRegistry $doctrine;
+    private NotificationAlertManager $notificationAlertManager;
 
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var array */
-    protected $emailBodyLoaders = [];
-
-    /** @var EntityManager */
-    protected $manager = null;
+    /** @var EmailBodyLoaderInterface[] */
+    protected array $emailBodyLoaders = [];
+    protected ?EntityManager $manager = null;
 
     /**
      * EmailBodySynchronizer constructor.
@@ -42,11 +40,13 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     public function __construct(
         EmailBodyLoaderSelector $selector,
         ManagerRegistry $doctrine,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        NotificationAlertManager $notificationAlertManager
     ) {
         $this->selector        = $selector;
         $this->doctrine        = $doctrine;
         $this->eventDispatcher = $eventDispatcher;
+        $this->notificationAlertManager = $notificationAlertManager;
     }
 
     /**
@@ -67,7 +67,13 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             foreach ($email->getEmailUsers() as $emailUser) {
                 if (($origin = $emailUser->getOrigin()) && $origin->isActive()) {
                     foreach ($emailUser->getFolders() as $folder) {
-                        list($bodyLoaded, $emailBodyChanged) = $this->loadBody($email, $forceSync, $origin, $folder);
+                        [$bodyLoaded, $emailBodyChanged, $notifications] = $this->loadBody(
+                            $email,
+                            $forceSync,
+                            $origin,
+                            $folder
+                        );
+                        $this->processNotificationAlerts($origin, $notifications, $emailBodyChanged);
                         if ($emailBodyChanged) {
                             $event = new EmailBodyAdded($email);
                             $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
@@ -188,6 +194,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      */
     protected function loadBody(Email $email, $forceSync, $origin, $folder)
     {
+        $notifications = [];
         $bodyLoaded = false;
         $emailBodyChanged = false;
         $em = $this->getManager();
@@ -204,11 +211,15 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         } catch (EmailBodyNotFoundException $e) {
             $this->logger->notice(
                 sprintf(
-                    'Attempt to load email body failed. Email id: %d. Error: %s',
+                    'Attempt to load email body from remote server failed. Email id: %d. Error: %s',
                     $email->getId(),
                     $e->getMessage()
                 ),
                 ['exception' => $e]
+            );
+            $notifications[] = EmailSyncNotificationAlert::createForGetItemBodyFail(
+                $email->getId(),
+                'Attempt to load email body failed. Error: ' . $e->getMessage()
             );
         } catch (\Doctrine\ORM\NoResultException $e) {
             $this->logger->notice(
@@ -219,27 +230,76 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 ),
                 ['exception' => $e]
             );
-        } catch (LoadEmailBodyException $loadEx) {
-            $this->logger->notice(
+            $notifications[] = EmailSyncNotificationAlert::createForGetItemBodyFail(
+                $email->getId(),
+                'Attempt to load email body failed. Error: %s' . $e->getMessage()
+            );
+        } catch (SyncWithNotificationAlertException  $ex) {
+            $this->logger->info(
                 sprintf(
                     'Load email body failed. Email id: %d. Error: %s',
                     $email->getId(),
-                    $loadEx->getMessage()
+                    $ex->getMessage()
                 ),
-                ['exception' => $loadEx]
+                ['exception' => $ex->getPrevious()]
             );
-            throw $loadEx;
+            $notifications[] = $ex->getNotificationAlert();
         } catch (\Exception $ex) {
             $this->logger->info(
                 sprintf(
-                    'Load email body failed. Email id: %d. Error: %s.',
+                    'Load email body failed. Email id: %d. Error: %s',
                     $email->getId(),
                     $ex->getMessage()
                 ),
                 ['exception' => $ex]
             );
+            $notifications[] = EmailSyncNotificationAlert::createForGetItemBodyFail(
+                $email->getId(),
+                'Load email body failed. Exception message:' . $ex->getMessage()
+            );
         }
 
-        return [$bodyLoaded, $emailBodyChanged];
+        return [$bodyLoaded, $emailBodyChanged, $notifications];
+    }
+
+    private function processNotificationAlerts(
+        EmailOrigin $origin,
+        array $notificationAlerts,
+        bool $emailBodyChanged
+    ): void {
+        $userId = $origin->getOwner()?->getId();
+        $organizationId = $origin->getOrganization()->getId();
+        $originId = $origin->getId();
+
+        $authAlertsExist = false;
+        /** @var $notificationAlert EmailSyncNotificationAlert */
+        foreach ($notificationAlerts as $notificationAlert) {
+            if (EmailSyncNotificationAlert::ALERT_TYPE_AUTH === $notificationAlert->getAlertType()) {
+                $authAlertsExist = true;
+            }
+
+            $notificationAlert->setUserId($userId);
+            $notificationAlert->setOrganizationId($organizationId);
+            $notificationAlert->setEmailOriginId($originId);
+
+            $this->notificationAlertManager->addNotificationAlert($notificationAlert);
+        }
+
+        if (false === $authAlertsExist) {
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                EmailSyncNotificationAlert::ALERT_TYPE_AUTH,
+                $userId,
+                $organizationId
+            );
+        }
+
+        if ($emailBodyChanged) {
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
+                EmailSyncNotificationAlert::ALERT_TYPE_SYNC,
+                EmailSyncNotificationAlert::STEP_GET,
+                $userId,
+                $organizationId
+            );
+        }
     }
 }

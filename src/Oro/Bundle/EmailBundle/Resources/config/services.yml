@@ -1165,6 +1165,7 @@ services:
             - '@oro_email.email_body_loader_selector'
             - '@doctrine'
             - '@event_dispatcher'
+            - '@oro_email.email_notification_alert_manager'
         calls:
             - [setLogger, ['@logger']]
 
@@ -1332,3 +1333,24 @@ services:
             - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.email_notification_alert_manager:
+        class: Oro\Bundle\EmailBundle\Sync\NotificationAlertManager
+        public: true
+        arguments:
+            - 'EmailSync'
+            - 'email'
+            - '@doctrine'
+            - '@oro_security.token_accessor'
+
+    oro_email.event_listener.notification_alerts_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\NotificationAlertsListener
+        arguments:
+            - '@router'
+            - '@session'
+            - '@translator'
+            - '@oro_email.email_notification_alert_manager'
+            - '@oro_email.mailbox.manager'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest }

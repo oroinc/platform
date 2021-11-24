@@ -17,6 +17,8 @@ use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizationProcessor;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
@@ -36,6 +38,9 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
+    /** @var NotificationAlertManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $notificationAlertManager;
+
     /** @var EmailEntityBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $emailEntityBuilder;
 
@@ -49,6 +54,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->em = $this->createMock(EntityManager::class);
+        $this->notificationAlertManager = $this->createMock(NotificationAlertManager::class);
         $this->emailEntityBuilder = $this->createMock(EmailEntityBuilder::class);
         $this->knownEmailAddressCheckerFactory = $this->createMock(KnownEmailAddressCheckerFactory::class);
         $this->knownEmailAddressCheckerFactory->expects($this->any())
@@ -64,7 +70,8 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->sync = new TestEmailSynchronizer(
             $this->doctrine,
             $this->knownEmailAddressCheckerFactory,
-            $this->emailEntityBuilder
+            $this->emailEntityBuilder,
+            $this->notificationAlertManager
         );
         $this->sync->setLogger($this->logger);
     }
@@ -98,6 +105,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
         $sync->expects($this->never())
             ->method('createSynchronizationProcessor');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('addNotificationAlert');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
 
         $sync->sync($maxConcurrentTasks, $minExecPeriodInMin);
     }
@@ -108,10 +119,18 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $maxConcurrentTasks = 3;
         $minExecPeriodInMin = 1;
+        $organization = new Organization();
+        $organization->setId(234);
         $origin = new TestEmailOrigin(123);
+        $origin->setOrganization($organization);
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([
+                $this->doctrine,
+                $this->knownEmailAddressCheckerFactory,
+                $this->emailEntityBuilder,
+                $this->notificationAlertManager
+            ])
             ->onlyMethods([
                 'resetHangedOrigins',
                 'findOriginToSync',
@@ -138,6 +157,14 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new ORMException());
         $sync->expects($this->never())
             ->method('createSynchronizationProcessor');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('addNotificationAlert');
+        $this->notificationAlertManager->expects(self::exactly(2))
+            ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization')
+            ->willReturnMap([
+                ['auth', null, 234, null],
+                ['switch folder', null, 234, null]
+            ]);
 
         $sync->sync($maxConcurrentTasks, $minExecPeriodInMin);
     }
@@ -153,7 +180,8 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs([
                 $this->doctrine,
                 $this->knownEmailAddressCheckerFactory,
-                $this->emailEntityBuilder
+                $this->emailEntityBuilder,
+                $this->notificationAlertManager
             ])
             ->onlyMethods([
                 'findOriginToSync',
@@ -227,7 +255,12 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $processor = $this->createMock(TestEmailSynchronizationProcessor::class);
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([
+                $this->doctrine,
+                $this->knownEmailAddressCheckerFactory,
+                $this->emailEntityBuilder,
+                $this->notificationAlertManager
+            ])
             ->onlyMethods([
                 'findOriginToSync',
                 'createSynchronizationProcessor',
@@ -268,7 +301,12 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $processor = $this->createMock(TestEmailSynchronizationProcessor::class);
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([
+                $this->doctrine,
+                $this->knownEmailAddressCheckerFactory,
+                $this->emailEntityBuilder,
+                $this->notificationAlertManager
+            ])
             ->onlyMethods([
                 'findOriginToSync',
                 'createSynchronizationProcessor',

@@ -84,6 +84,7 @@ oro:
             user.label:                     User
             message.label:                  Message
             organization.label:             Organization
+            additional_info.label:          Additional information
 
         system_configuration:
             email_notification_sender_email: Sender Email
