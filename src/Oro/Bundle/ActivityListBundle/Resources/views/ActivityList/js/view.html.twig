@@ -33,7 +33,7 @@
                     {% endblock %}
                 </div>
                 <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
-                    title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
+                    title="<%- _.__('oro.activitylist.comment.quantity_label') %>">
                     <span class="fa-comment" aria-hidden="true"></span><span class="count"><%= commentCount %></span>
                 </div>
             {% block activityDate %}

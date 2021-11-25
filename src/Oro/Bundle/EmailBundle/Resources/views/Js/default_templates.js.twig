@@ -6,7 +6,7 @@
                 <% _.each(options, function (item, key) { %>
                     <optgroup label="<%- key %>">
                         <% _.each(item['choices']['folder']['choices'], function (option) { %>
-                            <option value="<%= option.value %>" title="<%- option.label %>"
+                            <option value="<%- option.value %>" title="<%- option.label %>"
                             <% if (_.isArray(selected.value)) { %>
                             <% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
                             <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>

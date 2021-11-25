@@ -6,9 +6,9 @@
         <% if (hasDefault) { %>
         <div class="list-group-item__default">
             <input type="radio" class="default-selector"
-                   name="<%= name %>_default"
-                   title="<%= _.__('Default') %>"
-                   value="<%= id %>"
+                   name="<%- name %>_default"
+                   title="<%- _.__('Default') %>"
+                   value="<%- id %>"
             <% if(isDefault) { %>
             checked="checked"
             <% } %>

@@ -1,6 +1,6 @@
 <span class="tags-container">
     <% if (tags.length > 0) { _.each(tags , function(tag) { %>
-    <a href="<%= tag.url %>"
+    <a href="<%- tag.url %>"
        title="<%- tag.name %><% if(tag.ownerFirstName && tag.ownerLastName) { %><%- _.__('oro.tag.added_by', {first_name: tag.ownerFirstName, last_name: tag.ownerLastName}) %><% } %>"
        class="tags-container__tag-entry<% if(tag.owner == true) { %> tags-container__tag-entry_is-my<% } %><% if (tag.className) { %> <%- tag.className %><% } %>"
        <% if (tag.style) { %>style="<%- tag.style %>"<% } %>

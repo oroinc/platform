@@ -150,7 +150,7 @@
         <span class="{{- item.getExtra('icon') ~ ' menu-icon' -}}" aria-hidden="true"></span>
     {% endif -%}
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
-        {{- item.getLabel()|trans|oro_html_sanitize|raw -}}
+        {{- item.getLabel()|trans|oro_html_sanitize -}}
     {% elseif item.getExtra('translate_disabled', false) == false %}
         {{- item.getLabel()|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
     {% else %}

@@ -5,7 +5,7 @@
             <div class="head-panel__col head-panel__col--center">
                 <nav class="view-switcher">
                     <% _.each(items, function (item) { %>
-                    <a href="#" data-view-name="<%- item.name %>" title="<%- item.title %>" tabindex="-1" aria-label="<%= item.title %>"
+                    <a href="#" data-view-name="<%- item.name %>" title="<%- item.title %>" tabindex="-1" aria-label="<%- item.title %>"
                        class="<%- item.name %> view-switcher__item<% if (item.name === activeView) {%> active<% } %>">
                     </a>
                     <% }) %>
@@ -31,6 +31,6 @@
 <% } %>
 <main class="content-area">
     <div class="content-area__wrapper" data-view-name="<%- activeView %>">
-        <iframe class="content-area__iframe" src="<%- url %>" name="<%- frameName %>" title="<%= frameTitle %>"></iframe>
+        <iframe class="content-area__iframe" src="<%- url %>" name="<%- frameName %>" title="<%- frameTitle %>"></iframe>
     </div>
 </main>

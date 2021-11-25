@@ -340,6 +340,11 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_translation.message_catalogue_sanitizer:
+        class: Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizer
+        arguments:
+            - '@oro_ui.html_tag_helper'
+
     oro_translation.formatter.translator_formatter:
         class: Oro\Bundle\TranslationBundle\Formatter\TranslatorFormatter
         public: false

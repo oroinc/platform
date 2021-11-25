@@ -3,11 +3,11 @@
         {% if address_edit_acl_resource is not defined or is_granted(address_edit_acl_resource) %}
         <div class="address-book-item__actions">
             <% if (!_.isMobile()) { %>
-                <button class="btn btn-icon btn-light item-edit-button address-book-item__action" title="<%= _.__('Edit') %>">
+                <button class="btn btn-icon btn-light item-edit-button address-book-item__action" title="<%- _.__('Edit') %>">
                     <span class="fa-pencil-square-o hide-text" aria-hidden='true'><%- _.__('Edit') %></span>
                 </button>
                 <% if (!primary) { %>
-                    <button class="btn btn-icon btn-light item-remove-button address-book-item__action" title="<%= _.__('Remove') %>"><span class="fa-trash-o hide-text"><%= _.__('Remove') %></span></button>
+                    <button class="btn btn-icon btn-light item-remove-button address-book-item__action" title="<%- _.__('Remove') %>"><span class="fa-trash-o hide-text"><%- _.__('Remove') %></span></button>
                 <% } %>
             <% } else { %>
                 <div class="dropdown">
@@ -44,11 +44,11 @@
             <% } %>
             </div>
          {% endif %}
-        <div class="address-book-item__title"><%= _.escape(label) %></div>
+        <div class="address-book-item__title"><%- label %></div>
         <ul class="address-book-item__labels">
             <% if (primary) { %> <li class="address-book-item__label-container"><span class="address-book-item__label label-info"><%- _.__('Primary') %></span></li> <% } %>
             <% _.each(types, function(type) { %>
-                <li class="address-book-item__label-container"><span class="address-book-item__label"><%= _.escape(type.label) %></span></li>
+                <li class="address-book-item__label-container"><span class="address-book-item__label"><%- type.label %></span></li>
             <% }) %>
         </ul>
         <address class="address-book-item__address">

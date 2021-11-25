@@ -41,10 +41,10 @@
                 <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="<%- attachmentTogglerId %>">
                     <li>
                     <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL %>">
-                        <%= _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
+                        <%- _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
                     </a>
                     <% if (attachmentThumbnail) { %>
-                        <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
+                        <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%- _.__('oro.comment.attachment.view') %></a>
                     <% } %>
                     </li>
                 </ul>
@@ -73,15 +73,15 @@
                     <ul class="launchers-list">
                         <% if (editable) { %>
                         <li class="launcher-item mode-icon-only">
-                            <button class="btn btn-icon btn-light action mode-icon-only item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
-                                <span class="fa-pencil-square-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.update') %></span>
+                            <button class="btn btn-icon btn-light action mode-icon-only item-edit-button" title="<%- _.__('oro.comment.action.update') %>">
+                                <span class="fa-pencil-square-o hide-text" aria-hidden="true"><%- _.__('oro.comment.action.update') %></span>
                             </button>
                         </li>
                         <% } %>
                         <% if (removable) { %>
                         <li class="launcher-item mode-icon-only">
-                            <button class="btn btn-icon btn-light action mode-icon-only item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
-                                <span class="fa-trash-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.delete') %></span>
+                            <button class="btn btn-icon btn-light action mode-icon-only item-remove-button" title="<%- _.__('oro.comment.action.delete') %>">
+                                <span class="fa-trash-o hide-text" aria-hidden="true"><%- _.__('oro.comment.action.delete') %></span>
                             </button>
                         </li>
                         <% } %>

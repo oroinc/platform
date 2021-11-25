@@ -32,8 +32,8 @@
 <% if (links) { %><div class="btn-group"><% } %>
 
 <<%- tagName %>
-    <% if (tagName === "a") { %> href="<%= link %>" role="button"<% } %>
-    class="<%= actionClassNames.join(' ') %>"
+    <% if (tagName === "a") { %> href="<%- link %>" role="button"<% } %>
+    class="<%- actionClassNames.join(' ') %>"
     title="<%- title %>"
     <% if (obj.ariaLabel) { %>
     aria-label="<%- ariaLabel %>"
@@ -51,7 +51,7 @@
         <% if (iconClassName) { %><span class="icon <%- iconClassName %>" aria-hidden="true"></span><% } %>
         <%- label %>
     <% } %>
-</<%= tagName %>>
+</<%- tagName %>>
 
 <% if (links) { %>
     <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">

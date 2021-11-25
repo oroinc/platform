@@ -8,6 +8,7 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizerInterface;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\ReflectionUtil;
 use Psr\Container\ContainerInterface;
@@ -286,6 +287,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $container  = $this->createMock(ContainerInterface::class);
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $applicationState = $this->createMock(ApplicationState::class);
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
 
         $strategyProvider = $this->getStrategyProvider($locale);
 
@@ -302,6 +304,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
 
         $applicationState->expects($this->once())
             ->method('isInstalled')
@@ -336,6 +339,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $strategyProvider = $this->getStrategyProvider($locale);
 
         $databaseCache = $this->createMock(DynamicTranslationMetadataCache::class);
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
 
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
@@ -348,6 +352,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['addResource'])
             ->getMock();
 
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
         $translator->setEventDispatcher($this->getEventDispatcher());
@@ -458,6 +463,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
     ): Translator {
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $applicationState = $this->createMock(ApplicationState::class);
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
 
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())
@@ -481,6 +487,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $translator->setApplicationState($applicationState);
         $translator->setEventDispatcher($eventDispatcher);
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');
