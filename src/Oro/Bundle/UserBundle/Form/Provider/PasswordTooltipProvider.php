@@ -11,6 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PasswordTooltipProvider
 {
     const BASE = 'oro.user.password_complexity.';
+    const SPECIAL_CHARS_LIST = '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~';
     const UNRESTRICTED = self::BASE . 'unrestricted';
     const MIN_LENGTH = 'min_length';
     const LOWER_CASE = 'lower_case';
@@ -58,6 +59,12 @@ class PasswordTooltipProvider
             $transKey = self::BASE . implode(self::SEPARATOR, $parts);
         }
 
-        return $this->translator->trans($transKey, ['{{ length }}' => $this->configProvider->getMinLength()]);
+        return $this->translator->trans(
+            $transKey,
+            [
+                '{{ length }}' => $this->configProvider->getMinLength(),
+                '{{ specialChars }}' => self::SPECIAL_CHARS_LIST
+            ]
+        );
     }
 }

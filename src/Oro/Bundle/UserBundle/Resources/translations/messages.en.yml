@@ -313,33 +313,33 @@ oro:
             lower_case: The password must include a lower case letter
             upper_case: The password must include an upper case letter
             numbers:    The password must include a number
-            special_chars:  The password must include a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            special_chars:  The password must include a special character ({{ specialChars }} and space)
             min_length_upper_case: The password must be at least {{ length }} characters long and include an upper case letter
             min_length_numbers: The password must be at least {{ length }} characters long and include a number
-            min_length_special_chars: The password must be at least {{ length }} characters long and include a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_special_chars: The password must be at least {{ length }} characters long and include a special character ({{ specialChars }} and space)
             min_length_upper_case_numbers: The password must be at least {{ length }} characters long and include an upper case letter and a number
-            min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an upper case letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_upper_case_special_chars: The password must be at least {{ length }} characters long and include an upper case letter and a special character ({{ specialChars }} and space)
+            min_length_numbers_special_chars: The password must be at least {{ length }} characters long and include a number and a special character ({{ specialChars }} and space)
+            min_length_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include an upper case letter, a number, and a special character ({{ specialChars }} and space)
             upper_case_numbers: The password must include an upper case letter and a number
-            upper_case_special_chars: The password must include an upper case letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            numbers_special_chars: The password must include a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            upper_case_numbers_special_chars: The password must include an upper case letter, a number and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            upper_case_special_chars: The password must include an upper case letter and a special character ({{ specialChars }} and space)
+            numbers_special_chars: The password must include a number and a special character ({{ specialChars }} and space)
+            upper_case_numbers_special_chars: The password must include an upper case letter, a number and a special character ({{ specialChars }} and space)
             min_length_lower_case: The password must be at least {{ length }} characters long and include a lower case letter
             min_length_lower_case_upper_case: The password must be at least {{ length }} characters long and include a lower case letter, and an upper case letter
             min_length_lower_case_numbers: The password must be at least {{ length }} characters long and include a lower case letter, and a number
-            min_length_lower_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_lower_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, and a special character ({{ specialChars }} and space)
             min_length_lower_case_upper_case_numbers: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a number
-            min_length_lower_case_upper_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_lower_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            min_length_lower_case_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            min_length_lower_case_upper_case_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, and a special character ({{ specialChars }} and space)
+            min_length_lower_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, a number, and a special character ({{ specialChars }} and space)
+            min_length_lower_case_upper_case_numbers_special_chars: The password must be at least {{ length }} characters long and include a lower case letter, an upper case letter, a number, and a special character ({{ specialChars }} and space)
             lower_case_upper_case: The password must include a lower case letter and an upper case letter
             lower_case_numbers:    The password must include a lower case letter and a number
-            lower_case_special_chars:  The password must include a lower case letter and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            lower_case_special_chars:  The password must include a lower case letter and a special character ({{ specialChars }} and space)
             lower_case_upper_case_numbers: The password must include a lower case letter, an upper case letter, and a number
-            lower_case_upper_case_special_chars: The password must include a lower case letter, an upper case letter, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            lower_case_numbers_special_chars: The password must include a lower case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
-            lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space)
+            lower_case_upper_case_special_chars: The password must include a lower case letter, an upper case letter, and a special character ({{ specialChars }} and space)
+            lower_case_numbers_special_chars: The password must include a lower case letter, a number, and a special character ({{ specialChars }} and space)
+            lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character ({{ specialChars }} and space)
 
         enabled:
             enabled:      Enabled
@@ -401,7 +401,7 @@ oro:
                 password_special_chars:
                     label: Require a special character
                     tooltip: >
-                        Special chars: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ and space
+                        Special chars: {{ specialChars }} and space
                 send_password_in_invitation_email.label: 'Send plain text password in invitation emails'
                 case_insensitive_email_addresses_enabled:
                     label: 'Case-Insensitive Email Addresses'

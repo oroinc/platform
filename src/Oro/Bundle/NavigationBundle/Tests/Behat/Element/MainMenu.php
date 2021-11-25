@@ -162,7 +162,7 @@ class MainMenu extends Element
 
             if (!$menuTitle->has(
                 'xpath',
-                sprintf('ancestor::li[normalize-space(@data-original-text)="%s"]', $currentItem)
+                sprintf('ancestor::li[contains(normalize-space(@data-original-text),"%s")]', $currentItem)
             )) {
                 continue;
             }

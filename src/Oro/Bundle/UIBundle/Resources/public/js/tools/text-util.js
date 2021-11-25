@@ -7,9 +7,9 @@ define(['underscore', 'orotranslation/js/translator'], function(_, __) {
     // matches "A. L. Price", "In progress", "one of all"
     const shortWordsAtEndRegExp = /(\w+|^)(\s+(\w{1,3}|\w\.)\s+(\w{1,3}|\w\.)|\s+(\w{1,3}|\w\.?))$/;
 
-    const postpositionsRegExp = new RegExp('\\s+(' + __('postpositions') + ')(\\W|$)', 'gi');
-    const prepositionsRegExp = new RegExp('(\\W|^)(' + __('prepositions') + ')((\\s+)(' +
-        __('articles') + ')|)\\s+', 'gi');
+    const postpositionsRegExp = new RegExp('\\s+(' + __('postpositions').replace('\\', '\\\\') + ')(\\W|$)', 'gi');
+    const prepositionsRegExp = new RegExp('(\\W|^)(' + __('prepositions').replace('\\', '\\\\') + ')((\\s+)(' +
+        __('articles').replace('\\', '\\\\') + ')|)\\s+', 'gi');
 
     const abbreviateIgnoreList = __('abbreviate_ignore_list').split('|');
 

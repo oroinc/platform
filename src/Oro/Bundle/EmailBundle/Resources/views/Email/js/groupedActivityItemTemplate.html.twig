@@ -153,7 +153,7 @@
     {% set actions = actions|merge([action]) %}
 
     {% set action %}
-        <a href="<%= routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
+        <a href="<%- routing.generate('oro_email_thread_view', {'id': relatedActivityId}) %>"
            class="dropdown-item"
            title="{{ 'oro.email.view'|trans|e('html_attr') }}"><span
                 class="fa-eye hide-text" aria-hidden="true">{{ 'oro.email.view'|trans }}</span>
@@ -168,6 +168,6 @@
 {% block activityContent %}
     <div class="activity-item-email-content">
         {# Do NOT remove. Placeholder for activity view #}
-        <div class="info <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%= data.entityId %>"></div>
+        <div class="info <% if (is_head && !ignoreHead) { %>thread<% } %>" id="grouped-entity-<%- data.entityId %>"></div>
     </div>
 {% endblock %}

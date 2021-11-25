@@ -31,7 +31,7 @@ define(function(require) {
             title: '',
             alias: null,
             wid: null,
-            actionSectionTemplate: _.template('<div data-section="<%= section %>" class="widget-actions-section"/>'),
+            actionSectionTemplate: _.template('<div data-section="<%- section %>" class="widget-actions-section"/>'),
             actionWrapperTemplate: _.template('<span class="action-wrapper"/>'),
             loadingMaskEnabled: true,
             loadingElement: null,

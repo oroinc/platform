@@ -56,7 +56,8 @@ define(function(require) {
 
                         if (!_.isEmpty(self.options.deactivated)) {
                             response = _.extend(response, {
-                                deactivatedMessage: __('oro.workflow.deactivated_list') + self.options.deactivated
+                                deactivatedMessage: __('oro.workflow.deactivated_list') +
+                                    _.escape(self.options.deactivated)
                             });
                         }
 

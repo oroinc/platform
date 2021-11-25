@@ -202,7 +202,7 @@ define(function(require) {
                         this.$el.append('<span class="inline-editor-edit-action">' +
                             '<button data-role="edit" ' +
                                     'class="inline-actions-btn skip-row-click hide-text"' +
-                                    'title="' + __('Edit') + '">' +
+                                    'title="' + _.escape(__('Edit')) + '">' +
                                 '<span class="fa-pencil" aria-hidden="true"></span>' +
                             '</button>' +
                         '</span>');

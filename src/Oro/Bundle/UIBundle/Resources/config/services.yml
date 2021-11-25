@@ -222,6 +222,7 @@ services:
             - ['setAttribute', ['a', 'target', 'Text']]
             - ['setAttribute', ['a', 'title', 'Text']]
             - ['setAttribute', ['a', 'role', 'Text']]
+            - ['setAttribute', ['a', 'data-action', 'Text']]
             - ['setAttribute', ['a', 'data-toggle', 'Text']]
             - ['setAttribute', ['a', 'data-slide', 'Text']]
             - ['setAttribute', ['a', 'data-trigger', 'Text']]

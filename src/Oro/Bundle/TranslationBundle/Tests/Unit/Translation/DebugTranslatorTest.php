@@ -6,6 +6,7 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
+use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -246,6 +247,9 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $translator->setTranslationDomainProvider($translationDomainProvider);
+
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');

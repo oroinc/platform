@@ -48,6 +48,10 @@ class TranslatorDependencyPass implements CompilerPassInterface
 
         $isInstalled = $container->hasParameter('installed') && $container->getParameter('installed');
         $translatorDef->addMethodCall('setInstalled', [$isInstalled]);
+        $translatorDef->addMethodCall(
+            'setMessageCatalogueSanitizer',
+            [new Reference('oro_translation.message_catalogue_sanitizer')]
+        );
         $translatorDef->setPublic(true);
     }
 }

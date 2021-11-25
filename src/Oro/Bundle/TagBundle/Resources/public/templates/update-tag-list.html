@@ -1,6 +1,6 @@
 <ul class="inline tag-list">
 <% _.each(models, function(tag, i) { %>
-    <li data-id="<%= tag.get('id') %>">
+    <li data-id="<%- tag.get('id') %>">
         <span class="label label-info">
             <%- tag.get('name') %>
             <% if (options.unassign) { %>
@@ -10,6 +10,6 @@
     </li>
 <%}) %>
 <% if (models.length == 0) { %>
-    <li class="not-tagged-message"><%= _.__('Not tagged') %></li>
+    <li class="not-tagged-message"><%- _.__('Not tagged') %></li>
 <%} %>
 </ul>

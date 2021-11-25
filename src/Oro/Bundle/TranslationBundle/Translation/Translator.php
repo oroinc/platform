@@ -23,6 +23,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  * select different translation strategies.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class Translator extends BaseTranslator
 {
@@ -84,6 +85,9 @@ class Translator extends BaseTranslator
     /** @var array */
     private $cacheVary;
 
+    /** @var MessageCatalogueSanitizerInterface */
+    private $catalogueSanitizer;
+
     /**
      * @param ContainerInterface $container
      * @param MessageFormatter $formatter
@@ -105,6 +109,11 @@ class Translator extends BaseTranslator
         $this->resourceFiles = $this->options['resource_files'];
         $this->cacheVary = $this->options['cache_vary'] ?? [];
         $this->logger = new NullLogger();
+    }
+
+    public function setMessageCatalogueSanitizer(MessageCatalogueSanitizerInterface $catalogueSanitizer)
+    {
+        $this->catalogueSanitizer = $catalogueSanitizer;
     }
 
     public function setStrategyProvider(TranslationStrategyProvider $strategyProvider)
@@ -139,8 +148,8 @@ class Translator extends BaseTranslator
      * takes in account fallback of locales.
      * Method is used for exposing of collected translations.
      *
-     * @param array       $domains list of required domains, by default empty, means all domains
-     * @param string|null $locale  locale of translations, by default is current locale
+     * @param array $domains list of required domains, by default empty, means all domains
+     * @param string|null $locale locale of translations, by default is current locale
      *
      * @return array
      */
@@ -159,13 +168,13 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        $fallbackCatalogues   = array();
+        $fallbackCatalogues = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $fallbackCatalogues[] = $catalogue;
         }
 
-        $domains      = array_flip($domains);
+        $domains = array_flip($domains);
         $translations = array();
         for ($i = count($fallbackCatalogues) - 1; $i >= 0; $i--) {
             $localeTranslations = $fallbackCatalogues[$i]->all();
@@ -222,7 +231,7 @@ class Translator extends BaseTranslator
     /**
      * Checks if the given message has a translation.
      *
-     * @param string $id     The message id (may also be an object that can be cast to string)
+     * @param string $id The message id (may also be an object that can be cast to string)
      * @param string $domain The domain for the message
      * @param string $locale The locale
      *
@@ -245,7 +254,7 @@ class Translator extends BaseTranslator
         $id = (string)$id;
 
         $catalogue = $this->catalogues[$locale];
-        $result    = $catalogue->defines($id, $domain);
+        $result = $catalogue->defines($id, $domain);
         while (!$result && $catalogue = $catalogue->getFallbackCatalogue()) {
             $result = $catalogue->defines($id, $domain);
         }
@@ -343,7 +352,7 @@ class Translator extends BaseTranslator
             [
                 'cache_dir' => $tmpDir,
                 'resource_files' => array_map(
-                    function (array $localeResources) {
+                    static function (array $localeResources) {
                         return array_unique($localeResources);
                     },
                     $this->resourceFiles
@@ -372,6 +381,8 @@ class Translator extends BaseTranslator
             $translator->setEventDispatcher($this->eventDispatcher);
             $translator->setInstalled($this->installed);
             $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
+            $translator->setLogger($this->logger);
+            $translator->setMessageCatalogueSanitizer($this->catalogueSanitizer);
 
             $translator->warmUp($tmpDir);
         }
@@ -476,8 +487,14 @@ class Translator extends BaseTranslator
     protected function initializeCatalogue($locale)
     {
         parent::initializeCatalogue($locale);
+
         if (!isset($this->catalogues[$locale])) {
             $this->catalogues[$locale] = new MessageCatalogue($locale);
+        } else {
+            $this->catalogueSanitizer->sanitizeCatalogue($this->catalogues[$locale]);
+            foreach ($this->catalogueSanitizer->getSanitizationErrors() as $sanitizationError) {
+                $this->logger->warning('Unsafe translation message found', ['error' => $sanitizationError]);
+            }
         }
     }
 
@@ -516,11 +533,16 @@ class Translator extends BaseTranslator
 
     private function getCatalogueCachePath(string $locale): string
     {
-        return $this->options['cache_dir'] .'/catalogue.' .$locale .'.' .strtr(
-            substr(base64_encode(hash('sha256', serialize($this->cacheVary), true)), 0, 7),
-            '/',
-            '_'
-        ).'.php';
+        return $this->options['cache_dir']
+            . '/catalogue.'
+            . $locale
+            . '.'
+            . strtr(
+                substr(base64_encode(hash('sha256', serialize($this->cacheVary), true)), 0, 7),
+                '/',
+                '_'
+            )
+            . '.php';
     }
 
     private function isCatalogueCacheFileExits(string $path): bool

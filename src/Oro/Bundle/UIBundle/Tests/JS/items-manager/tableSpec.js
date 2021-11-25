@@ -85,7 +85,7 @@ define(function(require) {
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>"></div>',
                 collection: collection
             });
 
@@ -100,7 +100,7 @@ define(function(require) {
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>"><%= name %></div>',
+                itemTemplate: '<div data-cid="<%- cid %>"><%= name %></div>',
                 collection: collection
             });
 
@@ -147,7 +147,7 @@ define(function(require) {
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>" data-collection-action="foo"></div>',
                 collection: collection
             });
 
@@ -166,7 +166,7 @@ define(function(require) {
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>" data-collection-action="foo"></div>',
                 collection: collection,
                 fooHandler: function() {}
             });
@@ -187,7 +187,7 @@ define(function(require) {
             ]);
 
             const options = {
-                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="bar"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>" data-collection-action="bar"></div>',
                 collection: collection,
                 barHandler: function() {}
             };

@@ -3,7 +3,7 @@
     data-toggle="dropdown" role="button" id="<%- togglerId %>"
     aria-label="<%- _.__('oro.role.permission.edit_label', {label: label}) %>"
     aria-haspopup="true" aria-expanded="false"
-    data-target="<%= dropdownTarget %>"
+    data-target="<%- dropdownTarget %>"
     data-placement="bottom-end"
     data-modifiers="<%- JSON.stringify({preventOverflow: {enabled: false}, hide: {enabled: false}}) %>"
     class="dropdown-toggle dropdown-toggle--no-caret action-permissions__item-wrapper<% if (isAccessLevelChanged) {%> action-permissions__item-wrapper_changed<% } %>"

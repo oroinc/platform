@@ -23,6 +23,7 @@ services:
     Oro\Bundle\TranslationBundle\Command\OroTranslationRebuildCacheCommand:
         arguments:
             - '@oro_translation.rebuild_translation_cache_processor'
+            - '@oro_translation.message_catalogue_sanitizer'
         tags:
             - { name: console.command }
 

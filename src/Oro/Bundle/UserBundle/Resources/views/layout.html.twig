@@ -21,7 +21,7 @@
                 {% for type, messages in app.session.flashbag.all %}
                     {% for message in messages %}
                     <div class="alert{{ type ? ' alert-'~type : '' }}" role="alert">
-                    {{ message|trans|raw }}
+                    {{ message|trans|oro_html_sanitize }}
                     </div>
                     {% endfor %}
                 {% endfor %}

@@ -446,7 +446,8 @@ define(function (require) {
                     var type = types[key];
                     var button = this.options.icons[type];
                     if (typeof this.options.icons[type] === 'string') {
-                        button = '<a class="ui-dialog-titlebar-' + type + ' ui-corner-all" href="#" title="' + __(type)+ '"><span class="ui-icon ' + this.options.icons[type] + '">' + type + '</span></a>';
+                        button = '<a class="ui-dialog-titlebar-' + type + ' ui-corner-all" href="#" title="'
+                            + _.escape(__(type)) + '"><span class="ui-icon ' + this.options.icons[type] + '">' + type + '</span></a>';
 
                     } else {
                         button.addClass('ui-dialog-titlebar-' + type);

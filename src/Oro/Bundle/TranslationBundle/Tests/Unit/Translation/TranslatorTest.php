@@ -7,6 +7,7 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizerInterface;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -291,6 +292,8 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $container  = $this->createMock(ContainerInterface::class);
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
+
         $strategyProvider = $this->getStrategyProvider($locale);
 
         /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
@@ -305,9 +308,10 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['addResource'])
             ->getMock();
 
+        $translator->setInstalled(true);
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
-        $translator->setInstalled(true);
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
         $translator->setEventDispatcher($this->getEventDispatcher());
 
         $translator->setLocale($locale);
@@ -335,6 +339,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         /** @var DynamicTranslationMetadataCache|\PHPUnit\Framework\MockObject\MockObject $databaseCache */
         $databaseCache = $this->createMock(DynamicTranslationMetadataCache::class);
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
 
         /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
@@ -348,6 +353,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['addResource'])
             ->getMock();
 
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
         $translator->setTranslationDomainProvider($translationDomainProvider);
         $translator->setStrategyProvider($strategyProvider);
         $translator->setEventDispatcher($this->getEventDispatcher());
@@ -458,6 +464,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
     ) {
         /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
 
         $translator = new class(
             $this->getContainer($loader),
@@ -481,6 +488,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $translator->setStrategyProvider($strategyProvider);
         $translator->setInstalled(true);
         $translator->setEventDispatcher($eventDispatcher);
+        $translator->setMessageCatalogueSanitizer($catalogueSanitizer);
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');
